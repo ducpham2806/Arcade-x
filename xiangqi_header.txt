@@ -1,0 +1,345 @@
+          {/* Top In-Match Header Bar */}
+          <div className="w-full max-w-2xl rounded-2xl bg-[#120f12]/95 border border-amber-500/30 p-3 sm:p-4 shadow-xl backdrop-blur-md flex items-center justify-between gap-3">
+            {/* Player 1 (Red / Self) */}
+            <div className={`flex items-center gap-3 px-3 py-1.5 rounded-xl border transition-all ${((activeRoomId && isMyTurn) || (isAiMode && aiTurn === 'r')) ? 'bg-amber-950/40 border-amber-400 shadow-lg shadow-amber-500/20' : 'bg-transparent border-transparent opacity-70'}`}>
+              <div className="w-10 h-10 rounded-xl bg-rose-600/30 border border-rose-400/50 flex items-center justify-center text-xl relative">
+                {profile.avatar}
+                <span className="absolute -bottom-1 -right-1 px-1 rounded-full bg-rose-500 text-white font-black text-[9px]">
+                  ĐỎ
+                </span>
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-extrabold text-white truncate max-w-[120px]">
+                    {profile.username}
+                  </span>
+                  <span className="text-[10px] font-mono text-amber-300 font-bold">({playerElo})</span>
+                </div>
+                <span className="text-[10px] text-amber-400 font-medium">
+                  {((activeRoomId && isMyTurn) || (isAiMode && aiTurn === 'r')) ? '👉 Lượt của bạn' : 'Chờ đối thủ...'}
+                </span>
+              </div>
+            </div>
+
+            {/* Turn Timer / Move Indicator */}
+            <div className="flex flex-col items-center">
+              <div className={`text-xl font-black font-mono px-3 py-0.5 rounded-xl border ${turnTimeLeft <= 10 ? 'bg-rose-950/80 border-rose-500 text-rose-300 animate-pulse' : 'bg-black/60 border-amber-500/30 text-amber-300'}`}>
+                00:{turnTimeLeft < 10 ? `0${turnTimeLeft}` : turnTimeLeft}
+              </div>
+              <span className="text-[10px] text-slate-400 font-semibold uppercase mt-0.5">
+                {activeRoomId ? `Phòng #${roomState?.roomCode || ''}` : `AI (${aiDifficulty})`}
+              </span>
+            </div>
+
+            {/* Player 2 (Black / Opponent or Bot) */}
+            <div className={`flex items-center gap-3 px-3 py-1.5 rounded-xl border transition-all ${((activeRoomId && !isMyTurn && !isMatchEnded) || (isAiMode && aiTurn === 'b')) ? 'bg-blue-950/40 border-blue-400 shadow-lg shadow-blue-500/20' : 'bg-transparent border-transparent opacity-70'}`}>
+              <div className="text-right">
+                <div className="flex items-center justify-end gap-1.5">
+                  <span className="text-xs font-extrabold text-white truncate max-w-[120px]">
+                    {activeRoomId ? opponentInfo?.name || 'Đối thủ' : 'ArcadeX Bot'}
+                  </span>
+                  <span className="text-[10px] font-mono text-blue-300 font-bold">
+                    ({activeRoomId ? opponentInfo?.elo || 1200 : 1400})
+                  </span>
+                </div>
+                <span className="text-[10px] text-blue-400 font-medium">
+                  {((activeRoomId && !isMyTurn && !isMatchEnded) || (isAiMode && aiTurn === 'b')) ? '👉 Đang suy nghĩ' : 'Chờ...'}
+                </span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-400/50 flex items-center justify-center text-xl relative">
+                {activeRoomId ? opponentInfo?.avatarUrl || '⚔️' : '🤖'}
+                <span className="absolute -bottom-1 -left-1 px-1 rounded-full bg-blue-500 text-white font-black text-[9px]">
+                  ĐEN
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Draw Offer Notification */}
+          {activeRoomId && roomState?.drawOfferBy && roomState.drawOfferBy !== profile.id && !isMatchEnded && (
+            <div className="w-full max-w-md px-4 py-2.5 rounded-2xl bg-amber-950/90 border border-amber-400 text-amber-200 text-xs flex items-center justify-between shadow-xl">
+              <span className="flex items-center gap-1.5 font-bold">
+                <Handshake className="w-4 h-4 text-amber-400" />
+                Đối thủ xin CẦU HÒA! Bạn đồng ý không?
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => respondDraw(true)}
+                  className="px-3 py-1 rounded-lg bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 cursor-pointer"
+                >
+                  Đồng Ý
+                </button>
+                <button
+                  onClick={() => respondDraw(false)}
+                  className="px-3 py-1 rounded-lg bg-white/10 text-white font-bold text-xs hover:bg-white/20 cursor-pointer"
+                >
+                  Từ Chối
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* TRADITIONAL WOODEN XIANGQI BOARD MATRIX (9 x 10)         */}
+          {/* ========================================================= */}
+          <div className="relative p-3 sm:p-5 rounded-3xl bg-gradient-to-br from-[#4a2e18] via-[#2d1b0f] to-[#1a100a] border-4 border-[#7a4e28] shadow-2xl shadow-black overflow-x-auto max-w-full">
+            {/* Wooden Board Surface */}
+            <div
+              className="relative bg-[#d8ab76] border-2 border-[#5c3a1e] rounded-xl p-3 sm:p-4 shadow-inner"
+              style={{
+                width: 'min(94vw, 500px)',
+                height: 'min(105vw, 560px)',
+              }}
+            >
+              {/* River Text Banner (Chu Hà - Hán Giới) */}
+              <div className="absolute top-[46.5%] left-4 right-4 flex items-center justify-between px-6 pointer-events-none text-[#5c3a1e]/60 font-black tracking-[0.5em] text-xs sm:text-sm uppercase font-serif">
+                <span>楚 河</span>
+                <span>漢 界</span>
+              </div>
+
+              {/* Grid Cells (10 Rows x 9 Cols) */}
+              <div className="w-full h-full grid grid-rows-10 grid-cols-9 gap-0">
+                {Array.from({ length: 10 }).map((_, r) =>
+                  Array.from({ length: 9 }).map((_, c) => {
+                    const piece = currentBoard[r][c];
+                    const isSelected = selectedPos?.[0] === r && selectedPos?.[1] === c;
+                    const isLegalDest = legalMoves.some(([lr, lc]) => lr === r && lc === c);
+
+                    return (
+                      <div
+                        key={`${r}_${c}`}
+                        onClick={() => handleCellClick(r, c)}
+                        className="relative flex items-center justify-center cursor-pointer border-[0.5px] border-[#8a5d35]/40"
+                      >
+                        {/* Legal Move Glowing Dot */}
+                        {isLegalDest && (
+                          <div
+                            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${
+                              piece
+                                ? 'ring-4 ring-rose-500 bg-rose-500/50 animate-ping'
+                                : 'bg-emerald-600/80 ring-2 ring-emerald-300 animate-pulse'
+                            }`}
+                          />
+                        )}
+
+                        {/* Xiangqi Piece Token */}
+                        {piece && (
+                          <div
+                            className={`w-[88%] h-[88%] rounded-full flex items-center justify-center font-bold text-sm sm:text-base shadow-lg transition-transform transform ${
+                              isSelected ? 'scale-110 ring-4 ring-amber-400 z-20' : 'hover:scale-105'
+                            } ${
+                              piece.color === 'r'
+                                ? 'bg-gradient-to-b from-[#fff5eb] to-[#e8cbb0] text-rose-700 border-2 border-rose-600 shadow-rose-950/50'
+                                : 'bg-gradient-to-b from-[#2b2725] to-[#151312] text-amber-200 border-2 border-amber-600 shadow-black/80'
+                            }`}
+                          >
+                            <span className="font-serif font-black select-none">
+                              {PIECE_SYMBOLS[piece.color][piece.type]}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* In-Match Bottom Control Actions */}
+          <div className="w-full max-w-xl flex items-center justify-between gap-2 px-2">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSurrenderConfirm(true)}
+                disabled={isMatchEnded}
+                className="px-3.5 py-2 rounded-xl bg-rose-950/50 hover:bg-rose-900 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center gap-1.5 transition-all disabled:opacity-30 cursor-pointer"
+              >
+                <Flag className="w-3.5 h-3.5" />
+                <span>Đầu Hàng</span>
+              </button>
+
+              {activeRoomId && (
+                <button
+                  onClick={() => offerDraw()}
+                  disabled={isMatchEnded || roomState?.drawOfferBy === profile.id}
+                  className="px-3.5 py-2 rounded-xl bg-amber-950/50 hover:bg-amber-900 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all disabled:opacity-30 cursor-pointer"
+                >
+                  <Handshake className="w-3.5 h-3.5" />
+                  <span>Cầu Hòa</span>
+                </button>
+              )}
+            </div>
+
+            {/* Quick Emote / Chat Bar */}
+            {activeRoomId && (
+              <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-2xl border border-white/10">
+                {QUICK_EMOTES.slice(0, 4).map((emote) => (
+                  <button
+                    key={emote}
+                    onClick={() => sendChat(emote, true)}
+                    className="p-1.5 rounded-lg hover:bg-white/10 text-base hover:scale-125 transition-transform cursor-pointer"
+                  >
+                    {emote}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setShowChatBox(!showChatBox)}
+                  className="p-1.5 rounded-lg hover:bg-amber-600/40 text-amber-300 transition-colors cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Chat Popover */}
+          {showChatBox && activeRoomId && (
+            <div className="w-full max-w-sm rounded-2xl bg-[#181418] border border-amber-500/40 p-3 shadow-2xl space-y-2 animate-in fade-in">
+              <div className="text-[11px] font-bold text-amber-300/80 uppercase">Chọn tin nhắn mẫu:</div>
+              <div className="flex flex-col gap-1">
+                {QUICK_PHRASES.map((phrase) => (
+                  <button
+                    key={phrase}
+                    onClick={() => {
+                      sendChat(phrase, false);
+                      setShowChatBox(false);
+                    }}
+                    className="text-left px-3 py-2 rounded-xl bg-white/5 hover:bg-amber-600/30 text-xs text-white transition-colors cursor-pointer"
+                  >
+                    {phrase}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MATCH RESULT MODAL                                        */}
+      {/* ========================================================= */}
+      {isMatchEnded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in select-none">
+          <div className="w-full max-w-md p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#241612] via-[#1a100c] to-[#0d0806] border-2 border-amber-500/50 shadow-2xl text-center space-y-5">
+            {/* Win Icon */}
+            {((activeRoomId && roomState?.winner === profile.id) || (isAiMode && aiWinner === 'r')) && (
+              <div className="space-y-2">
+                <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-4xl shadow-xl shadow-amber-500/30 animate-bounce">
+                  🏆
+                </div>
+                <h3 className="text-3xl font-black italic uppercase text-amber-400 font-display">
+                  CHIẾN THẮNG!
+                </h3>
+                <p className="text-xs text-amber-200/80">
+                  {activeRoomId && roomState?.endReason === 'CHECKMATE' && 'Chiếu Bí đối phương thành công!'}
+                  {activeRoomId && roomState?.endReason === 'TIMEOUT' && 'Đối thủ đã hết thời gian suy nghĩ!'}
+                  {activeRoomId && roomState?.endReason === 'SURRENDER' && 'Đối thủ đã xin đầu hàng!'}
+                  {isAiMode && 'Bạn đã đánh bại ArcadeX AI Bot!'}
+                </p>
+              </div>
+            )}
+
+            {((activeRoomId && roomState?.winner && roomState.winner !== profile.id && roomState.winner !== 'DRAW') ||
+              (isAiMode && aiWinner === 'b')) && (
+              <div className="space-y-2">
+                <div className="w-20 h-20 mx-auto rounded-3xl bg-rose-500/20 border border-rose-400/50 flex items-center justify-center text-4xl shadow-xl shadow-rose-500/30">
+                  💀
+                </div>
+                <h3 className="text-3xl font-black italic uppercase text-rose-400 font-display">
+                  THẤT BẠI
+                </h3>
+                <p className="text-xs text-slate-300">
+                  Đối phương đã giành chiến thắng ván cờ. Hãy phục thù ở ván tiếp theo!
+                </p>
+              </div>
+            )}
+
+            {/* ELO Rewards Card */}
+            {activeRoomId && roomState?.eloChange && (
+              <div className="p-4 rounded-2xl bg-black/60 border border-amber-500/30 grid grid-cols-3 gap-2">
+                <div className="text-center">
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">Điểm ELO</div>
+                  <div className="text-base font-black font-mono text-white">
+                    {myRole === 'host' ? roomState.eloChange.newHostElo : roomState.eloChange.newGuestElo}
+                  </div>
+                  <div className={`text-[10px] font-bold ${(myRole === 'host' ? roomState.eloChange.hostDelta : roomState.eloChange.guestDelta) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {(myRole === 'host' ? roomState.eloChange.hostDelta : roomState.eloChange.guestDelta) >= 0 ? '+' : ''}
+                    {myRole === 'host' ? roomState.eloChange.hostDelta : roomState.eloChange.guestDelta}
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">Thưởng Coins</div>
+                  <div className="text-base font-black font-mono text-amber-400">
+                    +{roomState.winner === profile.id ? 300 : 100}
+                  </div>
+                  <div className="text-[10px] text-amber-300/80">🪙 Vàng</div>
+                </div>
+
+                <div className="text-center">
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">Thưởng EXP</div>
+                  <div className="text-base font-black font-mono text-indigo-400">
+                    +{roomState.winner === profile.id ? 180 : 60}
+                  </div>
+                  <div className="text-[10px] text-indigo-300/80">⚡ Kinh nghiệm</div>
+                </div>
+              </div>
+            )}
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+              <button
+                onClick={() => {
+                  if (activeRoomId) rematch(INITIAL_XIANGQI_BOARD);
+                  else handleStartAiPractice(aiDifficulty);
+                }}
+                className="w-full sm:flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-extrabold uppercase text-xs tracking-wider shadow-lg shadow-amber-600/40 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>Đấu Lại (Rematch)</span>
+              </button>
+
+              <button
+                onClick={handleLeaveMatch}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-extrabold uppercase text-xs tracking-wider transition-all cursor-pointer"
+              >
+                Về Sảnh Đấu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Surrender Confirm Modal */}
+      {showSurrenderConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in select-none">
+          <div className="w-full max-w-xs p-5 rounded-3xl bg-[#201412] border border-rose-500/40 text-center space-y-4 shadow-2xl">
+            <h4 className="text-base font-extrabold uppercase text-rose-300">
+              Xác nhận đầu hàng?
+            </h4>
+            <p className="text-xs text-slate-300">
+              Bạn sẽ bị xử thua ván đấu này và đối phương sẽ nhận chiến thắng.
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  setShowSurrenderConfirm(false);
+                  if (activeRoomId) surrender();
+                  else setAiWinner('b');
+                }}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all cursor-pointer"
+              >
+                Đồng Ý
+              </button>
+              <button
+                onClick={() => setShowSurrenderConfirm(false)}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-bold transition-all cursor-pointer"
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

@@ -1,0 +1,3 @@
+sed -i 's/grid grid-cols-1 sm:grid-cols-3 gap-4/flex flex-col gap-3/' src/components/LeaderboardModal.tsx
+sed -i 's/const heightClass = rank === 1 ? '\''sm:-mt-2 sm:mb-2 sm:z-10'\'' : '\''sm:mt-3 opacity-95 hover:opacity-100'\'';//' src/components/LeaderboardModal.tsx
+sed -i 's/rounded-3xl p-5 border bg-\[#0e0e12\] ${rankInfo.theme.borderClass} ${rankInfo.theme.glowClass} text-center relative flex flex-col items-center justify-between transition-all hover:scale-105 ${heightClass}/rounded-2xl p-3 sm:p-4 border bg-[#0e0e12] ${rankInfo.theme.borderClass} ${rankInfo.theme.glowClass} flex flex-row items-center justify-between transition-all hover:bg-white\/5 relative overflow-hidden/' src/components/LeaderboardModal.tsx

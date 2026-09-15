@@ -1,0 +1,171 @@
+{
+  "entities": {
+    "MatchmakingQueueEntry": {
+      "title": "MatchmakingQueueEntry",
+      "description": "Represents a player waiting in the matchmaking queue for a specific game",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 64 },
+        "avatarUrl": { "type": "string", "maxLength": 256 },
+        "gameId": { "type": "string", "maxLength": 64 },
+        "elo": { "type": "number" },
+        "status": { "type": "string", "enum": ["waiting", "matched", "cancelled"] },
+        "matchedRoomId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["uid", "displayName", "gameId", "elo", "status", "createdAt"]
+    },
+    "GameRoom": {
+      "title": "GameRoom",
+      "description": "Represents an active or completed multiplayer board game room",
+      "type": "object",
+      "properties": {
+        "roomId": { "type": "string", "maxLength": 128 },
+        "roomCode": { "type": "string", "maxLength": 12 },
+        "gameId": { "type": "string", "maxLength": 64 },
+        "isPrivate": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["waiting", "playing", "finished", "abandoned"] },
+        "currentTurn": { "type": "string", "enum": ["host", "guest"] },
+        "winner": { "type": "string", "maxLength": 128 },
+        "winReason": { "type": "string", "maxLength": 128 },
+        "moveCount": { "type": "number" },
+        "turnDurationSeconds": { "type": "number" },
+        "turnDeadline": { "type": "number" },
+        "lastMoveTimestamp": { "type": "number" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["roomId", "roomCode", "gameId", "status", "currentTurn", "moveCount", "createdAt"]
+    },
+    "GameMove": {
+      "title": "GameMove",
+      "description": "Atomic record of a move played in a game room",
+      "type": "object",
+      "properties": {
+        "moveIndex": { "type": "number" },
+        "playerId": { "type": "string", "maxLength": 128 },
+        "symbol": { "type": "string", "maxLength": 8 },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "notation": { "type": "string", "maxLength": 32 },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["moveIndex", "playerId", "symbol", "x", "y", "timestamp"]
+    },
+    "LeaderboardScore": {
+      "title": "LeaderboardScore",
+      "description": "Per-game leaderboard high score record",
+      "type": "object",
+      "properties": {
+        "playerName": { "type": "string", "maxLength": 64 },
+        "score": { "type": "number" },
+        "avatar": { "type": "string", "maxLength": 32 },
+        "title": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "maxLength": 32 },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["playerName", "score", "avatar"]
+    },
+    "DailyLeaderboardScore": {
+      "title": "DailyLeaderboardScore",
+      "description": "Daily 24-hour leaderboard high score record",
+      "type": "object",
+      "properties": {
+        "playerName": { "type": "string", "maxLength": 64 },
+        "score": { "type": "number" },
+        "avatar": { "type": "string", "maxLength": 32 },
+        "title": { "type": "string", "maxLength": 64 },
+        "gameId": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "maxLength": 32 },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["playerName", "score", "avatar", "gameId", "date"]
+    },
+    "DailyChallengeRecord": {
+      "title": "DailyChallengeRecord",
+      "description": "Represents player daily challenge status and rewards",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "gameId": { "type": "string", "maxLength": 64 },
+        "targetScore": { "type": "number" },
+        "timeLimitSeconds": { "type": "number" },
+        "bestScore": { "type": "number" },
+        "completed": { "type": "boolean" },
+        "claimed": { "type": "boolean" },
+        "rewardCoins": { "type": "number" }
+      },
+      "required": ["userId", "date", "gameId", "targetScore", "completed", "claimed"]
+    },
+    "PlayerInventoryDoc": {
+      "title": "PlayerInventoryDoc",
+      "description": "Represents player inventory, chest counts, forge mastery, and blueprints synced to cloud",
+      "type": "object",
+      "properties": {
+        "playerId": { "type": "string", "maxLength": 128 },
+        "items": { "type": "array" },
+        "chestCounts": { "type": "object" },
+        "forgeMastery": { "type": "object" },
+        "discoveredBlueprintIds": { "type": "array" },
+        "updatedAt": { "type": "number" },
+        "deviceInfo": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["playerId", "updatedAt"]
+    },
+    "GameSessionDoc": {
+      "title": "GameSessionDoc",
+      "description": "Represents a suspended or active game session for cross-device resume",
+      "type": "object",
+      "properties": {
+        "playerId": { "type": "string", "maxLength": 128 },
+        "gameId": { "type": "string", "maxLength": 64 },
+        "gameTitle": { "type": "string", "maxLength": 128 },
+        "gameIcon": { "type": "string", "maxLength": 32 },
+        "currentScore": { "type": "number" },
+        "isPracticeMode": { "type": "boolean" },
+        "isDailyChallengeMode": { "type": "boolean" },
+        "savedAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "suspended", "completed", "discarded"] },
+        "gameStateData": { "type": "object" }
+      },
+      "required": ["playerId", "gameId", "savedAt", "status"]
+    }
+  },
+  "firestore": {
+    "/matchmaking_queue/{queueId}": {
+      "schema": { "$ref": "MatchmakingQueueEntry" },
+      "description": "Queue of players seeking quick match opponents"
+    },
+    "/game_rooms/{roomId}": {
+      "schema": { "$ref": "GameRoom" },
+      "description": "Multiplayer turn-based game room document"
+    },
+    "/game_rooms/{roomId}/moves/{moveId}": {
+      "schema": { "$ref": "GameMove" },
+      "description": "Subcollection of verified sequential moves inside a room"
+    },
+    "/leaderboards/{gameId}/scores/{scoreId}": {
+      "schema": { "$ref": "LeaderboardScore" },
+      "description": "Per-game leaderboard score entry"
+    },
+    "/daily_leaderboards/{dailyBoardId}/scores/{scoreId}": {
+      "schema": { "$ref": "DailyLeaderboardScore" },
+      "description": "Daily 24-hour leaderboard score entry"
+    },
+    "/daily_challenges/{challengeId}": {
+      "schema": { "$ref": "DailyChallengeRecord" },
+      "description": "Daily challenge records for players"
+    },
+    "/players/{playerId}/inventory_data/{docId}": {
+      "schema": { "$ref": "PlayerInventoryDoc" },
+      "description": "User inventory items and chest reserves"
+    },
+    "/players/{playerId}/game_sessions/{sessionId}": {
+      "schema": { "$ref": "GameSessionDoc" },
+      "description": "Cross-device saved game sessions"
+    }
+  }
+}

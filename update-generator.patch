@@ -1,0 +1,23 @@
+--- src/games/car-escape/generator.ts
++++ src/games/car-escape/generator.ts
+@@ -102,7 +102,7 @@
+   
+   for (let attempt = 0; attempt < 100; attempt++) {
+     const targetRow = Math.floor(Math.random() * size); // Random target row
+-    const targetLength = Math.random() < 0.2 && size >= 5 ? 3 : 2; // Ambulance can be 2 or 3 blocks
++    const targetLength = 2; // Xe chính size luôn luôn cố định là 2 ô.
+ 
+     const state: Vehicle[] = [];
+     state.push({
+@@ -199,7 +199,10 @@
+     }
+     
++    let minDepth = 1;
++    if (level >= 10) minDepth = 5;
++
+     // If we found a reasonable puzzle
+-    if (bestState && bestState.depth >= Math.min(desiredDepth, 5)) {
++    if (bestState && bestState.depth >= minDepth && bestState.depth >= Math.min(desiredDepth, minDepth)) {
+       return { size, vehicles: bestState.st, targetRow, city };
+     }
+   }

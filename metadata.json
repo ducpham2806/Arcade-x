@@ -1,0 +1,8 @@
+{
+  "name": "ArcadeX - Instant Game Launcher and PWA Platform",
+  "description": "Nền tảng Instant Game Launcher PWA tích hợp kho game arcade, đấu trí đối kháng PvP thời gian thực (Cờ Tướng, Cờ Caro Gomoku) với hệ thống ghép trận ELO, mở rương, thành tựu và bảng xếp hạng.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
