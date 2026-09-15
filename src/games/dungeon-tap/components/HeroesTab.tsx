@@ -10,6 +10,7 @@ import {
 } from '../utils/upgradeMath';
 import { RARITY_CONFIG } from '../equipmentData';
 import { PROFESSION_METAS } from '../allyEquipmentData';
+import { INITIAL_ALLIES } from '../skillsAndAllies';
 
 interface HeroesTabProps {
   allies: HeroAlly[];
@@ -139,7 +140,15 @@ export const HeroesTab: React.FC<HeroesTabProps> = ({
           const weaponCanUpgrade = weapon && gold >= weapon.upgradeCost;
           const armorCanUpgrade = armor && gold >= armor.upgradeCost;
           const accessoryCanUpgrade = accessory && gold >= accessory.upgradeCost;
-          const allySkills = ally.skills || (ally.skill ? [ally.skill] : []);
+          const initialSkills = INITIAL_ALLIES.find((a) => a.id === ally.id)?.skills || [];
+          const allySkills =
+            ally.skills && ally.skills.length >= 3
+              ? ally.skills
+              : initialSkills.length >= 3
+              ? initialSkills
+              : ally.skill
+              ? [ally.skill]
+              : [];
 
           return (
             <div

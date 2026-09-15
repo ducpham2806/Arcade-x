@@ -284,10 +284,10 @@ export const GameCatalog: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. 1-ROW UNIFIED QUICK HUB: ĐIỂM DANH | THỬ THÁCH | ĐẠI SẢNH DANH VỌNG   */}
-      {/* Compact 3-widget bar on 1 row - clicking each opens its dedicated popup */}
+      {/* 2. UNIFIED QUICK HUB: ĐIỂM DANH | THỬ THÁCH | DANH VỌNG | VÒNG QUAY | LỊCH THÁNG */}
+      {/* Compact 5-widget bar - clicking each opens its dedicated popup */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3">
         {/* WIDGET 1: Chuỗi Đăng Nhập (Daily Streak) */}
         <button
           id="btn-hub-daily-streak"
@@ -335,7 +335,89 @@ export const GameCatalog: React.FC = () => {
           </div>
         </button>
 
-        {/* WIDGET 2: Thử Thách Hàng Ngày (Daily Challenge) */}
+        {/* WIDGET 2: Vòng Quay May Mắn (Daily Spin Wheel) */}
+        <button
+          id="btn-hub-spin-wheel"
+          type="button"
+          onClick={() => {
+            try {
+              soundEngine.play('click');
+              hapticService.tap();
+            } catch {}
+            setActiveModal('spinWheel');
+          }}
+          className="relative rounded-2xl border border-pink-500/30 hover:border-pink-500/60 bg-gradient-to-r from-pink-950/30 via-[#191118] to-[#100e0c] p-3 shadow-md hover:shadow-pink-500/10 transition-all flex items-center justify-between gap-2.5 text-left group cursor-pointer overflow-hidden"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/40 text-pink-400 flex items-center justify-center text-xl shrink-0">
+              🎡
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="text-[10px] font-black text-pink-400 uppercase tracking-wider">
+                  Vòng Quay
+                </span>
+                {profile.stats.lastSpinDate !== todayDateStr ? (
+                  <span className="text-[9px] font-bold text-pink-300 bg-pink-500/20 px-1.5 py-0.2 rounded-full border border-pink-500/30 animate-pulse">
+                    Có lượt!
+                  </span>
+                ) : (
+                  <span className="text-[9px] font-bold text-slate-400 bg-white/5 px-1.5 py-0.2 rounded-full border border-white/5">
+                    Đã quay ✓
+                  </span>
+                )}
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-pink-300 transition-colors">
+                Quay May Mắn 🎁
+              </h4>
+            </div>
+          </div>
+
+          <div className="w-7 h-7 rounded-lg bg-white/5 group-hover:bg-pink-500/20 text-slate-400 group-hover:text-pink-300 flex items-center justify-center shrink-0 transition-colors">
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </button>
+
+        {/* WIDGET 3: Lịch Điểm Danh Tháng 30 Ngày (Monthly Login Calendar) */}
+        <button
+          id="btn-hub-monthly-login"
+          type="button"
+          onClick={() => {
+            try {
+              soundEngine.play('click');
+              hapticService.tap();
+            } catch {}
+            setActiveModal('monthlyLogin');
+          }}
+          className="relative rounded-2xl border border-indigo-500/30 hover:border-indigo-500/60 bg-gradient-to-r from-indigo-950/30 via-[#111320] to-[#0e0f16] p-3 shadow-md hover:shadow-indigo-500/10 transition-all flex items-center justify-between gap-2.5 text-left group cursor-pointer overflow-hidden"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-xl shrink-0">
+              📅
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-wider">
+                  Lịch Tháng
+                </span>
+                <span className="text-[9px] font-bold text-indigo-300 bg-indigo-500/20 px-1.5 py-0.2 rounded-full border border-indigo-500/30">
+                  30 Ngày
+                </span>
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
+                Điểm Danh Tháng ✨
+              </h4>
+            </div>
+          </div>
+
+          <div className="w-7 h-7 rounded-lg bg-white/5 group-hover:bg-indigo-500/20 text-slate-400 group-hover:text-indigo-300 flex items-center justify-center shrink-0 transition-colors">
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </button>
+
+        {/* WIDGET 4: Thử Thách Hàng Ngày (Daily Challenge) */}
         <button
           id="btn-hub-daily-challenge"
           type="button"
@@ -373,7 +455,7 @@ export const GameCatalog: React.FC = () => {
           </div>
         </button>
 
-        {/* WIDGET 3: Đại Sảnh Danh Vọng (Hall of Fame) */}
+        {/* WIDGET 5: Đại Sảnh Danh Vọng (Hall of Fame) */}
         <button
           id="btn-hub-hall-of-fame"
           type="button"
@@ -401,7 +483,7 @@ export const GameCatalog: React.FC = () => {
                 </span>
               </div>
               <h4 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-yellow-300 transition-colors">
-                Bảng Kỷ Lục Toàn Server 🏆
+                Bảng Kỷ Lục Server 🏆
               </h4>
             </div>
           </div>

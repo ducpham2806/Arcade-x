@@ -10,6 +10,7 @@ import {
   calculateMaxSkillLevels,
   formatNumber,
 } from '../utils/upgradeMath';
+import { INITIAL_SKILLS } from '../skillsAndAllies';
 
 interface SwordMasterTabProps {
   heroLevel: number;
@@ -178,7 +179,8 @@ export const SwordMasterTab: React.FC<SwordMasterTabProps> = ({
         </div>
 
         <div className="grid grid-cols-1 gap-2.5">
-          {skills.map((skill) => {
+          {INITIAL_SKILLS.map((initSkill) => {
+            const skill = skills.find((s) => s.id === initSkill.id) || initSkill;
             const isUnlocked = heroLevel >= skill.unlockLevel;
             const skillInfo = getSkillData(skill.id, skill.level);
             const canAfford = isUnlocked && gold >= skill.upgradeCost;

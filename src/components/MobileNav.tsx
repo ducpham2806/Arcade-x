@@ -79,6 +79,8 @@ export const MobileNav: React.FC = () => {
     'hallOfFame',
     'settings',
     'pvpHistory',
+    'spinWheel',
+    'monthlyLogin',
   ].includes(activeModal);
 
   const handleOpenSubModal = (
@@ -95,6 +97,8 @@ export const MobileNav: React.FC = () => {
       | 'hallOfFame'
       | 'settings'
       | 'pvpHistory'
+      | 'spinWheel'
+      | 'monthlyLogin'
   ) => {
     setIsMoreMenuOpen(false);
     if (isChatOpen) toggleChat();
@@ -285,6 +289,52 @@ export const MobileNav: React.FC = () => {
 
               {/* Sub-menu Grid Options */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5 pt-1">
+              {/* 0a. Daily Spin Wheel */}
+              <button
+                id="btn-more-menu-spin-wheel"
+                type="button"
+                onClick={() => handleOpenSubModal('spinWheel')}
+                className="p-3 rounded-2xl bg-[#151722] hover:bg-[#1f2233] border border-amber-500/40 hover:border-amber-400/80 flex items-center justify-between text-left transition-colors group cursor-pointer shadow-sm"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-amber-400/50 flex items-center justify-center text-amber-300 relative shrink-0">
+                    <span className="text-base leading-none">🎡</span>
+                    {profile.stats.lastSpinDate !== today && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full animate-ping" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-white group-hover:text-amber-300 truncate">Vòng Quay</div>
+                    <div className="text-[10px] text-slate-400 truncate">
+                      {profile.stats.lastSpinDate !== today ? '🎁 Lượt quay mới' : 'Đã quay hôm nay'}
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 shrink-0" />
+              </button>
+
+              {/* 0b. Monthly Login Calendar */}
+              <button
+                id="btn-more-menu-monthly-login"
+                type="button"
+                onClick={() => handleOpenSubModal('monthlyLogin')}
+                className="p-3 rounded-2xl bg-[#151722] hover:bg-[#1f2233] border border-indigo-500/40 hover:border-indigo-400/80 flex items-center justify-between text-left transition-colors group cursor-pointer shadow-sm"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 relative shrink-0">
+                    <Calendar className="w-4 h-4" />
+                    {!profile.stats.loginHistoryDates?.includes(today) && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-indigo-400 rounded-full animate-ping" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-white group-hover:text-indigo-300 truncate">Lịch Điểm Danh</div>
+                    <div className="text-[10px] text-slate-400 truncate">Quà tháng 30 ngày</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 shrink-0" />
+              </button>
+
               {/* 1. Daily Rewards */}
               <button
                 type="button"

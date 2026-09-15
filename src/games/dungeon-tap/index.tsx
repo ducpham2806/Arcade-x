@@ -35,7 +35,8 @@ import { HeroesTab } from './components/HeroesTab';
 import { EquipmentTab } from './components/EquipmentTab';
 import { StoryTab } from './components/StoryTab';
 import { StatsTab } from './components/StatsTab';
-import { Swords, Users, Shield, BookOpen, Activity, Coins, Sparkles, Trophy, Flag, Zap } from 'lucide-react';
+import { Swords, Users, Shield, BookOpen, Activity, Coins, Sparkles, Trophy, Flag, Zap, Calendar, Gift } from 'lucide-react';
+import { useGame } from '../../context/GameContext';
 
 const SAVE_KEY = 'tap_titans_dungeon_save_v2';
 
@@ -44,6 +45,8 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   isPaused,
   onGameOver,
 }) => {
+  const { setActiveModal } = useGame();
+
   // Load saved state or default
   const [stage, setStage] = useState<number>(1);
   const [maxStageReached, setMaxStageReached] = useState<number>(1);
@@ -113,8 +116,48 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
         if (parsed.heroLevel) setHeroLevel(parsed.heroLevel);
         if (parsed.equipped) setEquipped(parsed.equipped);
         if (parsed.inventory) setInventory(parsed.inventory);
-        if (parsed.allies) setAllies(parsed.allies);
-        if (parsed.skills) setSkills(parsed.skills);
+
+        // Merge Allies to guarantee all 3 rotating skills per ally are present
+        if (parsed.allies && Array.isArray(parsed.allies)) {
+          const mergedAllies = INITIAL_ALLIES.map((initAlly) => {
+            const found = parsed.allies.find((a: HeroAlly) => a.id === initAlly.id);
+            if (!found) return initAlly;
+
+            const baseSkills = initAlly.skills || [initAlly.skill];
+            let allySkills = baseSkills;
+            if (found.skills && Array.isArray(found.skills) && found.skills.length >= 3) {
+              allySkills = baseSkills.map((sk, idx) => {
+                const foundSk = found.skills[idx];
+                return foundSk ? { ...sk, ...foundSk } : sk;
+              });
+            }
+
+            return {
+              ...initAlly,
+              ...found,
+              skills: allySkills,
+              skill: allySkills[found.currentSkillIndex || 0] || initAlly.skill,
+              equippedWeapon: found.equippedWeapon || initAlly.equippedWeapon,
+              equippedArmor: found.equippedArmor || initAlly.equippedArmor,
+              equippedAccessory: found.equippedAccessory || initAlly.equippedAccessory,
+            };
+          });
+          setAllies(mergedAllies);
+        } else {
+          setAllies(INITIAL_ALLIES);
+        }
+
+        // Merge Skills to guarantee all 7 Sword Master skills are present
+        if (parsed.skills && Array.isArray(parsed.skills)) {
+          const mergedSkills = INITIAL_SKILLS.map((initSkill) => {
+            const found = parsed.skills.find((s: ActiveSkill) => s.id === initSkill.id);
+            return found ? { ...initSkill, ...found } : initSkill;
+          });
+          setSkills(mergedSkills);
+        } else {
+          setSkills(INITIAL_SKILLS);
+        }
+
         if (parsed.allyInventory) setAllyInventory(parsed.allyInventory);
         if (parsed.monstersSlain) setMonstersSlain(parsed.monstersSlain);
         if (parsed.bossesSlain) setBossesSlain(parsed.bossesSlain);
@@ -1253,7 +1296,39 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
         </div>
 
         {/* Header Right Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Quick Access: Vòng Quay May Mắn */}
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                bridge.playSound('powerup');
+              } catch {}
+              setActiveModal('spinWheel');
+            }}
+            title="Vòng Quay May Mắn (Daily Spin)"
+            className="flex items-center gap-1 px-2 py-1 rounded-xl bg-gradient-to-r from-amber-600/30 to-orange-600/30 hover:from-amber-600/50 hover:to-orange-600/50 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
+          >
+            <span className="text-sm leading-none">🎡</span>
+            <span className="text-[11px] hidden md:inline">Vòng Quay</span>
+          </button>
+
+          {/* Quick Access: Lịch Điểm Danh Tháng */}
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                bridge.playSound('click');
+              } catch {}
+              setActiveModal('monthlyLogin');
+            }}
+            title="Lịch Điểm Danh Tháng 30 Ngày (Daily Check-in)"
+            className="flex items-center gap-1 px-2 py-1 rounded-xl bg-gradient-to-r from-indigo-600/30 to-purple-600/30 hover:from-indigo-600/50 hover:to-purple-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
+          >
+            <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="text-[11px] hidden md:inline">Điểm Danh</span>
+          </button>
+
           {/* Auto-Pickup Toggle Button */}
           <button
             type="button"
@@ -1270,11 +1345,11 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
           >
             <Zap className={`w-3.5 h-3.5 ${autoPickup ? 'text-emerald-400 fill-emerald-400' : 'text-slate-500'}`} />
             <span className="text-[11px] hidden xs:inline">Tự Nhặt: {autoPickup ? 'BẬT' : 'TẮT'}</span>
-            <span className="text-[11px] xs:hidden">{autoPickup ? 'Nhặt: Bật' : 'Nhặt: Tắt'}</span>
+            <span className="text-[11px] xs:hidden">{autoPickup ? 'Nhặt' : 'Tắt'}</span>
           </button>
 
           {/* Gold Counter */}
-          <div className="flex items-center gap-1.5 bg-amber-950/60 border border-amber-500/40 px-2.5 sm:px-3 py-1 rounded-xl shadow-inner">
+          <div className="flex items-center gap-1.5 bg-amber-950/60 border border-amber-500/40 px-2 sm:px-2.5 py-1 rounded-xl shadow-inner">
             <Coins className="w-4 h-4 text-yellow-300 fill-yellow-400" />
             <span className="font-black font-mono text-xs sm:text-base text-yellow-200">
               {formatNumber(gold)}
@@ -1286,7 +1361,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
             type="button"
             onClick={handleFinishRun}
             title="Kết thúc lượt đấu và hiển thị Bảng tóm tắt kết quả (Post-Game Summary)"
-            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-white border border-slate-700 hover:border-rose-500/50 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-white border border-slate-700 hover:border-rose-500/50 text-xs font-bold transition-all active:scale-95 cursor-pointer"
           >
             <Flag className="w-3.5 h-3.5 text-rose-400" />
             <span className="hidden xs:inline">Tổng Kết</span>
@@ -1296,7 +1371,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
 
       {/* Main Scrollable Area */}
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col max-w-2xl w-full mx-auto pb-16">
-        {/* Tap Titans 2 Battle Arena with Horizontal Skills & Buffs Bar */}
+        {/* Tap Titans 2 Battle Arena (Spacious & Clean) */}
         <div className="p-2 sm:p-3 shrink-0">
           <TitanArena
             monster={monster}
@@ -1313,16 +1388,6 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
             loots={loots}
             heroLevel={heroLevel}
             heroSlashing={heroSlashing}
-            isBerserkActive={isBerserkActive}
-            isMidasActive={isMidasActive}
-            isShadowCloneActive={isShadowCloneActive}
-            isWarCryActive={isWarCryActive}
-            isBladeStormActive={isBladeStormActive}
-            isArmorBreakActive={isArmorBreakActive}
-            skills={skills}
-            mana={mana}
-            maxMana={maxMana}
-            onCastSkill={handleCastSkill}
             allies={allies}
             alliesAttacking={alliesAttacking}
             onOpenAlliesTab={() => setActiveTab('heroes')}
@@ -1330,6 +1395,23 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
             autoPickup={autoPickup}
             autoPickupToast={autoPickupToast}
             onToggleAutoPickup={() => setAutoPickup((prev) => !prev)}
+          />
+        </div>
+
+        {/* Large, Touch-Friendly External Skill Bar directly beneath the characters row */}
+        <div className="px-2 sm:px-3 pb-2 shrink-0">
+          <SkillBar
+            skills={skills}
+            heroLevel={heroLevel}
+            mana={mana}
+            maxMana={maxMana}
+            onCastSkill={handleCastSkill}
+            isBerserkActive={isBerserkActive}
+            isMidasActive={isMidasActive}
+            isShadowCloneActive={isShadowCloneActive}
+            isWarCryActive={isWarCryActive}
+            isBladeStormActive={isBladeStormActive}
+            isArmorBreakActive={isArmorBreakActive}
           />
         </div>
 

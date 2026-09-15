@@ -18,12 +18,6 @@ interface TitanArenaProps {
   loots: DroppedLoot[];
   heroLevel: number;
   heroSlashing: boolean;
-  isBerserkActive: boolean;
-  isMidasActive: boolean;
-  isShadowCloneActive: boolean;
-  isWarCryActive?: boolean;
-  isBladeStormActive?: boolean;
-  isArmorBreakActive?: boolean;
   allies: HeroAlly[];
   alliesAttacking: boolean;
   onOpenAlliesTab?: () => void;
@@ -31,10 +25,6 @@ interface TitanArenaProps {
   autoPickup?: boolean;
   autoPickupToast?: { id: number; text: string; icon: string; rarityColor?: string } | null;
   onToggleAutoPickup?: () => void;
-  skills?: ActiveSkill[];
-  mana?: number;
-  maxMana?: number;
-  onCastSkill?: (skillId: ActiveSkill['id']) => void;
 }
 
 export const TitanArena: React.FC<TitanArenaProps> = ({
@@ -51,12 +41,6 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
   loots,
   heroLevel,
   heroSlashing,
-  isBerserkActive,
-  isMidasActive,
-  isShadowCloneActive,
-  isWarCryActive = false,
-  isBladeStormActive = false,
-  isArmorBreakActive = false,
   allies,
   alliesAttacking,
   onOpenAlliesTab,
@@ -64,10 +48,6 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
   autoPickup = true,
   autoPickupToast = null,
   onToggleAutoPickup,
-  skills = [],
-  mana = 100,
-  maxMana = 100,
-  onCastSkill,
 }) => {
   const hpPercent = Math.max(0, Math.min(100, (monster.hp / monster.maxHp) * 100));
   const isBossStage = stage % 10 === 0;
@@ -80,90 +60,16 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
   // Gold loots limited to max 2 subtle floating coin particles
   const goldLoots = loots.filter((l) => l.type === 'gold').slice(-2);
 
-  // Active Buffs list to show in horizontal row
-  const activeBuffs: { id: string; name: string; icon: string; duration: number; color: string; textColor?: string }[] = [];
-  const berserkSkill = skills.find((s) => s.id === 'berserker_rage');
-  if (isBerserkActive && berserkSkill && berserkSkill.activeRemaining > 0) {
-    activeBuffs.push({
-      id: 'berserk',
-      name: 'Cuồng Nộ x3',
-      icon: '🔥',
-      duration: Math.ceil(berserkSkill.activeRemaining),
-      color: '#ef4444',
-      textColor: '#fca5a5',
-    });
-  }
-
-  const midasSkill = skills.find((s) => s.id === 'hand_of_midas');
-  if (isMidasActive && midasSkill && midasSkill.activeRemaining > 0) {
-    activeBuffs.push({
-      id: 'midas',
-      name: 'Midas x5 Vàng',
-      icon: '💰',
-      duration: Math.ceil(midasSkill.activeRemaining),
-      color: '#eab308',
-      textColor: '#fef08a',
-    });
-  }
-
-  const cloneSkill = skills.find((s) => s.id === 'shadow_clone');
-  if (isShadowCloneActive && cloneSkill && cloneSkill.activeRemaining > 0) {
-    activeBuffs.push({
-      id: 'clone',
-      name: 'Phân Thân',
-      icon: '👥',
-      duration: Math.ceil(cloneSkill.activeRemaining),
-      color: '#a855f7',
-      textColor: '#e9d5ff',
-    });
-  }
-
-  const bladeStormSkill = skills.find((s) => s.id === 'blade_storm');
-  if (isBladeStormActive && bladeStormSkill && bladeStormSkill.activeRemaining > 0) {
-    activeBuffs.push({
-      id: 'blade_storm',
-      name: 'Bão Kiếm',
-      icon: '🌪️',
-      duration: Math.ceil(bladeStormSkill.activeRemaining),
-      color: '#38bdf8',
-      textColor: '#bae6fd',
-    });
-  }
-
-  const warCrySkill = skills.find((s) => s.id === 'war_cry');
-  if (isWarCryActive && warCrySkill && warCrySkill.activeRemaining > 0) {
-    activeBuffs.push({
-      id: 'war_cry',
-      name: 'Chiến Khải +150% DPS',
-      icon: '🎺',
-      duration: Math.ceil(warCrySkill.activeRemaining),
-      color: '#f59e0b',
-      textColor: '#fde68a',
-    });
-  }
-
-  const radiantSkill = skills.find((s) => s.id === 'radiant_slash');
-  if (isArmorBreakActive && radiantSkill && radiantSkill.activeRemaining > 0) {
-    activeBuffs.push({
-      id: 'armor_break',
-      name: 'Phá Giáp +50% ST',
-      icon: '⚡⚔️',
-      duration: Math.ceil(radiantSkill.activeRemaining),
-      color: '#06b6d4',
-      textColor: '#a5f3fc',
-    });
-  }
-
   return (
     <div
       onPointerDown={onTapArena}
-      className={`relative w-full h-[370px] sm:h-[410px] select-none touch-none overflow-hidden rounded-2xl flex flex-col justify-between p-3 border border-white/10 shadow-2xl transition-all duration-500 bg-gradient-to-b ${chapter.bgGradient}`}
+      className={`relative w-full h-[320px] sm:h-[360px] select-none touch-none overflow-hidden rounded-3xl flex flex-col justify-between p-3 border border-white/10 shadow-2xl transition-all duration-500 bg-gradient-to-b ${chapter.bgGradient}`}
     >
       {/* Subtle ambient lighting */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-black/70" />
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-black/75" />
 
-      {/* Top Section: Chapter Title, Stage Indicator, Boss Timer */}
-      <div className="relative z-10 w-full flex flex-col gap-1.5 pointer-events-none">
+      {/* Top Section: Chapter Title, Stage Indicator, Boss Timer & Health */}
+      <div className="relative z-10 w-full flex flex-col gap-1.5 pointer-events-none shrink-0">
         <div className="flex items-center justify-between text-xs px-1">
           <div className="flex items-center gap-1.5 font-bold text-amber-300 drop-shadow">
             <span>{chapter.badge}</span>
@@ -191,22 +97,22 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
             )}
 
             <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-amber-500/30 text-amber-200 font-mono font-bold text-xs">
-              <span>CẤP {stage}</span>
+              <span>TẦNG {stage}</span>
               {isBossStage && <Skull className="w-3.5 h-3.5 text-rose-400 animate-pulse" />}
             </div>
           </div>
         </div>
 
-        {/* 10-Stage Progress Dots */}
-        <div className="flex items-center justify-between gap-1 px-1 bg-black/40 backdrop-blur-sm rounded-lg p-1 border border-white/5">
+        {/* 10-Stage Progress Bar (Clean & Compact) */}
+        <div className="flex items-center justify-between gap-1 px-1 bg-black/50 backdrop-blur-sm rounded-lg p-1 border border-white/5">
           {Array.from({ length: 10 }).map((_, idx) => {
             const stepNum = idx + 1;
             const isCompleted = stepNum < stageInCycle;
             const isCurrent = stepNum === stageInCycle;
             const isBossDot = stepNum === 10;
 
-            let dotColor = 'bg-slate-700/60 text-slate-400';
-            if (isCompleted) dotColor = 'bg-amber-500 text-slate-950';
+            let dotColor = 'bg-slate-800 text-slate-500';
+            if (isCompleted) dotColor = 'bg-amber-500/90 text-slate-950';
             if (isCurrent)
               dotColor = isBossDot
                 ? 'bg-rose-500 text-white animate-bounce ring-2 ring-rose-400'
@@ -215,9 +121,9 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
             return (
               <div
                 key={idx}
-                className={`flex-1 h-3 rounded flex items-center justify-center text-[9px] font-bold transition-all ${dotColor}`}
+                className={`flex-1 h-2 sm:h-2.5 rounded flex items-center justify-center text-[8px] font-bold transition-all ${dotColor}`}
               >
-                {isBossDot ? '💀' : stepNum}
+                {isBossDot ? '💀' : isCurrent ? stepNum : ''}
               </div>
             );
           })}
@@ -317,12 +223,12 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
         </div>
       </div>
 
-      {/* Arena Center: Titan Monster */}
-      <div className="relative z-0 flex-1 flex flex-col items-center justify-center my-1">
+      {/* Arena Center: Titan Monster (Spacious & Impressive) */}
+      <div className="relative z-0 flex-1 flex flex-col items-center justify-center my-auto min-h-[110px]">
         {/* Monster Ambient Glow */}
         <div
-          className={`absolute w-32 h-32 rounded-full blur-2xl transition-all duration-300 ${
-            monster.isBoss ? 'bg-rose-600/25' : 'bg-cyan-600/15'
+          className={`absolute w-36 h-36 rounded-full blur-3xl transition-all duration-300 ${
+            monster.isBoss ? 'bg-rose-600/30' : 'bg-cyan-600/20'
           }`}
         />
 
@@ -330,8 +236,8 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
         <div
           className={`relative transition-transform duration-75 select-none ${
             monster.isBoss
-              ? 'text-6xl sm:text-7xl scale-110 drop-shadow-[0_12px_20px_rgba(225,29,72,0.5)]'
-              : 'text-5xl sm:text-6xl drop-shadow-[0_8px_12px_rgba(0,0,0,0.8)]'
+              ? 'text-7xl sm:text-8xl scale-110 drop-shadow-[0_12px_24px_rgba(225,29,72,0.6)]'
+              : 'text-6xl sm:text-7xl drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)]'
           } ${heroSlashing ? 'scale-90 translate-y-1' : 'animate-[bounce_3s_infinite_ease-in-out]'}`}
         >
           {monster.avatar}
@@ -345,10 +251,10 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
         </div>
 
         {/* Titan Floor Shadow */}
-        <div className="w-20 h-3 bg-black/50 rounded-full blur-sm mt-1" />
+        <div className="w-24 h-3 bg-black/60 rounded-full blur-sm mt-2" />
       </div>
 
-      {/* Clean Floating Damage Numbers (Max 4 items, quick fade to remove clutter) */}
+      {/* Clean Floating Damage Numbers (Max 4 items, quick fade) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
         {floatingDamages.slice(-4).map((dmg) => (
           <div
@@ -402,7 +308,7 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
 
       {/* Auto-Pickup Floating Toast Alert */}
       {autoPickupToast && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none animate-bounce">
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-40 pointer-events-none animate-bounce">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/90 border border-emerald-500/80 text-emerald-300 text-xs font-bold shadow-2xl shadow-emerald-950/80 backdrop-blur-md">
             <span className="text-base">{autoPickupToast.icon}</span>
             <span className="truncate max-w-[180px] sm:max-w-[240px] text-white">{autoPickupToast.text}</span>
@@ -418,7 +324,7 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
         equipmentLoots.map((loot) => (
           <div
             key={loot.id}
-            className="absolute bottom-28 left-3 z-30 pointer-events-auto"
+            className="absolute bottom-20 left-3 z-30 pointer-events-auto"
           >
             <button
               onClick={(e) => {
@@ -433,122 +339,11 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
           </div>
         ))}
 
-      {/* Horizontal Bar for Skills & Buffs directly above the characters */}
-      <div className="relative z-20 w-full flex flex-col gap-1 pointer-events-none mb-1">
-        {/* Active Buffs (Horizontal Row of compact glowing pills) */}
-        {activeBuffs.length > 0 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 pointer-events-auto">
-            {activeBuffs.map((buff) => (
-              <div
-                key={buff.id}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border shadow-md whitespace-nowrap animate-pulse"
-                style={{
-                  backgroundColor: `${buff.color}25`,
-                  borderColor: buff.color,
-                  color: buff.textColor || '#fff',
-                }}
-              >
-                <span>{buff.icon}</span>
-                <span>{buff.name}</span>
-                <span className="font-mono font-black text-amber-300">({buff.duration}s)</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 7 Sword Master Skills (Horizontal row of compact icon buttons) */}
-        {skills && skills.length > 0 && (
-          <div className="bg-slate-950/85 backdrop-blur-md border border-white/15 rounded-xl px-2 py-1 flex items-center justify-between gap-1.5 pointer-events-auto shadow-xl">
-            {/* Mini Mana Gauge */}
-            {mana !== undefined && maxMana !== undefined && (
-              <div className="flex items-center gap-1.5 pr-1.5 border-r border-white/10 shrink-0">
-                <Zap className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400 animate-pulse" />
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-mono font-black text-cyan-300 leading-tight">
-                    {Math.floor(mana)}/{maxMana}
-                  </span>
-                  <div className="w-12 h-1 bg-slate-900 rounded-full overflow-hidden border border-cyan-500/30">
-                    <div
-                      className="h-full bg-cyan-400 transition-all duration-150"
-                      style={{ width: `${Math.min(100, (mana / maxMana) * 100)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 7 Horizontal Skill Icons */}
-            <div className="flex items-center justify-between flex-1 gap-1 overflow-x-auto no-scrollbar">
-              {skills.map((skill) => {
-                const isUnlocked = heroLevel >= skill.unlockLevel;
-                const isOnCooldown = skill.currentCooldown > 0;
-                const isActive = (skill.activeRemaining || 0) > 0;
-                const canAfford = mana !== undefined && mana >= skill.manaCost;
-                const isCastable = isUnlocked && !isOnCooldown && !isActive && canAfford;
-
-                return (
-                  <button
-                    key={skill.id}
-                    type="button"
-                    disabled={!isCastable}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onCastSkill && isCastable) {
-                        onCastSkill(skill.id);
-                      }
-                    }}
-                    title={`${skill.name} (${skill.manaCost} MP): ${skill.description}`}
-                    className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl border flex flex-col items-center justify-center transition-all shrink-0 active:scale-90 ${
-                      isActive
-                        ? 'bg-amber-500/25 border-amber-400 ring-2 ring-amber-400/80 animate-pulse'
-                        : isCastable
-                        ? 'bg-gradient-to-b from-slate-800 to-slate-950 hover:from-cyan-900/60 hover:to-slate-900 border-cyan-400/60 shadow-md shadow-cyan-950/50 cursor-pointer'
-                        : 'bg-slate-950/90 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed'
-                    }`}
-                  >
-                    {/* Icon */}
-                    <span className="text-xs sm:text-sm select-none leading-none">{skill.icon}</span>
-
-                    {/* Active Timer Overlay */}
-                    {isActive && (
-                      <span className="absolute -top-1 -right-1 bg-amber-500 text-slate-950 font-mono font-black text-[8px] px-1 rounded-full shadow">
-                        {Math.ceil(skill.activeRemaining)}s
-                      </span>
-                    )}
-
-                    {/* Cooldown Overlay */}
-                    {isOnCooldown && !isActive && (
-                      <span className="absolute inset-0 bg-black/80 rounded-xl flex items-center justify-center font-mono font-black text-[9px] text-amber-300">
-                        {Math.ceil(skill.currentCooldown)}s
-                      </span>
-                    )}
-
-                    {/* Locked Level */}
-                    {!isUnlocked && (
-                      <span className="absolute inset-0 bg-slate-950/85 rounded-xl flex items-center justify-center text-[7px] font-mono text-slate-400 font-bold">
-                        Lv.{skill.unlockLevel}
-                      </span>
-                    )}
-
-                    {/* Mana Cost Badge */}
-                    {isUnlocked && !isOnCooldown && !isActive && (
-                      <span className="absolute -bottom-1 px-1 rounded bg-black/90 text-[7px] font-mono font-bold text-cyan-300 border border-cyan-500/40">
-                        {skill.manaCost}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Battlefield Ground: Sword Master and Allies Line-Up (Visual Parity) */}
-      <div className="relative z-10 w-full pt-1 pb-0.5 border-t border-white/10 bg-black/40 backdrop-blur-md rounded-xl px-2">
+      {/* Battlefield Ground: Sword Master and Allies Line-Up (Bottom of Arena) */}
+      <div className="relative z-10 w-full pt-1.5 pb-1 border-t border-white/10 bg-black/50 backdrop-blur-md rounded-2xl px-2.5 shrink-0">
         <div className="flex items-end justify-between gap-2 py-0.5">
           {/* Unlocked Hero Allies Standing in Battle Formation */}
-          <div className="flex items-end gap-2 flex-1 min-w-0 overflow-x-auto no-scrollbar py-0.5 pr-1">
+          <div className="flex items-end gap-2.5 flex-1 min-w-0 overflow-x-auto no-scrollbar py-0.5 pr-1">
             {unlockedAllies.length > 0 ? (
               unlockedAllies.map((ally) => {
                 const isSkillReadySoon = ally.skill && ally.skill.currentCooldown <= 1.0;
@@ -586,7 +381,7 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
                     {/* Ally Auto-Skill Mini Cooldown Indicator */}
                     {ally.skill && (
                       <div
-                        className="w-7 h-1 bg-slate-950 rounded-full overflow-hidden border border-purple-500/30 mt-0.5"
+                        className="w-8 h-1 bg-slate-950 rounded-full overflow-hidden border border-purple-500/30 mt-0.5"
                         title={`${ally.skill.name}: Tự dùng mỗi ${ally.skill.cooldown}s`}
                       >
                         <div
@@ -612,8 +407,8 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
             )}
           </div>
 
-          {/* Sword Master Hero (Front & Center, pinned on right, never clipped) */}
-          <div className="flex flex-col items-center shrink-0 pointer-events-none pl-2 border-l border-white/10">
+          {/* Sword Master Hero (Front & Center, pinned on right) */}
+          <div className="flex flex-col items-center shrink-0 pointer-events-none pl-2.5 border-l border-white/10">
             {/* Hero Figure with Slash animation */}
             <div
               className={`text-3xl sm:text-4xl transition-transform duration-75 select-none ${

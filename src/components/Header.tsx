@@ -251,6 +251,22 @@ export const Header: React.FC = () => {
             <span>Bạn Bè</span>
           </button>
 
+          {/* 6b. Vòng Quay May Mắn (Daily Spin) */}
+          <button
+            id="nav-desktop-spin"
+            type="button"
+            onClick={() => setActiveModal(activeModal === 'spinWheel' ? 'none' : 'spinWheel')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeModal === 'spinWheel'
+                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+            title="Vòng Quay May Mắn (Daily Spin)"
+          >
+            <span className="text-sm leading-none">🎡</span>
+            <span className="hidden xl:inline">Vòng Quay</span>
+          </button>
+
           {/* 7. Menu Tiện Ích (Tất cả tính năng mở rộng) */}
           <button
             id="nav-desktop-more"
