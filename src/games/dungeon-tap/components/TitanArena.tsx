@@ -63,163 +63,116 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
   return (
     <div
       onPointerDown={onTapArena}
-      className={`relative w-full h-[320px] sm:h-[360px] select-none touch-none overflow-hidden rounded-3xl flex flex-col justify-between p-3 border border-white/10 shadow-2xl transition-all duration-500 bg-gradient-to-b ${chapter.bgGradient}`}
+      className={`relative w-full h-[340px] sm:h-[380px] select-none touch-none overflow-hidden rounded-3xl flex flex-col justify-between p-3 border border-white/10 shadow-2xl transition-all duration-500 bg-gradient-to-b ${chapter.bgGradient}`}
     >
       {/* Subtle ambient lighting */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-black/75" />
 
-      {/* Top Section: Chapter Title, Stage Indicator, Boss Timer & Health */}
-      <div className="relative z-10 w-full flex flex-col gap-1.5 pointer-events-none shrink-0">
-        <div className="flex items-center justify-between text-xs px-1">
-          <div className="flex items-center gap-1.5 font-bold text-amber-300 drop-shadow">
-            <span>{chapter.badge}</span>
-            <span className="truncate max-w-[150px] sm:max-w-[220px]">{chapter.name}</span>
+      {/* Top Section: Integrated Ultra-Compact HUD for Monster HP & Stage Progress */}
+      <div className="relative z-10 w-full flex flex-col gap-1 pointer-events-none shrink-0">
+        {/* Row 1: Monster Name, Boss Controls & HP stats */}
+        <div className="flex items-center justify-between gap-2 px-1">
+          {/* Monster Name & Type */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-sm shrink-0">{monster.isBoss ? '👑' : chapter.badge}</span>
+            <span
+              className={`text-xs sm:text-sm font-black truncate drop-shadow ${
+                monster.isBoss ? 'text-rose-400 font-extrabold animate-pulse' : 'text-slate-100'
+              }`}
+            >
+              {monster.name}
+            </span>
+            {monster.isBoss && (
+              <span className="text-[9px] bg-rose-950/90 text-rose-300 border border-rose-500/60 px-1.5 py-0.2 rounded font-black uppercase tracking-wider shrink-0">
+                TRÙM TẦNG {stage}
+              </span>
+            )}
           </div>
 
-          <div className="flex items-center gap-1.5">
-            {onToggleAutoPickup && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleAutoPickup();
-                }}
-                title={autoPickup ? 'Tự động nhặt trang bị: Đang BẬT' : 'Tự động nhặt trang bị: Đang TẮT (bấm để bật)'}
-                className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all active:scale-95 cursor-pointer pointer-events-auto ${
-                  autoPickup
-                    ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/60 shadow-sm'
-                    : 'bg-slate-900/80 text-slate-400 border-slate-700 hover:text-slate-200'
-                }`}
-              >
-                <Zap className={`w-3 h-3 ${autoPickup ? 'text-emerald-400 fill-emerald-400' : 'text-slate-500'}`} />
-                <span>{autoPickup ? 'Tự Nhặt' : 'Thủ Công'}</span>
-              </button>
+          {/* Right: Boss Countdown / Challenge Action & HP Numbers */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Boss Fight Timer / Retreat */}
+            {monster.isBoss && (
+              <div className="flex items-center gap-1 pointer-events-auto">
+                <span
+                  className={`font-mono text-xs font-bold px-1.5 py-0.5 rounded bg-rose-950/90 border border-rose-500/50 ${
+                    bossTimer <= 5 ? 'text-rose-400 animate-ping' : 'text-amber-300'
+                  }`}
+                >
+                  ⏱️ {bossTimer}s
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLeaveBoss();
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-600 text-[10px] font-medium active:scale-95 transition-all shadow"
+                >
+                  Rút lui
+                </button>
+              </div>
             )}
 
-            <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-amber-500/30 text-amber-200 font-mono font-bold text-xs">
-              <span>TẦNG {stage}</span>
-              {isBossStage && <Skull className="w-3.5 h-3.5 text-rose-400 animate-pulse" />}
+            {/* If Boss Stage & Not in Boss Fight -> Compact Glowing Boss Trigger Button */}
+            {!monster.isBoss && isBossStage && (
+              <div className="pointer-events-auto">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onFightBoss();
+                  }}
+                  className="px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase tracking-wider bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white border border-amber-300/60 shadow-lg shadow-rose-950/60 animate-pulse active:scale-95 cursor-pointer flex items-center gap-1"
+                >
+                  <Skull className="w-3 h-3 text-white" />
+                  <span>Đấu Trùm</span>
+                </button>
+              </div>
+            )}
+
+            {/* HP Value */}
+            <div className="flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10 text-amber-300 font-mono font-bold text-[11px] sm:text-xs">
+              <span>{formatNumber(monster.hp)}</span>
+              <span className="text-slate-500 font-normal">/</span>
+              <span className="text-slate-400">{formatNumber(monster.maxHp)}</span>
+              <span className="text-[10px] text-amber-400/90 font-sans font-black ml-0.5">({Math.ceil(hpPercent)}%)</span>
             </div>
           </div>
         </div>
 
-        {/* 10-Stage Progress Bar (Clean & Compact) */}
-        <div className="flex items-center justify-between gap-1 px-1 bg-black/50 backdrop-blur-sm rounded-lg p-1 border border-white/5">
+        {/* Row 2: Slim Monster Health Bar */}
+        <div className="w-full h-2 sm:h-2.5 bg-black/80 rounded-full overflow-hidden border border-white/10 relative shadow-inner">
+          <div
+            className={`h-full rounded-full transition-all duration-75 ${
+              monster.isBoss
+                ? 'bg-gradient-to-r from-red-600 via-rose-500 to-amber-400'
+                : 'bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400'
+            }`}
+            style={{ width: `${hpPercent}%` }}
+          />
+        </div>
+
+        {/* Row 3: Ultra-Slim Segmented 10-Stage Progress Line (Zero Clutter) */}
+        <div className="flex items-center gap-1 px-0.5">
           {Array.from({ length: 10 }).map((_, idx) => {
             const stepNum = idx + 1;
             const isCompleted = stepNum < stageInCycle;
             const isCurrent = stepNum === stageInCycle;
             const isBossDot = stepNum === 10;
 
-            let dotColor = 'bg-slate-800 text-slate-500';
-            if (isCompleted) dotColor = 'bg-amber-500/90 text-slate-950';
-            if (isCurrent)
-              dotColor = isBossDot
-                ? 'bg-rose-500 text-white animate-bounce ring-2 ring-rose-400'
-                : 'bg-yellow-400 text-slate-950 ring-2 ring-yellow-300';
+            let barColor = 'bg-white/10';
+            if (isCompleted) barColor = 'bg-amber-500/80';
+            if (isCurrent) barColor = isBossDot ? 'bg-rose-500 ring-1 ring-rose-300 animate-pulse' : 'bg-yellow-400 ring-1 ring-yellow-300';
 
             return (
               <div
                 key={idx}
-                className={`flex-1 h-2 sm:h-2.5 rounded flex items-center justify-center text-[8px] font-bold transition-all ${dotColor}`}
-              >
-                {isBossDot ? '💀' : isCurrent ? stepNum : ''}
-              </div>
+                className={`flex-1 h-1 rounded-full transition-all ${barColor}`}
+                title={`Tầng ${stage - stageInCycle + stepNum} ${isBossDot ? '(Trùm)' : ''}`}
+              />
             );
           })}
-        </div>
-
-        {/* Boss Fight Timer / Retreat Button */}
-        {monster.isBoss && (
-          <div className="flex items-center justify-between px-1 pointer-events-auto">
-            <div className="flex items-center gap-1.5 bg-rose-950/80 border border-rose-500/50 px-2.5 py-1 rounded-lg text-rose-200 text-xs font-bold shadow-md">
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-400 animate-spin" />
-              <span>Thời Gian Trùm:</span>
-              <span
-                className={`font-mono text-sm ${
-                  bossTimer <= 5 ? 'text-rose-400 animate-ping' : 'text-amber-300'
-                }`}
-              >
-                {bossTimer}s
-              </span>
-            </div>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onLeaveBoss();
-              }}
-              className="px-2.5 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-600 text-xs font-medium active:scale-95 transition-all shadow-md"
-            >
-              Rút lui farm
-            </button>
-          </div>
-        )}
-
-        {/* Fight Boss Button (Disabled if not boss stage, active if boss stage) */}
-        {!monster.isBoss && (
-          <div className="flex flex-col items-center pointer-events-auto py-0.5 space-y-1">
-            {bossToast && (
-              <div className="px-3 py-1 rounded-lg bg-rose-600 text-white text-xs font-bold shadow-xl animate-bounce border border-rose-300 z-20 max-w-xs text-center">
-                {bossToast}
-              </div>
-            )}
-            <button
-              type="button"
-              disabled={!isBossStage}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!isBossStage) return;
-                onFightBoss();
-              }}
-              title={
-                isBossStage
-                  ? `Khiêu chiến Boss Tầng ${stage}!`
-                  : `Chưa đủ điều kiện: Cần đạt Tầng Boss (mốc ${Math.ceil(stage / 10) * 10 || 10}) để mở khóa`
-              }
-              className={`px-4 py-1.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg border flex items-center gap-2 transition-all ${
-                isBossStage
-                  ? 'bg-gradient-to-r from-rose-600 via-amber-600 to-rose-600 hover:from-rose-500 hover:to-amber-500 text-white border-amber-300/40 animate-pulse cursor-pointer active:scale-95'
-                  : 'bg-slate-900/80 border-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
-              }`}
-            >
-              {isBossStage ? <Skull className="w-4 h-4" /> : <Lock className="w-3.5 h-3.5" />}
-              {isBossStage
-                ? `Đấu Trùm Tầng ${stage} (Fight Boss)`
-                : `Đấu Trùm (Mở ở Tầng ${Math.ceil(stage / 10) * 10 || 10})`}
-            </button>
-          </div>
-        )}
-
-        {/* Titan Monster Health Bar */}
-        <div className="w-full bg-black/60 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10">
-          <div className="flex items-center justify-between text-xs mb-1 font-bold">
-            <span
-              className={`truncate max-w-[200px] ${
-                monster.isBoss ? 'text-rose-300 font-extrabold' : 'text-slate-200'
-              }`}
-            >
-              {monster.name}
-            </span>
-            <span className="font-mono text-amber-300 text-[11px]">
-              {formatNumber(monster.hp)} / {formatNumber(monster.maxHp)} HP
-            </span>
-          </div>
-
-          {/* Health Bar Track */}
-          <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-700/80 relative">
-            <div
-              className={`h-full rounded-full transition-all duration-75 ${
-                monster.isBoss
-                  ? 'bg-gradient-to-r from-red-600 via-rose-500 to-amber-400'
-                  : 'bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400'
-              }`}
-              style={{ width: `${hpPercent}%` }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center text-[9px] font-black text-white/90 drop-shadow">
-              {Math.ceil(hpPercent)}%
-            </div>
-          </div>
         </div>
       </div>
 

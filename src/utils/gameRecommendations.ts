@@ -197,12 +197,12 @@ export function computeGameRecommendations(
   // Apply refresh rotation if user pressed "Làm mới gợi ý"
   const total = candidates.length;
   if (total === 0) return [];
-  const normalizedOffset = refreshOffset % Math.max(1, total - 3);
+  const normalizedOffset = refreshOffset % Math.max(1, total - 2);
 
-  // Take a window of 3 to 4 games
-  const selected = candidates.slice(normalizedOffset, normalizedOffset + 4);
+  // Take a window of exactly 3 games
+  const selected = candidates.slice(normalizedOffset, normalizedOffset + 3);
   if (selected.length < 3) {
-    return candidates.slice(0, 4);
+    return candidates.slice(0, 3);
   }
   return selected;
 }

@@ -60,30 +60,30 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
     <div
       ref={containerRef}
       id={`game-card-${game.id}`}
-      className="group relative rounded-2xl bg-[#141414] border border-white/5 hover:border-indigo-500/50 p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 hover:bg-[#171717] hover:shadow-lg hover:shadow-indigo-500/10 overflow-hidden min-h-[148px]"
+      className="group relative rounded-xl sm:rounded-2xl bg-[#141414] border border-white/5 hover:border-indigo-500/50 p-2 sm:p-3 flex flex-col justify-between transition-all duration-200 hover:bg-[#171717] hover:shadow-lg hover:shadow-indigo-500/10 overflow-hidden min-h-[135px] sm:min-h-[148px]"
     >
       {!isIntersected ? (
         /* Lightweight Skeleton Placeholder: Zero Cumulative Layout Shift (CLS = 0) */
         <div className="w-full h-full flex flex-col justify-between animate-pulse">
           <div>
-            <div className="flex items-start justify-between gap-2 mb-2.5">
+            <div className="flex items-start justify-between gap-1.5 mb-2">
               <div
-                className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 shrink-0"
+                className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 shrink-0"
                 style={{ backgroundColor: `${game.themeColor || '#6366f1'}15` }}
               />
-              <div className="flex items-center gap-1.5">
-                <div className="w-14 h-4 bg-white/5 rounded-md" />
-                <div className="w-8 h-8 rounded-lg bg-white/5" />
+              <div className="flex items-center gap-1">
+                <div className="w-10 sm:w-14 h-4 bg-white/5 rounded-md" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/5" />
               </div>
             </div>
-            <div className="h-4 w-32 bg-white/10 rounded-md mb-2" />
+            <div className="h-3.5 sm:h-4 w-24 sm:w-32 bg-white/10 rounded-md mb-2" />
           </div>
 
-          <div className="pt-2 border-t border-white/5 flex items-center justify-between">
-            <div className="w-12 h-5 bg-white/5 rounded" />
+          <div className="pt-1.5 sm:pt-2 border-t border-white/5 flex items-center justify-between">
+            <div className="w-8 sm:w-12 h-4 sm:h-5 bg-white/5 rounded" />
             <div className="flex items-center gap-1">
-              <div className="w-8 h-8 bg-white/5 rounded-lg" />
-              <div className="w-16 h-8 bg-white/10 rounded-lg" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/5 rounded-lg" />
+              <div className="w-12 sm:w-16 h-6 sm:h-8 bg-white/10 rounded-lg" />
             </div>
           </div>
         </div>
@@ -92,9 +92,9 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
         <div className="w-full h-full flex flex-col justify-between transition-opacity duration-300 opacity-100">
           <div>
             {/* Card Header: Icon, Category Badge & Favorite Heart */}
-            <div className="flex items-start justify-between gap-2 mb-2.5">
+            <div className="flex items-start justify-between gap-1.5 mb-1.5 sm:mb-2.5">
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg border border-white/10 group-hover:scale-105 group-hover:border-indigo-500/50 transition-all shrink-0 cursor-pointer"
+                className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg sm:text-2xl shadow-lg border border-white/10 group-hover:scale-105 group-hover:border-indigo-500/50 transition-all shrink-0 cursor-pointer"
                 style={{ backgroundColor: `${game.themeColor}25` }}
                 onClick={() => onOpenDetail(game.id)}
                 title={`Mở chi tiết ${game.title}`}
@@ -102,11 +102,11 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                 {game.icon}
               </div>
 
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/5 text-indigo-400 border border-white/10 uppercase truncate max-w-[75px]">
+              <div className="flex items-center gap-1 min-w-0">
+                <span className="text-[8px] sm:text-[9px] font-bold px-1 sm:px-1.5 py-0.5 rounded bg-white/5 text-indigo-400 border border-white/10 uppercase truncate max-w-[55px] sm:max-w-[75px]">
                   {game.category}
                 </span>
-                <div className="hidden sm:inline-flex items-center gap-1 text-[9px] text-slate-400 bg-[#0a0a0c] px-1.5 py-0.5 rounded border border-white/5">
+                <div className="hidden md:inline-flex items-center gap-1 text-[9px] text-slate-400 bg-[#0a0a0c] px-1.5 py-0.5 rounded border border-white/5">
                   <span className="w-1 h-1 rounded-full bg-emerald-400" />
                   <span>{(stats?.activePlayers || 500).toLocaleString()}</span>
                 </div>
@@ -119,14 +119,14 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                     e.stopPropagation();
                     onToggleFavorite(game.id);
                   }}
-                  className={`p-1.5 rounded-lg border transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center min-h-[32px] min-w-[32px] ${
+                  className={`p-1 sm:p-1.5 rounded-lg border transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px] ${
                     isFav
                       ? 'bg-rose-500/20 text-rose-400 border-rose-500/50 shadow-sm'
                       : 'bg-white/5 text-slate-500 border-white/5 hover:text-white hover:bg-white/10'
                   }`}
                   title={isFav ? 'Bỏ Yêu Thích' : 'Thêm Vào Yêu Thích'}
                 >
-                  <Heart className={`w-3.5 h-3.5 transition-transform active:scale-75 ${isFav ? 'fill-rose-500 text-rose-500' : ''}`} />
+                  <Heart className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform active:scale-75 ${isFav ? 'fill-rose-500 text-rose-500' : ''}`} />
                 </button>
               </div>
             </div>
@@ -134,14 +134,14 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
             {/* Game Title - Click to open detail */}
             <div
               onClick={() => onOpenDetail(game.id)}
-              className="cursor-pointer group/title mb-2"
+              className="cursor-pointer group/title mb-1.5 sm:mb-2"
             >
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 <h4 className="text-xs sm:text-sm font-bold text-white group-hover/title:text-indigo-400 transition-colors font-display truncate">
                   {game.title}
                 </h4>
                 {game.id === 'blocker' && (
-                  <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[8px] font-black uppercase shrink-0">
+                  <span className="px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[7px] sm:text-[8px] font-black uppercase shrink-0">
                     500 Xu
                   </span>
                 )}
@@ -150,10 +150,10 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
           </div>
 
           {/* Card Footer: High Score & Action Buttons */}
-          <div className="pt-2 border-t border-white/5 flex items-center justify-between gap-1.5">
+          <div className="pt-1.5 sm:pt-2 border-t border-white/5 flex items-center justify-between gap-1">
             <div className="text-left min-w-0">
-              <span className="text-[8px] text-slate-500 uppercase tracking-wider block leading-tight">Kỷ Lục</span>
-              <span className="text-xs font-black font-mono text-yellow-500 truncate block leading-tight">
+              <span className="text-[7px] sm:text-[8px] text-slate-500 uppercase tracking-wider block leading-tight">Kỷ Lục</span>
+              <span className="text-[10px] sm:text-xs font-black font-mono text-yellow-500 truncate block leading-tight">
                 {personalHighScore.toLocaleString()}
               </span>
             </div>
@@ -164,10 +164,10 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                 id={`btn-detail-card-${game.id}`}
                 type="button"
                 onClick={() => onOpenDetail(game.id)}
-                className="p-1.5 rounded-lg bg-white/5 hover:bg-yellow-500/20 text-slate-300 hover:text-yellow-400 border border-white/10 hover:border-yellow-500/30 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[32px] min-w-[32px]"
+                className="p-1 sm:p-1.5 rounded-lg bg-white/5 hover:bg-yellow-500/20 text-slate-300 hover:text-yellow-400 border border-white/10 hover:border-yellow-500/30 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px]"
                 title="Xem Top 5 & Thể Lệ"
               >
-                <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-400" />
               </button>
 
               {/* AI Practice Button */}
@@ -176,10 +176,10 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                   id={`btn-play-ai-${game.id}`}
                   type="button"
                   onClick={() => onLaunchGame(game.id, true)}
-                  className="p-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[32px] min-w-[32px]"
+                  className="p-1 sm:p-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px]"
                   title="Luyện Với AI"
                 >
-                  <Bot className="w-3.5 h-3.5 text-indigo-400" />
+                  <Bot className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-400" />
                 </button>
               )}
 
@@ -188,11 +188,11 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                 id={`btn-play-${game.id}`}
                 type="button"
                 onClick={() => onLaunchGame(game.id)}
-                className="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-1 active:scale-95 cursor-pointer min-h-[32px]"
+                className="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-1 active:scale-95 cursor-pointer min-h-[26px] sm:min-h-[32px]"
                 title="Chơi Ngay"
               >
-                <Play className="w-3.5 h-3.5 fill-current" />
-                <span className="text-[11px] font-bold">Chơi</span>
+                <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+                <span className="text-[10px] sm:text-[11px] font-bold">Chơi</span>
               </button>
             </div>
           </div>
