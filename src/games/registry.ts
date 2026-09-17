@@ -35,6 +35,9 @@ import { CHESS_ACHIEVEMENTS, CHESS_DROP_RATES, CHESS_CONTROLS } from './chess/co
 import { CarEscapeGame } from './car-escape';
 import { CAR_ESCAPE_ACHIEVEMENTS, CAR_ESCAPE_DROP_RATES, CAR_ESCAPE_CONTROLS } from './car-escape/config';
 
+import { WordCrossGame } from './word-cross';
+import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
+
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
   'dungeon-tap': {
     id: 'dungeon-tap',
@@ -299,6 +302,22 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     achievements: TILE_2048_ACHIEVEMENTS,
     dropRates: TILE_2048_DROP_RATES,
     component: Tile2048Game,
+  },
+  'word-cross': {
+    id: 'word-cross',
+    title: 'Word Search',
+    shortDesc: 'Tìm và nối chữ cái để hoàn thành từ.',
+    description: 'Nối các chữ cái theo các hướng ngang, dọc, chéo để tạo thành từ theo danh sách có sẵn. 100 màn chơi tăng dần độ khó cùng nhiều chế độ chơi.',
+    category: 'Arcade',
+    difficulty: 'Trung Bình',
+    icon: '🔠',
+    bannerGradient: 'from-fuchsia-900/60 via-purple-950/80 to-slate-900',
+    themeColor: '#d946ef',
+    tags: ['Word Search', 'Tìm Chữ', 'Giải Đố', 'Vocabulary'],
+    controls: WORD_CROSS_CONTROLS,
+    achievements: WORD_CROSS_ACHIEVEMENTS,
+    dropRates: WORD_CROSS_DROP_RATES,
+    component: WordCrossGame,
   },
 };
 
