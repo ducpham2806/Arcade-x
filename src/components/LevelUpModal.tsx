@@ -1,16 +1,28 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Trophy, Coins, Gem, ArrowUpRight, Award } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Sparkles, Trophy, Coins, Gem, ArrowUpRight } from 'lucide-react';
 import { usePlayer } from '../context/PlayerContext';
+import { useGame } from '../context/GameContext';
 import { soundEngine } from '../services/audio';
 
 export const LevelUpModal: React.FC = () => {
   const { levelUpInfo, dismissLevelUp } = usePlayer();
+  const { activeGameId } = useGame();
 
-  if (!levelUpInfo) return null;
+  // CRITICAL REQUIREMENT:
+  // "popup lên cấp hiện tại hiển thị ra khi user đang chơi game, gây khó chịu và cắt ngang trải nghiệm chơi game,
+  // bạn hãy đổi thành dạng toast chúc mừng khi user đang ở trong 1 màn chơi. Sau khi ra màn hình launcher thì sẽ có tín hiệu thông báo rõ ràng hơn về việc lên cấp của account"
+  // If user is currently playing a game, DO NOT display the blocking modal! Toast is handled by NonIntrusiveToastManager.
+  if (!levelUpInfo || activeGameId !== null) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div
+      id="level-up-launcher-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Chúc mừng lên cấp"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
+    >
       <motion.div
         initial={{ scale: 0.8, opacity: 0, y: 30 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -36,7 +48,7 @@ export const LevelUpModal: React.FC = () => {
           Cấp Độ <span className="text-indigo-400">+{levelUpInfo.newLevel}</span>
         </h2>
         <p className="text-xs text-neutral-300 mb-6">
-          Chúc mừng bạn đã đạt mốc kinh nghiệm mới! Các phần thưởng giá trị đã được cộng trực tiếp vào kho đồ.
+          Chúc mừng bạn đã đạt mốc kinh nghiệm mới! Các phần thưởng giá trị đã được cộng trực tiếp vào kho đồ tài khoản.
         </p>
 
         {/* Rewards Box */}
@@ -63,6 +75,7 @@ export const LevelUpModal: React.FC = () => {
         </div>
 
         <button
+          id="btn-claim-level-up"
           type="button"
           onClick={() => {
             soundEngine.play('claim');
@@ -70,10 +83,11 @@ export const LevelUpModal: React.FC = () => {
           }}
           className="w-full py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 active:scale-95 text-white font-extrabold text-sm shadow-lg shadow-indigo-600/40 transition-all cursor-pointer flex items-center justify-center gap-2"
         >
-          <span>Tuyệt Vời! Tiếp Tục Chơi</span>
+          <span>Tuyệt Vời! Tiếp Tục Khám Phá</span>
           <ArrowUpRight className="w-4 h-4" />
         </button>
       </motion.div>
     </div>
   );
 };
+

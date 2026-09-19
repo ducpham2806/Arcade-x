@@ -207,14 +207,30 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-40 bg-black/85 backdrop-blur-md flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-w-lg w-full bg-[#0e0e12] border border-indigo-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl shadow-indigo-950/50 relative my-auto max-h-[calc(100vh-9.5rem)] sm:max-h-[calc(100vh-6.5rem)] flex flex-col"
+        className="max-w-lg w-full h-[90vh] sm:h-[650px] max-h-[700px] bg-[#0e0e12] border border-indigo-500/30 rounded-3xl p-5 sm:p-6 shadow-2xl shadow-indigo-950/50 relative my-auto flex flex-col overflow-hidden text-slate-200"
       >
-        {/* Close Button */}
-        <div className="absolute top-4 right-4 z-20">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/5 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+              {data.type === 'recap' ? <Camera className="w-5 h-5 text-cyan-400" /> : <Share2 className="w-5 h-5" />}
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-white font-display uppercase tracking-wide">
+                {data.type === 'recap' ? 'Game Recap • Thẻ Ảnh Tổng Kết' : data.type === 'achievement' ? 'Khoe Thành Tựu' : data.type === 'score' ? 'Khoe Kỷ Lục Điểm' : 'Chia Sẻ Hồ Sơ'}
+              </h2>
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate max-w-[240px] sm:max-w-xs">
+                {data.type === 'recap' 
+                  ? 'Thẻ ảnh tổng kết tự động chứa điểm số, thứ hạng' 
+                  : 'Chia sẻ thành tích rực rỡ lên mạng xã hội hoặc chat'}
+              </p>
+            </div>
+          </div>
+
           <CloseButton
             id="btn-close-share-modal"
             onClose={onClose}
@@ -222,22 +238,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
           />
         </div>
 
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            {data.type === 'recap' ? <Camera className="w-5 h-5 text-cyan-400" /> : <Share2 className="w-5 h-5" />}
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-white font-display uppercase tracking-wide">
-              {data.type === 'recap' ? 'Game Recap • Thẻ Ảnh Tổng Kết' : data.type === 'achievement' ? 'Khoe Thành Tựu' : data.type === 'score' ? 'Khoe Kỷ Lục Điểm' : 'Chia Sẻ Hồ Sơ'}
-            </h2>
-            <p className="text-xs text-slate-400">
-              {data.type === 'recap' 
-                ? 'Thẻ ảnh tổng kết tự động chứa điểm số, thứ hạng và dấu thời gian ván đấu' 
-                : 'Chia sẻ thành tích rực rỡ lên mạng xã hội hoặc kênh chat game'}
-            </p>
-          </div>
-        </div>
+        {/* Scrollable Share Body */}
+        <div className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar min-h-0">
 
         {/* Game Recap Card Image Preview if available */}
         {data.recapImageUrl ? (
@@ -397,9 +399,10 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
             </button>
           </div>
         </div>
+        </div>
 
         {/* Action 3: Copy Link & Copy Caption */}
-        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
+        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 shrink-0">
           <button
             id="btn-copy-share-link"
             type="button"

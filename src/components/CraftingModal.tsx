@@ -453,11 +453,11 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
         soundEngine.play('click');
         setActiveModal('none');
       }}
-      className="fixed inset-0 z-40 flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="arcadex-modal-overlay"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-5xl bg-[#0b0c14] border border-white/10 rounded-2xl sm:rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col h-[calc(100vh-9.5rem)] sm:h-[calc(100vh-6.5rem)] overflow-hidden"
+        className="arcadex-modal-container bg-[#0b0c14] border border-white/10"
       >
         
         {/* HEADER TOP BAR */}

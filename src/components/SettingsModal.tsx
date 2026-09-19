@@ -20,6 +20,7 @@ import {
   setAutoUpdateEnabled,
   isAutoUpdateEnabled,
   simulateNewVersionForTest,
+  triggerForceUpdateModal,
 } from '../services/updateService';
 import { hapticService } from '../services/haptics';
 import { getStoredLanguage, setStoredLanguage, t, Language } from '../services/languageService';
@@ -116,11 +117,11 @@ export const SettingsModal: React.FC = () => {
         } catch {}
         setActiveModal('none');
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="arcadex-modal-overlay"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md max-h-[85vh] overflow-y-auto bg-[#12121a] border border-indigo-500/30 rounded-3xl p-6 shadow-2xl shadow-indigo-950/50 relative select-none animate-in zoom-in-95 duration-200 custom-scrollbar text-slate-200"
+        className="arcadex-modal-container-sm bg-[#12121a] border border-indigo-500/30 p-6 shadow-2xl shadow-indigo-950/50 relative select-none text-slate-200"
       >
         {/* Close Button */}
         <button
@@ -139,8 +140,8 @@ export const SettingsModal: React.FC = () => {
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6 pr-10">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shadow-lg">
+        <div className="flex items-center gap-3 mb-4 pr-10 shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shadow-lg shrink-0">
             <Sliders className="w-5 h-5" />
           </div>
           <div>
@@ -152,7 +153,7 @@ export const SettingsModal: React.FC = () => {
         </div>
 
         {/* Toggles & Options List */}
-        <div className="space-y-3.5">
+        <div className="arcadex-modal-body space-y-3.5 pr-1 custom-scrollbar">
           {/* LANGUAGE SWITCHER */}
           <div className="flex items-center justify-between bg-[#181824] border border-white/10 rounded-2xl p-3.5 shadow-inner">
             <div className="flex items-center gap-3">
@@ -376,12 +377,12 @@ export const SettingsModal: React.FC = () => {
                     hapticService.tap();
                   } catch {}
                   setActiveModal('none');
-                  simulateNewVersionForTest();
+                  triggerForceUpdateModal('2.5.2');
                 }}
-                className="py-2 px-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer shadow-amber-950/40"
+                className="py-2 px-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer shadow-indigo-950/40 col-span-2 mt-1 border border-indigo-400/30"
               >
-                <RefreshCw className="w-3.5 h-3.5 text-amber-200 animate-spin" />
-                <span>{t('testUpdate', currentLang)}</span>
+                <RefreshCw className="w-3.5 h-3.5 text-amber-300" />
+                <span>Thử Nghiệm Popup Force Update Launcher</span>
               </button>
             </div>
           </div>

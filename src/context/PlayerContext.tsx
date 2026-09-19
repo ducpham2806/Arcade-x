@@ -69,11 +69,26 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         spread: 70,
         origin: { y: 0.6 },
       });
-      setLevelUpInfo({
+
+      const nextLevelUpInfo = {
         newLevel,
         rewardCoins: rewardCoinsTotal,
         rewardGems: rewardGemsTotal,
-      });
+      };
+
+      setLevelUpInfo(nextLevelUpInfo);
+
+      // Dispatch toast event so if user is currently playing a game, a non-intrusive toast pops up
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('arcadex:show_toast', {
+            detail: {
+              type: 'level_up',
+              levelUpInfo: nextLevelUpInfo,
+            },
+          })
+        );
+      }
     } else {
       prevLevelRef.current = profile.level;
     }

@@ -133,13 +133,13 @@ export const FriendsModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="arcadex-modal-overlay">
       <motion.div
         initial={{ scale: 0.92, opacity: 0, y: 15 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.92, opacity: 0, y: 15 }}
         transition={{ type: 'spring', damping: 24, stiffness: 300 }}
-        className="relative w-full max-w-2xl bg-neutral-900/95 border border-cyan-500/30 rounded-2xl shadow-2xl shadow-cyan-950/50 overflow-hidden flex flex-col max-h-[90vh]"
+        className="arcadex-modal-container-md bg-neutral-900/95 border border-cyan-500/30"
       >
         {/* Header */}
         <div className="relative px-5 py-4 border-b border-neutral-800 bg-gradient-to-r from-cyan-950/40 via-neutral-900 to-indigo-950/40 flex items-center justify-between">
@@ -230,7 +230,7 @@ export const FriendsModal: React.FC = () => {
         </div>
 
         {/* Modal Content */}
-        <div className="p-5 flex-1 overflow-y-auto space-y-4 relative">
+        <div className="arcadex-modal-body p-5 space-y-4 relative custom-scrollbar">
           {/* Toast Notification for Gift / Actions */}
           <AnimatePresence>
             {toastNotification && (

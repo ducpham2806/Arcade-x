@@ -39,6 +39,7 @@ import { usePlayer } from './context/PlayerContext';
 import { useRippleEffect } from './hooks/useRippleEffect';
 import { AchievementUnlockedPopup } from './components/AchievementUnlockedPopup';
 import { LevelUpModal } from './components/LevelUpModal';
+import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { MonthlyLoginCalendarModal } from './components/MonthlyLoginCalendarModal';
 import { DailySpinWheelModal } from './components/DailySpinWheelModal';
 import { PvpMatchHistoryModal } from './components/PvpMatchHistoryModal';
@@ -386,8 +387,11 @@ const AppContent: React.FC = () => {
       {/* Daily Login Reward Popup Modal */}
       <DailyLoginRewardModal />
 
-      {/* Level Up Celebration Modal */}
+      {/* Level Up Celebration Modal (Displayed on Launcher) */}
       <LevelUpModal />
+
+      {/* Launcher Force Update Modal (Hidden when in-game, shown on launcher with persistent blur overlay) */}
+      <ForceUpdateModal />
 
       {/* Primary Fixed Mobile Bottom Navigation Bar (Active on Main Menu & Hub) */}
       {!activeGameId && <MobileNav />}

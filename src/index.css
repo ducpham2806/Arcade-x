@@ -186,3 +186,107 @@
 .animate-shimmer {
   animation: shimmerBar 1.8s infinite linear;
 }
+
+/* ==========================================================================
+   Standardized Global Modal System (ArcadeX Modal Classes)
+   Prevents layout jumping & ensures consistent sizing across all screens
+   ========================================================================== */
+
+.arcadex-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
+  .arcadex-modal-overlay {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .arcadex-modal-overlay {
+    padding: 1.5rem;
+  }
+}
+
+/* Large / Full-Feature Modal Container (Profile, Shop, Crafting, Achievements, Leaderboard, Menu Tiện Ích) */
+.arcadex-modal-container,
+.arcadex-modal-container-xl {
+  position: relative;
+  width: 100%;
+  max-width: 64rem;
+  height: 92vh;
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+}
+
+@media (max-width: 639px) {
+  .arcadex-modal-container,
+  .arcadex-modal-container-xl {
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+}
+
+/* Medium Modal Container (Daily Quests, Friends, Weekly Quests, Hall of Fame, Game Detail, Auth) */
+.arcadex-modal-container-md {
+  position: relative;
+  width: 100%;
+  max-width: 52rem;
+  height: 90vh;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+}
+
+@media (min-width: 640px) {
+  .arcadex-modal-container-md {
+    height: 84vh;
+  }
+}
+
+/* Compact Modal Container (Settings, PvP History, Share) */
+.arcadex-modal-container-sm {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  height: 88vh;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+}
+
+@media (min-width: 640px) {
+  .arcadex-modal-container-sm {
+    height: 660px;
+  }
+}
+
+/* Independent Scrollable Body Area (Ensures zero jumping on tab change) */
+.arcadex-modal-body {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

@@ -76,11 +76,11 @@ export const DailyQuestsModal: React.FC = () => {
   return (
     <div
       onClick={() => setActiveModal('none')}
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      className="arcadex-modal-overlay"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-w-2xl w-full h-[92vh] sm:h-auto sm:max-h-[90vh] bg-[#0e0e0e] border border-white/10 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-2xl relative my-auto flex flex-col"
+        className="arcadex-modal-container bg-[#0e0e0e] border border-white/10 p-3.5 sm:p-6"
       >
         <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-white/5 shrink-0">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -135,7 +135,7 @@ export const DailyQuestsModal: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-2.5 sm:space-y-4 pr-1 mt-2.5 sm:mt-4">
+        <div className="arcadex-modal-body space-y-2.5 sm:space-y-4 pr-1 mt-2.5 sm:mt-4 custom-scrollbar">
           {/* TAB 1: DAILY QUESTS */}
           {mainTab === 'daily' && (
             <>

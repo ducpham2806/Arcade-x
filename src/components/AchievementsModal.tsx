@@ -118,11 +118,11 @@ export const AchievementsModal: React.FC = () => {
         soundEngine.play('click');
         setActiveModal('none');
       }}
-      className="fixed inset-0 z-40 bg-black/85 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
+      className="arcadex-modal-overlay"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-w-4xl w-full h-[92vh] sm:h-[88vh] max-h-[840px] bg-[#0c0c12] border border-white/10 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-2xl relative my-auto flex flex-col overflow-hidden"
+        className="arcadex-modal-container bg-[#0c0c12] border border-white/10 p-3 sm:p-6"
       >
         {/* Header */}
         <div className="flex items-center justify-between pb-2.5 sm:pb-4 border-b border-white/10 shrink-0">
@@ -262,7 +262,7 @@ export const AchievementsModal: React.FC = () => {
         </div>
 
         {/* Achievements List */}
-        <div className="flex-1 overflow-y-auto space-y-3 pr-1 pt-2">
+        <div className="arcadex-modal-body space-y-3 pr-1 pt-2 custom-scrollbar">
           {filtered.length === 0 ? (
             <div className="py-12 text-center text-slate-500 text-sm">
               Không có thành tựu nào khớp với bộ lọc này.

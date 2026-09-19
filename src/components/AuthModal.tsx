@@ -157,11 +157,11 @@ export const AuthModal: React.FC = () => {
   return (
     <div
       onClick={handleClose}
-      className="fixed inset-0 z-40 bg-black/85 backdrop-blur-md flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-w-xl w-full bg-[#0e0e0e] border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-2xl relative my-auto flex flex-col max-h-[calc(100vh-9.5rem)] sm:max-h-[calc(100vh-6.5rem)] overflow-hidden"
+        className="max-w-xl w-full h-[90vh] sm:h-[680px] max-h-[720px] bg-[#0e0e0e] border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-2xl relative my-auto flex flex-col overflow-hidden text-slate-200"
       >
         {/* Glow decoration */}
         <div className="absolute -top-24 -left-24 w-64 h-64 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />

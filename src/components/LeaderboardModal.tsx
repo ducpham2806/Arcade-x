@@ -284,11 +284,11 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ initialGameI
         soundEngine.play('click');
         setActiveModal('none');
       }}
-      className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
+      className="arcadex-modal-overlay"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-w-4xl w-full h-[92vh] sm:h-[84vh] max-h-[820px] bg-[#0a0a0a] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl relative my-auto flex flex-col overflow-hidden"
+        className="arcadex-modal-container bg-[#0a0a0a] border border-white/10"
       >
         {/* Header */}
         <div className="p-3.5 sm:p-6 border-b border-white/5 shrink-0 bg-gradient-to-b from-white/5 to-transparent">
@@ -638,7 +638,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ initialGameI
         </AnimatePresence>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-gradient-to-b from-[#0a0a0a] to-[#050505] space-y-4 sm:space-y-6">
+        <div className="arcadex-modal-body p-3 sm:p-6 bg-gradient-to-b from-[#0a0a0a] to-[#050505] space-y-4 sm:space-y-6 custom-scrollbar">
           {/* Top 3 Podium Cards */}
           {top3.length > 0 && (
             <div className="flex flex-col gap-3">

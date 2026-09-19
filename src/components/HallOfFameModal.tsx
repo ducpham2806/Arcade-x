@@ -95,11 +95,11 @@ export const HallOfFameModal: React.FC<Props> = ({ initialGameId, onClose }) => 
   return (
     <div
       id="modal-hall-of-fame"
-      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in select-none"
+      className="arcadex-modal-overlay select-none"
       onClick={handleClose}
     >
       <div
-        className="relative w-full max-w-4xl bg-gradient-to-b from-[#14141e] to-[#0d0d12] border border-amber-500/30 rounded-2xl shadow-2xl shadow-amber-500/10 flex flex-col max-h-[92vh] overflow-hidden"
+        className="arcadex-modal-container bg-gradient-to-b from-[#14141e] to-[#0d0d12] border border-amber-500/30 shadow-2xl shadow-amber-500/10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Ambient Top Glow */}
@@ -199,7 +199,7 @@ export const HallOfFameModal: React.FC<Props> = ({ initialGameId, onClose }) => 
         </div>
 
         {/* Modal Body */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4">
+        <div className="arcadex-modal-body p-3 sm:p-6 space-y-3 sm:space-y-4 custom-scrollbar">
           {/* TAB 1: ALL-TIME RECORDS */}
           {activeTab === 'records' && (
             <div className="space-y-3 sm:space-y-4">

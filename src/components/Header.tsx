@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
-  const { profile, expNeeded } = usePlayer();
+  const { profile, expNeeded, levelUpInfo } = usePlayer();
   const {
     activeModal,
     setActiveModal,
@@ -105,8 +105,12 @@ export const Header: React.FC = () => {
             <div className="min-w-0">
               <div className="flex items-center gap-1">
                 <span className="text-xs font-bold text-white truncate max-w-[55px] xs:max-w-[75px] sm:max-w-[100px]">{profile.username}</span>
-                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 shrink-0">
-                  Lv.{profile.level}
+                <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold shrink-0 transition-all ${
+                  levelUpInfo
+                    ? 'bg-gradient-to-r from-amber-500 to-indigo-500 text-white shadow-md shadow-amber-500/50 animate-bounce ring-1 ring-amber-300'
+                    : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                }`}>
+                  {levelUpInfo ? `Lv.${profile.level} UP!` : `Lv.${profile.level}`}
                 </span>
               </div>
               <div className="w-14 sm:w-20 h-1.5 bg-[#050505] rounded-full overflow-hidden mt-0.5">

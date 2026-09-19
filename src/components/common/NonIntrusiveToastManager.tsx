@@ -15,12 +15,19 @@ export interface AchievementToastData {
   rewardExp: number;
 }
 
+export interface LevelUpToastData {
+  newLevel: number;
+  rewardCoins: number;
+  rewardGems: number;
+}
+
 interface ToastItem {
   id: string;
-  type: 'pvp_invite' | 'achievement_reward';
+  type: 'pvp_invite' | 'achievement_reward' | 'level_up';
   duration: number; // in milliseconds
   pvpData?: FriendChallenge;
   achievementData?: AchievementToastData;
+  levelUpData?: LevelUpToastData;
   createdAt: number;
 }
 
@@ -59,7 +66,7 @@ export const NonIntrusiveToastManager: React.FC = () => {
     setToasts((prev) => [newToast, ...prev.slice(0, 2)]);
   }, [activeIncomingChallenge]);
 
-  // 2. Listen for Achievement Reward & Custom Toast events
+  // 2. Listen for Achievement Reward & Level-Up Custom Toast events
   useEffect(() => {
     const handleCustomToast = (event: Event) => {
       const customEvent = event as CustomEvent;
@@ -79,6 +86,22 @@ export const NonIntrusiveToastManager: React.FC = () => {
         try {
           soundEngine.play('claim');
           hapticService.claimReward();
+        } catch {}
+
+        setToasts((prev) => [newToast, ...prev.slice(0, 2)]);
+      } else if (detail.type === 'level_up' && detail.levelUpInfo) {
+        const toastId = `lvl_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const newToast: ToastItem = {
+          id: toastId,
+          type: 'level_up',
+          duration: 5000, // 5 seconds display
+          levelUpData: detail.levelUpInfo,
+          createdAt: Date.now(),
+        };
+
+        try {
+          soundEngine.play('levelUp');
+          hapticService.levelUp();
         } catch {}
 
         setToasts((prev) => [newToast, ...prev.slice(0, 2)]);
@@ -304,6 +327,82 @@ export const NonIntrusiveToastManager: React.FC = () => {
                       )}
                     </div>
                   </div>
+                </div>
+              </motion.div>
+            );
+          }
+
+          if (toast.type === 'level_up' && toast.levelUpData) {
+            const lvl = toast.levelUpData;
+
+            return (
+              <motion.div
+                key={toast.id}
+                layout
+                initial={{ opacity: 0, y: -25, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 40, scale: 0.95 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                className="pointer-events-auto rounded-2xl bg-gradient-to-r from-[#171333]/95 via-[#131126]/95 to-[#0e0c1a]/95 border-2 border-indigo-500/60 p-3.5 shadow-2xl shadow-indigo-950/60 backdrop-blur-xl overflow-hidden relative"
+              >
+                {/* Auto-expire countdown progress bar */}
+                <motion.div
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: toast.duration / 1000, ease: 'linear' }}
+                  className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-400"
+                />
+
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                    <span className="text-amber-300 flex items-center gap-1 text-[11px] font-black uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      Chúc Mừng Lên Cấp!
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => removeToast(toast.id)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 border border-indigo-300/40 flex items-center justify-center text-2xl shadow-lg shadow-indigo-500/30 shrink-0">
+                    🏆
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <h5 className="text-xs sm:text-sm font-black text-white">
+                        Cấp Độ <span className="text-indigo-400">+{lvl.newLevel}</span>
+                      </h5>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/40">
+                        LEVEL UP
+                      </span>
+                    </div>
+
+                    {/* Reward Pills */}
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded-lg border border-amber-500/25 font-mono">
+                        <Coins className="w-2.5 h-2.5" />
+                        +{lvl.rewardCoins} Xu
+                      </span>
+
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-300 bg-purple-500/10 px-1.5 py-0.5 rounded-lg border border-purple-500/25 font-mono">
+                        <Gem className="w-2.5 h-2.5" />
+                        +{lvl.rewardGems} KC
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-2 text-[10px] text-slate-400 italic text-right">
+                  Đã cộng vào kho đồ • Nhận vinh danh tại Launcher
                 </div>
               </motion.div>
             );

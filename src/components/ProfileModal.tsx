@@ -266,11 +266,11 @@ export const ProfileModal: React.FC = () => {
         soundEngine.play('click');
         setActiveModal('none');
       }}
-      className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      className="arcadex-modal-overlay"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-w-2xl w-full h-[82vh] max-h-[740px] min-h-[600px] bg-[#0e0e0e] border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative my-auto flex flex-col overflow-hidden"
+        className="arcadex-modal-container bg-[#0e0e0e] border border-white/10 p-4 sm:p-6"
       >
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/5 shrink-0">
@@ -363,7 +363,7 @@ export const ProfileModal: React.FC = () => {
         </div>
 
         {/* Profile Content Body */}
-        <div className="flex-1 overflow-y-auto space-y-6 pr-1 pt-4">
+        <div className="arcadex-modal-body space-y-6 pr-1 pt-4 custom-scrollbar">
           {activeTab === 'overview' && (
             <>
           {/* Account Status Card */}

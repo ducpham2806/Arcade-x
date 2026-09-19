@@ -123,11 +123,11 @@ export const GameDetailModal: React.FC = () => {
     <div
       id="game-detail-modal-overlay"
       onClick={closeGameDetail}
-      className="fixed inset-0 z-40 bg-black/85 backdrop-blur-md flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-w-3xl w-full h-[82vh] max-h-[760px] min-h-[650px] bg-[#0d0d12] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl relative my-auto flex flex-col overflow-hidden text-slate-200"
+        className="max-w-3xl w-full h-[90vh] sm:h-[84vh] max-h-[780px] bg-[#0d0d12] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl relative my-auto flex flex-col overflow-hidden text-slate-200"
       >
         {/* Header Hero Banner */}
         <div

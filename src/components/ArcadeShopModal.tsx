@@ -319,11 +319,11 @@ export const ArcadeShopModal: React.FC = () => {
   return (
     <div
       id="arcade-shop-modal-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-hidden animate-in fade-in duration-200"
+      className="arcadex-modal-overlay"
     >
       <div
         id="arcade-shop-modal-container"
-        className="relative w-full max-w-5xl h-[92vh] max-h-[900px] flex flex-col bg-[#0d0d16] border border-amber-500/20 rounded-2xl sm:rounded-3xl shadow-[0_20px_70px_rgba(0,0,0,0.8)] overflow-hidden text-slate-100"
+        className="arcadex-modal-container bg-[#0d0d16] border border-amber-500/20 text-slate-100"
       >
         {/* Top Decorative Banner */}
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 via-cyan-400 to-fuchsia-500" />
@@ -456,7 +456,7 @@ export const ArcadeShopModal: React.FC = () => {
         </div>
 
         {/* Main Content Area: Products Grid or Booster Section */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <div className="arcadex-modal-body p-4 sm:p-6 space-y-4 custom-scrollbar">
           {selectedCategory === 'boosters' ? (
             <div className="space-y-3">
               {/* Inventory overview header - compact */}

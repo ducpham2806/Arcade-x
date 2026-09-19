@@ -48,7 +48,7 @@ export const PvpMatchHistoryModal: React.FC = () => {
         exit={{ scale: 0.95, opacity: 0, y: 15 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-[#0f111a] border border-purple-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-200"
+        className="w-full max-w-lg bg-[#0f111a] border border-purple-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[85vh] sm:h-[620px] max-h-[680px] text-slate-200"
       >
         {/* Header */}
         <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-purple-950/60 via-[#121020] to-[#0f111a] shrink-0">
