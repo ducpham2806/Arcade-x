@@ -262,26 +262,25 @@ export const CharacterInventoryModal: React.FC = () => {
         {/* Top Header Bar */}
         <div className="bg-gradient-to-r from-[#141726] via-[#1a1e33] to-[#141726] px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-white/10 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shadow-lg shrink-0 text-sm sm:text-base">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shadow-lg shrink-0 text-sm sm:text-base" title="Nhân Vật & Hành Trang">
               🛡️
             </div>
-            <div className="min-w-0">
-              <h2 className="text-xs sm:text-base font-extrabold text-white tracking-wide uppercase font-display flex items-center gap-1.5 truncate">
-                <span>Nhân Vật & Hành Trang</span>
-                <span className="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono shrink-0">
-                  Lv.{profile.level}
-                </span>
-              </h2>
-              <p className="text-[11px] text-slate-400 hidden sm:block truncate">Trang thông tin nhân vật, chỉ số chiến đấu và kho rương đồ trực quan</p>
+            <div className="min-w-0 flex items-center gap-2">
+              <span className="text-[10px] sm:text-xs font-mono font-black px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">
+                Lv.{profile.level}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-white truncate">
+                {profile.username}
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {/* Cloud Sync Button */}
+            {/* Cloud Sync Button (Icon Only) */}
             <button
               type="button"
               onClick={() => manualSyncInventory()}
               disabled={cloudSyncStatus === 'syncing'}
-              className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl border text-xs font-medium transition-colors cursor-pointer shadow-sm ${
+              className={`p-2 rounded-xl border text-xs font-medium transition-colors cursor-pointer shadow-sm flex items-center justify-center ${
                 cloudSyncStatus === 'syncing'
                   ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
                   : cloudSyncStatus === 'error'
@@ -295,28 +294,20 @@ export const CharacterInventoryModal: React.FC = () => {
               }
             >
               {cloudSyncStatus === 'syncing' ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
               ) : (
-                <Cloud className="w-3.5 h-3.5 text-emerald-400" />
+                <Cloud className="w-4 h-4 text-emerald-400" />
               )}
-              <span className="hidden sm:inline">
-                {cloudSyncStatus === 'syncing'
-                  ? 'Đang sync...'
-                  : cloudSyncStatus === 'error'
-                  ? 'Thử lại sync'
-                  : 'Cloud Sync'}
-              </span>
             </button>
 
+            {/* Shop Button (Icon Only) */}
             <button
               type="button"
               onClick={() => setActiveModal('shop')}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition-colors cursor-pointer shadow-sm"
-              title="Mở Cửa Hàng Arcade để mua thêm Skin độc quyền"
+              className="p-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition-colors cursor-pointer shadow-sm flex items-center justify-center"
+              title="Mở Cửa Hàng Arcade Skins"
             >
-              <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Cửa Hàng</span>
-              <span>Skins</span>
+              <ShoppingBag className="w-4 h-4 text-amber-400" />
             </button>
             <CloseButton onClick={() => setActiveModal('none')} />
           </div>
@@ -331,42 +322,38 @@ export const CharacterInventoryModal: React.FC = () => {
           <div className="bg-[#121522] rounded-2xl border border-white/10 p-3.5 sm:p-4 shadow-xl shrink-0 flex flex-col gap-3">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold">
-                  🛡️
+                <div className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold" title="Trang Bị Đang Mặc (Active Gear)">
+                  ⚔️
                 </div>
-                <div>
-                  <h3 className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
-                    <span>Trang Bị Đang Mặc (Active Gear)</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40 text-indigo-300 border border-indigo-500/30">
-                      {profile.username} • Lv.{profile.level}
-                    </span>
-                  </h3>
-                  <p className="text-[11px] text-slate-400">10 khe trang bị chiến đấu kích hoạt trực tiếp cho nhân vật</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-black px-2 py-0.5 rounded bg-black/40 text-indigo-300 border border-indigo-500/30">
+                    {profile.username} • Lv.{profile.level}
+                  </span>
                 </div>
               </div>
 
-              {/* Combat Attributes Quick Summary */}
+              {/* Combat Attributes Quick Summary (Icon Only) */}
               <div className="grid grid-cols-4 gap-2 text-center text-xs font-bold w-full md:w-auto">
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
-                  <span className="text-[10px] text-rose-400 uppercase">ATK</span>
+                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="Sức Tấn Công (ATK)">
+                  <Sword className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                   <span className="text-white font-mono">{stats.atk}</span>
                 </div>
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
-                  <span className="text-[10px] text-blue-400 uppercase">DEF</span>
+                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="Phòng Thủ (DEF)">
+                  <Shield className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                   <span className="text-white font-mono">{stats.def}</span>
                 </div>
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
-                  <span className="text-[10px] text-emerald-400 uppercase">Tốc Độ</span>
+                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="Tốc Độ (+Speed%)">
+                  <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="text-white font-mono">+{stats.speed}%</span>
                 </div>
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
-                  <span className="text-[10px] text-amber-400 uppercase">May Mắn</span>
+                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="May Mắn (+Luck%)">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span className="text-white font-mono">+{stats.luck}%</span>
                 </div>
               </div>
             </div>
 
-            {/* 10 Equipment Slots Horizontal / Grid Bar */}
+            {/* 10 Equipment Slots Horizontal / Grid Bar (Icon Focus, Tooltips) */}
             <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
               {[
                 { name: 'Vũ Khí', item: equippedWeapon, icon: '⚔️', desc: 'Vũ khí chính' },
@@ -396,11 +383,8 @@ export const CharacterInventoryModal: React.FC = () => {
                     className={`aspect-square rounded-xl bg-black/75 border-2 flex flex-col items-center justify-center p-1 relative transition-all group ${slot.item ? 'cursor-pointer hover:scale-105 hover:border-indigo-400 shadow-md' : 'opacity-60'}`}
                     title={`${slot.name}: ${slot.item?.name || slot.desc}`}
                   >
-                    <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform">
+                    <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">
                       {slot.item?.icon || slot.icon}
-                    </span>
-                    <span className="text-[9px] text-slate-300 truncate w-full text-center mt-0.5 font-medium">
-                      {slot.name}
                     </span>
                     {slot.item && (
                       <>
@@ -415,10 +399,10 @@ export const CharacterInventoryModal: React.FC = () => {
                             soundEngine.play('click');
                             unequipItem(slot.item.id);
                           }}
-                          className="absolute bottom-1 left-1 right-1 bg-red-600/90 hover:bg-red-500 text-white font-black text-[8px] py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-0.5 opacity-0 group-hover:opacity-100 z-20"
+                          className="absolute bottom-1 left-1 right-1 bg-red-600/90 hover:bg-red-500 text-white font-black text-[9px] py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-0.5 opacity-0 group-hover:opacity-100 z-20"
                           title="Tháo nhanh"
                         >
-                          <span>⚡ Tháo</span>
+                          <span>✕</span>
                         </button>
                       </>
                     )}
@@ -437,29 +421,29 @@ export const CharacterInventoryModal: React.FC = () => {
               {/* Category Tabs: Grid layout, NO horizontal scroll */}
               <div className="grid grid-cols-6 gap-1 bg-[#0e1017] p-1 rounded-xl border border-white/10 w-full sm:w-auto">
                 {[
-                  { id: 'all' as FilterCategory, label: 'Tất Cả', icon: <Package className="w-3.5 h-3.5" />, count: counts.all },
-                  { id: 'weapons' as FilterCategory, label: 'Trang Bị', icon: <Sword className="w-3.5 h-3.5 text-indigo-400" />, count: counts.weapons },
-                  { id: 'skins' as FilterCategory, label: 'Skins', icon: <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />, count: counts.skins },
-                  { id: 'consumables' as FilterCategory, label: 'Tiêu Hao', icon: <FlaskConical className="w-3.5 h-3.5 text-amber-400" />, count: counts.consumables },
-                  { id: 'materials' as FilterCategory, label: 'Vật Liệu', icon: <Layers className="w-3.5 h-3.5 text-purple-400" />, count: counts.materials },
-                  { id: 'titles' as FilterCategory, label: 'Danh Hiệu', icon: <Award className="w-3.5 h-3.5 text-emerald-400" />, count: counts.titles },
+                  { id: 'all' as FilterCategory, label: 'Tất Cả', icon: <Package className="w-4 h-4" />, count: counts.all },
+                  { id: 'weapons' as FilterCategory, label: 'Trang Bị', icon: <Sword className="w-4 h-4 text-indigo-400" />, count: counts.weapons },
+                  { id: 'skins' as FilterCategory, label: 'Skins', icon: <ShoppingBag className="w-4 h-4 text-amber-400" />, count: counts.skins },
+                  { id: 'consumables' as FilterCategory, label: 'Tiêu Hao', icon: <FlaskConical className="w-4 h-4 text-amber-400" />, count: counts.consumables },
+                  { id: 'materials' as FilterCategory, label: 'Vật Liệu', icon: <Layers className="w-4 h-4 text-purple-400" />, count: counts.materials },
+                  { id: 'titles' as FilterCategory, label: 'Danh Hiệu', icon: <Award className="w-4 h-4 text-emerald-400" />, count: counts.titles },
                 ].map(cat => (
                   <button
                     key={`inv-cat-${cat.id}`}
                     type="button"
+                    title={`${cat.label} (${cat.count})`}
                     onClick={() => {
                       soundEngine.play('click');
                       setFilterCategory(cat.id);
                     }}
-                    className={`flex items-center justify-center gap-1 sm:gap-1.5 px-2 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-colors cursor-pointer border ${
+                    className={`flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                       filterCategory === cat.id
-                        ? 'bg-indigo-600 text-white border-indigo-500 shadow'
-                        : 'text-slate-400 hover:text-white border-transparent'
+                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30'
+                        : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border-white/5'
                     }`}
                   >
                     {cat.icon}
-                    <span className="truncate">{cat.label}</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded-full bg-black/40 text-slate-300 font-mono">
+                    <span className="text-[10px] px-1 py-0.2 rounded-full bg-black/40 text-slate-300 font-mono font-bold">
                       {cat.count}
                     </span>
                   </button>
@@ -546,9 +530,13 @@ export const CharacterInventoryModal: React.FC = () => {
                         </span>
 
                         {isChestItem && (
-                          <span className="text-[7px] font-bold text-amber-300 bg-amber-500/10 px-1 py-0.2 rounded uppercase mt-auto">
-                            🎁 Mở
-                          </span>
+                          <button
+                            type="button"
+                            className="mt-1 w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs py-0.5 rounded shadow transition-all flex items-center justify-center"
+                            title="Mở Rương Vật Phẩm"
+                          >
+                            🎁
+                          </button>
                         )}
 
                         {isSkinTheme && !isSkinEquipped && (
@@ -559,10 +547,10 @@ export const CharacterInventoryModal: React.FC = () => {
                               soundEngine.play('powerup');
                               equipItem(item.id);
                             }}
-                            className="mt-1 w-full bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-[9px] py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-0.5"
+                            className="mt-1 w-full bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center"
                             title="Trang bị giao diện này"
                           >
-                            <span>🎨 Dùng</span>
+                            🎨
                           </button>
                         )}
 
@@ -574,15 +562,18 @@ export const CharacterInventoryModal: React.FC = () => {
                               soundEngine.play('powerup');
                               updateTitle(item.name);
                             }}
-                            className="mt-1 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[9px] py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-0.5"
+                            className="mt-1 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center"
                             title="Sử dụng danh hiệu này"
                           >
-                            <span>👑 Dùng</span>
+                            👑
                           </button>
                         )}
                         {item.isTitleMilestone && item.equipped && (
-                          <span className="mt-1 w-full bg-indigo-600/50 text-indigo-200 font-extrabold text-[8px] py-0.5 rounded text-center block mt-auto">
-                            Đang Dùng
+                          <span
+                            className="mt-1 w-full bg-indigo-600/50 text-indigo-200 font-extrabold text-xs py-0.5 rounded flex items-center justify-center mt-auto"
+                            title="Đang Sử Dụng Danh Hiệu"
+                          >
+                            <Check className="w-3 h-3 text-emerald-300" />
                           </span>
                         )}
 
@@ -594,10 +585,10 @@ export const CharacterInventoryModal: React.FC = () => {
                               soundEngine.play('powerup');
                               equipItem(item.id);
                             }}
-                            className="mt-1 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[9px] py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-0.5"
+                            className="mt-1 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center"
                             title="Mặc ngay"
                           >
-                            <span>⚡ Mặc</span>
+                            ⚔️
                           </button>
                         )}
                       </div>
@@ -607,9 +598,8 @@ export const CharacterInventoryModal: React.FC = () => {
               ) : (
                 <div className="text-center p-12 rounded-2xl bg-[#0e1017] border border-white/5 text-slate-400 my-auto flex flex-col items-center justify-center h-full">
                   <Package className="w-10 h-10 text-slate-600 mb-2 animate-pulse" />
-                  <h4 className="text-xs font-bold text-white mb-1">Không tìm thấy vật phẩm nào</h4>
-                  <p className="text-[11px] text-slate-500 max-w-xs">
-                    Hành trang của bạn đang trống ở danh mục này. Hãy chơi game để thu thập thêm!
+                  <p className="text-xs text-slate-500 max-w-xs">
+                    Hành trang trống
                   </p>
                 </div>
               )}
@@ -617,24 +607,24 @@ export const CharacterInventoryModal: React.FC = () => {
 
             {/* Bottom Currency & Quick Action Bar */}
             <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5 bg-[#0e1017] px-3 py-1.5 rounded-xl border border-amber-500/30 text-amber-400 font-mono font-bold">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-1.5 bg-[#0e1017] px-2.5 sm:px-3 py-1.5 rounded-xl border border-amber-500/30 text-amber-400 font-mono font-bold" title="Arcade Coins">
                   <Coins className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{profile.coins.toLocaleString()} Vạn</span>
+                  <span>{profile.coins.toLocaleString()}</span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-[#0e1017] px-3 py-1.5 rounded-xl border border-blue-500/30 text-blue-400 font-mono font-bold">
-                  <Gem className="w-3.5 h-3.5 text-blue-400" />
-                  <span>{profile.gems.toLocaleString()} Xu</span>
+                <div className="flex items-center gap-1.5 bg-[#0e1017] px-2.5 sm:px-3 py-1.5 rounded-xl border border-cyan-500/30 text-cyan-400 font-mono font-bold" title="Kim Cương">
+                  <Gem className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>{profile.gems.toLocaleString()}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setActiveModal('crafting')}
-                  className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold transition-all cursor-pointer flex items-center gap-1.5 text-xs"
+                  className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold transition-all cursor-pointer flex items-center justify-center text-xs"
+                  title="Đến Lò Rèn Thần Khí"
                 >
-                  <Hammer className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Đến Lò Rèn</span>
+                  <Hammer className="w-4 h-4 text-purple-400" />
                 </button>
               </div>
             </div>

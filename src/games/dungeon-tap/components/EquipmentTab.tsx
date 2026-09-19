@@ -17,8 +17,9 @@ import {
   Flame,
   Users,
   Award,
+  ArrowUpDown,
 } from 'lucide-react';
-import { formatNumber, calculateItemPower, isBetterItem } from '../utils/upgradeMath';
+import { formatNumber, calculateItemPower, calculateItemBasePower, getItemBaseStats, isBetterItem } from '../utils/upgradeMath';
 
 interface EquipmentTabProps {
   equipped: Record<EquipmentSlot, EquipmentItem | null>;
@@ -27,6 +28,7 @@ interface EquipmentTabProps {
   onEquipItem: (item: EquipmentItem) => void;
   onUpgradeItem: (item: EquipmentItem, count?: number) => void;
   onSellItem: (itemId: string) => void;
+  onSellAllItems?: () => void;
   onEquipBestAll?: () => void;
   allies?: HeroAlly[];
   allyInventory?: AllyEquipmentItem[];
@@ -60,6 +62,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   onEquipItem,
   onUpgradeItem,
   onSellItem,
+  onSellAllItems,
   onEquipBestAll,
   allies = [],
   allyInventory = [],
@@ -73,6 +76,13 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [filterSlot, setFilterSlot] = useState<EquipmentSlot | 'all'>('all');
+  const [confirmingSellAll, setConfirmingSellAll] = useState(false);
+
+  // Total sell value of items in inventory
+  const totalInventorySellValue = useMemo(
+    () => inventory.reduce((sum, item) => sum + item.sellValue, 0),
+    [inventory]
+  );
 
   // Derived live selected item (updates reactively upon upgrade without resetting or desyncing state)
   const selectedItem = useMemo(() => {
@@ -88,10 +98,61 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     return null;
   }, [selectedSlot, selectedItemId, equipped, inventory]);
 
+  // Inventory sort mode: 'default' | 'rarity_desc' | 'rarity_asc' | 'level_desc' | 'level_asc'
+  const [sortMode, setSortMode] = useState<
+    'default' | 'rarity_desc' | 'rarity_asc' | 'level_desc' | 'level_asc'
+  >('default');
+
+  const RARITY_WEIGHT: Record<ItemRarity, number> = {
+    legendary: 4,
+    epic: 3,
+    rare: 2,
+    common: 1,
+  };
+
   const filteredInventory =
     filterSlot === 'all' ? inventory : inventory.filter((i) => i.slot === filterSlot);
 
-  // Count items in inventory that are direct upgrades
+  // Sorted inventory applying active Sort by Rarity and Sort by Level
+  const displayInventory = useMemo(() => {
+    const seen = new Set<string>();
+    const uniqueList: EquipmentItem[] = [];
+    for (const item of filteredInventory) {
+      if (item && item.id && !seen.has(item.id)) {
+        seen.add(item.id);
+        uniqueList.push(item);
+      }
+    }
+
+    const list = [...uniqueList];
+    if (sortMode === 'rarity_desc') {
+      return list.sort((a, b) => {
+        const diff = RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
+        return diff !== 0 ? diff : b.level - a.level;
+      });
+    }
+    if (sortMode === 'rarity_asc') {
+      return list.sort((a, b) => {
+        const diff = RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
+        return diff !== 0 ? diff : a.level - b.level;
+      });
+    }
+    if (sortMode === 'level_desc') {
+      return list.sort((a, b) => {
+        const diff = b.level - a.level;
+        return diff !== 0 ? diff : RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
+      });
+    }
+    if (sortMode === 'level_asc') {
+      return list.sort((a, b) => {
+        const diff = a.level - b.level;
+        return diff !== 0 ? diff : RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
+      });
+    }
+    return list;
+  }, [filteredInventory, sortMode]);
+
+  // Count items in inventory that are direct upgrades (compares base Level 1 stats)
   const recommendedItems = inventory.filter((item) =>
     isBetterItem(item, equipped[item.slot])
   );
@@ -150,17 +211,23 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     return { can1, cost5, levels5, costMax, levelsMax };
   }, [selectedItem, gold]);
 
-  // Power calculations
+  // Base stats (Level 1) & Power calculations
+  const selectedBase = getItemBaseStats(selectedItem);
+  const currentBase = getItemBaseStats(currentEquippedInSlot);
+
   const selectedPower = calculateItemPower(selectedItem);
   const currentPower = calculateItemPower(currentEquippedInSlot);
   const nextPower = calculateItemPower(nextLevelPreview);
 
+  // When comparing 2 items (bag vs equipped), compare their Level 1 base stats!
+  const basePowerDiff = selectedBase.power - currentBase.power;
+
   const powerDiff = isSelectedAlreadyEquipped
     ? nextPower - selectedPower
-    : selectedPower - currentPower;
+    : basePowerDiff;
 
   const isSelectedAnUpgrade =
-    Boolean(selectedItem && !isSelectedAlreadyEquipped && (!currentEquippedInSlot || powerDiff > 0));
+    Boolean(selectedItem && !isSelectedAlreadyEquipped && (!currentEquippedInSlot || basePowerDiff > 0));
 
   return (
     <div className="flex flex-col gap-3 p-3 text-slate-200">
@@ -214,9 +281,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           </h3>
           <span className="text-[11px] font-mono text-cyan-400 font-bold">
             Tổng Sức Mạnh: ⚡{' '}
-            {Object.values(equipped).reduce(
-              (acc, item) => acc + calculateItemPower(item),
-              0
+            {formatNumber(
+              Object.values(equipped).reduce(
+                (acc, item) => acc + calculateItemPower(item),
+                0
+              )
             )}
           </span>
         </div>
@@ -235,39 +304,41 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     setSelectedSlot(slot);
                     setSelectedItemId(item.id);
                   } else {
-                    // Auto switch filter to that slot to help player find an item
                     setFilterSlot(slot);
                   }
                 }}
-                className={`relative flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl border transition-all active:scale-95 text-center min-h-[76px] ${
+                className={`relative flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl border transition-all active:scale-95 text-center min-h-[68px] ${
                   item && rarity
                     ? `${rarity.bg} ${rarity.border} hover:brightness-110 shadow-sm`
                     : 'bg-slate-950/60 border-slate-800 text-slate-500 hover:border-slate-700'
                 } ${selectedItem?.id === item?.id ? 'ring-2 ring-cyan-400' : ''}`}
+                title={item ? `${item.name} (Lv.${item.level})` : `Ô ${SLOT_NAMES[slot]} (Trống)`}
               >
+                {/* Slot corner badge */}
+                <span className="absolute top-1 left-1 text-[9px] opacity-60 select-none">
+                  {SLOT_ICONS[slot]}
+                </span>
+
                 {/* Upgrade Available Indicator Badge on Equipped Slot */}
                 {hasUpgradeInBag && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md shadow-emerald-500/40 animate-pulse z-10 flex items-center gap-0.5">
-                    ▲ ĐỔI
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 text-[9px] font-black px-1 py-0.2 rounded-full shadow-md shadow-emerald-500/40 animate-pulse z-10 flex items-center">
+                    ▲
                   </span>
                 )}
 
-                <span className="text-2xl sm:text-3xl mb-0.5 select-none">
+                <span className="text-2xl sm:text-3xl my-0.5 select-none drop-shadow">
                   {item ? item.icon : SLOT_ICONS[slot]}
-                </span>
-                <span className="text-[10px] font-bold truncate w-full text-slate-300 leading-tight">
-                  {item ? item.name : SLOT_NAMES[slot].split(' ')[0]}
                 </span>
 
                 {item ? (
                   <span
-                    className="text-[9px] font-mono font-bold uppercase mt-0.5"
+                    className="text-[10px] font-mono font-bold uppercase"
                     style={{ color: rarity?.color }}
                   >
                     Lv.{item.level}
                   </span>
                 ) : (
-                  <span className="text-[9px] font-mono text-slate-600 mt-0.5">Trống</span>
+                  <span className="text-[9px] font-mono text-slate-600">Trống</span>
                 )}
               </button>
             );
@@ -313,7 +384,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 <span>Trang bị Kiếm Sĩ đang kích hoạt. Bấm nâng cấp liên tục để tăng vọt lực chiến!</span>
               </div>
               <span className="text-[10px] bg-amber-500/20 text-amber-200 px-2 py-0.5 rounded-md font-mono shrink-0">
-                Lv.{selectedItem.level} ➔ Lv.{selectedItem.level + 1}
+                Lv.{formatNumber(selectedItem.level)} ➔ Lv.{formatNumber(selectedItem.level + 1)}
               </span>
             </div>
           ) : (
@@ -331,8 +402,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 {!currentEquippedInSlot
                   ? 'Vị trí này đang để trống! Hãy mặc ngay để kích hoạt các chỉ số chiến đấu.'
                   : isSelectedAnUpgrade
-                  ? `ĐỀ XUẤT: Món này mạnh hơn trang bị đang dùng (+${powerDiff} điểm sức mạnh)!`
-                  : `CÂN NHẮC: Món này có tổng sức mạnh thấp hơn món đang mặc (${powerDiff} điểm).`}
+                  ? `ĐỀ XUẤT: Món này có chỉ số Cấp 1 gốc cao hơn (+${formatNumber(powerDiff)} điểm sức mạnh)! Nâng cấp sẽ vượt trội hơn.`
+                  : `CÂN NHẮC: Món này có chỉ số Cấp 1 gốc thấp hơn món đang mặc (${formatNumber(powerDiff)} điểm).`}
               </span>
             </div>
           )}
@@ -353,9 +424,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             >
               <div>
                 <div className="flex items-center justify-between text-[10px] uppercase font-bold text-slate-400 mb-1">
-                  <span>{isSelectedAlreadyEquipped ? 'Cấp Hiện Tại' : 'Đang Mặc'}</span>
+                  <span>{isSelectedAlreadyEquipped ? 'Cấp Hiện Tại' : 'Đang Mặc (Cấp 1 Gốc)'}</span>
                   <span className="text-cyan-400 font-mono">
-                    ⚡ {isSelectedAlreadyEquipped ? selectedPower : currentEquippedInSlot ? calculateItemPower(currentEquippedInSlot) : 0}
+                    ⚡ {isSelectedAlreadyEquipped ? formatNumber(selectedPower) : formatNumber(currentBase.power)}
                   </span>
                 </div>
 
@@ -378,7 +449,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                           {RARITY_CONFIG[(isSelectedAlreadyEquipped ? selectedItem : currentEquippedInSlot)!.rarity].name}
                         </span>
                         <span className="font-mono text-slate-400">
-                          Lv.{(isSelectedAlreadyEquipped ? selectedItem : currentEquippedInSlot)?.level}
+                          {isSelectedAlreadyEquipped
+                            ? `Lv.${selectedItem?.level}`
+                            : `Lv.1 Gốc (Đang Lv.${currentEquippedInSlot?.level})`}
                         </span>
                       </div>
                     </div>
@@ -404,10 +477,10 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               <div>
                 <div className="flex items-center justify-between text-[10px] uppercase font-bold text-slate-400 mb-1">
                   <span className={isSelectedAlreadyEquipped ? 'text-amber-300 font-black' : isSelectedAnUpgrade ? 'text-emerald-300 font-black' : ''}>
-                    {isSelectedAlreadyEquipped ? 'Cấp Kế Tiếp (+1 Lv)' : 'Trong Rương'}
+                    {isSelectedAlreadyEquipped ? 'Cấp Kế Tiếp (+1 Lv)' : 'Trong Rương (Cấp 1 Gốc)'}
                   </span>
                   <span className="text-amber-300 font-mono font-bold">
-                    ⚡ {isSelectedAlreadyEquipped ? nextPower : selectedPower}
+                    ⚡ {isSelectedAlreadyEquipped ? formatNumber(nextPower) : formatNumber(selectedBase.power)}
                   </span>
                 </div>
 
@@ -433,7 +506,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         ].name}
                       </span>
                       <span className="font-mono text-emerald-300 font-bold">
-                        Lv.{isSelectedAlreadyEquipped ? nextLevelPreview?.level : selectedItem.level}
+                        {isSelectedAlreadyEquipped ? `Lv.${nextLevelPreview?.level}` : `Lv.1`}
                       </span>
                     </div>
                   </div>
@@ -442,24 +515,24 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             </div>
           </div>
 
-          {/* Detailed Stat-by-Stat Diff Table */}
+          {/* Detailed Stat-by-Stat Diff Table (Compares base level 1 stats when comparing items!) */}
           <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5 flex flex-col gap-1.5 mb-3 text-xs">
             {/* Stat Row 1: Sát Thương Tap */}
-            {(selectedItem.tapDmgBonus > 0 ||
-              (currentEquippedInSlot && currentEquippedInSlot.tapDmgBonus > 0) ||
+            {((isSelectedAlreadyEquipped ? selectedItem.tapDmgBonus : selectedBase.tapDmgBonus) > 0 ||
+              (currentEquippedInSlot && (isSelectedAlreadyEquipped ? currentEquippedInSlot.tapDmgBonus : currentBase.tapDmgBonus) > 0) ||
               (nextLevelPreview && nextLevelPreview.tapDmgBonus > 0)) && (
               <div className="flex items-center justify-between py-0.5 border-b border-white/5">
                 <span className="text-slate-400 flex items-center gap-1.5">
                   <Swords className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Sát Thương Tap</span>
+                  <span>Sát Thương Tap {isSelectedAlreadyEquipped ? '' : '(Cấp 1)'}</span>
                 </span>
                 <div className="flex items-center gap-2 font-mono font-bold">
                   <span className="text-slate-500">
-                    +{isSelectedAlreadyEquipped ? selectedItem.tapDmgBonus : currentEquippedInSlot?.tapDmgBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? selectedItem.tapDmgBonus : currentBase.tapDmgBonus}%
                   </span>
                   <span className="text-slate-600">➔</span>
                   <span className="text-amber-300">
-                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.tapDmgBonus || 0 : selectedItem.tapDmgBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.tapDmgBonus || 0 : selectedBase.tapDmgBonus}%
                   </span>
                   {isSelectedAlreadyEquipped ? (
                     (nextLevelPreview?.tapDmgBonus || 0) > selectedItem.tapDmgBonus && (
@@ -468,16 +541,16 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       </span>
                     )
                   ) : (
-                    selectedItem.tapDmgBonus !== (currentEquippedInSlot?.tapDmgBonus || 0) && (
+                    selectedBase.tapDmgBonus !== currentBase.tapDmgBonus && (
                       <span
                         className={`text-[11px] px-1 rounded ${
-                          selectedItem.tapDmgBonus > (currentEquippedInSlot?.tapDmgBonus || 0)
+                          selectedBase.tapDmgBonus > currentBase.tapDmgBonus
                             ? 'text-emerald-400 bg-emerald-950/80'
                             : 'text-rose-400 bg-rose-950/80'
                         }`}
                       >
-                        {selectedItem.tapDmgBonus > (currentEquippedInSlot?.tapDmgBonus || 0) ? '+' : ''}
-                        {selectedItem.tapDmgBonus - (currentEquippedInSlot?.tapDmgBonus || 0)}%
+                        {selectedBase.tapDmgBonus > currentBase.tapDmgBonus ? '+' : ''}
+                        {selectedBase.tapDmgBonus - currentBase.tapDmgBonus}%
                       </span>
                     )
                   )}
@@ -486,21 +559,21 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             )}
 
             {/* Stat Row 2: Hero DPS */}
-            {(selectedItem.heroDmgBonus > 0 ||
-              (currentEquippedInSlot && currentEquippedInSlot.heroDmgBonus > 0) ||
+            {((isSelectedAlreadyEquipped ? selectedItem.heroDmgBonus : selectedBase.heroDmgBonus) > 0 ||
+              (currentEquippedInSlot && (isSelectedAlreadyEquipped ? currentEquippedInSlot.heroDmgBonus : currentBase.heroDmgBonus) > 0) ||
               (nextLevelPreview && nextLevelPreview.heroDmgBonus > 0)) && (
               <div className="flex items-center justify-between py-0.5 border-b border-white/5">
                 <span className="text-slate-400 flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Đồng Đội DPS</span>
+                  <span>Đồng Đội DPS {isSelectedAlreadyEquipped ? '' : '(Cấp 1)'}</span>
                 </span>
                 <div className="flex items-center gap-2 font-mono font-bold">
                   <span className="text-slate-500">
-                    +{isSelectedAlreadyEquipped ? selectedItem.heroDmgBonus : currentEquippedInSlot?.heroDmgBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? selectedItem.heroDmgBonus : currentBase.heroDmgBonus}%
                   </span>
                   <span className="text-slate-600">➔</span>
                   <span className="text-purple-300">
-                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.heroDmgBonus || 0 : selectedItem.heroDmgBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.heroDmgBonus || 0 : selectedBase.heroDmgBonus}%
                   </span>
                   {isSelectedAlreadyEquipped ? (
                     (nextLevelPreview?.heroDmgBonus || 0) > selectedItem.heroDmgBonus && (
@@ -509,16 +582,16 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       </span>
                     )
                   ) : (
-                    selectedItem.heroDmgBonus !== (currentEquippedInSlot?.heroDmgBonus || 0) && (
+                    selectedBase.heroDmgBonus !== currentBase.heroDmgBonus && (
                       <span
                         className={`text-[11px] px-1 rounded ${
-                          selectedItem.heroDmgBonus > (currentEquippedInSlot?.heroDmgBonus || 0)
+                          selectedBase.heroDmgBonus > currentBase.heroDmgBonus
                             ? 'text-emerald-400 bg-emerald-950/80'
                             : 'text-rose-400 bg-rose-950/80'
                         }`}
                       >
-                        {selectedItem.heroDmgBonus > (currentEquippedInSlot?.heroDmgBonus || 0) ? '+' : ''}
-                        {selectedItem.heroDmgBonus - (currentEquippedInSlot?.heroDmgBonus || 0)}%
+                        {selectedBase.heroDmgBonus > currentBase.heroDmgBonus ? '+' : ''}
+                        {selectedBase.heroDmgBonus - currentBase.heroDmgBonus}%
                       </span>
                     )
                   )}
@@ -527,21 +600,21 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             )}
 
             {/* Stat Row 3: Tỉ Lệ Bạo Kích */}
-            {(selectedItem.critRateBonus > 0 ||
-              (currentEquippedInSlot && currentEquippedInSlot.critRateBonus > 0) ||
+            {((isSelectedAlreadyEquipped ? selectedItem.critRateBonus : selectedBase.critRateBonus) > 0 ||
+              (currentEquippedInSlot && (isSelectedAlreadyEquipped ? currentEquippedInSlot.critRateBonus : currentBase.critRateBonus) > 0) ||
               (nextLevelPreview && nextLevelPreview.critRateBonus > 0)) && (
               <div className="flex items-center justify-between py-0.5 border-b border-white/5">
                 <span className="text-slate-400 flex items-center gap-1.5">
                   <Flame className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Tỉ Lệ Chí Mạng</span>
+                  <span>Tỉ Lệ Chí Mạng {isSelectedAlreadyEquipped ? '' : '(Cấp 1)'}</span>
                 </span>
                 <div className="flex items-center gap-2 font-mono font-bold">
                   <span className="text-slate-500">
-                    +{isSelectedAlreadyEquipped ? selectedItem.critRateBonus : currentEquippedInSlot?.critRateBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? selectedItem.critRateBonus : currentBase.critRateBonus}%
                   </span>
                   <span className="text-slate-600">➔</span>
                   <span className="text-rose-300">
-                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.critRateBonus || 0 : selectedItem.critRateBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.critRateBonus || 0 : selectedBase.critRateBonus}%
                   </span>
                   {isSelectedAlreadyEquipped ? (
                     (nextLevelPreview?.critRateBonus || 0) > selectedItem.critRateBonus && (
@@ -550,16 +623,16 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       </span>
                     )
                   ) : (
-                    selectedItem.critRateBonus !== (currentEquippedInSlot?.critRateBonus || 0) && (
+                    selectedBase.critRateBonus !== currentBase.critRateBonus && (
                       <span
                         className={`text-[11px] px-1 rounded ${
-                          selectedItem.critRateBonus > (currentEquippedInSlot?.critRateBonus || 0)
+                          selectedBase.critRateBonus > currentBase.critRateBonus
                             ? 'text-emerald-400 bg-emerald-950/80'
                             : 'text-rose-400 bg-rose-950/80'
                         }`}
                       >
-                        {selectedItem.critRateBonus > (currentEquippedInSlot?.critRateBonus || 0) ? '+' : ''}
-                        {selectedItem.critRateBonus - (currentEquippedInSlot?.critRateBonus || 0)}%
+                        {selectedBase.critRateBonus > currentBase.critRateBonus ? '+' : ''}
+                        {selectedBase.critRateBonus - currentBase.critRateBonus}%
                       </span>
                     )
                   )}
@@ -568,21 +641,21 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             )}
 
             {/* Stat Row 4: Vàng Rơi */}
-            {(selectedItem.goldBonus > 0 ||
-              (currentEquippedInSlot && currentEquippedInSlot.goldBonus > 0) ||
+            {((isSelectedAlreadyEquipped ? selectedItem.goldBonus : selectedBase.goldBonus) > 0 ||
+              (currentEquippedInSlot && (isSelectedAlreadyEquipped ? currentEquippedInSlot.goldBonus : currentBase.goldBonus) > 0) ||
               (nextLevelPreview && nextLevelPreview.goldBonus > 0)) && (
               <div className="flex items-center justify-between py-0.5 border-b border-white/5">
                 <span className="text-slate-400 flex items-center gap-1.5">
                   <Coins className="w-3.5 h-3.5 text-yellow-400" />
-                  <span>Vàng Rơi</span>
+                  <span>Vàng Rơi {isSelectedAlreadyEquipped ? '' : '(Cấp 1)'}</span>
                 </span>
                 <div className="flex items-center gap-2 font-mono font-bold">
                   <span className="text-slate-500">
-                    +{isSelectedAlreadyEquipped ? selectedItem.goldBonus : currentEquippedInSlot?.goldBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? selectedItem.goldBonus : currentBase.goldBonus}%
                   </span>
                   <span className="text-slate-600">➔</span>
                   <span className="text-yellow-300">
-                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.goldBonus || 0 : selectedItem.goldBonus || 0}%
+                    +{isSelectedAlreadyEquipped ? nextLevelPreview?.goldBonus || 0 : selectedBase.goldBonus}%
                   </span>
                   {isSelectedAlreadyEquipped ? (
                     (nextLevelPreview?.goldBonus || 0) > selectedItem.goldBonus && (
@@ -591,16 +664,16 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       </span>
                     )
                   ) : (
-                    selectedItem.goldBonus !== (currentEquippedInSlot?.goldBonus || 0) && (
+                    selectedBase.goldBonus !== currentBase.goldBonus && (
                       <span
                         className={`text-[11px] px-1 rounded ${
-                          selectedItem.goldBonus > (currentEquippedInSlot?.goldBonus || 0)
+                          selectedBase.goldBonus > currentBase.goldBonus
                             ? 'text-emerald-400 bg-emerald-950/80'
                             : 'text-rose-400 bg-rose-950/80'
                         }`}
                       >
-                        {selectedItem.goldBonus > (currentEquippedInSlot?.goldBonus || 0) ? '+' : ''}
-                        {selectedItem.goldBonus - (currentEquippedInSlot?.goldBonus || 0)}%
+                        {selectedBase.goldBonus > currentBase.goldBonus ? '+' : ''}
+                        {selectedBase.goldBonus - currentBase.goldBonus}%
                       </span>
                     )
                   )}
@@ -612,15 +685,15 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             <div className="flex items-center justify-between pt-1">
               <span className="text-slate-300 font-bold flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span>Tổng Điểm Sức Mạnh</span>
+                <span>Tổng Điểm Sức Mạnh {isSelectedAlreadyEquipped ? '' : '(Cấp 1 Gốc)'}</span>
               </span>
               <div className="flex items-center gap-2 font-mono font-bold">
                 <span className="text-slate-500">
-                  {isSelectedAlreadyEquipped ? selectedPower : currentPower}
+                  {isSelectedAlreadyEquipped ? formatNumber(selectedPower) : formatNumber(currentBase.power)}
                 </span>
                 <span className="text-slate-600">➔</span>
                 <span className="text-amber-300">
-                  {isSelectedAlreadyEquipped ? nextPower : selectedPower}
+                  {isSelectedAlreadyEquipped ? formatNumber(nextPower) : formatNumber(selectedBase.power)}
                 </span>
                 <span
                   className={`text-[11px] px-1.5 py-0.5 rounded font-bold ${
@@ -631,7 +704,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       : 'text-slate-400 bg-slate-800'
                   }`}
                 >
-                  {powerDiff > 0 ? `▲ +${powerDiff}` : powerDiff < 0 ? `▼ ${powerDiff}` : '= 0'}
+                  {powerDiff > 0 ? `▲ +${formatNumber(powerDiff)}` : powerDiff < 0 ? `▼ ${formatNumber(powerDiff)}` : '= 0'}
                 </span>
               </div>
             </div>
@@ -741,33 +814,104 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-            {/* Slot Filters */}
+          <div className="flex items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-end">
+            {/* Slot Filters (All Icons) */}
             <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
               {(['all', 'weapon', 'armor', 'helmet', 'cloak', 'ring'] as const).map((s) => (
                 <button
                   key={s}
                   onClick={() => setFilterSlot(s)}
-                  className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 ${
+                  className={`px-2 py-1 rounded-lg text-xs font-bold transition-all shrink-0 ${
                     filterSlot === s
                       ? 'bg-amber-500 text-slate-950 shadow-sm'
                       : 'bg-slate-800/90 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
                   }`}
+                  title={s === 'all' ? 'Tất cả trang bị' : SLOT_NAMES[s]}
                 >
-                  {s === 'all' ? 'Tất cả' : SLOT_ICONS[s]}
+                  {s === 'all' ? '🎒' : SLOT_ICONS[s]}
                 </button>
               ))}
             </div>
 
-            {/* Quick Equip Best All Button */}
+            {/* Sort by Rarity and Sort by Level Buttons (Icon Centric) */}
+            <div className="flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-lg border border-white/5 shrink-0">
+              <button
+                id="btn-sort-rarity"
+                type="button"
+                onClick={() => {
+                  setSortMode((prev) => (prev === 'rarity_desc' ? 'rarity_asc' : 'rarity_desc'));
+                }}
+                className={`px-1.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-0.5 cursor-pointer active:scale-95 shrink-0 ${
+                  sortMode.startsWith('rarity')
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Sắp xếp: Phẩm chất (Huyền Thoại > Sử Thi > Hiếm...)"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-[10px] font-mono font-bold">
+                  {sortMode === 'rarity_desc' ? '▼' : sortMode === 'rarity_asc' ? '▲' : ''}
+                </span>
+              </button>
+
+              <button
+                id="btn-sort-level"
+                type="button"
+                onClick={() => {
+                  setSortMode((prev) => (prev === 'level_desc' ? 'level_asc' : 'level_desc'));
+                }}
+                className={`px-1.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-0.5 cursor-pointer active:scale-95 shrink-0 ${
+                  sortMode.startsWith('level')
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Sắp xếp: Cấp độ"
+              >
+                <TrendingUp className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="text-[10px] font-mono font-bold">
+                  {sortMode === 'level_desc' ? '▼' : sortMode === 'level_asc' ? '▲' : ''}
+                </span>
+              </button>
+            </div>
+
+            {/* Quick Equip Best All Button (Icon Button) */}
             {onEquipBestAll && recommendedCount > 0 && (
               <button
                 onClick={onEquipBestAll}
-                className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-[11px] font-black shrink-0 flex items-center gap-1 active:scale-95 shadow-md shadow-emerald-500/20"
-                title="Tự động mặc các trang bị mạnh nhất trong rương cho toàn bộ vị trí"
+                className="p-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black shrink-0 flex items-center justify-center active:scale-95 shadow-md shadow-emerald-500/20"
+                title="Mặc trang bị mạnh nhất vào tất cả vị trí"
               >
-                <Zap className="w-3.5 h-3.5 fill-slate-950" />
-                <span>Mặc Tốt Nhất</span>
+                <Zap className="w-4 h-4 fill-slate-950" />
+              </button>
+            )}
+
+            {/* Sell All Button (Icon-First) */}
+            {onSellAllItems && inventory.length > 0 && (
+              <button
+                onClick={() => {
+                  if (!confirmingSellAll) {
+                    setConfirmingSellAll(true);
+                    setTimeout(() => setConfirmingSellAll(false), 4000);
+                  } else {
+                    onSellAllItems();
+                    setConfirmingSellAll(false);
+                    if (!isSelectedAlreadyEquipped) {
+                      setSelectedSlot(null);
+                      setSelectedItemId(null);
+                    }
+                  }
+                }}
+                className={`px-2 py-1 rounded-lg text-[11px] font-bold shrink-0 flex items-center gap-1 active:scale-95 transition-all shadow-sm cursor-pointer ${
+                  confirmingSellAll
+                    ? 'bg-rose-600 hover:bg-rose-500 text-white animate-pulse ring-2 ring-rose-400'
+                    : 'bg-rose-950/80 hover:bg-rose-900 border border-rose-800/80 text-rose-300'
+                }`}
+                title={`Bán tất cả ${inventory.length} món: +💰${formatNumber(totalInventorySellValue)}`}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>
+                  {confirmingSellAll ? 'Bán?' : `+💰${formatNumber(totalInventorySellValue)}`}
+                </span>
               </button>
             )}
           </div>
@@ -783,13 +927,13 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 Hãy tiếp tục tiêu diệt quái vật hoặc đánh bại Boss tầng để nhặt vũ khí và giáp quý hiếm!
               </span>
             </div>
-          ) : filteredInventory.length === 0 ? (
+          ) : displayInventory.length === 0 ? (
             <div className="py-8 text-center text-slate-500 text-xs">
               Không có trang bị nào thuộc danh mục này trong rương.
             </div>
           ) : (
             <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 gap-2">
-              {filteredInventory.map((item) => {
+              {displayInventory.map((item, index) => {
                 const rarity = RARITY_CONFIG[item.rarity];
                 const isEquipped = equipped[item.slot]?.id === item.id;
                 const isSelected = selectedItem?.id === item.id;
@@ -797,7 +941,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
                 return (
                   <button
-                    key={item.id}
+                    key={`${item.id}-${index}`}
                     onClick={() => {
                       setSelectedSlot(isEquipped ? item.slot : null);
                       setSelectedItemId(item.id);
@@ -851,7 +995,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
               {/* Decorative Empty Bag Slots for RPG Feel */}
               {Array.from({
-                length: Math.max(0, 15 - filteredInventory.length),
+                length: Math.max(0, 15 - displayInventory.length),
               }).map((_, idx) => (
                 <div
                   key={`empty-${idx}`}

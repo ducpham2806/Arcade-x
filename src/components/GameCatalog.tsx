@@ -1,11 +1,9 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { ALL_GAMES_LIST, GAME_REGISTRY } from '../games/registry';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { ALL_GAMES_LIST, GAME_REGISTRY, FEATURED_SLIDER_GAME_IDS } from '../games/registry';
 import { usePlayer } from '../context/PlayerContext';
 import { useGame } from '../context/GameContext';
 import { TopWeeklyPlayersWidget } from './TopWeeklyPlayersWidget';
-import { RecommendedGamesSection } from './RecommendedGamesSection';
-import { LazyGameCard } from './common/LazyGameCard';
-import { getResolvedHallOfFame } from '../data/hallOfFameData';
+import { LazyGameCard, getCategoryIcon } from './common/LazyGameCard';
 import { soundEngine } from '../services/audio';
 import { hapticService } from '../services/haptics';
 import {
@@ -13,27 +11,24 @@ import {
   Play,
   Bot,
   Trophy,
-  Sparkles,
-  Zap,
-  Tag,
-  ShieldCheck,
-  Flame,
-  Layers,
   Heart,
   History,
-  Clock,
-  RotateCcw,
-  Users,
-  Info,
-  Gamepad2,
-  CheckCircle2,
-  Gift,
   RefreshCw,
-  Crown,
   ChevronRight,
+  ChevronLeft,
+  Sparkles,
+  Layers,
 } from 'lucide-react';
 
-const CATEGORIES = ['Tất Cả', 'Yêu Thích', 'Multiplayer', 'Arcade', 'Action', 'Puzzle', 'Reflex'] as const;
+const CATEGORY_ITEMS = [
+  { id: 'Tất Cả', icon: '🎮', title: 'Tất Cả Game' },
+  { id: 'Yêu Thích', icon: '❤️', title: 'Yêu Thích' },
+  { id: 'Multiplayer', icon: '👥', title: 'PvP Đối Kháng' },
+  { id: 'Arcade', icon: '🕹️', title: 'Arcade' },
+  { id: 'Action', icon: '⚔️', title: 'Hành Động' },
+  { id: 'Puzzle', icon: '🧩', title: 'Giải Đố' },
+  { id: 'Reflex', icon: '⚡', title: 'Phản Xạ' },
+] as const;
 
 // Player count stats per game
 const GAME_PLAYER_STATS: Record<string, { activePlayers: number; totalPlays: string; rating: number }> = {
@@ -102,8 +97,45 @@ export const GameCatalog: React.FC = () => {
     });
   }, [selectedCategory, searchQuery, favorites]);
 
-  const featuredGame = ALL_GAMES_LIST[0]; // Neon Runner 2099 as spotlight hero
-  const isFeaturedFav = favorites.includes(featuredGame.id);
+  // 5 New & Featured Highlight Games for the top slider
+  const sliderGames = useMemo(() => {
+    return FEATURED_SLIDER_GAME_IDS
+      .map((id) => GAME_REGISTRY[id])
+      .filter(Boolean);
+  }, []);
+
+  const [activeSlide, setActiveSlide] = useState<number>(0);
+  const [isSliderHovered, setIsSliderHovered] = useState<boolean>(false);
+  const sliderTouchStartX = useRef<number>(0);
+
+  // Auto-advance slider every 4.5 seconds unless user hovers
+  useEffect(() => {
+    if (isSliderHovered || sliderGames.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % sliderGames.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isSliderHovered, sliderGames.length]);
+
+  const activeGame = sliderGames[activeSlide] || sliderGames[0] || ALL_GAMES_LIST[0];
+  const isActiveGameFav = favorites.includes(activeGame.id);
+
+  const getSliderBadge = (gameId: string) => {
+    switch (gameId) {
+      case 'word-cross':
+        return { label: 'GAME MỚI RA MẮT ⭐', bg: 'bg-fuchsia-500/25 text-fuchsia-300 border-fuchsia-400/40' };
+      case 'car-escape':
+        return { label: 'HOT • 100 LEVEL 🚗', bg: 'bg-rose-500/25 text-rose-300 border-rose-400/40' };
+      case 'dungeon-tap':
+        return { label: 'GAME NỔI BẬT ⚔️', bg: 'bg-amber-500/25 text-amber-300 border-amber-400/40' };
+      case 'mummy-escape':
+        return { label: 'CHIẾN THUẬT VƯỢT NGỤC 🧟‍♂️', bg: 'bg-emerald-500/25 text-emerald-300 border-emerald-400/40' };
+      case 'tile-2048':
+        return { label: 'SĂN NGỌC BÁU 💎', bg: 'bg-cyan-500/25 text-cyan-300 border-cyan-400/40' };
+      default:
+        return { label: 'GAME MỚI & NỔI BẬT ✨', bg: 'bg-indigo-500/25 text-indigo-300 border-indigo-400/40' };
+    }
+  };
 
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [pullDist, setPullDist] = useState<number>(0);
@@ -142,23 +174,6 @@ export const GameCatalog: React.FC = () => {
     touchStartYRef.current = 0;
   };
 
-  // Hall of Fame quick stats for the 1-row hub
-  const hallOfFameEntries = useMemo(() => {
-    return getResolvedHallOfFame(profile);
-  }, [profile]);
-  const userHofCount = useMemo(() => {
-    return hallOfFameEntries.filter(e => e.isUserHolder).length;
-  }, [hallOfFameEntries]);
-
-  // Daily Challenge completed count
-  const completedChallengesCount = useMemo(() => {
-    return Object.values(dailyChallenges || {}).filter((c: any) => c?.completed).length;
-  }, [dailyChallenges]);
-
-  // Streak status
-  const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
-  const isClaimedStreakToday = profile.stats.lastLoginDate === todayDateStr;
-
   return (
     <div
       onTouchStart={handleTouchStart}
@@ -182,252 +197,193 @@ export const GameCatalog: React.FC = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. COMPACT SPOTLIGHT FEATURED GAME BANNER                                 */}
+      {/* 1. NEW & FEATURED GAMES SLIDER (3-5 GAMES BANNER WITH AUTO-SLIDE & SWIPE)  */}
       {/* ========================================================================= */}
-      <section className="relative rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-r from-indigo-950/80 via-[#10101c] to-[#0d0d14] p-3 sm:p-4 shadow-lg group">
+      <section
+        className="relative rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-r from-indigo-950/90 via-[#10101c] to-[#0d0d14] p-3 sm:p-4 shadow-xl group transition-all"
+        onMouseEnter={() => setIsSliderHovered(true)}
+        onMouseLeave={() => setIsSliderHovered(false)}
+        onTouchStart={(e) => {
+          sliderTouchStartX.current = e.touches[0].clientX;
+        }}
+        onTouchEnd={(e) => {
+          if (!sliderTouchStartX.current) return;
+          const diff = e.changedTouches[0].clientX - sliderTouchStartX.current;
+          if (diff > 45) {
+            // Swiped right -> prev
+            setActiveSlide((prev) => (prev - 1 + sliderGames.length) % sliderGames.length);
+            try { hapticService.tap(); soundEngine.play('click'); } catch {}
+          } else if (diff < -45) {
+            // Swiped left -> next
+            setActiveSlide((prev) => (prev + 1) % sliderGames.length);
+            try { hapticService.tap(); soundEngine.play('click'); } catch {}
+          }
+          sliderTouchStartX.current = 0;
+        }}
+      >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.18),transparent_70%)] pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          {/* Left: Icon, Badge, Title & Tags */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl shadow-md border border-white/10 shrink-0 group-hover:scale-105 transition-transform cursor-pointer"
-              style={{ backgroundColor: `${featuredGame.themeColor}25` }}
-              onClick={() => openGameDetail(featuredGame.id)}
-            >
-              {featuredGame.icon}
+        <div className="relative z-10 flex flex-col gap-2.5">
+          {/* Top Row: Badge + Category + Slider Nav Controls */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {(() => {
+                const badge = getSliderBadge(activeGame.id);
+                return (
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${badge.bg}`}>
+                    <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+                    <span>{badge.label}</span>
+                  </span>
+                );
+              })()}
+              <span className="text-xs px-2 py-0.5 rounded bg-white/5 border border-white/10 flex items-center justify-center" title={`Thể loại: ${activeGame.category}`}>
+                {getCategoryIcon(activeGame.category)}
+              </span>
             </div>
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/30 text-[9px] sm:text-[10px] font-black text-indigo-300 uppercase tracking-wider">
-                  <Flame className="w-3 h-3 text-amber-400 animate-pulse" />
-                  <span>GAME NỔI BẬT HÔM NAY</span>
-                </span>
-                <span className="text-[10px] text-slate-400 font-bold uppercase px-1.5 py-0.5 rounded bg-white/5 border border-white/5">
-                  {featuredGame.category}
-                </span>
-              </div>
-
-              <h2
-                onClick={() => openGameDetail(featuredGame.id)}
-                className="text-sm sm:text-base font-black italic uppercase text-white tracking-tight truncate font-display group-hover:text-indigo-300 transition-colors cursor-pointer"
+            {/* Slider Navigation Arrows & Page Indicator */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveSlide((prev) => (prev - 1 + sliderGames.length) % sliderGames.length);
+                  try { soundEngine.play('click'); hapticService.tap(); } catch {}
+                }}
+                className="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 active:scale-90 border border-white/10 text-slate-300 flex items-center justify-center transition-all cursor-pointer"
+                title="Game trước"
               >
-                {featuredGame.title}
-              </h2>
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+
+              <span className="text-[10px] font-mono font-bold text-slate-400 px-1">
+                {activeSlide + 1}/{sliderGames.length}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveSlide((prev) => (prev + 1) % sliderGames.length);
+                  try { soundEngine.play('click'); hapticService.tap(); } catch {}
+                }}
+                className="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 active:scale-90 border border-white/10 text-slate-300 flex items-center justify-center transition-all cursor-pointer"
+                title="Game tiếp theo"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
-          {/* Right: Actions & High Score */}
-          <div className="flex items-center gap-2 shrink-0 justify-end flex-wrap sm:flex-nowrap pt-1 sm:pt-0 border-t sm:border-t-0 border-white/5">
-            {/* Personal Record */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/40 border border-white/5 text-[11px] text-slate-300">
-              <Trophy className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
-              <span className="text-slate-400 hidden xs:inline">Kỷ lục:</span>
-              <strong className="text-yellow-400 font-mono text-xs">
-                {(profile?.stats?.highScores?.[featuredGame.id] || 0).toLocaleString()}
-              </strong>
+          {/* Main Content: Icon, Title, Description, and Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Left: Icon, Title, Short Description */}
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-lg border border-white/15 shrink-0 group-hover:scale-105 transition-transform cursor-pointer"
+                style={{ backgroundColor: `${activeGame.themeColor}25` }}
+                onClick={() => openGameDetail(activeGame.id)}
+              >
+                {activeGame.icon}
+              </div>
+
+              <div className="min-w-0">
+                <h2
+                  onClick={() => openGameDetail(activeGame.id)}
+                  className="text-base sm:text-lg font-black italic uppercase text-white tracking-tight truncate font-display group-hover:text-indigo-300 transition-colors cursor-pointer"
+                >
+                  {activeGame.title}
+                </h2>
+                <p className="text-[11px] sm:text-xs text-slate-300 line-clamp-1 font-medium">
+                  {activeGame.shortDesc}
+                </p>
+              </div>
             </div>
 
-            {/* Favorite Button */}
-            <button
-              id="btn-fav-featured"
-              type="button"
-              onClick={() => toggleFavorite(featuredGame.id)}
-              className={`p-2 rounded-xl border transition-all active:scale-95 cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center ${
-                isFeaturedFav
-                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-sm'
-                  : 'bg-white/5 text-slate-400 border-white/10 hover:text-white hover:bg-white/10'
-              }`}
-              title={isFeaturedFav ? 'Đã Yêu Thích' : 'Thêm Vào Yêu Thích'}
-            >
-              <Heart className={`w-4 h-4 ${isFeaturedFav ? 'fill-rose-500 text-rose-500' : ''}`} />
-            </button>
+            {/* Right: Actions & High Score */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end flex-wrap sm:flex-nowrap pt-1 sm:pt-0 border-t sm:border-t-0 border-white/5">
+              {/* Personal Record (Icon Only) */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/40 border border-white/5 text-[11px] text-slate-300" title="Kỷ lục cá nhân">
+                <Trophy className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
+                <strong className="text-yellow-400 font-mono text-xs">
+                  {(profile?.stats?.highScores?.[activeGame.id] || 0).toLocaleString()}
+                </strong>
+              </div>
 
-            {/* Top 5 & Details Button */}
-            <button
-              id="btn-detail-featured"
-              type="button"
-              onClick={() => openGameDetail(featuredGame.id)}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center active:scale-95 transition-all cursor-pointer min-h-[36px] min-w-[36px]"
-              title="Xem Top 5 & Thể Lệ"
-            >
-              <Trophy className="w-4 h-4 text-yellow-400" />
-            </button>
-
-            {/* AI Practice Button */}
-            {featuredGame.supportsAI && (
+              {/* Favorite Button */}
               <button
-                id="btn-launch-featured-ai"
+                id="btn-fav-featured"
                 type="button"
-                onClick={() => launchGame(featuredGame.id, true)}
-                className="p-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 flex items-center justify-center active:scale-95 transition-all cursor-pointer min-h-[36px] min-w-[36px]"
-                title="Luyện Với AI"
+                onClick={() => toggleFavorite(activeGame.id)}
+                className={`p-2 rounded-xl border transition-all active:scale-95 cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center ${
+                  isActiveGameFav
+                    ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-sm'
+                    : 'bg-white/5 text-slate-400 border-white/10 hover:text-white hover:bg-white/10'
+                }`}
+                title={isActiveGameFav ? 'Đã Yêu Thích' : 'Thêm Vào Yêu Thích'}
               >
-                <Bot className="w-4 h-4" />
+                <Heart className={`w-4 h-4 ${isActiveGameFav ? 'fill-rose-500 text-rose-500' : ''}`} />
               </button>
-            )}
 
-            {/* Launch Play Button */}
-            <button
-              id="btn-launch-featured"
-              type="button"
-              onClick={() => launchGame(featuredGame.id)}
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-extrabold text-xs shadow-md shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[36px]"
-              title="Chơi Ngay"
-            >
-              <Play className="w-4 h-4 fill-current text-white" />
-              <span>Chơi Ngay</span>
-            </button>
+              {/* Top 5 & Details Button */}
+              <button
+                id="btn-detail-featured"
+                type="button"
+                onClick={() => openGameDetail(activeGame.id)}
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center active:scale-95 transition-all cursor-pointer min-h-[36px] min-w-[36px]"
+                title="Xem Top 5 & Thể Lệ"
+              >
+                <Trophy className="w-4 h-4 text-yellow-400" />
+              </button>
+
+              {/* AI Practice Button */}
+              {activeGame.supportsAI && (
+                <button
+                  id="btn-launch-featured-ai"
+                  type="button"
+                  onClick={() => launchGame(activeGame.id, true)}
+                  className="p-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 flex items-center justify-center active:scale-95 transition-all cursor-pointer min-h-[36px] min-w-[36px]"
+                  title="Luyện Với AI"
+                >
+                  <Bot className="w-4 h-4" />
+                </button>
+              )}
+
+              {/* Launch Play Button (Icon Only) */}
+              <button
+                id="btn-launch-featured"
+                type="button"
+                onClick={() => launchGame(activeGame.id)}
+                className="p-2 sm:px-3 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-extrabold shadow-lg shadow-indigo-500/25 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer min-h-[36px] min-w-[36px]"
+                title="Chơi Ngay"
+              >
+                <Play className="w-4 h-4 fill-current text-white" />
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom Pagination Dots */}
+          <div className="flex items-center justify-center gap-1.5 pt-1">
+            {sliderGames.map((game, idx) => {
+              const isActive = idx === activeSlide;
+              return (
+                <button
+                  key={game.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveSlide(idx);
+                    try { soundEngine.play('click'); hapticService.tap(); } catch {}
+                  }}
+                  className={`transition-all duration-300 rounded-full cursor-pointer ${
+                    isActive
+                      ? 'w-6 h-1.5 bg-gradient-to-r from-indigo-400 to-fuchsia-400 shadow-sm shadow-indigo-500/50'
+                      : 'w-1.5 h-1.5 bg-white/20 hover:bg-white/40'
+                  }`}
+                  title={game.title}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
-
-      {/* ========================================================================= */}
-      {/* 2. UNIFIED QUICK HUB: 5 ICONS ON 1 SINGLE HORIZONTAL ROW (NO SCROLL)        */}
-      {/* ĐIỂM DANH | VÒNG QUAY | LỊCH THÁNG | THỬ THÁCH | DANH VỌNG                */}
-      {/* ========================================================================= */}
-      <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 bg-[#12111d]/90 border border-white/10 rounded-2xl p-1.5 sm:p-2.5 shadow-lg">
-        {/* ICON 1: Chuỗi Đăng Nhập (Daily Streak) */}
-        <button
-          id="btn-hub-daily-streak"
-          type="button"
-          onClick={() => {
-            try {
-              soundEngine.play('click');
-              hapticService.tap();
-            } catch {}
-            setActiveModal('dailyReward');
-          }}
-          className="flex flex-col items-center justify-center p-1 sm:p-2 rounded-xl bg-white/[0.03] hover:bg-orange-500/15 border border-white/5 hover:border-orange-500/30 transition-all active:scale-95 group text-center cursor-pointer relative overflow-hidden"
-          title="Điểm danh nhận quà theo chuỗi"
-        >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0 relative group-hover:scale-105 transition-transform">
-            <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400 fill-orange-400 animate-pulse" />
-            <span className="absolute -bottom-1 -right-1 px-1 bg-black/90 rounded-full text-[8px] sm:text-[9px] font-black text-orange-400 border border-orange-500/60">
-              {profile.stats.dailyStreak || 1}d
-            </span>
-            {!isClaimedStreakToday && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-black animate-ping" />
-            )}
-          </div>
-          <span className="text-[10px] sm:text-[11px] font-bold text-white group-hover:text-orange-300 truncate w-full mt-1">
-            Điểm Danh
-          </span>
-          <span className="text-[8px] sm:text-[9px] text-orange-400/90 font-medium truncate w-full hidden xs:block">
-            {!isClaimedStreakToday ? 'Nhận ngay' : 'Đã nhận ✓'}
-          </span>
-        </button>
-
-        {/* ICON 2: Vòng Quay May Mắn (Daily Spin Wheel) */}
-        <button
-          id="btn-hub-spin-wheel"
-          type="button"
-          onClick={() => {
-            try {
-              soundEngine.play('click');
-              hapticService.tap();
-            } catch {}
-            setActiveModal('spinWheel');
-          }}
-          className="flex flex-col items-center justify-center p-1 sm:p-2 rounded-xl bg-white/[0.03] hover:bg-pink-500/15 border border-white/5 hover:border-pink-500/30 transition-all active:scale-95 group text-center cursor-pointer relative overflow-hidden"
-          title="Vòng quay may mắn hàng ngày"
-        >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-pink-500/20 border border-pink-500/40 text-pink-400 flex items-center justify-center text-base sm:text-xl shrink-0 relative group-hover:scale-105 transition-transform">
-            🎡
-            {profile.stats.lastSpinDate !== todayDateStr && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-pink-400 ring-2 ring-black animate-pulse" />
-            )}
-          </div>
-          <span className="text-[10px] sm:text-[11px] font-bold text-white group-hover:text-pink-300 truncate w-full mt-1">
-            Vòng Quay
-          </span>
-          <span className="text-[8px] sm:text-[9px] text-pink-400/90 font-medium truncate w-full hidden xs:block">
-            {profile.stats.lastSpinDate !== todayDateStr ? 'Có lượt' : 'Đã quay'}
-          </span>
-        </button>
-
-        {/* ICON 3: Lịch Điểm Danh Tháng 30 Ngày (Monthly Login) */}
-        <button
-          id="btn-hub-monthly-login"
-          type="button"
-          onClick={() => {
-            try {
-              soundEngine.play('click');
-              hapticService.tap();
-            } catch {}
-            setActiveModal('monthlyLogin');
-          }}
-          className="flex flex-col items-center justify-center p-1 sm:p-2 rounded-xl bg-white/[0.03] hover:bg-indigo-500/15 border border-white/5 hover:border-indigo-500/30 transition-all active:scale-95 group text-center cursor-pointer relative overflow-hidden"
-          title="Lịch điểm danh tích lũy 30 ngày"
-        >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-base sm:text-xl shrink-0 relative group-hover:scale-105 transition-transform">
-            📅
-          </div>
-          <span className="text-[10px] sm:text-[11px] font-bold text-white group-hover:text-indigo-300 truncate w-full mt-1">
-            Lịch Tháng
-          </span>
-          <span className="text-[8px] sm:text-[9px] text-indigo-400/90 font-medium truncate w-full hidden xs:block">
-            30 Ngày
-          </span>
-        </button>
-
-        {/* ICON 4: Thử Thách Hàng Ngày (Daily Challenge) */}
-        <button
-          id="btn-hub-daily-challenge"
-          type="button"
-          onClick={() => {
-            try {
-              soundEngine.play('click');
-              hapticService.tap();
-            } catch {}
-            setActiveModal('dailyChallengesList');
-          }}
-          className="flex flex-col items-center justify-center p-1 sm:p-2 rounded-xl bg-white/[0.03] hover:bg-amber-500/15 border border-white/5 hover:border-amber-500/30 transition-all active:scale-95 group text-center cursor-pointer relative overflow-hidden"
-          title="Nhiệm vụ và thử thách hàng ngày"
-        >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base sm:text-lg shrink-0 relative group-hover:scale-105 transition-transform">
-            🎯
-            <span className="absolute -bottom-1 -right-1 px-1 bg-black/90 rounded-full text-[8px] sm:text-[9px] font-black text-amber-400 border border-amber-500/60">
-              {completedChallengesCount}/{ALL_GAMES_LIST.length}
-            </span>
-          </div>
-          <span className="text-[10px] sm:text-[11px] font-bold text-white group-hover:text-amber-300 truncate w-full mt-1">
-            Thử Thách
-          </span>
-          <span className="text-[8px] sm:text-[9px] text-amber-400/90 font-medium truncate w-full hidden xs:block">
-            Nhiệm vụ
-          </span>
-        </button>
-
-        {/* ICON 5: Đại Sảnh Danh Vọng (Hall of Fame) */}
-        <button
-          id="btn-hub-hall-of-fame"
-          type="button"
-          onClick={() => {
-            try {
-              soundEngine.play('click');
-              hapticService.tap();
-            } catch {}
-            setActiveModal('hallOfFame');
-          }}
-          className="flex flex-col items-center justify-center p-1 sm:p-2 rounded-xl bg-white/[0.03] hover:bg-yellow-500/15 border border-white/5 hover:border-yellow-500/30 transition-all active:scale-95 group text-center cursor-pointer relative overflow-hidden"
-          title="Bảng kỷ lục đại sảnh danh vọng server"
-        >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-yellow-500/20 border border-yellow-500/40 text-yellow-400 flex items-center justify-center shrink-0 relative group-hover:scale-105 transition-transform">
-            <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-            <span className="absolute -bottom-1 -right-1 px-1 bg-black/90 rounded-full text-[8px] sm:text-[9px] font-black text-yellow-400 border border-yellow-500/60">
-              {hallOfFameEntries.length}
-            </span>
-          </div>
-          <span className="text-[10px] sm:text-[11px] font-bold text-white group-hover:text-yellow-300 truncate w-full mt-1">
-            Danh Vọng
-          </span>
-          <span className="text-[8px] sm:text-[9px] text-yellow-400/90 font-medium truncate w-full hidden xs:block">
-            Kỷ lục
-          </span>
-        </button>
-      </div>
 
       {/* ========================================================================= */}
       {/* 2-COLUMN MAIN LAYOUT: GAMES GRID (LEFT) & SIDEBAR (RIGHT)                   */}
@@ -437,55 +393,40 @@ export const GameCatalog: React.FC = () => {
         {/* LEFT / MAIN COLUMN: GAMES CATALOG (Pushed Up for Immediate Play) */}
         <div className="lg:col-span-8 xl:col-span-8 2xl:col-span-9 space-y-3.5 sm:space-y-4">
           
-          {/* Hệ thống gợi ý game dựa trên lịch sử chơi (Game Đề Xuất Cho Bạn) */}
-          <RecommendedGamesSection
-            allGames={ALL_GAMES_LIST}
-            gamesPlayedCount={profile?.stats?.gamesPlayedCount}
-            recentlyPlayed={recentlyPlayed}
-            favorites={favorites}
-            highScores={profile?.stats?.highScores}
-            onLaunchGame={launchGame}
-            onOpenDetail={openGameDetail}
-            onToggleFavorite={toggleFavorite}
-          />
-
-          {/* Category Filter Chips & Search Bar */}
+          {/* Compact Icon-Only Category Filters & Search Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3">
-            {/* Category & Favorites Pills: Naturally wrapping on mobile, NO horizontal scroll */}
-            <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-              {CATEGORIES.map((cat) => {
-                const isSelected = selectedCategory === cat;
+            {/* 7 Icon-Only Filter Buttons in a single balanced row, saving space and eliminating multi-row wrap */}
+            <div className="grid grid-cols-7 gap-1 sm:gap-1.5 w-full sm:w-auto">
+              {CATEGORY_ITEMS.map((item) => {
+                const isSelected = selectedCategory === item.id;
                 const favCount = favorites.length;
-
-                // Map category to icon and label
-                let iconSymbol = '🎮';
-                let label: string = cat;
-                if (cat === 'Yêu Thích') { iconSymbol = '❤️'; label = 'Yêu Thích'; }
-                else if (cat === 'Multiplayer') { iconSymbol = '👥'; label = 'PvP'; }
-                else if (cat === 'Arcade') { iconSymbol = '🕹️'; label = 'Arcade'; }
-                else if (cat === 'Action') { iconSymbol = '⚔️'; label = 'Hành Động'; }
-                else if (cat === 'Puzzle') { iconSymbol = '🧩'; label = 'Giải Đố'; }
-                else if (cat === 'Reflex') { iconSymbol = '⚡'; label = 'Phản Xạ'; }
 
                 return (
                   <button
-                    key={cat}
-                    id={`btn-filter-${cat.toLowerCase().replace(/\s+/g, '-')}`}
+                    key={item.id}
+                    id={`btn-filter-${item.id.toLowerCase().replace(/\s+/g, '-')}`}
                     type="button"
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px] shrink-0 border ${
+                    title={item.title}
+                    aria-label={item.title}
+                    onClick={() => {
+                      setSelectedCategory(item.id);
+                      try {
+                        soundEngine.play('click');
+                        hapticService.tap();
+                      } catch {}
+                    }}
+                    className={`relative h-10 sm:h-10.5 sm:w-11 rounded-xl flex items-center justify-center text-lg sm:text-xl transition-all cursor-pointer border ${
                       isSelected
-                        ? cat === 'Yêu Thích'
-                          ? 'bg-rose-600 text-white border-rose-500 shadow-lg shadow-rose-500/25'
-                          : 'bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/25'
-                        : 'bg-[#141414] hover:bg-white/10 text-slate-300 border-white/5'
+                        ? item.id === 'Yêu Thích'
+                          ? 'bg-rose-600 text-white border-rose-400 shadow-md shadow-rose-600/30 scale-105'
+                          : 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30 scale-105'
+                        : 'bg-[#141414] hover:bg-white/10 text-slate-300 border-white/5 active:scale-95'
                     }`}
                   >
-                    <span>{iconSymbol}</span>
-                    <span>{label}</span>
-                    {cat === 'Yêu Thích' && favCount > 0 && (
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                        isSelected ? 'bg-white/20 text-white' : 'bg-rose-500/20 text-rose-300'
+                    <span>{item.icon}</span>
+                    {item.id === 'Yêu Thích' && favCount > 0 && (
+                      <span className={`absolute -top-1 -right-1 px-1 min-w-[16px] h-4 text-[9px] font-black rounded-full border border-slate-900 shadow-sm flex items-center justify-center ${
+                        isSelected ? 'bg-white text-rose-600 font-bold' : 'bg-rose-500 text-white'
                       }`}>
                         {favCount}
                       </span>
@@ -503,7 +444,7 @@ export const GameCatalog: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm mini-game..."
+                placeholder="Tìm kiếm..."
                 className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#141414] border border-white/5 focus:border-indigo-500 text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition-colors min-h-[40px]"
               />
             </div>
@@ -511,13 +452,12 @@ export const GameCatalog: React.FC = () => {
 
           {/* Section Header */}
           <div className="flex items-center justify-between pt-0.5">
-            <h3 id="heading-game-library" className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+            <div id="heading-game-library" className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-indigo-400" />
-              <span>
-                {selectedCategory === 'Yêu Thích' ? 'Trò chơi yêu thích của bạn' : 'Thư Viện Mini-Games'} ({filteredGames.length})
+              <span className="text-xs font-mono font-bold text-slate-400">
+                ({filteredGames.length})
               </span>
-            </h3>
-            <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">Chạm vào để chơi tức thì</span>
+            </div>
           </div>
 
           {/* Empty state when filtering favorites */}
@@ -548,7 +488,7 @@ export const GameCatalog: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-2.5">
               {filteredGames.map((game) => {
                 const personalHighScore = profile?.stats?.highScores?.[game.id] || 0;
                 const isFav = favorites.includes(game.id);
@@ -575,20 +515,16 @@ export const GameCatalog: React.FC = () => {
         <aside className="lg:col-span-4 xl:col-span-4 2xl:col-span-3 space-y-4">
           
           {/* RECENTLY PLAYED SECTION (Moved to right sidebar, vertical layout, right above Top Cao Thủ) */}
-          <section aria-labelledby="heading-recently-played" className="rounded-2xl bg-gradient-to-br from-[#121218] via-[#101014] to-[#0c0c10] border border-white/10 p-4 shadow-xl space-y-3">
+          <section aria-labelledby="heading-recently-played" className="rounded-2xl bg-gradient-to-br from-[#121218] via-[#101014] to-[#0c0c10] border border-white/10 p-3.5 shadow-xl space-y-2.5">
             <div className="flex items-center justify-between pb-2 border-b border-white/5">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <div className="w-6 h-6 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400" title="Vừa Chơi Gần Đây">
                   <History className="w-3.5 h-3.5" />
                 </div>
-                <h3 id="heading-recently-played" className="text-xs font-bold uppercase tracking-wider text-white">
-                  Vừa Chơi Gần Đây
-                </h3>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium">Truy cập tức thì</span>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {recentGamesList.map((game) => {
                 const isFav = favorites.includes(game.id);
                 const personalHighScore = profile?.stats?.highScores?.[game.id] || 0;
@@ -596,11 +532,11 @@ export const GameCatalog: React.FC = () => {
                 return (
                   <div
                     key={`recent-${game.id}`}
-                    className="relative rounded-xl bg-[#16161c] border border-white/5 hover:border-indigo-500/40 p-3 transition-all duration-300 flex items-center justify-between gap-2.5 group"
+                    className="relative rounded-xl bg-[#16161c] border border-white/5 hover:border-indigo-500/40 p-2.5 transition-all duration-300 flex items-center justify-between gap-2 group"
                   >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-md border border-white/5 shrink-0 group-hover:scale-105 transition-transform"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shadow-md border border-white/5 shrink-0 group-hover:scale-105 transition-transform"
                         style={{ backgroundColor: `${game.themeColor}25` }}
                       >
                         {game.icon}
@@ -615,7 +551,7 @@ export const GameCatalog: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0">
                       {/* Favorite Icon Only */}
                       <button
                         id={`btn-fav-recent-${game.id}`}
@@ -624,7 +560,7 @@ export const GameCatalog: React.FC = () => {
                           e.stopPropagation();
                           toggleFavorite(game.id);
                         }}
-                        className={`p-2 rounded-lg border transition-all active:scale-95 cursor-pointer min-h-[34px] min-w-[34px] flex items-center justify-center ${
+                        className={`p-1.5 rounded-lg border transition-all active:scale-95 cursor-pointer min-h-[30px] min-w-[30px] flex items-center justify-center ${
                           isFav
                             ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
                             : 'bg-white/5 text-slate-500 border-white/5 hover:text-white hover:bg-white/10'
@@ -639,7 +575,7 @@ export const GameCatalog: React.FC = () => {
                         id={`btn-detail-recent-${game.id}`}
                         type="button"
                         onClick={() => openGameDetail(game.id)}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[34px] min-w-[34px]"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[30px] min-w-[30px]"
                         title="Top 5 & Thể Lệ"
                       >
                         <Trophy className="w-3.5 h-3.5 text-yellow-400" />
@@ -650,7 +586,7 @@ export const GameCatalog: React.FC = () => {
                         id={`btn-play-recent-${game.id}`}
                         type="button"
                         onClick={() => launchGame(game.id)}
-                        className="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[34px] min-w-[34px]"
+                        className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[30px] min-w-[30px]"
                         title="Chơi Ngay"
                       >
                         <Play className="w-3 h-3 fill-current" />
@@ -665,30 +601,25 @@ export const GameCatalog: React.FC = () => {
           {/* Top Weekly Players Leaderboard Widget */}
           <TopWeeklyPlayersWidget />
 
-          {/* Quick PvP Matchmaking Shortcut Card (Fixed working Đấu button) */}
-          <div className="rounded-2xl bg-gradient-to-br from-[#14121a] to-[#0e0d14] border border-purple-500/20 p-4 shadow-xl space-y-3">
+          {/* Quick PvP Matchmaking Shortcut Card (Icon Buttons) */}
+          <div className="rounded-2xl bg-gradient-to-br from-[#14121a] to-[#0e0d14] border border-purple-500/20 p-3.5 shadow-xl space-y-2.5">
             <div className="flex items-center justify-between pb-2 border-b border-white/5">
               <div className="flex items-center gap-2">
-                <span className="text-lg">⚔️</span>
-                <h4 className="text-xs font-black uppercase tracking-wider text-purple-300 font-display">
-                  Đấu Đối Kháng PvP Nổi Bật
-                </h4>
+                <span className="text-base" title="Đấu Đối Kháng PvP Nổi Bật">⚔️</span>
               </div>
-              <span className="text-[10px] font-mono text-purple-400/80 bg-purple-500/10 px-2 py-0.5 rounded-full">
-                Real-time
-              </span>
+              <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" title="Real-time PvP" />
             </div>
 
             <div className="space-y-2">
               <div 
                 onClick={() => launchGame('caro-gomoku')}
-                className="p-2.5 rounded-xl bg-black/40 hover:bg-white/5 border border-white/5 hover:border-indigo-500/40 transition-all cursor-pointer flex items-center justify-between group active:scale-95"
+                className="p-2 rounded-xl bg-black/40 hover:bg-white/5 border border-white/5 hover:border-indigo-500/40 transition-all cursor-pointer flex items-center justify-between group active:scale-95"
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-2xl">⭕</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">⭕</span>
                   <div>
-                    <div className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors">Cờ Caro Online</div>
-                    <div className="text-[10px] text-slate-400">Bàn cờ 15x15 • Xếp hạng ELO</div>
+                    <div className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors">Cờ Caro</div>
+                    <div className="text-[10px] text-slate-400">15x15 • ELO</div>
                   </div>
                 </div>
                 <button 
@@ -697,21 +628,22 @@ export const GameCatalog: React.FC = () => {
                     e.stopPropagation();
                     launchGame('caro-gomoku');
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold shadow transition-all cursor-pointer"
+                  className="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow transition-all cursor-pointer flex items-center justify-center"
+                  title="Vào Bàn Đấu Cờ Caro"
                 >
-                  Đấu
+                  <Play className="w-3.5 h-3.5 fill-current" />
                 </button>
               </div>
 
               <div 
                 onClick={() => launchGame('chess')}
-                className="p-2.5 rounded-xl bg-black/40 hover:bg-white/5 border border-white/5 hover:border-amber-500/40 transition-all cursor-pointer flex items-center justify-between group active:scale-95"
+                className="p-2 rounded-xl bg-black/40 hover:bg-white/5 border border-white/5 hover:border-amber-500/40 transition-all cursor-pointer flex items-center justify-between group active:scale-95"
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-2xl">♟️</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">♟️</span>
                   <div>
                     <div className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors">Cờ Vua</div>
-                    <div className="text-[10px] text-slate-400">Chuẩn FIDE • Đối kháng PvP</div>
+                    <div className="text-[10px] text-slate-400">FIDE • ELO</div>
                   </div>
                 </div>
                 <button 
@@ -720,9 +652,10 @@ export const GameCatalog: React.FC = () => {
                     e.stopPropagation();
                     launchGame('chess');
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold shadow transition-all cursor-pointer"
+                  className="p-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white shadow transition-all cursor-pointer flex items-center justify-center"
+                  title="Vào Bàn Đấu Cờ Vua"
                 >
-                  Đấu
+                  <Play className="w-3.5 h-3.5 fill-current" />
                 </button>
               </div>
             </div>

@@ -2,6 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GameConfig } from '../../types';
 import { Heart, Trophy, Bot, Play } from 'lucide-react';
 
+export const getCategoryIcon = (category: string): string => {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('puzzle') || cat.includes('trí tuệ')) return '🧩';
+  if (cat.includes('arcade') || cat.includes('cổ điển')) return '🕹️';
+  if (cat.includes('action') || cat.includes('hành động')) return '⚔️';
+  if (cat.includes('multiplayer') || cat.includes('đối kháng') || cat.includes('pvp') || cat.includes('online')) return '👥';
+  if (cat.includes('reflex') || cat.includes('phản xạ') || cat.includes('tốc độ')) return '⚡';
+  if (cat.includes('casual') || cat.includes('thư giãn')) return '🎲';
+  return '🎮';
+};
+
 interface LazyGameCardProps {
   game: GameConfig;
   personalHighScore: number;
@@ -72,7 +83,7 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                 style={{ backgroundColor: `${game.themeColor || '#6366f1'}15` }}
               />
               <div className="flex items-center gap-1">
-                <div className="w-10 sm:w-14 h-4 bg-white/5 rounded-md" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/5 rounded-lg" />
                 <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/5" />
               </div>
             </div>
@@ -83,7 +94,7 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
             <div className="w-8 sm:w-12 h-4 sm:h-5 bg-white/5 rounded" />
             <div className="flex items-center gap-1">
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/5 rounded-lg" />
-              <div className="w-12 sm:w-16 h-6 sm:h-8 bg-white/10 rounded-lg" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/10 rounded-lg" />
             </div>
           </div>
         </div>
@@ -91,7 +102,7 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
         /* Loaded Full Game Card with Smooth Fade-in */
         <div className="w-full h-full flex flex-col justify-between transition-opacity duration-300 opacity-100">
           <div>
-            {/* Card Header: Icon, Category Badge & Favorite Heart */}
+            {/* Card Header: Icon, Category Icon Badge & Favorite Heart */}
             <div className="flex items-start justify-between gap-1.5 mb-1.5 sm:mb-2.5">
               <div
                 className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg sm:text-2xl shadow-lg border border-white/10 group-hover:scale-105 group-hover:border-indigo-500/50 transition-all shrink-0 cursor-pointer"
@@ -103,9 +114,14 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
               </div>
 
               <div className="flex items-center gap-1 min-w-0">
-                <span className="text-[8px] sm:text-[9px] font-bold px-1 sm:px-1.5 py-0.5 rounded bg-white/5 text-indigo-400 border border-white/10 uppercase truncate max-w-[55px] sm:max-w-[75px]">
-                  {game.category}
+                {/* Category Icon Badge (No Text) */}
+                <span
+                  className="text-xs sm:text-sm px-1.5 py-0.5 rounded bg-white/5 border border-white/10 flex items-center justify-center shadow-inner"
+                  title={`Thể loại: ${game.category}`}
+                >
+                  {getCategoryIcon(game.category)}
                 </span>
+                
                 <div className="hidden md:inline-flex items-center gap-1 text-[9px] text-slate-400 bg-[#0a0a0c] px-1.5 py-0.5 rounded border border-white/5">
                   <span className="w-1 h-1 rounded-full bg-emerald-400" />
                   <span>{(stats?.activePlayers || 500).toLocaleString()}</span>
@@ -142,7 +158,7 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                 </h4>
                 {game.id === 'blocker' && (
                   <span className="px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[7px] sm:text-[8px] font-black uppercase shrink-0">
-                    500 Xu
+                    🪙 500
                   </span>
                 )}
               </div>
@@ -151,8 +167,8 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
 
           {/* Card Footer: High Score & Action Buttons */}
           <div className="pt-1.5 sm:pt-2 border-t border-white/5 flex items-center justify-between gap-1">
-            <div className="text-left min-w-0">
-              <span className="text-[7px] sm:text-[8px] text-slate-500 uppercase tracking-wider block leading-tight">Kỷ Lục</span>
+            <div className="flex items-center gap-1 text-left min-w-0" title="Kỷ lục cao nhất">
+              <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
               <span className="text-[10px] sm:text-xs font-black font-mono text-yellow-500 truncate block leading-tight">
                 {personalHighScore.toLocaleString()}
               </span>
@@ -183,16 +199,15 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({
                 </button>
               )}
 
-              {/* Play Button */}
+              {/* Play Button (Icon Only) */}
               <button
                 id={`btn-play-${game.id}`}
                 type="button"
                 onClick={() => onLaunchGame(game.id)}
-                className="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-1 active:scale-95 cursor-pointer min-h-[26px] sm:min-h-[32px]"
+                className="p-1.5 sm:p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px]"
                 title="Chơi Ngay"
               >
-                <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
-                <span className="text-[10px] sm:text-[11px] font-bold">Chơi</span>
+                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
               </button>
             </div>
           </div>

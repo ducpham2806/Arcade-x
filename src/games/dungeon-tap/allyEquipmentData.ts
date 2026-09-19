@@ -145,9 +145,10 @@ export function generateAllyLootItem(
       ? ARMORS_BY_PROFESSION[profession]
       : ACCESSORIES_BY_PROFESSION[profession];
   const baseName = nameList[Math.floor(Math.random() * nameList.length)];
-  const itemLevel = Math.max(1, Math.round(stage * (0.8 + Math.random() * 0.4)));
+  const itemLevel = 1;
 
-  const statScale = Math.pow(1.12, itemLevel - 1) * rarityInfo.statMultiplier;
+  const stageScale = Math.pow(1.08, Math.max(0, stage - 1));
+  const statScale = stageScale * rarityInfo.statMultiplier;
 
   let dpsBonusPercent = 0;
   let skillBonusPercent = 0;
@@ -181,12 +182,12 @@ export function generateAllyLootItem(
 
   return {
     id: `ally-item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    name: `${baseName} (+${itemLevel})`,
+    name: baseName,
     profession,
     professionName: profMeta.name,
     slot,
     rarity,
-    level: itemLevel,
+    level: 1,
     dpsBonusPercent,
     skillBonusPercent,
     cooldownReductionSec,

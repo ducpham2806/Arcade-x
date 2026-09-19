@@ -173,7 +173,7 @@ export const HeroesTab: React.FC<HeroesTabProps> = ({
                         <span>{profMeta.name}</span>
                       </span>
                       <span className="text-[10px] bg-purple-950 text-purple-300 border border-purple-700/50 px-1.5 py-0.2 rounded font-mono font-bold shrink-0">
-                        {ally.unlocked ? `Lv.${ally.level}` : 'Chưa Chiêu Mộ'}
+                        {ally.unlocked ? `Lv.${formatNumber(ally.level)}` : 'Chưa Chiêu Mộ'}
                       </span>
                     </div>
                     <div className="text-[11px] text-purple-300 font-mono font-bold mt-0.5">
@@ -195,7 +195,7 @@ export const HeroesTab: React.FC<HeroesTabProps> = ({
                 >
                   <div className="flex items-center gap-1 text-[11px] whitespace-nowrap">
                     <ChevronUp className="w-3.5 h-3.5" />
-                    <span>{ally.unlocked ? `TĂNG CẤP +${countToUpgrade}` : 'CHIÊU MỘ'}</span>
+                    <span>{ally.unlocked ? `TĂNG CẤP +${formatNumber(countToUpgrade)}` : 'CHIÊU MỘ'}</span>
                   </div>
                   <span className="font-mono text-[10px] font-bold">
                     💰 {formatNumber(cost)}
@@ -203,60 +203,61 @@ export const HeroesTab: React.FC<HeroesTabProps> = ({
                 </button>
               </div>
 
-              {/* Requirement: 3 Rotating Skills for Companion */}
-              <div className="bg-slate-950/80 border border-indigo-950/80 rounded-xl p-2.5 flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
-                    <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Bộ 3 Kỹ Năng Luân Phiên (Tự Động)</span>
+              {/* 3 Rotating Skills for Companion (Compact Horizontal Row) */}
+              <div className="bg-slate-950/80 border border-indigo-950/80 rounded-xl p-2 flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center gap-1 font-bold text-indigo-300">
+                    <Zap className="w-3 h-3 text-amber-400" />
+                    <span>3 Kỹ Năng</span>
                   </div>
                   {ally.unlocked && (
                     <span className="text-[10px] text-slate-400 font-mono">
-                      Hồi: <strong className="text-amber-300">{Math.ceil(skill?.currentCooldown || 0)}s</strong>
+                      ⏱️ <strong className="text-amber-300">{Math.ceil(skill?.currentCooldown || 0)}s</strong>
                     </span>
                   )}
                 </div>
 
-                {/* 3 Skills List */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                {/* 3 Skills in 1 Single Horizontal Row */}
+                <div className="grid grid-cols-3 gap-1.5">
                   {allySkills.map((sk, idx) => {
                     const isCurrent = ally.currentSkillIndex === idx || (!ally.currentSkillIndex && idx === 0);
                     const effect = getAllySkillEffect(sk.baseMultiplier, sk.level || 1, sk.effectType);
+                    const compactEffect = effect.label
+                      .replace('Gây ', '')
+                      .replace(' bộc phát', '')
+                      .replace('Cường hóa ', '+');
 
                     return (
                       <div
                         key={sk.id}
-                        className={`p-1.5 rounded-lg border text-[11px] flex flex-col justify-between transition-all ${
+                        title={`${sk.name}: ${effect.label} • Hồi: ${sk.cooldown}s • Lv.${formatNumber(sk.level || 1)}`}
+                        className={`p-1.5 rounded-xl border flex flex-col items-center justify-between text-center relative transition-all min-h-[64px] ${
                           isCurrent && ally.unlocked
-                            ? 'bg-indigo-950/70 border-indigo-400/80 shadow-sm ring-1 ring-indigo-400/40'
+                            ? 'bg-indigo-950/90 border-indigo-400/90 shadow-md ring-1 ring-indigo-400/50'
                             : 'bg-slate-900/60 border-slate-800/80 opacity-75'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-1">
-                          <div className="flex items-center gap-1 truncate font-bold text-indigo-200">
-                            <span>{sk.icon}</span>
-                            <span className="truncate">{sk.name}</span>
-                          </div>
-                          {isCurrent && ally.unlocked && (
-                            <span className="text-[8px] font-black bg-indigo-500 text-slate-950 px-1 rounded uppercase shrink-0">
-                              Đang dùng
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[10px] text-amber-200/90 font-medium truncate mt-0.5">
-                          {effect.label}
-                        </div>
-                        <div className="text-[9px] text-slate-400 font-mono mt-0.5">
-                          Hồi: {sk.cooldown}s • Lv.{sk.level || 1}
-                        </div>
+                        {isCurrent && ally.unlocked && (
+                          <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-slate-950 animate-ping" />
+                        )}
+                        <span className="text-xl select-none drop-shadow">{sk.icon}</span>
+                        <span className="text-[10px] font-bold text-indigo-200 truncate w-full leading-tight">
+                          {sk.name}
+                        </span>
+                        <span className="text-[9px] font-mono font-bold text-amber-300 truncate w-full">
+                          {compactEffect}
+                        </span>
+                        <span className="text-[8px] text-slate-400 font-mono">
+                          {sk.cooldown}s • Lv.{formatNumber(sk.level || 1)}
+                        </span>
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Cooldown progress bar for current active skill */}
+                {/* Cooldown progress bar */}
                 {ally.unlocked && skill && (
-                  <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                  <div className="w-full h-1 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                     <div
                       className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-400 transition-all duration-300 rounded-full"
                       style={{
@@ -270,104 +271,83 @@ export const HeroesTab: React.FC<HeroesTabProps> = ({
                 )}
               </div>
 
-              {/* Requirement 4: 3 Equipment Slots (Weapon, Armor, Accessory) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-0.5">
+              {/* 3 Equipment Slots (Compact Horizontal Row) */}
+              <div className="grid grid-cols-3 gap-1.5">
                 {/* Slot 1: Weapon */}
-                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2 flex flex-col justify-between gap-1">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-lg shrink-0">{weapon?.icon || profMeta.weaponIcon}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[11px] font-bold text-slate-200 truncate">
-                        {weapon?.name || profMeta.weaponSlotName}
-                      </div>
-                      <div className="text-[10px] font-mono text-purple-300 truncate">
-                        {weapon ? `+${weapon.dpsBonusPercent}% DPS • +${weapon.skillBonusPercent}% Skill` : 'Chưa có'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {weapon && ally.unlocked && onUpgradeAllyEquipment && (
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[10px]">
-                      <span className="text-slate-400 font-mono">Lv.{weapon.level}</span>
-                      <button
-                        id={`btn-upg-gear-wpn-${ally.id}`}
-                        onClick={() => onUpgradeAllyEquipment(ally.id, 'ally_weapon')}
-                        disabled={!weaponCanUpgrade}
-                        className={`px-2 py-0.5 rounded font-bold transition-all ${
-                          weaponCanUpgrade
-                            ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-sm'
-                            : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                        }`}
-                      >
-                        Cường hóa (💰{formatNumber(weapon.upgradeCost)})
-                      </button>
-                    </div>
+                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-1.5 flex flex-col items-center justify-between text-center relative min-h-[68px]">
+                  <span className="text-xl select-none">{weapon?.icon || profMeta.weaponIcon}</span>
+                  <span className="text-[9px] font-mono font-bold text-purple-300 truncate w-full">
+                    {weapon ? `+${weapon.dpsBonusPercent}% ⚔️` : 'Trống'}
+                  </span>
+                  {weapon && ally.unlocked && onUpgradeAllyEquipment ? (
+                    <button
+                      id={`btn-upg-gear-wpn-${ally.id}`}
+                      onClick={() => onUpgradeAllyEquipment(ally.id, 'ally_weapon')}
+                      disabled={!weaponCanUpgrade}
+                      className={`w-full py-0.5 px-1 rounded-lg text-[9px] font-bold flex items-center justify-center gap-0.5 transition-all ${
+                        weaponCanUpgrade
+                          ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-sm active:scale-95'
+                          : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      }`}
+                      title={`Cường hóa vũ khí: 💰${formatNumber(weapon.upgradeCost)}`}
+                    >
+                      <ChevronUp className="w-3 h-3" />
+                      <span>💰{formatNumber(weapon.upgradeCost)}</span>
+                    </button>
+                  ) : (
+                    <span className="text-[8px] text-slate-600 font-mono">⚔️ Vũ Khí</span>
                   )}
                 </div>
 
                 {/* Slot 2: Armor */}
-                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2 flex flex-col justify-between gap-1">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-lg shrink-0">{armor?.icon || profMeta.armorIcon}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[11px] font-bold text-slate-200 truncate">
-                        {armor?.name || profMeta.armorSlotName}
-                      </div>
-                      <div className="text-[10px] font-mono text-cyan-300 truncate">
-                        {armor ? `+${armor.dpsBonusPercent}% DPS • -${armor.cooldownReductionSec}s Hồi` : 'Chưa có'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {armor && ally.unlocked && onUpgradeAllyEquipment && (
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[10px]">
-                      <span className="text-slate-400 font-mono">Lv.{armor.level}</span>
-                      <button
-                        id={`btn-upg-gear-arm-${ally.id}`}
-                        onClick={() => onUpgradeAllyEquipment(ally.id, 'ally_armor')}
-                        disabled={!armorCanUpgrade}
-                        className={`px-2 py-0.5 rounded font-bold transition-all ${
-                          armorCanUpgrade
-                            ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-sm'
-                            : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                        }`}
-                      >
-                        Cường hóa (💰{formatNumber(armor.upgradeCost)})
-                      </button>
-                    </div>
+                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-1.5 flex flex-col items-center justify-between text-center relative min-h-[68px]">
+                  <span className="text-xl select-none">{armor?.icon || profMeta.armorIcon}</span>
+                  <span className="text-[9px] font-mono font-bold text-cyan-300 truncate w-full">
+                    {armor ? `+${armor.dpsBonusPercent}% 🛡️` : 'Trống'}
+                  </span>
+                  {armor && ally.unlocked && onUpgradeAllyEquipment ? (
+                    <button
+                      id={`btn-upg-gear-arm-${ally.id}`}
+                      onClick={() => onUpgradeAllyEquipment(ally.id, 'ally_armor')}
+                      disabled={!armorCanUpgrade}
+                      className={`w-full py-0.5 px-1 rounded-lg text-[9px] font-bold flex items-center justify-center gap-0.5 transition-all ${
+                        armorCanUpgrade
+                          ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-sm active:scale-95'
+                          : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      }`}
+                      title={`Cường hóa giáp: 💰${formatNumber(armor.upgradeCost)}`}
+                    >
+                      <ChevronUp className="w-3 h-3" />
+                      <span>💰{formatNumber(armor.upgradeCost)}</span>
+                    </button>
+                  ) : (
+                    <span className="text-[8px] text-slate-600 font-mono">🛡️ Giáp</span>
                   )}
                 </div>
 
                 {/* Slot 3: Accessory */}
-                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2 flex flex-col justify-between gap-1">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-lg shrink-0">{accessory?.icon || profMeta.accessoryIcon}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[11px] font-bold text-slate-200 truncate">
-                        {accessory?.name || profMeta.accessorySlotName}
-                      </div>
-                      <div className="text-[10px] font-mono text-emerald-300 truncate">
-                        {accessory ? `+${accessory.dpsBonusPercent}% DPS • +${accessory.teamBuffBonusPercent}% Đội` : 'Chưa có'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {accessory && ally.unlocked && onUpgradeAllyEquipment && (
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[10px]">
-                      <span className="text-slate-400 font-mono">Lv.{accessory.level}</span>
-                      <button
-                        id={`btn-upg-gear-acc-${ally.id}`}
-                        onClick={() => onUpgradeAllyEquipment(ally.id, 'ally_accessory')}
-                        disabled={!accessoryCanUpgrade}
-                        className={`px-2 py-0.5 rounded font-bold transition-all ${
-                          accessoryCanUpgrade
-                            ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-sm'
-                            : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                        }`}
-                      >
-                        Cường hóa (💰{formatNumber(accessory.upgradeCost)})
-                      </button>
-                    </div>
+                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-1.5 flex flex-col items-center justify-between text-center relative min-h-[68px]">
+                  <span className="text-xl select-none">{accessory?.icon || profMeta.accessoryIcon}</span>
+                  <span className="text-[9px] font-mono font-bold text-emerald-300 truncate w-full">
+                    {accessory ? `+${accessory.dpsBonusPercent}% 💍` : 'Trống'}
+                  </span>
+                  {accessory && ally.unlocked && onUpgradeAllyEquipment ? (
+                    <button
+                      id={`btn-upg-gear-acc-${ally.id}`}
+                      onClick={() => onUpgradeAllyEquipment(ally.id, 'ally_accessory')}
+                      disabled={!accessoryCanUpgrade}
+                      className={`w-full py-0.5 px-1 rounded-lg text-[9px] font-bold flex items-center justify-center gap-0.5 transition-all ${
+                        accessoryCanUpgrade
+                          ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-sm active:scale-95'
+                          : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      }`}
+                      title={`Cường hóa phụ kiện: 💰${formatNumber(accessory.upgradeCost)}`}
+                    >
+                      <ChevronUp className="w-3 h-3" />
+                      <span>💰{formatNumber(accessory.upgradeCost)}</span>
+                    </button>
+                  ) : (
+                    <span className="text-[8px] text-slate-600 font-mono">💍 Phụ Kiện</span>
                   )}
                 </div>
               </div>
@@ -377,7 +357,7 @@ export const HeroesTab: React.FC<HeroesTabProps> = ({
                 <div className="flex items-center justify-between text-[10px] text-slate-400 border-t border-white/5 pt-1.5">
                   <div className="flex items-center gap-1 text-purple-300 font-medium truncate">
                     <Award className="w-3 h-3 text-purple-400 shrink-0" />
-                    <span className="truncate">Mốc đột phá: Lv.{milestone.nextMilestone} (+60% DPS)</span>
+                    <span className="truncate">Mốc đột phá: Lv.{formatNumber(milestone.nextMilestone)} (+60% DPS)</span>
                   </div>
                   <span className="font-mono text-slate-400 shrink-0 ml-1">
                     Thưởng: x{formatNumber(milestone.multiplier)}

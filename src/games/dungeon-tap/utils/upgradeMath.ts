@@ -150,7 +150,11 @@ export function formatNumber(num: number | null | undefined, decimals: number = 
   if (num < 0) return '-' + formatNumber(-num, decimals);
 
   if (num < 1000) {
-    return Math.floor(num).toString();
+    if (Math.floor(num) === num) {
+      return num.toString();
+    }
+    const str = num.toFixed(decimals);
+    return str.includes('.') ? str.replace(/\.?0+$/, '') : str;
   }
 
   const suffixes = [
@@ -190,7 +194,81 @@ export function formatNumber(num: number | null | undefined, decimals: number = 
 }
 
 /**
- * Calculates a Combat Power score for an equipment item based on its stats
+ * Retrieves the base Level 1 stats of an equipment item.
+ * When comparing items, the game compares their Level 1 base stats rather than their post-upgraded stats.
+ */
+export function getItemBaseStats(item: EquipmentItem | null | undefined): {
+  tapDmgBonus: number;
+  heroDmgBonus: number;
+  critRateBonus: number;
+  goldBonus: number;
+  power: number;
+} {
+  if (!item) {
+    return { tapDmgBonus: 0, heroDmgBonus: 0, critRateBonus: 0, goldBonus: 0, power: 0 };
+  }
+
+  if (item.baseLevelStats) {
+    const b = item.baseLevelStats;
+    const power = Math.round(
+      (b.tapDmgBonus || 0) * 1.0 +
+      (b.heroDmgBonus || 0) * 1.0 +
+      (b.critRateBonus || 0) * 2.5 +
+      (b.goldBonus || 0) * 0.8
+    );
+    return {
+      tapDmgBonus: b.tapDmgBonus || 0,
+      heroDmgBonus: b.heroDmgBonus || 0,
+      critRateBonus: b.critRateBonus || 0,
+      goldBonus: b.goldBonus || 0,
+      power,
+    };
+  }
+
+  const lvl = Math.max(1, item.level || 1);
+  if (lvl === 1) {
+    const power = Math.round(
+      (item.tapDmgBonus || 0) * 1.0 +
+      (item.heroDmgBonus || 0) * 1.0 +
+      (item.critRateBonus || 0) * 2.5 +
+      (item.goldBonus || 0) * 0.8
+    );
+    return {
+      tapDmgBonus: item.tapDmgBonus || 0,
+      heroDmgBonus: item.heroDmgBonus || 0,
+      critRateBonus: item.critRateBonus || 0,
+      goldBonus: item.goldBonus || 0,
+      power,
+    };
+  }
+
+  // Reverse 1.25x scaling per level to recover Level 1 base stats
+  const factor = Math.pow(1.25, lvl - 1);
+  const tapDmgBonus = Math.round((item.tapDmgBonus || 0) / factor);
+  const heroDmgBonus = Math.round((item.heroDmgBonus || 0) / factor);
+  const critRateBonus = Math.max(0, (item.critRateBonus || 0) - (lvl - 1));
+  const goldBonus = Math.round((item.goldBonus || 0) / factor);
+  const power = Math.round(
+    tapDmgBonus * 1.0 +
+    heroDmgBonus * 1.0 +
+    critRateBonus * 2.5 +
+    goldBonus * 0.8
+  );
+  return { tapDmgBonus, heroDmgBonus, critRateBonus, goldBonus, power };
+}
+
+/**
+ * Calculates a Combat Power score for an equipment item based strictly on its Level 1 Base Stats!
+ * As requested: "Khi so sánh sẽ so sánh chỉ số của cấp 1 giữa 2 đồ, chứ ko phải cấp sau khi đã tăng cấp."
+ */
+export function calculateItemBasePower(item: EquipmentItem | null | undefined): number {
+  if (!item) return 0;
+  const base = getItemBaseStats(item);
+  return base.power;
+}
+
+/**
+ * Calculates current actual Combat Power score for an equipment item based on its current stats
  */
 export function calculateItemPower(item: EquipmentItem | null | undefined): number {
   if (!item) return 0;
@@ -205,6 +283,7 @@ export function calculateItemPower(item: EquipmentItem | null | undefined): numb
 
 /**
  * Determines whether a candidate item is better than the currently equipped item in that slot
+ * Always compares base Level 1 stats!
  */
 export function isBetterItem(
   candidate: EquipmentItem,
@@ -212,7 +291,7 @@ export function isBetterItem(
 ): boolean {
   if (!currentEquipped) return true; // Slot is empty, always recommend equipping!
   if (candidate.id === currentEquipped.id) return false;
-  return calculateItemPower(candidate) > calculateItemPower(currentEquipped);
+  return calculateItemBasePower(candidate) > calculateItemBasePower(currentEquipped);
 }
 
 /**

@@ -149,7 +149,7 @@ export const Header: React.FC = () => {
               }
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeModal === 'none' && !activeGameId
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -157,7 +157,7 @@ export const Header: React.FC = () => {
             title="Thư viện Trò chơi"
           >
             <Gamepad2 className="w-4 h-4 text-indigo-300" />
-            <span>Trò Chơi</span>
+            <span className="hidden xl:inline">Trò Chơi</span>
           </button>
 
           {/* 2. Kho Đồ */}
@@ -165,7 +165,7 @@ export const Header: React.FC = () => {
             id="nav-desktop-inventory"
             type="button"
             onClick={() => setActiveModal(activeModal === 'inventory' ? 'none' : 'inventory')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
               activeModal === 'inventory'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -173,7 +173,7 @@ export const Header: React.FC = () => {
             title="Kho Đồ & Rương Thưởng"
           >
             <Package className="w-4 h-4 text-indigo-300" />
-            <span>Kho Đồ</span>
+            <span className="hidden xl:inline">Kho Đồ</span>
             {totalChests > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-white font-extrabold text-[10px] leading-tight">
                 {totalChests}
@@ -186,7 +186,7 @@ export const Header: React.FC = () => {
             id="nav-desktop-shop"
             type="button"
             onClick={() => setActiveModal(activeModal === 'shop' ? 'none' : 'shop')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeModal === 'shop'
                 ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -194,7 +194,7 @@ export const Header: React.FC = () => {
             title="Cửa Hàng Arcade Shop"
           >
             <ShoppingBag className="w-4 h-4 text-amber-400" />
-            <span>Cửa Hàng</span>
+            <span className="hidden xl:inline">Cửa Hàng</span>
           </button>
 
           {/* 4. Nhiệm Vụ */}
@@ -202,7 +202,7 @@ export const Header: React.FC = () => {
             id="nav-desktop-quests"
             type="button"
             onClick={() => setActiveModal(activeModal === 'quests' || activeModal === 'dailyQuests' ? 'none' : 'quests')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
               activeModal === 'quests' || activeModal === 'dailyQuests'
                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -210,7 +210,7 @@ export const Header: React.FC = () => {
             title="Sổ Nhiệm Vụ Hàng Ngày & Tuần"
           >
             <Target className="w-4 h-4 text-emerald-400" />
-            <span>Nhiệm Vụ</span>
+            <span className="hidden xl:inline">Nhiệm Vụ</span>
             {unclaimedQuests > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-emerald-400 text-black font-extrabold text-[10px] leading-tight animate-pulse">
                 {unclaimedQuests}
@@ -223,7 +223,7 @@ export const Header: React.FC = () => {
             id="nav-desktop-leaderboard"
             type="button"
             onClick={() => setActiveModal(activeModal === 'leaderboard' ? 'none' : 'leaderboard')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeModal === 'leaderboard'
                 ? 'bg-yellow-600 text-white shadow-md shadow-yellow-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -231,8 +231,7 @@ export const Header: React.FC = () => {
             title="Bảng Vàng Cao Thủ"
           >
             <Trophy className="w-4 h-4 text-yellow-400" />
-            <span className="hidden lg:inline">Bảng Vàng</span>
-            <span className="lg:hidden">BXH</span>
+            <span className="hidden xl:inline">Bảng Vàng</span>
           </button>
 
           {/* 6. Bạn Bè */}
@@ -240,7 +239,7 @@ export const Header: React.FC = () => {
             id="nav-desktop-friends"
             type="button"
             onClick={() => setActiveModal(activeModal === 'friends' ? 'none' : 'friends')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeModal === 'friends'
                 ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -248,7 +247,7 @@ export const Header: React.FC = () => {
             title="Bạn Bè & Thách Đấu PvP"
           >
             <Users className="w-4 h-4 text-cyan-400" />
-            <span>Bạn Bè</span>
+            <span className="hidden xl:inline">Bạn Bè</span>
           </button>
 
           {/* 6b. Vòng Quay May Mắn (Daily Spin) */}
@@ -256,7 +255,7 @@ export const Header: React.FC = () => {
             id="nav-desktop-spin"
             type="button"
             onClick={() => setActiveModal(activeModal === 'spinWheel' ? 'none' : 'spinWheel')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeModal === 'spinWheel'
                 ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -267,18 +266,18 @@ export const Header: React.FC = () => {
             <span className="hidden xl:inline">Vòng Quay</span>
           </button>
 
-          {/* 7. Menu Tiện Ích (Tất cả tính năng mở rộng) */}
+          {/* 7. Menu Tiện Ích */}
           <button
             id="nav-desktop-more"
             type="button"
             onClick={() => {
               window.dispatchEvent(new CustomEvent('arcadex:open_more_menu'));
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/5 relative"
-            title="Menu & Tiện Ích Đầy Đủ (Điểm Danh, Vòng Quay, Lò Rèn, Cài Đặt...)"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/5 relative"
+            title="Menu & Tiện Ích Đầy Đủ"
           >
             <LayoutGrid className="w-4 h-4 text-amber-400" />
-            <span>Menu</span>
+            <span className="hidden xl:inline">Menu</span>
             {hasUnclaimedMenuBadge && (
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping absolute top-1 right-1" />
             )}

@@ -15,6 +15,12 @@ export interface EquipmentItem {
   description: string;
   sellValue: number;
   upgradeCost: number;
+  baseLevelStats?: {
+    tapDmgBonus: number;
+    heroDmgBonus: number;
+    critRateBonus: number;
+    goldBonus: number;
+  };
 }
 
 export interface TitanMonster {

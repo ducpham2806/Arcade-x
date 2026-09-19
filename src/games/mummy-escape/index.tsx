@@ -62,6 +62,8 @@ import {
   Sparkles,
   BarChart3,
   Palette,
+  Trophy,
+  Footprints,
 } from 'lucide-react';
 
 interface MummyEscapeGameProps {
@@ -835,19 +837,17 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
         {/* LEFT COLUMN: Tactical Mummy Escape Side Panel (4 cols) */}
         <div className="md:col-span-4 flex flex-col gap-2.5 bg-[#17110a] border border-[#5d3f1c] rounded-2xl p-3 shadow-xl">
-          {/* Score & Step Counters */}
+          {/* Score & Step Counters - Icon-focused */}
           <div className="grid grid-cols-2 gap-2">
             {/* Score */}
-            <div className="bg-[#24190e] border border-[#7d5626]/50 rounded-xl p-2 text-center shadow-inner">
-              <span className="text-[10px] font-bold text-amber-400/80 uppercase">Điểm Số</span>
+            <div className="bg-[#24190e] border border-[#7d5626]/50 rounded-xl p-2 text-center shadow-inner" title="Điểm Số">
+              <Trophy className="w-4 h-4 text-amber-400 mx-auto mb-0.5" />
               <div className="text-xl font-black text-yellow-300 font-mono tracking-wider">{score}</div>
             </div>
 
             {/* Turns Taken / Par */}
-            <div className="bg-[#24190e] border border-[#7d5626]/50 rounded-xl p-2 text-center shadow-inner">
-              <span className="text-[10px] font-bold text-amber-400/80 uppercase">
-                {mode === 'turn_limit' ? 'Số Bước Còn' : 'Số Bước'}
-              </span>
+            <div className="bg-[#24190e] border border-[#7d5626]/50 rounded-xl p-2 text-center shadow-inner" title="Số Bước">
+              <Footprints className="w-4 h-4 text-amber-400 mx-auto mb-0.5" />
               <div className="text-xl font-black text-white font-mono">
                 {mode === 'turn_limit'
                   ? Math.max(0, (levelData.maxTurns || 25) - turnsTaken)
@@ -858,10 +858,9 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
 
           {/* Time Limit bar if Time Attack */}
           {mode === 'time_attack' && (
-            <div className="bg-[#24190e] border border-cyan-500/40 rounded-xl p-2 flex items-center justify-between">
+            <div className="bg-[#24190e] border border-cyan-500/40 rounded-xl p-2 flex items-center justify-between" title="Thời Gian Còn Lại">
               <div className="flex items-center gap-1.5 text-cyan-300 text-xs font-bold">
                 <Hourglass className="w-4 h-4 animate-spin" />
-                <span>Thời Gian Còn:</span>
               </div>
               <span className="text-lg font-black font-mono text-cyan-200">{timeLeft}s</span>
             </div>
@@ -875,6 +874,8 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               type="button"
               onClick={handleRevertTurn}
               disabled={history.length === 0 || isVictory || revertCharges <= 0}
+              title="Hoàn Tác Lượt"
+              aria-label="Hoàn Tác Lượt"
               className={`w-full py-2.5 px-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-between border shadow-lg transition-all cursor-pointer ${
                 history.length > 0 && !isVictory && revertCharges > 0
                   ? 'bg-gradient-to-b from-[#8f6826] to-[#593d11] hover:from-[#a77a2f] hover:to-[#6d4b17] text-yellow-200 border-[#d4af37] active:scale-[0.98]'
@@ -883,7 +884,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
             >
               <div className="flex items-center gap-1.5">
                 <Undo2 className="w-4 h-4 text-yellow-300" />
-                <span>HOÀN TÁC LƯỢT (REVERT)</span>
               </div>
               <div className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-lg border border-yellow-500/30">
                 <span className="text-[10px] text-yellow-300 font-mono">
@@ -897,10 +897,11 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               id="btn-mummy-reset"
               type="button"
               onClick={handleReset}
+              title="Chơi Lại (Reset)"
+              aria-label="Chơi Lại (Reset)"
               className="w-full py-2 px-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-[#2d1e0d] hover:bg-[#3d2912] text-[#d4b483] border border-[#7d5626] active:scale-[0.98] transition-all cursor-pointer"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-              <span>CHƠI LẠI (RESET)</span>
+              <RotateCcw className="w-4 h-4 text-amber-400" />
             </button>
 
             {/* Skip / Wait Turn Button */}
@@ -909,10 +910,11 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               type="button"
               onClick={() => handleMove('wait')}
               disabled={isVictory || isCaught}
+              title="Đứng Yên (Bỏ Lượt / Space)"
+              aria-label="Đứng Yên (Bỏ Lượt / Space)"
               className="w-full py-2 px-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-[#3b2a14] hover:bg-[#4d371a] text-amber-200 border border-amber-500/40 active:scale-[0.98] transition-all cursor-pointer"
             >
-              <Flame className="w-3.5 h-3.5 text-amber-400" />
-              <span>ĐỨNG YÊN (BỎ LƯỢT / SPACE)</span>
+              <Flame className="w-4 h-4 text-amber-400" />
             </button>
           </div>
 
@@ -922,31 +924,33 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               id="btn-mummy-procedural-gen"
               type="button"
               onClick={() => setShowProceduralModal(true)}
-              className="py-2 px-1 rounded-xl text-[10px] font-bold bg-gradient-to-r from-amber-700/80 to-yellow-800/80 hover:from-amber-600 hover:to-yellow-700 text-yellow-100 border border-amber-400/50 flex items-center justify-center gap-1 cursor-pointer transition-all shadow-md"
+              title="Tự Sinh"
+              aria-label="Tự Sinh"
+              className="py-2 px-1 rounded-xl bg-gradient-to-r from-amber-700/80 to-yellow-800/80 hover:from-amber-600 hover:to-yellow-700 text-yellow-100 border border-amber-400/50 flex items-center justify-center cursor-pointer transition-all shadow-md"
             >
-              <Wand2 className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
-              <span className="truncate">Tự Sinh</span>
+              <Wand2 className="w-4 h-4 text-yellow-300 shrink-0" />
             </button>
 
             <button
               id="btn-mummy-world-map"
               type="button"
               onClick={() => setShowLevelSelect(true)}
-              className="py-2 px-1 rounded-xl text-[10px] font-bold bg-[#1d140b] hover:bg-[#2c1e11] text-amber-300 border border-[#5d3f1c] flex items-center justify-center gap-1 cursor-pointer transition-all"
+              title="Bản Đồ"
+              aria-label="Bản Đồ"
+              className="py-2 px-1 rounded-xl bg-[#1d140b] hover:bg-[#2c1e11] text-amber-300 border border-[#5d3f1c] flex items-center justify-center cursor-pointer transition-all"
             >
-              <Map className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">Bản Đồ</span>
+              <Map className="w-4 h-4 shrink-0" />
             </button>
 
             <button
               id="btn-mummy-open-display-settings"
               type="button"
               onClick={() => setShowSettingsModal(true)}
-              className="py-2 px-1 rounded-xl text-[10px] font-bold bg-[#1d140b] hover:bg-[#2c1e11] text-yellow-300 border border-[#5d3f1c] flex items-center justify-center gap-1 cursor-pointer transition-all"
+              className="py-2 px-1 rounded-xl bg-[#1d140b] hover:bg-[#2c1e11] text-yellow-300 border border-[#5d3f1c] flex items-center justify-center cursor-pointer transition-all"
               title="Đổi Bảng Màu & Cài Đặt Hiển Thị"
+              aria-label="Đổi Bảng Màu & Cài Đặt Hiển Thị"
             >
-              <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="truncate">Màu Lưới</span>
+              <Palette className="w-4 h-4 text-amber-400 shrink-0" />
             </button>
           </div>
 

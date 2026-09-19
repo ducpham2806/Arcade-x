@@ -959,23 +959,29 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                 <button
                   id="btn-chess-ai-easy"
                   onClick={() => startAiPractice('easy')}
-                  className="py-3 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center"
+                  className="py-3 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5"
+                  title="Độ khó Tập Sự (1000 ELO)"
                 >
-                  Tập Sự
+                  <span>🌱</span>
+                  <span>Tập Sự</span>
                 </button>
                 <button
                   id="btn-chess-ai-medium"
                   onClick={() => startAiPractice('medium')}
-                  className="py-3 rounded-xl bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center"
+                  className="py-3 rounded-xl bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5"
+                  title="Độ khó Cao Thủ (1400 ELO)"
                 >
-                  Cao Thủ
+                  <span>⚡</span>
+                  <span>Cao Thủ</span>
                 </button>
                 <button
                   id="btn-chess-ai-hard"
                   onClick={() => startAiPractice('hard')}
-                  className="py-3 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-rose-300 text-xs font-bold transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center"
+                  className="py-3 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-rose-300 text-xs font-bold transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5"
+                  title="Độ khó Đại Kiện Tướng (1800 ELO)"
                 >
-                  Đại Kiện Tướng
+                  <span>🔥</span>
+                  <span>Kiện Tướng</span>
                 </button>
               </div>
             </div>

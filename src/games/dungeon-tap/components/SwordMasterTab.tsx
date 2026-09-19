@@ -66,7 +66,7 @@ export const SwordMasterTab: React.FC<SwordMasterTabProps> = ({
                 Kiếm Sĩ (Sword Master)
               </h3>
               <span className="text-[11px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-mono font-bold border border-amber-500/40 shrink-0">
-                Lv.{heroLevel}
+                Lv.{formatNumber(heroLevel)}
               </span>
             </div>
             <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
@@ -91,7 +91,7 @@ export const SwordMasterTab: React.FC<SwordMasterTabProps> = ({
         >
           <div className="flex items-center gap-1 text-[11px] sm:text-[12px] whitespace-nowrap">
             <ChevronUp className="w-4 h-4" />
-            <span>TĂNG CẤP +{targetCount}</span>
+            <span>TĂNG CẤP +{formatNumber(targetCount)}</span>
           </div>
           <span className="font-mono text-[10px] sm:text-[11px] font-bold">
             💰 {formatNumber(batchCost)}
@@ -104,7 +104,7 @@ export const SwordMasterTab: React.FC<SwordMasterTabProps> = ({
         <div className="flex items-center justify-between text-xs text-slate-400 px-0.5">
           <span className="font-semibold text-[11px] text-slate-300">Mức tăng cấp nhanh:</span>
           <span className="text-[10px] font-mono text-amber-400">
-            {multiplier === 'max' ? `Tối đa +${targetCount}` : `+${multiplier} Cấp`}
+            {multiplier === 'max' ? `Tối đa +${formatNumber(targetCount)}` : `+${multiplier} Cấp`}
           </span>
         </div>
 
@@ -141,7 +141,7 @@ export const SwordMasterTab: React.FC<SwordMasterTabProps> = ({
         <div className="flex items-center justify-between text-xs mb-1.5">
           <div className="flex items-center gap-1.5 font-bold text-amber-300">
             <Award className="w-4 h-4 text-amber-400" />
-            <span>Mốc Đột Phá Tiếp Theo: Lv.{milestoneData.nextMilestone}</span>
+            <span>Mốc Đột Phá Tiếp Theo: Lv.{formatNumber(milestoneData.nextMilestone)}</span>
           </div>
           <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/40 px-1.5 py-0.5 rounded">
             +50% Sát Thương
@@ -166,136 +166,123 @@ export const SwordMasterTab: React.FC<SwordMasterTabProps> = ({
         </div>
       </div>
 
-      {/* Skills Milestone List with Level Up capability */}
+      {/* Skills Milestone List with Level Up capability (Compact Grid Layout) */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5 text-cyan-400" />
-            Kỹ Năng Độc Quyền Kiếm Sĩ
+            <span>Kỹ Năng Kiếm Sĩ</span>
           </h4>
-          <span className="text-[11px] text-cyan-400/80 font-medium">
-            Có thể nâng cấp bằng Vàng
+          <span className="text-[10px] text-cyan-400/80 font-mono">
+            {skills.filter((s) => heroLevel >= s.unlockLevel).length}/{INITIAL_SKILLS.length} Mở
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-2.5">
+        {/* 2-Column Grid Layout for Skills */}
+        <div className="grid grid-cols-2 gap-2">
           {INITIAL_SKILLS.map((initSkill) => {
             const skill = skills.find((s) => s.id === initSkill.id) || initSkill;
             const isUnlocked = heroLevel >= skill.unlockLevel;
             const skillInfo = getSkillData(skill.id, skill.level);
             const canAfford = isUnlocked && gold >= skill.upgradeCost;
 
+            const cost1 = isUnlocked ? calculateSkillUpgradeCost(skill.baseUpgradeCost || 100, skill.level, 1) : 0;
+            const canAfford1 = isUnlocked && gold >= cost1;
+
+            const cost5 = isUnlocked ? calculateSkillUpgradeCost(skill.baseUpgradeCost || 100, skill.level, 5) : 0;
+            const canAfford5 = isUnlocked && gold >= cost5;
+
+            const maxData = isUnlocked ? calculateMaxSkillLevels(skill.baseUpgradeCost || 100, skill.level, gold) : { count: 0, totalCost: 0 };
+            const canAffordMax = isUnlocked && maxData.count > 0 && gold >= maxData.totalCost;
+
             return (
               <div
                 key={skill.id}
-                className={`flex flex-col gap-2 p-3 rounded-xl border transition-all ${
+                className={`flex flex-col justify-between p-2 rounded-xl border transition-all min-h-[140px] ${
                   isUnlocked
-                    ? 'bg-gradient-to-r from-slate-900/90 to-slate-950 border-cyan-500/40 text-slate-200 shadow-sm'
-                    : 'bg-slate-950/60 border-slate-800 text-slate-500'
+                    ? 'bg-slate-900/90 border-cyan-500/40 text-slate-200 shadow-sm'
+                    : 'bg-slate-950/60 border-slate-800 text-slate-500 opacity-60'
                 }`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-2.5">
-                    <div className="text-2xl p-1.5 bg-black/50 rounded-lg border border-slate-800 shrink-0">
-                      {skill.icon}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-sm text-cyan-300">{skill.name}</span>
-                        {isUnlocked ? (
-                          <span className="text-[11px] font-bold bg-cyan-950/90 text-cyan-300 border border-cyan-500/50 px-2 py-0.5 rounded-full shadow-inner">
-                            Cấp {skill.level}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] bg-slate-900 text-slate-400 border border-slate-700 px-1.5 py-0.5 rounded">
-                            Mở tại Lv.{skill.unlockLevel}
-                          </span>
-                        )}
+                {/* Header: Icon, Name, Level */}
+                <div>
+                  <div className="flex items-center gap-1.5 justify-between">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-xl shrink-0 p-1 bg-black/40 rounded-lg border border-slate-800/80">
+                        {skill.icon}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs text-cyan-300 truncate leading-tight">
+                          {skill.name}
+                        </div>
+                        <div className="text-[9px] font-mono text-slate-400">
+                          {isUnlocked ? `Lv.${formatNumber(skill.level)}` : `🔒 Lv.${skill.unlockLevel}`}
+                        </div>
                       </div>
-
-                      {/* Current skill effect */}
-                      <p className="text-xs text-amber-200/90 font-medium mt-1">
-                        {isUnlocked ? skillInfo.currentEffect : skill.description}
-                      </p>
-
-                      {/* Next level preview */}
-                      {isUnlocked && (
-                        <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                          <span className="text-emerald-400">➔ Kế tiếp:</span> {skillInfo.nextEffect}
-                        </p>
-                      )}
                     </div>
+
+                    <span className="text-[9px] font-mono font-bold text-cyan-400 shrink-0">
+                      💧{skill.manaCost}
+                    </span>
                   </div>
 
-                  <div className="text-right text-[11px] font-mono shrink-0">
-                    <div className="text-cyan-400 font-bold">{skill.manaCost} MP</div>
-                    <div className="text-slate-500">{skill.cooldown}s hồi chiêu</div>
+                  {/* Compact Effect Summary */}
+                  <div className="text-[10px] text-amber-200/95 font-medium line-clamp-2 mt-1.5">
+                    {isUnlocked ? skillInfo.currentEffect : skill.description}
                   </div>
                 </div>
 
-                {/* Upgrade Controls when unlocked */}
-                {isUnlocked && (() => {
-                  const cost1 = calculateSkillUpgradeCost(skill.baseUpgradeCost || 100, skill.level, 1);
-                  const canAfford1 = gold >= cost1;
+                {/* Compact Upgrade Button Bar */}
+                {isUnlocked ? (
+                  <div className="pt-1.5 border-t border-slate-800/80 mt-1.5 flex items-center gap-1 justify-between">
+                    <button
+                      id={`btn-upgrade-skill-1-${skill.id}`}
+                      onClick={() => onUpgradeSkill(skill.id, 1)}
+                      disabled={!canAfford1}
+                      className={`flex-1 py-1 px-1 rounded-lg font-bold text-[10px] flex items-center justify-center gap-0.5 transition-all shadow-sm active:scale-95 ${
+                        canAfford1
+                          ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-cyan-900/30'
+                          : 'bg-slate-800/80 text-slate-500 cursor-not-allowed'
+                      }`}
+                      title={`+1 Cấp: 💰${formatNumber(cost1)}`}
+                    >
+                      <ArrowUpCircle className="w-3 h-3 shrink-0" />
+                      <span className="truncate">💰{formatNumber(cost1)}</span>
+                    </button>
 
-                  const cost5 = calculateSkillUpgradeCost(skill.baseUpgradeCost || 100, skill.level, 5);
-                  const canAfford5 = gold >= cost5;
+                    <button
+                      id={`btn-upgrade-skill-5-${skill.id}`}
+                      onClick={() => onUpgradeSkill(skill.id, 5)}
+                      disabled={!canAfford5}
+                      className={`py-1 px-1.5 rounded-lg font-bold text-[10px] transition-all active:scale-95 shrink-0 ${
+                        canAfford5
+                          ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-700/60'
+                          : 'bg-slate-800/80 text-slate-500 cursor-not-allowed'
+                      }`}
+                      title={`+5 Cấp: 💰${formatNumber(cost5)}`}
+                    >
+                      +5
+                    </button>
 
-                  const maxData = calculateMaxSkillLevels(skill.baseUpgradeCost || 100, skill.level, gold);
-                  const canAffordMax = maxData.count > 0 && gold >= maxData.totalCost && maxData.totalCost > 0;
-
-                  return (
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-800/80 mt-0.5">
-                      <div className="text-[11px] text-slate-400">
-                        Chi phí (+1 Lv): <span className="text-amber-400 font-bold font-mono">💰 {formatNumber(cost1)}</span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 self-end sm:self-auto">
-                        <button
-                          id={`btn-upgrade-skill-1-${skill.id}`}
-                          onClick={() => onUpgradeSkill(skill.id, 1)}
-                          disabled={!canAfford1}
-                          className={`px-2.5 py-1 rounded-lg font-bold text-[11px] flex items-center gap-1 transition-all shadow-sm active:scale-95 ${
-                            canAfford1
-                              ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-cyan-900/30'
-                              : 'bg-slate-800/80 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                          }`}
-                        >
-                          <ArrowUpCircle className="w-3 h-3" />
-                          +1 Cấp
-                        </button>
-
-                        <button
-                          id={`btn-upgrade-skill-5-${skill.id}`}
-                          onClick={() => onUpgradeSkill(skill.id, 5)}
-                          disabled={!canAfford5}
-                          className={`px-2.5 py-1 rounded-lg font-bold text-[11px] flex items-center gap-1 transition-all shadow-sm active:scale-95 ${
-                            canAfford5
-                              ? 'bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 border border-cyan-700/50'
-                              : 'bg-slate-800/80 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                          }`}
-                          title={`Tăng 5 cấp skill: 💰 ${formatNumber(cost5)}`}
-                        >
-                          +5 Cấp
-                        </button>
-
-                        <button
-                          id={`btn-upgrade-skill-max-${skill.id}`}
-                          onClick={() => onUpgradeSkill(skill.id, maxData.count)}
-                          disabled={!canAffordMax}
-                          className={`px-2.5 py-1 rounded-lg font-bold text-[11px] flex items-center gap-1 transition-all shadow-sm active:scale-95 ${
-                            canAffordMax
-                              ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-amber-500/20'
-                              : 'bg-slate-800/80 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                          }`}
-                          title={`Tăng tối đa (+${maxData.count} cấp): 💰 ${formatNumber(maxData.totalCost)}`}
-                        >
-                          MAX {canAffordMax ? `(+${maxData.count})` : ''}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })()}
+                    <button
+                      id={`btn-upgrade-skill-max-${skill.id}`}
+                      onClick={() => onUpgradeSkill(skill.id, maxData.count)}
+                      disabled={!canAffordMax}
+                      className={`py-1 px-1.5 rounded-lg font-bold text-[10px] transition-all active:scale-95 shrink-0 ${
+                        canAffordMax
+                          ? 'bg-amber-500 text-slate-950 font-black'
+                          : 'bg-slate-800/80 text-slate-500 cursor-not-allowed'
+                      }`}
+                      title={`Tối đa (+${formatNumber(maxData.count)} cấp): 💰${formatNumber(maxData.totalCost)}`}
+                    >
+                      MAX
+                    </button>
+                  </div>
+                ) : (
+                  <div className="pt-1 text-center text-[10px] font-mono text-slate-600">
+                    Mở tại Cấp {formatNumber(skill.unlockLevel)}
+                  </div>
+                )}
               </div>
             );
           })}

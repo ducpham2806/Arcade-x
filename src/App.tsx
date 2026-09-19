@@ -44,7 +44,8 @@ import { DailySpinWheelModal } from './components/DailySpinWheelModal';
 import { PvpMatchHistoryModal } from './components/PvpMatchHistoryModal';
 import { DiscardSessionConfirmModal } from './components/common/DiscardSessionConfirmModal';
 import { CloudSyncStatusIndicator } from './components/common/CloudSyncStatusIndicator';
-import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy } from 'lucide-react';
+import { QuickHubBar } from './components/QuickHubBar';
+import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy, Pause, Save, Bot, Trash2 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   useRippleEffect();
@@ -161,127 +162,125 @@ const AppContent: React.FC = () => {
             {/* Platform News & System Updates Marquee Ticker */}
             <NewsTicker />
 
-            {/* Paused Game Session Sticky Banner (Auto-save / Resume with Quick Session Stats) */}
+            {/* Quick Hub Bar (Daily Streak, Spin Wheel, 30-Day Calendar, Daily Challenge, Hall of Fame) - Placed Above Paused Game */}
+            <div className="max-w-7xl mx-auto w-full px-2.5 sm:px-6 pt-2.5 sm:pt-3">
+              <QuickHubBar />
+            </div>
+
+            {/* Paused Game Session Banner (Auto-save / Resume with Quick Session Stats) */}
             {pausedGameSession && (
-              <aside
-                id="paused-game-banner"
-                aria-label="Tiếp tục ván game đang tạm dừng"
-                className="bg-gradient-to-r from-amber-950/90 via-[#181824] to-indigo-950/90 border-b border-amber-500/40 px-3.5 py-3 text-xs shadow-xl shadow-amber-500/10 backdrop-blur-md relative z-20"
-              >
-                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
-                  {/* Left: Game information & status badges */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shrink-0 shadow-inner shadow-amber-500/20">
-                      {pausedGameSession.gameIcon || '🎮'}
-                    </div>
-                    <div>
-                      <div className="font-bold text-white flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold tracking-wide">
-                          Ván đang tạm dừng: {pausedGameSession.gameTitle}
+              <div className="max-w-7xl mx-auto w-full px-2.5 sm:px-6 pt-2 sm:pt-2.5">
+                <aside
+                  id="paused-game-banner"
+                  aria-label="Tiếp tục ván game đang tạm dừng"
+                  className="rounded-2xl bg-gradient-to-r from-amber-950/80 via-[#14141e] to-indigo-950/80 border border-amber-500/30 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs shadow-lg shadow-amber-500/10 backdrop-blur-md relative z-20 overflow-hidden"
+                >
+                  <div className="flex items-center justify-between gap-1.5 sm:gap-3 flex-nowrap min-w-0">
+                    {/* Left: Game Icon, Title & Status Badges */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-base sm:text-lg shrink-0 shadow-inner">
+                        {pausedGameSession.gameIcon || '🎮'}
+                      </div>
+                      <div className="flex items-center gap-1 min-w-0">
+                        <span className="font-bold text-white text-xs sm:text-sm tracking-tight truncate flex items-center gap-1">
+                          <Pause className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span className="truncate max-w-[85px] min-[370px]:max-w-[120px] sm:max-w-[200px] md:max-w-none">{pausedGameSession.gameTitle}</span>
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 font-medium">
+                        <span className="p-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0" title="Đồng bộ Cloud">
                           <Cloud className="w-2.5 h-2.5 text-emerald-400" />
-                          <span>Đồng bộ Cloud</span>
                         </span>
                         {pausedGameSession.isPracticeMode && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-medium">
-                            Luyện Tập
+                          <span className="p-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center shrink-0" title="Luyện Tập">
+                            <Bot className="w-2.5 h-2.5 text-blue-400" />
                           </span>
                         )}
                         {pausedGameSession.isDailyChallengeMode && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 font-medium">
-                            Thử Thách Ngày
+                          <span className="p-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 flex items-center justify-center shrink-0" title="Thử Thách Ngày">
+                            <Flame className="w-2.5 h-2.5 text-orange-400" />
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-                        <span>Lưu gần nhất:</span>
-                        <span className="text-slate-300 font-medium">
-                          {pausedGameSession.savedAt ? new Date(pausedGameSession.savedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Vừa xong'}
+                    </div>
+
+                    {/* Middle: Compact Session Stats (Time, Moves, Score) */}
+                    <div
+                      id="quick-session-stats-bar"
+                      className="flex items-center gap-1 sm:gap-1.5 py-0.5 px-1.5 sm:px-2 rounded-lg bg-black/50 border border-white/10 shrink-0 text-[10px] sm:text-xs"
+                    >
+                      {/* Time */}
+                      <div
+                        id="session-stat-time"
+                        className="flex items-center gap-1 text-slate-200"
+                        title="Thời gian đã chơi"
+                      >
+                        <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400 shrink-0" />
+                        <span className="font-mono font-bold text-amber-300">
+                          {(() => {
+                            const secs = pausedGameSession.timeElapsedSeconds ?? pausedGameSession.sessionStats?.timeElapsed ?? 0;
+                            const m = Math.floor(secs / 60);
+                            const s = secs % 60;
+                            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                          })()}
+                        </span>
+                      </div>
+
+                      <span className="text-white/20 text-[9px]">|</span>
+
+                      {/* Moves */}
+                      <div
+                        id="session-stat-moves"
+                        className="flex items-center gap-1 text-slate-200"
+                        title="Số nước đi"
+                      >
+                        <Footprints className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-indigo-400 shrink-0" />
+                        <span className="font-mono font-bold text-indigo-300">
+                          {(pausedGameSession.totalMoves ?? pausedGameSession.sessionStats?.moves ?? 0) > 0
+                            ? (pausedGameSession.totalMoves ?? pausedGameSession.sessionStats?.moves)
+                            : 1}
+                        </span>
+                      </div>
+
+                      <span className="text-white/20 text-[9px]">|</span>
+
+                      {/* Score */}
+                      <div
+                        id="session-stat-score"
+                        className="flex items-center gap-1 text-slate-200"
+                        title="Điểm số"
+                      >
+                        <Trophy className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-yellow-400 shrink-0" />
+                        <span className="font-mono font-bold text-yellow-300">
+                          {pausedGameSession.currentScore.toLocaleString()}
                         </span>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Middle: Quick Session Stats Summary (Total moves, time elapsed, current score) */}
-                  <div
-                    id="quick-session-stats-bar"
-                    className="flex items-center flex-wrap gap-2 w-full lg:w-auto py-1 px-2.5 rounded-xl bg-black/40 border border-white/10 shadow-inner"
-                  >
-                    <span className="text-[10px] uppercase font-bold text-amber-400/90 tracking-wider mr-1 hidden sm:inline">
-                      Quick Session Stats:
-                    </span>
-
-                    {/* Stat: Time Elapsed */}
-                    <div
-                      id="session-stat-time"
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-slate-200"
-                      title="Tổng thời gian đã trôi qua trong ván"
-                    >
-                      <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span className="text-[10px] text-slate-400">Thời gian:</span>
-                      <span className="font-mono font-bold text-amber-300">
-                        {(() => {
-                          const secs = pausedGameSession.timeElapsedSeconds ?? pausedGameSession.sessionStats?.timeElapsed ?? 0;
-                          const m = Math.floor(secs / 60);
-                          const s = secs % 60;
-                          return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                        })()}
-                      </span>
-                    </div>
-
-                    {/* Stat: Total Moves Made */}
-                    <div
-                      id="session-stat-moves"
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-slate-200"
-                      title="Tổng số lượt hoặc thao tác nước đi đã thực hiện"
-                    >
-                      <Footprints className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                      <span className="text-[10px] text-slate-400">Nước đi:</span>
-                      <span className="font-mono font-bold text-indigo-300">
-                        {(pausedGameSession.totalMoves ?? pausedGameSession.sessionStats?.moves ?? 0) > 0
-                          ? `${pausedGameSession.totalMoves ?? pausedGameSession.sessionStats?.moves} lượt`
-                          : '1+ lượt'}
-                      </span>
-                    </div>
-
-                    {/* Stat: Score */}
-                    <div
-                      id="session-stat-score"
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-slate-200"
-                      title="Điểm số đạt được trong ván"
-                    >
-                      <Trophy className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
-                      <span className="text-[10px] text-slate-400">Điểm số:</span>
-                      <span className="font-mono font-bold text-yellow-300">
-                        {pausedGameSession.currentScore.toLocaleString()} pts
-                      </span>
+                    {/* Right: Actions (Resume / Discard) */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        id="btn-resume-paused-game"
+                        type="button"
+                        onClick={resumePausedGame}
+                        title="Tiếp tục chơi"
+                        aria-label="Tiếp tục chơi"
+                        className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-black font-extrabold text-xs shadow-md shadow-amber-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-black" />
+                      </button>
+                      <button
+                        id="btn-discard-paused-game"
+                        type="button"
+                        onClick={() => setShowDiscardConfirmModal(true)}
+                        title="Hủy ván game"
+                        aria-label="Hủy ván game"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/10 active:scale-95 text-slate-400 hover:text-rose-400 border border-white/5 hover:border-rose-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                      </button>
                     </div>
                   </div>
-
-                  {/* Right: Actions (Resume or Discard with Confirmation Modal) */}
-                  <div className="flex items-center gap-2 shrink-0 self-end lg:self-center w-full sm:w-auto justify-end">
-                    <button
-                      id="btn-resume-paused-game"
-                      type="button"
-                      onClick={resumePausedGame}
-                      className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-black font-extrabold text-xs shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-black" />
-                      <span>Tiếp Tục Ván Chơi</span>
-                    </button>
-                    <button
-                      id="btn-discard-paused-game"
-                      type="button"
-                      onClick={() => setShowDiscardConfirmModal(true)}
-                      className="px-3 py-2 rounded-xl bg-white/5 hover:bg-rose-500/10 active:scale-95 text-slate-400 hover:text-rose-400 text-xs border border-white/5 hover:border-rose-500/30 transition-all cursor-pointer font-medium"
-                      title="Hủy ván game đang tạm dừng (yêu cầu xác nhận)"
-                    >
-                      Hủy ván
-                    </button>
-                  </div>
-                </div>
-              </aside>
+                </aside>
+              </div>
             )}
 
             {/* Unclaimed Daily Login Notification Sticky Bar (if not claimed today and not playing a game) */}
@@ -353,7 +352,7 @@ const AppContent: React.FC = () => {
       {activeModal === 'settings' && <SettingsModal />}
       {activeModal === 'crafting' && <CraftingModal initialTab="forge" />}
       {activeModal === 'achievements' && <AchievementsModal />}
-      {activeModal === 'leaderboard' && <LeaderboardModal />}
+      {activeModal === 'leaderboard' && <LeaderboardModal initialGameId={activeGameId || undefined} />}
       {activeModal === 'gameDetail' && <GameDetailModal />}
       {(activeModal === 'quests' || activeModal === 'dailyQuests') && <DailyQuestsModal />}
       {activeModal === 'weeklyQuests' && <WeeklyQuestsModal />}

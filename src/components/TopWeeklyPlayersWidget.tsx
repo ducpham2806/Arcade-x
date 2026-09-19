@@ -37,42 +37,30 @@ export const TopWeeklyPlayersWidget: React.FC = () => {
 
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-white/5">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500/20 to-yellow-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-md shadow-amber-500/10">
-              <Crown className="w-5 h-5" />
+        <div className="flex items-center justify-between gap-3 mb-3 pb-2.5 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-md" title="Top Cao Thủ Tuần (Live Cloud)">
+              <Crown className="w-4 h-4" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-white font-display">
-                  Top Cao Thủ Tuần
-                </h3>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-semibold text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Live Cloud
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400">BXH tổng điểm tuần này</p>
-            </div>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Live Cloud Sync" />
           </div>
 
           <button
             id="btn-open-full-leaderboard"
             type="button"
             onClick={() => setActiveModal('leaderboard')}
-            className="text-[11px] font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 hover:underline active:scale-95 transition-all py-1 px-2 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer"
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-indigo-400 hover:text-indigo-300 border border-white/5 active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+            title="Mở Bảng Xếp Hạng Đầy Đủ"
           >
-            <span>Tất cả</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <Trophy className="w-4 h-4 text-indigo-400" />
           </button>
         </div>
 
         {/* Players List */}
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2 mb-3">
           {isLoading && players.length === 0 ? (
             <div className="py-6 text-center text-xs text-slate-500 flex flex-col items-center gap-2">
               <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-              <span>Đang đồng bộ BXH từ Firebase...</span>
             </div>
           ) : (
             players.slice(0, 5).map((player, idx) => {
@@ -109,13 +97,13 @@ export const TopWeeklyPlayersWidget: React.FC = () => {
               return (
                 <div
                   key={`${player.playerName}-${idx}`}
-                  className={`flex items-center justify-between p-2.5 rounded-xl transition-all ${
+                  className={`flex items-center justify-between p-2 rounded-xl transition-all ${
                     isUser
                       ? 'bg-indigo-950/50 border border-indigo-500/40 shadow-md shadow-indigo-500/10'
                       : 'bg-white/[0.02] hover:bg-white/[0.05] border border-white/5'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
                     {rankBadge}
                     <div className="relative">
                       <PlayerAvatar avatar={player.avatar} playerName={player.playerName} forceTop10={true} size="sm" />
@@ -126,13 +114,13 @@ export const TopWeeklyPlayersWidget: React.FC = () => {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1">
                         <span className={`text-xs font-bold truncate ${isUser ? 'text-indigo-300' : 'text-slate-200'}`}>
                           {player.playerName}
                         </span>
                         {isUser && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-500 text-white shrink-0">
-                            BẠN
+                          <span className="text-[9px] font-bold px-1 rounded bg-indigo-500 text-white shrink-0" title="Tài Khoản Của Bạn">
+                            ⭐
                           </span>
                         )}
                       </div>
@@ -146,7 +134,6 @@ export const TopWeeklyPlayersWidget: React.FC = () => {
                     <span className="text-xs font-extrabold font-mono text-amber-400 block">
                       {(player.totalScore || 0).toLocaleString()}
                     </span>
-                    <span className="text-[9px] text-slate-500 uppercase">pts</span>
                   </div>
                 </div>
               );
@@ -156,21 +143,17 @@ export const TopWeeklyPlayersWidget: React.FC = () => {
       </div>
 
       {/* User's Current Weekly Standing Footer Card */}
-      <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-3 text-xs bg-[#0a0a0e]/60 rounded-xl p-2.5 border border-white/5">
+      <div className="pt-2.5 border-t border-white/5 flex items-center justify-between gap-2 text-xs bg-[#0a0a0e]/60 rounded-xl p-2 border border-white/5">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-sm">
+          <div className="w-6 h-6 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-xs">
             {profile.avatar}
           </div>
-          <div className="min-w-0">
-            <span className="text-[10px] text-slate-400 block truncate">Vị trí của bạn</span>
-            <span className="text-xs font-bold text-white">
-              {currentPlayerRank ? `#${currentPlayerRank} Bảng Vàng` : 'Top 100'}
-            </span>
-          </div>
+          <span className="text-xs font-bold text-white font-mono">
+            {currentPlayerRank ? `#${currentPlayerRank}` : 'Top 100'}
+          </span>
         </div>
 
         <div className="text-right shrink-0">
-          <span className="text-[10px] text-slate-400 block">Tổng điểm</span>
           <span className="text-xs font-mono font-bold text-indigo-300">
             {(userTotalScore || 0).toLocaleString()} pts
           </span>

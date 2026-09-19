@@ -39,21 +39,21 @@ import { WordCrossGame } from './word-cross';
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
-  'dungeon-tap': {
-    id: 'dungeon-tap',
-    title: 'Dungeon Titan',
-    shortDesc: 'Nhập vai RPG chém boss khổng lồ, săn đồ & chiêu mộ đồng đội',
-    description: 'Game nhập vai Tap Titans đỉnh cao! Chạm liên tục tiêu diệt Titan khổng lồ, cốt truyện tuyến tính qua nhiều chương hồi, cứ 10 level đấu Boss 30 giây nghẹt thở, quái vật rơi đồ ngẫu nhiên, màn hình trang bị 5 món, nâng cấp Kiếm Sĩ và kích hoạt 4 tuyệt kỹ tối thượng: Thiên Kiếm, Cuồng Nộ, Bàn Tay Vàng và Phân Thân!',
-    category: 'Action',
-    difficulty: 'Thử Thách',
-    icon: '⚔️',
-    bannerGradient: 'from-amber-900/60 via-orange-950/80 to-slate-900',
-    themeColor: '#f59e0b',
-    tags: ['Tap Titans', 'Dungeon Tap', 'Loot Đồ', 'Trang Bị', 'Boss Rush', 'RPG'],
-    controls: DUNGEON_TAP_CONTROLS,
-    achievements: DUNGEON_TAP_ACHIEVEMENTS,
-    dropRates: DUNGEON_TAP_DROP_RATES,
-    component: DungeonTapGame,
+  'word-cross': {
+    id: 'word-cross',
+    title: 'Word Cross',
+    shortDesc: 'Nối chữ tìm từ vựng tiếng Anh, thử thách Daily Puzzle toàn cầu',
+    description: 'Nối các chữ cái theo các hướng ngang, dọc, chéo để tạo thành từ theo danh sách có sẵn. Hơn 100 màn chơi tăng dần độ khó, chế độ Ẩn Danh, tính năng Thử Thách Mỗi Ngày (Daily Puzzle) tranh tài bảng xếp hạng toàn cầu, tra cứu từ điển và hệ thống nhân điểm Combo cực cuốn!',
+    category: 'Arcade',
+    difficulty: 'Trung Bình',
+    icon: '🔠',
+    bannerGradient: 'from-fuchsia-900/60 via-purple-950/80 to-slate-900',
+    themeColor: '#d946ef',
+    tags: ['Word Cross', 'Tìm Chữ', 'Daily Puzzle', 'Từ Vựng', 'Giải Đố', 'Vocabulary'],
+    controls: WORD_CROSS_CONTROLS,
+    achievements: WORD_CROSS_ACHIEVEMENTS,
+    dropRates: WORD_CROSS_DROP_RATES,
+    component: WordCrossGame,
   },
   'car-escape': {
     id: 'car-escape',
@@ -70,6 +70,22 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     achievements: CAR_ESCAPE_ACHIEVEMENTS,
     dropRates: CAR_ESCAPE_DROP_RATES,
     component: CarEscapeGame,
+  },
+  'dungeon-tap': {
+    id: 'dungeon-tap',
+    title: 'Dungeon Titan',
+    shortDesc: 'Nhập vai RPG chém boss khổng lồ, săn đồ & chiêu mộ đồng đội',
+    description: 'Game nhập vai Tap Titans đỉnh cao! Chạm liên tục tiêu diệt Titan khổng lồ, cốt truyện tuyến tính qua nhiều chương hồi, cứ 10 level đấu Boss 30 giây nghẹt thở, quái vật rơi đồ ngẫu nhiên, màn hình trang bị 5 món, nâng cấp Kiếm Sĩ và kích hoạt 4 tuyệt kỹ tối thượng: Thiên Kiếm, Cuồng Nộ, Bàn Tay Vàng và Phân Thân!',
+    category: 'Action',
+    difficulty: 'Thử Thách',
+    icon: '⚔️',
+    bannerGradient: 'from-amber-900/60 via-orange-950/80 to-slate-900',
+    themeColor: '#f59e0b',
+    tags: ['Tap Titans', 'Dungeon Tap', 'Loot Đồ', 'Trang Bị', 'Boss Rush', 'RPG'],
+    controls: DUNGEON_TAP_CONTROLS,
+    achievements: DUNGEON_TAP_ACHIEVEMENTS,
+    dropRates: DUNGEON_TAP_DROP_RATES,
+    component: DungeonTapGame,
   },
   'mummy-escape': {
     id: 'mummy-escape',
@@ -303,22 +319,15 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     dropRates: TILE_2048_DROP_RATES,
     component: Tile2048Game,
   },
-  'word-cross': {
-    id: 'word-cross',
-    title: 'Word Search',
-    shortDesc: 'Tìm và nối chữ cái để hoàn thành từ.',
-    description: 'Nối các chữ cái theo các hướng ngang, dọc, chéo để tạo thành từ theo danh sách có sẵn. 100 màn chơi tăng dần độ khó cùng nhiều chế độ chơi.',
-    category: 'Arcade',
-    difficulty: 'Trung Bình',
-    icon: '🔠',
-    bannerGradient: 'from-fuchsia-900/60 via-purple-950/80 to-slate-900',
-    themeColor: '#d946ef',
-    tags: ['Word Search', 'Tìm Chữ', 'Giải Đố', 'Vocabulary'],
-    controls: WORD_CROSS_CONTROLS,
-    achievements: WORD_CROSS_ACHIEVEMENTS,
-    dropRates: WORD_CROSS_DROP_RATES,
-    component: WordCrossGame,
-  },
 };
 
 export const ALL_GAMES_LIST = Object.values(GAME_REGISTRY);
+
+// 5 new & featured highlight games for the top slider
+export const FEATURED_SLIDER_GAME_IDS = [
+  'word-cross',   // Newest release with Daily Puzzle & Vocab
+  'car-escape',   // Hot 100-level parking puzzle
+  'dungeon-tap',  // RPG Tap Titans Boss Rush
+  'mummy-escape', // Turn-based pyramid tactical puzzle
+  'tile-2048',    // Jewel-dropping 2048 puzzle
+];

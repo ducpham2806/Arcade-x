@@ -567,9 +567,9 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+            <div className="flex items-center gap-1.5 text-xs text-slate-400" title="Kỷ lục">
               <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
-              <span>Kỷ lục: <strong className="text-yellow-400 font-mono">{(highScore || 0).toLocaleString()}</strong></span>
+              <strong className="text-yellow-400 font-mono">{(highScore || 0).toLocaleString()}</strong>
             </div>
           </div>
         </div>
@@ -614,10 +614,10 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
             type="button"
             onClick={() => setShowExitConfirm(true)}
             title="Trở về màn hình chính"
-            className="px-2.5 sm:px-3 h-9 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:scale-95 text-rose-400 hover:text-white flex items-center gap-1.5 border border-rose-500/30 text-xs font-semibold transition-all cursor-pointer"
+            aria-label="Thoát trò chơi"
+            className="w-9 h-9 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:scale-90 text-rose-400 hover:text-white flex items-center justify-center border border-rose-500/30 transition-all cursor-pointer"
           >
-            <Home className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Thoát</span>
+            <Home className="w-4 h-4 text-rose-400" />
           </button>
         </div>
       </header>
@@ -766,10 +766,11 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                   id="btn-pause-resume"
                   type="button"
                   onClick={() => setIsPaused(false)}
+                  title="Tiếp Tục Chơi"
+                  aria-label="Tiếp Tục Chơi"
                   className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-indigo-400 font-bold uppercase text-xs shadow-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <Play className="w-4 h-4 fill-current" />
-                  Tiếp Tục Chơi
+                  <Play className="w-5 h-5 fill-current" />
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -778,10 +779,10 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                     type="button"
                     onClick={handleSaveAndExit}
                     className="w-full py-2.5 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold text-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                    title="Lưu trạng thái và trở về sảnh"
+                    title="Lưu & Ra Ngoài"
+                    aria-label="Lưu & Ra Ngoài"
                   >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>Lưu & Ra Ngoài</span>
+                    <Save className="w-4 h-4" />
                   </button>
 
                   <button
@@ -789,9 +790,10 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                     type="button"
                     onClick={handleRestart}
                     className="w-full py-2.5 px-3 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-95 text-slate-200 font-semibold text-xs border border-white/5 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    title="Chơi Lại"
+                    aria-label="Chơi Lại"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Chơi Lại</span>
+                    <RotateCcw className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -1023,19 +1025,21 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                   id="btn-gameover-replay"
                   type="button"
                   onClick={handleRestart}
+                  title="Chơi Lại"
+                  aria-label="Chơi Lại"
                   className="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 active:scale-95 text-white font-black uppercase text-xs sm:text-sm shadow-lg shadow-emerald-950/40 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <RotateCcw className="w-4 h-4" />
-                  Chơi Lại (Replay)
+                  <RotateCcw className="w-5 h-5" />
                 </button>
                 <button
                   id="btn-gameover-home"
                   type="button"
                   onClick={handleTriggerExit}
+                  title="Về Trang Chủ"
+                  aria-label="Về Trang Chủ"
                   className="w-full py-3 px-3 rounded-xl bg-[#1a1a1a] hover:bg-white/10 active:scale-95 text-slate-200 hover:text-white font-bold text-xs sm:text-sm border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md"
                 >
-                  <Home className="w-4 h-4 text-slate-300" />
-                  Về Trang Chủ
+                  <Home className="w-5 h-5 text-slate-300" />
                 </button>
               </div>
             </div>
@@ -1055,25 +1059,23 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
               <h3 className="text-xl font-bold text-white font-display mb-1">TỔNG KẾT PHIÊN CHƠI</h3>
               <p className="text-xs text-slate-400 mb-6">{gameMeta?.title || 'Trò Chơi Arcade'}</p>
 
-              {/* Stats Grid */}
+              {/* Stats Grid - Icon only stats */}
               <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="p-3.5 rounded-2xl bg-[#141414] border border-white/5 text-left">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Thời Gian Chơi</span>
+                <div className="p-3.5 rounded-2xl bg-[#141414] border border-white/5 text-center flex flex-col items-center justify-center" title="Thời gian chơi">
+                  <div className="flex items-center justify-center mb-1">
+                    <Clock className="w-5 h-5 text-indigo-400" />
                   </div>
                   <div className="text-base font-bold text-white font-mono">
-                    {Math.floor(sessionSummaryData.timePlayedSeconds / 60)} phút {sessionSummaryData.timePlayedSeconds % 60} giây
+                    {Math.floor(sessionSummaryData.timePlayedSeconds / 60)}:{String(sessionSummaryData.timePlayedSeconds % 60).padStart(2, '0')}
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-[#141414] border border-white/5 text-left">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Điểm Đạt Được</span>
+                <div className="p-3.5 rounded-2xl bg-[#141414] border border-white/5 text-center flex flex-col items-center justify-center" title="Điểm đạt được">
+                  <div className="flex items-center justify-center mb-1">
+                    <Trophy className="w-5 h-5 text-amber-400" />
                   </div>
                   <div className="text-base font-bold text-amber-400 font-mono">
-                    {sessionSummaryData.scoreEarned.toLocaleString()} <span className="text-[10px] text-slate-400">pts</span>
+                    {sessionSummaryData.scoreEarned.toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -1088,22 +1090,22 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                   {sessionSummaryData.isHighScore && (
                     <div className="flex items-center gap-2 text-yellow-400 font-bold">
                       <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-                      🔥 Thiết lập Kỷ Lục Điểm Cao Mới cho game này!
+                      🔥 Kỷ Lục Điểm Cao Mới!
                     </div>
                   )}
                   {sessionSummaryData.droppedChest && (
                     <div className="flex items-center gap-2 text-indigo-400 font-bold">
                       <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                      🎁 Nhận được Rương Báu ({sessionSummaryData.droppedChest.toUpperCase()})!
+                      🎁 Rương Báu ({sessionSummaryData.droppedChest.toUpperCase()})
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-cyan-400 font-semibold">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                    ⭐ Xếp hạng phiên: {sessionSummaryData.rankText}
+                    ⭐ {sessionSummaryData.rankText}
                   </div>
                   <div className="flex items-center gap-2 text-emerald-400 font-semibold">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    🪙 Nhận +{sessionSummaryData.coinsEarned} Coins, ✨ +{sessionSummaryData.expEarned} EXP
+                    🪙 +{sessionSummaryData.coinsEarned} Coins, ✨ +{sessionSummaryData.expEarned} EXP
                   </div>
                 </div>
               </div>
@@ -1112,10 +1114,11 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 id="btn-session-summary-confirm"
                 type="button"
                 onClick={onExit}
+                title="Về Trang Chủ"
+                aria-label="Về Trang Chủ"
                 className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold uppercase text-xs shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
-                <Home className="w-4 h-4" />
-                Xác Nhận & Trở Về Sảnh
+                <Home className="w-5 h-5" />
               </button>
             </div>
           </div>

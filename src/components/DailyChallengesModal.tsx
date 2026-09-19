@@ -172,24 +172,23 @@ export const DailyChallengesModal: React.FC = () => {
                       {challenge.description}
                     </p>
 
-                    {/* Progress & Rewards Row */}
+                    {/* Progress & Rewards Row - Icon only */}
                     <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
-                      <div className="flex items-center gap-1 text-slate-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">
+                      <div className="flex items-center gap-1.5 text-slate-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5" title="Kỷ lục đạt được / Mục tiêu">
                         <Target className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Kỷ lục:</span>
                         <strong className="text-yellow-400 font-mono">
                           {bestScore.toLocaleString()} / {targetScore.toLocaleString()}
                         </strong>
                       </div>
 
                       <div className="flex items-center gap-2 text-[11px]">
-                        <span className="inline-flex items-center gap-1 text-amber-400 font-mono font-bold">
+                        <span className="inline-flex items-center gap-1 text-amber-400 font-mono font-bold" title="Arcade Coins">
                           <Coins className="w-3.5 h-3.5" /> +{challenge.rewardCoins}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-purple-400 font-mono font-bold">
+                        <span className="inline-flex items-center gap-1 text-purple-400 font-mono font-bold" title="Gems">
                           <Gem className="w-3.5 h-3.5" /> +{challenge.rewardGems}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-indigo-400 font-mono font-bold">
+                        <span className="inline-flex items-center gap-1 text-indigo-400 font-mono font-bold" title="EXP">
                           <Zap className="w-3.5 h-3.5" /> +{challenge.rewardExp}
                         </span>
                       </div>
@@ -204,19 +203,22 @@ export const DailyChallengesModal: React.FC = () => {
                       id={`btn-dc-claimed-${game.id}`}
                       type="button"
                       disabled
-                      className="px-4 py-2 rounded-xl bg-white/5 text-slate-500 font-bold text-xs border border-white/5 cursor-not-allowed min-h-[40px]"
+                      title="Đã Nhận Thưởng"
+                      aria-label="Đã Nhận Thưởng"
+                      className="px-4 py-2 rounded-xl bg-white/5 text-slate-500 font-bold text-xs border border-white/5 cursor-not-allowed min-h-[40px] flex items-center justify-center"
                     >
-                      Đã Nhận
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     </button>
                   ) : isCompleted && !isClaimed ? (
                     <button
                       id={`btn-dc-claim-${game.id}`}
                       type="button"
                       onClick={() => claimDailyChallenge(game.id)}
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-black text-xs uppercase tracking-tight shadow-lg shadow-amber-500/25 flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer animate-pulse min-h-[40px]"
+                      title="Nhận Thưởng"
+                      aria-label="Nhận Thưởng"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-black text-xs uppercase tracking-tight shadow-lg shadow-amber-500/25 flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer animate-pulse min-h-[40px]"
                     >
                       <Gift className="w-4 h-4" />
-                      <span>Nhận Thưởng</span>
                     </button>
                   ) : (
                     <button
@@ -226,10 +228,11 @@ export const DailyChallengesModal: React.FC = () => {
                         setActiveModal('none');
                         launchDailyChallenge(game.id);
                       }}
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-black text-xs uppercase tracking-tight shadow-lg shadow-indigo-500/25 flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer min-h-[40px]"
+                      title="Chơi Thử Thách"
+                      aria-label="Chơi Thử Thách"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-black text-xs uppercase tracking-tight shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer min-h-[40px]"
                     >
                       <Play className="w-4 h-4 fill-current" />
-                      <span>Chơi Thử Thách</span>
                     </button>
                   )}
                 </div>

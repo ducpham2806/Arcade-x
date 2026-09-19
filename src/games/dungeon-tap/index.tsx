@@ -26,6 +26,7 @@ import {
   getAllySkillEffect,
   formatNumber,
   calculateItemPower,
+  calculateItemBasePower,
   isBetterItem,
 } from './utils/upgradeMath';
 import { TitanArena } from './components/TitanArena';
@@ -35,8 +36,11 @@ import { HeroesTab } from './components/HeroesTab';
 import { EquipmentTab } from './components/EquipmentTab';
 import { StoryTab } from './components/StoryTab';
 import { StatsTab } from './components/StatsTab';
+import { DungeonLeaderboardModal } from './components/DungeonLeaderboardModal';
 import { Swords, Users, Shield, BookOpen, Activity, Coins, Sparkles, Trophy, Flag, Zap, Calendar, Gift } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
+import { usePlayer } from '../../context/PlayerContext';
+import { FirebaseService } from '../../services/firebase';
 
 const SAVE_KEY = 'tap_titans_dungeon_save_v2';
 
@@ -45,7 +49,9 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   isPaused,
   onGameOver,
 }) => {
-  const { setActiveModal } = useGame();
+  const { setActiveModal, activeModal } = useGame();
+  const { profile, recordGamePlayed } = usePlayer();
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState<boolean>(false);
 
   // Load saved state or default
   const [stage, setStage] = useState<number>(1);
@@ -115,7 +121,17 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
         if (parsed.gold !== undefined) setGold(parsed.gold);
         if (parsed.heroLevel) setHeroLevel(parsed.heroLevel);
         if (parsed.equipped) setEquipped(parsed.equipped);
-        if (parsed.inventory) setInventory(parsed.inventory);
+        if (parsed.inventory && Array.isArray(parsed.inventory)) {
+          const seen = new Set<string>();
+          const cleanInv: EquipmentItem[] = [];
+          for (const it of parsed.inventory) {
+            if (it && it.id && !seen.has(it.id)) {
+              seen.add(it.id);
+              cleanInv.push(it);
+            }
+          }
+          setInventory(cleanInv);
+        }
 
         // Merge Allies to guarantee all 3 rotating skills per ally are present
         if (parsed.allies && Array.isArray(parsed.allies)) {
@@ -158,7 +174,17 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
           setSkills(INITIAL_SKILLS);
         }
 
-        if (parsed.allyInventory) setAllyInventory(parsed.allyInventory);
+        if (parsed.allyInventory && Array.isArray(parsed.allyInventory)) {
+          const seen = new Set<string>();
+          const cleanAllyInv: AllyEquipmentItem[] = [];
+          for (const it of parsed.allyInventory) {
+            if (it && it.id && !seen.has(it.id)) {
+              seen.add(it.id);
+              cleanAllyInv.push(it);
+            }
+          }
+          setAllyInventory(cleanAllyInv);
+        }
         if (parsed.monstersSlain) setMonstersSlain(parsed.monstersSlain);
         if (parsed.bossesSlain) setBossesSlain(parsed.bossesSlain);
         if (parsed.autoPickup !== undefined) setAutoPickup(parsed.autoPickup);
@@ -172,16 +198,30 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   // Save to local storage
   const saveState = useCallback(() => {
     try {
+      const seenInv = new Set<string>();
+      const cleanInventory = inventory.filter((item) => {
+        if (!item?.id || seenInv.has(item.id)) return false;
+        seenInv.add(item.id);
+        return true;
+      });
+
+      const seenAllyInv = new Set<string>();
+      const cleanAllyInventory = allyInventory.filter((item) => {
+        if (!item?.id || seenAllyInv.has(item.id)) return false;
+        seenAllyInv.add(item.id);
+        return true;
+      });
+
       const data = {
         stage,
         maxStageReached,
         gold,
         heroLevel,
         equipped,
-        inventory,
+        inventory: cleanInventory,
         allies,
         skills,
-        allyInventory,
+        allyInventory: cleanAllyInventory,
         monstersSlain,
         bossesSlain,
         autoPickup,
@@ -196,6 +236,32 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     const timer = setInterval(saveState, 5000);
     return () => clearInterval(timer);
   }, [saveState]);
+
+  // Safely synchronize high stage reached to PlayerContext & Leaderboard outside of render/state updaters
+  const lastSyncStageRef = useRef<number>(0);
+  useEffect(() => {
+    if (maxStageReached > 1 && maxStageReached > lastSyncStageRef.current) {
+      lastSyncStageRef.current = maxStageReached;
+      try {
+        recordGamePlayed('dungeon-tap', maxStageReached);
+        FirebaseService.submitLeaderboardScore(
+          'dungeon-tap',
+          profile?.username || 'Kiếm Sĩ Vô Danh',
+          maxStageReached,
+          profile?.avatar || '⚔️',
+          profile?.currentTitle || profile?.equippedTitle || 'Hiệp Sĩ Dungeon',
+          {
+            bossesSlain,
+            monstersSlain,
+            currentStage: stage,
+            heroLevel,
+          }
+        );
+      } catch (e) {
+        console.warn('Leaderboard score submit error:', e);
+      }
+    }
+  }, [maxStageReached, bossesSlain, monstersSlain, stage, heroLevel, profile, recordGamePlayed]);
 
   // Derived Combat Stats
   const heroMilestone = getHeroMilestoneData(heroLevel);
@@ -379,29 +445,36 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
 
   // Companion Equipment Management (3 Slots: Weapon, Armor, Accessory)
   const handleEquipAllyItem = (allyId: string, item: AllyEquipmentItem) => {
+    const ally = allies.find((a) => a.id === allyId);
+    if (!ally) return;
+
+    const slotKey =
+      item.slot === 'ally_weapon'
+        ? 'equippedWeapon'
+        : item.slot === 'ally_armor'
+        ? 'equippedArmor'
+        : 'equippedAccessory';
+    const currentEquipped = ally[slotKey];
+
     setAllies((prevAllies) =>
-      prevAllies.map((ally) => {
-        if (ally.id !== allyId) return ally;
-        const slotKey =
-          item.slot === 'ally_weapon'
-            ? 'equippedWeapon'
-            : item.slot === 'ally_armor'
-            ? 'equippedArmor'
-            : 'equippedAccessory';
-        const currentEquipped = ally[slotKey];
-
-        // Return old equipped item to ally inventory
-        setAllyInventory((prevInv) => {
-          const filtered = prevInv.filter((i) => i.id !== item.id);
-          return currentEquipped ? [currentEquipped, ...filtered] : filtered;
-        });
-
+      prevAllies.map((a) => {
+        if (a.id !== allyId) return a;
         return {
-          ...ally,
+          ...a,
           [slotKey]: item,
         };
       })
     );
+
+    // Return old equipped item to ally inventory, remove newly equipped item, and guarantee unique IDs
+    setAllyInventory((prevInv) => {
+      const filtered = prevInv.filter((i) => i.id !== item.id);
+      if (currentEquipped && currentEquipped.id !== item.id) {
+        return [currentEquipped, ...filtered.filter((i) => i.id !== currentEquipped.id)];
+      }
+      return filtered;
+    });
+
     bridge.playSound('craft');
   };
 
@@ -455,113 +528,121 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     let currentAllyInv = [...allyInventory];
     let changed = false;
 
-    setAllies((prevAllies) =>
-      prevAllies.map((ally) => {
-        if (!ally.unlocked) return ally;
+    const newAllies = allies.map((ally) => {
+      if (!ally.unlocked) return ally;
 
-        let newWeapon = ally.equippedWeapon;
-        let newArmor = ally.equippedArmor;
-        let newAccessory = ally.equippedAccessory;
+      let newWeapon = ally.equippedWeapon;
+      let newArmor = ally.equippedArmor;
+      let newAccessory = ally.equippedAccessory;
 
-        // Check weapon candidates
-        const weaponCandidates = currentAllyInv.filter(
-          (i) => i.slot === 'ally_weapon' && i.profession === ally.profession
-        );
-        if (weaponCandidates.length > 0) {
-          const currentPower = calculateAllyItemPower(newWeapon);
-          let best = newWeapon;
-          let bestPower = currentPower;
-          for (const cand of weaponCandidates) {
-            const p = calculateAllyItemPower(cand);
-            if (p > bestPower) {
-              best = cand;
-              bestPower = p;
-            }
-          }
-          if (best && best !== newWeapon) {
-            changed = true;
-            currentAllyInv = currentAllyInv.filter((i) => i.id !== best.id);
-            if (newWeapon) currentAllyInv.push(newWeapon);
-            newWeapon = best;
+      // Check weapon candidates
+      const weaponCandidates = currentAllyInv.filter(
+        (i) => i.slot === 'ally_weapon' && i.profession === ally.profession
+      );
+      if (weaponCandidates.length > 0) {
+        let best = newWeapon;
+        let bestPower = calculateAllyItemPower(newWeapon);
+        for (const cand of weaponCandidates) {
+          const p = calculateAllyItemPower(cand);
+          if (p > bestPower) {
+            best = cand;
+            bestPower = p;
           }
         }
-
-        // Check armor candidates
-        const armorCandidates = currentAllyInv.filter(
-          (i) => i.slot === 'ally_armor' && i.profession === ally.profession
-        );
-        if (armorCandidates.length > 0) {
-          const currentPower = calculateAllyItemPower(newArmor);
-          let best = newArmor;
-          let bestPower = currentPower;
-          for (const cand of armorCandidates) {
-            const p = calculateAllyItemPower(cand);
-            if (p > bestPower) {
-              best = cand;
-              bestPower = p;
-            }
+        if (best && best !== newWeapon) {
+          changed = true;
+          currentAllyInv = currentAllyInv.filter((i) => i.id !== best.id);
+          if (newWeapon && !currentAllyInv.some((i) => i.id === newWeapon.id)) {
+            currentAllyInv.push(newWeapon);
           }
-          if (best && best !== newArmor) {
-            changed = true;
-            currentAllyInv = currentAllyInv.filter((i) => i.id !== best.id);
-            if (newArmor) currentAllyInv.push(newArmor);
-            newArmor = best;
+          newWeapon = best;
+        }
+      }
+
+      // Check armor candidates
+      const armorCandidates = currentAllyInv.filter(
+        (i) => i.slot === 'ally_armor' && i.profession === ally.profession
+      );
+      if (armorCandidates.length > 0) {
+        let best = newArmor;
+        let bestPower = calculateAllyItemPower(newArmor);
+        for (const cand of armorCandidates) {
+          const p = calculateAllyItemPower(cand);
+          if (p > bestPower) {
+            best = cand;
+            bestPower = p;
           }
         }
-
-        // Check accessory candidates
-        const accessoryCandidates = currentAllyInv.filter(
-          (i) => i.slot === 'ally_accessory' && i.profession === ally.profession
-        );
-        if (accessoryCandidates.length > 0) {
-          const currentPower = calculateAllyItemPower(newAccessory);
-          let best = newAccessory;
-          let bestPower = currentPower;
-          for (const cand of accessoryCandidates) {
-            const p = calculateAllyItemPower(cand);
-            if (p > bestPower) {
-              best = cand;
-              bestPower = p;
-            }
+        if (best && best !== newArmor) {
+          changed = true;
+          currentAllyInv = currentAllyInv.filter((i) => i.id !== best.id);
+          if (newArmor && !currentAllyInv.some((i) => i.id === newArmor.id)) {
+            currentAllyInv.push(newArmor);
           }
-          if (best && best !== newAccessory) {
-            changed = true;
-            currentAllyInv = currentAllyInv.filter((i) => i.id !== best.id);
-            if (newAccessory) currentAllyInv.push(newAccessory);
-            newAccessory = best;
+          newArmor = best;
+        }
+      }
+
+      // Check accessory candidates
+      const accessoryCandidates = currentAllyInv.filter(
+        (i) => i.slot === 'ally_accessory' && i.profession === ally.profession
+      );
+      if (accessoryCandidates.length > 0) {
+        let best = newAccessory;
+        let bestPower = calculateAllyItemPower(newAccessory);
+        for (const cand of accessoryCandidates) {
+          const p = calculateAllyItemPower(cand);
+          if (p > bestPower) {
+            best = cand;
+            bestPower = p;
           }
         }
+        if (best && best !== newAccessory) {
+          changed = true;
+          currentAllyInv = currentAllyInv.filter((i) => i.id !== best.id);
+          if (newAccessory && !currentAllyInv.some((i) => i.id === newAccessory.id)) {
+            currentAllyInv.push(newAccessory);
+          }
+          newAccessory = best;
+        }
+      }
 
-        return {
-          ...ally,
-          equippedWeapon: newWeapon,
-          equippedArmor: newArmor,
-          equippedAccessory: newAccessory,
-        };
-      })
-    );
+      return {
+        ...ally,
+        equippedWeapon: newWeapon,
+        equippedArmor: newArmor,
+        equippedAccessory: newAccessory,
+      };
+    });
 
     if (changed) {
-      setAllyInventory(currentAllyInv);
+      const seen = new Set<string>();
+      const cleanInv = currentAllyInv.filter((i) => {
+        if (!i?.id || seen.has(i.id)) return false;
+        seen.add(i.id);
+        return true;
+      });
+      setAllies(newAllies);
+      setAllyInventory(cleanInv);
       bridge.playSound('craft');
     }
   };
 
   // Equipment actions
   const handleEquipItem = (item: EquipmentItem) => {
-    setEquipped((prev) => {
-      const currentEquipped = prev[item.slot];
-      const newInventory = inventory.filter((i) => i.id !== item.id);
-      if (currentEquipped) {
-        newInventory.push(currentEquipped);
+    const currentEquipped = equipped[item.slot];
+    setEquipped((prev) => ({
+      ...prev,
+      [item.slot]: item,
+    }));
+    setInventory((prevInv) => {
+      const filtered = prevInv.filter((i) => i.id !== item.id);
+      if (currentEquipped && currentEquipped.id !== item.id) {
+        return [currentEquipped, ...filtered.filter((i) => i.id !== currentEquipped.id)];
       }
-      setInventory(newInventory);
-      bridge.playSound('craft');
-      return {
-        ...prev,
-        [item.slot]: item,
-      };
+      return filtered;
     });
+    bridge.playSound('craft');
   };
 
   const handleEquipBestAll = () => {
@@ -572,7 +653,8 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
 
     for (const slot of slots) {
       const current = curEquipped[slot];
-      const currentPower = calculateItemPower(current);
+      // Compare Level 1 base stats when equipping best
+      const currentPower = calculateItemBasePower(current);
 
       const candidates = curInventory.filter((i) => i.slot === slot);
       if (candidates.length === 0) continue;
@@ -581,7 +663,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       let bestPower = currentPower;
 
       for (const cand of candidates) {
-        const power = calculateItemPower(cand);
+        const power = calculateItemBasePower(cand);
         if (power > bestPower) {
           bestPower = power;
           bestCand = cand;
@@ -591,7 +673,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       if (bestCand) {
         changed = true;
         curInventory = curInventory.filter((i) => i.id !== bestCand.id);
-        if (current) {
+        if (current && !curInventory.some((i) => i.id === current.id)) {
           curInventory.push(current);
         }
         curEquipped[slot] = bestCand;
@@ -599,8 +681,14 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     }
 
     if (changed) {
+      const seen = new Set<string>();
+      const cleanInv = curInventory.filter((i) => {
+        if (!i?.id || seen.has(i.id)) return false;
+        seen.add(i.id);
+        return true;
+      });
       setEquipped(curEquipped);
-      setInventory(curInventory);
+      setInventory(cleanInv);
       bridge.playSound('craft');
     }
   };
@@ -614,7 +702,15 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
 
     if (!currentItem) return;
 
-    let tempItem: EquipmentItem = { ...currentItem };
+    // Cache or preserve baseLevelStats before upgrades
+    const baseLevelStats = currentItem.baseLevelStats || {
+      tapDmgBonus: currentItem.tapDmgBonus || 0,
+      heroDmgBonus: currentItem.heroDmgBonus || 0,
+      critRateBonus: currentItem.critRateBonus || 0,
+      goldBonus: currentItem.goldBonus || 0,
+    };
+
+    let tempItem: EquipmentItem = { ...currentItem, baseLevelStats };
     let totalCost = 0;
     let actualUpgrades = 0;
     const maxAffordable = count === -1 ? 9999 : count;
@@ -632,6 +728,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
         goldBonus: tempItem.goldBonus ? Math.round(tempItem.goldBonus * 1.25) : 0,
         upgradeCost: Math.round(tempItem.upgradeCost * 1.45),
         sellValue: Math.round(tempItem.sellValue * 1.3),
+        baseLevelStats,
       };
     }
 
@@ -653,6 +750,14 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
 
     setGold((prev) => prev + item.sellValue);
     setInventory((prev) => prev.filter((i) => i.id !== itemId));
+    bridge.playSound('coin');
+  };
+
+  const handleSellAllItems = () => {
+    if (inventory.length === 0) return;
+    const totalSellGold = inventory.reduce((sum, item) => sum + item.sellValue, 0);
+    setGold((prev) => prev + totalSellGold);
+    setInventory([]);
     bridge.playSound('coin');
   };
 
@@ -702,6 +807,8 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   const totalHeroDpsRef = useRef(totalHeroDps);
   totalHeroDpsRef.current = totalHeroDps;
   const applyDamageToMonsterRef = useRef<((damage: number, isCrit: boolean, isSkill?: boolean) => void) | null>(null);
+  const lootsRef = useRef(loots);
+  lootsRef.current = loots;
 
   // Keep track of defeat in-flight to prevent re-entrant calls
   const isDefeatingRef = useRef(false);
@@ -740,7 +847,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     if (shouldDropItem) {
       const droppedEquipment = generateLootItem(stage);
       if (autoPickup) {
-        setInventory((prev) => [droppedEquipment, ...prev]);
+        setInventory((prev) => [droppedEquipment, ...prev.filter((i) => i.id !== droppedEquipment.id)]);
         bridge.playSound('craft');
         showAutoPickupToast({
           id: Date.now() + Math.random(),
@@ -763,7 +870,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     if (shouldDropAllyItem) {
       const droppedAllyItem = generateAllyLootItem(stage);
       if (autoPickup) {
-        setAllyInventory((prev) => [droppedAllyItem, ...prev]);
+        setAllyInventory((prev) => [droppedAllyItem, ...prev.filter((i) => i.id !== droppedAllyItem.id)]);
         bridge.playSound('craft');
         showAutoPickupToast({
           id: Date.now() + Math.random() + 0.5,
@@ -801,7 +908,14 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     // Spawn next monster
     setMonster(generateMonsterForStage(nextStage));
     setBossTimer(30);
-  }, [monster, goldMultiplier, stage, bridge, autoPickup, showAutoPickupToast]);
+  }, [
+    monster,
+    goldMultiplier,
+    stage,
+    bridge,
+    autoPickup,
+    showAutoPickupToast,
+  ]);
 
   // Apply damage to current monster
   const applyDamageToMonster = useCallback(
@@ -934,10 +1048,10 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       setGold((prev) => prev + loot.amount!);
       bridge.playSound('coin');
     } else if (loot.type === 'equipment' && loot.item) {
-      setInventory((prev) => [loot.item!, ...prev]);
+      setInventory((prev) => [loot.item!, ...prev.filter((i) => i.id !== loot.item!.id)]);
       bridge.playSound('craft');
     } else if (loot.type === 'ally_equipment' && loot.allyItem) {
-      setAllyInventory((prev) => [loot.allyItem!, ...prev]);
+      setAllyInventory((prev) => [loot.allyItem!, ...prev.filter((i) => i.id !== loot.allyItem!.id)]);
       bridge.playSound('craft');
     }
     setLoots((prev) => prev.filter((l) => l.id !== loot.id));
@@ -957,6 +1071,27 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       10,
       stage * 150 + bossesSlain * 600 + monstersSlain * 35 + Math.floor(gold / 10)
     );
+
+    // Sync highest floor level to real-time Leaderboard
+    try {
+      recordGamePlayed('dungeon-tap', maxStageReached);
+      FirebaseService.submitLeaderboardScore(
+        'dungeon-tap',
+        profile?.username || 'Kiếm Sĩ Vô Danh',
+        maxStageReached,
+        profile?.avatar || '⚔️',
+        profile?.currentTitle || profile?.equippedTitle || 'Hiệp Sĩ Dungeon',
+        {
+          bossesSlain,
+          monstersSlain,
+          currentStage: stage,
+          heroLevel,
+        }
+      );
+    } catch (e) {
+      console.warn('Leaderboard submit on finish error:', e);
+    }
+
     if (onGameOver) {
       onGameOver(calculatedScore, {
         stage,
@@ -1036,22 +1171,30 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       }
 
       // Auto-Pickup safety net: collect any stray dropped items/gold
-      if (autoPickup) {
-        setLoots((prevLoots) => {
-          if (prevLoots.length === 0) return prevLoots;
-          let addedGold = 0;
-          const newGear: EquipmentItem[] = [];
-          const newAllyGear: AllyEquipmentItem[] = [];
-          prevLoots.forEach((loot) => {
-            if (loot.type === 'equipment' && loot.item) newGear.push(loot.item);
-            else if (loot.type === 'ally_equipment' && loot.allyItem) newAllyGear.push(loot.allyItem);
-            else if (loot.type === 'gold' && loot.amount) addedGold += loot.amount;
-          });
-          if (addedGold > 0) setGold((g) => g + addedGold);
-          if (newGear.length > 0) setInventory((inv) => [...newGear, ...inv]);
-          if (newAllyGear.length > 0) setAllyInventory((inv) => [...newAllyGear, ...inv]);
-          return [];
+      if (autoPickup && lootsRef.current.length > 0) {
+        const stray = lootsRef.current;
+        let addedGold = 0;
+        const newGear: EquipmentItem[] = [];
+        const newAllyGear: AllyEquipmentItem[] = [];
+        stray.forEach((loot) => {
+          if (loot.type === 'equipment' && loot.item) newGear.push(loot.item);
+          else if (loot.type === 'ally_equipment' && loot.allyItem) newAllyGear.push(loot.allyItem);
+          else if (loot.type === 'gold' && loot.amount) addedGold += loot.amount;
         });
+        setLoots([]);
+        if (addedGold > 0) setGold((g) => g + addedGold);
+        if (newGear.length > 0) {
+          setInventory((inv) => {
+            const newIds = new Set(newGear.map((g) => g.id));
+            return [...newGear, ...inv.filter((i) => !newIds.has(i.id))];
+          });
+        }
+        if (newAllyGear.length > 0) {
+          setAllyInventory((inv) => {
+            const newIds = new Set(newAllyGear.map((g) => g.id));
+            return [...newAllyGear, ...inv.filter((i) => !newIds.has(i.id))];
+          });
+        }
       }
 
       // Boss Timer countdown
@@ -1282,7 +1425,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-black text-xs text-amber-300">TẦNG {stage}</span>
+              <span className="font-black text-xs text-amber-300">TẦNG {formatNumber(stage)}</span>
               {monster.isBoss && (
                 <span className="text-[10px] bg-rose-950 text-rose-300 border border-rose-500/50 px-1 rounded font-bold animate-pulse">
                   BOSS
@@ -1297,6 +1440,23 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
 
         {/* Header Right Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Quick Access: Bảng Xếp Hạng Hầm Ngục */}
+          <button
+            type="button"
+            id="btn-dungeon-leaderboard-top"
+            onClick={() => {
+              try {
+                bridge.playSound('click');
+              } catch {}
+              setIsLeaderboardOpen(true);
+            }}
+            title="Bảng Xếp Hạng Tầng Hầm Ngục Titan (Real-Time Leaderboard)"
+            className="flex items-center gap-1 px-2 py-1 rounded-xl bg-gradient-to-r from-amber-600/30 to-yellow-600/30 hover:from-amber-600/50 hover:to-yellow-600/50 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
+          >
+            <Trophy className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400/40" />
+            <span className="text-[11px] hidden md:inline">BXH</span>
+          </button>
+
           {/* Quick Access: Vòng Quay May Mắn */}
           <button
             type="button"
@@ -1449,6 +1609,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
               onEquipItem={handleEquipItem}
               onUpgradeItem={handleUpgradeItem}
               onSellItem={handleSellItem}
+              onSellAllItems={handleSellAllItems}
               onEquipBestAll={handleEquipBestAll}
               allies={allies}
               allyInventory={allyInventory}
@@ -1478,6 +1639,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
               bossesSlain={bossesSlain}
               monstersSlain={monstersSlain}
               heroLevel={heroLevel}
+              onOpenLeaderboard={() => setIsLeaderboardOpen(true)}
             />
           )}
         </div>
@@ -1550,6 +1712,39 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
           <span className="text-[10px] font-bold mt-0.5">Chỉ Số</span>
         </button>
       </nav>
+
+      {/* Real-time Dungeon Titan Leaderboard Modal */}
+      <DungeonLeaderboardModal
+        isOpen={isLeaderboardOpen}
+        onClose={() => {
+          setIsLeaderboardOpen(false);
+          if (activeModal === 'leaderboard') {
+            setActiveModal('none');
+          }
+        }}
+        maxStageReached={maxStageReached}
+        currentStage={stage}
+        bossesSlain={bossesSlain}
+        monstersSlain={monstersSlain}
+        playerName={profile?.username || 'Kiếm Sĩ Vô Danh'}
+        playerAvatar={profile?.avatar || '⚔️'}
+        playerTitle={profile?.currentTitle || profile?.equippedTitle || 'Hiệp Sĩ Dungeon'}
+        onRefreshScore={() => {
+          FirebaseService.submitLeaderboardScore(
+            'dungeon-tap',
+            profile?.username || 'Kiếm Sĩ Vô Danh',
+            maxStageReached,
+            profile?.avatar || '⚔️',
+            profile?.currentTitle || profile?.equippedTitle || 'Hiệp Sĩ Dungeon',
+            {
+              bossesSlain,
+              monstersSlain,
+              currentStage: stage,
+              heroLevel,
+            }
+          );
+        }}
+      />
     </div>
   );
 };

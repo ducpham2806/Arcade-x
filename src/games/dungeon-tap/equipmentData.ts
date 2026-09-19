@@ -124,10 +124,12 @@ export function generateLootItem(stage: number, forcedSlot?: EquipmentSlot): Equ
   if (slot === 'ring') nameList = RING_NAMES;
 
   const baseName = nameList[Math.floor(Math.random() * nameList.length)];
-  const itemLevel = Math.max(1, Math.round(stage * (0.8 + Math.random() * 0.4)));
+  // All equipment dropped in dungeons starts at Level 1
+  const itemLevel = 1;
 
-  // Calculate stats based on slot, level, and rarity
-  const statScale = Math.pow(1.12, itemLevel - 1) * rarityInfo.statMultiplier;
+  // Base stats at level 1 scale based on the dungeon stage where dropped and rarity multiplier
+  const stageScale = Math.pow(1.08, Math.max(0, stage - 1));
+  const statScale = stageScale * rarityInfo.statMultiplier;
 
   let tapDmgBonus = 0;
   let heroDmgBonus = 0;
@@ -155,18 +157,24 @@ export function generateLootItem(stage: number, forcedSlot?: EquipmentSlot): Equ
 
   return {
     id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    name: `${baseName} (+${itemLevel})`,
+    name: baseName,
     slot,
     rarity,
-    level: itemLevel,
+    level: 1,
     tapDmgBonus,
     heroDmgBonus,
     critRateBonus,
     goldBonus,
     icon: SLOT_ICONS[slot],
-    description: `Trang bị ${rarityInfo.name} cấp ${itemLevel} nhặt được tại Tầng ${stage}.`,
+    description: `Trang bị ${rarityInfo.name} cấp 1 nhặt được tại Tầng ${stage}.`,
     sellValue,
     upgradeCost,
+    baseLevelStats: {
+      tapDmgBonus,
+      heroDmgBonus,
+      critRateBonus,
+      goldBonus,
+    },
   };
 }
 
@@ -185,6 +193,12 @@ export const STARTER_EQUIPMENT: Record<EquipmentSlot, EquipmentItem> = {
     description: 'Vũ khí khởi đầu mộc mạc của Kiếm Sĩ.',
     sellValue: 10,
     upgradeCost: 25,
+    baseLevelStats: {
+      tapDmgBonus: 10,
+      heroDmgBonus: 0,
+      critRateBonus: 2,
+      goldBonus: 0,
+    },
   },
   armor: {
     id: 'starter-armor',
@@ -200,6 +214,12 @@ export const STARTER_EQUIPMENT: Record<EquipmentSlot, EquipmentItem> = {
     description: 'Giáp nhẹ bảo hộ cơ bản.',
     sellValue: 10,
     upgradeCost: 25,
+    baseLevelStats: {
+      tapDmgBonus: 5,
+      heroDmgBonus: 5,
+      critRateBonus: 0,
+      goldBonus: 0,
+    },
   },
   helmet: {
     id: 'starter-helmet',
@@ -215,6 +235,12 @@ export const STARTER_EQUIPMENT: Record<EquipmentSlot, EquipmentItem> = {
     description: 'Băng đầu giúp tăng tập trung.',
     sellValue: 10,
     upgradeCost: 25,
+    baseLevelStats: {
+      tapDmgBonus: 0,
+      heroDmgBonus: 8,
+      critRateBonus: 0,
+      goldBonus: 0,
+    },
   },
   cloak: {
     id: 'starter-cloak',
@@ -230,6 +256,12 @@ export const STARTER_EQUIPMENT: Record<EquipmentSlot, EquipmentItem> = {
     description: 'Khăn quàng phất phơ trong gió bão.',
     sellValue: 10,
     upgradeCost: 25,
+    baseLevelStats: {
+      tapDmgBonus: 4,
+      heroDmgBonus: 0,
+      critRateBonus: 3,
+      goldBonus: 0,
+    },
   },
   ring: {
     id: 'starter-ring',
@@ -245,5 +277,11 @@ export const STARTER_EQUIPMENT: Record<EquipmentSlot, EquipmentItem> = {
     description: 'Nhẫn đồng thô mang lại chút may mắn.',
     sellValue: 10,
     upgradeCost: 25,
+    baseLevelStats: {
+      tapDmgBonus: 0,
+      heroDmgBonus: 0,
+      critRateBonus: 0,
+      goldBonus: 10,
+    },
   },
 };

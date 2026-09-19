@@ -126,34 +126,28 @@ export const DiscardSessionConfirmModal: React.FC<DiscardSessionConfirmModalProp
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="text-[10px] text-slate-500 uppercase block font-semibold">Điểm số</span>
-                <span className="text-sm font-extrabold text-amber-400 font-mono">
-                  {session.currentScore.toLocaleString()} pts
+              <div className="flex items-center gap-1.5" title="Điểm số">
+                <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="text-base font-extrabold text-amber-400 font-mono">
+                  {session.currentScore.toLocaleString()}
                 </span>
               </div>
             </div>
 
-            {/* Quick Session Stats summary inside modal */}
+            {/* Quick Session Stats summary inside modal - Icon only */}
             <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
-              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/5 border border-white/5">
-                <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <div className="min-w-0">
-                  <span className="text-[9px] text-slate-400 uppercase block">Thời gian</span>
-                  <span className="text-xs font-mono font-bold text-slate-200 truncate">
-                    {formatTime(timeElapsed)}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-white/5 border border-white/5" title="Thời gian đã chơi">
+                <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="text-sm font-mono font-bold text-slate-200 truncate">
+                  {formatTime(timeElapsed)}
+                </span>
               </div>
 
-              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/5 border border-white/5">
-                <Footprints className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                <div className="min-w-0">
-                  <span className="text-[9px] text-slate-400 uppercase block">Số nước đi</span>
-                  <span className="text-xs font-mono font-bold text-slate-200 truncate">
-                    {totalMoves > 0 ? `${totalMoves} lượt` : 'Chưa ghi nhận'}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-white/5 border border-white/5" title="Số nước đi">
+                <Footprints className="w-4 h-4 text-indigo-400 shrink-0" />
+                <span className="text-sm font-mono font-bold text-slate-200 truncate">
+                  {totalMoves > 0 ? totalMoves : 1}
+                </span>
               </div>
             </div>
           </div>
@@ -165,10 +159,10 @@ export const DiscardSessionConfirmModal: React.FC<DiscardSessionConfirmModalProp
               id="btn-modal-cancel-discard"
               type="button"
               onClick={handleCancel}
+              title="Giữ ván & Tiếp tục"
               className="w-full sm:w-1/2 py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-slate-300 hover:text-white text-xs font-bold border border-white/10 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Giữ Ván & Tiếp Tục</span>
+              <ArrowLeft className="w-4 h-4" />
             </button>
 
             {/* Destructive Option: Confirm Discard */}
@@ -176,10 +170,10 @@ export const DiscardSessionConfirmModal: React.FC<DiscardSessionConfirmModalProp
               id="btn-modal-confirm-discard"
               type="button"
               onClick={handleConfirm}
+              title="Xác nhận hủy ván"
               className="w-full sm:w-1/2 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-95 text-white text-xs font-bold shadow-lg shadow-rose-950/50 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Xác Nhận Hủy Ván</span>
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         </motion.div>

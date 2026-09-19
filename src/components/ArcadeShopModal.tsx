@@ -128,7 +128,7 @@ export const ArcadeShopModal: React.FC = () => {
     return [
       { id: 'all', label: 'Tất Cả Skins', icon: '🛍️', count: SHOP_THEMES.length },
       { id: 'scrolls', label: 'Cuộn Giấy Rèn', icon: '📜', count: FORGE_SCROLL_PRODUCTS.length },
-      { id: 'boosters', label: 'Trợ Lực (Boosters)', icon: '⚡', count: HEX_BOOSTER_PRODUCTS.length },
+      { id: 'boosters', label: 'Trợ Lực', icon: '⚡', count: HEX_BOOSTER_PRODUCTS.length },
       { id: 'eat-em-all', label: "Eat 'Em All", icon: '😋', count: SHOP_THEMES.filter(t => t.gameId === 'eat-em-all').length },
       { id: 'scoodoku', label: 'Scoodoku', icon: '🔢', count: SHOP_THEMES.filter(t => t.gameId === 'scoodoku').length },
       { id: 'shikaku', label: 'Shikaku', icon: '🟥', count: SHOP_THEMES.filter(t => t.gameId === 'shikaku').length },
@@ -329,67 +329,47 @@ export const ArcadeShopModal: React.FC = () => {
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 via-cyan-400 to-fuchsia-500" />
 
         {/* Modal Header */}
-        <header className="flex items-center justify-between gap-2 sm:gap-3 px-3.5 sm:px-6 py-2.5 sm:py-3.5 border-b border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent shrink-0">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10 shrink-0">
+        <header className="flex items-center justify-between gap-1.5 sm:gap-3 px-3 sm:px-6 py-2 sm:py-3 border-b border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 flex items-center justify-center shadow-md shadow-amber-500/10 shrink-0" title="Cửa Hàng Arcade Skins">
               <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h2 className="text-sm sm:text-lg font-black tracking-tight text-white flex items-center gap-1.5 truncate">
-                  Cửa Hàng Arcade
-                </h2>
-                <span className="text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
-                  Skins
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block truncate">
-                Mở khóa giao diện đặc quyền bằng Arcade Coins
-              </p>
             </div>
           </div>
 
           {/* Right Header: Coins Balance & Close */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Player Coins Wallet - Compact on mobile */}
             <div
               id="shop-player-coins"
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 shadow-inner"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 shadow-inner"
               title="Số dư Arcade Coins của bạn"
             >
-              <Coins className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
-              <div className="flex items-baseline gap-1">
-                <span className="text-xs sm:text-sm font-black text-amber-300 font-mono">
-                  {profile.coins.toLocaleString()}
-                </span>
-                <span className="text-[10px] text-amber-400/80 font-semibold">Xu</span>
-              </div>
+              <Coins className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="text-xs sm:text-sm font-black text-amber-300 font-mono">
+                {profile.coins.toLocaleString()}
+              </span>
             </div>
 
             {/* Player Gems Wallet */}
             <div
               id="shop-player-gems"
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 shadow-inner"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-cyan-500/10 border border-cyan-500/30 shadow-inner"
               title="Số dư Kim Cương của bạn"
             >
-              <span className="text-sm shrink-0">💎</span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xs sm:text-sm font-black text-cyan-300 font-mono">
-                  {profile.gems.toLocaleString()}
-                </span>
-                <span className="text-[10px] text-cyan-400/80 font-semibold">Kim Cương</span>
-              </div>
+              <span className="text-xs sm:text-sm shrink-0">💎</span>
+              <span className="text-xs sm:text-sm font-black text-cyan-300 font-mono">
+                {profile.gems.toLocaleString()}
+              </span>
             </div>
 
             {/* Quick Earn Coins shortcut button */}
             <button
               type="button"
               onClick={() => setActiveModal('quests')}
-              className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-semibold transition-all cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-semibold transition-all cursor-pointer flex items-center justify-center"
               title="Kiếm thêm Xu qua Nhiệm Vụ Hàng Ngày"
             >
               <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Nhiệm Vụ</span>
             </button>
 
             {/* Close Button */}
@@ -423,14 +403,14 @@ export const ArcadeShopModal: React.FC = () => {
               onClick={() => setFeedbackMessage(null)}
               className="text-xs opacity-70 hover:opacity-100 px-2 py-0.5 shrink-0"
             >
-              Đóng
+              ✕
             </button>
           </div>
         )}
 
-        {/* Filter Bar & Sort Controls - Sleek Single-Line Scroll on Mobile */}
+        {/* Filter Bar & Sort Controls */}
         <div className="flex items-center justify-between gap-2 px-3 sm:px-6 py-2 border-b border-white/5 bg-[#0a0a10] shrink-0">
-          {/* Categories Pill - Single-row horizontal scroll on mobile */}
+          {/* Categories Pill - Icon Only + Count */}
           <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none flex-nowrap touch-pan-x py-0.5 min-w-0 flex-1">
             {categories.map((cat) => {
               const isActive = selectedCategory === cat.id;
@@ -439,14 +419,14 @@ export const ArcadeShopModal: React.FC = () => {
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border shrink-0 ${
+                  title={cat.label}
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border shrink-0 ${
                     isActive
                       ? 'bg-amber-500 text-stone-950 border-amber-500 shadow-md shadow-amber-500/20'
                       : 'bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/5'
                   }`}
                 >
-                  <span className="text-xs">{cat.icon}</span>
-                  <span>{cat.label}</span>
+                  <span className="text-sm">{cat.icon}</span>
                   <span
                     className={`text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
                       isActive ? 'bg-black/20 text-stone-900 font-bold' : 'bg-white/10 text-slate-400'
@@ -459,20 +439,18 @@ export const ArcadeShopModal: React.FC = () => {
             })}
           </div>
 
-          {/* Sort Selector - Compact on mobile */}
-          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 pl-1 border-l border-white/10">
-            <span className="text-[10px] sm:text-[11px] text-slate-400 hidden md:flex items-center gap-1">
-              <Filter className="w-3 h-3" /> Sắp xếp:
-            </span>
+          {/* Sort Selector */}
+          <div className="flex items-center gap-1 shrink-0 pl-1 border-l border-white/10">
+            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <select
               value={selectedSort}
               onChange={(e) => setSelectedSort(e.target.value as any)}
               className="bg-[#141420] text-slate-200 border border-white/10 text-[11px] sm:text-xs rounded-lg sm:rounded-xl px-2 py-1 sm:py-1.5 outline-none cursor-pointer focus:border-amber-500/50"
             >
-              <option value="recommended">Đề Xuất</option>
-              <option value="price-asc">Giá: Thấp → Cao</option>
-              <option value="price-desc">Giá: Cao → Thấp</option>
-              <option value="rarity">Độ Hiếm</option>
+              <option value="recommended">⭐</option>
+              <option value="price-asc">💰 ↑</option>
+              <option value="price-desc">💰 ↓</option>
+              <option value="rarity">💎</option>
             </select>
           </div>
         </div>
@@ -480,28 +458,25 @@ export const ArcadeShopModal: React.FC = () => {
         {/* Main Content Area: Products Grid or Booster Section */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {selectedCategory === 'boosters' ? (
-            <div className="space-y-4">
-              {/* Inventory overview header */}
-              <div className="bg-gradient-to-r from-amber-950/40 via-purple-950/40 to-slate-900 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shadow-inner">
+            <div className="space-y-3">
+              {/* Inventory overview header - compact */}
+              <div className="bg-gradient-to-r from-amber-950/40 via-purple-950/40 to-slate-900 border border-amber-500/30 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-md">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shadow-inner shrink-0">
                     ⚡
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-white flex items-center gap-1.5">
+                    <h3 className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5">
                       <span>Vật Phẩm Trợ Lực Hex Puzzle</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                        Booster Store
-                      </span>
                     </h3>
-                    <p className="text-xs text-slate-400">
-                      Sử dụng trong game Hex Collapse Puzzle để vượt qua các thế cờ hóc búa
+                    <p className="text-[11px] text-slate-400 line-clamp-1">
+                      Sử dụng trong game Hex Collapse Puzzle để vượt qua các thế cờ hiểm
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-slate-950/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-mono font-bold text-slate-200">
-                  <span className="text-slate-400 text-[11px] font-sans font-semibold">Kho đồ:</span>
+                <div className="flex items-center gap-2 bg-slate-950/80 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-slate-200 shrink-0 self-end sm:self-auto">
+                  <span className="text-slate-400 text-[10px] font-sans font-semibold">Kho đồ:</span>
                   <span title="Búa Kẹo">🔨 {currentBoosters.hammer}</span>
                   <span title="Kẹo Sọc">⚡ {currentBoosters.rocket}</span>
                   <span title="Bom Cầu Vồng">💣 {currentBoosters.color_bomb}</span>
@@ -509,8 +484,8 @@ export const ArcadeShopModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Booster Packs Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Booster Packs Compact 2-3 Columns Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3">
                 {HEX_BOOSTER_PRODUCTS.map((prod) => {
                   const canAfford = profile.coins >= prod.priceCoins;
                   const isPurchasing = purchasingId === prod.id;
@@ -518,58 +493,59 @@ export const ArcadeShopModal: React.FC = () => {
                   return (
                     <div
                       key={prod.id}
-                      className={`relative flex flex-col justify-between p-4 rounded-2xl border transition-all duration-200 ${
+                      className={`relative flex flex-col justify-between p-2.5 sm:p-3 rounded-2xl border transition-all duration-200 shadow-sm ${
                         prod.isBundle
-                          ? 'bg-gradient-to-b from-purple-950/60 via-indigo-950/40 to-[#0e0e18] border-purple-500/50 shadow-lg shadow-purple-500/10 ring-1 ring-purple-500/30 sm:col-span-2 lg:col-span-3'
+                          ? 'col-span-2 sm:col-span-2 md:col-span-3 bg-gradient-to-r from-purple-950/70 via-indigo-950/50 to-[#0e0e18] border-purple-500/50 shadow-md shadow-purple-500/10 ring-1 ring-purple-500/30'
                           : 'bg-[#12121e] border-white/10 hover:border-amber-500/40 hover:bg-[#151524]'
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center text-3xl shadow-xl">
-                            {prod.icon}
+                      {/* Top: Icon & Name & Tag */}
+                      <div className="flex items-start gap-2 sm:gap-2.5 mb-1.5">
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-xl sm:text-2xl shadow-inner shrink-0">
+                          {prod.icon}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <h4 className="text-xs sm:text-sm font-black text-white truncate">
+                              {prod.name}
+                            </h4>
+                            {prod.tag && (
+                              <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                {prod.tag}
+                              </span>
+                            )}
                           </div>
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="text-sm sm:text-base font-black text-white">
-                                {prod.name}
-                              </h4>
-                              {prod.tag && (
-                                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                  {prod.tag}
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-[11px] font-bold text-amber-400">
-                              Số lượng: +{prod.count} cái
-                            </span>
-                          </div>
+                          <span className="text-[10px] sm:text-[11px] font-bold text-amber-400 block truncate">
+                            +{prod.count} vật phẩm
+                          </span>
                         </div>
                       </div>
 
-                      <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+                      {/* Description: concise 1-line */}
+                      <p className="text-[10px] sm:text-[11px] text-slate-400 truncate mb-2">
                         {prod.description}
                       </p>
 
-                      <div className="flex items-center justify-between pt-3 border-t border-white/10 mt-auto">
-                        <div className="flex items-center gap-1.5 font-mono font-black text-amber-300 text-sm">
-                          <Coins className="w-4 h-4 text-amber-400" />
+                      {/* Bottom Row: Price & Buy Button */}
+                      <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-auto">
+                        <div className="flex items-center gap-1 font-mono font-black text-amber-300 text-xs sm:text-sm">
+                          <Coins className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                           <span>{prod.priceCoins.toLocaleString()}</span>
-                          <span className="text-[10px] text-amber-400/80 font-sans font-semibold">Xu</span>
+                          <span className="text-[9px] text-amber-400/80 font-sans font-semibold hidden xs:inline">Xu</span>
                         </div>
 
                         <button
                           type="button"
                           disabled={!canAfford || isPurchasing}
                           onClick={() => handlePurchaseBooster(prod)}
-                          className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md ${
+                          className={`px-2.5 sm:px-3 py-1 rounded-xl text-[10px] sm:text-xs font-black flex items-center gap-1 transition-all cursor-pointer shadow-sm whitespace-nowrap active:scale-95 ${
                             canAfford
-                              ? 'bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 active:scale-95 shadow-amber-500/20'
+                              ? 'bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-amber-500/20'
                               : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
                           }`}
                         >
-                          <ShoppingBag className="w-3.5 h-3.5" />
-                          <span>{isPurchasing ? 'Đang Mua...' : 'Mua Ngay'}</span>
+                          <ShoppingBag className="w-3 h-3" />
+                          <span>{isPurchasing ? 'Mua...' : 'Mua'}</span>
                         </button>
                       </div>
                     </div>
@@ -578,28 +554,25 @@ export const ArcadeShopModal: React.FC = () => {
               </div>
             </div>
           ) : selectedCategory === 'scrolls' ? (
-            <div className="space-y-4">
-              {/* Inventory overview header */}
-              <div className="bg-gradient-to-r from-amber-950/40 via-purple-950/40 to-slate-900 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shadow-inner">
+            <div className="space-y-3">
+              {/* Inventory overview header - compact */}
+              <div className="bg-gradient-to-r from-amber-950/40 via-purple-950/40 to-slate-900 border border-amber-500/30 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-md">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shadow-inner shrink-0">
                     📜
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-white flex items-center gap-1.5">
-                      <span>Cuộn Giấy Rèn Tăng Tỷ Lệ Thành Công</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                        Forge Buffs
-                      </span>
+                    <h3 className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5">
+                      <span>Cuộn Giấy Rèn Tăng Tỷ Lệ Rèn</span>
                     </h3>
-                    <p className="text-xs text-slate-400">
-                      Sử dụng các cuộn giấy này khi rèn/dung hợp đồ tại Lò Rèn để tăng đáng kể tỷ lệ thành công (+10% đến +50%)
+                    <p className="text-[11px] text-slate-400 line-clamp-1">
+                      Tăng tỷ lệ thành công (+10% đến +50%) khi rèn và dung hợp trang bị tại Lò Rèn
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-slate-950/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-mono font-bold text-slate-200">
-                  <span className="text-slate-400 text-[11px] font-sans font-semibold">Kho đồ:</span>
+                <div className="flex items-center gap-2 bg-slate-950/80 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-slate-200 shrink-0 self-end sm:self-auto">
+                  <span className="text-slate-400 text-[10px] font-sans font-semibold">Kho đồ:</span>
                   <span title="Cuộn Sơ Cấp">📜 {items.find(i => i.id === 'scroll-basic')?.count || 0}</span>
                   <span title="Cuộn Trung Cấp">🧧 {items.find(i => i.id === 'scroll-medium')?.count || 0}</span>
                   <span title="Cuộn Cao Cấp">🎫 {items.find(i => i.id === 'scroll-advanced')?.count || 0}</span>
@@ -608,8 +581,8 @@ export const ArcadeShopModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Scrolls Products Compact Line List */}
-              <div className="space-y-3">
+              {/* Scrolls Products Compact 2-3 Columns Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3">
                 {FORGE_SCROLL_PRODUCTS.map((prod) => {
                   const qty = scrollQuantities[prod.id] || 1;
                   const unitPrice = prod.priceGems || 50;
@@ -620,84 +593,69 @@ export const ArcadeShopModal: React.FC = () => {
                   return (
                     <div
                       key={prod.id}
-                      className="flex flex-col sm:flex-row items-center justify-between p-3.5 sm:px-4 sm:py-3 rounded-2xl bg-[#12121e] border border-white/10 hover:border-cyan-500/40 hover:bg-[#151524] transition-all gap-3"
+                      className="flex flex-col justify-between p-2.5 sm:p-3 rounded-2xl bg-[#12121e] border border-white/10 hover:border-cyan-500/40 hover:bg-[#151524] transition-all gap-2 shadow-sm"
                     >
-                      {/* Left: Icon, Name, Rarity, Basic Info */}
-                      <div className="flex items-center gap-3 w-full sm:w-auto">
-                        <div className="w-12 h-12 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-2xl shadow-inner shrink-0">
+                      {/* Top: Icon, Name, Tag & Bonus */}
+                      <div className="flex items-start gap-2">
+                        <div className="w-10 h-10 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-xl shadow-inner shrink-0">
                           {prod.icon}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-sm font-black text-white">{prod.name}</h4>
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <h4 className="text-xs sm:text-sm font-black text-white truncate">{prod.name}</h4>
+                            <span className="text-[8px] sm:text-[9px] font-black uppercase px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                               {prod.tag}
                             </span>
-                            <span className="text-[11px] font-bold text-emerald-400">
-                              {prod.bonusDescription}
-                            </span>
                           </div>
-                          <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
-                            {prod.description}
-                          </p>
-                          <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400 mt-1">
-                            <span>Đang có: <strong className="text-amber-300">x{ownedCount}</strong></span>
-                            <span>•</span>
-                            <span>Đơn giá: <strong className="text-cyan-300">{unitPrice} 💎</strong></span>
+                          <span className="text-[10px] sm:text-[11px] font-bold text-emerald-400 block truncate mt-0.5">
+                            {prod.bonusDescription}
+                          </span>
+                          <div className="text-[9px] sm:text-[10px] font-mono text-slate-400 mt-0.5 truncate">
+                            Có: <strong className="text-amber-300">x{ownedCount}</strong> • <strong className="text-cyan-300">{unitPrice} 💎</strong>
                           </div>
                         </div>
                       </div>
 
-                      {/* Right: Quantity Selector, (i) Info Button, Buy Button */}
-                      <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                      {/* Bottom: Quantity Selector & Buy Button */}
+                      <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-white/5 mt-auto">
                         {/* Quantity Selector */}
-                        <div className="flex items-center bg-slate-950 border border-white/10 rounded-xl overflow-hidden">
+                        <div className="flex items-center bg-slate-950 border border-white/10 rounded-lg overflow-hidden shrink-0">
                           <button
                             type="button"
                             onClick={() => handleQtyChange(prod.id, -1)}
-                            className="px-2.5 py-1 text-slate-300 hover:bg-white/10 font-mono text-xs cursor-pointer transition-colors"
+                            className="px-1.5 py-0.5 text-slate-300 hover:bg-white/10 font-mono text-xs cursor-pointer transition-colors"
                           >
                             -
                           </button>
-                          <span className="px-2.5 py-1 font-mono text-xs font-bold text-white min-w-[28px] text-center">
+                          <span className="px-1.5 py-0.5 font-mono text-xs font-bold text-white min-w-[20px] text-center">
                             {qty}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleQtyChange(prod.id, 1)}
-                            className="px-2.5 py-1 text-slate-300 hover:bg-white/10 font-mono text-xs cursor-pointer transition-colors"
+                            className="px-1.5 py-0.5 text-slate-300 hover:bg-white/10 font-mono text-xs cursor-pointer transition-colors"
                           >
                             +
                           </button>
                         </div>
 
                         {/* Total Price */}
-                        <div className="font-mono font-black text-cyan-300 text-xs sm:text-sm px-2">
+                        <div className="font-mono font-black text-cyan-300 text-xs truncate">
                           {totalPrice.toLocaleString()} 💎
                         </div>
-
-                        {/* (i) Info Button */}
-                        <button
-                          type="button"
-                          onClick={() => setInfoModalProduct(prod)}
-                          className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center font-bold text-xs cursor-pointer transition-all"
-                          title="Thông tin chi tiết"
-                        >
-                          i
-                        </button>
 
                         {/* Buy Button */}
                         <button
                           type="button"
                           disabled={!canAfford}
                           onClick={() => setConfirmPurchaseData({ product: prod, qty })}
-                          className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1 transition-all cursor-pointer shadow-md whitespace-nowrap ${
+                          className={`px-2.5 sm:px-3 py-1 rounded-xl text-[10px] sm:text-xs font-black flex items-center gap-1 transition-all cursor-pointer shadow-sm whitespace-nowrap shrink-0 active:scale-95 ${
                             canAfford
-                              ? 'bg-gradient-to-r from-cyan-500 to-blue-400 hover:from-cyan-400 hover:to-blue-300 text-slate-950 active:scale-95 shadow-cyan-500/25'
+                              ? 'bg-gradient-to-r from-cyan-500 to-blue-400 hover:from-cyan-400 hover:to-blue-300 text-slate-950 shadow-cyan-500/25'
                               : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
                           }`}
                         >
-                          <ShoppingBag className="w-3.5 h-3.5" />
+                          <ShoppingBag className="w-3 h-3" />
                           <span>Mua</span>
                         </button>
                       </div>
@@ -707,7 +665,7 @@ export const ArcadeShopModal: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col space-y-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
               {displayedThemes.map((theme) => {
                 const owned = isItemOwned(theme.id);
                 const currentEquippedSkin = getEquippedSkinForGame(theme.gameId);
@@ -719,87 +677,92 @@ export const ArcadeShopModal: React.FC = () => {
                   <div
                     key={theme.id}
                     id={`shop-item-${theme.id}`}
-                    className={`flex flex-col sm:flex-row items-center justify-between p-3 sm:px-4 sm:py-2.5 rounded-xl border transition-all duration-200 gap-3 ${
+                    className={`group relative flex flex-col justify-between p-2.5 sm:p-3 rounded-2xl border transition-all duration-200 overflow-hidden shadow-sm ${
                       isEquipped
-                        ? 'bg-gradient-to-r from-indigo-950/70 to-[#121220] border-indigo-500/60 shadow-md shadow-indigo-500/10'
+                        ? 'bg-gradient-to-b from-indigo-950/80 via-[#131326] to-[#0e0e18] border-indigo-500/70 shadow-lg shadow-indigo-500/15 ring-1 ring-indigo-500/40'
                         : owned
-                        ? 'bg-[#12121e] border-white/10 hover:border-emerald-500/40 hover:bg-[#151524]'
-                        : 'bg-[#10101a] border-white/5 hover:border-amber-500/40 hover:bg-[#131322]'
+                        ? 'bg-[#11111d] border-white/10 hover:border-emerald-500/40 hover:bg-[#141424]'
+                        : 'bg-[#0f0f18] border-white/5 hover:border-amber-500/40 hover:bg-[#131322]'
                     }`}
                   >
-                    {/* Left: Icon, Name, Game & Rarity */}
-                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                    {/* Top Game Tag & Rarity */}
+                    <div className="flex items-center justify-between gap-1 mb-1.5">
+                      <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-black/50 text-slate-300 border border-white/10 truncate max-w-[62%]">
+                        <span className="shrink-0">{theme.gameIcon}</span>
+                        <span className="truncate">{theme.gameTitle}</span>
+                      </span>
+                      <RarityBadge rarity={theme.rarity} />
+                    </div>
+
+                    {/* Center Icon Showcase / Interactive Preview Trigger */}
+                    <div
+                      onClick={() => setPreviewTheme(theme)}
+                      className="relative flex flex-col items-center justify-center py-2.5 sm:py-3 rounded-xl border border-white/5 cursor-pointer group-hover:border-white/15 transition-all mb-2"
+                      style={{
+                        background: `radial-gradient(circle at center, ${theme.accentColor}25 0%, rgba(15,15,24,0.4) 75%)`,
+                      }}
+                      title="Chạm để xem thử giao diện động"
+                    >
                       <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-white/15 shrink-0"
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-lg border border-white/15 transition-transform duration-200 group-hover:scale-105"
                         style={{
-                          backgroundColor: `${theme.accentColor}25`,
+                          backgroundColor: `${theme.accentColor}30`,
+                          boxShadow: `0 6px 16px ${theme.accentColor}30`,
                         }}
                       >
                         {theme.icon}
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="text-sm font-black text-white truncate">{theme.name}</h4>
-                          <span className="flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-black/40 text-slate-300 border border-white/10">
-                            <span>{theme.gameIcon}</span>
-                            <span>{theme.gameTitle}</span>
-                          </span>
-                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded border ${theme.badgeBg}`}>
-                            {theme.tag}
-                          </span>
-                          <RarityBadge rarity={theme.rarity} />
-                        </div>
-                        <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
-                          {theme.description} • <span className="text-slate-300">{theme.features[0]}</span>
-                        </p>
-                      </div>
-                    </div>
 
-                    {/* Right: Preview, Price & Action Buttons */}
-                    <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                      {/* Preview Button */}
+                      {/* Single Eye Preview Button (Top-Right) */}
                       <button
                         type="button"
-                        onClick={() => setPreviewTheme(theme)}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold border border-white/10 transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewTheme(theme);
+                        }}
+                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-lg bg-black/60 hover:bg-amber-500/25 text-slate-400 hover:text-amber-300 border border-white/10 flex items-center justify-center transition-all cursor-pointer shadow-sm"
                         title="Xem thử giao diện"
                       >
-                        <Eye className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="hidden sm:inline">Xem Thử</span>
+                        <Eye className="w-3 h-3 text-amber-400" />
                       </button>
 
-                      {/* Info Button */}
-                      <button
-                        type="button"
-                        onClick={() => setInfoModalProduct({
-                          id: theme.id,
-                          name: theme.name,
-                          description: theme.description,
-                          icon: theme.icon,
-                          tag: theme.tag,
-                          bonusDescription: theme.features.join(' • '),
-                          type: 'skin',
-                        } as any)}
-                        className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center font-bold text-xs cursor-pointer transition-all"
-                        title="Thông tin chi tiết"
+                      {theme.tag && (
+                        <span className={`mt-1.5 text-[8px] sm:text-[9px] font-black uppercase px-1.5 py-0.2 rounded border ${theme.badgeBg}`}>
+                          {theme.tag}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Theme Name & Concise Feature (Reduced text) */}
+                    <div className="mb-2">
+                      <h4
+                        onClick={() => setPreviewTheme(theme)}
+                        className="text-xs sm:text-sm font-black text-white truncate cursor-pointer group-hover:text-amber-300 transition-colors"
+                        title={theme.name}
                       >
-                        i
-                      </button>
+                        {theme.name}
+                      </h4>
+                      <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                        {theme.features?.[0] || theme.description}
+                      </p>
+                    </div>
 
-                      {/* Price / Status */}
-                      <div className="px-2 font-mono min-w-[90px] text-right">
+                    {/* Bottom Row: Price & Action */}
+                    <div className="pt-2 border-t border-white/5 flex items-center justify-between gap-1.5 mt-auto">
+                      {/* Price / Owned status */}
+                      <div className="font-mono min-w-0">
                         {owned ? (
-                          <span className="text-emerald-400 text-xs font-bold flex items-center gap-1 justify-end">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Đã Mua</span>
+                          <span className="text-emerald-400 text-[10px] sm:text-[11px] font-bold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 shrink-0" />
+                            <span className="truncate">Đã Có</span>
                           </span>
                         ) : (
-                          <div className="flex items-center justify-end gap-1 font-mono">
-                            <Coins className="w-3.5 h-3.5 text-amber-400" />
-                            <span className={`text-xs sm:text-sm font-black ${canAfford ? 'text-amber-300' : 'text-slate-400'}`}>
+                          <div className="flex items-center gap-0.5 font-mono">
+                            <Coins className="w-3 h-3 text-amber-400 shrink-0" />
+                            <span className={`text-[11px] sm:text-xs font-black truncate ${canAfford ? 'text-amber-300' : 'text-slate-400'}`}>
                               {theme.priceCoins.toLocaleString()}
                             </span>
-                            <span className="text-[10px] text-amber-400/80 font-bold uppercase">Xu</span>
+                            <span className="text-[9px] text-amber-400/80 font-semibold hidden xs:inline">Xu</span>
                           </div>
                         )}
                       </div>
@@ -810,32 +773,33 @@ export const ArcadeShopModal: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleEquipToggle(theme)}
-                            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-indigo-600/20 transition-colors cursor-pointer whitespace-nowrap"
+                            className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                            title="Đang sử dụng (Bấm để gỡ)"
                           >
                             <Check className="w-3.5 h-3.5" />
-                            <span>Đang Dùng</span>
                           </button>
                         ) : owned ? (
                           <button
                             type="button"
                             onClick={() => handleEquipToggle(theme)}
-                            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-100 text-xs font-bold border border-white/10 transition-colors cursor-pointer whitespace-nowrap"
+                            className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-white/10 hover:bg-white/20 text-slate-100 text-xs font-bold border border-white/10 transition-all cursor-pointer whitespace-nowrap active:scale-95 flex items-center justify-center"
+                            title="Trang bị giao diện này"
                           >
-                            Trang Bị
+                            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                           </button>
                         ) : (
                           <button
                             type="button"
                             disabled={!canAfford || purchasingId === theme.id}
                             onClick={() => handlePurchase(theme)}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 transition-all cursor-pointer whitespace-nowrap shadow-md ${
+                            className={`p-1.5 sm:px-2.5 sm:py-1 rounded-xl text-xs font-black flex items-center justify-center transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95 ${
                               canAfford
                                 ? 'bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-amber-500/20'
                                 : 'bg-white/5 text-slate-500 border border-white/5 cursor-not-allowed'
                             }`}
+                            title={`Mua với ${theme.priceCoins.toLocaleString()} Xu`}
                           >
                             <ShoppingBag className="w-3.5 h-3.5" />
-                            <span>Mua</span>
                           </button>
                         )}
                       </div>
@@ -847,36 +811,35 @@ export const ArcadeShopModal: React.FC = () => {
           )}
 
           {/* Quick Help / Info box at bottom */}
-          <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between gap-3 text-xs text-slate-400">
             <div className="flex items-center gap-2">
               <Info className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>
-                Theme mua từ Arcade Shop sẽ lưu vĩnh viễn vào <strong>Kho Rương Đồ</strong> và kích hoạt trực tiếp trong game tương ứng.
-              </span>
+              <span className="truncate">Skins lưu vĩnh viễn trong kho đồ</span>
             </div>
             <button
               type="button"
               onClick={() => setActiveModal('inventory')}
-              className="text-amber-400 hover:text-amber-300 font-bold whitespace-nowrap flex items-center gap-1"
+              className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 transition-all flex items-center justify-center cursor-pointer shrink-0"
+              title="Xem Túi Đồ"
             >
-              <span>Xem Túi Đồ</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Modal Footer */}
-        <footer className="px-4 sm:px-6 py-3 border-t border-white/10 bg-[#0a0a10] flex items-center justify-between gap-3 shrink-0">
+        <footer className="px-4 sm:px-6 py-2.5 sm:py-3 border-t border-white/10 bg-[#0a0a10] flex items-center justify-between gap-3 shrink-0">
           <div className="text-xs text-slate-400 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Mỗi tuần sẽ cập nhật thêm các bộ theme động mới!</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="text-[11px] text-slate-400 truncate">Cập nhật mỗi tuần</span>
           </div>
           <button
             type="button"
             onClick={() => setActiveModal('none')}
-            className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold transition-all cursor-pointer"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
+            title="Đóng Cửa Hàng"
           >
-            Đóng Cửa Hàng
+            ✕
           </button>
         </footer>
 
@@ -1131,21 +1094,24 @@ const ThemePreviewDialog: React.FC<ThemePreviewDialogProps> = ({
                 <button
                   type="button"
                   onClick={onEquip}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  title={isEquipped ? 'Gỡ Trang Bị' : 'Trang Bị Ngay'}
+                  aria-label={isEquipped ? 'Gỡ Trang Bị' : 'Trang Bị Ngay'}
+                  className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
                     isEquipped
                       ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40'
                       : 'bg-white/10 hover:bg-white/20 text-white'
                   }`}
                 >
-                  {isEquipped ? 'Gỡ Trang Bị' : 'Trang Bị Ngay'}
+                  <Sparkles className="w-3.5 h-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={onPlayNow}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                  title="Chơi Ngay"
+                  aria-label="Chơi Ngay"
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
                 >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Chơi Ngay</span>
+                  <Play className="w-4 h-4 fill-current" />
                 </button>
               </>
             ) : (
@@ -1153,14 +1119,15 @@ const ThemePreviewDialog: React.FC<ThemePreviewDialogProps> = ({
                 type="button"
                 disabled={!canAfford}
                 onClick={onPurchase}
-                className={`px-5 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all active:scale-95 cursor-pointer ${
+                title={canAfford ? 'Mua Theme Này' : 'Không Đủ Xu'}
+                aria-label={canAfford ? 'Mua Theme Này' : 'Không Đủ Xu'}
+                className={`px-4 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer ${
                   canAfford
                     ? 'bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-lg shadow-amber-500/20'
                     : 'bg-white/5 text-slate-500 border border-white/5 cursor-not-allowed'
                 }`}
               >
                 <ShoppingBag className="w-4 h-4" />
-                <span>{canAfford ? 'Mua Theme Này' : 'Không Đủ Xu'}</span>
               </button>
             )}
           </div>

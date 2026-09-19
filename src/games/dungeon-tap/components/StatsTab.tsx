@@ -12,6 +12,7 @@ interface StatsTabProps {
   bossesSlain: number;
   monstersSlain: number;
   heroLevel: number;
+  onOpenLeaderboard?: () => void;
 }
 
 export const StatsTab: React.FC<StatsTabProps> = ({
@@ -24,6 +25,7 @@ export const StatsTab: React.FC<StatsTabProps> = ({
   bossesSlain,
   monstersSlain,
   heroLevel,
+  onOpenLeaderboard,
 }) => {
   return (
     <div className="flex flex-col gap-3 p-3 text-slate-200">
@@ -74,19 +76,33 @@ export const StatsTab: React.FC<StatsTabProps> = ({
           <div className="text-[11px] text-slate-500">Nhân với vàng cơ bản</div>
         </div>
 
-        <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
-          <div className="flex items-center gap-1.5 text-xs text-cyan-400 font-bold mb-1">
-            <Trophy className="w-3.5 h-3.5" /> Tầng Cao Nhất
+        <div
+          onClick={onOpenLeaderboard}
+          className={`bg-slate-950/80 border border-slate-800 p-3 rounded-xl transition-all ${
+            onOpenLeaderboard
+              ? 'hover:border-amber-500/50 hover:bg-slate-900 cursor-pointer active:scale-95 group'
+              : ''
+          }`}
+        >
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-1.5 text-xs text-cyan-400 font-bold">
+              <Trophy className="w-3.5 h-3.5 text-yellow-400" /> Tầng Cao Nhất
+            </div>
+            {onOpenLeaderboard && (
+              <span className="text-[10px] text-amber-400 font-bold group-hover:underline">
+                Xem BXH →
+              </span>
+            )}
           </div>
-          <div className="text-lg font-black font-mono text-cyan-200">Tầng {maxStageReached}</div>
-          <div className="text-[11px] text-slate-500">Kỷ lục tiến trình</div>
+          <div className="text-lg font-black font-mono text-cyan-200">Tầng {formatNumber(maxStageReached)}</div>
+          <div className="text-[11px] text-slate-500">Kỷ lục tiến trình cá nhân</div>
         </div>
 
         <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
           <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-bold mb-1">
             <Sparkles className="w-3.5 h-3.5" /> Cấp Kiếm Sĩ
           </div>
-          <div className="text-lg font-black font-mono text-indigo-200">Lv.{heroLevel}</div>
+          <div className="text-lg font-black font-mono text-indigo-200">Lv.{formatNumber(heroLevel)}</div>
           <div className="text-[11px] text-slate-500">Cấp độ nhân vật</div>
         </div>
       </div>

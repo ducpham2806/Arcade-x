@@ -221,13 +221,12 @@ export const getRaritySlotStyle = (rarity: Rarity, isEquipped: boolean = false, 
   return base;
 };
 
-export const RarityBadge = ({ rarity, compact }: { rarity: Rarity; compact?: boolean }) => {
+export const RarityBadge = ({ rarity, compact = true }: { rarity: Rarity; compact?: boolean }) => {
   const info = getRarityInfo(rarity);
   return (
     <span
-      className={`inline-flex items-center gap-1 font-black uppercase rounded-full border shadow-sm backdrop-blur-sm whitespace-nowrap select-none shrink-0 ${
-        compact ? 'text-[8px] px-1.5 py-0.5' : 'text-[9px] px-2 py-0.5'
-      }`}
+      title={`${info.nameVi} (${info.name})`}
+      className="inline-flex items-center gap-1 font-black uppercase rounded-full border shadow-sm backdrop-blur-sm whitespace-nowrap select-none shrink-0 text-[8px] sm:text-[9px] px-1.5 py-0.5 font-mono cursor-default"
       style={{
         backgroundColor: info.badgeBg,
         color: info.badgeText,
@@ -235,11 +234,10 @@ export const RarityBadge = ({ rarity, compact }: { rarity: Rarity; compact?: boo
       }}
     >
       <span
-        className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0"
-        style={{ backgroundColor: info.hex }}
+        className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0 shadow-sm"
+        style={{ backgroundColor: info.hex, boxShadow: `0 0 6px ${info.hex}` }}
       />
-      <span className="font-mono font-black opacity-90">{info.shortHand}</span>
-      {!compact && <span>{info.nameVi}</span>}
+      <span>{info.shortCode}</span>
     </span>
   );
 };

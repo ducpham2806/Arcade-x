@@ -84,7 +84,7 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
             </span>
             {monster.isBoss && (
               <span className="text-[9px] bg-rose-950/90 text-rose-300 border border-rose-500/60 px-1.5 py-0.2 rounded font-black uppercase tracking-wider shrink-0">
-                TRÙM TẦNG {stage}
+                TRÙM TẦNG {formatNumber(stage)}
               </span>
             )}
           </div>
@@ -328,7 +328,7 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
 
                     {/* Ally Level Badge */}
                     <div className="text-[9px] font-bold text-purple-300 bg-slate-950/90 px-1.5 py-0.5 rounded-full border border-purple-500/40 whitespace-nowrap mt-0.5 font-mono">
-                      {ally.name.split(' ')[0]} Lv.{ally.level}
+                      {ally.name.split(' ')[0]} Lv.{formatNumber(ally.level)}
                     </div>
 
                     {/* Ally Auto-Skill Mini Cooldown Indicator */}
@@ -375,7 +375,7 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
 
             {/* Hero Level Badge */}
             <div className="text-[10px] font-bold text-amber-300 bg-black/90 px-2 py-0.5 rounded-full border border-amber-500/50 shadow-sm font-mono mt-0.5 whitespace-nowrap">
-              Kiếm Sĩ Lv.{heroLevel}
+              Kiếm Sĩ Lv.{formatNumber(heroLevel)}
             </div>
           </div>
         </div>
