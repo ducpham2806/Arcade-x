@@ -197,25 +197,37 @@ export const CarEscapeGame: React.FC<GameComponentProps> = ({ bridge, isPaused, 
     }
 
     if (newCol !== activeVehicle.col || newRow !== activeVehicle.row) {
-      setVehicles(prev => prev.map(v => v.id === draggingId ? { ...v, col: newCol, row: newRow } : v));
+      setVehicles(prev => {
+        const nextVehicles = prev.map(v => v.id === draggingId ? { ...v, col: newCol, row: newRow } : v);
+        const currentTarget = nextVehicles.find(v => v.isTarget);
+        if (currentTarget && currentTarget.col >= config.size - currentTarget.length) {
+          setTimeout(() => handleLevelComplete(), 50);
+        }
+        return nextVehicles;
+      });
       // Subtle haptic when snapping to a new grid cell
       hapticService.tap();
     }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    if (draggingId === null || !activeVehicle || !config) return;
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    if (draggingId === null || !config) return;
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
     
-    // Did it move?
-    if (activeVehicle.col !== dragStartPos.col || activeVehicle.row !== dragStartPos.row) {
-      setMoves(m => m + 1);
-      soundEngine.play('tap');
-    }
-    
-    // Check win
-    if (activeVehicle.isTarget && activeVehicle.col >= config.size - activeVehicle.length) {
-      handleLevelComplete();
+    // Find current vehicle
+    const currentVeh = vehicles.find(v => v.id === draggingId);
+    if (currentVeh) {
+      if (currentVeh.col !== dragStartPos.col || currentVeh.row !== dragStartPos.row) {
+        setMoves(m => m + 1);
+        soundEngine.play('tap');
+      }
+      
+      // Check win
+      if (currentVeh.isTarget && currentVeh.col >= config.size - currentVeh.length) {
+        handleLevelComplete();
+      }
     }
     
     setDraggingId(null);

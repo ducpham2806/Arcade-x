@@ -11,8 +11,6 @@ import { CraftingModal } from './components/CraftingModal';
 import { CharacterInventoryModal } from './components/CharacterInventoryModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
-import { DailyQuestsModal } from './components/DailyQuestsModal';
-import { WeeklyQuestsModal } from './components/WeeklyQuestsModal';
 import { FriendsModal } from './components/FriendsModal';
 import { NonIntrusiveToastManager } from './components/common/NonIntrusiveToastManager';
 import { DailyChallengesModal } from './components/DailyChallengesModal';
@@ -21,7 +19,6 @@ import { AuthModal } from './components/AuthModal';
 import { ShareModal } from './components/ShareModal';
 import { GlobalChat } from './components/GlobalChat';
 import { FloatingChatBubble } from './components/FloatingChatBubble';
-import { DailyLoginRewardModal } from './components/DailyLoginRewardModal';
 import { GameDetailModal } from './components/GameDetailModal';
 import { SettingsModal } from './components/SettingsModal';
 import { ArcadeShopModal } from './components/ArcadeShopModal';
@@ -40,8 +37,7 @@ import { useRippleEffect } from './hooks/useRippleEffect';
 import { AchievementUnlockedPopup } from './components/AchievementUnlockedPopup';
 import { LevelUpModal } from './components/LevelUpModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
-import { MonthlyLoginCalendarModal } from './components/MonthlyLoginCalendarModal';
-import { DailySpinWheelModal } from './components/DailySpinWheelModal';
+import { DailyRewardsHubModal } from './components/DailyRewardsHubModal';
 import { PvpMatchHistoryModal } from './components/PvpMatchHistoryModal';
 import { DiscardSessionConfirmModal } from './components/common/DiscardSessionConfirmModal';
 import { CloudSyncStatusIndicator } from './components/common/CloudSyncStatusIndicator';
@@ -115,6 +111,20 @@ const AppContent: React.FC = () => {
 
   const today = new Date().toISOString().split('T')[0];
   const isClaimedToday = profile.stats.lastLoginDate === today;
+
+  // Auto-open unified rewards hub on launch if daily reward is unclaimed
+  const [hasAutoOpenedRewards, setHasAutoOpenedRewards] = useState(false);
+  useEffect(() => {
+    if (!hasAutoOpenedRewards && !isClaimedToday && !showSplash && activeGameId === null) {
+      const timer = setTimeout(() => {
+        if (activeModal === 'none') {
+          setActiveModal('dailyReward');
+          setHasAutoOpenedRewards(true);
+        }
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [hasAutoOpenedRewards, isClaimedToday, showSplash, activeGameId, activeModal, setActiveModal]);
 
   return (
     <div className="relative w-full min-h-screen bg-[#050505] text-slate-200 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
@@ -355,11 +365,13 @@ const AppContent: React.FC = () => {
       {activeModal === 'achievements' && <AchievementsModal />}
       {activeModal === 'leaderboard' && <LeaderboardModal initialGameId={activeGameId || undefined} />}
       {activeModal === 'gameDetail' && <GameDetailModal />}
-      {(activeModal === 'quests' || activeModal === 'dailyQuests') && <DailyQuestsModal />}
-      {activeModal === 'weeklyQuests' && <WeeklyQuestsModal />}
+      {(activeModal === 'quests' ||
+        activeModal === 'dailyQuests' ||
+        activeModal === 'weeklyQuests' ||
+        activeModal === 'monthlyLogin' ||
+        activeModal === 'spinWheel' ||
+        activeModal === 'dailyReward') && <DailyRewardsHubModal />}
       {activeModal === 'friends' && <FriendsModal />}
-      {activeModal === 'monthlyLogin' && <MonthlyLoginCalendarModal />}
-      {activeModal === 'spinWheel' && <DailySpinWheelModal />}
       {activeModal === 'pvpHistory' && <PvpMatchHistoryModal />}
       {activeModal === 'dailyChallengesList' && <DailyChallengesModal />}
       {activeModal === 'auth' && <AuthModal />}
@@ -383,9 +395,6 @@ const AppContent: React.FC = () => {
 
       {/* Non-intrusive Floating Toast Notifications (PvP Invites & Achievement Rewards) */}
       <NonIntrusiveToastManager />
-
-      {/* Daily Login Reward Popup Modal */}
-      <DailyLoginRewardModal />
 
       {/* Level Up Celebration Modal (Displayed on Launcher) */}
       <LevelUpModal />

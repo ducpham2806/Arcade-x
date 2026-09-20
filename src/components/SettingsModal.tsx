@@ -4,6 +4,8 @@ import {
   Volume2,
   VolumeX,
   Music,
+  Music2,
+  Sparkles,
   Bell,
   Hand,
   ArrowUpCircle,
@@ -26,10 +28,21 @@ import { hapticService } from '../services/haptics';
 import { getStoredLanguage, setStoredLanguage, t, Language } from '../services/languageService';
 
 export const SettingsModal: React.FC = () => {
-  const { setActiveModal } = useGame();
+  const {
+    setActiveModal,
+    isSoundMuted,
+    toggleSound,
+    soundVolume,
+    setSoundVolume,
+    isMusicMuted,
+    toggleMusic,
+    musicVolume,
+    setMusicVolume,
+    musicTheme,
+    setMusicTheme,
+    playTestTone,
+  } = useGame();
   const [currentLang, setCurrentLang] = useState<Language>(() => getStoredLanguage());
-  const [isSoundMuted, setIsSoundMuted] = useState<boolean>(soundEngine.getIsMuted());
-  const [isMusicOn, setIsMusicOn] = useState<boolean>(true);
   const [isNotificationOn, setIsNotificationOn] = useState<boolean>(true);
   const [touchSensitivity, setTouchSensitivity] = useState<'tight' | 'standard' | 'spacious'>(() => {
     try {
@@ -72,22 +85,18 @@ export const SettingsModal: React.FC = () => {
     setCurrentLang(nextLang);
   };
 
-  const toggleSound = () => {
+  const handleToggleSound = () => {
     try {
-      soundEngine.play('click');
       hapticService.tap();
     } catch {}
-    const nextMuted = !isSoundMuted;
-    soundEngine.setMuted(nextMuted);
-    setIsSoundMuted(nextMuted);
+    toggleSound();
   };
 
   const handleToggleMusic = () => {
     try {
-      soundEngine.play('click');
       hapticService.tap();
     } catch {}
-    setIsMusicOn((prev) => !prev);
+    toggleMusic();
   };
 
   const handleToggleNotification = () => {
@@ -174,56 +183,175 @@ export const SettingsModal: React.FC = () => {
             </button>
           </div>
 
-          {/* SOUND */}
-          <div className="flex items-center justify-between bg-[#181824] border border-white/10 rounded-2xl p-3.5 shadow-inner">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-300 border border-indigo-500/30">
-                {isSoundMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-indigo-300" />}
+          {/* SOUND EFFECTS */}
+          <div className="bg-[#181824] border border-white/10 rounded-2xl p-3.5 shadow-inner space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-colors ${
+                  !isSoundMuted ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-slate-800 text-slate-500 border-white/5'
+                }`}>
+                  {isSoundMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-indigo-300" />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-white text-xs tracking-wide">{t('sound', currentLang)}</span>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                      !isSoundMuted 
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
+                        : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                    }`}>
+                      {!isSoundMuted ? `${Math.round(soundVolume * 100)}%` : (currentLang === 'vi' ? 'Đang tắt' : 'Muted')}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-400">{t('soundDesc', currentLang)}</div>
+                </div>
               </div>
-              <div>
-                <span className="font-bold text-white text-xs tracking-wide">{t('sound', currentLang)}</span>
-                <div className="text-[10px] text-slate-400">{t('soundDesc', currentLang)}</div>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={toggleSound}
-              className={`w-14 h-8 rounded-full transition-colors relative p-1 cursor-pointer shadow-inner ${
-                !isSoundMuted ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <div
-                className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-200 ${
-                  !isSoundMuted ? 'translate-x-6' : 'translate-x-0'
+              <button
+                id="btn-settings-toggle-sound"
+                type="button"
+                onClick={handleToggleSound}
+                className={`w-14 h-8 rounded-full transition-colors relative p-1 cursor-pointer shadow-inner ${
+                  !isSoundMuted ? 'bg-indigo-600' : 'bg-slate-700'
                 }`}
-              />
-            </button>
+              >
+                <div
+                  className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-200 ${
+                    !isSoundMuted ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Volume slider & test tone button */}
+            {!isSoundMuted && (
+              <div className="pt-2 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 flex-1">
+                  <span className="text-[11px] font-medium text-slate-400 shrink-0">
+                    {t('soundVolume', currentLang)}:
+                  </span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={Math.round(soundVolume * 100)}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10) / 100;
+                      setSoundVolume(val);
+                    }}
+                    className="w-full accent-indigo-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+                  />
+                  <span className="text-[11px] font-mono font-bold text-indigo-300 w-9 text-right shrink-0">
+                    {Math.round(soundVolume * 100)}%
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => playTestTone()}
+                  className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-[10px] font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 active:scale-95"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span>{currentLang === 'vi' ? 'Thử âm' : 'Test Sound'}</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* MUSIC */}
-          <div className="flex items-center justify-between bg-[#181824] border border-white/10 rounded-2xl p-3.5 shadow-inner">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-300 border border-indigo-500/30">
-                <Music className="w-4 h-4 text-indigo-300" />
+          {/* BACKGROUND MUSIC */}
+          <div className="bg-[#181824] border border-white/10 rounded-2xl p-3.5 shadow-inner space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-colors ${
+                  !isMusicMuted ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-800 text-slate-500 border-white/5'
+                }`}>
+                  {!isMusicMuted ? <Music className="w-4 h-4 text-emerald-300 animate-pulse" /> : <Music2 className="w-4 h-4 text-slate-500" />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-white text-xs tracking-wide">{t('music', currentLang)}</span>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                      !isMusicMuted 
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
+                        : 'bg-slate-800 text-slate-400 border-white/5'
+                    }`}>
+                      {!isMusicMuted ? `${Math.round(musicVolume * 100)}%` : (currentLang === 'vi' ? 'Đang tắt' : 'Muted')}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-400">{t('musicDesc', currentLang)}</div>
+                </div>
               </div>
-              <div>
-                <span className="font-bold text-white text-xs tracking-wide">{t('music', currentLang)}</span>
-                <div className="text-[10px] text-slate-400">{t('musicDesc', currentLang)}</div>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleToggleMusic}
-              className={`w-14 h-8 rounded-full transition-colors relative p-1 cursor-pointer shadow-inner ${
-                isMusicOn ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <div
-                className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-200 ${
-                  isMusicOn ? 'translate-x-6' : 'translate-x-0'
+              <button
+                id="btn-settings-toggle-music"
+                type="button"
+                onClick={handleToggleMusic}
+                className={`w-14 h-8 rounded-full transition-colors relative p-1 cursor-pointer shadow-inner ${
+                  !isMusicMuted ? 'bg-emerald-600' : 'bg-slate-700'
                 }`}
-              />
-            </button>
+              >
+                <div
+                  className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-200 ${
+                    !isMusicMuted ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Volume slider & Theme Selector when music enabled */}
+            {!isMusicMuted && (
+              <div className="pt-2 border-t border-white/5 space-y-2.5">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[11px] font-medium text-slate-400 shrink-0">
+                    {t('musicVolume', currentLang)}:
+                  </span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={Math.round(musicVolume * 100)}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10) / 100;
+                      setMusicVolume(val);
+                    }}
+                    className="w-full accent-emerald-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+                  />
+                  <span className="text-[11px] font-mono font-bold text-emerald-300 w-9 text-right shrink-0">
+                    {Math.round(musicVolume * 100)}%
+                  </span>
+                </div>
+
+                {/* Theme selection chips */}
+                <div>
+                  <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
+                    <span>{t('musicTheme', currentLang)}</span>
+                    <span className="text-emerald-400 font-normal lowercase">live synth</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                    {[
+                      { id: 'arcade', label: t('themeArcade', currentLang), icon: '🎵' },
+                      { id: 'puzzle', label: t('themePuzzle', currentLang), icon: '🧩' },
+                      { id: 'dungeon', label: t('themeDungeon', currentLang), icon: '⚔️' },
+                      { id: 'action', label: t('themeAction', currentLang), icon: '⚡' },
+                    ].map((themeItem) => {
+                      const isSelected = musicTheme === themeItem.id;
+                      return (
+                        <button
+                          key={themeItem.id}
+                          type="button"
+                          onClick={() => setMusicTheme(themeItem.id as any)}
+                          className={`px-2 py-1.5 rounded-xl text-[10px] font-bold flex items-center justify-center gap-1 border transition-all cursor-pointer active:scale-95 ${
+                            isSelected
+                              ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-sm shadow-emerald-500/20'
+                              : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                          }`}
+                        >
+                          <span>{themeItem.icon}</span>
+                          <span className="truncate">{themeItem.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* NOTIFICATION */}

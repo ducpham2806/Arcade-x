@@ -53,16 +53,50 @@ class HapticService {
   }
 
   /**
-   * Internal safe vibration trigger
+   * Visual micro-haptic fallback (for iOS Safari where navigator.vibrate is blocked)
+   */
+  private triggerVisualFeedback(durationMs: number = 20): void {
+    if (typeof window === 'undefined' || !this.enabled) return;
+    try {
+      window.dispatchEvent(new CustomEvent('arcadex:haptic-shake', { detail: { duration: durationMs } }));
+      const target = document.getElementById('root') || document.body;
+      if (target) {
+        target.classList.remove('haptic-micro-pulse');
+        // Trigger reflow to restart CSS animation
+        void target.offsetWidth;
+        target.classList.add('haptic-micro-pulse');
+        setTimeout(() => {
+          target.classList.remove('haptic-micro-pulse');
+        }, Math.max(120, durationMs + 40));
+      }
+    } catch {}
+  }
+
+  /**
+   * Internal safe vibration trigger with iOS fallback
    */
   public vibrate(pattern: number | number[]): boolean {
-    if (!this.enabled || !this.supported) return false;
+    if (!this.enabled) return false;
+    
+    // On iOS Safari / unsupported platforms, use visual tactile micro-feedback
+    if (!this.supported) {
+      const dur = Array.isArray(pattern) ? (pattern[0] || 20) : pattern;
+      this.triggerVisualFeedback(dur);
+      return true;
+    }
+
     try {
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        return navigator.vibrate(pattern);
+        const didVibrate = navigator.vibrate(pattern);
+        if (!didVibrate) {
+          const dur = Array.isArray(pattern) ? (pattern[0] || 20) : pattern;
+          this.triggerVisualFeedback(dur);
+        }
+        return didVibrate;
       }
     } catch {
-      // Silently catch browser policy restrictions or user-activation errors
+      const dur = Array.isArray(pattern) ? (pattern[0] || 20) : pattern;
+      this.triggerVisualFeedback(dur);
     }
     return false;
   }

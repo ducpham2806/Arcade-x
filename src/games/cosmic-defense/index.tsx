@@ -145,12 +145,13 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     };
   }, [triggerEmpBomb]);
 
-  // Mouse & Touch drag tracking
+  // Mouse & Touch drag tracking with ergonomic touch offset for mobile
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!containerRef.current || stateRef.current.isOver || isPaused) return;
     const rect = containerRef.current.getBoundingClientRect();
+    const touchOffsetY = e.pointerType === 'touch' ? 50 : 0;
     stateRef.current.targetX = e.clientX - rect.left;
-    stateRef.current.targetY = e.clientY - rect.top;
+    stateRef.current.targetY = Math.max(30, e.clientY - rect.top - touchOffsetY);
   };
 
   useEffect(() => {

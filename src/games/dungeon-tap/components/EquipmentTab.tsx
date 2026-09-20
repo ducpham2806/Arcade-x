@@ -35,6 +35,7 @@ interface EquipmentTabProps {
   onEquipAllyItem?: (allyId: string, item: AllyEquipmentItem) => void;
   onUpgradeAllyItem?: (allyId: string, slot: AllyEquipSlot) => void;
   onSellAllyItem?: (itemId: string) => void;
+  onSellAllAllyItems?: () => void;
   onEquipBestAllies?: () => void;
   defaultSubTab?: 'hero' | 'allies';
 }
@@ -69,6 +70,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   onEquipAllyItem = () => {},
   onUpgradeAllyItem = () => {},
   onSellAllyItem = () => {},
+  onSellAllAllyItems,
   onEquipBestAllies = () => {},
   defaultSubTab = 'hero',
 }) => {
@@ -268,6 +270,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           onEquipAllyItem={onEquipAllyItem}
           onUpgradeAllyItem={onUpgradeAllyItem}
           onSellAllyItem={onSellAllyItem}
+          onSellAllAllyItems={onSellAllAllyItems}
           onEquipBestAllies={onEquipBestAllies}
         />
       ) : (

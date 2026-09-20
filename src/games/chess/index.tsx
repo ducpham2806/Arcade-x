@@ -19,6 +19,9 @@ import {
   ChevronRight,
   Shield,
   Trophy,
+  ZoomIn,
+  CheckCheck,
+  X,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { GameComponentProps } from '../../types';
@@ -70,6 +73,31 @@ class ChessSoundFX {
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
+  }
+
+  playSelect() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(480, this.ctx.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.05);
+  }
+
+  play(name: string) {
+    if (name === 'select') this.playSelect();
+    else if (name === 'move') this.playMove();
+    else if (name === 'capture') this.playCapture();
+    else if (name === 'check') this.playCheck();
+    else if (name === 'victory') this.playVictory();
   }
 
   playMove() {
@@ -201,6 +229,8 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   const chessInstanceRef = useRef(new Chess());
   const [fen, setFen] = useState<string>(chessInstanceRef.current.fen());
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
+  const [confirmMoveMode, setConfirmMoveMode] = useState<boolean>(true);
+  const [pendingTargetSquare, setPendingTargetSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
   const [isThinkingAi, setIsThinkingAi] = useState(false);
 
@@ -686,6 +716,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
       if (selectedSquare) {
         if (selectedSquare === square) {
           setSelectedSquare(null);
+          setPendingTargetSquare(null);
           return;
         }
 
@@ -699,6 +730,27 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         const isLegal = legalMovesFromSelected.includes(square);
 
         if (isLegal) {
+          if (confirmMoveMode) {
+            if (pendingTargetSquare === square) {
+              // Confirmed 2nd tap on destination square!
+              setPendingTargetSquare(null);
+              setSelectedSquare(null);
+              if (isPawnPromotion) {
+                setPendingPromotion({ from: selectedSquare, to: square });
+                return;
+              }
+              executeMoveInternal(selectedSquare, square);
+              return;
+            } else {
+              // 1st tap on destination: highlight and show Magnifier HUD
+              setPendingTargetSquare(square);
+              sounds.play('select');
+              return;
+            }
+          }
+
+          setPendingTargetSquare(null);
+          setSelectedSquare(null);
           if (isPawnPromotion) {
             setPendingPromotion({ from: selectedSquare, to: square });
             return;
@@ -708,22 +760,27 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
           return;
         }
 
-        // If clicked another own piece, select that instead
+        // If clicked another own piece, switch selection to that instead
         if (piece && piece.color === myColor) {
           setSelectedSquare(square);
+          setPendingTargetSquare(null);
+          sounds.play('select');
           return;
         }
 
         setSelectedSquare(null);
+        setPendingTargetSquare(null);
         return;
       }
 
       // First click: select piece if it's player's piece
       if (piece && piece.color === myColor) {
         setSelectedSquare(square);
+        setPendingTargetSquare(null);
+        sounds.play('select');
       }
     },
-    [isTurn, selectedSquare, legalMovesFromSelected, myColor, executeMoveInternal]
+    [isTurn, selectedSquare, pendingTargetSquare, confirmMoveMode, legalMovesFromSelected, myColor, executeMoveInternal]
   );
 
   // AI Turn Execution
@@ -801,6 +858,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
     const piece = chessInstanceRef.current.get(square);
     const isSelected = selectedSquare === square;
     const isLegalTarget = legalMovesFromSelected.includes(square);
+    const isPendingTarget = pendingTargetSquare === square;
     const isLastMove =
       roomState?.lastMove &&
       (roomState.lastMove.from === square || roomState.lastMove.to === square);
@@ -816,7 +874,9 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             ? 'bg-amber-100/90 text-amber-950 hover:bg-amber-200'
             : 'bg-emerald-800/90 text-emerald-100 hover:bg-emerald-700'
         } ${isSelected ? '!bg-amber-400/90 ring-4 ring-amber-300 z-10' : ''} ${
-          isLastMove ? 'ring-2 ring-cyan-400 bg-cyan-900/30' : ''
+          isPendingTarget ? '!bg-cyan-400/90 ring-4 ring-cyan-300 z-20 shadow-lg' : ''
+        } ${
+          isLastMove && !isPendingTarget ? 'ring-2 ring-cyan-400 bg-cyan-900/30' : ''
         } ${isKingChecked ? '!bg-rose-600/90 animate-pulse ring-4 ring-rose-400 z-10' : ''}`}
       >
         {/* Coordinates labels */}
@@ -829,6 +889,15 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
           <span className="absolute bottom-0.5 right-1 text-[9px] sm:text-[11px] font-bold opacity-60 pointer-events-none">
             {file}
           </span>
+        )}
+
+        {/* 2-Tap Pending Destination Reticle */}
+        {isPendingTarget && (
+          <div className="absolute inset-0 flex items-center justify-center bg-cyan-400/30 z-20 animate-pulse">
+            <div className="w-5 h-5 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs font-black shadow-lg">
+              ✓
+            </div>
+          </div>
         )}
 
         {/* Piece Icon */}
@@ -1012,6 +1081,22 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             
             <div className="flex items-center gap-2">
               <button
+                onClick={() => {
+                  setConfirmMoveMode(!confirmMoveMode);
+                  setPendingTargetSquare(null);
+                }}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 cursor-pointer min-h-[40px] ${
+                  confirmMoveMode
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 ring-1 ring-cyan-400/30'
+                    : 'bg-slate-800/80 text-slate-400 border-slate-700'
+                }`}
+                title="Chế độ 2 chạm / Kính lúp chống bấm nhầm nước đi trên điện thoại"
+              >
+                <ZoomIn className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="text-[11px] font-medium">{confirmMoveMode ? '2 Chạm: Bật' : '2 Chạm: Tắt'}</span>
+              </button>
+
+              <button
                 id="chess-btn-mute"
                 onClick={() => setSoundMuted(!soundMuted)}
                 className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-amber-400 transition-all active:scale-95 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
@@ -1095,6 +1180,59 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Magnifier / 2-Tap Move Confirmation Floating HUD */}
+            {selectedSquare && pendingTargetSquare && isTurn && (
+              <div className="absolute -bottom-3 sm:-bottom-4 left-1/2 -translate-x-1/2 z-30 w-[94%] max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 font-bold text-xs">
+                    <ZoomIn className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Định Vị Nước Đi</div>
+                    <div className="text-xs font-black text-cyan-300">
+                      [{selectedSquare.toUpperCase()}] ➜ [{pendingTargetSquare.toUpperCase()}]
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      const from = selectedSquare;
+                      const to = pendingTargetSquare;
+                      setPendingTargetSquare(null);
+                      setSelectedSquare(null);
+
+                      const movingPiece = chessInstanceRef.current.get(from);
+                      const isPawnPromotion =
+                        movingPiece?.type === 'p' &&
+                        ((movingPiece.color === 'w' && to[1] === '8') ||
+                          (movingPiece.color === 'b' && to[1] === '1'));
+
+                      if (isPawnPromotion) {
+                        setPendingPromotion({ from, to });
+                        return;
+                      }
+                      executeMoveInternal(from, to);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 active:scale-95 text-white text-xs font-bold shadow-md flex items-center gap-1 cursor-pointer"
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    <span>Đi Nước Này</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPendingTargetSquare(null);
+                    }}
+                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    title="Hủy chọn ô đích"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         }
         controls={

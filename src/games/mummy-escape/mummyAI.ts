@@ -188,6 +188,9 @@ export function simulatePlayerAndMummiesTurn(
         nextTraps.forEach((trap) => {
           if (trap.x === mummy.x && trap.y === mummy.y && !trap.triggered) {
             mummy.alive = false;
+            if (trap.type === 'spikes') {
+              trap.triggered = true;
+            }
             mummiesDestroyedCount++;
             events.push({
               type: 'trap_trigger',

@@ -1,23 +1,197 @@
 import { SoundEffect } from '../types';
 import { hapticService } from './haptics';
 
-class SoundEngine {
+export type MusicTheme = 'arcade' | 'dungeon' | 'puzzle' | 'action';
+
+interface ThemeDefinition {
+  bpm: number;
+  oscType: OscillatorType;
+  filterFreq: number;
+  chords: {
+    bass: number;
+    chord: number[];
+    arp: number[];
+  }[];
+}
+
+const THEMES: Record<MusicTheme, ThemeDefinition> = {
+  arcade: {
+    bpm: 116,
+    oscType: 'triangle',
+    filterFreq: 2200,
+    chords: [
+      { bass: 87.31, chord: [174.61, 220.0, 261.63, 329.63], arp: [261.63, 329.63, 392.0, 523.25, 392.0, 329.63] },
+      { bass: 98.0, chord: [196.0, 246.94, 293.66, 392.0], arp: [293.66, 392.0, 493.88, 587.33, 493.88, 392.0] },
+      { bass: 82.41, chord: [164.81, 196.0, 246.94, 293.66], arp: [246.94, 293.66, 392.0, 493.88, 392.0, 293.66] },
+      { bass: 110.0, chord: [220.0, 261.63, 329.63, 392.0], arp: [261.63, 329.63, 440.0, 523.25, 440.0, 329.63] },
+    ],
+  },
+  puzzle: {
+    bpm: 82,
+    oscType: 'sine',
+    filterFreq: 1800,
+    chords: [
+      { bass: 65.41, chord: [261.63, 329.63, 392.0, 493.88], arp: [392.0, 493.88, 523.25, 659.25, 523.25, 493.88] },
+      { bass: 110.0, chord: [220.0, 261.63, 329.63, 440.0], arp: [329.63, 440.0, 523.25, 659.25, 523.25, 440.0] },
+      { bass: 73.42, chord: [146.83, 220.0, 261.63, 349.23], arp: [349.23, 440.0, 523.25, 587.33, 523.25, 440.0] },
+      { bass: 98.0, chord: [196.0, 246.94, 293.66, 349.23], arp: [293.66, 392.0, 493.88, 587.33, 493.88, 392.0] },
+    ],
+  },
+  dungeon: {
+    bpm: 92,
+    oscType: 'sawtooth',
+    filterFreq: 1300,
+    chords: [
+      { bass: 73.42, chord: [146.83, 174.61, 220.0], arp: [220.0, 261.63, 293.66, 349.23, 293.66, 261.63] },
+      { bass: 116.54, chord: [116.54, 146.83, 174.61], arp: [174.61, 233.08, 293.66, 349.23, 293.66, 233.08] },
+      { bass: 98.0, chord: [98.0, 116.54, 146.83], arp: [196.0, 233.08, 293.66, 392.0, 293.66, 233.08] },
+      { bass: 110.0, chord: [110.0, 138.59, 164.81], arp: [220.0, 277.18, 329.63, 440.0, 329.63, 277.18] },
+    ],
+  },
+  action: {
+    bpm: 128,
+    oscType: 'sawtooth',
+    filterFreq: 2400,
+    chords: [
+      { bass: 92.5, chord: [185.0, 220.0, 277.18], arp: [277.18, 369.99, 440.0, 554.37, 440.0, 369.99] },
+      { bass: 73.42, chord: [146.83, 185.0, 220.0], arp: [293.66, 369.99, 440.0, 587.33, 440.0, 369.99] },
+      { bass: 82.41, chord: [164.81, 207.65, 246.94], arp: [329.63, 415.3, 493.88, 659.25, 493.88, 415.3] },
+      { bass: 69.3, chord: [138.59, 164.81, 207.65], arp: [277.18, 329.63, 415.3, 554.37, 415.3, 329.63] },
+    ],
+  },
+};
+
+export class CentralizedAudioManager {
   private ctx: AudioContext | null = null;
-  private isMuted: boolean = false;
-  private masterGain: GainNode | null = null;
+  private sfxGain: GainNode | null = null;
+  private bgmGain: GainNode | null = null;
+  private bgmFilter: BiquadFilterNode | null = null;
+  private masterNode: GainNode | null = null;
+
+  // Settings with localStorage persistence
+  private isSoundMuted: boolean = false;
+  private isMusicMuted: boolean = false;
+  private soundVolume: number = 0.8;
+  private musicVolume: number = 0.5;
+  private currentTheme: MusicTheme = 'arcade';
+
+  // Music synthesis state
+  private isMusicActive: boolean = false;
+  private isDocumentVisible: boolean = true;
+  private schedulerInterval: ReturnType<typeof setInterval> | null = null;
+  private currentStep: number = 0;
+  private nextStepTime: number = 0;
 
   constructor() {
-    // Lazy initialize on first user gesture
+    this.loadSettings();
+    this.setupListeners();
+  }
+
+  private loadSettings() {
+    try {
+      if (typeof window === 'undefined') return;
+      const soundMuted = localStorage.getItem('arcadex_sound_muted');
+      if (soundMuted !== null) this.isSoundMuted = soundMuted === 'true';
+
+      const musicMuted = localStorage.getItem('arcadex_music_muted');
+      if (musicMuted !== null) this.isMusicMuted = musicMuted === 'true';
+
+      const soundVol = localStorage.getItem('arcadex_sound_volume');
+      if (soundVol !== null) {
+        const v = parseFloat(soundVol);
+        if (!isNaN(v)) this.soundVolume = Math.max(0, Math.min(1, v));
+      }
+
+      const musicVol = localStorage.getItem('arcadex_music_volume');
+      if (musicVol !== null) {
+        const v = parseFloat(musicVol);
+        if (!isNaN(v)) this.musicVolume = Math.max(0, Math.min(1, v));
+      }
+
+      const theme = localStorage.getItem('arcadex_music_theme');
+      if (theme && ['arcade', 'dungeon', 'puzzle', 'action'].includes(theme)) {
+        this.currentTheme = theme as MusicTheme;
+      }
+    } catch {}
+  }
+
+  private setupListeners() {
+    if (typeof window === 'undefined') return;
+
+    const unlock = () => {
+      this.initCtx();
+      if (!this.isMusicMuted && !this.isMusicActive) {
+        this.playMusic(this.currentTheme);
+      }
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+
+    window.addEventListener('pointerdown', unlock, { once: true, passive: true });
+    window.addEventListener('keydown', unlock, { once: true, passive: true });
+
+    // Handle tab visibility change
+    document.addEventListener('visibilitychange', () => {
+      this.isDocumentVisible = !document.hidden;
+      if (this.ctx) {
+        if (document.hidden) {
+          if (this.bgmGain) {
+            this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+            this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, this.ctx.currentTime);
+            this.bgmGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
+          }
+        } else {
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          if (this.bgmGain && !this.isMusicMuted && this.isMusicActive) {
+            this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+            this.bgmGain.gain.setValueAtTime(0, this.ctx.currentTime);
+            this.bgmGain.gain.linearRampToValueAtTime(this.musicVolume * 0.35, this.ctx.currentTime + 0.3);
+          }
+        }
+      }
+    });
   }
 
   private initCtx() {
     if (!this.ctx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtxClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtxClass) {
         this.ctx = new AudioCtxClass();
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.value = this.isMuted ? 0 : 0.4;
-        this.masterGain.connect(this.ctx.destination);
+
+        // Dynamics Compressor for Master Audio Normalization (prevents harsh volume spikes)
+        const compressor = this.ctx.createDynamicsCompressor();
+        compressor.threshold.setValueAtTime(-22, this.ctx.currentTime);
+        compressor.knee.setValueAtTime(30, this.ctx.currentTime);
+        compressor.ratio.setValueAtTime(10, this.ctx.currentTime);
+        compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+        compressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+        compressor.connect(this.ctx.destination);
+
+        // Master Node
+        this.masterNode = this.ctx.createGain();
+        this.masterNode.gain.value = 1.0;
+        this.masterNode.connect(compressor);
+
+        // SFX Node
+        this.sfxGain = this.ctx.createGain();
+        this.sfxGain.gain.value = this.isSoundMuted ? 0 : this.soundVolume * 0.45;
+        this.sfxGain.connect(this.masterNode);
+
+        // BGM Filter Node (Gentle lowpass filter for lush vintage arcade aesthetic)
+        this.bgmFilter = this.ctx.createBiquadFilter();
+        this.bgmFilter.type = 'lowpass';
+        this.bgmFilter.frequency.value = THEMES[this.currentTheme].filterFreq;
+        this.bgmFilter.Q.value = 1.0;
+
+        // BGM Node
+        this.bgmGain = this.ctx.createGain();
+        this.bgmGain.gain.value = this.isMusicMuted ? 0 : this.musicVolume * 0.35;
+        this.bgmFilter.connect(this.bgmGain);
+        this.bgmGain.connect(this.masterNode);
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
@@ -25,15 +199,361 @@ class SoundEngine {
     }
   }
 
-  public setMuted(muted: boolean) {
-    this.isMuted = muted;
-    if (this.masterGain && this.ctx) {
-      this.masterGain.gain.setValueAtTime(muted ? 0 : 0.4, this.ctx.currentTime);
+  // Backwards compatibility getter so all SFX methods route to sfxGain
+  private get masterGain(): GainNode | null {
+    if (!this.sfxGain) {
+      this.initCtx();
     }
+    return this.sfxGain;
+  }
+
+  // ==========================================
+  // --- SOUND EFFECTS (SFX) CONTROLS ---
+  // ==========================================
+
+  public setMuted(muted: boolean) {
+    this.setSoundMuted(muted);
   }
 
   public getIsMuted(): boolean {
-    return this.isMuted;
+    return this.isSoundMuted;
+  }
+
+  public isSoundEnabled(): boolean {
+    return !this.isSoundMuted;
+  }
+
+  public setSoundMuted(muted: boolean) {
+    this.isSoundMuted = muted;
+    try {
+      localStorage.setItem('arcadex_sound_muted', String(muted));
+    } catch {}
+
+    if (this.sfxGain && this.ctx) {
+      const target = muted ? 0 : this.soundVolume * 0.45;
+      this.sfxGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.sfxGain.gain.setValueAtTime(this.sfxGain.gain.value, this.ctx.currentTime);
+      this.sfxGain.gain.linearRampToValueAtTime(target, this.ctx.currentTime + 0.05);
+    }
+    this.notifyStateChanged();
+  }
+
+  public toggleSound(): boolean {
+    const next = !this.isSoundMuted;
+    this.setSoundMuted(next);
+    if (!next) {
+      this.play('click');
+    }
+    return next;
+  }
+
+  public getSoundVolume(): number {
+    return this.soundVolume;
+  }
+
+  public setSoundVolume(volume: number) {
+    const clamped = Math.max(0, Math.min(1, volume));
+    this.soundVolume = clamped;
+    try {
+      localStorage.setItem('arcadex_sound_volume', clamped.toFixed(2));
+    } catch {}
+
+    if (this.sfxGain && this.ctx && !this.isSoundMuted) {
+      this.sfxGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.sfxGain.gain.setValueAtTime(this.sfxGain.gain.value, this.ctx.currentTime);
+      this.sfxGain.gain.linearRampToValueAtTime(clamped * 0.45, this.ctx.currentTime + 0.05);
+    }
+    this.notifyStateChanged();
+  }
+
+  public playTestTone() {
+    if (this.isSoundMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx || !this.sfxGain) return;
+      const now = this.ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+      notes.forEach((f, idx) => {
+        if (!this.ctx || !this.sfxGain) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(f, now + idx * 0.06);
+        gain.gain.setValueAtTime(0.25, now + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.06 + 0.2);
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+        osc.start(now + idx * 0.06);
+        osc.stop(now + idx * 0.06 + 0.2);
+      });
+    } catch {}
+  }
+
+  // ==========================================
+  // --- BACKGROUND MUSIC (BGM) CONTROLS ---
+  // ==========================================
+
+  public isMusicEnabled(): boolean {
+    return !this.isMusicMuted;
+  }
+
+  public getIsMusicMuted(): boolean {
+    return this.isMusicMuted;
+  }
+
+  public setMusicMuted(muted: boolean) {
+    this.isMusicMuted = muted;
+    try {
+      localStorage.setItem('arcadex_music_muted', String(muted));
+    } catch {}
+
+    if (this.bgmGain && this.ctx) {
+      const target = muted ? 0 : this.musicVolume * 0.35;
+      this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, this.ctx.currentTime);
+      this.bgmGain.gain.linearRampToValueAtTime(target, this.ctx.currentTime + 0.15);
+    }
+
+    if (!muted && !this.isMusicActive) {
+      this.playMusic(this.currentTheme);
+    }
+    this.notifyStateChanged();
+  }
+
+  public toggleMusic(): boolean {
+    const next = !this.isMusicMuted;
+    this.setMusicMuted(next);
+    return next;
+  }
+
+  public getMusicVolume(): number {
+    return this.musicVolume;
+  }
+
+  public setMusicVolume(volume: number) {
+    const clamped = Math.max(0, Math.min(1, volume));
+    this.musicVolume = clamped;
+    try {
+      localStorage.setItem('arcadex_music_volume', clamped.toFixed(2));
+    } catch {}
+
+    if (this.bgmGain && this.ctx && !this.isMusicMuted) {
+      this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, this.ctx.currentTime);
+      this.bgmGain.gain.linearRampToValueAtTime(clamped * 0.35, this.ctx.currentTime + 0.05);
+    }
+    this.notifyStateChanged();
+  }
+
+  public getMusicTheme(): MusicTheme {
+    return this.currentTheme;
+  }
+
+  public setMusicTheme(theme: MusicTheme) {
+    if (this.currentTheme === theme) return;
+    this.currentTheme = theme;
+    try {
+      localStorage.setItem('arcadex_music_theme', theme);
+    } catch {}
+
+    if (this.bgmFilter && this.ctx) {
+      this.bgmFilter.frequency.setTargetAtTime(THEMES[theme].filterFreq, this.ctx.currentTime, 0.2);
+    }
+
+    if (this.isMusicActive) {
+      // Smoothly transition theme
+      this.playMusic(theme);
+    }
+    this.notifyStateChanged();
+  }
+
+  public playMusic(theme?: MusicTheme) {
+    if (theme && theme !== this.currentTheme) {
+      this.currentTheme = theme;
+      try {
+        localStorage.setItem('arcadex_music_theme', theme);
+      } catch {}
+    }
+
+    this.initCtx();
+    if (!this.ctx) return;
+
+    this.isMusicActive = true;
+
+    if (this.bgmFilter) {
+      this.bgmFilter.frequency.setTargetAtTime(THEMES[this.currentTheme].filterFreq, this.ctx.currentTime, 0.2);
+    }
+
+    if (this.bgmGain && !this.isMusicMuted && this.isDocumentVisible) {
+      this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, this.ctx.currentTime);
+      this.bgmGain.gain.linearRampToValueAtTime(this.musicVolume * 0.35, this.ctx.currentTime + 0.2);
+    }
+
+    if (!this.schedulerInterval) {
+      this.currentStep = 0;
+      this.nextStepTime = this.ctx.currentTime + 0.05;
+      this.schedulerInterval = setInterval(() => this.schedulerLoop(), 40);
+    }
+  }
+
+  public stopMusic() {
+    this.isMusicActive = false;
+    if (this.schedulerInterval) {
+      clearInterval(this.schedulerInterval);
+      this.schedulerInterval = null;
+    }
+    if (this.bgmGain && this.ctx) {
+      this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, this.ctx.currentTime);
+      this.bgmGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
+    }
+  }
+
+  public pauseMusic() {
+    if (this.bgmGain && this.ctx) {
+      this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, this.ctx.currentTime);
+      this.bgmGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
+    }
+  }
+
+  public resumeMusic() {
+    if (this.bgmGain && this.ctx && !this.isMusicMuted && this.isMusicActive && this.isDocumentVisible) {
+      this.bgmGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.bgmGain.gain.setValueAtTime(0, this.ctx.currentTime);
+      this.bgmGain.gain.linearRampToValueAtTime(this.musicVolume * 0.35, this.ctx.currentTime + 0.2);
+    }
+  }
+
+  // Procedural Music Scheduler Loop
+  private schedulerLoop() {
+    if (!this.ctx || !this.isMusicActive || !this.bgmFilter) return;
+
+    const theme = THEMES[this.currentTheme] || THEMES.arcade;
+    const stepDuration = 60 / theme.bpm / 4; // 16th note in seconds
+
+    // Schedule audio events up to 0.15s ahead
+    while (this.nextStepTime < this.ctx.currentTime + 0.15) {
+      this.scheduleStepNotes(this.currentStep, this.nextStepTime, theme);
+      this.nextStepTime += stepDuration;
+      this.currentStep = (this.currentStep + 1) % 64; // 4 measures of 16 steps
+    }
+  }
+
+  private scheduleStepNotes(step: number, time: number, theme: ThemeDefinition) {
+    if (!this.ctx || !this.bgmFilter) return;
+
+    const chordIndex = Math.floor(step / 16) % theme.chords.length;
+    const currentChord = theme.chords[chordIndex];
+    const stepInChord = step % 16;
+
+    // 1. Bassline (downbeats and driving rhythmic pulses)
+    if (stepInChord === 0 || stepInChord === 6 || stepInChord === 10) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = theme.oscType === 'sawtooth' ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(currentChord.bass, time);
+
+      const dur = stepInChord === 0 ? 0.3 : 0.18;
+      gain.gain.setValueAtTime(0.35, time);
+      gain.gain.exponentialRampToValueAtTime(0.005, time + dur);
+
+      osc.connect(gain);
+      gain.connect(this.bgmFilter);
+      osc.start(time);
+      osc.stop(time + dur);
+    }
+
+    // 2. Chords pad (gentle sustained warm chords on beat 0 and 8)
+    if (stepInChord === 0 || stepInChord === 8) {
+      currentChord.chord.forEach((freq) => {
+        if (!this.ctx || !this.bgmFilter) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, time);
+
+        const padDur = 0.65;
+        gain.gain.setValueAtTime(0, time);
+        gain.gain.linearRampToValueAtTime(0.08, time + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.002, time + padDur);
+
+        osc.connect(gain);
+        gain.connect(this.bgmFilter);
+        osc.start(time);
+        osc.stop(time + padDur);
+      });
+    }
+
+    // 3. Arpeggio / Melody (flowing notes)
+    if (stepInChord % 2 === 0) {
+      const arpNoteIndex = (stepInChord / 2) % currentChord.arp.length;
+      const arpFreq = currentChord.arp[arpNoteIndex];
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = theme.oscType;
+      osc.frequency.setValueAtTime(arpFreq, time);
+
+      const arpDur = 0.12;
+      gain.gain.setValueAtTime(0.12, time);
+      gain.gain.exponentialRampToValueAtTime(0.005, time + arpDur);
+
+      osc.connect(gain);
+      gain.connect(this.bgmFilter);
+      osc.start(time);
+      osc.stop(time + arpDur);
+    }
+
+    // 4. Subtle percussion ticks (soft kick on 0 & 8, soft hat on 4 & 12)
+    if (stepInChord === 0 || stepInChord === 8) {
+      // Soft sub kick
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(100, time);
+      osc.frequency.exponentialRampToValueAtTime(35, time + 0.08);
+
+      gain.gain.setValueAtTime(0.2, time);
+      gain.gain.exponentialRampToValueAtTime(0.005, time + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.bgmFilter);
+      osc.start(time);
+      osc.stop(time + 0.08);
+    } else if (stepInChord === 4 || stepInChord === 12) {
+      // Soft retro snare tap
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(280, time);
+      osc.frequency.exponentialRampToValueAtTime(80, time + 0.05);
+
+      gain.gain.setValueAtTime(0.1, time);
+      gain.gain.exponentialRampToValueAtTime(0.005, time + 0.05);
+
+      osc.connect(gain);
+      gain.connect(this.bgmFilter);
+      osc.start(time);
+      osc.stop(time + 0.05);
+    }
+  }
+
+  private notifyStateChanged() {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('arcadex_audio_state_changed', {
+          detail: {
+            isSoundMuted: this.isSoundMuted,
+            isMusicMuted: this.isMusicMuted,
+            soundVolume: this.soundVolume,
+            musicVolume: this.musicVolume,
+            currentTheme: this.currentTheme,
+          },
+        })
+      );
+    }
   }
 
   public play(effect: SoundEffect) {
@@ -72,7 +592,7 @@ class SoundEngine {
         break;
     }
 
-    if (this.isMuted) return;
+    if (this.isSoundMuted) return;
     try {
       this.initCtx();
       if (!this.ctx || !this.masterGain) return;
@@ -634,4 +1154,6 @@ class SoundEngine {
   }
 }
 
-export const soundEngine = new SoundEngine();
+export const audioManager = new CentralizedAudioManager();
+export const soundEngine = audioManager;
+export const SoundEngine = CentralizedAudioManager;

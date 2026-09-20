@@ -7,7 +7,7 @@ import { FirebaseService } from '../services/firebase';
 import { MatchmakingService } from '../services/matchmakingService';
 import { QuestGeneratorService } from '../services/questGenerator';
 import { NotificationService } from '../services/notificationService';
-import { soundEngine } from '../services/audio';
+import { soundEngine, audioManager, MusicTheme } from '../services/audio';
 import { hapticService } from '../services/haptics';
 import { usePlayer } from './PlayerContext';
 import confetti from 'canvas-confetti';
@@ -58,6 +58,17 @@ interface GameContextType {
   closePublicProfile: () => void;
   isSoundMuted: boolean;
   toggleSound: () => void;
+  soundVolume: number;
+  setSoundVolume: (val: number) => void;
+  isMusicMuted: boolean;
+  toggleMusic: () => void;
+  musicVolume: number;
+  setMusicVolume: (val: number) => void;
+  musicTheme: MusicTheme;
+  setMusicTheme: (theme: MusicTheme) => void;
+  playBGM: (theme?: MusicTheme) => void;
+  stopBGM: () => void;
+  playTestTone: () => void;
   triggerConfetti: () => void;
   submitGameScore: (gameId: string, score: number, extraStats?: Record<string, any>) => Promise<void>;
   shareData: ShareData | null;
@@ -202,7 +213,35 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>(() => StorageService.loadLeaderboards());
   const [dailyChallenges, setDailyChallenges] = useState<Record<string, DailyChallenge>>(() => StorageService.loadAllDailyChallenges());
   const dailyChallenge = dailyChallenges[activeGameId || 'blocker'] || dailyChallenges['blocker'] || Object.values(dailyChallenges)[0];
-  const [isSoundMuted, setIsSoundMuted] = useState<boolean>(() => soundEngine.getIsMuted());
+  const [isSoundMuted, setIsSoundMuted] = useState<boolean>(() => audioManager.getIsMuted());
+  const [isMusicMuted, setIsMusicMuted] = useState<boolean>(() => audioManager.getIsMusicMuted());
+  const [soundVolume, setSoundVolumeState] = useState<number>(() => audioManager.getSoundVolume());
+  const [musicVolume, setMusicVolumeState] = useState<number>(() => audioManager.getMusicVolume());
+  const [musicTheme, setMusicThemeState] = useState<MusicTheme>(() => audioManager.getMusicTheme());
+
+  // Listen to centralized audio manager state changes (syncs across all UI)
+  useEffect(() => {
+    const handleAudioChange = (e: Event) => {
+      const custom = e as CustomEvent<{
+        isSoundMuted: boolean;
+        isMusicMuted: boolean;
+        soundVolume: number;
+        musicVolume: number;
+        currentTheme?: MusicTheme;
+      }>;
+      if (custom.detail) {
+        setIsSoundMuted(custom.detail.isSoundMuted);
+        setIsMusicMuted(custom.detail.isMusicMuted);
+        setSoundVolumeState(custom.detail.soundVolume);
+        setMusicVolumeState(custom.detail.musicVolume);
+        if (custom.detail.currentTheme) {
+          setMusicThemeState(custom.detail.currentTheme);
+        }
+      }
+    };
+    window.addEventListener('arcadex_audio_state_changed', handleAudioChange as EventListener);
+    return () => window.removeEventListener('arcadex_audio_state_changed', handleAudioChange as EventListener);
+  }, []);
   const [shareData, setShareData] = useState<ShareData | null>(null);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<string[]>(() => StorageService.loadFavorites());
@@ -774,6 +813,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
+  const getGameMusicTheme = (gameId: string): MusicTheme => {
+    if (['dungeon-tap', 'mummy-escape'].includes(gameId)) return 'dungeon';
+    if (['cyber-slice', 'neon-runner', 'car-escape', 'space-invaders', 'brick-breaker'].includes(gameId)) return 'action';
+    if (['hex-match', 'tile-2048', 'scoodoku', 'word-cross', 'chess', 'xiangqi', 'fill-the-space', 'shikaku'].includes(gameId)) return 'puzzle';
+    return 'arcade';
+  };
+
   const launchGame = useCallback((gameId: string, isPracticeMode = false, isDailyChallenge = false) => {
     setIsPracticeMode(isPracticeMode);
     setIsDailyChallengeMode(isDailyChallenge);
@@ -784,6 +830,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveGameId(gameId);
     setActiveModal('none');
     setSelectedGameForDetail(null);
+    audioManager.playMusic(getGameMusicTheme(gameId));
   }, []);
 
   const openGameDetail = useCallback((gameId: string) => {
@@ -836,16 +883,45 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     soundEngine.play('click');
     setActiveGameId(null);
     setIsDailyChallengeMode(false);
-  }, []);
+    audioManager.playMusic(musicTheme);
+  }, [musicTheme]);
 
   const toggleSound = useCallback(() => {
-    const newMuted = !isSoundMuted;
-    setIsSoundMuted(newMuted);
-    soundEngine.setMuted(newMuted);
-    if (!newMuted) {
-      soundEngine.play('click');
-    }
-  }, [isSoundMuted]);
+    const next = audioManager.toggleSound();
+    setIsSoundMuted(next);
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    const next = audioManager.toggleMusic();
+    setIsMusicMuted(next);
+  }, []);
+
+  const setSoundVolume = useCallback((val: number) => {
+    audioManager.setSoundVolume(val);
+    setSoundVolumeState(val);
+  }, []);
+
+  const setMusicVolume = useCallback((val: number) => {
+    audioManager.setMusicVolume(val);
+    setMusicVolumeState(val);
+  }, []);
+
+  const setMusicTheme = useCallback((theme: MusicTheme) => {
+    audioManager.setMusicTheme(theme);
+    setMusicThemeState(theme);
+  }, []);
+
+  const playBGM = useCallback((theme?: MusicTheme) => {
+    audioManager.playMusic(theme);
+  }, []);
+
+  const stopBGM = useCallback(() => {
+    audioManager.stopMusic();
+  }, []);
+
+  const playTestTone = useCallback(() => {
+    audioManager.playTestTone();
+  }, []);
 
   const triggerConfetti = useCallback(() => {
     confetti({
@@ -1190,6 +1266,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       claimFriendQuest,
       isSoundMuted,
       toggleSound,
+      soundVolume,
+      setSoundVolume,
+      isMusicMuted,
+      toggleMusic,
+      musicVolume,
+      setMusicVolume,
+      musicTheme,
+      setMusicTheme,
+      playBGM,
+      stopBGM,
+      playTestTone,
       triggerConfetti,
       submitGameScore,
       shareData,
@@ -1267,6 +1354,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       claimFriendQuest,
       isSoundMuted,
       toggleSound,
+      soundVolume,
+      setSoundVolume,
+      isMusicMuted,
+      toggleMusic,
+      musicVolume,
+      setMusicVolume,
+      musicTheme,
+      setMusicTheme,
+      playBGM,
+      stopBGM,
+      playTestTone,
       triggerConfetti,
       submitGameScore,
       shareData,

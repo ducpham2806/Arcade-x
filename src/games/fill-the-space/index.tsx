@@ -76,6 +76,10 @@ export const FillTheSpaceGame: React.FC<GameComponentProps> = ({
   // Sound state
   const [muted, setMuted] = useState<boolean>(isMuted);
 
+  useEffect(() => {
+    setMuted(isMuted);
+  }, [isMuted]);
+
   // Dragging state
   const [dragState, setDragState] = useState<{
     block: BlockShape;
@@ -665,7 +669,7 @@ export const FillTheSpaceGame: React.FC<GameComponentProps> = ({
     origin: 'tray' | 'board',
     originalPos?: CellCoord
   ) => {
-    if (isLevelWon) return;
+    if (isLevelWon || isPaused) return;
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
 

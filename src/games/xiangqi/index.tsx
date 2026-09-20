@@ -23,6 +23,9 @@ import {
   Undo2,
   RefreshCw,
   ArrowLeft,
+  ZoomIn,
+  CheckCheck,
+  X,
 } from 'lucide-react';
 import { GameComponentProps } from '../../types';
 import { usePlayer } from '../../context/PlayerContext';
@@ -95,6 +98,8 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
 
   // UI Interactive Board states
   const [selectedPos, setSelectedPos] = useState<[number, number] | null>(null);
+  const [confirmMoveMode, setConfirmMoveMode] = useState<boolean>(true);
+  const [pendingDest, setPendingDest] = useState<[number, number] | null>(null);
   const [legalMoves, setLegalMoves] = useState<[number, number][]>([]);
   const [showChatBox, setShowChatBox] = useState(false);
   const [showSurrenderConfirm, setShowSurrenderConfirm] = useState(false);
@@ -531,6 +536,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       }
 
       setSelectedPos([r, c]);
+      setPendingDest(null);
       const validDestinations = getLegalMovesForPiece(currentBoard, r, c);
       setLegalMoves(validDestinations);
       bridge.playSound('click');
@@ -543,7 +549,23 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       if (!isLegal) {
         setSelectedPos(null);
         setLegalMoves([]);
+        setPendingDest(null);
         return;
+      }
+
+      // Two-Tap confirmation check on destination
+      if (confirmMoveMode) {
+        if (pendingDest && pendingDest[0] === r && pendingDest[1] === c) {
+          // Confirmed second tap on destination -> proceed to move!
+          setPendingDest(null);
+        } else {
+          // First tap on destination -> set pending destination and show magnifier preview
+          setPendingDest([r, c]);
+          bridge.playSound('click');
+          return;
+        }
+      } else {
+        setPendingDest(null);
       }
 
       const [fromR, fromC] = selectedPos;
@@ -859,27 +881,45 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
               </span>
             </div>
 
-            {playMode === 'local_hotseat' && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleUndoLocalMove}
-                  disabled={localMoveHistory.length === 0 || isMatchEnded}
-                  className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 disabled:opacity-30 transition-all flex items-center gap-1 cursor-pointer"
-                  title="Đi lại nước trước"
-                >
-                  <Undo2 className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">Đi Lại</span>
-                </button>
-                <button
-                  onClick={handleStartLocalHotseat}
-                  className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1 cursor-pointer"
-                  title="Ván cờ mới"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="hidden sm:inline">Ván Mới</span>
-                </button>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setConfirmMoveMode(!confirmMoveMode);
+                  setPendingDest(null);
+                }}
+                className={`px-2 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1 cursor-pointer min-h-[36px] ${
+                  confirmMoveMode
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 ring-1 ring-cyan-400/30'
+                    : 'bg-slate-800/80 text-slate-400 border-slate-700'
+                }`}
+                title="Chế độ 2 chạm / Kính lúp chống bấm nhầm nước đi trên điện thoại"
+              >
+                <ZoomIn className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="text-[11px] font-medium">{confirmMoveMode ? '2 Chạm: Bật' : '2 Chạm: Tắt'}</span>
+              </button>
+
+              {playMode === 'local_hotseat' && (
+                <>
+                  <button
+                    onClick={handleUndoLocalMove}
+                    disabled={localMoveHistory.length === 0 || isMatchEnded}
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 disabled:opacity-30 transition-all flex items-center gap-1 cursor-pointer"
+                    title="Đi lại nước trước"
+                  >
+                    <Undo2 className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="hidden sm:inline">Đi Lại</span>
+                  </button>
+                  <button
+                    onClick={handleStartLocalHotseat}
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1 cursor-pointer"
+                    title="Ván cờ mới"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="hidden sm:inline">Ván Mới</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Opponent / Top Player Card */}
@@ -1005,15 +1045,27 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                     const piece = currentBoard[r][c];
                     const isSelected = selectedPos?.[0] === r && selectedPos?.[1] === c;
                     const isLegalDest = legalMoves.some(([lr, lc]) => lr === r && lc === c);
+                    const isPendingDest = pendingDest?.[0] === r && pendingDest?.[1] === c;
 
                     return (
                       <div
                         key={`${r}_${c}`}
                         onClick={() => handleCellClick(r, c)}
-                        className="relative flex items-center justify-center cursor-pointer border-[0.5px] border-[#8a5d35]/40"
+                        className={`relative flex items-center justify-center cursor-pointer border-[0.5px] border-[#8a5d35]/40 ${
+                          isPendingDest ? 'bg-cyan-400/40 ring-4 ring-cyan-400 z-20 rounded-md shadow-lg animate-pulse' : ''
+                        }`}
                       >
+                        {/* 2-Tap Pending Reticle */}
+                        {isPendingDest && (
+                          <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+                            <div className="w-5 h-5 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs font-black shadow-lg">
+                              ✓
+                            </div>
+                          </div>
+                        )}
+
                         {/* Legal Move Glowing Dot */}
-                        {isLegalDest && (
+                        {isLegalDest && !isPendingDest && (
                           <div
                             className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${
                               piece
@@ -1043,6 +1095,45 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                 )}
               </div>
             </div>
+
+            {/* Magnifier / 2-Tap Move Confirmation Floating HUD */}
+            {selectedPos && pendingDest && !isMatchEnded && (
+              <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 w-[94%] max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 font-bold text-xs">
+                    <ZoomIn className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Định Vị Nước Đi</div>
+                    <div className="text-xs font-black text-cyan-300">
+                      {currentBoard[selectedPos[0]][selectedPos[1]] ? PIECE_SYMBOLS[currentBoard[selectedPos[0]][selectedPos[1]]!.color][currentBoard[selectedPos[0]][selectedPos[1]]!.type] : 'Quân'} [{selectedPos[0] + 1},{selectedPos[1] + 1}] ➜ [{pendingDest[0] + 1},{pendingDest[1] + 1}]
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      const [r, c] = pendingDest;
+                      handleCellClick(r, c);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 active:scale-95 text-white text-xs font-bold shadow-md flex items-center gap-1 cursor-pointer"
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    <span>Đi Nước Này</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPendingDest(null);
+                    }}
+                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    title="Hủy chọn ô đích"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Bottom / Own Player Card */}

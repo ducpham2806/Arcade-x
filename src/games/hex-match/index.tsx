@@ -329,7 +329,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     if (isProcessing) return;
     setIsProcessing(true);
 
-    const clickedTile = grid[clickR][clickC];
+    const clickedTile = grid[clickR]?.[clickC] || grid[cluster[0].r][cluster[0].c];
     const matchSize = cluster.length;
     const isSpecialCreation = matchSize >= 4;
 
@@ -357,7 +357,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
       x: clientX,
       y: clientY,
       text: `+${comboPts}`,
-      color: clickedTile.color,
+      color: clickedTile?.color || '#facc15',
       type: 'score',
     });
 
@@ -369,7 +369,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
         x: clientX,
         y: clientY,
         text: `${compliment} x${combo}`,
-        color: clickedTile.color,
+        color: clickedTile?.color || '#f43f5e',
         type: 'combo',
       });
     }
@@ -388,17 +388,19 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     let clearedIce = 0;
     let clearedStone = 0;
     let clearedChain = 0;
+    const poppedColorCounts: Record<string, number> = {};
 
-    // Find adjacent positions for damaging surrounding obstacles (ice & stone)
-    const adjacentPositions: { r: number; c: number }[] = [];
+    // Find unique adjacent positions for damaging surrounding obstacles (ice, stone, chain)
+    const adjacentPositionsMap: Record<string, { r: number; c: number }> = {};
     cluster.forEach((pos) => {
       const neighbors = getNeighbors(pos.r, pos.c);
       neighbors.forEach((n) => {
         if (!cluster.some((p) => p.r === n.r && p.c === n.c)) {
-          adjacentPositions.push(n);
+          adjacentPositionsMap[`${n.r},${n.c}`] = n;
         }
       });
     });
+    const adjacentPositions: { r: number; c: number }[] = Object.values(adjacentPositionsMap);
 
     // 2. Wait 240ms for the Pop Animation to play out, then apply Gravity & Refill
     setTimeout(() => {
@@ -407,12 +409,17 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
           row.map((t) => ({ ...t, isPopping: false }))
         );
 
-        // Clear matched tiles
+        // Clear matched tiles and count direct obstacle hits
         cluster.forEach((pos) => {
-          const tile = copy[pos.r][pos.c];
+          const tile = prevGrid[pos.r]?.[pos.c];
           if (!tile) return;
 
+          if (tile.color) {
+            poppedColorCounts[tile.color] = (poppedColorCounts[tile.color] || 0) + 1;
+          }
+
           if (tile.obstacle === 'ice') clearedIce++;
+          if (tile.obstacle === 'stone') clearedStone++;
           if (tile.obstacle === 'chain') clearedChain++;
 
           if (pos.r === clickR && pos.c === clickC && isSpecialCreation) {
@@ -432,7 +439,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
         // Damage adjacent obstacles
         adjacentPositions.forEach((pos) => {
           const tile = copy[pos.r]?.[pos.c];
-          if (!tile) return;
+          if (!tile || tile.obstacle === 'none') return;
 
           if (tile.obstacle === 'ice') {
             tile.obstacle = 'none';
@@ -440,6 +447,9 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
           } else if (tile.obstacle === 'stone') {
             tile.obstacle = 'none';
             clearedStone++;
+          } else if (tile.obstacle === 'chain') {
+            tile.obstacle = 'none';
+            clearedChain++;
           }
         });
 
@@ -482,11 +492,41 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
         return nextResult;
       });
 
+      // Special notification when saving ice bears or breaking obstacles
+      if (clearedIce > 0) {
+        bridge.playSound('powerup');
+        addEffect({
+          x: clientX,
+          y: clientY - 30,
+          text: `🐻 +${clearedIce} Cứu Gấu Băng!`,
+          color: '#38bdf8',
+          type: 'combo',
+        });
+      } else if (clearedStone > 0) {
+        bridge.playSound('hit');
+        addEffect({
+          x: clientX,
+          y: clientY - 30,
+          text: `🍫 +${clearedStone} Chocolate!`,
+          color: '#fbbf24',
+          type: 'combo',
+        });
+      } else if (clearedChain > 0) {
+        bridge.playSound('pop');
+        addEffect({
+          x: clientX,
+          y: clientY - 30,
+          text: `🎁 +${clearedChain} Nơ Quà!`,
+          color: '#c084fc',
+          type: 'combo',
+        });
+      }
+
       // Update target objectives
       const updatedTargets = targets.map((tgt) => {
         let current = tgt.current;
-        if (tgt.type === 'collect_color' && tgt.color === clickedTile.color) {
-          current += matchSize;
+        if (tgt.type === 'collect_color' && tgt.color) {
+          current += poppedColorCounts[tgt.color] || 0;
         } else if (tgt.type === 'clear_ice') {
           current += clearedIce;
         } else if (tgt.type === 'clear_stone') {

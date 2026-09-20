@@ -96,12 +96,32 @@ export function generatePuzzle(level: number): LevelConfig {
   
   const city = Math.floor((level - 1) / 10) + 1;
   
-  // Complexity scaling
-  const numVehicles = Math.min(Math.floor(size * size * 0.55), 35 + Math.floor(level/1.5));
-  const desiredDepth = size * 5 + Math.floor(level * 3); // Massively increased difficulty multiplier
+  // Complexity scaling - balanced vehicle count and depth for responsive generation
+  let numVehicles = 4;
+  let desiredDepth = 4;
+
+  if (size === 4) {
+    numVehicles = 4 + (level > 5 ? 1 : 0);
+    desiredDepth = 3 + Math.min(level, 4);
+  } else if (size === 5) {
+    numVehicles = 5 + (level > 18 ? 2 : 1);
+    desiredDepth = 5 + Math.floor((level - 10) * 0.35);
+  } else if (size === 6) {
+    numVehicles = 7 + (level > 33 ? 2 : 1);
+    desiredDepth = 7 + Math.floor((level - 25) * 0.35);
+  } else if (size === 7) {
+    numVehicles = 10 + (level > 50 ? 2 : 1);
+    desiredDepth = 9 + Math.floor((level - 40) * 0.3);
+  } else if (size === 8) {
+    numVehicles = 13 + (level > 70 ? 2 : 1);
+    desiredDepth = 11 + Math.floor((level - 60) * 0.25);
+  } else if (size >= 9) {
+    numVehicles = 16 + Math.min(4, Math.floor((level - 80) * 0.25));
+    desiredDepth = 13 + Math.floor((level - 80) * 0.25);
+  }
   
-  for (let attempt = 0; attempt < 100; attempt++) {
-    const targetRow = Math.floor(Math.random() * size); // Random target row
+  for (let attempt = 0; attempt < 35; attempt++) {
+    const targetRow = Math.max(0, Math.min(size - 1, Math.floor(size / 2) - (size % 2 === 0 ? 1 : 0)));
     const targetLength = 2; // Xe chính size luôn luôn cố định là 2 ô.
 
     const state: Vehicle[] = [];
@@ -123,13 +143,12 @@ export function generatePuzzle(level: number): LevelConfig {
     // Add obstacles
     let colorIdx = 0;
     for (let i = 1; i <= numVehicles; i++) {
-      for (let tr = 0; tr < 60; tr++) {
+      for (let tr = 0; tr < 45; tr++) {
         const isHorizontal = Math.random() < 0.5;
-        // Introduce 1-block, 2-block, and 3-block cars
+        // Introduce 2-block and 3-block cars
         let length = 2;
         const rand = Math.random();
-        if (rand < 0.25) length = 1;
-        else if (rand > 0.75 && size > 4) length = 3;
+        if (rand > 0.7 && size >= 6) length = 3;
 
         const r = Math.floor(Math.random() * (isHorizontal ? size : size - length + 1));
         const c = Math.floor(Math.random() * (isHorizontal ? size - length + 1 : size));
@@ -162,7 +181,7 @@ export function generatePuzzle(level: number): LevelConfig {
       }
     }
     
-    // BFS backward search
+    // BFS backward search with lean memory & fast bounds
     const visited = new Set<string>();
     const queue: { st: Vehicle[], depth: number }[] = [];
     
@@ -173,7 +192,7 @@ export function generatePuzzle(level: number): LevelConfig {
     let maxDepth = 0;
     let bestState: { st: Vehicle[], depth: number } | null = null;
     
-    while (head < queue.length && head < 35000) {
+    while (head < queue.length && head < 4000) {
       const curr = queue[head++];
       
       // Ensure target is far away from the exit (at the very beginning)
@@ -198,36 +217,47 @@ export function generatePuzzle(level: number): LevelConfig {
       }
     }
     
-    // If we found a reasonable puzzle
-    let minDepth = 1;
-    if (level >= 10) minDepth = 5;
-
-    if (bestState && bestState.depth >= minDepth && bestState.depth >= Math.min(desiredDepth, minDepth)) {
+    // If we found a valid puzzle
+    const minAcceptableDepth = Math.max(2, Math.floor(desiredDepth * 0.5));
+    if (bestState && bestState.depth >= minAcceptableDepth) {
       return { size, vehicles: bestState.st, targetRow, city };
     }
   }
   
-  // Fallback puzzle
+  // Guaranteed dynamically-sized fallback puzzle
+  const targetRowFallback = Math.max(0, Math.min(size - 1, Math.floor(size / 2) - (size % 2 === 0 ? 1 : 0)));
+  const fallbackVehicles: Vehicle[] = [
+    { id: 0, isTarget: true, isHorizontal: true, length: 2, row: targetRowFallback, col: 0, color: '#ef4444' },
+    { id: 1, isTarget: false, isHorizontal: false, length: 2, row: 0, col: 2, color: '#3b82f6' },
+    { id: 2, isTarget: false, isHorizontal: true, length: 2, row: Math.min(size - 1, targetRowFallback + 1), col: 1, color: '#10b981' }
+  ];
+
+  if (size >= 5) {
+    fallbackVehicles.push({ id: 3, isTarget: false, isHorizontal: false, length: 2, row: 1, col: size - 1, color: '#f59e0b' });
+  }
+  if (size >= 6) {
+    fallbackVehicles.push({ id: 4, isTarget: false, isHorizontal: true, length: 2, row: 0, col: 0, color: '#8b5cf6' });
+    fallbackVehicles.push({ id: 5, isTarget: false, isHorizontal: false, length: 3, row: 2, col: size - 2, color: '#06b6d4' });
+  }
+  if (size >= 7) {
+    fallbackVehicles.push({ id: 6, isTarget: false, isHorizontal: false, length: 2, row: size - 3, col: 0, color: '#ec4899' });
+  }
+
   return {
-    size: 4,
-    targetRow: 1,
+    size,
+    targetRow: targetRowFallback,
     city,
-    vehicles: [
-      { id: 0, isTarget: true, isHorizontal: true, length: 2, row: 1, col: 0, color: '#ef4444' },
-      { id: 1, isTarget: false, isHorizontal: false, length: 2, row: 0, col: 3, color: '#3b82f6' },
-      { id: 2, isTarget: false, isHorizontal: false, length: 2, row: 2, col: 2, color: '#10b981' }
-    ]
+    vehicles: fallbackVehicles
   };
 }
 
 export function generateBossPuzzle(): LevelConfig {
-  const size = 12;
-  const numVehicles = 65; // High density
-  const desiredDepth = 60; // Very high minimum moves
+  const size = 10;
+  const numVehicles = 18;
+  const desiredDepth = 15;
   
-  // Same logic as before, just fixed size and parameters
-  for (let attempt = 0; attempt < 50; attempt++) {
-    const targetRow = Math.floor(Math.random() * size);
+  for (let attempt = 0; attempt < 25; attempt++) {
+    const targetRow = 4;
     const targetLength = 3; // Boss is a 3-block ambulance
     const state: Vehicle[] = [];
     state.push({
@@ -247,13 +277,11 @@ export function generateBossPuzzle(): LevelConfig {
     
     let colorIdx = 0;
     for (let i = 1; i <= numVehicles; i++) {
-      for (let tr = 0; tr < 60; tr++) {
+      for (let tr = 0; tr < 40; tr++) {
         const isHorizontal = Math.random() < 0.5;
         let length = 2;
         const rand = Math.random();
-        if (rand < 0.20) length = 1;
-        else if (rand > 0.65) length = 3;
-        else if (rand > 0.90) length = 4; // Boss map has 4-block huge trucks
+        if (rand > 0.6) length = 3;
         
         const r = Math.floor(Math.random() * (isHorizontal ? size : size - length + 1));
         const c = Math.floor(Math.random() * (isHorizontal ? size - length + 1 : size));
@@ -295,7 +323,7 @@ export function generateBossPuzzle(): LevelConfig {
     let maxDepth = 0;
     let bestState: { st: Vehicle[], depth: number } | null = null;
     
-    while (head < queue.length && head < 60000) {
+    while (head < queue.length && head < 5000) {
       const curr = queue[head++];
       
       if (curr.st[0].col <= 2) {
@@ -319,20 +347,20 @@ export function generateBossPuzzle(): LevelConfig {
       }
     }
     
-    if (bestState && bestState.depth >= 35) {
+    if (bestState && bestState.depth >= 8) {
       return { size, vehicles: bestState.st, targetRow, city: 999 };
     }
   }
   
   // Fallback for boss
   return {
-    size: 12,
-    targetRow: 6,
+    size: 10,
+    targetRow: 4,
     city: 999,
     vehicles: [
-      { id: 0, isTarget: true, isHorizontal: true, length: 3, row: 6, col: 0, color: '#ef4444' },
-      { id: 1, isTarget: false, isHorizontal: false, length: 3, row: 5, col: 4, color: '#3b82f6' },
-      { id: 2, isTarget: false, isHorizontal: false, length: 4, row: 7, col: 7, color: '#10b981' }
+      { id: 0, isTarget: true, isHorizontal: true, length: 3, row: 4, col: 0, color: '#ef4444' },
+      { id: 1, isTarget: false, isHorizontal: false, length: 3, row: 3, col: 4, color: '#3b82f6' },
+      { id: 2, isTarget: false, isHorizontal: false, length: 3, row: 5, col: 7, color: '#10b981' }
     ]
   };
 }

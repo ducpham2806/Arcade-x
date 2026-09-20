@@ -43,7 +43,7 @@ export function calculateMaxHeroLevels(
       break;
     }
   }
-  return { count: Math.max(1, count), totalCost: total };
+  return { count, totalCost: total };
 }
 
 /**
@@ -106,7 +106,7 @@ export function calculateMaxAllyLevels(
       break;
     }
   }
-  return { count: Math.max(1, count), totalCost: total };
+  return { count, totalCost: total };
 }
 
 /**

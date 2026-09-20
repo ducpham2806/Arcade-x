@@ -24,6 +24,7 @@ interface AllyEquipmentSubTabProps {
   onUpgradeAllyItem: (allyId: string, slot: AllyEquipSlot) => void;
   onSellAllyItem: (itemId: string) => void;
   onEquipBestAllies: () => void;
+  onSellAllAllyItems?: () => void;
 }
 
 export const AllyEquipmentSubTab: React.FC<AllyEquipmentSubTabProps> = ({
@@ -34,12 +35,19 @@ export const AllyEquipmentSubTab: React.FC<AllyEquipmentSubTabProps> = ({
   onUpgradeAllyItem,
   onSellAllyItem,
   onEquipBestAllies,
+  onSellAllAllyItems,
 }) => {
   const [selectedItem, setSelectedItem] = useState<AllyEquipmentItem | null>(null);
+  const [confirmingSellAll, setConfirmingSellAll] = useState(false);
   const [filterProfession, setFilterProfession] = useState<AllyProfession | 'all'>('all');
   const [sortMode, setSortMode] = useState<
     'default' | 'rarity_desc' | 'rarity_asc' | 'level_desc' | 'level_asc'
   >('default');
+
+  const totalInventorySellValue = useMemo(
+    () => allyInventory.reduce((sum, item) => sum + item.sellValue, 0),
+    [allyInventory]
+  );
 
   const RARITY_WEIGHT: Record<ItemRarity, number> = {
     legendary: 4,
@@ -489,6 +497,35 @@ export const AllyEquipmentSubTab: React.FC<AllyEquipmentSubTabProps> = ({
                 {sortMode === 'level_desc' ? '▼' : sortMode === 'level_asc' ? '▲' : ''}
               </span>
             </button>
+
+            {/* Quick Sell All Unequipped Ally Items */}
+            {onSellAllAllyItems && allyInventory.length > 0 && (
+              <button
+                id="btn-sell-all-ally-items"
+                type="button"
+                onClick={() => {
+                  if (!confirmingSellAll) {
+                    setConfirmingSellAll(true);
+                    setTimeout(() => setConfirmingSellAll(false), 4000);
+                  } else {
+                    onSellAllAllyItems();
+                    setConfirmingSellAll(false);
+                    setSelectedItem(null);
+                  }
+                }}
+                className={`px-2 py-1 rounded-lg text-[11px] font-bold shrink-0 flex items-center gap-1 active:scale-95 transition-all shadow-sm cursor-pointer ${
+                  confirmingSellAll
+                    ? 'bg-rose-600 hover:bg-rose-500 text-white animate-pulse ring-2 ring-rose-400'
+                    : 'bg-rose-950/80 hover:bg-rose-900 border border-rose-800/80 text-rose-300'
+                }`}
+                title={`Bán tất cả ${allyInventory.length} trang bị đồng đội: +💰${formatNumber(totalInventorySellValue)}`}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>
+                  {confirmingSellAll ? 'Bán hết?' : `+💰${formatNumber(totalInventorySellValue)}`}
+                </span>
+              </button>
+            )}
           </div>
         </div>
 

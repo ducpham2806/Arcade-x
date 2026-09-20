@@ -33,6 +33,7 @@ interface ComboNotification {
 export const BlockerGame: React.FC<GameComponentProps> = ({
   bridge,
   onGameOver,
+  isPaused,
   isMuted,
   isDailyChallengeMode: propChallengeMode,
 }) => {
@@ -70,6 +71,10 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
   const [combo, setCombo] = useState(0);
   const [gameOver, setGameOver] = useState(false);
 
+  // Gems collected during the game session
+  const [rubyCount, setRubyCount] = useState(0);
+  const [amethystCount, setAmethystCount] = useState(0);
+
   // Sync prop changes
   useEffect(() => {
     if (propChallengeMode !== undefined) {
@@ -79,7 +84,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
 
   // Challenge Timer Countdown Loop
   useEffect(() => {
-    if (!isChallengeMode || !challengeStarted || gameOver || challengeVictoryModal || challengeTimeUpModal) {
+    if (!isChallengeMode || !challengeStarted || isPaused || gameOver || challengeVictoryModal || challengeTimeUpModal) {
       return;
     }
 
@@ -90,6 +95,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
           setChallengeTimeUpModal(true);
           sounds.playGameOver();
           recordDailyChallengeAttempt(score, 180);
+          bridge.submitScore(score, { ruby: rubyCount, timeSpent: 180 });
           return 0;
         }
         return prev - 1;
@@ -100,18 +106,17 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
   }, [
     isChallengeMode,
     challengeStarted,
+    isPaused,
     gameOver,
     challengeVictoryModal,
     challengeTimeUpModal,
     score,
+    rubyCount,
     sounds,
     recordDailyChallengeAttempt,
+    bridge,
   ]);
   
-  // Gems collected during the game session
-  const [rubyCount, setRubyCount] = useState(0);
-  const [amethystCount, setAmethystCount] = useState(0);
-
   // Clearing animation active rows/cols
   const [clearingCells, setClearingCells] = useState<{ r: number; c: number }[]>([]);
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
@@ -238,6 +243,17 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     return false;
   }, []);
 
+  // Bad-luck protection: ensure rolling a new batch gives the player at least 1 placeable shape whenever board has open possibilities
+  const getFairShapesBatch = useCallback((gridToCheck: GridState): BlockShape[] => {
+    let batch = getRandomShapes(3);
+    let attempts = 0;
+    while (!checkAnyPlaceable(gridToCheck, batch) && attempts < 10) {
+      batch = getRandomShapes(3);
+      attempts++;
+    }
+    return batch;
+  }, [checkAnyPlaceable]);
+
   // Check which lines will clear with a hypothetical grid
   const checkLines = (currentGrid: GridState) => {
     const rowsToClear: number[] = [];
@@ -274,7 +290,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
 
   // Pointer Down to start dragging
   const handlePointerDown = (e: React.PointerEvent, shape: BlockShape, index: number) => {
-    if (gameOver) return;
+    if (gameOver || isPaused) return;
     updateCellDimensions();
 
     const isTouch = e.pointerType === 'touch' || (typeof window !== 'undefined' && 'ontouchstart' in window && window.innerWidth < 768);
@@ -591,7 +607,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
           newShapes[dragging.index] = null;
 
           if (newShapes.every(s => s === null)) {
-            const nextBatch = getRandomShapes(3);
+            const nextBatch = getFairShapesBatch(newGrid);
             setShapes(nextBatch);
             if (!checkAnyPlaceable(newGrid, nextBatch)) {
               handleGameOver(newScore);

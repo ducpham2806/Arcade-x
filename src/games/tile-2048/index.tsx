@@ -423,18 +423,31 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
 
     const diffX = clientX - touchStartPos.current.x;
     const diffY = clientY - touchStartPos.current.y;
-    const threshold = 35;
+    const absX = Math.abs(diffX);
+    const absY = Math.abs(diffY);
+    const threshold = 32;
 
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-      if (Math.abs(diffX) > threshold) {
-        if (diffX > 0) move('RIGHT');
-        else move('LEFT');
-      }
+    // Ignore tiny taps
+    if (absX < threshold && absY < threshold) {
+      touchStartPos.current = null;
+      return;
+    }
+
+    // Deadzone filter for ambiguous diagonal swipes:
+    // If smaller axis is > 80% of larger axis, reject to protect user from misdirected moves
+    const maxAxis = Math.max(absX, absY);
+    const minAxis = Math.min(absX, absY);
+    if (minAxis / maxAxis > 0.8) {
+      touchStartPos.current = null;
+      return;
+    }
+
+    if (absX > absY) {
+      if (diffX > 0) move('RIGHT');
+      else move('LEFT');
     } else {
-      if (Math.abs(diffY) > threshold) {
-        if (diffY > 0) move('DOWN');
-        else move('UP');
-      }
+      if (diffY > 0) move('DOWN');
+      else move('UP');
     }
     touchStartPos.current = null;
   };

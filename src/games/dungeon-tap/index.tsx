@@ -57,9 +57,10 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   const [stage, setStage] = useState<number>(1);
   const [maxStageReached, setMaxStageReached] = useState<number>(1);
   const [gold, setGold] = useState<number>(100);
-  const [mana, setMana] = useState<number>(100);
-  const [maxMana, setMaxMana] = useState<number>(100);
   const [heroLevel, setHeroLevel] = useState<number>(1);
+  // Max Mana scales with hero level (+5 MP per 5 levels)
+  const maxMana = 100 + Math.floor(heroLevel / 5) * 5;
+  const [mana, setMana] = useState<number>(100);
   const [bossTimer, setBossTimer] = useState<number>(30);
   const [isFightingBoss, setIsFightingBoss] = useState<boolean>(false);
   const [bossToast, setBossToast] = useState<string | null>(null);
@@ -761,6 +762,14 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     bridge.playSound('coin');
   };
 
+  const handleSellAllAllyItems = () => {
+    if (allyInventory.length === 0) return;
+    const totalSellGold = allyInventory.reduce((sum, item) => sum + item.sellValue, 0);
+    setGold((prev) => prev + totalSellGold);
+    setAllyInventory([]);
+    bridge.playSound('coin');
+  };
+
   // Active Skill Cast
   const handleCastSkill = (skillId: ActiveSkill['id']) => {
     const skill = skills.find((s) => s.id === skillId);
@@ -896,7 +905,23 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       ...newLoots,
     ]);
 
-    // Stage progression
+    // Boss Stage Protection: If we're at a milestone boss stage (10, 20, 30...) and farming regular mobs,
+    // do NOT advance the stage. Keep farming mob active until the player slays the actual Boss!
+    const isBossStage = stage % 10 === 0;
+    if (isBossStage && !isBoss) {
+      const farmStage = Math.max(1, stage - 1);
+      const farmMonster = generateMonsterForStage(farmStage);
+      farmMonster.isBoss = false;
+      farmMonster.stage = stage;
+      setMonster(farmMonster);
+      return;
+    }
+
+    if (isBoss) {
+      setIsFightingBoss(false);
+    }
+
+    // Stage progression upon normal mob or Boss victory
     const nextStage = stage + 1;
     setStage(nextStage);
     setMaxStageReached((prev) => Math.max(prev, nextStage));
@@ -906,7 +931,9 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     }
 
     // Spawn next monster
-    setMonster(generateMonsterForStage(nextStage));
+    const nextMonster = generateMonsterForStage(nextStage);
+    setIsFightingBoss(nextMonster.isBoss);
+    setMonster(nextMonster);
     setBossTimer(30);
   }, [
     monster,
@@ -1061,7 +1088,13 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   const handleLeaveBoss = () => {
     setIsFightingBoss(false);
     const farmStage = Math.max(1, stage - 1);
-    setMonster(generateMonsterForStage(farmStage));
+    const farmMonster = generateMonsterForStage(farmStage);
+    farmMonster.isBoss = false;
+    farmMonster.stage = stage;
+    setMonster(farmMonster);
+    if (bossToastTimerRef.current) clearTimeout(bossToastTimerRef.current);
+    setBossToast('Đã rút lui về cày vàng! Nâng cấp lực chiến rồi bấm [ĐẤU TRÙM] để tái đấu.');
+    bossToastTimerRef.current = setTimeout(() => setBossToast(null), 3500);
   };
 
   // End current run and show Post-Game Summary
@@ -1114,7 +1147,9 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     if (isFightingBoss && monster.isBoss) return; // prevent spamming freeze
 
     setIsFightingBoss(true);
-    setMonster(generateMonsterForStage(stage));
+    const bossMonster = generateMonsterForStage(stage);
+    bossMonster.isBoss = true;
+    setMonster(bossMonster);
     setBossTimer(30);
   };
 
@@ -1122,7 +1157,9 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   const handleSelectStage = (selectedStage: number) => {
     if (selectedStage > maxStageReached) return;
     setStage(selectedStage);
-    setMonster(generateMonsterForStage(selectedStage));
+    const newMonster = generateMonsterForStage(selectedStage);
+    setIsFightingBoss(newMonster.isBoss);
+    setMonster(newMonster);
     setBossTimer(30);
     setActiveTab('swordMaster');
   };
@@ -1202,7 +1239,15 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
         setBossTimer((prev) => {
           if (prev <= 1) {
             setTimeout(() => {
-              setMonster(generateMonsterForStage(Math.max(1, stageRef.current - 1)));
+              setIsFightingBoss(false);
+              const farmStage = Math.max(1, stageRef.current - 1);
+              const farmMonster = generateMonsterForStage(farmStage);
+              farmMonster.isBoss = false;
+              farmMonster.stage = stageRef.current;
+              setMonster(farmMonster);
+              if (bossToastTimerRef.current) clearTimeout(bossToastTimerRef.current);
+              setBossToast('Hết giờ! Bạn chưa hạ được Trùm. Hãy nâng cấp rồi bấm [ĐẤU TRÙM]!');
+              bossToastTimerRef.current = setTimeout(() => setBossToast(null), 3500);
             }, 50);
             return 30;
           }
@@ -1530,7 +1575,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       </header>
 
       {/* Main Scrollable Area */}
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col max-w-2xl w-full mx-auto pb-16">
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col max-w-2xl w-full mx-auto pb-28 sm:pb-24">
         {/* Tap Titans 2 Battle Arena (Spacious & Clean) */}
         <div className="p-2 sm:p-3 shrink-0">
           <TitanArena
@@ -1616,6 +1661,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
               onEquipAllyItem={handleEquipAllyItem}
               onUpgradeAllyItem={handleUpgradeAllyItem}
               onSellAllyItem={handleSellAllyItem}
+              onSellAllAllyItems={handleSellAllAllyItems}
               onEquipBestAllies={handleEquipBestAllies}
             />
           )}

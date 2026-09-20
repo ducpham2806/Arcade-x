@@ -23,6 +23,9 @@ import {
   Gamepad2,
   Undo2,
   RefreshCw,
+  ZoomIn,
+  CheckCheck,
+  X,
 } from 'lucide-react';
 import { BoardLayout } from '../../components/games/BoardLayout';
 import { GameComponentProps } from '../../types';
@@ -107,6 +110,8 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   >([]);
 
   // UI Interactive States
+  const [twoTapConfirm, setTwoTapConfirm] = useState<boolean>(true);
+  const [pendingCell, setPendingCell] = useState<{ x: number; y: number } | null>(null);
   const [hoverCell, setHoverCell] = useState<{ x: number; y: number } | null>(null);
   const [showChatBox, setShowChatBox] = useState(false);
   const [showSurrenderConfirm, setShowSurrenderConfirm] = useState(false);
@@ -386,6 +391,34 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   // === IN-GAME MOVES ===
   const handleCellClick = async (x: number, y: number) => {
     if (isPaused) return;
+
+    // Fast validation: cell occupied or not our turn
+    const cellKey = `${x}_${y}`;
+    if (screenMode === 'playing') {
+      if (!roomData || roomData.status !== 'playing' || roomData.currentTurn !== myRole) {
+        bridge.playSound('hit');
+        return;
+      }
+      if (roomData.boardState[cellKey]) return;
+    } else if (screenMode === 'ai_practice') {
+      if (aiTurn !== 'human' || aiWinner) return;
+      if (aiBoardState[cellKey]) return;
+    } else if (screenMode === 'local_hotseat') {
+      if (localWinner || localBoardState[cellKey]) return;
+    }
+
+    // Two-tap confirmation check
+    if (twoTapConfirm) {
+      if (!pendingCell || pendingCell.x !== x || pendingCell.y !== y) {
+        setPendingCell({ x, y });
+        bridge.playSound('click');
+        return;
+      }
+      // Confirmed second tap on same cell
+      setPendingCell(null);
+    } else {
+      setPendingCell(null);
+    }
 
     if (screenMode === 'playing') {
       if (!roomData || roomData.status !== 'playing') return;
@@ -1193,27 +1226,45 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                 </div>
               </div>
 
-              {screenMode === 'local_hotseat' && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleUndoLocalMove}
-                    disabled={localMoveHistory.length === 0 || isMatchFinished}
-                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 disabled:opacity-30 transition-all flex items-center gap-1 cursor-pointer"
-                    title="Đi lại nước trước"
-                  >
-                    <Undo2 className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="hidden sm:inline">Đi Lại</span>
-                  </button>
-                  <button
-                    onClick={handleStartLocalHotseat}
-                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1 cursor-pointer"
-                    title="Ván cờ mới"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-teal-400" />
-                    <span className="hidden sm:inline">Ván Mới</span>
-                  </button>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setTwoTapConfirm(!twoTapConfirm);
+                    setPendingCell(null);
+                  }}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                    twoTapConfirm
+                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 ring-1 ring-cyan-400/30'
+                      : 'bg-slate-800/80 text-slate-400 border-slate-700'
+                  }`}
+                  title="Chế độ 2 chạm / Kính lúp chống bấm nhầm trên màn hình cảm ứng"
+                >
+                  <ZoomIn className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="text-[11px] font-medium">{twoTapConfirm ? '2 Chạm: Bật' : '2 Chạm: Tắt'}</span>
+                </button>
+
+                {screenMode === 'local_hotseat' && (
+                  <>
+                    <button
+                      onClick={handleUndoLocalMove}
+                      disabled={localMoveHistory.length === 0 || isMatchFinished}
+                      className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 disabled:opacity-30 transition-all flex items-center gap-1 cursor-pointer"
+                      title="Đi lại nước trước"
+                    >
+                      <Undo2 className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="hidden sm:inline">Đi Lại</span>
+                    </button>
+                    <button
+                      onClick={handleStartLocalHotseat}
+                      className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1 cursor-pointer"
+                      title="Ván cờ mới"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-teal-400" />
+                      <span className="hidden sm:inline">Ván Mới</span>
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           }
           topPlayer={{
@@ -1261,6 +1312,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                     const isStar = STAR_POINTS.some((p) => p.x === row && p.y === col);
                     const canMoveNow = screenMode === 'local_hotseat' ? !isMatchFinished : (isMyTurn && !isMatchFinished);
                     const isHovered = hoverCell?.x === row && hoverCell?.y === col && !stone && canMoveNow;
+                    const isPending = pendingCell?.x === row && pendingCell?.y === col && !stone;
 
                     return (
                       <div
@@ -1268,17 +1320,30 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                         onClick={() => handleCellClick(row, col)}
                         onMouseEnter={() => setHoverCell({ x: row, y: col })}
                         onMouseLeave={() => setHoverCell(null)}
-                        className={`relative border-[0.5px] border-slate-300 flex items-center justify-center cursor-pointer transition-colors duration-150 group aspect-square overflow-hidden ${
-                          isWinningStone ? 'bg-amber-200' : 'bg-transparent'
+                        className={`relative border-[0.5px] border-slate-300 flex items-center justify-center cursor-pointer transition-all duration-150 group aspect-square overflow-hidden ${
+                          isWinningStone
+                            ? 'bg-amber-200'
+                            : isPending
+                            ? 'bg-cyan-100 ring-2 ring-inset ring-cyan-500 z-10'
+                            : 'bg-transparent'
                         }`}
                       >
                         {/* Star Dot Marker */}
-                        {isStar && !stone && (
+                        {isStar && !stone && !isPending && (
                           <div className="w-1.5 h-1.5 rounded-full bg-slate-400 pointer-events-none" />
                         )}
 
+                        {/* Pending Confirmation Marker (First Tap) */}
+                        {isPending && (
+                          <div className="w-full h-full flex flex-col items-center justify-center animate-pulse bg-cyan-400/20">
+                            <div className="w-3.5 h-3.5 rounded-full bg-cyan-500 text-white flex items-center justify-center text-[9px] font-black shadow">
+                              ✓
+                            </div>
+                          </div>
+                        )}
+
                         {/* Ghost Hover Marker */}
-                        {isHovered && (
+                        {isHovered && !isPending && (
                           <div
                             className={`w-3/4 h-3/4 rounded-full border-2 border-dashed flex items-center justify-center font-bold text-xs opacity-50 ${
                               (screenMode === 'local_hotseat' ? (localTurn === 'p1' ? localP1Symbol : localP2Symbol) : mySymbol) === 'X'
@@ -1332,8 +1397,42 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                   </div>
                 </div>
               )}
-          </div>
-        }
+
+              {/* Magnifier / 2-Tap Move Confirmation Floating HUD */}
+              {pendingCell && !isMatchFinished && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 font-bold text-xs">
+                      <ZoomIn className="w-4 h-4 text-cyan-400 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Kính Lúp Định Vị</div>
+                      <div className="text-xs font-black text-cyan-300">
+                        Ô [{String.fromCharCode(65 + pendingCell.y)}{pendingCell.x + 1}] • Hàng {pendingCell.x + 1}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleCellClick(pendingCell.x, pendingCell.y)}
+                      className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 active:scale-95 text-white text-xs font-bold shadow-md flex items-center gap-1 cursor-pointer"
+                    >
+                      <CheckCheck className="w-3.5 h-3.5" />
+                      <span>Đánh Ô Này</span>
+                    </button>
+                    <button
+                      onClick={() => setPendingCell(null)}
+                      className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      title="Hủy chọn ô"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          }
         controls={
             <div className="w-full flex flex-col items-center gap-2 mt-1 z-10">
               <div className="w-full max-w-xl flex flex-wrap items-center justify-between gap-2 px-2">

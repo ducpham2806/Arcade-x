@@ -24,7 +24,7 @@ import { WordDefinitionModal } from './WordDefinitionModal';
 import { FirebaseService } from '../../services/firebase';
 import { StorageService } from '../../services/storage';
 
-export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
+export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge, isPaused, isMuted }) => {
   const [levelIndex, setLevelIndex] = useState(0); // 0-indexed
   const [maxCompletedLevel, setMaxCompletedLevel] = useState(0);
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'won'>('menu');
@@ -40,6 +40,7 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
   const gridRef = useRef<HTMLDivElement>(null);
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [isTimeUp, setIsTimeUp] = useState(false);
   const [hintsLeft, setHintsLeft] = useState(3);
   const [score, setScore] = useState(0);
 
@@ -113,6 +114,7 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
     setMaxCombo(1);
     setComboTimerPercent(0);
     setHintsLeft(3);
+    setIsTimeUp(false);
     setGameState('playing');
     bridge.playSound('turnStart');
   };
@@ -129,13 +131,14 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
     setMaxCombo(1);
     setComboTimerPercent(0);
     setHintsLeft(3);
+    setIsTimeUp(false);
     setGameState('playing');
     bridge.playSound('turnStart');
   };
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (gameState === 'playing' && timeLeft > 0) {
+    if (gameState === 'playing' && timeLeft > 0 && !isPaused && !isTimeUp) {
       timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -147,17 +150,11 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [gameState, timeLeft]);
+  }, [gameState, timeLeft, isPaused, isTimeUp]);
 
   const handleTimeUp = () => {
     bridge.playSound('error');
-    if (currentLevelData?.mode === 'daily') {
-      alert("Hết thời gian thử thách hôm nay! Hãy thử lại để đạt điểm cao hơn.");
-      loadDailyPuzzle();
-    } else {
-      alert("Hết thời gian! Hãy thử lại.");
-      loadLevel(levelIndex, currentLevelData?.mode || 'classic');
-    }
+    setIsTimeUp(true);
   };
 
   const getCellFromEvent = (e: React.PointerEvent | PointerEvent) => {
@@ -178,7 +175,7 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isTimeUp) return;
     const cell = getCellFromEvent(e);
     if (cell) {
       setIsSelecting(true);
@@ -200,11 +197,31 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
       let newR = cell.r;
       let newC = cell.c;
 
-      if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) {
-        if (Math.abs(dr) > Math.abs(dc)) {
+      const absR = Math.abs(dr);
+      const absC = Math.abs(dc);
+
+      if (absR > 0 && absC > 0) {
+        const ratio = absR / absC;
+        if (ratio >= 2.2) {
+          // Primarily vertical
           newC = startCell.c;
-        } else {
+        } else if (ratio <= 0.45) {
+          // Primarily horizontal
           newR = startCell.r;
+        } else {
+          // True diagonal (45 degrees)
+          const dist = Math.max(absR, absC);
+          const maxDim = currentLevelData?.size || 8;
+          const targetR = startCell.r + dist * Math.sign(dr);
+          const targetC = startCell.c + dist * Math.sign(dc);
+          if (targetR >= 0 && targetR < maxDim && targetC >= 0 && targetC < maxDim) {
+            newR = targetR;
+            newC = targetC;
+          } else {
+            const clampedDist = Math.min(absR, absC);
+            newR = startCell.r + clampedDist * Math.sign(dr);
+            newC = startCell.c + clampedDist * Math.sign(dc);
+          }
         }
       }
 
@@ -310,6 +327,10 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
         bridge.grantCoins(100);
         bridge.grantExp(50);
         bridge.reportProgress('wc_daily_complete', 1);
+        bridge.submitScore(finalDailyScore, {
+          maxCombo: peakCombo,
+          timeSpent: 180 - timeLeft,
+        });
       } else {
         // Classic / Mystery mode progression
         const newMaxLevel = Math.max(maxCompletedLevel, levelIndex + 1);
@@ -320,6 +341,11 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
         bridge.grantExp(currentLevelData.difficulty === 'HARD' ? 20 : 10);
         if (levelIndex === 0) bridge.reportProgress('wc_first_word', 1);
         if (levelIndex === 9) bridge.reportProgress('wc_level_10', 1);
+        bridge.submitScore(currentScore, {
+          level: levelIndex + 1,
+          maxCombo: peakCombo,
+          wordsFound: currentFoundWords.length,
+        });
       }
     }
   };
@@ -654,6 +680,69 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({ bridge }) => {
           </button>
         </div>
       </div>
+
+      {/* Time Up Modal Overlay */}
+      {isTimeUp && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 animate-in fade-in duration-300 select-none">
+          <div className="bg-slate-900 border border-rose-500/30 rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl flex flex-col items-center text-white">
+            <div className="w-16 h-16 sm:w-18 sm:h-18 bg-rose-500/20 text-rose-400 border border-rose-500/40 rounded-3xl flex items-center justify-center mb-4 shadow-xl shadow-rose-500/20 animate-pulse">
+              <Clock className="w-8 h-8 sm:w-9 sm:h-9" />
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-black mb-1 text-rose-400">
+              HẾT THỜI GIAN!
+            </h2>
+            <p className="text-slate-400 text-xs sm:text-sm font-medium mb-5">
+              {isDaily
+                ? 'Đã hết thời gian cho thử thách ma trận hôm nay.'
+                : `Thời gian hoàn thành Cấp ${levelIndex + 1} đã kết thúc.`}
+            </p>
+
+            {/* Performance recap */}
+            <div className="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 w-full mb-6 grid grid-cols-3 gap-2">
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] text-slate-400 font-bold uppercase">ĐÃ TÌM</span>
+                <span className="text-base font-black text-amber-300">
+                  {foundWords.length}/{currentLevelData?.words.length || 0}
+                </span>
+              </div>
+              <div className="flex flex-col items-center border-x border-slate-700">
+                <span className="text-[10px] text-slate-400 font-bold uppercase">ĐIỂM SỐ</span>
+                <span className="text-base font-black text-white">{score.toLocaleString()}</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] text-slate-400 font-bold uppercase">COMBO MAX</span>
+                <span className="text-base font-black text-orange-400">x{maxCombo}</span>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="w-full space-y-2.5">
+              <button
+                onClick={() => {
+                  setIsTimeUp(false);
+                  if (isDaily) loadDailyPuzzle();
+                  else loadLevel(levelIndex, currentLevelData?.mode || 'classic');
+                }}
+                className="w-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 py-3.5 rounded-2xl font-black text-base shadow-lg shadow-amber-400/20 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <RotateCcw className="w-5 h-5" />
+                <span>Chơi Lại Màn Này</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsTimeUp(false);
+                  setGameState('menu');
+                }}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white py-3 rounded-2xl font-bold text-sm transition-all cursor-pointer"
+              >
+                Quay Lại Bản Đồ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Win Modal Overlay */}
       {gameState === 'won' && (

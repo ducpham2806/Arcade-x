@@ -5,24 +5,35 @@ interface Props {
   size: number;
   hints: Hint[];
   userRects: Rect[];
+  pencilRects?: Rect[];
   currentDrawing: Rect | null;
   onDrawStart: (p: Point) => void;
   onDrawMove: (p: Point) => void;
   onDrawEnd: () => void;
   skinId: string;
+  selectionMode?: '2tap' | 'drag';
+  tapCorner1?: Point | null;
+  tapCorner2?: Point | null;
+  onCellTap?: (p: Point) => void;
 }
 
 export const ShikakuBoard: React.FC<Props> = ({
   size,
   hints,
   userRects,
+  pencilRects = [],
   currentDrawing,
   onDrawStart,
   onDrawMove,
   onDrawEnd,
-  skinId
+  skinId,
+  selectionMode = '2tap',
+  tapCorner1 = null,
+  tapCorner2 = null,
+  onCellTap
 }) => {
   const boardRef = useRef<HTMLDivElement>(null);
+  const pointerStartPos = useRef<{ x: number; y: number } | null>(null);
 
   const getCell = (clientX: number, clientY: number): Point | null => {
     if (!boardRef.current) return null;
@@ -38,22 +49,40 @@ export const ShikakuBoard: React.FC<Props> = ({
   const handlePointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    pointerStartPos.current = { x: e.clientX, y: e.clientY };
     const cell = getCell(e.clientX, e.clientY);
-    if (cell) onDrawStart(cell);
+    if (selectionMode === 'drag') {
+      if (cell) onDrawStart(cell);
+    }
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     e.preventDefault();
-    if ((e.buttons & 1) !== 1) return; // Only process move if primary button is pressed
-    const cell = getCell(e.clientX, e.clientY);
-    if (cell) onDrawMove(cell);
+    if (selectionMode === 'drag') {
+      if (e.pointerType === 'mouse' && (e.buttons & 1) !== 1) return;
+      const cell = getCell(e.clientX, e.clientY);
+      if (cell) onDrawMove(cell);
+    }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
     e.preventDefault();
     if ((e.target as HTMLElement).hasPointerCapture(e.pointerId)) {
-        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     }
+
+    const cell = getCell(e.clientX, e.clientY);
+    const startPos = pointerStartPos.current;
+    pointerStartPos.current = null;
+
+    if (selectionMode === '2tap') {
+      const dist = startPos ? Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y) : 0;
+      if (dist < 18 && cell && onCellTap) {
+        onCellTap(cell);
+        return;
+      }
+    }
+
     onDrawEnd();
   };
 
@@ -138,9 +167,65 @@ export const ShikakuBoard: React.FC<Props> = ({
             ))}
         </div>
 
+        {/* Pencil/Draft Rectangles */}
+        {pencilRects.map(r => (
+          <div
+            key={r.id}
+            style={{
+              position: 'absolute',
+              top: `${(r.r / size) * 100}%`,
+              left: `${(r.c / size) * 100}%`,
+              width: `${(r.w / size) * 100}%`,
+              height: `${(r.h / size) * 100}%`,
+              pointerEvents: 'none',
+              zIndex: 9,
+            }}
+            className="border-2 border-dashed border-cyan-400 bg-cyan-400/20 rounded-md shadow-sm"
+          />
+        ))}
+
         {/* User Rectangles */}
         {userRects.map(r => renderRect(r))}
         {currentDrawing && renderRect(currentDrawing, true)}
+
+        {/* 2-Tap Selected Corner Reticles */}
+        {tapCorner1 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: `${(tapCorner1.r / size) * 100}%`,
+              left: `${(tapCorner1.c / size) * 100}%`,
+              width: `${(1 / size) * 100}%`,
+              height: `${(1 / size) * 100}%`,
+              pointerEvents: 'none',
+              zIndex: 35,
+            }}
+            className="flex items-center justify-center p-0.5"
+          >
+            <div className="w-full h-full rounded-md border-2 border-cyan-400 bg-cyan-400/40 animate-pulse shadow-lg flex items-center justify-center">
+              <span className="text-[10px] font-black text-white drop-shadow">1</span>
+            </div>
+          </div>
+        )}
+
+        {tapCorner2 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: `${(tapCorner2.r / size) * 100}%`,
+              left: `${(tapCorner2.c / size) * 100}%`,
+              width: `${(1 / size) * 100}%`,
+              height: `${(1 / size) * 100}%`,
+              pointerEvents: 'none',
+              zIndex: 35,
+            }}
+            className="flex items-center justify-center p-0.5"
+          >
+            <div className="w-full h-full rounded-md border-2 border-emerald-400 bg-emerald-400/40 animate-pulse shadow-lg flex items-center justify-center">
+              <span className="text-[10px] font-black text-white drop-shadow">2</span>
+            </div>
+          </div>
+        )}
 
         {/* Hints - Rendered above rects so text is visible */}
         <div

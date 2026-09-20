@@ -15,6 +15,8 @@ import {
   Home,
   Volume2,
   VolumeX,
+  Music,
+  Music2,
   Trophy,
   Sparkles,
   Zap,
@@ -36,6 +38,7 @@ import {
   Minimize2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { soundEngine } from '../services/audio';
 
 interface GameWrapperProps {
   gameMeta?: GameMetadata;
@@ -53,6 +56,8 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     submitGameScore,
     isSoundMuted,
     toggleSound,
+    isMusicMuted,
+    toggleMusic,
     setActiveModal,
     openShareModal,
     isPracticeMode,
@@ -64,6 +69,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   } = useGame();
 
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
   const [showPreGameLoading, setShowPreGameLoading] = useState<boolean>(() => {
     try {
       const skipped = localStorage.getItem('arcadex_skip_pregame_loading');
@@ -72,6 +78,28 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       return true;
     }
   });
+
+  const handleResume = useCallback(() => {
+    setIsPaused(false);
+    setResumeCountdown(3);
+  }, []);
+
+  useEffect(() => {
+    if (resumeCountdown === null) return;
+    if (resumeCountdown > 0) {
+      soundEngine.play('click');
+      const timer = setTimeout(() => {
+        setResumeCountdown((prev) => (prev !== null ? prev - 1 : null));
+      }, 750);
+      return () => clearTimeout(timer);
+    } else {
+      soundEngine.play('pop');
+      const timer = setTimeout(() => {
+        setResumeCountdown(null);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [resumeCountdown]);
   const [hasAutoSaved, setHasAutoSaved] = useState<boolean>(false);
   const [gameOverData, setGameOverData] = useState<{
     score: number;
@@ -551,7 +579,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   return (
     <div id="game-wrapper-viewport" className="fixed inset-0 z-50 bg-[#050505] flex flex-col select-none overflow-hidden font-sans">
       {/* Top Header HUD */}
-      <header className="h-14 bg-[#0e0e0e]/90 backdrop-blur-md border-b border-white/5 px-3 sm:px-6 flex items-center justify-between z-30 shrink-0">
+      <header className="h-12 sm:h-14 bg-[#0e0e0e]/95 backdrop-blur-md border-b border-white/5 px-2.5 sm:px-6 flex items-center justify-between z-30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-lg shrink-0">
             {gameMeta.icon}
@@ -576,23 +604,38 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
         {/* Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Dynamic Viewport Scale Fit Pill */}
-          
-
           <button
             id="btn-game-toggle-sound"
             type="button"
             onClick={toggleSound}
             aria-label={isSoundMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+            title={isSoundMuted ? "Bật hiệu ứng âm thanh" : "Tắt hiệu ứng âm thanh"}
             className="w-9 h-9 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-90 text-slate-300 hover:text-white flex items-center justify-center border border-white/5 transition-all cursor-pointer"
           >
             {isSoundMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-indigo-400" />}
           </button>
 
           <button
+            id="btn-game-toggle-music"
+            type="button"
+            onClick={toggleMusic}
+            aria-label={isMusicMuted ? "Bật nhạc nền" : "Tắt nhạc nền"}
+            title={isMusicMuted ? "Bật nhạc nền game" : "Tắt nhạc nền game"}
+            className="w-9 h-9 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-90 text-slate-300 hover:text-white flex items-center justify-center border border-white/5 transition-all cursor-pointer"
+          >
+            {isMusicMuted ? <Music2 className="w-4 h-4 text-slate-500" /> : <Music className="w-4 h-4 text-emerald-400" />}
+          </button>
+
+          <button
             id="btn-game-pause"
             type="button"
-            onClick={() => setIsPaused((p) => !p)}
+            onClick={() => {
+              if (isPaused) {
+                handleResume();
+              } else {
+                setIsPaused(true);
+              }
+            }}
             aria-label={isPaused ? "Tiếp tục chơi" : "Tạm dừng"}
             className="w-9 h-9 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-90 text-slate-300 hover:text-white flex items-center justify-center border border-white/5 transition-all cursor-pointer"
           >
@@ -641,12 +684,26 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
             isPracticeMode={isPracticeMode}
             isDailyChallengeMode={isDailyChallengeMode}
             bridge={bridge}
-            isPaused={isPaused || showPreGameLoading || gameOverData !== null || showExitConfirm || activeModal !== 'none'}
+            isPaused={isPaused || showPreGameLoading || gameOverData !== null || showExitConfirm || activeModal !== 'none' || resumeCountdown !== null}
             isMuted={isSoundMuted}
             onGameOver={handleGameOver}
             onRestart={handleRestart}
           />
         </div>
+
+        {/* Unpause / Resume 3-2-1 Countdown Overlay */}
+        {resumeCountdown !== null && (
+          <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center pointer-events-none select-none">
+            <div className="text-center animate-in zoom-in-75 duration-200">
+              <div className="text-7xl sm:text-9xl font-black font-display text-transparent bg-clip-text bg-gradient-to-br from-amber-300 via-orange-400 to-rose-500 drop-shadow-[0_0_35px_rgba(245,158,11,0.8)] tracking-tighter">
+                {resumeCountdown > 0 ? resumeCountdown : 'GO!'}
+              </div>
+              <p className="text-xs sm:text-sm text-slate-300 mt-3 font-semibold tracking-widest uppercase">
+                {resumeCountdown > 0 ? 'Chuẩn bị quay lại ván chơi...' : 'Tiếp tục chiến đấu!'}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Transient Swipe Visual Direction Feedback Cue */}
         {swipeVisualCue && (
@@ -765,12 +822,13 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 <button
                   id="btn-pause-resume"
                   type="button"
-                  onClick={() => setIsPaused(false)}
+                  onClick={handleResume}
                   title="Tiếp Tục Chơi"
                   aria-label="Tiếp Tục Chơi"
                   className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-indigo-400 font-bold uppercase text-xs shadow-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Play className="w-5 h-5 fill-current" />
+                  <span className="font-bold">Tiếp Tục Chơi</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
