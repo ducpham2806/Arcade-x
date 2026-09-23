@@ -135,8 +135,16 @@ export const MobileNav: React.FC = () => {
               : 'text-slate-400 hover:text-slate-200 font-bold'
           }`}
         >
-          <Gamepad2 className="w-5 h-5" />
-          <span className="text-[11px] mt-0.5 font-medium">Trò Chơi</span>
+          <motion.div
+            animate={{
+              scale: activeModal === 'none' && !isChatOpen && !isMoreMenuOpen ? 1.15 : 1,
+            }}
+            transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+            className="flex items-center justify-center pointer-events-none"
+          >
+            <Gamepad2 className="w-5 h-5" />
+          </motion.div>
+          <span className="text-[11px] mt-0.5 font-medium pointer-events-none">Trò Chơi</span>
           {activeModal === 'none' && !isChatOpen && !isMoreMenuOpen && (
             <motion.span layoutId="activeTabIndicator" className="absolute bottom-0.5 w-6 h-1 bg-indigo-500 rounded-full" />
           )}
@@ -159,15 +167,21 @@ export const MobileNav: React.FC = () => {
               : 'text-slate-400 hover:text-slate-200 font-bold'
           }`}
         >
-          <div className="relative">
+          <motion.div
+            animate={{
+              scale: activeModal === 'inventory' ? 1.15 : 1,
+            }}
+            transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+            className="relative flex items-center justify-center pointer-events-none"
+          >
             <Package className="w-5 h-5" />
             {totalChests > 0 && (
               <span className="absolute -top-1 -right-2 bg-indigo-600 text-white font-extrabold text-[9px] px-1 rounded-full border border-[#0a0a12]">
                 {totalChests}
               </span>
             )}
-          </div>
-          <span className="text-[11px] mt-0.5 font-medium">Kho Đồ</span>
+          </motion.div>
+          <span className="text-[11px] mt-0.5 font-medium pointer-events-none">Kho Đồ</span>
           {activeModal === 'inventory' && (
             <motion.span layoutId="activeTabIndicator" className="absolute bottom-0.5 w-6 h-1 bg-indigo-500 rounded-full" />
           )}
@@ -190,8 +204,16 @@ export const MobileNav: React.FC = () => {
               : 'text-slate-400 hover:text-slate-200 font-bold'
           }`}
         >
-          <ShoppingBag className="w-5 h-5 text-amber-400" />
-          <span className="text-[11px] mt-0.5 font-medium">Cửa Hàng</span>
+          <motion.div
+            animate={{
+              scale: activeModal === 'shop' ? 1.15 : 1,
+            }}
+            transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+            className="flex items-center justify-center pointer-events-none"
+          >
+            <ShoppingBag className="w-5 h-5 text-amber-400" />
+          </motion.div>
+          <span className="text-[11px] mt-0.5 font-medium pointer-events-none">Cửa Hàng</span>
           {activeModal === 'shop' && (
             <motion.span layoutId="activeTabIndicator" className="absolute bottom-0.5 w-6 h-1 bg-amber-500 rounded-full" />
           )}
@@ -213,11 +235,17 @@ export const MobileNav: React.FC = () => {
               : 'text-slate-400 hover:text-slate-200 font-bold'
           }`}
         >
-          <div className="relative">
+          <motion.div
+            animate={{
+              scale: isChatOpen ? 1.15 : 1,
+            }}
+            transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+            className="relative flex items-center justify-center pointer-events-none"
+          >
             <MessageSquare className="w-5 h-5" />
             <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          </div>
-          <span className="text-[11px] mt-0.5 font-medium">Chat</span>
+          </motion.div>
+          <span className="text-[11px] mt-0.5 font-medium pointer-events-none">Chat</span>
           {isChatOpen && (
             <motion.span layoutId="activeTabIndicator" className="absolute bottom-0.5 w-6 h-1 bg-cyan-500 rounded-full" />
           )}
@@ -238,13 +266,19 @@ export const MobileNav: React.FC = () => {
               : 'text-slate-400 hover:text-slate-200 font-bold'
           }`}
         >
-          <div className="relative">
+          <motion.div
+            animate={{
+              scale: isMoreMenuOpen || isSubModalActive ? 1.15 : 1,
+            }}
+            transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+            className="relative flex items-center justify-center pointer-events-none"
+          >
             <LayoutGrid className="w-5 h-5" />
             {hasUnclaimedSubItems && (
               <span className="absolute -top-1 -right-1.5 w-2.5 h-2.5 bg-amber-400 rounded-full animate-ping" />
             )}
-          </div>
-          <span className="text-[11px] mt-0.5 font-medium">Menu</span>
+          </motion.div>
+          <span className="text-[11px] mt-0.5 font-medium pointer-events-none">Menu</span>
           {(isMoreMenuOpen || isSubModalActive) && (
             <motion.span layoutId="activeTabIndicator" className="absolute bottom-0.5 w-6 h-1 bg-amber-500 rounded-full" />
           )}

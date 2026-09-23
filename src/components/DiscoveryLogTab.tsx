@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { getRarityInfo } from '../utils/rarity';
 import { DEFAULT_LEGENDARY_BLUEPRINTS } from '../data/legendaryBlueprints';
+import { EmptyState } from './common/EmptyState';
 
 interface DiscoveryLogTabProps {
   onBackToLab: () => void;
@@ -274,19 +275,30 @@ export const DiscoveryLogTab: React.FC<DiscoveryLogTabProps> = ({ onBackToLab })
             </div>
           ))
         ) : (
-          <div className="text-center p-8 rounded-2xl bg-[#0c0d16] border border-white/5 my-auto">
-            <History className="w-10 h-10 mx-auto text-slate-600 mb-2" />
-            <p className="text-sm font-bold text-slate-300">Không có bản ghi nhật ký phù hợp</p>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              Hãy đặt các vật phẩm bậc thấp vào Bình Luyện Kim để tiến hành thí nghiệm khám phá công thức đầu tiên!
-            </p>
-            <button
-              type="button"
-              onClick={onBackToLab}
-              className="mt-4 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs font-bold transition-all cursor-pointer"
-            >
-              Vào Phòng Khám Phá Ngay
-            </button>
+          <div className="py-4 my-auto">
+            <EmptyState
+              id="empty-discovery-log"
+              icon={<History className="w-8 h-8 text-purple-400" />}
+              badge="LỊCH SỬ THÍ NGHIỆM"
+              badgeColor="text-purple-300 border-purple-500/30 bg-purple-500/15"
+              title="Chưa Có Nhật Ký Thí Nghiệm"
+              description="Hãy kết hợp 3 vật phẩm bất kỳ trong Bình Luyện Kim để thử nghiệm công thức và mở khóa các bản thiết kế Hoàng Kim!"
+              tip="Mẹo: Mỗi lần thử nghiệm đều được ghi lại tỉ mỉ tại đây giúp bạn theo dõi tỷ lệ thành công."
+              primaryAction={{
+                label: 'Vào Phòng Khám Phá',
+                onClick: onBackToLab,
+                icon: <FlaskConical className="w-3.5 h-3.5" />,
+                variant: 'purple',
+              }}
+              secondaryAction={
+                filterType !== 'all'
+                  ? {
+                      label: 'Xem Tất Cả Bản Ghi',
+                      onClick: () => setFilterType('all'),
+                    }
+                  : undefined
+              }
+            />
           </div>
         )}
       </div>

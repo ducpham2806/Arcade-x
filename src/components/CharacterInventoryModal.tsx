@@ -19,6 +19,7 @@ import { useScrollLock } from '../hooks/useScrollLock';
 import { getRarityInfo, getRaritySlotBoxStyle, RARITIES, RARITY_ORDER, getRaritySlotStyle, RarityBadge, getItemSlot, SLOT_INFO, isItemRecommended } from '../utils/rarity';
 import { getUnlockedTitles, calculateOverallPlayerElo } from '../utils/eloRankSystem';
 import { LootBoxOpeningModal } from './LootBoxOpeningModal';
+import { EmptyState } from './common/EmptyState';
 
 type FilterCategory = 'all' | 'weapons' | 'skins' | 'consumables' | 'materials' | 'titles';
 
@@ -46,6 +47,35 @@ export const CharacterInventoryModal: React.FC = () => {
   const [hoveredItem, setHoveredItem] = useState<any | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [openingResult, setOpeningResult] = useState<ChestOpenResult | null>(null);
+
+  const [mobileView, setMobileView] = useState<'bag' | 'character'>('bag');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Auto-Equip Best Gear across all eligible slots
+  const handleAutoEquipBest = () => {
+    soundEngine.play('powerup');
+    const targetSlots: EquipmentSlot[] = ['weapon', 'armor', 'helmet', 'ship', 'blade', 'necklace', 'ringLeft', 'ringRight'];
+    let equippedCount = 0;
+
+    targetSlots.forEach((slot) => {
+      const candidates = ownedItems.filter((item) => getItemSlot(item) === slot);
+      if (candidates.length > 0) {
+        candidates.sort((a, b) => {
+          const tierA = RARITY_ORDER.indexOf(a.rarity as any);
+          const tierB = RARITY_ORDER.indexOf(b.rarity as any);
+          return tierB - tierA;
+        });
+        const best = candidates[0];
+        if (best && !best.equipped) {
+          equipItem(best.id);
+          equippedCount++;
+        }
+      }
+    });
+
+    setToastMessage(equippedCount > 0 ? `Đã tự động trang bị ${equippedCount} vật phẩm tối ưu!` : 'Tất cả vị trí đã là trang bị mạnh nhất!');
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   // Close on Escape key press
   useEffect(() => {
@@ -84,6 +114,8 @@ export const CharacterInventoryModal: React.FC = () => {
         unlockedAt: Date.now(),
       }));
   }, [chestCounts]);
+
+  const totalChests = useMemo(() => chestVirtualItems.reduce((acc, c) => acc + (c.count || 0), 0), [chestVirtualItems]);
 
   // Filtered owned real items
   const ownedItems = useMemo(() => items.filter(i => i.count > 0), [items]);
@@ -274,8 +306,66 @@ export const CharacterInventoryModal: React.FC = () => {
               </span>
             </div>
           </div>
+
+          {/* Mobile View Switcher (Hidden on Desktop) */}
+          <div role="tablist" aria-label="Chế độ hiển thị" className="flex lg:hidden bg-black/50 p-1 rounded-xl border border-white/10 shrink-0 select-none">
+            <button
+              id="tab-mobile-view-bag"
+              type="button"
+              role="tab"
+              aria-selected={mobileView === 'bag'}
+              onClick={() => {
+                soundEngine.play('click');
+                setMobileView('bag');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer touch-manipulation select-none flex items-center gap-1.5 border ${
+                mobileView === 'bag'
+                  ? 'bg-indigo-600 text-white border-indigo-400/50 shadow'
+                  : 'text-slate-400 hover:text-white border-transparent'
+              }`}
+            >
+              <motion.span
+                animate={{ scale: mobileView === 'bag' ? 1.15 : 1 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+                className="pointer-events-none inline-block text-sm"
+              >
+                🎒
+              </motion.span>
+              <span className="pointer-events-none">Túi Đồ</span>
+              {totalChests > 0 && (
+                <span className="pointer-events-none text-[10px] px-1.5 py-0.2 rounded-full bg-black/40 text-amber-300 font-mono font-bold">
+                  {totalChests}
+                </span>
+              )}
+            </button>
+            <button
+              id="tab-mobile-view-char"
+              type="button"
+              role="tab"
+              aria-selected={mobileView === 'character'}
+              onClick={() => {
+                soundEngine.play('click');
+                setMobileView('character');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer touch-manipulation select-none flex items-center gap-1.5 border ${
+                mobileView === 'character'
+                  ? 'bg-indigo-600 text-white border-indigo-400/50 shadow'
+                  : 'text-slate-400 hover:text-white border-transparent'
+              }`}
+            >
+              <motion.span
+                animate={{ scale: mobileView === 'character' ? 1.15 : 1 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+                className="pointer-events-none inline-block text-sm"
+              >
+                ⚔️
+              </motion.span>
+              <span className="pointer-events-none">Nhân Vật</span>
+            </button>
+          </div>
+
           <div className="flex items-center gap-2 shrink-0">
-            {/* Cloud Sync Button (Icon Only) */}
+            {/* Cloud Sync Button */}
             <button
               type="button"
               onClick={() => manualSyncInventory()}
@@ -300,7 +390,7 @@ export const CharacterInventoryModal: React.FC = () => {
               )}
             </button>
 
-            {/* Shop Button (Icon Only) */}
+            {/* Shop Button */}
             <button
               type="button"
               onClick={() => setActiveModal('shop')}
@@ -313,55 +403,87 @@ export const CharacterInventoryModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content Area: Persistent Top Equipment Section & Bottom Inventory List */}
-        <div className="flex-1 flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto bg-[#090a12]">
+        {/* Floating Feedback Toast */}
+        {toastMessage && (
+          <div className="absolute top-14 left-1/2 -translate-x-1/2 z-50 bg-indigo-600 text-white px-4 py-2 rounded-xl shadow-2xl font-bold text-xs flex items-center gap-2 border border-indigo-400 animate-in fade-in slide-in-from-top-2">
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+
+        {/* Main Content Area: Responsive 2-Column Split (Desktop) or View Tab (Mobile) */}
+        <div className="flex-1 flex flex-col lg:flex-row gap-3.5 p-3 sm:p-5 overflow-y-auto bg-[#090a12] min-h-0">
           
           {/* ========================================================================= */}
-          {/* PERSISTENT TOP SECTION: ACTIVE GEAR (10 SLOTS) & CHARACTER STATS         */}
+          {/* COLUMN 1: CHARACTER LOADOUT, STATS & 10 GEAR SLOTS                        */}
           {/* ========================================================================= */}
-          <div className="bg-[#121522] rounded-2xl border border-white/10 p-3.5 sm:p-4 shadow-xl shrink-0 flex flex-col gap-3">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-white/10">
+          <div className={`bg-[#121522] rounded-2xl border border-white/10 p-3.5 sm:p-4 shadow-xl shrink-0 flex flex-col gap-3 ${
+            mobileView === 'character' ? 'flex w-full' : 'hidden lg:flex lg:w-[340px] xl:w-[380px]'
+          }`}>
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold" title="Trang Bị Đang Mặc (Active Gear)">
+                <div className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold" title="Trang Bị Đang Mặc">
                   ⚔️
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-black px-2 py-0.5 rounded bg-black/40 text-indigo-300 border border-indigo-500/30">
-                    {profile.username} • Lv.{profile.level}
-                  </span>
+                <div>
+                  <h3 className="text-xs font-extrabold text-white uppercase tracking-wider">Trang Bị Đang Mặc</h3>
+                  <p className="text-[10px] text-slate-400">10 vị trí cường hóa</p>
                 </div>
               </div>
 
-              {/* Combat Attributes Quick Summary (Icon Only) */}
-              <div className="grid grid-cols-4 gap-2 text-center text-xs font-bold w-full md:w-auto">
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="Sức Tấn Công (ATK)">
-                  <Sword className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                  <span className="text-white font-mono">{stats.atk}</span>
+              {/* Quick Auto-Equip Button */}
+              <button
+                type="button"
+                onClick={handleAutoEquipBest}
+                className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold text-[11px] flex items-center gap-1 shadow-md shadow-indigo-600/30 transition-all cursor-pointer active:scale-95"
+                title="Tự động tìm và mặc những vật phẩm có chỉ số cao nhất trong túi"
+              >
+                <Zap className="w-3.5 h-3.5 text-amber-300" />
+                <span>Mặc Tốt Nhất</span>
+              </button>
+            </div>
+
+            {/* Combat Attributes Quick Summary */}
+            <div className="grid grid-cols-4 gap-1.5 text-center text-xs font-bold">
+              <div className="bg-black/50 p-2 rounded-xl border border-white/5 flex flex-col items-center justify-center" title="Sức Tấn Công (ATK)">
+                <div className="flex items-center gap-1 text-[10px] text-rose-400 mb-0.5">
+                  <Sword className="w-3 h-3" />
+                  <span>ATK</span>
                 </div>
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="Phòng Thủ (DEF)">
-                  <Shield className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                  <span className="text-white font-mono">{stats.def}</span>
+                <span className="text-white font-mono font-extrabold">{stats.atk}</span>
+              </div>
+              <div className="bg-black/50 p-2 rounded-xl border border-white/5 flex flex-col items-center justify-center" title="Phòng Thủ (DEF)">
+                <div className="flex items-center gap-1 text-[10px] text-blue-400 mb-0.5">
+                  <Shield className="w-3 h-3" />
+                  <span>DEF</span>
                 </div>
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="Tốc Độ (+Speed%)">
-                  <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="text-white font-mono">+{stats.speed}%</span>
+                <span className="text-white font-mono font-extrabold">{stats.def}</span>
+              </div>
+              <div className="bg-black/50 p-2 rounded-xl border border-white/5 flex flex-col items-center justify-center" title="Tốc Độ (+Speed%)">
+                <div className="flex items-center gap-1 text-[10px] text-emerald-400 mb-0.5">
+                  <Zap className="w-3 h-3" />
+                  <span>SPD</span>
                 </div>
-                <div className="bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 flex items-center justify-center gap-1.5" title="May Mắn (+Luck%)">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span className="text-white font-mono">+{stats.luck}%</span>
+                <span className="text-white font-mono font-extrabold">+{stats.speed}%</span>
+              </div>
+              <div className="bg-black/50 p-2 rounded-xl border border-white/5 flex flex-col items-center justify-center" title="May Mắn (+Luck%)">
+                <div className="flex items-center gap-1 text-[10px] text-amber-400 mb-0.5">
+                  <Sparkles className="w-3 h-3" />
+                  <span>LUCK</span>
                 </div>
+                <span className="text-white font-mono font-extrabold">+{stats.luck}%</span>
               </div>
             </div>
 
-            {/* 10 Equipment Slots Horizontal / Grid Bar (Icon Focus, Tooltips) */}
-            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+            {/* 10 Equipment Slots (2 columns of 5 slots) */}
+            <div className="grid grid-cols-2 gap-2 flex-1 overflow-y-auto pr-1">
               {[
                 { name: 'Vũ Khí', item: equippedWeapon, icon: '⚔️', desc: 'Vũ khí chính' },
                 { name: 'Y Phục', item: equippedArmor, icon: '🏃', desc: 'Trang phục & Giáp' },
                 { name: 'Mũ/Nón', item: equippedHelmet, icon: '👑', desc: 'Mũ giáp chiến binh' },
-                { name: 'Tàu Không Gian', item: equippedShip, icon: '🚀', desc: 'Phi thuyền chiến đấu' },
+                { name: 'Phi Thuyền', item: equippedShip, icon: '🚀', desc: 'Tàu chiến không gian' },
                 { name: 'Kiếm Laser', item: equippedBlade, icon: '⚡', desc: 'Vũ khí năng lượng' },
-                { name: 'Dây Chuyền', item: equippedNecklace, icon: '📿', desc: 'Dây chuyền & Bùa' },
+                { name: 'Dây Chuyền', item: equippedNecklace, icon: '📿', desc: 'Dây chuyền ma thuật' },
                 { name: 'Nhẫn Trái', item: equippedRingLeft, icon: '💍', desc: 'Nhẫn ngón trái' },
                 { name: 'Nhẫn Phải', item: equippedRingRight, icon: '💍', desc: 'Nhẫn ngón phải' },
                 { name: 'Avatar', item: equippedAvatar, icon: profile.avatar, desc: 'Ảnh đại diện' },
@@ -378,33 +500,36 @@ export const CharacterInventoryModal: React.FC = () => {
                       }
                     }}
                     style={{
-                      borderColor: slot.item ? rarityInfo.hex : 'rgba(255,255,255,0.1)',
+                      borderColor: slot.item ? rarityInfo.hex : 'rgba(255,255,255,0.08)',
                     }}
-                    className={`aspect-square rounded-xl bg-black/75 border-2 flex flex-col items-center justify-center p-1 relative transition-all group ${slot.item ? 'cursor-pointer hover:scale-105 hover:border-indigo-400 shadow-md' : 'opacity-60'}`}
-                    title={`${slot.name}: ${slot.item?.name || slot.desc}`}
+                    className={`p-2 rounded-xl bg-black/60 border flex items-center gap-2.5 transition-all group relative ${
+                      slot.item
+                        ? 'cursor-pointer hover:border-indigo-400 hover:bg-black/90 shadow'
+                        : 'border-dashed opacity-70'
+                    }`}
                   >
-                    <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">
+                    <div className="w-9 h-9 rounded-lg bg-black/50 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
                       {slot.item?.icon || slot.icon}
-                    </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] text-slate-400 font-bold uppercase truncate">{slot.name}</div>
+                      <div className="text-xs font-bold text-white truncate" style={{ color: slot.item ? rarityInfo.hex : '#94a3b8' }}>
+                        {slot.item?.name || 'Chưa trang bị'}
+                      </div>
+                    </div>
                     {slot.item && (
-                      <>
-                        <span
-                          className="absolute top-1 right-1 w-2 h-2 rounded-full shadow"
-                          style={{ background: rarityInfo.hex }}
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            soundEngine.play('click');
-                            unequipItem(slot.item.id);
-                          }}
-                          className="absolute bottom-1 left-1 right-1 bg-red-600/90 hover:bg-red-500 text-white font-black text-[9px] py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-0.5 opacity-0 group-hover:opacity-100 z-20"
-                          title="Tháo nhanh"
-                        >
-                          <span>✕</span>
-                        </button>
-                      </>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          soundEngine.play('click');
+                          unequipItem(slot.item.id);
+                        }}
+                        className="w-5 h-5 rounded bg-rose-600/80 hover:bg-rose-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 transition-opacity"
+                        title="Tháo trang bị"
+                      >
+                        ✕
+                      </button>
                     )}
                   </div>
                 );
@@ -413,69 +538,217 @@ export const CharacterInventoryModal: React.FC = () => {
           </div>
 
           {/* ========================================================================= */}
-          {/* BOTTOM SECTION: INVENTORY LIST / OWNED ITEMS (HÀNH TRANG SỞ HỮU)          */}
+          {/* COLUMN 2: BAG, QUICK CHESTS & INVENTORY ITEMS GRID                        */}
           {/* ========================================================================= */}
-          <div className="flex-1 bg-[#121522] rounded-2xl border border-white/10 p-4 flex flex-col gap-3 shadow-xl">
-            {/* Top Toolbar: Categories & Sort & Slot Counter */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
-              {/* Category Tabs: Grid layout, NO horizontal scroll */}
-              <div className="grid grid-cols-6 gap-1 bg-[#0e1017] p-1 rounded-xl border border-white/10 w-full sm:w-auto">
+          <div className={`flex-1 bg-[#121522] rounded-2xl border border-white/10 p-3.5 sm:p-4 shadow-xl flex flex-col gap-3 min-w-0 ${
+            mobileView === 'bag' ? 'flex' : 'hidden lg:flex'
+          }`}>
+            
+            {/* Quick Chests Banner (Displays when user has chests to open) */}
+            {totalChests > 0 && (
+              <div className="bg-gradient-to-r from-amber-950/60 via-amber-900/30 to-[#161426] border border-amber-500/40 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-lg shadow-amber-500/5 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shrink-0 animate-bounce">
+                    🎁
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-black text-amber-300">
+                      Bạn có {totalChests} Rương Báu đang chờ mở!
+                    </h4>
+                    <p className="text-[11px] text-amber-200/80">
+                      Mở để nhận Vàng, Kim Cương và trang bị hiếm
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-end">
+                  {chestVirtualItems.map((chest) => (
+                    <button
+                      key={`quick-chest-${chest.id}`}
+                      type="button"
+                      onClick={() => setSelectedChest(chest)}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 font-extrabold text-xs flex items-center gap-1 transition-colors cursor-pointer active:scale-95 touch-manipulation select-none"
+                      title={`Mở ${chest.name}`}
+                    >
+                      <span className="pointer-events-none">{chest.icon}</span>
+                      <span className="pointer-events-none">x{chest.count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Category Segmented Tabs Bar: Fixed 6-column Grid on all devices (No cut-off, No side-scroll jump) */}
+            <div className="flex flex-col gap-2 pb-2.5 border-b border-white/10 shrink-0">
+              {/* 6-Column Icon-First Grid */}
+              <div
+                role="tablist"
+                aria-label="Phân loại rương đồ"
+                className="grid grid-cols-6 gap-1 sm:gap-1.5 bg-[#0a0c16] p-1 sm:p-1.5 rounded-2xl border border-white/10 shadow-inner w-full shrink-0"
+              >
                 {[
-                  { id: 'all' as FilterCategory, label: 'Tất Cả', icon: <Package className="w-4 h-4" />, count: counts.all },
-                  { id: 'weapons' as FilterCategory, label: 'Trang Bị', icon: <Sword className="w-4 h-4 text-indigo-400" />, count: counts.weapons },
-                  { id: 'skins' as FilterCategory, label: 'Skins', icon: <ShoppingBag className="w-4 h-4 text-amber-400" />, count: counts.skins },
-                  { id: 'consumables' as FilterCategory, label: 'Tiêu Hao', icon: <FlaskConical className="w-4 h-4 text-amber-400" />, count: counts.consumables },
-                  { id: 'materials' as FilterCategory, label: 'Vật Liệu', icon: <Layers className="w-4 h-4 text-purple-400" />, count: counts.materials },
-                  { id: 'titles' as FilterCategory, label: 'Danh Hiệu', icon: <Award className="w-4 h-4 text-emerald-400" />, count: counts.titles },
-                ].map(cat => (
-                  <button
-                    key={`inv-cat-${cat.id}`}
-                    type="button"
-                    title={`${cat.label} (${cat.count})`}
-                    onClick={() => {
-                      soundEngine.play('click');
-                      setFilterCategory(cat.id);
-                    }}
-                    className={`flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                      filterCategory === cat.id
-                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30'
-                        : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border-white/5'
-                    }`}
-                  >
-                    {cat.icon}
-                    <span className="text-[10px] px-1 py-0.2 rounded-full bg-black/40 text-slate-300 font-mono font-bold">
-                      {cat.count}
-                    </span>
-                  </button>
-                ))}
+                  {
+                    id: 'all' as FilterCategory,
+                    label: 'Tất Cả',
+                    icon: <Package className="w-4 h-4 pointer-events-none" />,
+                    activeStyle: 'bg-indigo-600 text-white border-indigo-400/60 shadow-md shadow-indigo-600/30',
+                    iconColor: 'text-indigo-400',
+                    count: counts.all,
+                  },
+                  {
+                    id: 'weapons' as FilterCategory,
+                    label: 'Trang Bị',
+                    icon: <Sword className="w-4 h-4 pointer-events-none" />,
+                    activeStyle: 'bg-blue-600 text-white border-blue-400/60 shadow-md shadow-blue-600/30',
+                    iconColor: 'text-blue-400',
+                    count: counts.weapons,
+                  },
+                  {
+                    id: 'skins' as FilterCategory,
+                    label: 'Skins',
+                    icon: <ShoppingBag className="w-4 h-4 pointer-events-none" />,
+                    activeStyle: 'bg-amber-600 text-white border-amber-400/60 shadow-md shadow-amber-600/30',
+                    iconColor: 'text-amber-400',
+                    count: counts.skins,
+                  },
+                  {
+                    id: 'consumables' as FilterCategory,
+                    label: 'Tiêu Hao',
+                    icon: <FlaskConical className="w-4 h-4 pointer-events-none" />,
+                    activeStyle: 'bg-emerald-600 text-white border-emerald-400/60 shadow-md shadow-emerald-600/30',
+                    iconColor: 'text-emerald-400',
+                    count: counts.consumables,
+                  },
+                  {
+                    id: 'materials' as FilterCategory,
+                    label: 'Vật Liệu',
+                    icon: <Layers className="w-4 h-4 pointer-events-none" />,
+                    activeStyle: 'bg-purple-600 text-white border-purple-400/60 shadow-md shadow-purple-600/30',
+                    iconColor: 'text-purple-400',
+                    count: counts.materials,
+                  },
+                  {
+                    id: 'titles' as FilterCategory,
+                    label: 'Danh Hiệu',
+                    icon: <Award className="w-4 h-4 pointer-events-none" />,
+                    activeStyle: 'bg-rose-600 text-white border-rose-400/60 shadow-md shadow-rose-600/30',
+                    iconColor: 'text-rose-400',
+                    count: counts.titles,
+                  },
+                ].map((cat) => {
+                  const isActive = filterCategory === cat.id;
+                  return (
+                    <button
+                      key={`inv-cat-${cat.id}`}
+                      id={`inv-cat-tab-${cat.id}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      title={`${cat.label} (${cat.count})`}
+                      onClick={() => {
+                        soundEngine.play('click');
+                        setFilterCategory(cat.id);
+                      }}
+                      className={`min-h-[46px] sm:min-h-[48px] flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1 sm:px-2 py-1 sm:py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer border select-none touch-manipulation relative ${
+                        isActive
+                          ? cat.activeStyle
+                          : 'bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.08] border-transparent'
+                      }`}
+                    >
+                      <motion.div
+                        animate={{
+                          scale: isActive ? 1.15 : 1,
+                        }}
+                        transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+                        className="relative flex items-center justify-center pointer-events-none"
+                      >
+                        <span className={isActive ? 'text-white' : cat.iconColor}>
+                          {cat.icon}
+                        </span>
+                        {/* Mobile Micro Count Badge on Icon */}
+                        <span
+                          className={`sm:hidden absolute -top-1.5 -right-2.5 text-[8px] font-mono font-black px-1 py-0 rounded-full border leading-tight ${
+                            isActive
+                              ? 'bg-black/60 text-white border-white/30'
+                              : 'bg-[#151726] text-slate-300 border-white/10'
+                          }`}
+                        >
+                          {cat.count}
+                        </span>
+                      </motion.div>
+                      <span className="pointer-events-none text-[9px] sm:text-xs font-bold truncate max-w-full leading-tight">
+                        {cat.label}
+                      </span>
+                      {/* Desktop Pill Count Badge */}
+                      <span
+                        className={`hidden sm:inline-block pointer-events-none text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold border ${
+                          isActive
+                            ? 'bg-black/40 text-white border-white/20'
+                            : 'bg-black/30 text-slate-400 border-white/5'
+                        }`}
+                      >
+                        {cat.count}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* Slot Counter & Icon Sort */}
-              <div className="flex items-center gap-2 justify-end">
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#0e1017] border border-white/10 rounded-xl text-[11px] text-slate-300 font-mono">
-                  <Package className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>{chestVirtualItems.length + ownedItems.length}/100</span>
+              {/* Secondary Sub-toolbar: Search Input & Item Counter & Sort Button */}
+              <div className="flex items-center justify-between gap-2">
+                {/* Search Input */}
+                <div className="relative flex-1 max-w-[200px] sm:max-w-xs">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Tìm trong rương..."
+                    className="w-full bg-[#0a0c16] border border-white/10 focus:border-indigo-500 rounded-xl pl-8 pr-6 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none transition-colors"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs px-0.5 touch-manipulation cursor-pointer"
+                      title="Xóa tìm kiếm"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundEngine.play('click');
-                    if (sortBy === 'rarity-desc') setSortBy('rarity-asc');
-                    else if (sortBy === 'rarity-asc') setSortBy('name');
-                    else setSortBy('rarity-desc');
-                  }}
-                  className="bg-[#0e1017] border border-white/10 hover:border-indigo-500 p-2 rounded-xl text-white transition-all cursor-pointer flex items-center justify-center shadow"
-                  title={`Sắp xếp: ${sortBy === 'rarity-desc' ? 'Phẩm chất (Cao đến thấp)' : sortBy === 'rarity-asc' ? 'Phẩm chất (Thấp đến cao)' : 'Tên (A-Z)'}`}
-                >
-                  <ArrowUpDown className="w-4 h-4 text-indigo-400" />
-                </button>
+
+                {/* Counter & Sort Controls */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#0a0c16] border border-white/10 rounded-xl text-[11px] text-slate-300 font-mono">
+                    <Package className="w-3.5 h-3.5 text-indigo-400 pointer-events-none" />
+                    <span className="pointer-events-none font-bold">{allGridItems.length} món</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundEngine.play('click');
+                      if (sortBy === 'rarity-desc') setSortBy('rarity-asc');
+                      else if (sortBy === 'rarity-asc') setSortBy('name');
+                      else setSortBy('rarity-desc');
+                    }}
+                    className="bg-[#0a0c16] border border-white/10 hover:border-indigo-500 px-2.5 py-1.5 rounded-xl text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow touch-manipulation select-none"
+                    title={`Sắp xếp: ${sortBy === 'rarity-desc' ? 'Phẩm chất (Cao đến thấp)' : sortBy === 'rarity-asc' ? 'Phẩm chất (Thấp đến cao)' : 'Tên (A-Z)'}`}
+                  >
+                    <ArrowUpDown className="w-3.5 h-3.5 text-indigo-400 pointer-events-none" />
+                    <span className="hidden sm:inline pointer-events-none text-xs font-bold text-slate-300">
+                      {sortBy === 'rarity-desc' ? 'Phẩm chất ↓' : sortBy === 'rarity-asc' ? 'Phẩm chất ↑' : 'Tên A-Z'}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Inventory Items Grid */}
-            <div className="flex-1 overflow-y-auto min-h-[260px] max-h-[420px] pr-1">
+            <div className="flex-1 overflow-y-auto min-h-[260px] pr-1">
               {allGridItems.length > 0 ? (
-                <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2">
                   {allGridItems.map((item: any) => {
                     const isChestItem = item.isChest;
                     const isSkinTheme = filterCategory === 'skins' || item.previewType;
@@ -493,7 +766,7 @@ export const CharacterInventoryModal: React.FC = () => {
                           }
                         }}
                         style={getRaritySlotBoxStyle(item.rarity, false, isSkinEquipped)}
-                        className={`p-1.5 rounded-xl border flex flex-col items-center text-center transition-all cursor-pointer group relative ${getRaritySlotStyle(item.rarity, false, isSkinEquipped)} ${isSkinEquipped ? 'border-indigo-400' : ''}`}
+                        className={`p-2 rounded-xl border flex flex-col items-center text-center transition-all cursor-pointer group relative ${getRaritySlotStyle(item.rarity, false, isSkinEquipped)} ${isSkinEquipped ? 'border-indigo-400' : ''}`}
                       >
                         {isSkinEquipped && (
                           <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md z-20" title="Đang sử dụng">
@@ -521,21 +794,21 @@ export const CharacterInventoryModal: React.FC = () => {
                           </div>
                         )}
 
-                        <div className="text-2xl my-0.5 group-hover:scale-110 transition-transform">
+                        <div className="text-3xl my-1 group-hover:scale-110 transition-transform">
                           {item.icon}
                         </div>
 
-                        <span className="text-[10px] font-bold text-white truncate w-full mt-0.5">
+                        <span className="text-[11px] font-bold text-white truncate w-full mt-0.5">
                           {item.name}
                         </span>
 
                         {isChestItem && (
                           <button
                             type="button"
-                            className="mt-1 w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs py-0.5 rounded shadow transition-all flex items-center justify-center"
+                            className="mt-1.5 w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-[10px] py-1 rounded shadow transition-all flex items-center justify-center gap-1"
                             title="Mở Rương Vật Phẩm"
                           >
-                            🎁
+                            <span>Mở Rương</span>
                           </button>
                         )}
 
@@ -547,10 +820,10 @@ export const CharacterInventoryModal: React.FC = () => {
                               soundEngine.play('powerup');
                               equipItem(item.id);
                             }}
-                            className="mt-1 w-full bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center"
+                            className="mt-1.5 w-full bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-[10px] py-1 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-1"
                             title="Trang bị giao diện này"
                           >
-                            🎨
+                            <span>Dùng Skin</span>
                           </button>
                         )}
 
@@ -562,18 +835,18 @@ export const CharacterInventoryModal: React.FC = () => {
                               soundEngine.play('powerup');
                               updateTitle(item.name);
                             }}
-                            className="mt-1 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center"
+                            className="mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] py-1 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-1"
                             title="Sử dụng danh hiệu này"
                           >
-                            👑
+                            <span>Đeo Danh Hiệu</span>
                           </button>
                         )}
                         {item.isTitleMilestone && item.equipped && (
                           <span
-                            className="mt-1 w-full bg-indigo-600/50 text-indigo-200 font-extrabold text-xs py-0.5 rounded flex items-center justify-center mt-auto"
+                            className="mt-1.5 w-full bg-indigo-600/50 text-indigo-200 font-extrabold text-[10px] py-1 rounded flex items-center justify-center"
                             title="Đang Sử Dụng Danh Hiệu"
                           >
-                            <Check className="w-3 h-3 text-emerald-300" />
+                            <Check className="w-3 h-3 text-emerald-300 mr-1" /> Đang Dùng
                           </span>
                         )}
 
@@ -585,10 +858,10 @@ export const CharacterInventoryModal: React.FC = () => {
                               soundEngine.play('powerup');
                               equipItem(item.id);
                             }}
-                            className="mt-1 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-0.5 rounded shadow transition-all cursor-pointer flex items-center justify-center"
+                            className="mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] py-1 rounded shadow transition-all cursor-pointer flex items-center justify-center gap-1"
                             title="Mặc ngay"
                           >
-                            ⚔️
+                            <span>Mặc Ngay</span>
                           </button>
                         )}
                       </div>
@@ -596,17 +869,157 @@ export const CharacterInventoryModal: React.FC = () => {
                   })}
                 </div>
               ) : (
-                <div className="text-center p-12 rounded-2xl bg-[#0e1017] border border-white/5 text-slate-400 my-auto flex flex-col items-center justify-center h-full">
-                  <Package className="w-10 h-10 text-slate-600 mb-2 animate-pulse" />
-                  <p className="text-xs text-slate-500 max-w-xs">
-                    Hành trang trống
-                  </p>
+                <div className="flex-1 flex items-center justify-center py-4">
+                  {searchQuery ? (
+                    <EmptyState
+                      id="empty-inventory-search"
+                      icon={<Search className="w-8 h-8 text-indigo-400" />}
+                      badge="TÌM KIẾM"
+                      badgeColor="text-indigo-300 border-indigo-500/30 bg-indigo-500/15"
+                      title="Không Tìm Thấy Vật Phẩm"
+                      description={`Không có vật phẩm nào khớp với từ khóa "${searchQuery}". Hãy thử tìm kiếm với tên khác hoặc xóa từ khóa.`}
+                      primaryAction={{
+                        label: 'Xóa Tìm Kiếm',
+                        onClick: () => setSearchQuery(''),
+                        icon: <RotateCcw className="w-3.5 h-3.5" />,
+                        variant: 'indigo',
+                      }}
+                      secondaryAction={{
+                        label: 'Xem Tất Cả',
+                        onClick: () => {
+                          setSearchQuery('');
+                          setFilterCategory('all');
+                        },
+                      }}
+                    />
+                  ) : filterCategory === 'weapons' ? (
+                    <EmptyState
+                      id="empty-inventory-weapons"
+                      icon={<Sword className="w-8 h-8 text-blue-400" />}
+                      badge="KHO TRANG BỊ"
+                      badgeColor="text-blue-300 border-blue-500/30 bg-blue-500/15"
+                      title="Chưa Có Trang Bị Vũ Khí"
+                      description="Túi trang bị chiến đấu của bạn hiện đang trống. Hãy mở Rương Báu hoặc Dung Hợp trang bị tại Lò Rèn Ma Thuật!"
+                      tip="Mẹo: Đạt điểm số cao hoặc chuỗi thắng trong trò chơi để nhận miễn phí rương Sử Thi & Huyền Thoại."
+                      primaryAction={{
+                        label: 'Đến Lò Rèn Ma Thuật',
+                        onClick: () => setActiveModal('crafting'),
+                        icon: <Hammer className="w-3.5 h-3.5" />,
+                        variant: 'purple',
+                      }}
+                      secondaryAction={{
+                        label: 'Xem Tất Cả Vật Phẩm',
+                        onClick: () => setFilterCategory('all'),
+                      }}
+                    />
+                  ) : filterCategory === 'skins' ? (
+                    <EmptyState
+                      id="empty-inventory-skins"
+                      icon={<ShoppingBag className="w-8 h-8 text-amber-400" />}
+                      badge="BỘ SƯU TẬP SKINS"
+                      badgeColor="text-amber-300 border-amber-500/30 bg-amber-500/15"
+                      title="Chưa Mở Khóa Skin Nào"
+                      description="Khám phá các trang phục và hiệu ứng độc quyền trong Cửa Hàng Arcade hoặc quay thưởng mỗi ngày!"
+                      tip="Mẹo: Đổi Arcade Coins tích lũy qua từng trận đấu để mở khóa bộ skin chủ đề yêu thích."
+                      primaryAction={{
+                        label: 'Ghé Cửa Hàng Arcade',
+                        onClick: () => setActiveModal('shop'),
+                        icon: <ShoppingBag className="w-3.5 h-3.5" />,
+                        variant: 'amber',
+                      }}
+                      secondaryAction={{
+                        label: 'Xem Tất Cả Vật Phẩm',
+                        onClick: () => setFilterCategory('all'),
+                      }}
+                    />
+                  ) : filterCategory === 'consumables' ? (
+                    <EmptyState
+                      id="empty-inventory-consumables"
+                      icon={<FlaskConical className="w-8 h-8 text-emerald-400" />}
+                      badge="DƯỢC PHẨM & BÙA CHÚ"
+                      badgeColor="text-emerald-300 border-emerald-500/30 bg-emerald-500/15"
+                      title="Túi Dược Phẩm Trống"
+                      description="Thuốc tăng EXP, hồi sinh và bình thể lực có thể nhận qua Sổ Nhiệm Vụ Hàng Ngày hoặc đổi tại Cửa Hàng."
+                      tip="Mẹo: Đăng nhập đều đặn 7 ngày liên tiếp để nhận Gói Dược Phẩm Thần Thánh miễn phí."
+                      primaryAction={{
+                        label: 'Xem Sổ Nhiệm Vụ',
+                        onClick: () => setActiveModal('quests'),
+                        icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+                        variant: 'emerald',
+                      }}
+                      secondaryAction={{
+                        label: 'Xem Tất Cả Vật Phẩm',
+                        onClick: () => setFilterCategory('all'),
+                      }}
+                    />
+                  ) : filterCategory === 'materials' ? (
+                    <EmptyState
+                      id="empty-inventory-materials"
+                      icon={<Layers className="w-8 h-8 text-purple-400" />}
+                      badge="NGUYÊN LIỆU LUYỆN KIM"
+                      badgeColor="text-purple-300 border-purple-500/30 bg-purple-500/15"
+                      title="Chưa Có Đá & Vật Liệu Rèn"
+                      description="Đá cường hóa, phôi kim loại và cuộn bảo hộ dùng để dung hợp nâng cấp trang bị tại Lò Rèn."
+                      tip="Mẹo: Mở rương đồng và bạc để thu thập đá nguyên liệu cơ bản dồi dào nhất."
+                      primaryAction={{
+                        label: 'Đến Lò Rèn Ma Thuật',
+                        onClick: () => setActiveModal('crafting'),
+                        icon: <Hammer className="w-3.5 h-3.5" />,
+                        variant: 'purple',
+                      }}
+                      secondaryAction={{
+                        label: 'Xem Tất Cả Vật Phẩm',
+                        onClick: () => setFilterCategory('all'),
+                      }}
+                    />
+                  ) : filterCategory === 'titles' ? (
+                    <EmptyState
+                      id="empty-inventory-titles"
+                      icon={<Award className="w-8 h-8 text-rose-400" />}
+                      badge="DANH HIỆU CAO QUÝ"
+                      badgeColor="text-rose-300 border-rose-500/30 bg-rose-500/15"
+                      title="Chưa Mở Khóa Danh Hiệu"
+                      description="Hoàn thành các chiến tích arcade phi thường để mở khóa danh hiệu hiển thị vinh danh trên hồ sơ của bạn!"
+                      tip="Mẹo: Thắng 5 trận liên tiếp hoặc leo Top Bảng Xếp Hạng tuần để nhận danh hiệu Độc Bản."
+                      primaryAction={{
+                        label: 'Xem Bảng Thành Tựu',
+                        onClick: () => setActiveModal('achievements'),
+                        icon: <Crown className="w-3.5 h-3.5" />,
+                        variant: 'amber',
+                      }}
+                      secondaryAction={{
+                        label: 'Xem Tất Cả Vật Phẩm',
+                        onClick: () => setFilterCategory('all'),
+                      }}
+                    />
+                  ) : (
+                    <EmptyState
+                      id="empty-inventory-all"
+                      icon={<Package className="w-8 h-8 text-indigo-400" />}
+                      badge="KHO ĐỒ TÂN THỦ"
+                      badgeColor="text-indigo-300 border-indigo-500/30 bg-indigo-500/15"
+                      title="Kho Đồ Đang Trống"
+                      description="Hãy bắt đầu chơi các tựa game arcade vui nhộn để kiếm Rương Kho Báu và tích lũy trang bị đầu tiên!"
+                      tip="Mẹo: Mỗi trận đấu đều đem lại điểm kinh nghiệm, Vàng và cơ hội nhận Rương Báu ngẫu nhiên."
+                      primaryAction={{
+                        label: 'Khám Phá Trò Chơi Ngay',
+                        onClick: () => setActiveModal('none'),
+                        icon: <Gamepad2 className="w-3.5 h-3.5" />,
+                        variant: 'indigo',
+                      }}
+                      secondaryAction={{
+                        label: 'Nhận Quà Điểm Danh',
+                        onClick: () => setActiveModal('dailyReward'),
+                        icon: <Sparkles className="w-3.5 h-3.5" />,
+                      }}
+                    />
+                  )}
                 </div>
               )}
             </div>
 
             {/* Bottom Currency & Quick Action Bar */}
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+            <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-xs shrink-0">
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="flex items-center gap-1.5 bg-[#0e1017] px-2.5 sm:px-3 py-1.5 rounded-xl border border-amber-500/30 text-amber-400 font-mono font-bold" title="Arcade Coins">
                   <Coins className="w-3.5 h-3.5 text-amber-400" />
@@ -621,10 +1034,11 @@ export const CharacterInventoryModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveModal('crafting')}
-                  className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold transition-all cursor-pointer flex items-center justify-center text-xs"
-                  title="Đến Lò Rèn Thần Khí"
+                  className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold transition-all cursor-pointer flex items-center justify-center text-xs gap-1.5"
+                  title="Đến Lò Rèn Ma Thuật"
                 >
-                  <Hammer className="w-4 h-4 text-purple-400" />
+                  <Hammer className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="hidden sm:inline">Lò Rèn</span>
                 </button>
               </div>
             </div>

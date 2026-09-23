@@ -420,15 +420,15 @@ export const ArcadeShopModal: React.FC = () => {
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
                   title={cat.label}
-                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border shrink-0 ${
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border shrink-0 touch-manipulation select-none ${
                     isActive
                       ? 'bg-amber-500 text-stone-950 border-amber-500 shadow-md shadow-amber-500/20'
                       : 'bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/5'
                   }`}
                 >
-                  <span className="text-sm">{cat.icon}</span>
+                  <span className="text-sm pointer-events-none">{cat.icon}</span>
                   <span
-                    className={`text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                    className={`text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono pointer-events-none ${
                       isActive ? 'bg-black/20 text-stone-900 font-bold' : 'bg-white/10 text-slate-400'
                     }`}
                   >

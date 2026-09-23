@@ -311,33 +311,33 @@ export const DailyRewardsHubModal: React.FC<DailyRewardsHubModalProps> = ({ init
         className="w-full h-full sm:h-[92vh] sm:max-h-[900px] sm:max-w-4xl lg:max-w-5xl bg-[#0d0e14] border border-indigo-500/30 rounded-2xl sm:rounded-3xl shadow-2xl shadow-indigo-950/50 flex flex-col overflow-hidden relative"
       >
         {/* TOP HEADER HUD */}
-        <div className="relative p-3.5 sm:p-5 bg-gradient-to-r from-indigo-950/90 via-purple-950/70 to-[#0e0e14] border-b border-white/10 shrink-0 flex flex-wrap items-center justify-between gap-3">
+        <div className="relative p-2.5 sm:p-5 bg-gradient-to-r from-indigo-950/90 via-purple-950/70 to-[#0e0e14] border-b border-white/10 shrink-0 flex items-center justify-between gap-2">
           {/* Title & Stats */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 shrink-0">
-              <Gift className="w-5 h-5 sm:w-6 sm:h-6" />
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 shrink-0">
+              <Gift className="w-4 h-4 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-xl font-black text-white tracking-tight truncate">
-                  Trung Tâm Phúc Lợi & Quà Tặng
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-sm sm:text-xl font-black text-white tracking-tight truncate">
+                  Trung Tâm Phúc Lợi
                 </h2>
                 {totalClaimableCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white animate-pulse">
-                    {totalClaimableCount} quà chờ nhận
+                  <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-rose-500 text-white shrink-0 animate-pulse">
+                    {totalClaimableCount} chờ nhận
                   </span>
                 )}
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
-                Điểm danh chuỗi, vòng quay may mắn và hệ thống nhiệm vụ thống nhất
+              <p className="text-[10px] sm:text-xs text-slate-400 truncate hidden xs:block">
+                Điểm danh chuỗi, vòng quay may mắn & nhiệm vụ thống nhất
               </p>
             </div>
           </div>
 
           {/* Quick Wallet & Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3 ml-auto pr-9">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Wallet Badges (Tập trung Vàng & Đá Quý) */}
-            <div className="hidden sm:flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-1.5 rounded-xl">
+            <div className="hidden md:flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-1.5 rounded-xl">
               <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
                 <Coins className="w-3.5 h-3.5 text-amber-400" />
                 <span>{(profile.coins || 0).toLocaleString()}</span>
@@ -355,122 +355,167 @@ export const DailyRewardsHubModal: React.FC<DailyRewardsHubModalProps> = ({ init
               type="button"
               disabled={totalClaimableCount === 0}
               onClick={handleClaimAll}
-              className={`px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-lg active:scale-95 cursor-pointer ${
+              className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-colors shadow-lg active:scale-95 cursor-pointer touch-manipulation ${
                 totalClaimableCount > 0
                   ? 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white shadow-orange-500/30 hover:brightness-110 ring-2 ring-amber-300/60'
                   : 'bg-white/5 text-slate-500 border border-white/5 cursor-not-allowed'
               }`}
             >
-              <Sparkles className="w-4 h-4 text-white" />
-              <span>Nhận Tất Cả</span>
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white pointer-events-none" />
+              <span className="pointer-events-none whitespace-nowrap">Nhận Tất Cả</span>
               {totalClaimableCount > 0 && (
-                <span className="bg-black/30 px-1.5 py-0.2 rounded-full text-[11px] font-black">
+                <span className="bg-black/30 px-1.5 py-0.2 rounded-full text-[10px] sm:text-[11px] font-black pointer-events-none">
                   {totalClaimableCount}
                 </span>
               )}
             </button>
-          </div>
 
-          {/* Close Button */}
-          <CloseButton onClick={handleClose} />
+            {/* Close Button */}
+            <CloseButton onClick={handleClose} />
+          </div>
         </div>
 
-        {/* TAB NAVIGATION BAR */}
-        <div className="flex items-center gap-1.5 px-3 sm:px-6 py-2 bg-[#090a0f] border-b border-white/5 overflow-x-auto custom-scrollbar shrink-0">
+        {/* TAB NAVIGATION BAR - 5-COLUMN ICON-FIRST GRID (EASY TAP, NO OVERFLOW ISSUES) */}
+        <div className="grid grid-cols-5 gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 bg-[#090a0f] border-b border-white/10 shrink-0">
+          {/* Tab 1: Checkin */}
           <button
+            id="tab-rewards-checkin"
             type="button"
+            role="tab"
+            aria-selected={currentTab === 'checkin'}
             onClick={() => {
               soundEngine.play('click');
               setCurrentTab('checkin');
             }}
-            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={`relative w-full min-h-[52px] sm:min-h-[56px] rounded-xl sm:rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 transition-all cursor-pointer touch-manipulation select-none border overflow-hidden ${
               currentTab === 'checkin'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 border border-indigo-400/40'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 border-indigo-400/60 font-black'
+                : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border-white/5 active:scale-95'
             }`}
           >
-            <Calendar className="w-4 h-4" />
-            <span>Điểm Danh & Lịch Tháng</span>
-            {unclaimedDailyLogin && (
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            )}
+            <div className="relative pointer-events-none flex items-center justify-center shrink-0">
+              <Calendar className={`w-4 h-4 sm:w-5 sm:h-5 pointer-events-none ${currentTab === 'checkin' ? 'text-white' : 'text-indigo-400'}`} strokeWidth={2.4} />
+              {unclaimedDailyLogin && (
+                <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#090a0f] animate-pulse pointer-events-none" />
+              )}
+            </div>
+            <span className="pointer-events-none text-[10px] sm:text-xs font-bold truncate max-w-full text-center leading-tight">
+              <span className="sm:hidden">Điểm Danh</span>
+              <span className="hidden sm:inline">Điểm Danh & Lịch</span>
+            </span>
           </button>
 
+          {/* Tab 2: Spin */}
           <button
+            id="tab-rewards-spin"
             type="button"
+            role="tab"
+            aria-selected={currentTab === 'spin'}
             onClick={() => {
               soundEngine.play('click');
               setCurrentTab('spin');
             }}
-            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={`relative w-full min-h-[52px] sm:min-h-[56px] rounded-xl sm:rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 transition-all cursor-pointer touch-manipulation select-none border overflow-hidden ${
               currentTab === 'spin'
-                ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30 border border-amber-400/40'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 border-amber-400/60 font-black'
+                : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border-white/5 active:scale-95'
             }`}
           >
-            <RotateCw className="w-4 h-4" />
-            <span>Vòng Quay May Mắn</span>
-            {!hasSpunToday && (
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-            )}
+            <div className="relative pointer-events-none flex items-center justify-center shrink-0">
+              <RotateCw className={`w-4 h-4 sm:w-5 sm:h-5 pointer-events-none ${currentTab === 'spin' ? 'text-white' : 'text-amber-400'} ${isSpinning ? 'animate-spin' : ''}`} strokeWidth={2.4} />
+              {!hasSpunToday && (
+                <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-[#090a0f] animate-ping pointer-events-none" />
+              )}
+            </div>
+            <span className="pointer-events-none text-[10px] sm:text-xs font-bold truncate max-w-full text-center leading-tight">
+              <span className="sm:hidden">Vòng Quay</span>
+              <span className="hidden sm:inline">Vòng Quay May Mắn</span>
+            </span>
           </button>
 
+          {/* Tab 3: Daily Quests */}
           <button
+            id="tab-rewards-daily-quests"
             type="button"
+            role="tab"
+            aria-selected={currentTab === 'daily_quests'}
             onClick={() => {
               soundEngine.play('click');
               setCurrentTab('daily_quests');
             }}
-            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={`relative w-full min-h-[52px] sm:min-h-[56px] rounded-xl sm:rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 transition-all cursor-pointer touch-manipulation select-none border overflow-hidden ${
               currentTab === 'daily_quests'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 border border-emerald-400/40'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/40 border-emerald-400/60 font-black'
+                : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border-white/5 active:scale-95'
             }`}
           >
-            <Target className="w-4 h-4" />
-            <span>Nhiệm Vụ Ngày</span>
-            {claimableDailyQuests.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white">
-                {claimableDailyQuests.length}
-              </span>
-            )}
+            <div className="relative pointer-events-none flex items-center justify-center shrink-0">
+              <Target className={`w-4 h-4 sm:w-5 sm:h-5 pointer-events-none ${currentTab === 'daily_quests' ? 'text-white' : 'text-emerald-400'}`} strokeWidth={2.4} />
+              {claimableDailyQuests.length > 0 && (
+                <span className="absolute -top-1 -right-1.5 px-1 min-w-[14px] h-3.5 rounded-full text-[8px] font-black bg-rose-500 text-white pointer-events-none shadow flex items-center justify-center">
+                  {claimableDailyQuests.length}
+                </span>
+              )}
+            </div>
+            <span className="pointer-events-none text-[10px] sm:text-xs font-bold truncate max-w-full text-center leading-tight">
+              <span className="sm:hidden">Nhiệm Vụ</span>
+              <span className="hidden sm:inline">Nhiệm Vụ Ngày</span>
+            </span>
           </button>
 
+          {/* Tab 4: Weekly Quests */}
           <button
+            id="tab-rewards-weekly-quests"
             type="button"
+            role="tab"
+            aria-selected={currentTab === 'weekly_quests'}
             onClick={() => {
               soundEngine.play('click');
               setCurrentTab('weekly_quests');
             }}
-            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={`relative w-full min-h-[52px] sm:min-h-[56px] rounded-xl sm:rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 transition-all cursor-pointer touch-manipulation select-none border overflow-hidden ${
               currentTab === 'weekly_quests'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-400/40'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 border-purple-400/60 font-black'
+                : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border-white/5 active:scale-95'
             }`}
           >
-            <Trophy className="w-4 h-4" />
-            <span>Nhiệm Vụ Tuần & Bạn Bè</span>
-            {claimableWeeklyQuests.length + claimableFriendQuests.length + claimableMilestones.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white">
-                {claimableWeeklyQuests.length + claimableFriendQuests.length + claimableMilestones.length}
-              </span>
-            )}
+            <div className="relative pointer-events-none flex items-center justify-center shrink-0">
+              <Trophy className={`w-4 h-4 sm:w-5 sm:h-5 pointer-events-none ${currentTab === 'weekly_quests' ? 'text-white' : 'text-purple-400'}`} strokeWidth={2.4} />
+              {claimableWeeklyQuests.length + claimableFriendQuests.length + claimableMilestones.length > 0 && (
+                <span className="absolute -top-1 -right-1.5 px-1 min-w-[14px] h-3.5 rounded-full text-[8px] font-black bg-rose-500 text-white pointer-events-none shadow flex items-center justify-center">
+                  {claimableWeeklyQuests.length + claimableFriendQuests.length + claimableMilestones.length}
+                </span>
+              )}
+            </div>
+            <span className="pointer-events-none text-[10px] sm:text-xs font-bold truncate max-w-full text-center leading-tight">
+              <span className="sm:hidden">Mốc Tuần</span>
+              <span className="hidden sm:inline">Mốc Tuần & Bạn Bè</span>
+            </span>
           </button>
 
+          {/* Tab 5: Economy */}
           <button
+            id="tab-rewards-economy"
             type="button"
+            role="tab"
+            aria-selected={currentTab === 'economy'}
             onClick={() => {
               soundEngine.play('click');
               setCurrentTab('economy');
             }}
-            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={`relative w-full min-h-[52px] sm:min-h-[56px] rounded-xl sm:rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 transition-all cursor-pointer touch-manipulation select-none border overflow-hidden ${
               currentTab === 'economy'
-                ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/30 border border-cyan-400/40'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/40 border-cyan-400/60 font-black'
+                : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border-white/5 active:scale-95'
             }`}
           >
-            <Coins className="w-4 h-4" />
-            <span>Kinh Tế & Tiền Tệ</span>
+            <div className="relative pointer-events-none flex items-center justify-center shrink-0">
+              <Coins className={`w-4 h-4 sm:w-5 sm:h-5 pointer-events-none ${currentTab === 'economy' ? 'text-white' : 'text-cyan-400'}`} strokeWidth={2.4} />
+            </div>
+            <span className="pointer-events-none text-[10px] sm:text-xs font-bold truncate max-w-full text-center leading-tight">
+              <span className="sm:hidden">Kinh Tế</span>
+              <span className="hidden sm:inline">Kinh Tế & Tiền Tệ</span>
+            </span>
           </button>
         </div>
 

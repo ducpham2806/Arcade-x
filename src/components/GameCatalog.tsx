@@ -18,16 +18,22 @@ import {
   ChevronLeft,
   Sparkles,
   Layers,
+  Gamepad2,
+  Users,
+  Flame,
+  Swords,
+  Puzzle,
+  Zap,
 } from 'lucide-react';
 
 const CATEGORY_ITEMS = [
-  { id: 'Tất Cả', icon: '🎮', title: 'Tất Cả Game' },
-  { id: 'Yêu Thích', icon: '❤️', title: 'Yêu Thích' },
-  { id: 'Multiplayer', icon: '👥', title: 'PvP Đối Kháng' },
-  { id: 'Arcade', icon: '🕹️', title: 'Arcade' },
-  { id: 'Action', icon: '⚔️', title: 'Hành Động' },
-  { id: 'Puzzle', icon: '🧩', title: 'Giải Đố' },
-  { id: 'Reflex', icon: '⚡', title: 'Phản Xạ' },
+  { id: 'Tất Cả', icon: Gamepad2, title: 'Tất Cả Game', activeColor: 'bg-indigo-600 border-indigo-400 text-white shadow-indigo-600/40', defaultColor: 'text-indigo-400' },
+  { id: 'Yêu Thích', icon: Heart, title: 'Yêu Thích', activeColor: 'bg-rose-600 border-rose-400 text-white shadow-rose-600/40', defaultColor: 'text-rose-400' },
+  { id: 'Multiplayer', icon: Users, title: 'PvP Đối Kháng', activeColor: 'bg-cyan-600 border-cyan-400 text-white shadow-cyan-600/40', defaultColor: 'text-cyan-400' },
+  { id: 'Arcade', icon: Flame, title: 'Arcade', activeColor: 'bg-amber-600 border-amber-400 text-white shadow-amber-600/40', defaultColor: 'text-amber-400' },
+  { id: 'Action', icon: Swords, title: 'Hành Động', activeColor: 'bg-orange-600 border-orange-400 text-white shadow-orange-600/40', defaultColor: 'text-orange-400' },
+  { id: 'Puzzle', icon: Puzzle, title: 'Giải Đố', activeColor: 'bg-emerald-600 border-emerald-400 text-white shadow-emerald-600/40', defaultColor: 'text-emerald-400' },
+  { id: 'Reflex', icon: Zap, title: 'Phản Xạ', activeColor: 'bg-yellow-500 border-yellow-300 text-slate-950 shadow-yellow-500/40', defaultColor: 'text-yellow-400' },
 ] as const;
 
 // Player count stats per game
@@ -400,6 +406,7 @@ export const GameCatalog: React.FC = () => {
               {CATEGORY_ITEMS.map((item) => {
                 const isSelected = selectedCategory === item.id;
                 const favCount = favorites.length;
+                const IconComp = item.icon;
 
                 return (
                   <button
@@ -415,18 +422,23 @@ export const GameCatalog: React.FC = () => {
                         hapticService.tap();
                       } catch {}
                     }}
-                    className={`relative h-10 sm:h-10.5 sm:w-11 rounded-xl flex items-center justify-center text-lg sm:text-xl transition-all cursor-pointer border ${
+                    className={`relative min-h-[46px] h-11 sm:h-12 w-full sm:w-12 rounded-xl flex items-center justify-center transition-all cursor-pointer border touch-manipulation select-none overflow-hidden ${
                       isSelected
-                        ? item.id === 'Yêu Thích'
-                          ? 'bg-rose-600 text-white border-rose-400 shadow-md shadow-rose-600/30 scale-105'
-                          : 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30 scale-105'
-                        : 'bg-[#141414] hover:bg-white/10 text-slate-300 border-white/5 active:scale-95'
+                        ? `${item.activeColor} shadow-md scale-105 z-10 font-bold`
+                        : 'bg-[#14141c] hover:bg-white/10 text-slate-300 hover:text-white border-white/10 active:scale-95'
                     }`}
                   >
-                    <span>{item.icon}</span>
+                    <div className="w-full h-full flex items-center justify-center pointer-events-none p-2.5">
+                      <IconComp
+                        className={`w-5 h-5 pointer-events-none transition-transform ${
+                          isSelected ? 'text-current scale-110 drop-shadow-sm' : `${item.defaultColor}`
+                        }`}
+                        strokeWidth={2.4}
+                      />
+                    </div>
                     {item.id === 'Yêu Thích' && favCount > 0 && (
-                      <span className={`absolute -top-1 -right-1 px-1 min-w-[16px] h-4 text-[9px] font-black rounded-full border border-slate-900 shadow-sm flex items-center justify-center ${
-                        isSelected ? 'bg-white text-rose-600 font-bold' : 'bg-rose-500 text-white'
+                      <span className={`absolute top-1 right-1 px-1 min-w-[15px] h-3.5 text-[8px] font-black rounded-full border shadow-sm flex items-center justify-center pointer-events-none ${
+                        isSelected ? 'bg-white text-rose-600 border-rose-300 font-bold' : 'bg-rose-500 text-white border-slate-900'
                       }`}>
                         {favCount}
                       </span>

@@ -294,41 +294,6 @@ const AppContent: React.FC = () => {
               </div>
             )}
 
-            {/* Unclaimed Daily Login Notification Sticky Bar (if not claimed today and not playing a game) */}
-            {!isClaimedToday && (
-              <aside
-                aria-label="Nhắc nhở điểm danh hàng ngày"
-                className="bg-gradient-to-r from-indigo-950/90 via-[#141414] to-purple-950/90 border-b border-indigo-500/30 px-3 py-2 text-xs"
-              >
-                <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 text-indigo-200">
-                    <span className="flex h-2 w-2 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-                    </span>
-                    <Gift className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>
-                      Bạn có{' '}
-                      <strong>
-                        Quà Điểm Danh Ngày{' '}
-                        {profile.stats.dailyStreak + 1 > 7 ? 1 : profile.stats.dailyStreak + 1}
-                      </strong>{' '}
-                      chưa nhận!
-                    </span>
-                  </div>
-                  <button
-                    id="btn-banner-claim-daily"
-                    type="button"
-                    onClick={() => setActiveModal('dailyReward')}
-                    className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] flex items-center gap-1 shadow-md shadow-indigo-500/20 transition-all shrink-0"
-                  >
-                    <Flame className="w-3 h-3 fill-orange-400 text-orange-400" />
-                    <span>Nhận Quà Ngay</span>
-                  </button>
-                </div>
-              </aside>
-            )}
-
             {/* Main Game Catalog Hub */}
             <main className="flex-1 pb-24 md:pb-24">
               <GameCatalog />

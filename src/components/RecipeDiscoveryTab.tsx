@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { InventoryItem, LegendaryBlueprint, Rarity } from '../types';
 import { useInventory, RecipeDiscoveryResult } from '../context/InventoryContext';
 import { usePlayer } from '../context/PlayerContext';
+import { useGame } from '../context/GameContext';
 import { DEFAULT_LEGENDARY_BLUEPRINTS } from '../services/storage';
 import { soundEngine } from '../services/audio';
 import { motion, AnimatePresence } from 'motion/react';
@@ -23,8 +24,10 @@ import {
   Flame,
   Zap,
   Search,
+  Package,
 } from 'lucide-react';
 import { getRarityInfo, getRaritySlotBoxStyle } from '../utils/rarity';
+import { EmptyState } from './common/EmptyState';
 
 interface RecipeDiscoveryTabProps {
   onNavigateToLog: () => void;
@@ -38,6 +41,7 @@ export const RecipeDiscoveryTab: React.FC<RecipeDiscoveryTabProps> = ({ onNaviga
     discoverRecipe,
   } = useInventory();
   const { profile, spendCoins } = usePlayer();
+  const { setActiveModal } = useGame();
 
   // 3 Discovery Crucible Slots
   const [discoverySlots, setDiscoverySlots] = useState<(InventoryItem | null)[]>([null, null, null]);
@@ -466,12 +470,28 @@ export const RecipeDiscoveryTab: React.FC<RecipeDiscoveryTabProps> = ({ onNaviga
               })}
             </div>
           ) : (
-            <div className="text-center p-6 rounded-2xl bg-[#111220] border border-white/5 text-slate-400">
-              <FlaskConical className="w-8 h-8 mx-auto text-slate-600 mb-1" />
-              <p className="text-xs font-bold text-slate-300">Không còn vật phẩm bậc thấp khả dụng</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                Chơi các mini-game hoặc mở rương đồng để nhận thêm nguyên liệu Thường, Hiếm và Quý.
-              </p>
+            <div className="py-2">
+              <EmptyState
+                id="empty-discovery-low-tier"
+                compact
+                icon={<FlaskConical className="w-6 h-6 text-amber-400" />}
+                badge="PHÒNG THÍ NGHIỆM"
+                badgeColor="text-amber-300 border-amber-500/30 bg-amber-500/15"
+                title="Hết Nguyên Liệu Nghiên Cứu"
+                description="Bạn đã dùng hết vật phẩm phẩm cấp Thường, Hiếm và Quý để nghiên cứu công thức mới."
+                tip="Mẹo: Chơi mini-game hoặc mở rương Đồng & Bạc để nhận thêm vật phẩm thử nghiệm."
+                primaryAction={{
+                  label: 'Mở Rương Báu',
+                  onClick: () => setActiveModal('inventory'),
+                  icon: <Package className="w-3.5 h-3.5" />,
+                  variant: 'amber',
+                }}
+                secondaryAction={{
+                  label: 'Xem Nhật Ký Thí Nghiệm',
+                  onClick: onNavigateToLog,
+                  icon: <History className="w-3.5 h-3.5" />,
+                }}
+              />
             </div>
           )}
         </div>

@@ -12,11 +12,12 @@ import {
   Hammer, Search, Sword, Check, Flame,
   Layers, Plus, ChevronRight, ChevronDown, Award, Info,
   FlaskConical, Wrench, RotateCcw, Wand2, AlertCircle, ArrowRight,
-  History, Crown, ShieldCheck
+  History, Crown, ShieldCheck, ShoppingBag
 , Gamepad2 } from 'lucide-react';
 import { getRarityInfo, getRaritySlotBoxStyle, RARITIES, RARITY_ORDER, getRaritySlotStyle, RarityBadge } from '../utils/rarity';
 import { RecipeDiscoveryTab } from './RecipeDiscoveryTab';
 import { DiscoveryLogTab } from './DiscoveryLogTab';
+import { EmptyState } from './common/EmptyState';
 
 type InventoryTab = 'forge' | 'discovery' | 'log';
 type FilterCategory = 'all' | 'weapons' | 'consumables' | 'materials';
@@ -66,6 +67,7 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
   const [isCraftingAnim, setIsCraftingAnim] = useState(false);
   const [craftedResult, setCraftedResult] = useState<CraftResult | null>(null);
   const [forgeErrorNotice, setForgeErrorNotice] = useState<string | null>(null);
+  const [showTierCostGuide, setShowTierCostGuide] = useState(false);
 
   // Close on Escape key press
   useEffect(() => {
@@ -499,14 +501,20 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
                 setActiveTab('forge');
                 setSelectedItem(null);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap touch-manipulation select-none ${
                 activeTab === 'forge'
                   ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Hammer className="w-3.5 h-3.5" />
-              <span>Lò Rèn</span>
+              <motion.div
+                animate={{ scale: activeTab === 'forge' ? 1.15 : 1 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+                className="flex items-center justify-center pointer-events-none"
+              >
+                <Hammer className="w-3.5 h-3.5" />
+              </motion.div>
+              <span className="pointer-events-none">Lò Rèn</span>
             </button>
 
             <button
@@ -517,14 +525,20 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
                 setActiveTab('discovery');
                 setSelectedItem(null);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap touch-manipulation select-none ${
                 activeTab === 'discovery'
                   ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <FlaskConical className="w-3.5 h-3.5 text-amber-400" />
-              <span>Khám Phá</span>
+              <motion.div
+                animate={{ scale: activeTab === 'discovery' ? 1.15 : 1 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+                className="flex items-center justify-center pointer-events-none"
+              >
+                <FlaskConical className="w-3.5 h-3.5 text-amber-400" />
+              </motion.div>
+              <span className="pointer-events-none">Khám Phá</span>
             </button>
 
             <button
@@ -535,14 +549,20 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
                 setActiveTab('log');
                 setSelectedItem(null);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap touch-manipulation select-none ${
                 activeTab === 'log'
                   ? 'bg-gradient-to-r from-purple-700 to-slate-700 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <History className="w-3.5 h-3.5 text-slate-300" />
-              <span>Nhật Ký</span>
+              <motion.div
+                animate={{ scale: activeTab === 'log' ? 1.15 : 1 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+                className="flex items-center justify-center pointer-events-none"
+              >
+                <History className="w-3.5 h-3.5 text-slate-300" />
+              </motion.div>
+              <span className="pointer-events-none">Nhật Ký</span>
             </button>
           </div>
 
@@ -573,14 +593,20 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
               setActiveTab('forge');
               setSelectedItem(null);
             }}
-            className={`min-h-[38px] flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+            className={`min-h-[42px] flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer touch-manipulation select-none border ${
               activeTab === 'forge'
                 ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-purple-500 shadow-md'
                 : 'text-slate-400 hover:text-white bg-white/5 border-transparent'
             }`}
           >
-            <Hammer className="w-3.5 h-3.5" />
-            <span>Lò Rèn</span>
+            <motion.div
+              animate={{ scale: activeTab === 'forge' ? 1.15 : 1 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+              className="flex items-center justify-center pointer-events-none"
+            >
+              <Hammer className="w-3.5 h-3.5" />
+            </motion.div>
+            <span className="pointer-events-none">Lò Rèn</span>
           </button>
 
           <button
@@ -591,14 +617,20 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
               setActiveTab('discovery');
               setSelectedItem(null);
             }}
-            className={`min-h-[38px] flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+            className={`min-h-[42px] flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer touch-manipulation select-none border ${
               activeTab === 'discovery'
                 ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white border-amber-400 shadow-md'
                 : 'text-slate-400 hover:text-white bg-white/5 border-transparent'
             }`}
           >
-            <FlaskConical className="w-3.5 h-3.5 text-amber-400" />
-            <span>Khám Phá</span>
+            <motion.div
+              animate={{ scale: activeTab === 'discovery' ? 1.15 : 1 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+              className="flex items-center justify-center pointer-events-none"
+            >
+              <FlaskConical className="w-3.5 h-3.5 text-amber-400" />
+            </motion.div>
+            <span className="pointer-events-none">Khám Phá</span>
           </button>
 
           <button
@@ -609,14 +641,20 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
               setActiveTab('log');
               setSelectedItem(null);
             }}
-            className={`min-h-[38px] flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+            className={`min-h-[42px] flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer touch-manipulation select-none border ${
               activeTab === 'log'
                 ? 'bg-gradient-to-r from-purple-700 to-slate-700 text-white border-purple-400 shadow-md'
                 : 'text-slate-400 hover:text-white bg-white/5 border-transparent'
             }`}
           >
-            <History className="w-3.5 h-3.5 text-slate-300" />
-            <span>Nhật Ký</span>
+            <motion.div
+              animate={{ scale: activeTab === 'log' ? 1.15 : 1 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 15 }}
+              className="flex items-center justify-center pointer-events-none"
+            >
+              <History className="w-3.5 h-3.5 text-slate-300" />
+            </motion.div>
+            <span className="pointer-events-none">Nhật Ký</span>
           </button>
         </div>
 
@@ -719,94 +757,73 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
             {/* ===================================================================== */}
             {/* THE 3 FORGE PEDESTALS / SLOTS CONTAINER (CLICK TO FOCUS & SELECT)     */}
             {/* ===================================================================== */}
-            <div className="bg-[#121424] border border-purple-500/20 rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-lg relative mb-4">
+            <div className="bg-[#121424] border border-purple-500/20 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-lg relative mb-4">
               
-              {/* Active Selection Step Banner */}
-              <div className="text-center mb-3">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-200 text-xs font-bold">
-                  {craftingSlots.every(s => s !== null) ? (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-                      <span>Đã đủ 3 vật phẩm! Sẵn sàng dung hợp</span>
-                    </>
-                  ) : (
-                    <>
-                      <ArrowRight className="w-3.5 h-3.5 text-purple-400 animate-bounce" />
-                      <span>Đang chọn vật phẩm cho <strong>Ô {typeof activeForgeSlot === 'number' ? activeForgeSlot + 1 : 'Phụ'}</strong> (Chạm vào danh sách bên dưới)</span>
-                    </>
+              {/* Newbie Quick Tip & Auto-Fill Banner */}
+              <div className="mb-3 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-950/60 via-purple-950/40 to-[#121424] border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                <div className="flex items-center gap-2 text-indigo-200">
+                  <span className="text-base shrink-0">💡</span>
+                  <span><strong>Quy tắc đơn giản:</strong> Đặt 3 vật phẩm cùng phẩm cấp để hợp nhất thành 1 trang bị cấp cao hơn!</span>
+                </div>
+                <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleAutoFill}
+                    className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[11px] flex items-center gap-1 shadow cursor-pointer transition-all active:scale-95"
+                    title="Tự động tìm 3 món cùng phẩm cấp để điền nhanh"
+                  >
+                    <Wand2 className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Điền Nhanh</span>
+                  </button>
+                  {craftingSlots.some(s => s !== null) && (
+                    <button
+                      type="button"
+                      onClick={handleClearAllForge}
+                      className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-[11px] font-bold transition-all cursor-pointer"
+                      title="Xóa cả 3 ô để chọn lại"
+                    >
+                      Xóa
+                    </button>
                   )}
-                </span>
+                </div>
               </div>
 
-              {/* Prominent Projected Success Rate Widget right next to / above item placement slots */}
-              <div className="mx-2 sm:mx-4 mb-2 p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-purple-950/80 via-indigo-950/80 to-slate-900/90 border border-purple-500/40 shadow-lg flex items-center justify-between">
+              {/* Consolidated Success Forecast Bar */}
+              <div className="mx-1 sm:mx-2 mb-3 p-2.5 sm:p-3 rounded-2xl bg-black/50 border border-purple-500/30 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
-                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
+                  <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 shrink-0">
+                    <Sparkles className="w-4 h-4" />
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-wide">
-                      Tỷ Lệ Thành Công Dự Kiến
-                    </div>
-                    <div className="text-xs sm:text-sm font-semibold text-white flex items-center gap-1.5 flex-wrap">
+                  <div className="min-w-0 text-xs">
+                    <div className="font-bold text-slate-300">
                       {currentCraftRarity ? (
-                        <>
-                          <span>Cơ Bản: <strong className="text-amber-300 font-mono">{baseSuccessRates[currentCraftRarity]}%</strong></span>
+                        <span className="flex items-center gap-1.5 flex-wrap">
+                          <span>Dung hợp phẩm cấp:</span>
+                          <RarityBadge rarity={currentCraftRarity} />
                           {auxSlot && (
-                            <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                            <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30 text-[10px]">
                               +{(auxSlot as any).bonusValue}% (Cuộn)
                             </span>
                           )}
-                        </>
+                        </span>
                       ) : (
-                        <span className="text-slate-400 text-[11px]">Chưa chọn đủ 3 vật phẩm cùng loại</span>
+                        <span className="text-slate-400">Chọn 3 vật phẩm cùng phẩm cấp để xem tỷ lệ</span>
                       )}
                     </div>
+                    {forgeMastery.criticalUnlocked && currentCraftRarity && (
+                      <div className="text-[10px] text-amber-300 mt-0.5 font-medium">
+                        ⚡ Cơ hội bạo kích nhận đồ Huyền Thoại: {(forgeMastery.criticalRate * 100).toFixed(0)}%
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="text-right shrink-0 pl-2">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">Tổng Tỷ Lệ</div>
-                  <div className="text-base sm:text-xl font-black text-amber-300 font-mono tracking-tight drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">Xác Suất</div>
+                  <div className="text-base sm:text-xl font-black text-amber-300 font-mono tracking-tight">
                     {currentCraftRarity ? `${finalSuccessRate}%` : '---'}
                   </div>
                 </div>
-              </div>
-
-              {/* SUCCESS FORECAST & OUTCOME ANALYSIS BOX */}
-              <div className="mx-2 sm:mx-4 mb-3 p-3 rounded-xl bg-black/50 border border-purple-500/30 text-xs space-y-1.5">
-                <div className="font-bold text-purple-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Wand2 className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Dự Báo Kết Quả Rèn (Success Forecast Matrix)</span>
-                </div>
-                {currentCraftRarity ? (
-                  <div className="text-slate-300 space-y-1 text-[11px]">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Xác Suất Thành Công Thực Tế:</span>
-                      <strong className="text-emerald-400 font-mono">{finalSuccessRate}%</strong>
-                    </div>
-                    {forgeMastery.criticalUnlocked && (
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Tỷ Lệ Đột Phá Bạo Kích (Legendary Mutation):</span>
-                        <strong className="text-amber-400 font-mono">{(forgeMastery.criticalRate * 100).toFixed(0)}%</strong>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Kết quả khi thành công:</span>
-                      <span className="text-purple-200 font-medium">Nhận 1 vật phẩm cấp cao hơn + EXP Lò Rèn</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Tác động cuộn giấy phụ:</span>
-                      <span className={auxSlot ? "text-emerald-300 font-semibold" : "text-slate-500"}>
-                        {auxSlot ? `Đã trang bị "${auxSlot.name}" (+${(auxSlot as any).bonusValue}% tỷ lệ)` : 'Chưa dùng cuộn giấy (có thể thêm ở ô phụ)'}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-slate-500 italic text-[11px]">
-                    Vui lòng chọn 3 trang bị cùng phẩm cấp ở các ô phía trên để hiển thị dự báo chi tiết kết quả.
-                  </div>
-                )}
               </div>
 
               {/* 3 Interactive Slots + Aux Slot (Responsive Mobile Layout) */}
@@ -1003,34 +1020,8 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
                 </AnimatePresence>
               </div>
 
-
-
-              {/* CRAFT EXECUTION BUTTON WITH COIN FEE & AUTO-FILL / CLEAR BUTTONS */}
-              <div className="mt-4 pt-3 border-t border-white/10 space-y-2.5">
-                <div className="flex items-center justify-end gap-2">
-                  <button
-                    id="btn-forge-auto-fill"
-                    type="button"
-                    onClick={handleAutoFill}
-                    className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
-                    title="Tự động tìm 3 món cùng phẩm cấp để điền nhanh"
-                  >
-                    <Wand2 className="w-3.5 h-3.5 text-purple-400" />
-                    <span>Tự Động Điền</span>
-                  </button>
-
-                  <button
-                    id="btn-forge-clear-all"
-                    type="button"
-                    onClick={handleClearAllForge}
-                    className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-rose-300 border border-white/10 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
-                    title="Xóa cả 3 ô để chọn lại từ đầu"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Xóa Hết</span>
-                  </button>
-                </div>
-
+              {/* CRAFT EXECUTION BUTTON WITH COIN FEE */}
+              <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
                 <button
                   id="btn-forge-execute"
                   type="button"
@@ -1057,47 +1048,59 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
                 </button>
               </div>
 
-              {/* Fee Tier Guide Carousel / Strip */}
-              <div className="mt-3 pt-3 border-t border-white/5">
-                <div className="text-[10px] font-bold text-slate-400 mb-1.5 flex items-center justify-between">
-                  <span>Bảng Phí Nâng Cấp 9 Cấp Phẩm Chất:</span>
-                  <span className="text-[9px] text-purple-300 font-mono">3 Cùng Loại ➔ 1 Cấp Cao Hơn</span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[9.5px]">
-                  {[
-                    { from: 'common' as Rarity, to: 'uncommon' as Rarity },
-                    { from: 'uncommon' as Rarity, to: 'rare' as Rarity },
-                    { from: 'rare' as Rarity, to: 'epic' as Rarity },
-                    { from: 'epic' as Rarity, to: 'legendary' as Rarity },
-                    { from: 'legendary' as Rarity, to: 'mythic' as Rarity },
-                    { from: 'mythic' as Rarity, to: 'relic' as Rarity },
-                    { from: 'relic' as Rarity, to: 'masterwork' as Rarity },
-                    { from: 'masterwork' as Rarity, to: 'eternal' as Rarity },
-                  ].map(({ from, to }) => {
-                    const fromInfo = getRarityInfo(from);
-                    const toInfo = getRarityInfo(to);
-                    const isCurrent = currentCraftRarity === from;
-                    return (
-                      <div
-                        key={`tier-cost-${from}`}
-                        className={`p-1.5 rounded-xl border transition-all text-center ${
-                          isCurrent
-                            ? 'bg-purple-950/60 border-purple-400 text-purple-200 font-bold ring-1 ring-purple-400'
-                            : 'bg-black/40 border-white/5 text-slate-400'
-                        }`}
-                      >
-                        <div className="flex items-center justify-center gap-1">
-                          <span style={{ color: fromInfo.hex }} className="font-bold">{fromInfo.shortHand}</span>
-                          <span className="text-slate-500">➔</span>
-                          <span style={{ color: toInfo.hex }} className="font-bold">{toInfo.shortHand}</span>
+              {/* Fee Tier Guide Collapsible Accordion */}
+              <div className="mt-2.5 pt-2 border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={() => setShowTierCostGuide(!showTierCostGuide)}
+                  className="w-full text-[10px] font-bold text-slate-400 hover:text-slate-200 py-1 flex items-center justify-between cursor-pointer"
+                >
+                  <span className="flex items-center gap-1">
+                    <Info className="w-3 h-3 text-purple-400" />
+                    <span>Bảng Phí Nâng Cấp 9 Cấp Phẩm Chất</span>
+                  </span>
+                  <span className="text-[9px] text-purple-300">
+                    {showTierCostGuide ? '▲ Thu gọn' : '▼ Xem chi tiết'}
+                  </span>
+                </button>
+
+                {showTierCostGuide && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[9.5px] mt-2 animate-in fade-in">
+                    {[
+                      { from: 'common' as Rarity, to: 'uncommon' as Rarity },
+                      { from: 'uncommon' as Rarity, to: 'rare' as Rarity },
+                      { from: 'rare' as Rarity, to: 'epic' as Rarity },
+                      { from: 'epic' as Rarity, to: 'legendary' as Rarity },
+                      { from: 'legendary' as Rarity, to: 'mythic' as Rarity },
+                      { from: 'mythic' as Rarity, to: 'relic' as Rarity },
+                      { from: 'relic' as Rarity, to: 'masterwork' as Rarity },
+                      { from: 'masterwork' as Rarity, to: 'eternal' as Rarity },
+                    ].map(({ from, to }) => {
+                      const fromInfo = getRarityInfo(from);
+                      const toInfo = getRarityInfo(to);
+                      const isCurrent = currentCraftRarity === from;
+                      return (
+                        <div
+                          key={`tier-cost-${from}`}
+                          className={`p-1.5 rounded-xl border transition-all text-center ${
+                            isCurrent
+                              ? 'bg-purple-950/60 border-purple-400 text-purple-200 font-bold ring-1 ring-purple-400'
+                              : 'bg-black/40 border-white/5 text-slate-400'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1">
+                            <span style={{ color: fromInfo.hex }} className="font-bold">{fromInfo.shortHand}</span>
+                            <span className="text-slate-500">➔</span>
+                            <span style={{ color: toInfo.hex }} className="font-bold">{toInfo.shortHand}</span>
+                          </div>
+                          <div className="text-amber-400 font-bold font-mono text-[9px] mt-0.5">
+                            🪙 {fromInfo.craftCost.toLocaleString()} Xu
+                          </div>
                         </div>
-                        <div className="text-amber-400 font-bold font-mono text-[9px] mt-0.5">
-                          🪙 {fromInfo.craftCost.toLocaleString()} Xu
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1200,14 +1203,49 @@ export const CraftingModal: React.FC<{ initialTab?: InventoryTab }> = ({ initial
                   })}
                 </div>
               ) : (
-                <div className="text-center p-6 rounded-2xl bg-[#121422] border border-white/5 text-slate-400 my-auto">
-                  <Package className="w-8 h-8 mx-auto text-slate-600 mb-2" />
-                  <p className="text-xs font-bold text-slate-300 mb-1">Không có vật phẩm phù hợp khả dụng</p>
-                  <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-                    {lockedRarity 
-                      ? `Bạn cần thêm vật phẩm cấp ${getRarityInfo(lockedRarity).nameVi} hoặc bấm "Xóa Hết" để chọn phẩm cấp khác.`
-                      : 'Các vật phẩm trong kho đồ đã được gán hết vào lò rèn hoặc bạn chưa có vật phẩm phù hợp.'}
-                  </p>
+                <div className="py-2">
+                  <EmptyState
+                    id="empty-forge-candidates"
+                    compact
+                    icon={<Hammer className="w-6 h-6 text-purple-400" />}
+                    badge="LÒ RÈN MA THUẬT"
+                    badgeColor="text-purple-300 border-purple-500/30 bg-purple-500/15"
+                    title={lockedRarity ? 'Hết Vật Phẩm Cùng Cấp' : 'Không Có Vật Phẩm Khả Dụng'}
+                    description={
+                      lockedRarity
+                        ? `Bạn đang chọn phẩm cấp ${getRarityInfo(lockedRarity).nameVi}, nhưng trong kho không còn món nào cùng bậc để gán tiếp.`
+                        : 'Toàn bộ vật phẩm đủ điều kiện đã được đặt vào lò rèn hoặc kho đồ chưa có trang bị cùng phẩm cấp để dung hợp.'
+                    }
+                    tip="Quy tắc: Cần ghép đủ 3 vật phẩm cùng phẩm cấp để thăng hạng trang bị lên cấp kế tiếp."
+                    primaryAction={
+                      lockedRarity
+                        ? {
+                            label: 'Làm Mới Lò Rèn',
+                            onClick: handleClearAllForge,
+                            icon: <RotateCcw className="w-3.5 h-3.5" />,
+                            variant: 'purple',
+                          }
+                        : {
+                            label: 'Mở Rương Báu',
+                            onClick: () => setActiveModal('inventory'),
+                            icon: <Package className="w-3.5 h-3.5" />,
+                            variant: 'indigo',
+                          }
+                    }
+                    secondaryAction={
+                      lockedRarity
+                        ? {
+                            label: 'Mở Kho Đồ',
+                            onClick: () => setActiveModal('inventory'),
+                            icon: <Package className="w-3.5 h-3.5" />,
+                          }
+                        : {
+                            label: 'Ghé Cửa Hàng',
+                            onClick: () => setActiveModal('shop'),
+                            icon: <ShoppingBag className="w-3.5 h-3.5" />,
+                          }
+                    }
+                  />
                 </div>
               )}
             </div>

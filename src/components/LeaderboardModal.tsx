@@ -425,14 +425,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ initialGameI
                   soundEngine.play('click');
                   setFilterView('global');
                 }}
-                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap ${
+                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap touch-manipulation select-none ${
                   filterView === 'global'
                     ? 'bg-indigo-600 text-white border-indigo-500 shadow-md'
                     : 'text-slate-400 hover:text-white border-transparent'
                 }`}
               >
-                <Globe className="w-3 h-3" />
-                <span>Theo Game</span>
+                <Globe className="w-3 h-3 pointer-events-none" />
+                <span className="pointer-events-none">Theo Game</span>
               </button>
 
               <button
@@ -442,14 +442,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ initialGameI
                   soundEngine.play('click');
                   setFilterView('friends');
                 }}
-                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap ${
+                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap touch-manipulation select-none ${
                   filterView === 'friends'
                     ? 'bg-purple-600 text-white border-purple-500 shadow-md'
                     : 'text-slate-400 hover:text-white border-transparent'
                 }`}
               >
-                <Users className="w-3 h-3" />
-                <span>Bạn Bè</span>
+                <Users className="w-3 h-3 pointer-events-none" />
+                <span className="pointer-events-none">Bạn Bè</span>
               </button>
 
               <button
@@ -459,14 +459,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ initialGameI
                   soundEngine.play('click');
                   setFilterView('daily_best');
                 }}
-                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap ${
+                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap touch-manipulation select-none ${
                   filterView === 'daily_best'
                     ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black border-amber-400 shadow-md'
                     : 'text-slate-400 hover:text-white border-transparent'
                 }`}
               >
-                <Clock className="w-3 h-3" />
-                <span>24H</span>
+                <Clock className="w-3 h-3 pointer-events-none" />
+                <span className="pointer-events-none">24H</span>
               </button>
 
               <button
@@ -476,14 +476,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ initialGameI
                   soundEngine.play('click');
                   setFilterView('total_exp');
                 }}
-                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap ${
+                className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer border whitespace-nowrap touch-manipulation select-none ${
                   filterView === 'total_exp'
                     ? 'bg-emerald-600 text-white border-emerald-500 shadow-md'
                     : 'text-slate-400 hover:text-white border-transparent'
                 }`}
               >
-                <Medal className="w-3 h-3" />
-                <span>Tổng EXP</span>
+                <Medal className="w-3 h-3 pointer-events-none" />
+                <span className="pointer-events-none">Tổng EXP</span>
               </button>
             </div>
 

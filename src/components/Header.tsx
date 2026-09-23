@@ -185,7 +185,44 @@ export const Header: React.FC = () => {
             )}
           </button>
 
-          {/* 3. Cửa Hàng */}
+          {/* 3. Lò Rèn */}
+          <button
+            id="nav-desktop-crafting"
+            type="button"
+            onClick={() => setActiveModal(activeModal === 'crafting' ? 'none' : 'crafting')}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeModal === 'crafting'
+                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+            title="Lò Rèn Ma Thuật (Nâng cấp & Chế tác bảo vật)"
+          >
+            <span className="text-sm leading-none">🔨</span>
+            <span className="hidden xl:inline">Lò Rèn</span>
+          </button>
+
+          {/* 4. Phúc Lợi (Trung Tâm Phúc Lợi Hợp Nhất) */}
+          <button
+            id="nav-desktop-rewards-hub"
+            type="button"
+            onClick={() => setActiveModal(activeModal === 'dailyReward' ? 'none' : 'dailyReward')}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
+              activeModal === 'dailyReward' || activeModal === 'quests' || activeModal === 'dailyQuests'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+            title="Trung Tâm Phúc Lợi & Quà Điểm Danh"
+          >
+            <span className="text-sm leading-none">🎁</span>
+            <span className="hidden xl:inline">Phúc Lợi</span>
+            {(!isClaimedToday || unclaimedQuests > 0) && (
+              <span className="px-1.5 py-0.2 rounded-full bg-emerald-400 text-black font-extrabold text-[10px] leading-tight animate-pulse">
+                {(!isClaimedToday ? 1 : 0) + unclaimedQuests}
+              </span>
+            )}
+          </button>
+
+          {/* 5. Cửa Hàng */}
           <button
             id="nav-desktop-shop"
             type="button"
@@ -201,28 +238,7 @@ export const Header: React.FC = () => {
             <span className="hidden xl:inline">Cửa Hàng</span>
           </button>
 
-          {/* 4. Nhiệm Vụ */}
-          <button
-            id="nav-desktop-quests"
-            type="button"
-            onClick={() => setActiveModal(activeModal === 'quests' || activeModal === 'dailyQuests' ? 'none' : 'quests')}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer relative ${
-              activeModal === 'quests' || activeModal === 'dailyQuests'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-                : 'text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            title="Sổ Nhiệm Vụ Hàng Ngày & Tuần"
-          >
-            <Target className="w-4 h-4 text-emerald-400" />
-            <span className="hidden xl:inline">Nhiệm Vụ</span>
-            {unclaimedQuests > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-emerald-400 text-black font-extrabold text-[10px] leading-tight animate-pulse">
-                {unclaimedQuests}
-              </span>
-            )}
-          </button>
-
-          {/* 5. Bảng Vàng */}
+          {/* 6. Bảng Vàng */}
           <button
             id="nav-desktop-leaderboard"
             type="button"
@@ -236,38 +252,6 @@ export const Header: React.FC = () => {
           >
             <Trophy className="w-4 h-4 text-yellow-400" />
             <span className="hidden xl:inline">Bảng Vàng</span>
-          </button>
-
-          {/* 6. Bạn Bè */}
-          <button
-            id="nav-desktop-friends"
-            type="button"
-            onClick={() => setActiveModal(activeModal === 'friends' ? 'none' : 'friends')}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              activeModal === 'friends'
-                ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30'
-                : 'text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            title="Bạn Bè & Thách Đấu PvP"
-          >
-            <Users className="w-4 h-4 text-cyan-400" />
-            <span className="hidden xl:inline">Bạn Bè</span>
-          </button>
-
-          {/* 6b. Vòng Quay May Mắn (Daily Spin) */}
-          <button
-            id="nav-desktop-spin"
-            type="button"
-            onClick={() => setActiveModal(activeModal === 'spinWheel' ? 'none' : 'spinWheel')}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              activeModal === 'spinWheel'
-                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
-                : 'text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            title="Vòng Quay May Mắn (Daily Spin)"
-          >
-            <span className="text-sm leading-none">🎡</span>
-            <span className="hidden xl:inline">Vòng Quay</span>
           </button>
 
           {/* 7. Menu Tiện Ích */}
