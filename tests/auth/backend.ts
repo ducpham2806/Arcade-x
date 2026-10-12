@@ -50,7 +50,8 @@ export function mockSupabase() {
         else if (!user.confirmed) reject('email_not_confirmed','Email not confirmed');
         else data=session(user);
       } else if (url.pathname.endsWith('/logout')) { status=204; data=null; }
-      else if (url.pathname.endsWith('/user')) data=users.has(uid)?responseUser(users.get(uid)!):null;
+      else if (url.pathname.endsWith('/recover') || url.pathname.endsWith('/resend')) data={};
+      else if (url.pathname.endsWith('/user')) { const user=users.get(uid); if(user && request.method()==='PUT' && body.password) user.password=body.password; data=user?responseUser(user):null; }
       else if (url.pathname.endsWith('/arcadex_bind_player')) {
         if (owners.has(body.p_player_id)&&owners.get(body.p_player_id)!==uid) reject('42501','Not your player');
         else { owners.set(body.p_player_id,uid); data=null; }
@@ -79,5 +80,6 @@ export function mockSupabase() {
       await route.fulfill({status,contentType:'application/json',body:status===204?'':JSON.stringify(data)});
     });
   }
-  return {install,documents,users,confirm(email:string){const u=[...users.values()].find(u=>u.email===email);if(u)u.confirmed=true;},failReads(value:boolean){failReads=value;},readDelay(ms:number){readDelay=ms;}};
+  return {install,documents,users,recovery(email:string){const u=[...users.values()].find(u=>u.email===email);if(!u)throw new Error("Missing user");const s=session(u);return `#access_token=${s.access_token}&refresh_token=${s.refresh_token}&expires_in=3600&token_type=bearer&type=recovery`;},confirm(email:string){const u=[...users.values()].find(u=>u.email===email);if(u)u.confirmed=true;},failReads(value:boolean){failReads=value;},readDelay(ms:number){readDelay=ms;}};
 }
+

@@ -1,3 +1,4 @@
+import { getRecoveryState, initializeRecovery, clearRecovery, authRedirect, takeAuthCallbackMessage } from './authRecovery';
 import { hydrateGameSaves, syncGameSaves } from './gameSaves';
 import type { User, Session } from '@supabase/supabase-js';
 import type { UserAccount } from '../types';
@@ -14,7 +15,7 @@ export interface RegisterParams {
 }
 export interface AuthResult {
   success: boolean; error?: string; user?: UserAccount;
-  needsEmailConfirmation?: boolean; message?: string; requiresRestore?: boolean; cancelled?: boolean;
+  needsEmailConfirmation?: boolean; retryAfter?: number; message?: string; requiresRestore?: boolean; cancelled?: boolean;
 }
 const USER_KEY = 'arcadex_current_user';
 let manualOperations = 0;
@@ -35,7 +36,8 @@ function errorText(error: any): string {
   if (error?.code === 'over_email_send_rate_limit' || error?.status === 429) return 'Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.';
   if (error?.code === 'email_address_invalid') return 'Địa chỉ email không hợp lệ.';
   if (error?.code === 'signup_disabled') return 'Đăng ký đang tạm đóng. Bạn vẫn có thể chơi như khách.';
-  if (error?.code === 'weak_password') return 'Mật khẩu chưa đủ mạnh. Hãy dùng ít nhất 8 ký tự.';
+  if (['otp_expired', 'flow_state_expired', 'flow_state_not_found', 'bad_code_verifier', 'session_not_found'].includes(error?.code)) return 'Link đã hết hạn hoặc không hợp lệ. Hãy yêu cầu email mới.';
+  if (error?.code === 'weak_password' || error?.name === 'AuthWeakPasswordError') return 'Mật khẩu chưa đủ mạnh. Hãy dùng ít nhất 8 ký tự.';
   if (error instanceof TypeError || /fetch|network|timeout/i.test(error?.message || '')) return 'Chưa kết nối được máy chủ. Kiểm tra mạng hoặc tiếp tục chơi như khách.';
   return error?.message || 'Không thể xác thực lúc này. Vui lòng thử lại.';
 }
@@ -145,15 +147,18 @@ export class AuthService {
   public static async restoreSession(): Promise<AuthResult> {
     const epoch = authEpoch;
     try {
+      const recovery = await initializeRecovery();
+      if (recovery.status !== 'idle') return { success: true };
       if (!supabase) { await activateSession(null, epoch); return { success: true }; }
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
-      try { return await activateSession(data.session, epoch); }
+      try { const result = await activateSession(data.session, epoch); const message = takeAuthCallbackMessage(); return message ? { ...result, message } : result; }
       catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
     } catch (error) { return epoch !== authEpoch ? { success: false, cancelled: true } : { success: false, error: errorText(error), requiresRestore: true }; }
   }
   public static listen(callback: () => void): () => void {
     const subscription = supabase?.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') { authEpoch++; setTimeout(callback, 0); return; }
       if (manualOperations > 0 || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') return;
       const currentId = this.getCurrentUser()?.id;
       if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && !session?.user.is_anonymous && session?.user.id !== currentId
@@ -176,7 +181,7 @@ export class AuthService {
       rememberExistingGuest();
       const guest = captureAccount();
       const { data, error } = await client().auth.signUp({ email, password: params.password,
-        options: { data: { username, avatar: params.avatar || '🎮' }, emailRedirectTo: window.location.origin + '/' } });
+        options: { data: { username, avatar: params.avatar || '🎮' }, emailRedirectTo: authRedirect() } });
       if (error) throw error;
       if (params.keepGuestData) stageGuestRegistration(email, guest);
       else clearPendingRegistration(email);
@@ -185,7 +190,7 @@ export class AuthService {
       try { return await activateSession(data.session, epoch); }
       catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
     } catch (error) { return { success: false, error: errorText(error) }; }
-    finally { manualOperations--; if (manualOperations === 0) resumeCloudIdentity(); }
+    finally { manualOperations--; if (manualOperations === 0 && getRecoveryState().status === 'idle') resumeCloudIdentity(); }
   }
   public static async login(email: string, password: string): Promise<AuthResult> {
     if (!email.trim() || !password) return { success: false, error: 'Vui lòng nhập email và mật khẩu.' };
@@ -198,8 +203,8 @@ export class AuthService {
       if (error) throw error;
       try { return await activateSession(data.session, epoch); }
       catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
-    } catch (error) { return { success: false, error: errorText(error) }; }
-    finally { manualOperations--; if (manualOperations === 0) resumeCloudIdentity(); }
+    } catch (error: any) { return { success: false, error: errorText(error), needsEmailConfirmation: error?.code === 'email_not_confirmed' }; }
+    finally { manualOperations--; if (manualOperations === 0 && getRecoveryState().status === 'idle') resumeCloudIdentity(); }
   }
   public static async logout(): Promise<AuthResult> {
     manualOperations++;
@@ -217,7 +222,7 @@ export class AuthService {
       localStorage.removeItem(USER_KEY); activateGuest(true); resetCloudIdentity();
       return { success: true };
     } catch (error) { return { success: false, error: errorText(error) }; }
-    finally { manualOperations--; if (manualOperations === 0) resumeCloudIdentity(); }
+    finally { manualOperations--; if (manualOperations === 0 && getRecoveryState().status === 'idle') resumeCloudIdentity(); }
   }
   public static async continueAsGuest(): Promise<AuthResult> {
     authEpoch++;
@@ -227,6 +232,48 @@ export class AuthService {
     rememberExistingGuest();
     if (!StorageService.loadProfile().id.startsWith('guest_')) activateGuest();
     return { success: true };
+  }
+  public static async requestPasswordReset(email: string): Promise<AuthResult> {
+    return this.sendAccountEmail(email, 'recovery');
+  }
+  public static async resendConfirmation(email: string): Promise<AuthResult> {
+    return this.sendAccountEmail(email, 'signup');
+  }
+  private static async sendAccountEmail(rawEmail: string, kind: 'recovery' | 'signup'): Promise<AuthResult> {
+    const email = rawEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { success: false, error: 'Vui lòng nhập email hợp lệ.' };
+    const key = 'auth-mail-cooldown-v1';
+    let recent: { email?: string; at?: number } = {};
+    try { recent = JSON.parse(sessionStorage.getItem(key) || '{}') || {}; } catch { /* server still rate limits */ }
+    const remaining = recent.email === email ? Math.ceil((60000 - (Date.now() - (recent.at || 0))) / 1000) : 0;
+    if (remaining > 0) return { success: false, retryAfter: remaining, error: `Vui lòng chờ ${remaining} giây trước khi gửi lại.` };
+    // Reserve before awaiting to prevent duplicate clicks from concurrent callers.
+    sessionStorage.setItem(key, JSON.stringify({ email, at: Date.now() }));
+    try {
+      const result = kind === 'recovery'
+        ? await client().auth.resetPasswordForEmail(email, { redirectTo: authRedirect(true) })
+        : await client().auth.resend({ type: 'signup', email, options: { emailRedirectTo: authRedirect() } });
+      if (result.error) throw result.error;
+      return { success: true, retryAfter: 60, message: 'Nếu email này đủ điều kiện, bạn sẽ nhận được thư hướng dẫn. Hãy kiểm tra hộp thư và thư rác.' };
+    } catch (error) { return { success: false, retryAfter: 60, error: errorText(error) }; }
+  }
+  public static async updateRecoveryPassword(password: string): Promise<AuthResult> {
+    if (password.length < 8) return { success: false, error: 'Mật khẩu cần ít nhất 8 ký tự.' };
+    const recovery = getRecoveryState();
+    if (recovery.status !== 'ready' || !recovery.owner) return { success: false, error: 'Link đã hết hạn hoặc không hợp lệ. Hãy yêu cầu email mới.' };
+    manualOperations++;
+    const epoch = authEpoch;
+    try {
+      const { data, error } = await client().auth.getUser();
+      if (error || !data.user || data.user.is_anonymous || data.user.id !== recovery.owner) throw error || new Error('Phiên khôi phục đã thay đổi. Hãy mở link mới.');
+      if (epoch !== authEpoch || getRecoveryState().owner !== recovery.owner) return { success: false, cancelled: true };
+      const result = await client().auth.updateUser({ password });
+      if (result.error) throw result.error;
+      if (epoch !== authEpoch || getRecoveryState().owner !== recovery.owner) return { success: false, cancelled: true };
+      clearRecovery();
+      return { success: true, message: 'Đã đổi mật khẩu. Đang khôi phục tài khoản của bạn.' };
+    } catch (error) { return { success: false, error: errorText(error) }; }
+    finally { manualOperations--; }
   }
   public static async saveIdentity(name: string, avatar: string): Promise<AuthResult> {
     const user = this.getCurrentUser();
@@ -248,6 +295,7 @@ export class AuthService {
     } catch (error) { return { success: false, error: errorText(error) }; }
   }
   public static async checkpoint(): Promise<void> {
+    if (getRecoveryState().status !== 'idle') return;
     const user = this.getCurrentUser(); const snapshot = captureAccount();
     const id = StorageService.loadProfile().id;
     saveAccountSlot(id, snapshot);
@@ -270,3 +318,4 @@ export class AuthService {
     return saving;
   }
 }
+

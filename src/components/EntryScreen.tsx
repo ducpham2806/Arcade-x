@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gamepad2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
-  const { currentUser, login, register, continueAsGuest, saveIdentity, authModalMode, logout } = useAuth();
-  const [mode, setMode] = useState<'login' | 'register'>(authModalMode);
+  const { currentUser, login, register, continueAsGuest, saveIdentity, authModalMode, logout, requestPasswordReset, resendConfirmation, notice } = useAuth();
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(authModalMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -14,13 +14,19 @@ export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [confirmationNeeded, setConfirmationNeeded] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  useEffect(() => { if (!cooldown) return; const timer = setTimeout(() => setCooldown(value => Math.max(0,value-1)),1000); return () => clearTimeout(timer); }, [cooldown]);
   const setup = !!currentUser && !currentUser.profileCompleted;
-  const run = async (operation: () => Promise<{ success: boolean; error?: string; needsEmailConfirmation?: boolean; message?: string; user?: { profileCompleted?: boolean } }>, enter: boolean) => {
+  const run = async (operation: () => Promise<{ success: boolean; error?: string; needsEmailConfirmation?: boolean; retryAfter?: number; message?: string; user?: { profileCompleted?: boolean } }>, enter: boolean) => {
     setBusy(true); setError(''); setMessage('');
     try {
       const result = await operation();
+      if (result.retryAfter) setCooldown(result.retryAfter);
+      if (result.needsEmailConfirmation) setConfirmationNeeded(true);
       if (!result.success) setError(result.error || 'Chưa thực hiện được. Hãy thử lại.');
       else if (result.needsEmailConfirmation) { setMessage(result.message || 'Kiểm tra email để xác nhận tài khoản.'); setMode('login'); setPassword(''); setConfirm(''); }
+      else if (!enter && result.message) setMessage(result.message);
       else if (enter && (!result.user || result.user.profileCompleted)) onEnter();
     } catch { setError('Chưa kết nối được máy chủ. Hãy thử lại.'); }
     finally { setBusy(false); }
@@ -34,7 +40,7 @@ export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
         <p className="hidden md:block text-xs text-slate-500">Thư viện game · Máy tính & điện thoại</p>
       </div>
       <div className="bg-[#101621] p-6 sm:p-10 space-y-5">
-        <h2 className="text-2xl font-bold text-white">{setup ? 'Bạn muốn được gọi là gì?' : currentUser ? 'Chào mừng trở lại' : 'Bắt đầu với ArcadeX'}</h2>
+        <h2 className="text-2xl font-bold text-white">{setup ? 'Bạn muốn được gọi là gì?' : currentUser ? 'Chào mừng trở lại' : mode === 'forgot' ? 'Quên mật khẩu?' : 'Bắt đầu với ArcadeX'}</h2>
         {setup ? <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(() => saveIdentity(name, avatar), true); }}>
           <p className="text-sm text-slate-400">Thêm một cái tên và ảnh đại diện để bạn bè nhận ra bạn. Bạn có thể sửa sau trong Tài khoản.</p>
           <p className="text-sm text-slate-300 break-all">{currentUser.email}</p>
@@ -44,16 +50,21 @@ export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
           <button id="btn-complete-profile" disabled={busy} className="simple-primary-button w-full justify-center py-3">{busy ? 'Đang kiểm tra và lưu…' : 'Lưu hồ sơ & vào chơi'}<ArrowRight size={18}/></button>
         </form> : currentUser ? <div className="space-y-4"><p className="text-slate-300">{currentUser.avatar} {currentUser.username}</p><p className="text-sm text-slate-400 break-all">{currentUser.email}</p><button id="btn-entry-continue" onClick={onEnter} className="simple-primary-button w-full justify-center py-3">Vào thư viện game<ArrowRight size={18}/></button><button id="btn-logout-account" disabled={busy} onClick={() => {void run(logout,false);}} className="simple-secondary-button w-full justify-center py-3">Đăng xuất / dùng tài khoản khác</button></div> : <>
           <div className="flex rounded-xl bg-black/30 p-1">{(['login','register'] as const).map(v => <button id={`tab-auth-${v}`} key={v} type="button" onClick={() => {setMode(v);setError('');setMessage('');}} disabled={busy} aria-pressed={mode===v} className={`flex-1 rounded-lg py-2.5 text-sm font-bold ${mode===v?'bg-indigo-600 text-white':'text-slate-400'}`}>{v==='login'?'Đăng nhập':'Đăng ký'}</button>)}</div>
-          <form className="space-y-4" onSubmit={e => { e.preventDefault(); if (mode==='register' && password!==confirm) {setError('Mật khẩu xác nhận không trùng khớp.');return;} void run(() => mode==='login' ? login(email,password) : register({ email,password,keepGuestData:keep }),true); }}>
+          <form className="space-y-4" onSubmit={e => { e.preventDefault(); if (mode==='register' && password!==confirm) {setError('Mật khẩu xác nhận không trùng khớp.');return;} void run(() => mode==='forgot' ? requestPasswordReset(email) : mode==='login' ? login(email,password) : register({ email,password,keepGuestData:keep }),mode!=='forgot'); }}>
             <div><label className="block text-sm mb-2" htmlFor={mode==='login'?'input-login-identifier':'input-reg-email'}>Email</label><input id={mode==='login'?'input-login-identifier':'input-reg-email'} className={input} type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} disabled={busy}/></div>
-            <div><label className="block text-sm mb-2" htmlFor={mode==='login'?'input-login-password':'input-reg-password'}>Mật khẩu</label><input id={mode==='login'?'input-login-password':'input-reg-password'} className={input} type="password" minLength={mode==='register'?8:undefined} autoComplete={mode==='login'?'current-password':'new-password'} required value={password} onChange={e => setPassword(e.target.value)} disabled={busy}/></div>
+            {mode !== 'forgot' && <div><label className="block text-sm mb-2" htmlFor={mode==='login'?'input-login-password':'input-reg-password'}>Mật khẩu</label><input id={mode==='login'?'input-login-password':'input-reg-password'} className={input} type="password" minLength={mode==='register'?8:undefined} autoComplete={mode==='login'?'current-password':'new-password'} required value={password} onChange={e => setPassword(e.target.value)} disabled={busy}/></div>}
             {mode==='register' && <><div><label className="block text-sm mb-2" htmlFor="input-reg-confirm-password">Nhập lại mật khẩu</label><input id="input-reg-confirm-password" className={input} type="password" autoComplete="new-password" required value={confirm} onChange={e=>setConfirm(e.target.value)} disabled={busy}/></div><label className="flex gap-2 text-xs text-slate-400"><input id="input-keep-guest-data" type="checkbox" checked={keep} onChange={e=>setKeep(e.target.checked)} disabled={busy}/>Giữ tiến trình khách trên thiết bị này</label><p className="text-xs text-slate-500">Ít nhất 8 ký tự. Sau khi xác nhận email và đăng nhập, bạn sẽ đặt tên hiển thị.</p></>}
-            <button id={`btn-submit-${mode}`} disabled={busy} className="simple-primary-button py-3 w-full justify-center">{busy?'Đang xử lý…':mode==='login'?'Đăng nhập':'Tạo tài khoản'}<ArrowRight size={18}/></button>
+            <button id={`btn-submit-${mode}`} disabled={busy || mode==='forgot' && cooldown>0} className="simple-primary-button py-3 w-full justify-center">{busy?'Đang xử lý…':mode==='forgot' ? cooldown ? `Gửi lại sau ${cooldown}s` : 'Gửi link khôi phục' : mode==='login'?'Đăng nhập':'Tạo tài khoản'}<ArrowRight size={18}/></button>
           </form>
+          {mode==='login' && <button id="btn-forgot-password" disabled={busy} type="button" onClick={() => { setMode('forgot');setError('');setMessage('');setPassword(''); }} className="text-sm text-lime-300 py-2">Quên mật khẩu?</button>}
+          {mode==='forgot' && <p className="text-xs text-slate-400">Nhập email đã đăng ký. Link khôi phục sẽ mở màn đặt mật khẩu mới.</p>}
+          {confirmationNeeded && mode==='login' && <button id="btn-resend-confirmation" type="button" disabled={busy || cooldown>0} onClick={() => void run(() => resendConfirmation(email),false)} className="simple-secondary-button w-full py-3 justify-center">{cooldown ? `Gửi lại sau ${cooldown}s` : 'Gửi lại email xác nhận'}</button>}
         </>}
+        {notice && !message && !error && <p role="status" className="text-sm text-amber-300">{notice}</p>}
         {error && <p role="alert" className="text-sm text-rose-300">{error}</p>}{message && <p role="status" className="text-sm text-emerald-300">{message}</p>}
         <div className="border-t border-white/10 pt-4"><button id="btn-auth-play-guest" disabled={busy} type="button" onClick={() => {void run(continueAsGuest,true);}} className="simple-secondary-button w-full justify-center py-3">Chơi như khách</button><p className="mt-3 text-xs text-slate-500 text-center">Tiến trình khách chỉ lưu trên trình duyệt này.</p></div>
       </div>
     </section>
   </main>;
 };
+

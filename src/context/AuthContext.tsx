@@ -1,3 +1,5 @@
+import { PasswordRecoveryScreen } from '../components/PasswordRecoveryScreen';
+import { getRecoveryState, clearRecovery } from '../services/authRecovery';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { EntryScreen } from '../components/EntryScreen';
 import { SplashScreen } from '../components/SplashScreen';
@@ -9,6 +11,7 @@ interface AuthContextType {
   authModalMode: 'login' | 'register'; setAuthModalMode: (mode: 'login' | 'register') => void;
   register: (params: RegisterParams) => Promise<AuthResult>;
   login: (email: string, password: string) => Promise<AuthResult>;
+  requestPasswordReset: (email: string) => Promise<AuthResult>; resendConfirmation: (email: string) => Promise<AuthResult>;
   logout: () => Promise<AuthResult>; continueAsGuest: () => Promise<AuthResult>;
   openEntry: (mode?: 'login' | 'register') => void;
   saveIdentity: (name: string, avatar: string) => Promise<AuthResult>;
@@ -16,6 +19,7 @@ interface AuthContextType {
 }
 const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [recovery, setRecovery] = useState(getRecoveryState);
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
   const [loading, setLoading] = useState(true);
@@ -39,6 +43,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
   useEffect(() => {
     let alive = true;
+    const recovered = () => { if (alive) { setRecovery(getRecoveryState()); setEntered(false); } };
+    window.addEventListener('arcadex:auth_recovery', recovered);
     const switching = () => { if (alive) setLoading(true); };
     window.addEventListener('arcadex:account_switching', switching);
     void AuthService.initialize().then(result => { if (alive) apply(result); });
@@ -47,10 +53,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       void AuthService.restoreSession().then(result => { if (alive) apply(result); });
     });
-    return () => { alive = false; unsubscribe(); window.removeEventListener('arcadex:account_switching', switching); };
+    return () => { alive = false; unsubscribe(); window.removeEventListener('arcadex:auth_recovery', recovered); window.removeEventListener('arcadex:account_switching', switching); };
   }, [apply]);
   useEffect(() => {
-    if (loading || restoreError) return;
+    if (loading || restoreError || recovery.status !== 'idle') return;
     const save = () => { void AuthService.checkpoint().catch(() => {
       setNotice('Tiến trình đã lưu trên thiết bị; đồng bộ tài khoản sẽ thử lại khi có kết nối.');
     }); };
@@ -58,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     window.addEventListener('pagehide', save);
     window.addEventListener('online', save);
     return () => { clearInterval(interval); window.removeEventListener('pagehide', save); window.removeEventListener('online', save); };
-  }, [loading, restoreError, currentUser?.id]);
+  }, [loading, restoreError, currentUser?.id, recovery.status]);
 
   const register = useCallback(async (params: RegisterParams) => apply(await AuthService.register(params)), [apply]);
   const login = useCallback(async (email: string, password: string) => apply(await AuthService.login(email, password)), [apply]);
@@ -68,8 +74,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const openEntry = useCallback((mode: 'login' | 'register' = 'login') => { setAuthModalMode(mode); setEntered(false); }, []);
   const retry = async () => { setLoading(true); apply(await AuthService.restoreSession()); };
   return <AuthContext.Provider value={{ currentUser, isLoggedIn: !!currentUser, isGuest: !currentUser,
-    authModalMode, setAuthModalMode, register, login, logout, continueAsGuest, saveIdentity, openEntry, notice, dismissNotice: () => setNotice('') }}>
-    {!booted && !restoreError ? <SplashScreen ready={!loading} onComplete={() => setBooted(true)} onGuest={async () => { const result = await continueAsGuest(); if (result.success) {setBooted(true);setEntered(true);} }}/> : loading || restoreError ? <div className="min-h-screen bg-[#050505] text-slate-200 flex items-center justify-center p-6">
+    authModalMode, setAuthModalMode, register, login, requestPasswordReset: email => AuthService.requestPasswordReset(email), resendConfirmation: email => AuthService.resendConfirmation(email), logout, continueAsGuest, saveIdentity, openEntry, notice, dismissNotice: () => setNotice('') }}>
+    {recovery.status !== 'idle' ? <PasswordRecoveryScreen state={recovery} onComplete={async () => { setLoading(true); setBooted(true); apply(await AuthService.restoreSession()); }} onCancel={async () => { const result = apply(await AuthService.logout()); if (result.success) { clearRecovery(); setEntered(false); setBooted(true); } }} /> : !booted && !restoreError ? <SplashScreen ready={!loading} onComplete={() => setBooted(true)} onGuest={async () => { const result = await continueAsGuest(); if (result.success) {setBooted(true);setEntered(true);} }}/> : loading || restoreError ? <div className="min-h-screen bg-[#050505] text-slate-200 flex items-center justify-center p-6">
       <div className="w-full max-w-md rounded-3xl bg-[#101018] border border-white/10 p-8 text-center space-y-5" role="status" aria-live="polite">
         <h1 className="text-2xl font-bold text-white">ArcadeX</h1>
         <p>{restoreError || 'Đang chuẩn bị hồ sơ người chơi…'}</p>
@@ -84,3 +90,4 @@ export function useAuth(): AuthContextType {
   if (!value) throw new Error('useAuth must be used within an AuthProvider');
   return value;
 }
+
