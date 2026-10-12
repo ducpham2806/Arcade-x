@@ -24,3 +24,7 @@ enabled = true
 site_url = "http://localhost:3000"
 enable_signup = true
 enable_anonymous_sign_ins = true
+
+# Cosmic handler also checks auth.getUser and ticket ownership.
+[functions.cosmic-verify]
+verify_jwt = true

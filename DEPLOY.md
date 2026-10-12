@@ -1,3 +1,5 @@
+> Supabase Arcade-x đã được triển khai đợt A ngày 12/10/2026. Xem [báo cáo và kết quả kiểm thử](docs/SUPABASE-PHASE-A-2026-10-12.md). Không chạy lại FRESH/bundle/migration nguồn lên project này; lịch sử triển khai máy chủ dùng các đợt gộp được ghi trong báo cáo. Hướng dẫn cài mới bên dưới chỉ dành cho database chưa cài.
+
 # Deploy từ nhánh Git này
 
 Mã nguồn ứng dụng nằm ngay tại thư mục gốc repository, đã có mọi sửa đổi mới nhất. Khi deploy bằng Git lên Vercel/Netlify, đặt Root directory là `.`; install `npm ci`, build `npm run build`, publish `dist`, Node 24. Đặt hai biến môi trường theo `deploy/frontend.env`; giá trị ở đây là public frontend config. `.env.local` của workspace không được đưa lên Git.
@@ -75,6 +77,7 @@ Dùng thư mục `dist` vừa tạo để đưa lên hosting. Có thể chạy `
 1. Mở Supabase → **SQL Editor → New query**.
 2. Mở file **backend/01-FRESH-INSTALL-ONLY.sql**, sao chép toàn bộ, dán vào editor và bấm **Run**.
 3. File này cài đủ 11 migration trong một giao dịch: nền tảng, identity, launcher, catalog, Car Escape, Word Cross và từ điển, Cosmic Defend, Shikaku.
+4. Nếu cài trực tiếp từ repository, chạy tiếp `supabase/phase-a-hardening.sql` để bổ sung các quyền, policy và chỉ mục đã kiểm trong đợt A.
 
 File FRESH dành cho database chưa có các bảng ứng dụng ArcadeX. Không chạy lại file này lên dự án đã cài SQL trước đây.
 
@@ -111,12 +114,12 @@ Trong Supabase → **Authentication**:
 
 1. Supabase → **Edge Functions**, tạo function tên chính xác **cosmic-verify** bằng editor.
 2. Sao chép toàn bộ file **backend/cosmic-verify/index.ts** vào editor và deploy. Đây là bundle tự chứa engine/campaign; có thể dán riêng một file.
-3. Tắt **Verify JWT** ở gateway cho function này nếu Dashboard có tùy chọn đó. Function vẫn tự kiểm tra Bearer token bằng `auth.getUser`, chủ tài khoản và vé; hỗ trợ publishable key mới. Các biến server Supabase tiêu chuẩn do runtime cung cấp.
+3. Bật **Verify JWT** ở gateway cho function này theo `supabase/config.toml`. Client gửi JWT người dùng trong `Authorization` và publishable key trong `apikey`. Handler vẫn kiểm Bearer token bằng `auth.getUser`, chủ tài khoản và vé. Các biến server Supabase tiêu chuẩn do runtime cung cấp.
 
 Nếu dùng Supabase CLI, chạy từ thư mục source đã đăng nhập và link đúng project:
 
 ```bash
-supabase functions deploy cosmic-verify --project-ref whjatkhhupeqfngakmee --no-verify-jwt
+supabase functions deploy cosmic-verify --project-ref whjatkhhupeqfngakmee
 ```
 
 Car Escape, Word Cross và Shikaku dùng các RPC trong SQL, không cần thêm Edge Function. Xu/thành tích và ván cục bộ vẫn lưu được khi chưa có backend; các tính năng đồng bộ/xếp hạng cần SQL/Auth/Function tương ứng.
