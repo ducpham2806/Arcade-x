@@ -10,7 +10,7 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: 'autoUpdate',
+        registerType: 'prompt',
         includeAssets: [
           'favicon.ico',
           'apple-touch-icon.png',
@@ -23,7 +23,7 @@ export default defineConfig(() => {
           id: '/',
           name: 'ArcadeX - Instant Game Launcher and PWA Platform',
           short_name: 'ArcadeX',
-          description: 'Nền tảng Instant Game Launcher PWA tích hợp kho mini-game phong phú, mở rương, thành tựu và bảng xếp hạng offline/online.',
+          description: 'Launcher mini-game đơn giản, đồng bộ tài khoản và hỗ trợ chơi ngoại tuyến.',
           theme_color: '#050505',
           background_color: '#050505',
           display: 'standalone',
@@ -52,7 +52,7 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2,json}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2,ttf,json}'],
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: '/index.html',

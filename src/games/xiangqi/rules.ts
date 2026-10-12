@@ -128,7 +128,7 @@ export function cloneBoard(board: BoardMatrix): BoardMatrix {
 /**
  * Validates whether a move from (fromR, fromC) to (toR, toC) is legal under Xiangqi rules
  */
-export function getLegalMovesForPiece(
+function getPseudoLegalMovesForPiece(
   board: BoardMatrix,
   fromR: number,
   fromC: number
@@ -340,13 +340,37 @@ export function getLegalMovesForPiece(
     }
   }
 
-  // Filter moves that would violate Flying General or leave King in check
-  return moves.filter(([toR, toC]) => {
-    const testBoard = cloneBoard(board);
-    testBoard[toR][toC] = testBoard[fromR][fromC];
-    testBoard[fromR][fromC] = null;
-    return !hasFlyingGenerals(testBoard);
+  return moves;
+}
+
+export function isKingInCheck(board: BoardMatrix, color: PieceColor): boolean {
+  const king = findKing(board, color);
+  if (!king) return true;
+  if (hasFlyingGenerals(board)) return true;
+  for (let r = 0; r < 10; r++) for (let c = 0; c < 9; c++) {
+    if (board[r][c] && board[r][c]!.color !== color &&
+        getPseudoLegalMovesForPiece(board, r, c).some(([toR, toC]) => toR === king[0] && toC === king[1])) return true;
+  }
+  return false;
+}
+
+// Attack detection uses pseudo-legal moves to avoid recursive legal-move checks.
+export function getLegalMovesForPiece(board: BoardMatrix, fromR: number, fromC: number): [number, number][] {
+  const piece = board[fromR]?.[fromC];
+  if (!piece) return [];
+  return getPseudoLegalMovesForPiece(board, fromR, fromC).filter(([toR, toC]) => {
+    const next = cloneBoard(board);
+    next[toR][toC] = next[fromR][fromC];
+    next[fromR][fromC] = null;
+    return !isKingInCheck(next, piece.color);
   });
+}
+
+export function hasLegalMoves(board: BoardMatrix, color: PieceColor): boolean {
+  for (let r = 0; r < 10; r++) for (let c = 0; c < 9; c++) {
+    if (board[r][c]?.color === color && getLegalMovesForPiece(board, r, c).length) return true;
+  }
+  return false;
 }
 
 /**
@@ -398,14 +422,14 @@ export function findKing(board: BoardMatrix, color: PieceColor): [number, number
 }
 
 /**
- * Serialize Xiangqi board to JSON string for reliable Firestore storage (avoids nested array restriction)
+ * Serialize Xiangqi board to JSON string for reliable Supabase storage (avoids nested array restriction)
  */
 export function serializeXiangqiBoard(board: BoardMatrix): string {
   return JSON.stringify(board);
 }
 
 /**
- * Safely deserialize Xiangqi board from Firestore (supports string or array)
+ * Safely deserialize Xiangqi board from Supabase (supports string or array)
  */
 export function deserializeXiangqiBoard(raw: any): BoardMatrix {
   if (!raw) return INITIAL_XIANGQI_BOARD;

@@ -97,10 +97,7 @@ export const WinPopup: React.FC<WinPopupProps> = ({
             <Coins className="w-4 h-4 text-yellow-400" />
             <span>+{result.coinsEarned} Vàng</span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs font-black text-cyan-300">
-            <Zap className="w-4 h-4 text-cyan-400" />
-            <span>+{result.expEarned} EXP</span>
-          </div>
+
           {result.gemsEarned > 0 && (
             <div className="flex items-center gap-1.5 text-xs font-black text-pink-300">
               <Gem className="w-4 h-4 text-pink-400" />

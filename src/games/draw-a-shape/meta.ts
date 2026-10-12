@@ -1,5 +1,6 @@
 import { GameMetadata } from '../../types';
-import { DrawAShapeGame } from './index';
+import { lazy } from 'react';
+const DrawAShapeGame = lazy(() => import('./index').then(module => ({ default: module.DrawAShapeGame })));
 import { DRAW_SHAPE_ACHIEVEMENTS, DRAW_SHAPE_CONTROLS, DRAW_SHAPE_DROP_RATES } from './config';
 
 export const DrawAShapeMeta: GameMetadata = {

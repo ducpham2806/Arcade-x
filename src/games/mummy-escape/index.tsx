@@ -729,7 +729,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
   return (
     <div
       id="mummy-escape-root"
-      className="flex flex-col items-center justify-start w-full h-full max-w-4xl mx-auto text-white select-none overflow-y-auto overflow-x-hidden p-1 sm:p-3 scrollbar-thin"
+      className="arcade-game-surface flex flex-col items-center justify-start w-full h-full max-w-4xl mx-auto text-white select-none overflow-y-auto overflow-x-hidden p-1 sm:p-3 scrollbar-thin"
     >
       {/* Game Header Bar & Mode Selector */}
       <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 mb-2 bg-[#1b140e] border border-[#7d5626] rounded-2xl p-2 sm:px-4 shadow-lg">
@@ -1103,7 +1103,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
         </div>
 
         {/* RIGHT COLUMN: Turn Indicator + Game Board + Mobile D-Pad (8 cols) */}
-        <div className="md:col-span-8 flex flex-col items-center justify-center bg-[#151009] border border-[#5d3f1c] rounded-2xl p-2 sm:p-4 shadow-2xl relative">
+        <div className="mummy-board-panel md:col-span-8 flex flex-col items-center justify-center bg-[#151009] border border-[#5d3f1c] rounded-2xl p-2 sm:p-4 shadow-2xl relative">
           {/* Visual Turn Indicator UI Component with Countdown Timer */}
           <MummyEscapeTurnIndicator
             turnPhase={turnPhase}

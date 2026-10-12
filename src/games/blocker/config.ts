@@ -48,7 +48,7 @@ export const BLOCKER_CONTROLS: GameControlInfo[] = [
   {
     key: 'Kéo thả gạch',
     action: 'Kéo gạch từ khay bên dưới và thả vào vị trí trống trên bàn cờ',
-    touchInstruction: 'Chạm và giữ khối gạch, kéo thả vào lưới',
+    touchInstruction: 'Kéo thả hoặc chọn khối rồi chạm ô trên lưới; xoay và gợi ý miễn phí',
   },
   {
     key: 'Xóa hàng / cột',

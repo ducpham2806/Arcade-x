@@ -1,0 +1,545 @@
+@font-face {
+  font-family: CosmicPixel;
+  src: url("/games/cosmic-defense/font/VT323-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+.cd-root,
+.cd-dialog {
+  --cd-cyan: #27e3ff;
+  --cd-dark: #0b1020;
+  --cd-border: #2b3a5c;
+  color: #f2f6fa;
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  background: #0b1020;
+}
+.cd-root {
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  overflow: auto;
+  position: relative;
+  overscroll-behavior: contain;
+}
+.cd-root button,
+.cd-dialog button {
+  cursor: pointer;
+  min-height: 44px;
+  border: 2px solid #1496c9;
+  background: #111d34;
+  color: #f2f6fa;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 3px 0 #071020;
+  border-radius: 2px;
+}
+.cd-root button:hover,
+.cd-dialog button:hover {
+  background: #233852;
+  border-color: #27e3ff;
+}
+.cd-root button:focus-visible,
+.cd-dialog button:focus-visible,
+.cd-root canvas:focus-visible {
+  outline: 3px solid #ffd23f;
+  outline-offset: 3px;
+}
+.cd-root button:disabled,
+.cd-dialog button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.cd-root .cd-primary,
+.cd-dialog .cd-primary {
+  background: #27e3ff;
+  color: #0b1020;
+  border-color: #7af4ff;
+}
+.cd-root .cd-danger,
+.cd-dialog .cd-danger {
+  border-color: #ff3d81;
+}
+.cd-root h1,
+.cd-root h2,
+.cd-root h3,
+.cd-dialog h2 {
+  font-family: CosmicPixel, monospace;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+}
+.cd-root h1 {
+  font-size: 48px;
+}
+.cd-root h2,
+.cd-dialog h2 {
+  font-size: 32px;
+}
+.cd-root h3 {
+  font-size: 26px;
+}
+.cd-root p,
+.cd-dialog p {
+  line-height: 1.65;
+  font-size: 13px;
+}
+.cd-root small,
+.cd-dialog small {
+  font-size: 12px;
+  color: #a9c1d9;
+}
+.cd-root input,
+.cd-root select,
+.cd-dialog select {
+  background: #1b2440;
+  color: white;
+  border: 1px solid #6b7fa0;
+  padding: 10px;
+  min-height: 44px;
+  max-width: 100%;
+}
+.cd-sprite {
+  display: inline-block;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.cd-page {
+  max-width: 960px;
+  margin: auto;
+  padding: 20px;
+  min-height: 100%;
+  background:
+    linear-gradient(0deg, #0b1020e8, #0b1020c9),
+    url("/games/cosmic-defense/backgrounds/bg_01_asteria_far.png");
+  image-rendering: auto;
+}
+.cd-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.cd-wallet {
+  font-family: CosmicPixel, monospace;
+  font-size: 26px;
+  color: #ffd23f;
+}
+.cd-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
+  text-align: center;
+  padding: 26px 12px;
+  position: relative;
+  border: 2px solid #2b3a5c;
+  background: radial-gradient(ellipse, #1496c928, transparent 70%);
+}
+.cd-hero .cd-logo {
+  max-width: 100%;
+}
+.cd-hero h1 {
+  margin: 0;
+}
+.cd-hero button {
+  width: min(360px, 100%);
+}
+.cd-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.cd-card {
+  border: 2px solid #2b3a5c;
+  background: #111b2f;
+  padding: 16px;
+  min-width: 0;
+}
+.cd-card h3 {
+  margin: 8px 0;
+}
+.cd-card p {
+  color: #a9c1d9;
+  margin: 6px 0 12px;
+}
+.cd-card button {
+  margin-top: 8px;
+}
+.cd-stat {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cd-levels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+.cd-root .cd-level {
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 2px;
+  gap: 7px;
+}
+.cd-level span {
+  color: #ffd23f;
+  letter-spacing: 2px;
+}
+.cd-level strong {
+  font-family: CosmicPixel;
+  font-size: 30px;
+}
+.cd-level.cd-boss {
+  border-color: #ff3d81;
+}
+.cd-bar {
+  height: 12px;
+  border: 1px solid #6b7fa0;
+  background: #1b2440;
+  margin: 10px 0;
+  position: relative;
+}
+.cd-bar span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #27e3ff 0,
+    #27e3ff 8px,
+    #1496c9 8px,
+    #1496c9 10px
+  );
+}
+.cd-selectable[aria-pressed="true"] {
+  border-color: #ffd23f !important;
+  background: #344122 !important;
+}
+.cd-game {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  align-items: center;
+  background: #060a14;
+  overflow: hidden;
+  padding: 4px;
+}
+.cd-gamebar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 2px 6px 6px;
+  font-size: 12px;
+}
+.cd-gamebar button {
+  min-height: 36px;
+  font-size: 12px;
+  padding: 4px 7px;
+}
+.cd-arena-fit {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: size;
+}
+.cd-arena {
+  position: relative;
+  height: min(100cqh, 177.777cqw);
+  aspect-ratio: 9/16;
+  max-width: 100%;
+  border: 2px solid #2b3a5c;
+  overflow: hidden;
+  background: #0b1020;
+}
+.cd-arena canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  image-rendering: pixelated;
+}
+.cd-hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 8px 8px 5px;
+  background: linear-gradient(#0b1020ef, #0b1020b0, transparent);
+  pointer-events: none;
+  font-family: CosmicPixel, monospace;
+  font-size: 22px;
+}
+.cd-hud-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+.cd-hud small {
+  font-size: 17px;
+  color: #f2f6fa;
+}
+.cd-hp {
+  display: flex;
+  gap: 2px;
+}
+.cd-objective {
+  margin-top: 4px;
+}
+.cd-objective .cd-bar {
+  height: 5px;
+  margin: 3px 0;
+}
+.cd-boss-label {
+  color: #ff7af0;
+  line-height: 1;
+}
+.cd-game .cd-slotbar {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  gap: 8px;
+}
+.cd-game .cd-slotbar.one-hand {
+  justify-content: flex-end;
+}
+.cd-game .cd-slot {
+  pointer-events: auto;
+  width: 70px;
+  height: 68px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+  background: #0b1020df;
+  padding: 3px;
+  border: 2px solid #ffd23f;
+  box-shadow: none;
+  font-size: 11px;
+}
+.cd-game .cd-slot:disabled {
+  border-color: #6b7fa0;
+  opacity: 0.65;
+}
+.cd-message {
+  position: absolute;
+  top: 26%;
+  left: 10px;
+  right: 10px;
+  text-align: center;
+  font-family: CosmicPixel, monospace;
+  font-size: 22px;
+  color: #ffd23f;
+  text-shadow: 2px 2px #0b1020;
+  pointer-events: none;
+}
+.cd-gamehint {
+  flex-shrink: 0;
+  font-size: 11px !important;
+  margin: 4px !important;
+  color: #a9c1d9;
+  text-align: center;
+}
+.cd-pause-inset {
+  position: absolute;
+  inset: 0;
+  background: #0b1020e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 10px;
+  text-align: center;
+}
+.cd-pause-inset button {
+  width: min(250px, 100%);
+}
+.cd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: #000b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.cd-dialog {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #1496c9;
+  overflow: hidden;
+}
+.cd-dialog header,
+.cd-dialog footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 2px solid #2b3a5c;
+}
+.cd-dialog footer {
+  border-top: 2px solid #2b3a5c;
+  border-bottom: none;
+}
+.cd-dialog h2 {
+  margin: 0;
+}
+.cd-dialog-body {
+  padding: 20px;
+  min-height: 0;
+  overflow: auto;
+  flex: 1;
+}
+.cd-dialog-body .cd-grid {
+  margin: 0;
+}
+.cd-results {
+  text-align: center;
+}
+.cd-stars {
+  font-family: CosmicPixel;
+  font-size: 64px;
+  color: #ffd23f;
+  letter-spacing: 12px;
+}
+.cd-reward {
+  font-family: CosmicPixel;
+  font-size: 32px;
+  color: #2de2a8;
+}
+.cd-result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  text-align: left;
+  padding: 18px;
+  border: 2px solid #2b3a5c;
+  margin: 20px 0;
+}
+.cd-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cd-notice {
+  color: #ffd23f !important;
+  border-left: 3px solid #ffd23f;
+  padding: 8px 12px;
+  background: #ffd23f09;
+}
+.cd-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.cd-settings label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.cd-settings input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+}
+.cd-story {
+  width: 180px;
+  max-width: 100%;
+  image-rendering: pixelated;
+  float: right;
+  margin: 0 0 12px 16px;
+}
+.cd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cd-rankrow {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px;
+  background: #1b2440;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .cd-dialog {
+    width: min(92vw, 960px);
+    height: 92vh;
+    max-height: 900px;
+  }
+  .cd-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cd-page {
+    padding: 28px;
+  }
+  .cd-hero {
+    padding: 30px;
+  }
+}
+@media (max-width: 360px) {
+  .cd-page {
+    padding: 12px;
+  }
+  .cd-grid {
+    gap: 8px;
+  }
+  .cd-card {
+    padding: 12px;
+  }
+  .cd-levels {
+    gap: 6px;
+  }
+  .cd-level strong {
+    font-size: 26px;
+  }
+  .cd-hud {
+    font-size: 18px;
+    padding: 5px;
+  }
+  .cd-hud small {
+    font-size: 15px;
+  }
+  .cd-game .cd-slot {
+    width: 60px;
+    height: 58px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cd-root *,
+  .cd-dialog * {
+    scroll-behavior: auto !important;
+  }
+}

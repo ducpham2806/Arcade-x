@@ -1,3 +1,4 @@
+import { GameArtwork } from '../../visuals/gameArt';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { GameComponentProps } from '../../types';
 import {
@@ -15,6 +16,7 @@ import {
   getDigitCounts,
   findConflicts,
   isBoardSolved,
+  isSolvableWithEntry,
   getSmartHint,
   SmartHintResult,
 } from './generator';
@@ -22,7 +24,7 @@ import { CAMPAIGN_STAGES } from './config';
 import { SudokuBoard } from './SudokuBoard';
 import { Numpad } from './Numpad';
 import { WinPopup } from './WinPopup';
-import { usePlayer } from '../../context/PlayerContext';
+import { validSudokuBoard } from './save';
 import { DynamicDifficultyService, DynamicDifficultySuggestion } from './dynamicDifficulty';
 import {
   ArrowLeft,
@@ -50,7 +52,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-const HINT_COIN_COST = 20;
+
 
 export const ScoodokuGame: React.FC<GameComponentProps> = ({
   bridge,
@@ -59,9 +61,9 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
   isPracticeMode,
   onGameOver,
   onRestart,
+  initialState,
 }) => {
-  // Global Player Profile & Currency
-  const { profile, spendCoins } = usePlayer();
+
 
   // Screen Views: 'menu' | 'stages' | 'playing'
   const [view, setView] = useState<'menu' | 'stages' | 'playing'>('menu');
@@ -125,28 +127,41 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
   // Help Modal Toggle
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
 
-  // Load Saved Game State from Bridge
+  const [saveRestored, setSaveRestored] = useState(false);
+  // Keep old progress-only saves compatible while restoring versioned active puzzles.
   useEffect(() => {
-    const saved = bridge.loadGameState<{
-      highScore: number;
-      unlockedStars: Record<number, number>;
-      consecutiveNoHintStreak: number;
-    }>();
+    const saved = (initialState === undefined ? bridge.loadGameState() : initialState) as any;
     if (saved) {
-      if (saved.highScore) setHighScore(saved.highScore);
-      if (saved.unlockedStars) setUnlockedStars(saved.unlockedStars);
-      if (saved.consecutiveNoHintStreak) setConsecutiveNoHintStreak(saved.consecutiveNoHintStreak);
+      if (Number.isFinite(saved.highScore)) setHighScore(Math.max(0, saved.highScore));
+      if (saved.unlockedStars && typeof saved.unlockedStars === 'object') setUnlockedStars(saved.unlockedStars);
+      if (Number.isFinite(saved.consecutiveNoHintStreak)) setConsecutiveNoHintStreak(saved.consecutiveNoHintStreak);
+      const run = saved.version === 1 ? saved.run : null;
+      if (run && validSudokuBoard(run.board) && ['campaign','time','endless','limit_steps'].includes(run.gameMode)) {
+        setBoard(run.board); setView('playing'); setGameMode(run.gameMode);
+        setSelectedSize(run.board.size); setSelectedDifficulty(run.board.difficulty);
+        const n = (key: string, fallback = 0) => Number.isFinite(run[key]) ? Math.max(0, run[key]) : fallback;
+        setCurrentStageId(n('currentStageId',1)); setTimeElapsed(n('timeElapsed'));
+        setInitialTargetTime(n('initialTargetTime',300)); setTimeRemaining(n('timeRemaining',300));
+        setMistakesCount(n('mistakesCount')); setMaxMistakesAllowed(n('maxMistakesAllowed',3));
+        setHintsUsedCount(n('hintsUsedCount')); setHintsAvailable(Math.min(3,n('hintsAvailable',3)));
+        setScore(n('score')); setEndlessSolvedCount(n('endlessSolvedCount'));
+        setIsNotesMode(run.isNotesMode === true); setIsWon(run.isWon === true); setIsFailed(run.isFailed === true);
+        if (run.winResult && typeof run.winResult === 'object') setWinResult(run.winResult);
+        if (run.selectedPos && Number.isInteger(run.selectedPos.row) && Number.isInteger(run.selectedPos.col) && run.board.cells[run.selectedPos.row]?.[run.selectedPos.col]) setSelectedPos(run.selectedPos);
+        setUndoHistory(Array.isArray(run.undoHistory) ? run.undoHistory.filter((step: UndoStep) => step && run.board.cells[step.row]?.[step.col] && Array.isArray(step.prevNotes) && Array.isArray(step.newNotes)).slice(-200) : []);
+      }
     }
-  }, [bridge]);
-
-  // Save Game State
+    setSaveRestored(true);
+  }, []);
   useEffect(() => {
-    bridge.saveGameState({
-      highScore: Math.max(score, highScore),
-      unlockedStars,
-      consecutiveNoHintStreak,
-    });
-  }, [bridge, score, highScore, unlockedStars, consecutiveNoHintStreak]);
+    if (!saveRestored) return;
+    bridge.saveGameState({ version: 1, highScore: Math.max(score, highScore), unlockedStars, consecutiveNoHintStreak,
+      run: view === 'playing' ? { board, gameMode, currentStageId, selectedPos, isNotesMode, undoHistory: undoHistory.slice(-200),
+        hintsAvailable, timeElapsed, initialTargetTime, timeRemaining, mistakesCount, maxMistakesAllowed, hintsUsedCount,
+        score, endlessSolvedCount, isWon, isFailed, winResult } : null });
+  }, [saveRestored, bridge, view, highScore, unlockedStars, consecutiveNoHintStreak, board, gameMode, currentStageId, selectedPos,
+    isNotesMode, undoHistory, hintsAvailable, timeElapsed, initialTargetTime, timeRemaining, mistakesCount, maxMistakesAllowed,
+    hintsUsedCount, score, endlessSolvedCount, isWon, isFailed, winResult]);
 
   // Refresh dynamic difficulty suggestion when settings change
   useEffect(() => {
@@ -429,7 +444,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
   // Place Number or Toggle Note in Selected Cell
   const handleSelectDigit = useCallback(
     (num: number) => {
-      if (!selectedPos || isWon || isFailed) return;
+      if (isPaused || !selectedPos || isWon || isFailed) return;
       const { row, col } = selectedPos;
       const currentCell = board.cells[row][col];
 
@@ -472,7 +487,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
       // DIRECT NUMBER ENTRY MODE
       const prevVal = currentCell.value;
       const prevNotes = currentCell.notes || [];
-      const isCorrect = num === currentCell.solutionValue;
+      const isCorrect = num === currentCell.solutionValue || isSolvableWithEntry(board, row, col, num);
 
       // If user is clicking the same number already in cell, keep it
       if (prevVal === num) return;
@@ -558,6 +573,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
       }
     },
     [
+      isPaused,
       selectedPos,
       isWon,
       isFailed,
@@ -576,7 +592,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
   // Erase Number or Notes from Cell
   const handleErase = useCallback(() => {
-    if (!selectedPos || isWon || isFailed) return;
+    if (isPaused || !selectedPos || isWon || isFailed) return;
     const { row, col } = selectedPos;
     const currentCell = board.cells[row][col];
 
@@ -605,11 +621,11 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     });
 
     if (!muted) bridge.playSound('tap');
-  }, [selectedPos, isWon, isFailed, board.cells, muted, bridge]);
+  }, [isPaused, selectedPos, isWon, isFailed, board.cells, muted, bridge]);
 
   // Undo Last Action
   const handleUndo = useCallback(() => {
-    if (undoHistory.length === 0 || isWon || isFailed) return;
+    if (isPaused || undoHistory.length === 0 || isWon || isFailed) return;
 
     const lastStep = undoHistory[undoHistory.length - 1];
     setUndoHistory((prev) => prev.slice(0, -1));
@@ -632,11 +648,11 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
     setSelectedPos({ row: lastStep.row, col: lastStep.col });
     if (!muted) bridge.playSound('tap');
-  }, [undoHistory, isWon, isFailed, muted, bridge]);
+  }, [isPaused, undoHistory, isWon, isFailed, muted, bridge]);
 
   // Auto-Fill Candidates for Pencil Mode
   const handleAutoPencilCandidates = useCallback(() => {
-    if (isWon || isFailed) return;
+    if (isPaused || isWon || isFailed) return;
 
     setBoard((prev) => {
       const newCells = prev.cells.map((rList, r) =>
@@ -686,11 +702,11 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
     showToast('✏️ Đã tự động phân tích và điền toàn bộ ghi chú ứng viên hợp lệ!');
     if (!muted) bridge.playSound('pop');
-  }, [isWon, isFailed, showToast, muted, bridge]);
+  }, [isPaused, isWon, isFailed, showToast, muted, bridge]);
 
   // Clear All Pencil Notes on Board
   const handleClearAllNotes = useCallback(() => {
-    if (isWon || isFailed) return;
+    if (isPaused || isWon || isFailed) return;
 
     setBoard((prev) => {
       const newCells = prev.cells.map((rList) =>
@@ -701,11 +717,11 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
     showToast('🧹 Đã xóa sạch mọi số nháp ghi chú trên bàn cờ!');
     if (!muted) bridge.playSound('tap');
-  }, [isWon, isFailed, showToast, muted, bridge]);
+  }, [isPaused, isWon, isFailed, showToast, muted, bridge]);
 
-  // Hint Request costing Arcade Coins
+  // Three free reveals per puzzle; no platform wallet dependency.
   const handleHint = useCallback(() => {
-    if (isWon || isFailed) return;
+    if (isPaused || isWon || isFailed) return;
 
     // Determine target cell: use selected cell or auto-find first unfilled/incorrect cell
     let targetR = selectedPos?.row;
@@ -741,28 +757,15 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
       setSelectedPos({ row: targetR, col: targetC });
     }
 
-    // Check Arcade Coins
-    if (profile.coins < HINT_COIN_COST) {
-      showToast(
-        `⚠️ Không đủ Arcade Coins! Cần ${HINT_COIN_COST} 🪙 (bạn có: ${profile.coins} 🪙). Hãy chơi thêm để tích lũy xu!`
-      );
-      if (!muted) bridge.playSound('error');
-      return;
-    }
-
-    // Deduct Arcade Coins
-    const spent = spendCoins(HINT_COIN_COST);
-    if (!spent) {
-      showToast('Giao dịch Arcade Coins không thành công, vui lòng thử lại.');
-      return;
-    }
+    if (hintsAvailable <= 0) { showToast('Bạn đã dùng hết 3 gợi ý của ván này.'); return; }
+    setHintsAvailable(count => count - 1);
 
     const correctVal = targetCell.solutionValue;
     setHintInfo({
       row: targetR!,
       col: targetC!,
       value: correctVal,
-      reason: `Đã mở số ${correctVal} cho ô [Hàng ${targetR! + 1}, Cột ${targetC! + 1}] (-${HINT_COIN_COST} 🪙)`,
+      reason: `Đã tiết lộ số ${correctVal} ở hàng ${targetR! + 1}, cột ${targetC! + 1}. Gợi ý này dùng đáp án của đề bài.`,
     });
     setHintsUsedCount((h) => h + 1);
 
@@ -807,7 +810,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     });
 
     showToast(
-      `🪙 -${HINT_COIN_COST} Arcade Coins: Đã mở số ${correctVal} cho ô [${targetR! + 1}, ${targetC! + 1}]!`
+      `Đã mở số ${correctVal} cho ô [${targetR! + 1}, ${targetC! + 1}]. Còn ${hintsAvailable - 1} gợi ý.`
     );
     if (!muted) bridge.playSound('pop');
 
@@ -825,8 +828,8 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     isFailed,
     selectedPos,
     board,
-    profile.coins,
-    spendCoins,
+    isPaused,
+    hintsAvailable,
     showToast,
     muted,
     bridge,
@@ -835,7 +838,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
   // Keyboard Shortcuts (1..9, WASD / Arrow Keys, N / P for Pencil, H for Hint, Backspace/Delete, Z)
   useEffect(() => {
-    if (view !== 'playing' || isWon || isFailed) return;
+    if (isPaused || view !== 'playing' || isWon || isFailed) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key >= '1' && e.key <= String(board.dimension)) {
@@ -865,7 +868,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [view, isWon, isFailed, board.dimension, handleSelectDigit, handleHint, handleErase, handleUndo]);
+  }, [isPaused, view, isWon, isFailed, board.dimension, handleSelectDigit, handleHint, handleErase, handleUndo]);
 
   const formatTimer = (secs: number) => {
     const mins = Math.floor(secs / 60);
@@ -890,7 +893,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     return (
       <div
         id="scoodoku-menu-view"
-        className="relative w-full h-full min-h-[600px] flex flex-col items-center justify-between p-4 sm:p-6 text-amber-100 overflow-y-auto"
+        className="arcade-game-surface relative w-full h-full min-h-[600px] flex flex-col items-center justify-between p-4 sm:p-6 text-amber-100 overflow-y-auto"
         style={{
           backgroundColor: '#1c1008',
           backgroundImage: `
@@ -914,10 +917,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
         {/* Hero Section */}
         <div className="flex flex-col items-center text-center my-4 z-10">
-          <div className="relative flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-amber-700 via-yellow-500 to-amber-600 border-4 border-yellow-200/80 shadow-[0_0_40px_rgba(245,158,11,0.5)] mb-3 animate-bounce">
-            <span className="text-4xl sm:text-5xl font-black text-stone-950 font-serif">9</span>
-            <Sparkles className="absolute -top-2 -right-2 w-7 h-7 text-yellow-200 animate-spin" />
-          </div>
+          <div className="arcade-menu-emblem"><GameArtwork gameId="scoodoku"/></div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-100 uppercase tracking-wide drop-shadow-md">
             SCOODOKU
@@ -1155,7 +1155,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     return (
       <div
         id="scoodoku-stages-view"
-        className="w-full h-full min-h-[600px] flex flex-col items-center p-4 sm:p-6 text-amber-100 overflow-y-auto"
+        className="arcade-game-surface w-full h-full min-h-[600px] flex flex-col items-center p-4 sm:p-6 text-amber-100 overflow-y-auto"
         style={{
           backgroundColor: '#1c1008',
           backgroundImage: `
@@ -1262,7 +1262,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
   return (
     <div
       id="scoodoku-playing-view"
-      className="relative w-full h-full min-h-[600px] flex flex-col items-center justify-between px-1 py-1 sm:p-4 text-amber-100 overflow-x-hidden overflow-y-auto select-none"
+      className="arcade-game-surface relative w-full h-full min-h-[600px] flex flex-col items-center justify-between px-1 py-1 sm:p-4 text-amber-100 overflow-x-hidden overflow-y-auto select-none"
       style={{
         backgroundColor: '#1f120a',
         backgroundImage: `
@@ -1305,14 +1305,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
 
         {/* Right: Coins, Sound & Restart */}
         <div className="flex items-center gap-1.5">
-          {/* Arcade Coins Display */}
-          <div
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#361a0b] border border-yellow-500/40 text-xs font-black text-yellow-300 shadow-inner"
-            title="Arcade Coins hiện có"
-          >
-            <Coins className="w-3.5 h-3.5 text-yellow-400" />
-            <span className="font-mono">{profile.coins}</span>
-          </div>
+          <span className="text-xs text-amber-300" title="Gợi ý miễn phí mỗi ván">💡 {hintsAvailable}/3</span>
 
           <button
             id="scoodoku-btn-restart"
@@ -1506,8 +1499,6 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
           hintsAvailable={hintsAvailable}
           highlightedDigit={highlightedDigit}
           onHighlightDigit={(d) => setHighlightedDigit(d)}
-          hintCost={HINT_COIN_COST}
-          playerCoins={profile.coins}
           hasSelectedCell={
             !!selectedPos && !board.cells[selectedPos.row]?.[selectedPos.col]?.isGiven
           }

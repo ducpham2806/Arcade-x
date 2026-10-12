@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { PlayerProfile, PlayerStats, DailyLoginRewardItem } from '../types';
 import { StorageService, getExpNeededForLevel, getStreakMultiplier } from '../services/storage';
+import { SupabaseService } from '../services/supabase';
 import { soundEngine } from '../services/audio';
 import { hapticService } from '../services/haptics';
 import confetti from 'canvas-confetti';
@@ -42,57 +43,9 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Sync to storage on profile change
   useEffect(() => {
     StorageService.saveProfile(profile);
+    const timer = setTimeout(() => { void SupabaseService.syncProfileToCloud(profile); }, 1500);
+    return () => clearTimeout(timer);
   }, [profile]);
-
-  // Handle level-up rewards & celebration cleanly in useEffect outside render cycle
-  useEffect(() => {
-    if (prevLevelRef.current === null) {
-      prevLevelRef.current = profile.level;
-      return;
-    }
-
-    if (profile.level > prevLevelRef.current) {
-      const oldLevel = prevLevelRef.current;
-      const newLevel = profile.level;
-      prevLevelRef.current = newLevel;
-
-      let rewardCoinsTotal = 0;
-      let rewardGemsTotal = 0;
-      for (let lvl = oldLevel + 1; lvl <= newLevel; lvl++) {
-        rewardCoinsTotal += lvl * 100;
-        rewardGemsTotal += Math.floor(lvl / 2) * 5 + 5;
-      }
-
-      soundEngine.play('levelUp');
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
-
-      const nextLevelUpInfo = {
-        newLevel,
-        rewardCoins: rewardCoinsTotal,
-        rewardGems: rewardGemsTotal,
-      };
-
-      setLevelUpInfo(nextLevelUpInfo);
-
-      // Dispatch toast event so if user is currently playing a game, a non-intrusive toast pops up
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(
-          new CustomEvent('arcadex:show_toast', {
-            detail: {
-              type: 'level_up',
-              levelUpInfo: nextLevelUpInfo,
-            },
-          })
-        );
-      }
-    } else {
-      prevLevelRef.current = profile.level;
-    }
-  }, [profile.level]);
 
   // Reload profile when auth state changes (login, register, logout, switch account)
   useEffect(() => {
@@ -107,45 +60,17 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const expNeeded = getExpNeededForLevel(profile.level);
 
-  const addExp = useCallback((amount: number) => {
-    if (amount <= 0) return;
-
-    setProfile(prev => {
-      let currentExp = prev.exp + amount;
-      let currentLevel = prev.level;
-      let needed = getExpNeededForLevel(currentLevel);
-      let rewardCoinsTotal = 0;
-      let rewardGemsTotal = 0;
-
-      while (currentExp >= needed) {
-        currentExp -= needed;
-        currentLevel += 1;
-        needed = getExpNeededForLevel(currentLevel);
-        const levelBonusCoins = currentLevel * 100;
-        const levelBonusGems = Math.floor(currentLevel / 2) * 5 + 5;
-        rewardCoinsTotal += levelBonusCoins;
-        rewardGemsTotal += levelBonusGems;
-      }
-
-      return {
-        ...prev,
-        level: currentLevel,
-        exp: currentExp,
-        coins: prev.coins + rewardCoinsTotal,
-        gems: prev.gems + rewardGemsTotal,
-      };
-    });
+  const addExp = useCallback((_amount: number) => {
+    // User accounts no longer have an XP progression loop.
   }, []);
 
   const addCoins = useCallback((amount: number) => {
     if (amount <= 0) return;
-    soundEngine.play('coin');
     setProfile(prev => ({ ...prev, coins: prev.coins + amount }));
   }, []);
 
   const addGems = useCallback((amount: number) => {
     if (amount <= 0) return;
-    soundEngine.play('powerup');
     setProfile(prev => ({ ...prev, gems: prev.gems + amount }));
   }, []);
 

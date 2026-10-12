@@ -66,7 +66,7 @@ export const TILE_2048_CONTROLS: GameControlInfo[] = [
   },
   {
     key: 'Đạt mốc 512 / 1024 / 2048',
-    action: 'Tự động kích hoạt hiệu ứng rớt ngọc quý (+10, +25, +50 Gems) trực tiếp',
+    action: 'Ghép các ô giống nhau để đạt ô số lớn hơn và tăng điểm',
   },
   {
     key: 'Kỹ năng Hoàn Tác & Xáo Ô',

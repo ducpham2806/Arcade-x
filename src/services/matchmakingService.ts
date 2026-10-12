@@ -1,6 +1,6 @@
 /**
  * Core Matchmaking & Multiplayer Service
- * High-performance Firestore onSnapshot & Atomic Transaction Engine
+ * High-performance Supabase Realtime & Atomic Transaction Engine
  */
 import {
   collection,
@@ -15,9 +15,9 @@ import {
   limit,
   runTransaction,
   arrayUnion,
-  Firestore,
-} from 'firebase/firestore';
-import { FirebaseService } from './firebase';
+  CloudDatabase,
+} from './cloudStore';
+import { SupabaseService } from './supabase';
 import {
   StandardGameRoom,
   MatchmakingQueueRecord,
@@ -28,18 +28,6 @@ import {
 } from '../types/multiplayerCore';
 
 
-export function updatePlayersEloInTransaction(tx: any, db: any, gameId: string, hostUid: string, guestUid: string, eloChange: { newHostElo: number, newGuestElo: number }) {
-  if (hostUid) {
-    tx.set(doc(db, 'players', hostUid), {
-      stats: { highScores: { [`${gameId}-elo`]: eloChange.newHostElo } }
-    }, { merge: true });
-  }
-  if (guestUid) {
-    tx.set(doc(db, 'players', guestUid), {
-      stats: { highScores: { [`${gameId}-elo`]: eloChange.newGuestElo } }
-    }, { merge: true });
-  }
-}
 
 export const ELO_K_FACTOR = 32;
 
@@ -85,10 +73,10 @@ export function generate6CharRoomCode(): string {
 }
 
 export class MatchmakingService {
-  private static getDb(): Firestore {
-    const db = FirebaseService.getDb();
+  private static getDb(): CloudDatabase {
+    const db = SupabaseService.getDb();
     if (!db) {
-      throw new Error('Firestore is not initialized. Please check Firebase config.');
+      throw new Error('Supabase chưa được cấu hình.');
     }
     return db;
   }
@@ -489,9 +477,7 @@ export class MatchmakingService {
         );
       }
 
-      if (status === 'ended' && eloChange) {
-        updatePlayersEloInTransaction(tx, db, room.gameId, hostUid, guestUid, eloChange);
-      }
+      // Postgres applies both ELO updates atomically when the room ends.
 
       tx.update(roomRef, {
         boardState: newBoardState,
@@ -535,8 +521,7 @@ export class MatchmakingService {
         hostUid,
         guestUid
       );
-
-      updatePlayersEloInTransaction(tx, db, room.gameId, hostUid, guestUid, eloChange);
+      // Postgres applies both ELO updates atomically when the room ends.
       const forfeiterName = forfeitUid === hostUid ? room.players.host.name : room.players.guest?.name;
 
       tx.update(roomRef, {
@@ -587,8 +572,7 @@ export class MatchmakingService {
         hostUid,
         guestUid
       );
-
-      updatePlayersEloInTransaction(tx, db, room.gameId, hostUid, guestUid, eloChange);
+      // Postgres applies both ELO updates atomically when the room ends.
       tx.update(roomRef, {
         status: 'ended',
         winner: claimantUid,
@@ -648,8 +632,7 @@ export class MatchmakingService {
           hostUid,
           guestUid
         );
-
-        updatePlayersEloInTransaction(tx, db, room.gameId, hostUid, guestUid, eloChange);
+      // Postgres applies both ELO updates atomically when the room ends.
         tx.update(roomRef, {
           status: 'ended',
           winner: 'DRAW',

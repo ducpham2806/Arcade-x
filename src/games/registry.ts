@@ -1,49 +1,50 @@
+import { lazy } from 'react';
 import { GameMetadata } from '../types';
-import { NeonRunnerGame } from './neon-runner';
+const NeonRunnerGame = lazy(() => import('./neon-runner').then(module => ({ default: module.NeonRunnerGame })));
 import { NEON_RUNNER_ACHIEVEMENTS, NEON_RUNNER_DROP_RATES, NEON_RUNNER_CONTROLS } from './neon-runner/config';
-import { CosmicDefenseGame } from './cosmic-defense';
+const CosmicDefenseGame = lazy(() => import('./cosmic-defense').then(module => ({ default: module.CosmicDefenseGame })));
 import { COSMIC_DEFENSE_ACHIEVEMENTS, COSMIC_DEFENSE_DROP_RATES, COSMIC_DEFENSE_CONTROLS } from './cosmic-defense/config';
-import { CyberSliceGame } from './cyber-slice';
+const CyberSliceGame = lazy(() => import('./cyber-slice').then(module => ({ default: module.CyberSliceGame })));
 import { CYBER_SLICE_ACHIEVEMENTS, CYBER_SLICE_DROP_RATES, CYBER_SLICE_CONTROLS } from './cyber-slice/config';
-import { DungeonTapGame } from './dungeon-tap';
+const DungeonTapGame = lazy(() => import('./dungeon-tap').then(module => ({ default: module.DungeonTapGame })));
 import { DUNGEON_TAP_ACHIEVEMENTS, DUNGEON_TAP_DROP_RATES, DUNGEON_TAP_CONTROLS } from './dungeon-tap/config';
-import { HexMatchGame } from './hex-match';
+const HexMatchGame = lazy(() => import('./hex-match').then(module => ({ default: module.HexMatchGame })));
 import { HEX_MATCH_ACHIEVEMENTS, HEX_MATCH_DROP_RATES, HEX_MATCH_CONTROLS } from './hex-match/config';
-import { Tile2048Game } from './tile-2048';
+const Tile2048Game = lazy(() => import('./tile-2048').then(module => ({ default: module.Tile2048Game })));
 import { TILE_2048_ACHIEVEMENTS, TILE_2048_DROP_RATES, TILE_2048_CONTROLS } from './tile-2048/config';
 import { DrawAShapeMeta } from './draw-a-shape/meta';
-import { CaroGomokuGame } from './caro-gomoku';
+const CaroGomokuGame = lazy(() => import('./caro-gomoku').then(module => ({ default: module.CaroGomokuGame })));
 import { CARO_GOMOKU_ACHIEVEMENTS, CARO_GOMOKU_DROP_RATES, CARO_GOMOKU_CONTROLS } from './caro-gomoku/config';
-import { XiangqiGame } from './xiangqi';
+const XiangqiGame = lazy(() => import('./xiangqi').then(module => ({ default: module.XiangqiGame })));
 import { XIANGQI_ACHIEVEMENTS, XIANGQI_DROP_RATES, XIANGQI_CONTROLS } from './xiangqi/config';
-import { ChessGame } from './chess';
-import { BlockerGame } from './blocker';
+const ChessGame = lazy(() => import('./chess').then(module => ({ default: module.ChessGame })));
+const BlockerGame = lazy(() => import('./blocker').then(module => ({ default: module.BlockerGame })));
 import { BLOCKER_ACHIEVEMENTS, BLOCKER_DROP_RATES, BLOCKER_CONTROLS } from './blocker/config';
-import { FillTheSpaceGame } from './fill-the-space';
+const FillTheSpaceGame = lazy(() => import('./fill-the-space').then(module => ({ default: module.FillTheSpaceGame })));
 import { FILL_THE_SPACE_ACHIEVEMENTS, FILL_THE_SPACE_DROP_RATES, FILL_THE_SPACE_CONTROLS } from './fill-the-space/config';
-import { ScoodokuGame } from './scoodoku';
+const ScoodokuGame = lazy(() => import('./scoodoku').then(module => ({ default: module.ScoodokuGame })));
 import { SCOODOKU_ACHIEVEMENTS, SCOODOKU_DROP_RATES, SCOODOKU_CONTROLS } from './scoodoku/config';
-import { ShikakuGame } from './shikaku';
+const ShikakuGame = lazy(() => import('./shikaku').then(module => ({ default: module.ShikakuGame })));
 import { SHIKAKU_ACHIEVEMENTS, SHIKAKU_DROP_RATES, SHIKAKU_CONTROLS } from './shikaku/config';
-import { EatEmAllGame } from './eat-em-all';
+const EatEmAllGame = lazy(() => import('./eat-em-all').then(module => ({ default: module.EatEmAllGame })));
 import { EAT_EM_ALL_ACHIEVEMENTS, EAT_EM_ALL_DROP_RATES, EAT_EM_ALL_CONTROLS } from './eat-em-all/config';
-import { MummyEscapeGame } from './mummy-escape';
+const MummyEscapeGame = lazy(() => import('./mummy-escape').then(module => ({ default: module.MummyEscapeGame })));
 import { MUMMY_ESCAPE_ACHIEVEMENTS, MUMMY_ESCAPE_DROP_RATES, MUMMY_ESCAPE_CONTROLS } from './mummy-escape/config';
 
 import { CHESS_ACHIEVEMENTS, CHESS_DROP_RATES, CHESS_CONTROLS } from './chess/config';
 
-import { CarEscapeGame } from './car-escape';
+const CarEscapeGame = lazy(() => import('./car-escape').then(module => ({ default: module.CarEscapeGame })));
 import { CAR_ESCAPE_ACHIEVEMENTS, CAR_ESCAPE_DROP_RATES, CAR_ESCAPE_CONTROLS } from './car-escape/config';
 
-import { WordCrossGame } from './word-cross';
+const WordCrossGame = lazy(() => import('./word-cross').then(module => ({ default: module.WordCrossGame })));
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
   'word-cross': {
     id: 'word-cross',
     title: 'Word Cross',
-    shortDesc: 'Nối chữ tìm từ vựng tiếng Anh, thử thách Daily Puzzle toàn cầu',
-    description: 'Nối các chữ cái theo các hướng ngang, dọc, chéo để tạo thành từ theo danh sách có sẵn. Hơn 100 màn chơi tăng dần độ khó, chế độ Ẩn Danh, tính năng Thử Thách Mỗi Ngày (Daily Puzzle) tranh tài bảng xếp hạng toàn cầu, tra cứu từ điển và hệ thống nhân điểm Combo cực cuốn!',
+    shortDesc: '200 màn tìm từ, 5 chế độ và kho từ offline phong phú',
+    description: 'Tìm từ tiếng Anh theo hàng, cột và đường chéo. 200 màn với bảng 6×6 đến 12×12, 5 chế độ và 117.597 dạng từ offline. Mỗi ván chiến dịch chọn từ và bố cục mới; tiếp tục ván giữ nguyên bảng. Nhận 1–3 sao theo độ chính xác, thời gian và hint. Thử thách ngày dùng chung đề; bảng thành tích kiểm tra lời giải trên máy chủ.',
     category: 'Arcade',
     difficulty: 'Trung Bình',
     icon: '🔠',
@@ -59,7 +60,7 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     id: 'car-escape',
     title: 'Car Escape',
     shortDesc: 'Giải đố kẹt xe đỉnh cao, di chuyển xe để mở đường cho xe cứu thương thoát hiểm.',
-    description: 'Game giải đố dọn đường kinh điển! Trượt các phương tiện sang trái, phải, lên hoặc xuống để dọn đường cho chiếc Xe cứu thương màu đỏ thoát ra lối ra. Grid layout thay đổi kích thước từ 4x4 đến 10x10 với 100 màn chơi và 10 thành phố giao thông khác nhau. Tính toán logic cẩn thận để tìm đường đi ngắn nhất!',
+    description: 'Giải cứu xe vàng trên bãi xe 2D. 100 màn được kiểm chứng cần 5–26 lượt tối ưu; bàn 6×6, 7×7 và 8×8. Chơi tự do, giới hạn lượt, đếm ngược hoặc đường dài. Thu thập 3 sao khi giải hiệu quả không dùng hint, và thi tài theo từng màn.',
     category: 'Puzzle',
     difficulty: 'Thử Thách',
     icon: '🚑',
@@ -107,7 +108,7 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     id: 'shikaku',
     title: 'Shikaku',
     shortDesc: 'Vẽ các hình chữ nhật để lấp đầy bảng theo số ô cho sẵn',
-    description: 'Game giải đố không gian Shikaku! Dùng tay vẽ các hình chữ nhật trên grid sao cho mỗi hình chứa đúng 1 số, và diện tích (số ô) của hình chữ nhật đó phải bằng đúng số đã cho. Lấp đầy toàn bộ bảng để chiến thắng! Tích hợp 3 chế độ chơi: Zen Mode, Time Attack và Hardcore.',
+    description: 'Game giải đố không gian Shikaku! Dùng tay vẽ các hình chữ nhật trên grid sao cho mỗi hình chứa đúng 1 số, và diện tích (số ô) của hình chữ nhật đó phải bằng đúng số đã cho. Lấp đầy toàn bộ bảng để chiến thắng! Chơi thư giãn hoặc thử thách 3 phút, chọn bảng 4×4 đến 8×8. Kéo thả trực tiếp, hoàn tác và gợi ý miễn phí.',
     category: 'Puzzle',
     difficulty: 'Trung Bình',
     icon: '🟥',
@@ -171,8 +172,8 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
   'blocker': {
     id: 'blocker',
     title: 'Xếp Gạch',
-    shortDesc: 'Xếp gạch phá hàng ngang dọc ghi điểm rớt ngọc',
-    description: 'Game xếp gạch cổ điển! Kéo thả các khối gạch đủ hình dạng vào bàn cờ 8x8. Khi một hàng hoặc cột được lấp đầy, nó sẽ biến mất và ghi điểm.',
+    shortDesc: 'Chơi tự do hoặc khám phá 100 màn sắc màu',
+    description: 'Xếp Gạch Color Pop: tự do không đồng hồ hoặc hành trình 100 màn qua 10 vùng đất. Xoay và gợi ý miễn phí, combo rực rỡ, thu sao, phá băng và dùng xu trong game để mua booster.',
     category: 'Puzzle',
     difficulty: 'Dễ',
     icon: '🧱',
@@ -225,7 +226,7 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     id: 'caro-gomoku',
     title: 'Cờ Caro Gomoku Online',
     shortDesc: 'Đấu trí 15x15 nhiều người chơi, ghép trận PvP thời gian thực và xếp hạng ELO',
-    description: 'Chế độ cờ Caro / Gomoku 15x15 đỉnh cao! Hỗ trợ ghép trận nhanh ngẫu nhiên, tạo phòng riêng có mã mời 6 số, đồng bộ thời gian thực Firestore onSnapshot, chống đi đè bằng runTransaction và tính điểm ELO xếp hạng quốc tế.',
+    description: 'Chế độ cờ Caro / Gomoku 15x15 đỉnh cao! Hỗ trợ ghép trận nhanh ngẫu nhiên, tạo phòng riêng có mã mời 6 số, đồng bộ nước đi theo thời gian thực và tính điểm ELO.',
     category: 'Multiplayer',
     difficulty: 'Thử Thách',
     icon: '🎯',
@@ -257,9 +258,9 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
   },
   'cosmic-defense': {
     id: 'cosmic-defense',
-    title: 'Cosmic Defense',
-    shortDesc: 'Bắn ruồi không gian retro và tiêu diệt hạm đội Boss',
-    description: 'Điều khiển chiến hạm không gian tối tân tiêu diệt các đợt quái vật ngoài hành tinh, nâng cấp đạn chùm và giải phóng bom hủy diệt EMP.',
+    title: 'Cosmic Defend',
+    shortDesc: '100 nhiệm vụ pixel, 10 hành tinh và 10 boss',
+    description: 'Lái Aegis Nova qua 100 nhiệm vụ trên 10 hành tinh. Tự bắn, né đạn, thu thập 10 item, nâng cấp Hangar và chinh phục 10 boss với đồ họa pixel gốc.',
     category: 'Action',
     difficulty: 'Thử Thách',
     icon: '🚀',
@@ -306,14 +307,14 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
   'tile-2048': {
     id: 'tile-2048',
     title: 'Xếp Gạch 2048',
-    shortDesc: 'Vuốt ghép các ô số lên 2048 và rớt ngọc báu',
-    description: 'Vuốt các ô số để ghép thành 2048! Đạt các mốc 512, 1024, 2048 để kích hoạt hiệu ứng rớt Ngọc Quý trực tiếp vào tài khoản, tích lũy combo và leo top bảng xếp hạng.',
+    shortDesc: 'Vuốt ghép các ô số, chinh phục mốc 2048',
+    description: 'Vuốt các ô số để ghép thành 2048! Kết hợp những ô giống nhau, giữ ô lớn nhất ở một góc và thử phá kỷ lục điểm số của bạn.',
     category: 'Puzzle',
     difficulty: 'Trung Bình',
     icon: '🔢',
     bannerGradient: 'from-amber-900/60 via-yellow-950/80 to-slate-900',
     themeColor: '#f59e0b',
-    tags: ['2048', 'Xếp Gạch', 'Rớt Ngọc 512/1024', 'Giải Đố', 'Vuốt Chạm'],
+    tags: ['2048', 'Xếp Gạch', 'Ghép Số', 'Giải Đố', 'Vuốt Chạm'],
     controls: TILE_2048_CONTROLS,
     achievements: TILE_2048_ACHIEVEMENTS,
     dropRates: TILE_2048_DROP_RATES,

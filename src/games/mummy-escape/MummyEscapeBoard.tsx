@@ -1,3 +1,4 @@
+import { MummySprite } from '../../visuals/MummySprite';
 import React, { useRef, useState, useEffect } from 'react';
 import { Position, MummyEntity, Gate, KeyItem, TrapItem, Direction, MummyThreatPath, GridPaletteTheme } from './types';
 import { GRID_PALETTES } from './palettes';
@@ -151,7 +152,7 @@ export const MummyEscapeBoard: React.FC<MummyEscapeBoardProps> = ({
   const nearestThreat = threatPaths.find((t) => t.isNearest);
 
   return (
-    <div className="relative flex flex-col items-center justify-center select-none w-full max-w-[500px] mx-auto p-1 sm:p-2">
+    <div className="mummy-board-shell relative flex flex-col items-center justify-center select-none w-full max-w-[500px] mx-auto p-1 sm:p-2">
       {/* Ancient Egyptian Tomb Chamber Top Hieroglyphic Frieze with Torches & Warning Radar Toggle */}
       <div className="w-full bg-[#3a2818] border-2 border-[#8b6534] rounded-t-xl px-3 py-1.5 flex items-center justify-between shadow-inner relative overflow-hidden">
         {/* Left Torch with flame */}
@@ -207,7 +208,7 @@ export const MummyEscapeBoard: React.FC<MummyEscapeBoardProps> = ({
         id="mummy-maze-grid-container"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`relative w-full aspect-square border-4 rounded-b-xl shadow-2xl overflow-hidden touch-none transition-all duration-75 ${
+        className={`arcade-board relative w-full aspect-square border-4 rounded-b-xl shadow-2xl overflow-hidden touch-none transition-all duration-75 ${
           activeShake === 'caught'
             ? 'border-rose-600 animate-[bounce_0.15s_infinite] scale-[0.97] ring-4 ring-rose-500/80'
             : activeShake === 'crush'
@@ -703,7 +704,7 @@ export const MummyEscapeBoard: React.FC<MummyEscapeBoardProps> = ({
               >
                 {/* Mummy Avatar Icon */}
                 <span className="text-2xl drop-shadow-md select-none transform hover:scale-110 transition-transform">
-                  {isWhite ? '🧟‍♂️' : isRed ? '🧛‍♂️' : '🦂'}
+                  <MummySprite kind={isWhite ? "white" : isRed ? "red" : "scorpion"}/>
                 </span>
 
                 {/* Badge Tag */}

@@ -796,7 +796,7 @@ export const FillTheSpaceGame: React.FC<GameComponentProps> = ({
       id="fts-game-container"
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      className="relative w-full h-full min-h-[640px] flex flex-col justify-between items-center select-none overflow-hidden"
+      className="arcade-game-surface relative w-full h-full min-h-[640px] flex flex-col justify-between items-center select-none overflow-hidden"
       style={{
         // Realistic warm wood background matching reference photo
         backgroundColor: '#cf9d69',

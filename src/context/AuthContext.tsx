@@ -1,127 +1,86 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { UserAccount } from '../types';
-import { AuthService, RegisterParams, AuthResult } from '../services/auth';
-import { soundEngine } from '../services/audio';
-import confetti from 'canvas-confetti';
+import { EntryScreen } from '../components/EntryScreen';
+import { SplashScreen } from '../components/SplashScreen';
+import type { UserAccount } from '../types';
+import { AuthService, type RegisterParams, type AuthResult } from '../services/auth';
 
 interface AuthContextType {
-  currentUser: UserAccount | null;
-  isLoggedIn: boolean;
-  isGuest: boolean;
-  savedAccounts: UserAccount[];
-  authModalMode: 'login' | 'register';
-  setAuthModalMode: (mode: 'login' | 'register') => void;
+  currentUser: UserAccount | null; isLoggedIn: boolean; isGuest: boolean;
+  authModalMode: 'login' | 'register'; setAuthModalMode: (mode: 'login' | 'register') => void;
   register: (params: RegisterParams) => Promise<AuthResult>;
-  login: (usernameOrEmail: string, password: string) => Promise<AuthResult>;
-  logout: () => void;
-  switchAccount: (userId: string) => Promise<AuthResult>;
-  deleteAccount: (userId: string) => boolean;
-  refreshAccountsList: () => void;
+  login: (email: string, password: string) => Promise<AuthResult>;
+  logout: () => Promise<AuthResult>; continueAsGuest: () => Promise<AuthResult>;
+  openEntry: (mode?: 'login' | 'register') => void;
+  saveIdentity: (name: string, avatar: string) => Promise<AuthResult>;
+  notice: string; dismissNotice: () => void;
 }
-
 const AuthContext = createContext<AuthContextType | null>(null);
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => AuthService.getCurrentUser());
-  const [savedAccounts, setSavedAccounts] = useState<UserAccount[]>(() => AuthService.getRegisteredAccounts());
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+  const [loading, setLoading] = useState(true);
+  const [restoreError, setRestoreError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [entered, setEntered] = useState(false);
+  const [booted, setBooted] = useState(false);
+  const [revision, setRevision] = useState(0);
 
-  const refreshAccountsList = useCallback(() => {
-    setSavedAccounts(AuthService.getRegisteredAccounts());
-    setCurrentUser(AuthService.getCurrentUser());
-  }, []);
-
-  const handleRegister = useCallback(async (params: RegisterParams): Promise<AuthResult> => {
-    const result = AuthService.register(params);
-    if (result.success && result.user) {
-      setCurrentUser(result.user);
-      setSavedAccounts(AuthService.getRegisteredAccounts());
-      soundEngine.play('claim');
-      confetti({
-        particleCount: 100,
-        spread: 80,
-        origin: { y: 0.5 },
-      });
-      // Trigger a window custom event or reload state if needed
-      window.dispatchEvent(new CustomEvent('arcadex_auth_changed', { detail: { user: result.user } }));
-    }
-    return result;
-  }, []);
-
-  const handleLogin = useCallback(async (usernameOrEmail: string, password: string): Promise<AuthResult> => {
-    const result = AuthService.login(usernameOrEmail, password);
-    if (result.success && result.user) {
-      setCurrentUser(result.user);
-      setSavedAccounts(AuthService.getRegisteredAccounts());
-      soundEngine.play('claim');
-      confetti({
-        particleCount: 70,
-        spread: 60,
-        origin: { y: 0.5 },
-      });
-      window.dispatchEvent(new CustomEvent('arcadex_auth_changed', { detail: { user: result.user } }));
-    }
-    return result;
-  }, []);
-
-  const handleLogout = useCallback(() => {
-    AuthService.logout();
-    setCurrentUser(null);
-    setSavedAccounts(AuthService.getRegisteredAccounts());
-    soundEngine.play('click');
-    window.dispatchEvent(new CustomEvent('arcadex_auth_changed', { detail: { user: null } }));
-  }, []);
-
-  const handleSwitchAccount = useCallback(async (userId: string): Promise<AuthResult> => {
-    const result = AuthService.switchAccount(userId);
-    if (result.success && result.user) {
-      setCurrentUser(result.user);
-      setSavedAccounts(AuthService.getRegisteredAccounts());
-      soundEngine.play('claim');
-      window.dispatchEvent(new CustomEvent('arcadex_auth_changed', { detail: { user: result.user } }));
-    }
-    return result;
-  }, []);
-
-  const handleDeleteAccount = useCallback((userId: string): boolean => {
-    const success = AuthService.deleteAccount(userId);
-    if (success) {
-      setSavedAccounts(AuthService.getRegisteredAccounts());
+  const apply = useCallback((result: AuthResult) => {
+    if (result.cancelled) return result;
+    if (result.success && !result.needsEmailConfirmation) {
       setCurrentUser(AuthService.getCurrentUser());
-      window.dispatchEvent(new CustomEvent('arcadex_auth_changed', { detail: { user: null } }));
-    }
-    return success;
+      setRevision(value => value + 1);
+      setRestoreError('');
+    } else if (result.requiresRestore) setRestoreError(result.error || 'Chưa tải được dữ liệu tài khoản.');
+    if (result.message) setNotice(result.message);
+    if (!result.success && !result.requiresRestore) setNotice(result.error || 'Thao tác chưa thành công.');
+    setLoading(false);
+    return result;
   }, []);
+  useEffect(() => {
+    let alive = true;
+    const switching = () => { if (alive) setLoading(true); };
+    window.addEventListener('arcadex:account_switching', switching);
+    void AuthService.initialize().then(result => { if (alive) apply(result); });
+    const unsubscribe = AuthService.listen(() => {
+      if (!alive) return;
+      setLoading(true);
+      void AuthService.restoreSession().then(result => { if (alive) apply(result); });
+    });
+    return () => { alive = false; unsubscribe(); window.removeEventListener('arcadex:account_switching', switching); };
+  }, [apply]);
+  useEffect(() => {
+    if (loading || restoreError) return;
+    const save = () => { void AuthService.checkpoint().catch(() => {
+      setNotice('Tiến trình đã lưu trên thiết bị; đồng bộ tài khoản sẽ thử lại khi có kết nối.');
+    }); };
+    const interval = setInterval(save, 5000);
+    window.addEventListener('pagehide', save);
+    window.addEventListener('online', save);
+    return () => { clearInterval(interval); window.removeEventListener('pagehide', save); window.removeEventListener('online', save); };
+  }, [loading, restoreError, currentUser?.id]);
 
-  const isLoggedIn = !!currentUser && !currentUser.isGuest;
-  const isGuest = !isLoggedIn;
-
-  return (
-    <AuthContext.Provider
-      value={{
-        currentUser,
-        isLoggedIn,
-        isGuest,
-        savedAccounts,
-        authModalMode,
-        setAuthModalMode,
-        register: handleRegister,
-        login: handleLogin,
-        logout: handleLogout,
-        switchAccount: handleSwitchAccount,
-        deleteAccount: handleDeleteAccount,
-        refreshAccountsList,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const register = useCallback(async (params: RegisterParams) => apply(await AuthService.register(params)), [apply]);
+  const login = useCallback(async (email: string, password: string) => apply(await AuthService.login(email, password)), [apply]);
+  const logout = useCallback(async () => { const result = apply(await AuthService.logout()); if (result.success) setEntered(false); return result; }, [apply]);
+  const saveIdentity = useCallback(async (name: string, avatar: string) => { const result = await AuthService.saveIdentity(name, avatar); if (result.success) setCurrentUser(AuthService.getCurrentUser()); return result; }, []);
+  const continueAsGuest = useCallback(async () => apply(await AuthService.continueAsGuest()), [apply]);
+  const openEntry = useCallback((mode: 'login' | 'register' = 'login') => { setAuthModalMode(mode); setEntered(false); }, []);
+  const retry = async () => { setLoading(true); apply(await AuthService.restoreSession()); };
+  return <AuthContext.Provider value={{ currentUser, isLoggedIn: !!currentUser, isGuest: !currentUser,
+    authModalMode, setAuthModalMode, register, login, logout, continueAsGuest, saveIdentity, openEntry, notice, dismissNotice: () => setNotice('') }}>
+    {!booted && !restoreError ? <SplashScreen ready={!loading} onComplete={() => setBooted(true)} onGuest={async () => { const result = await continueAsGuest(); if (result.success) {setBooted(true);setEntered(true);} }}/> : loading || restoreError ? <div className="min-h-screen bg-[#050505] text-slate-200 flex items-center justify-center p-6">
+      <div className="w-full max-w-md rounded-3xl bg-[#101018] border border-white/10 p-8 text-center space-y-5" role="status" aria-live="polite">
+        <h1 className="text-2xl font-bold text-white">ArcadeX</h1>
+        <p>{restoreError || 'Đang chuẩn bị hồ sơ người chơi…'}</p>
+        {restoreError && <button type="button" onClick={retry} className="w-full rounded-xl bg-indigo-600 p-3 font-semibold">Thử lại kết nối</button>}
+        <button id="btn-auth-loading-guest" type="button" onClick={async () => { const result = await continueAsGuest(); if (result.success) {setBooted(true);setEntered(true);} }} className="w-full rounded-xl border border-white/15 p-3 font-semibold">Chơi như khách</button>
+      </div>
+    </div> : !entered || currentUser && !currentUser.profileCompleted ? <EntryScreen onEnter={() => setEntered(true)}/> : <React.Fragment key={revision}>{children}</React.Fragment>}
+  </AuthContext.Provider>;
 };
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export function useAuth(): AuthContextType {
+  const value = useContext(AuthContext);
+  if (!value) throw new Error('useAuth must be used within an AuthProvider');
+  return value;
+}

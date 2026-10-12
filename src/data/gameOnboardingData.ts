@@ -260,11 +260,11 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
 
   'cosmic-defense': {
     gameId: 'cosmic-defense',
-    headlineObjective: 'Điều khiển chiến hạm tiêu diệt hạm đội quái vật không gian ngoài hành tinh và hạ gục tàu mẹ Boss!',
+    headlineObjective: 'Lái Aegis Nova qua 100 nhiệm vụ, thu hồi Lõi Sao và hạ 10 boss trên 10 hành tinh.',
     rules: [
       'Chiến hạm tự động bắn laser liên tục khi bạn di chuyển.',
       'Né tránh làn đạn của phi thuyền địch và thiên thạch va chạm.',
-      'Thả bom EMP hủy diệt để quét sạch toàn bộ đạn địch khi nguy cấp.',
+      'Nhặt 10 loại item; bấm các slot để dùng Nova Bomb, Laser, Phase Cloak hoặc Overdrive.',
     ],
     mobileGestures: [
       {
@@ -275,7 +275,7 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
       },
       {
         icon: '💣',
-        gesture: 'Chạm Nút EMP',
+        gesture: 'Chạm slot item',
         action: 'Kích nổ sóng xung kích tiêu diệt toàn bộ đạn quái',
         badge: 'Bom nổ',
       },
@@ -289,7 +289,7 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
     proTip: 'Giữ ngón tay phía dưới thân tàu để không bị ngón tay che khuất tầm nhìn chiến hạm!',
     touchLayoutTip: 'Kéo ngón tay cách tàu một khoảng nhỏ để quan sát đường đạn địch dễ dàng.',
     gestureGuide: {
-      headlineTip: 'Chạm & kéo tự do trên màn hình để lái tàu. Chạm nút bom EMP dưới góc khi nguy cấp.',
+      headlineTip: 'Chạm & kéo tự do trên màn hình để lái tàu. Chạm slot item dưới góc khi nguy cấp.',
       layoutType: 'free-drag',
       zones: [
         {
@@ -434,11 +434,11 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
 
   'blocker': {
     gameId: 'blocker',
-    headlineObjective: 'Kéo thả các khối gạch đủ hình dạng vào bàn cờ 8x8. Lấp đầy hàng ngang hoặc dọc để phá hủy và rớt ngọc!',
+    headlineObjective: 'Kéo thả các khối gạch đủ hình dạng vào bàn cờ 8x8. Lấp đầy hàng ngang hoặc dọc để phá hàng và ghi điểm!',
     rules: [
       'Mỗi lượt bạn nhận được 3 khối gạch bên dưới.',
       'Phải đặt hết 3 khối mới nhận được đợt gạch tiếp theo.',
-      'Game kết thúc khi không còn chỗ trống trên bàn cờ cho các khối gạch.',
+      'Hai chế độ: tự do không đồng hồ và hành trình 100 màn. Mỗi lượt có một lần cứu bàn miễn phí.',
     ],
     mobileGestures: [
       {
@@ -456,11 +456,11 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
       {
         icon: '🎯',
         gesture: 'Giữ Chỗ Trống',
-        action: 'Luôn chừa chỗ trống kích thước 3x3 cho khối gạch to',
+        action: 'Xoay khối và dùng gợi ý miễn phí để tìm vị trí phù hợp',
         badge: 'Chiến thuật',
       },
     ],
-    proTip: 'Luôn giữ trung tâm bàn cờ thông thoáng và chuẩn bị sẵn chỗ cho khối vuông 3x3!',
+    proTip: 'Xoay và gợi ý luôn miễn phí. Xóa liên tiếp hoặc nhiều hàng cùng lúc để tăng combo!',
     touchLayoutTip: 'Khối gạch hiển thị nhô cao hơn vị trí ngón tay để không bị che khuất điểm đặt.',
     gestureGuide: {
       headlineTip: 'Chạm giữ khối gạch ở khay đáy, kéo thả vào các ô trống trên bàn cờ 8x8.',
@@ -496,7 +496,7 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
 
   'tile-2048': {
     gameId: 'tile-2048',
-    headlineObjective: 'Vuốt 4 hướng để trượt và hợp nhất các ô số giống nhau, đạt mốc 2048 để kích hoạt rơi ngọc báu quý giá!',
+    headlineObjective: 'Vuốt 4 hướng để trượt và hợp nhất các ô số giống nhau, chinh phục mốc 2048 và phá kỷ lục điểm số!',
     rules: [
       'Khi vuốt, tất cả các ô số trên bàn cờ đều trượt theo hướng đó.',
       'Hai ô có cùng giá trị va chạm sẽ gộp lại thành ô có giá trị gấp đôi (2+2=4, 4+4=8...).',
@@ -516,10 +516,10 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
         badge: 'Trượt dọc',
       },
       {
-        icon: '💎',
+        icon: '🔢',
         gesture: 'Mốc 512 / 1024 / 2048',
-        action: 'Mỗi khi gộp ra mốc này sẽ nhận ngay Ngọc Quý trực tiếp',
-        badge: 'Thưởng lớn',
+        action: 'Ghép các ô giống nhau để đạt ô số lớn hơn và tăng điểm',
+        badge: 'Ghép số',
       },
     ],
     proTip: 'Chiến thuật bất bại: Luôn giữ ô số lớn nhất nằm cố định ở một góc (ví dụ góc dưới cùng bên phải) và không bao giờ vuốt ngược lên!',

@@ -69,6 +69,39 @@ function solveGrid(
   return true;
 }
 
+// Stop at two solutions; MRV keeps uniqueness checks practical during clue removal.
+export function countSudokuSolutions(input: number[][], boxWidth: number, boxHeight: number, dimension: number): number {
+  if (input.length !== dimension || !input.every(row => row.length === dimension && row.every(n => Number.isInteger(n) && n >= 0 && n <= dimension))) return 0;
+  const grid = input.map(row => [...row]);
+  for (let r = 0; r < dimension; r++) for (let c = 0; c < dimension; c++) {
+    if (grid[r][c] && !isValidPlacement(grid, r, c, grid[r][c], boxWidth, boxHeight, dimension)) return 0;
+  }
+  let count = 0;
+  function search() {
+    if (count >= 2) return;
+    let target: [number, number] | null = null;
+    let options: number[] = [];
+    for (let r = 0; r < dimension; r++) for (let c = 0; c < dimension; c++) {
+      if (grid[r][c]) continue;
+      const candidates = Array.from({ length: dimension }, (_, i) => i + 1)
+        .filter(n => isValidPlacement(grid, r, c, n, boxWidth, boxHeight, dimension));
+      if (!candidates.length) return;
+      if (!target || candidates.length < options.length) { target = [r, c]; options = candidates; }
+    }
+    if (!target) { count++; return; }
+    const [r, c] = target;
+    for (const n of options) { grid[r][c] = n; search(); grid[r][c] = 0; if (count >= 2) return; }
+  }
+  search();
+  return count;
+}
+
+export function isSolvableWithEntry(board: SudokuBoardState, row: number, col: number, value: number): boolean {
+  const grid = board.cells.map(cells => cells.map(cell => cell.value || 0));
+  grid[row][col] = value;
+  return countSudokuSolutions(grid, board.boxWidth, board.boxHeight, board.dimension) > 0;
+}
+
 // Generate a full solved board
 export function generateFullSolution(
   dimension: number,
@@ -149,39 +182,27 @@ export function generateSudokuBoard(
     }))
   );
 
-  if (size === 'staircase') {
-    // Build the iconic Staircase Clue layout from the photo!
-    // In row r, fill cols from r to dimension - 1 (or symmetric staircase)
-    for (let r = 0; r < dimension; r++) {
-      for (let c = 0; c < dimension; c++) {
-        // Upper-right staircase: c >= r
-        if (c >= r) {
-          cells[r][c].value = solution[r][c];
-          cells[r][c].isGiven = true;
-        }
-      }
-    }
-  } else {
-    // Standard random clue distribution
-    const allPositions: { r: number; c: number }[] = [];
-    for (let r = 0; r < dimension; r++) {
-      for (let c = 0; c < dimension; c++) {
-        allPositions.push({ r, c });
-      }
-    }
-
-    // Shuffle positions
-    for (let i = allPositions.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [allPositions[i], allPositions[j]] = [allPositions[j], allPositions[i]];
-    }
-
-    // Take cluesCount positions
-    for (let i = 0; i < Math.min(cluesCount, allPositions.length); i++) {
-      const { r, c } = allPositions[i];
-      cells[r][c].value = solution[r][c];
-      cells[r][c].isGiven = true;
-    }
+  const puzzle = solution.map(row => [...row]);
+  const positions: { r: number; c: number }[] = [];
+  for (let r = 0; r < dimension; r++) for (let c = 0; c < dimension; c++) {
+    if (size !== 'staircase' || c < r) positions.push({ r, c });
+  }
+  for (let i = positions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [positions[i], positions[j]] = [positions[j], positions[i]];
+  }
+  let clues = dimension * dimension;
+  for (const { r, c } of positions) {
+    if (size !== 'staircase' && clues <= cluesCount) break;
+    const previous = puzzle[r][c];
+    puzzle[r][c] = 0;
+    if (countSudokuSolutions(puzzle, boxWidth, boxHeight, dimension) === 1) clues--;
+    else puzzle[r][c] = previous;
+  }
+  // Difficulty clue counts are targets. Keep additional clues if uniqueness requires them.
+  for (let r = 0; r < dimension; r++) for (let c = 0; c < dimension; c++) {
+    cells[r][c].value = puzzle[r][c] || null;
+    cells[r][c].isGiven = puzzle[r][c] !== 0;
   }
 
   const titleMap: Record<SudokuGridSize, string> = {
@@ -308,15 +329,14 @@ export function findConflicts(
 
 // Check if entire board is fully filled and correctly solved
 export function isBoardSolved(cells: SudokuCell[][]): boolean {
-  for (let r = 0; r < cells.length; r++) {
-    for (let c = 0; c < cells[r].length; c++) {
-      const cell = cells[r][c];
-      if (cell.value === null || cell.value !== cell.solutionValue) {
-        return false;
-      }
-    }
-  }
-  return true;
+  const dimension = cells.length;
+  if (![4, 6, 9].includes(dimension) || cells.some(row => row.length !== dimension)) return false;
+  const boxWidth = dimension === 6 ? 3 : Math.sqrt(dimension);
+  const boxHeight = dimension / boxWidth;
+  const grid = cells.map(row => row.map(cell => cell.value || 0));
+  return grid.every((row, r) => row.every((value, c) =>
+    Number.isInteger(value) && value >= 1 && value <= dimension &&
+    isValidPlacement(grid, r, c, value, boxWidth, boxHeight, dimension)));
 }
 
 // Provide a smart hint: finds an empty or incorrect cell and returns row, col, correct value & explanation
@@ -332,6 +352,12 @@ export function getSmartHint(
   selectedRow?: number | null,
   selectedCol?: number | null
 ): SmartHintResult | null {
+  const dimension = cells.length;
+  const boxWidth = dimension === 6 ? 3 : Math.sqrt(dimension);
+  const grid = cells.map(row => row.map(cell => cell.value || 0));
+  const valid = grid.every((row, r) => row.every((n, c) => !n || isValidPlacement(grid, r, c, n, boxWidth, dimension / boxWidth, dimension)));
+  const solved = valid && solveGrid(grid, boxWidth, dimension / boxWidth, dimension, false);
+  const solutionValue = (r: number, c: number) => solved ? grid[r][c] : cells[r][c].solutionValue;
   // If user has a selected cell that is empty or wrong, give hint for this cell first!
   if (
     selectedRow !== undefined &&
@@ -340,12 +366,12 @@ export function getSmartHint(
     selectedCol !== null
   ) {
     const cell = cells[selectedRow][selectedCol];
-    if (cell && !cell.isGiven && cell.value !== cell.solutionValue) {
+    if (cell && !cell.isGiven && cell.value !== solutionValue(selectedRow, selectedCol)) {
       return {
         row: selectedRow,
         col: selectedCol,
-        value: cell.solutionValue,
-        reason: `Ô (${selectedRow + 1}, ${selectedCol + 1}) chính xác phải là số ${cell.solutionValue} dựa vào suy luận loại trừ hàng, cột và khối!`,
+        value: solutionValue(selectedRow, selectedCol),
+        reason: `Ô (${selectedRow + 1}, ${selectedCol + 1}) chính xác phải là số ${solutionValue(selectedRow, selectedCol)} dựa vào suy luận loại trừ hàng, cột và khối!`,
       };
     }
   }
@@ -354,12 +380,12 @@ export function getSmartHint(
   for (let r = 0; r < cells.length; r++) {
     for (let c = 0; c < cells[r].length; c++) {
       const cell = cells[r][c];
-      if (!cell.isGiven && (cell.value === null || cell.value !== cell.solutionValue)) {
+      if (!cell.isGiven && (cell.value === null || cell.value !== solutionValue(r, c))) {
         return {
           row: r,
           col: c,
-          value: cell.solutionValue,
-          reason: `Gợi ý: Điền số ${cell.solutionValue} vào ô [Hàng ${r + 1}, Cột ${c + 1}] để tiếp tục mạch suy luận.`,
+          value: solutionValue(r, c),
+          reason: `Gợi ý: Điền số ${solutionValue(r, c)} vào ô [Hàng ${r + 1}, Cột ${c + 1}] để tiếp tục mạch suy luận.`,
         };
       }
     }

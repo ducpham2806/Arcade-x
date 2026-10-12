@@ -1,334 +1,272 @@
-import { UserAccount, PlayerProfile, InventoryItem, Achievement, DailyQuest } from '../types';
-import { StorageService, INITIAL_PLAYER_PROFILE, ALL_DEFAULT_ITEMS, DEFAULT_ACHIEVEMENTS, DEFAULT_DAILY_QUESTS } from './storage';
-
-const AUTH_STORAGE_KEYS = {
-  ACCOUNTS: 'arcadex_registered_accounts',
-  CURRENT_USER: 'arcadex_current_user',
-  USER_DATA_PREFIX: 'arcadex_user_data_',
-};
-
-// Simple cryptographic-like string hashing for local client credential validation
-export function hashPassword(password: string): string {
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    const char = password.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  // Secondary salt pass
-  let saltHash = 5381;
-  const saltedStr = `arcadex_salt_${password}_2026`;
-  for (let i = 0; i < saltedStr.length; i++) {
-    saltHash = (saltHash * 33) ^ saltedStr.charCodeAt(i);
-  }
-  return `hx_${Math.abs(hash).toString(16)}_${Math.abs(saltHash).toString(16)}`;
-}
+import { hydrateGameSaves, syncGameSaves } from './gameSaves';
+import type { User, Session } from '@supabase/supabase-js';
+import type { UserAccount } from '../types';
+import { supabase, resetCloudIdentity, pauseCloudIdentity, resumeCloudIdentity } from './supabaseClient';
+import { StorageService } from './storage';
+import {
+  activateAccount, activateGuest, captureAccount, saveAccountSlot, readAccountSlot,
+  rememberActiveAccount, rememberExistingGuest, pendingGuestRegistration,
+  stageGuestRegistration, clearPendingRegistration, validateSnapshot,
+} from './accountStorage';
 
 export interface RegisterParams {
-  username: string;
-  email?: string;
-  password: string;
-  avatar?: string;
-  keepGuestData?: boolean;
+  username?: string; email: string; password: string; avatar?: string; keepGuestData?: boolean;
 }
-
 export interface AuthResult {
-  success: boolean;
-  error?: string;
-  user?: UserAccount;
+  success: boolean; error?: string; user?: UserAccount;
+  needsEmailConfirmation?: boolean; message?: string; requiresRestore?: boolean; cancelled?: boolean;
+}
+const USER_KEY = 'arcadex_current_user';
+let manualOperations = 0;
+let authEpoch = 0;
+let startup: Promise<AuthResult> | null = null;
+let lastCloudSnapshot = '';
+let saving: Promise<void> | null = null;
+
+function client() {
+  if (!supabase) throw new Error('Chưa cấu hình kết nối. Bạn vẫn có thể chơi với tư cách khách.');
+  return supabase;
+}
+function errorText(error: any): string {
+  if (error?.code === 'PGRST202') return 'Hệ thống tài khoản chưa được nâng cấp. Bạn có thể chơi như khách trong lúc chờ.';
+  if (error?.code === 'invalid_credentials') return 'Email hoặc mật khẩu chưa đúng.';
+  if (error?.code === 'email_not_confirmed') return 'Bạn cần xác nhận email trước khi đăng nhập. Hãy kiểm tra hộp thư và thư rác.';
+  if (error?.code === 'user_already_exists') return 'Email này đã đăng ký. Hãy chuyển sang Đăng nhập.';
+  if (error?.code === 'over_email_send_rate_limit' || error?.status === 429) return 'Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.';
+  if (error?.code === 'email_address_invalid') return 'Địa chỉ email không hợp lệ.';
+  if (error?.code === 'signup_disabled') return 'Đăng ký đang tạm đóng. Bạn vẫn có thể chơi như khách.';
+  if (error?.code === 'weak_password') return 'Mật khẩu chưa đủ mạnh. Hãy dùng ít nhất 8 ký tự.';
+  if (error instanceof TypeError || /fetch|network|timeout/i.test(error?.message || '')) return 'Chưa kết nối được máy chủ. Kiểm tra mạng hoặc tiếp tục chơi như khách.';
+  return error?.message || 'Không thể xác thực lúc này. Vui lòng thử lại.';
+}
+function account(user: User): UserAccount {
+  return { id: user.id, email: user.email, username: user.user_metadata?.username || user.email?.split('@')[0] || 'Game thủ',
+    avatar: user.user_metadata?.avatar || '🎮', currentTitle: 'Tân Binh Arcade',
+    createdAt: new Date(user.created_at).getTime(), lastLoginAt: Date.now(), isGuest: false, provider: 'supabase' };
+}
+async function readCloud(collection: string, id: string) {
+  const { data, error } = await client().rpc('arcadex_read', { p_collection: collection, p_id: id });
+  if (error) throw error;
+  return data?.[0]?.data || null;
+}
+async function activateSession(session: Session | null, epoch = authEpoch): Promise<AuthResult> {
+  if (epoch !== authEpoch) return { success: false, cancelled: true };
+  const user = session?.user;
+  if (!user || user.is_anonymous) {
+    const current = AuthService.getCurrentUser();
+    if (current) { rememberActiveAccount(); activateGuest(!user); }
+    else if (!StorageService.loadProfile().id.startsWith('guest_')) { rememberActiveAccount(); activateGuest(!user); }
+    else { rememberExistingGuest(); if (!user) activateGuest(true); }
+    localStorage.removeItem(USER_KEY);
+    resetCloudIdentity();
+    return { success: true };
+  }
+  window.dispatchEvent(new Event('arcadex:account_switching'));
+  const nextUser = account(user);
+  const previousId = StorageService.loadProfile().id;
+  if (previousId !== user.id) rememberActiveAccount();
+  const cached = previousId === user.id ? captureAccount() : readAccountSlot(user.id);
+  let snapshot = cached;
+  let warning: string | undefined;
+  try {
+    const { error } = await client().rpc('arcadex_bind_player', { p_player_id: user.id });
+    if (error) throw error;
+    const { data: identity, error: identityError } = await client().rpc('arcadex_get_identity');
+    if (identityError) throw identityError;
+    nextUser.profileCompleted = !!identity;
+    if (identity) { nextUser.username = identity.display_name; nextUser.avatar = identity.avatar; }
+    const [inventory, profile, savedSession, gameRows] = await Promise.all([
+      readCloud(`players/${user.id}/inventory_data`, 'main'),
+      readCloud('players', user.id),
+      readCloud(`players/${user.id}/game_sessions`, 'current'),
+      client().rpc('arcadex_read', { p_collection: `players/${user.id}/game_sessions` }).then(({ data, error }) => { if (error) throw error; return data || []; }),
+    ]);
+    const cloud = validateSnapshot(inventory?.accountState);
+    if (cloud && (!cached || cloud.savedAt > cached.savedAt)) snapshot = cloud;
+    // Hydrate older cloud records even when no full account snapshot exists yet.
+    if (profile || inventory || savedSession) {
+      snapshot = structuredClone(snapshot || { version: 1, savedAt: 0, values: {} });
+      if (profile) {
+        const savedProfile = JSON.parse(snapshot.values.arcadex_player_profile || '{}');
+        const restoredProfile = savedProfile.id ? savedProfile : profile;
+        const ratings = Object.fromEntries(Object.entries(profile.stats?.highScores || {}).filter(([key]) => key.endsWith('-elo')));
+        restoredProfile.stats = { ...restoredProfile.stats, highScores: { ...restoredProfile.stats?.highScores, ...ratings } };
+        snapshot.values.arcadex_player_profile = JSON.stringify(restoredProfile);
+      }
+      const localInventoryRevision = JSON.parse(snapshot.values.arcadex_inventory_sync_v1 || 'null')?.updatedAt || 0;
+      const cloudInventoryRevision = inventory?.stateUpdatedAt ?? inventory?.updatedAt ?? 0;
+      const newerInventory = cloudInventoryRevision > localInventoryRevision;
+      if (Array.isArray(inventory?.items) && (!snapshot.values.arcadex_inventory || newerInventory)) snapshot.values.arcadex_inventory = JSON.stringify(inventory.items);
+      if (inventory?.chestCounts && (!snapshot.values.arcadex_chest_counts || newerInventory)) snapshot.values.arcadex_chest_counts = JSON.stringify(inventory.chestCounts);
+      if (inventory?.forgeMastery && (!snapshot.values.arcadex_forge_mastery_v1 || newerInventory)) snapshot.values.arcadex_forge_mastery_v1 = JSON.stringify(inventory.forgeMastery);
+      if (inventory?.discoveredBlueprintIds && (!snapshot.values.arcadex_legendary_blueprints_v1 || newerInventory)) snapshot.values.arcadex_legendary_blueprints_v1 = JSON.stringify(inventory.discoveredBlueprintIds);
+      if (newerInventory) snapshot.values.arcadex_inventory_sync_v1 = JSON.stringify({ updatedAt: cloudInventoryRevision, dirty: false });
+      if (savedSession?.status === 'suspended') snapshot.values.arcadex_paused_game_session_v1 = JSON.stringify(savedSession);
+      else if (savedSession?.status === 'cleared') delete snapshot.values.arcadex_paused_game_session_v1;
+    } else if (!snapshot && user.email) {
+      let guest = pendingGuestRegistration(user.email.toLowerCase());
+      if (guest && JSON.parse(guest.values.arcadex_player_profile || '{}').id === StorageService.loadProfile().id) guest = captureAccount();
+      if (guest) {
+        snapshot = structuredClone(guest);
+        snapshot.values.arcadex_player_profile = JSON.stringify({ ...JSON.parse(snapshot.values.arcadex_player_profile || '{}'),
+          username: nextUser.username, avatar: nextUser.avatar });
+      }
+    }
+    snapshot = snapshot || { version: 1, savedAt: 0, values: {} };
+    snapshot.values = hydrateGameSaves({ ...Object.fromEntries(Object.entries(snapshot.values).filter(([key]) => !key.startsWith('arcadex_save_v1_') && !key.startsWith('arcadex_save_backup_'))), ...Object.fromEntries(Object.entries(cached?.values || {}).filter(([key]) => key.startsWith('arcadex_save_v1_'))) }, gameRows);
+  } catch (error) {
+    if (epoch !== authEpoch) return { success: false, cancelled: true };
+    // Never upload an empty new-device profile over an unreadable cloud account.
+    if (!cached) throw error;
+    const cachedUser = AuthService.getCurrentUser();
+    if (cachedUser?.id === user.id) Object.assign(nextUser, cachedUser);
+    warning = 'Đang dùng tiến trình đã lưu trên thiết bị. Dữ liệu trực tuyến chưa tải được.';
+  }
+  if (epoch !== authEpoch) return { success: false, cancelled: true };
+  activateAccount(snapshot, user.id, nextUser.username, nextUser.avatar);
+  if (nextUser.profileCompleted) StorageService.saveProfile({ ...StorageService.loadProfile(), username: nextUser.username, avatar: nextUser.avatar });
+  localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+  if (!warning && user.email) clearPendingRegistration(user.email.toLowerCase());
+  resetCloudIdentity(); lastCloudSnapshot = '';
+  return { success: true, user: nextUser, message: warning };
 }
 
 export class AuthService {
-  /**
-   * Get all registered accounts saved in local storage
-   */
-  public static getRegisteredAccounts(): UserAccount[] {
-    try {
-      const data = localStorage.getItem(AUTH_STORAGE_KEYS.ACCOUNTS);
-      if (data) {
-        return JSON.parse(data);
-      }
-    } catch {
-      // fallback
-    }
-    return [];
-  }
-
-  /**
-   * Save the list of registered accounts
-   */
-  private static saveAccounts(accounts: UserAccount[]): void {
-    try {
-      localStorage.setItem(AUTH_STORAGE_KEYS.ACCOUNTS, JSON.stringify(accounts));
-    } catch {
-      // ignore
-    }
-  }
-
-  /**
-   * Get current authenticated user or null if guest
-   */
   public static getCurrentUser(): UserAccount | null {
     try {
-      const data = localStorage.getItem(AUTH_STORAGE_KEYS.CURRENT_USER);
-      if (data) {
-        const user = JSON.parse(data);
-        if (user && !user.isGuest) {
-          return user;
-        }
-      }
-    } catch {
-      // fallback
-    }
-    return null;
+      const user = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
+      return user?.provider === 'supabase' && !user.isGuest ? user : null;
+    } catch { return null; }
   }
-
-  /**
-   * Set current authenticated session
-   */
-  public static setCurrentUser(user: UserAccount | null): void {
+  public static initialize(): Promise<AuthResult> {
+    if (!startup) startup = this.restoreSession();
+    return startup;
+  }
+  public static async restoreSession(): Promise<AuthResult> {
+    const epoch = authEpoch;
     try {
-      if (user) {
-        localStorage.setItem(AUTH_STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
-      } else {
-        localStorage.removeItem(AUTH_STORAGE_KEYS.CURRENT_USER);
-      }
-    } catch {
-      // ignore
-    }
+      if (!supabase) { await activateSession(null, epoch); return { success: true }; }
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      try { return await activateSession(data.session, epoch); }
+      catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
+    } catch (error) { return epoch !== authEpoch ? { success: false, cancelled: true } : { success: false, error: errorText(error), requiresRestore: true }; }
   }
-
-  /**
-   * Save a user's isolated game data slot (profile, inventory, achievements, etc.)
-   */
-  public static saveUserDataSlot(userId: string): void {
+  public static listen(callback: () => void): () => void {
+    const subscription = supabase?.auth.onAuthStateChange((event, session) => {
+      if (manualOperations > 0 || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') return;
+      const currentId = this.getCurrentUser()?.id;
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && !session?.user.is_anonymous && session?.user.id !== currentId
+        || event === 'SIGNED_OUT' && currentId) {
+        // Never await Supabase calls inside the auth callback (the SDK holds its lock).
+        setTimeout(callback, 0);
+      }
+    });
+    return () => subscription?.data.subscription.unsubscribe();
+  }
+  public static async register(params: RegisterParams): Promise<AuthResult> {
+    const username = params.username?.trim() || ''; const email = params.email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { success: false, error: 'Vui lòng nhập email hợp lệ.' };
+    if (params.password.length < 8) return { success: false, error: 'Mật khẩu cần ít nhất 8 ký tự.' };
+    if (this.getCurrentUser()) return { success: false, error: 'Hãy đăng xuất trước khi tạo tài khoản khác.' };
+    manualOperations++;
+    const epoch = ++authEpoch;
     try {
-      const slotData = StorageService.exportDataBackup();
-      localStorage.setItem(`${AUTH_STORAGE_KEYS.USER_DATA_PREFIX}${userId}`, slotData);
-    } catch {
-      // ignore
-    }
+      await pauseCloudIdentity();
+      rememberExistingGuest();
+      const guest = captureAccount();
+      const { data, error } = await client().auth.signUp({ email, password: params.password,
+        options: { data: { username, avatar: params.avatar || '🎮' }, emailRedirectTo: window.location.origin + '/' } });
+      if (error) throw error;
+      if (params.keepGuestData) stageGuestRegistration(email, guest);
+      else clearPendingRegistration(email);
+      if (!data.session) return { success: true, needsEmailConfirmation: true,
+        message: 'Hãy mở email xác nhận (kiểm tra cả thư rác), sau đó đăng nhập. Bạn có thể tiếp tục chơi như khách trong lúc chờ.' };
+      try { return await activateSession(data.session, epoch); }
+      catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
+    } catch (error) { return { success: false, error: errorText(error) }; }
+    finally { manualOperations--; if (manualOperations === 0) resumeCloudIdentity(); }
   }
-
-  /**
-   * Load a user's isolated game data slot into active storage
-   */
-  public static loadUserDataSlot(userId: string, defaultUsername?: string, defaultAvatar?: string): boolean {
+  public static async login(email: string, password: string): Promise<AuthResult> {
+    if (!email.trim() || !password) return { success: false, error: 'Vui lòng nhập email và mật khẩu.' };
+    manualOperations++;
+    const epoch = ++authEpoch;
     try {
-      const slotData = localStorage.getItem(`${AUTH_STORAGE_KEYS.USER_DATA_PREFIX}${userId}`);
-      if (slotData) {
-        return StorageService.importDataBackup(slotData);
-      } else {
-        // Create initial clean profile for this new user
-        const newProfile: PlayerProfile = {
-          ...INITIAL_PLAYER_PROFILE,
-          id: userId,
-          username: defaultUsername || 'Player',
-          avatar: defaultAvatar || '🎮',
-          createdAt: Date.now(),
-        };
-        StorageService.saveProfile(newProfile);
-        StorageService.saveInventory(ALL_DEFAULT_ITEMS);
-        StorageService.saveAchievements(DEFAULT_ACHIEVEMENTS);
-        StorageService.saveDailyQuests(DEFAULT_DAILY_QUESTS);
-        this.saveUserDataSlot(userId);
-        return true;
+      await pauseCloudIdentity();
+      rememberActiveAccount();
+      const { data, error } = await client().auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+      if (error) throw error;
+      try { return await activateSession(data.session, epoch); }
+      catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
+    } catch (error) { return { success: false, error: errorText(error) }; }
+    finally { manualOperations--; if (manualOperations === 0) resumeCloudIdentity(); }
+  }
+  public static async logout(): Promise<AuthResult> {
+    manualOperations++;
+    const epoch = ++authEpoch;
+    try {
+      await pauseCloudIdentity();
+      rememberActiveAccount();
+      window.dispatchEvent(new Event('arcadex:account_switching'));
+      // Preserve a final local checkpoint even if cloud is unavailable.
+      await this.checkpoint().catch(() => {});
+      if (supabase) {
+        const { error } = await supabase.auth.signOut({ scope: 'local' });
+        if (error) throw error;
       }
-    } catch {
-      return false;
-    }
+      localStorage.removeItem(USER_KEY); activateGuest(true); resetCloudIdentity();
+      return { success: true };
+    } catch (error) { return { success: false, error: errorText(error) }; }
+    finally { manualOperations--; if (manualOperations === 0) resumeCloudIdentity(); }
   }
-
-  /**
-   * Register a new user account
-   */
-  public static register(params: RegisterParams): AuthResult {
-    const trimmedUsername = params.username.trim();
-    const trimmedEmail = params.email?.trim().toLowerCase() || undefined;
-    const password = params.password;
-
-    // Validations
-    if (!trimmedUsername) {
-      return { success: false, error: 'Vui lòng nhập tên tài khoản!' };
-    }
-    if (trimmedUsername.length < 3 || trimmedUsername.length > 20) {
-      return { success: false, error: 'Tên tài khoản phải từ 3 đến 20 ký tự!' };
-    }
-    const usernameRegex = /^[a-zA-Z0-9_.\s\u00C0-\u024F\u1E00-\u1EFF]+$/;
-    if (!usernameRegex.test(trimmedUsername)) {
-      return { success: false, error: 'Tên tài khoản chỉ được chứa chữ, số và dấu gạch dưới!' };
-    }
-    if (!password || password.length < 6) {
-      return { success: false, error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự!' };
-    }
-    if (trimmedEmail) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(trimmedEmail)) {
-        return { success: false, error: 'Địa chỉ email không đúng định dạng!' };
+  public static async continueAsGuest(): Promise<AuthResult> {
+    authEpoch++;
+    if (this.getCurrentUser()) return this.logout();
+    const { data } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
+    if (data.session && !data.session.user.is_anonymous) return this.logout();
+    rememberExistingGuest();
+    if (!StorageService.loadProfile().id.startsWith('guest_')) activateGuest();
+    return { success: true };
+  }
+  public static async saveIdentity(name: string, avatar: string): Promise<AuthResult> {
+    const user = this.getCurrentUser();
+    const epoch = authEpoch;
+    if (!user) return { success: false, error: 'Bạn cần đăng nhập để lưu hồ sơ.' };
+    try {
+      const { data, error } = await client().rpc('arcadex_save_identity', { p_display_name: name.normalize('NFKC').trim().replace(/\s+/g, ' '), p_avatar: avatar });
+      if (error) {
+        if (error.code === '23505') return { success: false, error: 'Tên hiển thị đã được sử dụng. Hãy chọn tên khác.' };
+        throw error;
       }
-    }
-
-    const accounts = this.getRegisteredAccounts();
-
-    // Check duplicate username
-    const existingName = accounts.find(
-      (a) => a.username.toLowerCase() === trimmedUsername.toLowerCase()
-    );
-    if (existingName) {
-      return { success: false, error: 'Tên tài khoản này đã được sử dụng. Vui lòng chọn tên khác!' };
-    }
-
-    // Check duplicate email
-    if (trimmedEmail) {
-      const existingEmail = accounts.find(
-        (a) => a.email && a.email.toLowerCase() === trimmedEmail
-      );
-      if (existingEmail) {
-        return { success: false, error: 'Địa chỉ email này đã được liên kết với một tài khoản khác!' };
-      }
-    }
-
-    const userId = `usr_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-    const avatar = params.avatar || '🎮';
-    const now = Date.now();
-
-    const newAccount: UserAccount = {
-      id: userId,
-      username: trimmedUsername,
-      email: trimmedEmail,
-      passwordHash: hashPassword(password),
-      avatar: avatar,
-      currentTitle: 'Tân Binh Arcade',
-      createdAt: now,
-      lastLoginAt: now,
-      isGuest: false,
-    };
-
-    // Save previous active user's slot if logged in
-    const prevUser = this.getCurrentUser();
-    if (prevUser && prevUser.id) {
-      this.saveUserDataSlot(prevUser.id);
-    }
-
-    if (params.keepGuestData) {
-      // Migrate current guest data to new user
-      const currentProfile = StorageService.loadProfile();
-      currentProfile.id = userId;
-      currentProfile.username = trimmedUsername;
-      if (params.avatar) currentProfile.avatar = params.avatar;
-      StorageService.saveProfile(currentProfile);
-      this.saveUserDataSlot(userId);
-    } else {
-      // Initialize fresh user data slot
-      this.loadUserDataSlot(userId, trimmedUsername, avatar);
-    }
-
-    // Add to accounts list
-    accounts.push(newAccount);
-    this.saveAccounts(accounts);
-    this.setCurrentUser(newAccount);
-
-    return {
-      success: true,
-      user: newAccount,
-    };
+      if (epoch !== authEpoch || this.getCurrentUser()?.id !== user.id) return { success: false, cancelled: true };
+      const updated = { ...user, username: data.display_name, avatar: data.avatar, profileCompleted: true };
+      StorageService.saveProfile({ ...StorageService.loadProfile(), username: updated.username, avatar: updated.avatar });
+      localStorage.setItem(USER_KEY, JSON.stringify(updated));
+      saveAccountSlot(user.id);
+      await this.checkpoint().catch(() => {});
+      return { success: true, user: updated };
+    } catch (error) { return { success: false, error: errorText(error) }; }
   }
-
-  /**
-   * Log in with username/email and password
-   */
-  public static login(usernameOrEmail: string, password: string): AuthResult {
-    const query = usernameOrEmail.trim().toLowerCase();
-    if (!query) {
-      return { success: false, error: 'Vui lòng nhập tên đăng nhập hoặc email!' };
-    }
-    if (!password) {
-      return { success: false, error: 'Vui lòng nhập mật khẩu!' };
-    }
-
-    const accounts = this.getRegisteredAccounts();
-    const account = accounts.find(
-      (a) =>
-        a.username.toLowerCase() === query ||
-        (a.email && a.email.toLowerCase() === query)
-    );
-
-    if (!account) {
-      return { success: false, error: 'Tài khoản không tồn tại. Vui lòng kiểm tra lại hoặc đăng ký!' };
-    }
-
-    const inputHash = hashPassword(password);
-    if (account.passwordHash !== inputHash) {
-      return { success: false, error: 'Mật khẩu không chính xác. Vui lòng thử lại!' };
-    }
-
-    // Save current active user before switching
-    const prevUser = this.getCurrentUser();
-    if (prevUser && prevUser.id) {
-      this.saveUserDataSlot(prevUser.id);
-    }
-
-    // Update account lastLoginAt
-    account.lastLoginAt = Date.now();
-    this.saveAccounts(accounts);
-    this.setCurrentUser(account);
-
-    // Load account's game data slot
-    this.loadUserDataSlot(account.id, account.username, account.avatar);
-
-    return {
-      success: true,
-      user: account,
-    };
-  }
-
-  /**
-   * Log out and switch to guest mode
-   */
-  public static logout(): void {
-    const currentUser = this.getCurrentUser();
-    if (currentUser && currentUser.id) {
-      this.saveUserDataSlot(currentUser.id);
-    }
-    this.setCurrentUser(null);
-  }
-
-  /**
-   * Switch directly to another registered account
-   */
-  public static switchAccount(userId: string): AuthResult {
-    const accounts = this.getRegisteredAccounts();
-    const target = accounts.find((a) => a.id === userId);
-    if (!target) {
-      return { success: false, error: 'Không tìm thấy tài khoản!' };
-    }
-
-    const prevUser = this.getCurrentUser();
-    if (prevUser && prevUser.id) {
-      this.saveUserDataSlot(prevUser.id);
-    }
-
-    target.lastLoginAt = Date.now();
-    this.saveAccounts(accounts);
-    this.setCurrentUser(target);
-    this.loadUserDataSlot(target.id, target.username, target.avatar);
-
-    return { success: true, user: target };
-  }
-
-  /**
-   * Delete an account from the device
-   */
-  public static deleteAccount(userId: string): boolean {
-    let accounts = this.getRegisteredAccounts();
-    accounts = accounts.filter((a) => a.id !== userId);
-    this.saveAccounts(accounts);
-    localStorage.removeItem(`${AUTH_STORAGE_KEYS.USER_DATA_PREFIX}${userId}`);
-
-    const currentUser = this.getCurrentUser();
-    if (currentUser?.id === userId) {
-      this.logout();
-    }
-    return true;
+  public static async checkpoint(): Promise<void> {
+    const user = this.getCurrentUser(); const snapshot = captureAccount();
+    const id = StorageService.loadProfile().id;
+    saveAccountSlot(id, snapshot);
+    if (!user || user.id !== id || !supabase || !navigator.onLine) return;
+    if (saving) { await saving; return this.checkpoint(); }
+    const signature = JSON.stringify(snapshot.values);
+    saving = (async () => {
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || data.session?.user.id !== id || data.session.user.is_anonymous) return;
+      await syncGameSaves(id);
+      if (StorageService.loadProfile().id !== id) return;
+      if (signature === lastCloudSnapshot) return;
+      const { error } = await supabase.rpc('arcadex_commit', { p_writes: [{
+        path: `players/${id}/inventory_data/main`, operation: 'set', merge: true,
+        data: { accountState: { ...snapshot, values: Object.fromEntries(Object.entries(snapshot.values).filter(([key]) => !key.startsWith('arcadex_save_v1_') && !key.startsWith('arcadex_save_backup_'))) } },
+      }] });
+      if (error) throw error;
+      lastCloudSnapshot = signature;
+    })().finally(() => { saving = null; });
+    return saving;
   }
 }

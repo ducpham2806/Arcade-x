@@ -712,7 +712,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     const totalStarsCollected = Object.values(levelStars).reduce((a, b) => a + b, 0);
 
     return (
-      <div className="relative w-full h-full max-w-lg mx-auto flex flex-col items-center justify-between p-4 sm:p-6 select-none bg-gradient-to-b from-[#080c18] to-[#04060d] text-white overflow-y-auto">
+      <div className="arcade-game-surface relative w-full h-full max-w-lg mx-auto flex flex-col items-center justify-between p-4 sm:p-6 select-none bg-gradient-to-b from-[#080c18] to-[#04060d] text-white overflow-y-auto">
         {/* Menu Header */}
         <div className="text-center space-y-2 mt-3">
           <div className="inline-flex p-3 rounded-3xl bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-300 shadow-xl shadow-pink-500/25 mb-2">
@@ -837,7 +837,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
 
   // --- IN-GAME VIEW ---
   return (
-    <div className="relative w-full h-full max-w-lg mx-auto flex flex-col justify-between p-1 sm:p-2 select-none bg-[#080c18] overflow-hidden">
+    <div className="arcade-game-surface relative w-full h-full max-w-lg mx-auto flex flex-col justify-between p-1 sm:p-2 select-none bg-[#080c18] overflow-hidden">
       {/* Visual Effects & Particle Layer */}
       <HexVFX effects={effects} />
 

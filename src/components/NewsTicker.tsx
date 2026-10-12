@@ -56,7 +56,7 @@ const TICKER_ITEMS: NewsTickerItem[] = [
     id: 'notice-server',
     type: 'maintenance',
     badge: 'HỆ THỐNG',
-    text: 'Đồng bộ Cloud Firestore & Chat Toàn Cầu hoạt động ổn định',
+    text: 'Đồng bộ Cloud Supabase & Chat Toàn Cầu hoạt động ổn định',
     highlightText: '100% Uptime',
   },
   {

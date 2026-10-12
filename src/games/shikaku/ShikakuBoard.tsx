@@ -1,263 +1,248 @@
-import React, { useRef, useEffect } from 'react';
-import { Rect, Hint, Point } from './generator';
-
+import React, { useEffect, useRef, useState } from "react";
+import type { Point, Rect, ShikakuPuzzle } from "./generator";
+import { checkRegion, contains, rectangle } from "./rules";
 interface Props {
-  size: number;
-  hints: Hint[];
-  userRects: Rect[];
-  pencilRects?: Rect[];
-  currentDrawing: Rect | null;
-  onDrawStart: (p: Point) => void;
-  onDrawMove: (p: Point) => void;
-  onDrawEnd: () => void;
-  skinId: string;
-  selectionMode?: '2tap' | 'drag';
-  tapCorner1?: Point | null;
-  tapCorner2?: Point | null;
-  onCellTap?: (p: Point) => void;
+  puzzle: ShikakuPuzzle;
+  rects: Rect[];
+  notes: Rect[];
+  preview: Rect | null;
+  hint: Rect | null;
+  selected: string | null;
+  disabled: boolean;
+  twoTap: boolean;
+  onPreview: (r: Rect | null) => void;
+  onCommit: (r: Rect, tap: boolean) => void;
 }
-
-export const ShikakuBoard: React.FC<Props> = ({
-  size,
-  hints,
-  userRects,
-  pencilRects = [],
-  currentDrawing,
-  onDrawStart,
-  onDrawMove,
-  onDrawEnd,
-  skinId,
-  selectionMode = '2tap',
-  tapCorner1 = null,
-  tapCorner2 = null,
-  onCellTap
-}) => {
-  const boardRef = useRef<HTMLDivElement>(null);
-  const pointerStartPos = useRef<{ x: number; y: number } | null>(null);
-
-  const getCell = (clientX: number, clientY: number): Point | null => {
-    if (!boardRef.current) return null;
-    const rect = boardRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-    if (x < 0 || x >= rect.width || y < 0 || y >= rect.height) return null;
-    const c = Math.floor((x / rect.width) * size);
-    const r = Math.floor((y / rect.height) * size);
-    return { r: Math.min(Math.max(r, 0), size - 1), c: Math.min(Math.max(c, 0), size - 1) };
+export function ShikakuBoard({
+  puzzle,
+  rects,
+  notes,
+  preview,
+  hint,
+  selected,
+  disabled,
+  twoTap,
+  onPreview,
+  onCommit,
+}: Props) {
+  const board = useRef<HTMLDivElement>(null);
+  const active = useRef<{ id: number; start: Point; last: Point } | null>(null);
+  const corner = useRef<Point | null>(null);
+  const [cursor, setCursor] = useState<Point>({ r: 0, c: 0 });
+  const [keyboard, setKeyboard] = useState(false);
+  const cancel = () => {
+    active.current = null;
+    corner.current = null;
+    onPreview(null);
   };
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    e.preventDefault();
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    pointerStartPos.current = { x: e.clientX, y: e.clientY };
-    const cell = getCell(e.clientX, e.clientY);
-    if (selectionMode === 'drag') {
-      if (cell) onDrawStart(cell);
-    }
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    e.preventDefault();
-    if (selectionMode === 'drag') {
-      if (e.pointerType === 'mouse' && (e.buttons & 1) !== 1) return;
-      const cell = getCell(e.clientX, e.clientY);
-      if (cell) onDrawMove(cell);
-    }
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    e.preventDefault();
-    if ((e.target as HTMLElement).hasPointerCapture(e.pointerId)) {
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    }
-
-    const cell = getCell(e.clientX, e.clientY);
-    const startPos = pointerStartPos.current;
-    pointerStartPos.current = null;
-
-    if (selectionMode === '2tap') {
-      const dist = startPos ? Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y) : 0;
-      if (dist < 18 && cell && onCellTap) {
-        onCellTap(cell);
-        return;
-      }
-    }
-
-    onDrawEnd();
-  };
-
-  const isNeon = skinId === 'skin-shikaku-neon';
-  const isPastel = skinId === 'skin-shikaku-pastel';
-
-  const renderRect = (rect: Rect, isDrawing = false) => {
-    const top = `${(rect.r / size) * 100}%`;
-    const left = `${(rect.c / size) * 100}%`;
-    const width = `${(rect.w / size) * 100}%`;
-    const height = `${(rect.h / size) * 100}%`;
-
-    let isValid = true;
-    let containedHints = 0;
-    let hintValue = 0;
-    
-    if (!isDrawing) {
-        hints.forEach(h => {
-            if (h.r >= rect.r && h.r < rect.r + rect.h && h.c >= rect.c && h.c < rect.c + rect.w) {
-                containedHints++;
-                hintValue = h.value;
-            }
-        });
-        if (containedHints > 1) isValid = false;
-        if (containedHints === 1 && rect.w * rect.h !== hintValue) isValid = false;
-    }
-
-    const baseStyle: React.CSSProperties = {
-        position: 'absolute',
-        top, left, width, height,
-        backgroundColor: rect.color || '#60a5fa',
-        opacity: isDrawing ? 0.6 : 0.95,
-        border: isNeon ? '2px solid rgba(255,255,255,0.7)' : (isPastel ? '3px solid rgba(255,255,255,0.8)' : '2px solid rgba(0,0,0,0.3)'),
-        borderRadius: isPastel ? '12px' : '4px',
-        pointerEvents: 'none',
-        zIndex: 10,
-        transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: isNeon ? `0 0 12px ${rect.color}, inset 0 0 8px rgba(255,255,255,0.5)` : (isPastel ? '0 4px 6px rgba(0,0,0,0.05)' : 'none')
+  useEffect(() => {
+    cancel();
+  }, [disabled, twoTap, puzzle]);
+  useEffect(() => {
+    const hide = () => {
+      if (document.hidden) cancel();
     };
-
-    if (!isValid && !isDrawing) {
-        baseStyle.backgroundColor = '#ef4444';
-        baseStyle.backgroundImage = 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.15) 10px, rgba(0,0,0,0.15) 20px)';
+    const blur = () => cancel();
+    document.addEventListener("visibilitychange", hide);
+    window.addEventListener("blur", blur);
+    return () => {
+      document.removeEventListener("visibilitychange", hide);
+      window.removeEventListener("blur", blur);
+    };
+  }, []);
+  const cell = (x: number, y: number, clamp = false): Point | null => {
+    const b = board.current!.getBoundingClientRect();
+    if (!clamp && (x < b.left || x >= b.right || y < b.top || y >= b.bottom))
+      return null;
+    return {
+      r: Math.max(
+        0,
+        Math.min(
+          puzzle.size - 1,
+          Math.floor(((y - b.top) / b.height) * puzzle.size),
+        ),
+      ),
+      c: Math.max(
+        0,
+        Math.min(
+          puzzle.size - 1,
+          Math.floor(((x - b.left) / b.width) * puzzle.size),
+        ),
+      ),
+    };
+  };
+  const tap = (p: Point) => {
+    if (corner.current) {
+      onCommit(rectangle(corner.current, p), false);
+      corner.current = null;
+      onPreview(null);
+    } else if (rects.some((r) => contains(r, p))) {
+      onCommit(rectangle(p, p), true);
+    } else {
+      corner.current = p;
+      onPreview(rectangle(p, p));
     }
-
-    return <div key={rect.id || 'drawing'} style={baseStyle} />;
   };
-
-  const getFontSizeClass = (boardSize: number) => {
-    if (boardSize <= 5) return 'text-2xl sm:text-3xl font-black';
-    if (boardSize <= 7) return 'text-xl sm:text-2xl font-black';
-    if (boardSize <= 9) return 'text-base sm:text-xl font-black';
-    return 'text-sm sm:text-base font-black';
-  };
-
+  const style = (r: Rect): React.CSSProperties => ({
+    top: `${(r.r / puzzle.size) * 100}%`,
+    left: `${(r.c / puzzle.size) * 100}%`,
+    width: `${(r.w / puzzle.size) * 100}%`,
+    height: `${(r.h / puzzle.size) * 100}%`,
+  });
+  const valid = preview && checkRegion(puzzle, preview, rects).valid;
   return (
     <div
-      ref={boardRef}
-      className={`relative w-[min(96vw,calc(100dvh-100px))] h-[min(96vw,calc(100dvh-100px))] select-none touch-none rounded-2xl overflow-hidden mx-auto shadow-2xl ${
-          isNeon ? 'bg-[#0a0a1a] border-[3px] border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.4)]' : 
-          (isPastel ? 'bg-[#fdf2f8] border-4 border-pink-200 shadow-xl' : 'bg-[#e2e8f0] border-4 border-slate-400 shadow-lg')
-      }`}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      ref={board}
+      className="sk-board"
+      data-testid="shikaku-board"
+      role="grid"
+      tabIndex={disabled ? -1 : 0}
+      aria-label={`Bảng Shikaku ${puzzle.size} × ${puzzle.size}. Kéo từ góc này tới góc đối diện. Bàn phím: mũi tên di chuyển, Space chọn hai góc, Escape hủy.`}
+      aria-rowcount={puzzle.size}
+      aria-colcount={puzzle.size}
+      aria-activedescendant={`sk-cell-${cursor.r}-${cursor.c}`}
+      data-no-swipe="true"
+      onKeyDown={(e) => {
+        if (disabled) return;
+        setKeyboard(true);
+        if (e.key === "Escape") {
+          cancel();
+          return;
+        }
+        if (
+          ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
+        ) {
+          e.preventDefault();
+          const p = {
+            r: Math.max(
+              0,
+              Math.min(
+                puzzle.size - 1,
+                cursor.r +
+                  (e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0),
+              ),
+            ),
+            c: Math.max(
+              0,
+              Math.min(
+                puzzle.size - 1,
+                cursor.c +
+                  (e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0),
+              ),
+            ),
+          };
+          setCursor(p);
+          if (corner.current) onPreview(rectangle(corner.current, p));
+        } else if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          tap(cursor);
+        }
+      }}
+      onPointerDown={(e) => {
+        if (disabled || active.current || !e.isPrimary || e.button !== 0)
+          return;
+        const p = cell(e.clientX, e.clientY);
+        if (!p) return;
+        e.preventDefault();
+        setKeyboard(false);
+        e.currentTarget.setPointerCapture(e.pointerId);
+        active.current = { id: e.pointerId, start: p, last: p };
+        if (!twoTap) onPreview(rectangle(p, p));
+      }}
+      onPointerMove={(e) => {
+        const a = active.current;
+        if (!a || a.id !== e.pointerId || disabled) return;
+        const p = cell(e.clientX, e.clientY, true)!;
+        a.last = p;
+        if (!twoTap) onPreview(rectangle(a.start, p));
+      }}
+      onPointerUp={(e) => {
+        const a = active.current;
+        if (!a || a.id !== e.pointerId) return;
+        active.current = null;
+        const p = cell(e.clientX, e.clientY);
+        if (e.currentTarget.hasPointerCapture(e.pointerId))
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        if (disabled || !p) {
+          onPreview(null);
+          return;
+        }
+        if (twoTap) {
+          tap(p);
+        } else {
+          onCommit(
+            rectangle(a.start, p),
+            a.start.r === p.r && a.start.c === p.c,
+          );
+          onPreview(null);
+        }
+      }}
+      onPointerCancel={cancel}
+      onLostPointerCapture={() => {
+        if (active.current) cancel();
+      }}
       onContextMenu={(e) => e.preventDefault()}
     >
-        {/* Grid Lines */}
-        <div
-          className="absolute inset-0 grid pointer-events-none"
-          style={{
-            gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`
-          }}
-        >
-            {Array.from({ length: size * size }).map((_, i) => (
-                <div key={i} className={`border ${
-                    isNeon ? 'border-cyan-900/40' : 
-                    (isPastel ? 'border-pink-300/30' : 'border-slate-300/80')
-                }`} />
-            ))}
-        </div>
-
-        {/* Pencil/Draft Rectangles */}
-        {pencilRects.map(r => (
-          <div
-            key={r.id}
-            style={{
-              position: 'absolute',
-              top: `${(r.r / size) * 100}%`,
-              left: `${(r.c / size) * 100}%`,
-              width: `${(r.w / size) * 100}%`,
-              height: `${(r.h / size) * 100}%`,
-              pointerEvents: 'none',
-              zIndex: 9,
-            }}
-            className="border-2 border-dashed border-cyan-400 bg-cyan-400/20 rounded-md shadow-sm"
-          />
+      <div
+        className="sk-cells"
+        style={{ gridTemplateColumns: `repeat(${puzzle.size},1fr)` }}
+      >
+        {Array.from({ length: puzzle.size ** 2 }, (_, i) => (
+          <div key={i} />
         ))}
-
-        {/* User Rectangles */}
-        {userRects.map(r => renderRect(r))}
-        {currentDrawing && renderRect(currentDrawing, true)}
-
-        {/* 2-Tap Selected Corner Reticles */}
-        {tapCorner1 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: `${(tapCorner1.r / size) * 100}%`,
-              left: `${(tapCorner1.c / size) * 100}%`,
-              width: `${(1 / size) * 100}%`,
-              height: `${(1 / size) * 100}%`,
-              pointerEvents: 'none',
-              zIndex: 35,
-            }}
-            className="flex items-center justify-center p-0.5"
-          >
-            <div className="w-full h-full rounded-md border-2 border-cyan-400 bg-cyan-400/40 animate-pulse shadow-lg flex items-center justify-center">
-              <span className="text-[10px] font-black text-white drop-shadow">1</span>
-            </div>
-          </div>
-        )}
-
-        {tapCorner2 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: `${(tapCorner2.r / size) * 100}%`,
-              left: `${(tapCorner2.c / size) * 100}%`,
-              width: `${(1 / size) * 100}%`,
-              height: `${(1 / size) * 100}%`,
-              pointerEvents: 'none',
-              zIndex: 35,
-            }}
-            className="flex items-center justify-center p-0.5"
-          >
-            <div className="w-full h-full rounded-md border-2 border-emerald-400 bg-emerald-400/40 animate-pulse shadow-lg flex items-center justify-center">
-              <span className="text-[10px] font-black text-white drop-shadow">2</span>
-            </div>
-          </div>
-        )}
-
-        {/* Hints - Rendered above rects so text is visible */}
+      </div>
+      {notes.map((r) => (
+        <div key={r.id} className="sk-region sk-note" style={style(r)} />
+      ))}
+      {rects.map((r, i) => (
         <div
-          className="absolute inset-0 grid pointer-events-none z-20"
+          key={r.id}
+          className={`sk-region ${selected === r.id ? "sk-selected" : ""} ${!checkRegion(puzzle, r).valid ? "sk-legacy-invalid" : ""}`}
           style={{
-            gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`
+            ...style(r),
+            backgroundColor: [
+              "#8fdccc",
+              "#aabdf6",
+              "#f2c689",
+              "#d1b4ed",
+              "#efaebf",
+              "#9bd3f0",
+            ][i % 6],
           }}
-        >
-            {Array.from({ length: size * size }).map((_, i) => {
-                const r = Math.floor(i / size);
-                const c = i % size;
-                const hint = hints.find(h => h.r === r && h.c === c);
-                if (!hint) return <div key={i} />;
-
-                const coveringRect = userRects.find(rect => r >= rect.r && r < rect.r + rect.h && c >= rect.c && c < rect.c + rect.w);
-                const isCovered = !!coveringRect;
-
-                return (
-                    <div key={i} className="flex items-center justify-center">
-                        <span className={`${getFontSizeClass(size)} drop-shadow-md transition-colors duration-200 ${
-                            isCovered ? 
-                                'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]' : 
-                                (isNeon ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 
-                                (isPastel ? 'text-pink-600' : 'text-slate-700'))
-                        }`}>
-                            {hint.value}
-                        </span>
-                    </div>
-                );
-            })}
-        </div>
+        />
+      ))}
+      {hint && <div className="sk-region sk-hint" style={style(hint)} />}
+      {preview && (
+        <div
+          className={`sk-region sk-preview ${valid ? "sk-valid" : "sk-invalid"}`}
+          style={style(preview)}
+        />
+      )}
+      <div
+        className="sk-clues"
+        style={{ gridTemplateColumns: `repeat(${puzzle.size},1fr)` }}
+      >
+        {Array.from({ length: puzzle.size ** 2 }, (_, i) => {
+          const p = { r: Math.floor(i / puzzle.size), c: i % puzzle.size };
+          const clue = puzzle.hints.find((h) => h.r === p.r && h.c === p.c);
+          const covered = rects.some((r) => contains(r, p));
+          return (
+            <div
+              role="gridcell"
+              id={`sk-cell-${p.r}-${p.c}`}
+              key={i}
+              className={
+                keyboard && cursor.r === p.r && cursor.c === p.c
+                  ? "sk-cursor"
+                  : ""
+              }
+              aria-label={`Hàng ${p.r + 1}, cột ${p.c + 1}${clue ? `, số ${clue.value}` : ""}${covered ? ", đã đặt" : ""}`}
+            >
+              <span className={covered ? "sk-covered" : ""}>{clue?.value}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

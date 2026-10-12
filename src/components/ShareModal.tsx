@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShareData } from '../types';
-import { FirebaseService } from '../services/firebase';
+import { SupabaseService } from '../services/supabase';
 import { usePlayer } from '../context/PlayerContext';
 import { soundEngine } from '../services/audio';
 import confetti from 'canvas-confetti';
@@ -36,7 +36,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
   const [isPosting, setIsPosting] = useState(false);
 
   const currentUrl = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : 'https://arcadex.app';
-  
+
   // Format share caption
   const generateShareCaption = (): string => {
     if (data.type === 'recap') {
@@ -46,12 +46,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
       return `📸 [GAME RECAP] Tôi vừa hoàn thành trận đấu "${data.gameTitle || 'Arcade'}" trên ArcadeX Instant Gaming! Điểm số: ${(data.score || 0).toLocaleString()} • Xếp hạng đạt được: ${data.achievedRank || 'Challenger'} • Thời gian: ${timeStr}. Ai dám so trình phá kỷ lục này không? ⚡🎮`;
     }
     if (data.type === 'achievement') {
-      return `🏆 Tôi vừa mở khóa huy hiệu "${data.title}" (${data.description}) trong ArcadeX Instant Gaming! Cấp độ: ${data.playerLevel || profile.level} • Danh hiệu: "${data.playerTitle || profile.currentTitle}". Vào chơi và săn thưởng cùng tôi nhé! 🎮✨`;
+      return `🎮 ${data.title}: ${data.description || 'Cùng chơi trên ArcadeX!'}`;
     }
     if (data.type === 'score') {
       return `🔥 Kỷ Lục Mới! Tôi vừa đạt ${data.score?.toLocaleString() || 0} điểm trong game "${data.gameTitle || 'Arcade'}" trên ArcadeX! Ai dám vào phá kỷ lục này không? ⚡🎮`;
     }
-    return `🎮 Tôi đang leo rank Cấp ${profile.level} với ${profile.stats.totalGamesPlayed} trận tại ArcadeX! Hãy cùng tham gia trải nghiệm ngay! 🚀`;
+    return `🎮 Tôi đang chơi game trên ArcadeX. Cùng chơi nhé!`;
   };
 
   const shareText = generateShareCaption();
@@ -118,7 +118,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
         const timeFormatted = typeof data.timestamp === 'number'
           ? new Date(data.timestamp).toLocaleString('vi-VN')
           : (data.timestamp || new Date().toLocaleString('vi-VN'));
-        await FirebaseService.sendChatMessage({
+        await SupabaseService.sendChatMessage({
           senderId: profile.id,
           senderName: profile.username,
           senderAvatar: profile.avatar,
@@ -136,7 +136,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
           },
         });
       } else if (data.type === 'achievement') {
-        await FirebaseService.sendChatMessage({
+        await SupabaseService.sendChatMessage({
           senderId: profile.id,
           senderName: profile.username,
           senderAvatar: profile.avatar,
@@ -152,7 +152,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
           },
         });
       } else if (data.type === 'score') {
-        await FirebaseService.sendChatMessage({
+        await SupabaseService.sendChatMessage({
           senderId: profile.id,
           senderName: profile.username,
           senderAvatar: profile.avatar,
@@ -167,7 +167,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
           },
         });
       } else {
-        await FirebaseService.sendChatMessage({
+        await SupabaseService.sendChatMessage({
           senderId: profile.id,
           senderName: profile.username,
           senderAvatar: profile.avatar,
@@ -224,8 +224,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
                 {data.type === 'recap' ? 'Game Recap • Thẻ Ảnh Tổng Kết' : data.type === 'achievement' ? 'Khoe Thành Tựu' : data.type === 'score' ? 'Khoe Kỷ Lục Điểm' : 'Chia Sẻ Hồ Sơ'}
               </h2>
               <p className="text-[11px] sm:text-xs text-slate-400 truncate max-w-[240px] sm:max-w-xs">
-                {data.type === 'recap' 
-                  ? 'Thẻ ảnh tổng kết tự động chứa điểm số, thứ hạng' 
+                {data.type === 'recap'
+                  ? 'Thẻ ảnh tổng kết tự động chứa điểm số, thứ hạng'
                   : 'Chia sẻ thành tích rực rỡ lên mạng xã hội hoặc chat'}
               </p>
             </div>
@@ -314,12 +314,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
                 <span className="text-lg">{data.playerAvatar || profile.avatar}</span>
                 <div>
                   <span className="font-bold text-white block leading-tight">{data.playerName || profile.username}</span>
-                  <span className="text-[10px] text-indigo-300 font-semibold">{data.playerTitle || profile.currentTitle}</span>
+                  <span className="text-[10px] text-indigo-300 font-semibold">ArcadeX</span>
                 </div>
               </div>
               <div className="text-right">
                 <span className="text-[10px] text-slate-400 font-mono block">ARCADEX INSTANT</span>
-                <span className="text-[11px] font-bold text-emerald-400 font-mono">CẤP {data.playerLevel || profile.level}</span>
+
               </div>
             </div>
           </div>

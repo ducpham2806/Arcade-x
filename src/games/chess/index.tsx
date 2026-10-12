@@ -1,3 +1,4 @@
+import { ChessPiece } from '../../visuals/ChessPiece';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Chess, Square, PieceSymbol, Color } from 'chess.js';
 import { motion, AnimatePresence } from 'motion/react';
@@ -868,6 +869,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
       <button
         key={square}
         id={`chess-sq-${square}`}
+        aria-label={`${square}${piece ? `: ${CHESS_PIECE_SYMBOLS[`${piece.color}${piece.type}`]?.name}` : ""}`}
         onClick={() => handleSquareClick(square)}
         className={`relative aspect-square flex items-center justify-center select-none transition-all duration-150 ${
           isLight
@@ -906,13 +908,13 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             layoutId={`piece-${square}`}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className={`text-2xl sm:text-4xl md:text-5xl font-serif font-black drop-shadow-md transition-transform ${
+            className={`chess-piece-holder font-serif font-black drop-shadow-md transition-transform ${
               piece.color === 'w'
                 ? 'text-neutral-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'
                 : 'text-neutral-900 drop-shadow-[0_2px_4px_rgba(255,255,255,0.4)]'
             }`}
           >
-            {CHESS_PIECE_SYMBOLS[`${piece.color}${piece.type}`]?.symbol}
+            <ChessPiece type={piece.type} color={piece.color}/><span className="sr-only">{CHESS_PIECE_SYMBOLS[`${piece.color}${piece.type}`]?.symbol}</span>
           </motion.div>
         )}
 
@@ -943,7 +945,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   }, [fen]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-amber-950/40 text-slate-100 flex flex-col items-center justify-between p-2 sm:p-4 md:p-6 select-none font-sans">
+    <div className="arcade-game-surface min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-amber-950/40 text-slate-100 flex flex-col items-center justify-between p-2 sm:p-4 md:p-6 select-none font-sans">
       {/* Top Header Bar */}
       
       {/* LOBBY VIEW */}
@@ -1150,7 +1152,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
           <div className="relative flex flex-col items-center w-full">
             <div
               id="chess-board"
-              className="w-[95vw] max-w-[400px] sm:max-w-[440px] md:max-w-[480px] aspect-square rounded sm:rounded-xl overflow-hidden shadow-2xl border-4 sm:border-8 border-amber-950/90 grid grid-cols-8 grid-rows-8 bg-amber-950 p-0 sm:p-0.5"
+              className="arcade-board w-[95vw] max-w-[400px] sm:max-w-[440px] md:max-w-[480px] aspect-square rounded sm:rounded-xl overflow-hidden shadow-2xl border-4 sm:border-8 border-amber-950/90 grid grid-cols-8 grid-rows-8 bg-amber-950 p-0 sm:p-0.5"
             >
               {Array.from({ length: 8 }).map((_, row) =>
                 Array.from({ length: 8 }).map((_, col) => renderSquare(row, col))

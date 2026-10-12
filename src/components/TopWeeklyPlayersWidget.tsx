@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WeeklyTopPlayer } from '../types';
-import { FirebaseService } from '../services/firebase';
+import { SupabaseService } from '../services/supabase';
 import { useGame } from '../context/GameContext';
 import { usePlayer } from '../context/PlayerContext';
 import { Trophy, Crown, Medal, Flame, ChevronRight, Radio, Sparkles } from 'lucide-react';
@@ -14,7 +14,7 @@ export const TopWeeklyPlayersWidget: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    const unsubscribe = FirebaseService.subscribeToWeeklyTopPlayers((topList) => {
+    const unsubscribe = SupabaseService.subscribeToWeeklyTopPlayers((topList) => {
       setPlayers(topList);
       setIsLoading(false);
     });

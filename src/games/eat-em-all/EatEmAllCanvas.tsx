@@ -1620,7 +1620,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full min-h-[460px] max-h-[760px] rounded-2xl overflow-hidden touch-none select-none bg-black flex items-center justify-center border border-white/10 shadow-2xl"
+      className="arcade-board relative w-full h-full min-h-[460px] max-h-[760px] rounded-2xl overflow-hidden touch-none select-none bg-black flex items-center justify-center border border-white/10 shadow-2xl"
     >
       <canvas
         ref={canvasRef}

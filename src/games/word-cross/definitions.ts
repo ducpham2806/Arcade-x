@@ -477,11 +477,11 @@ export function getWordDefinition(word: string): WordDefinition {
   // Fallback generation for any word
   return {
     word: upper,
-    phonetic: `/${upper.toLowerCase()}/`,
+
     partOfSpeech: 'Từ vựng tiếng Anh (Vocabulary)',
-    meaningVi: `Từ vựng "${upper}" trong ma trận giải đố Word Cross.`,
-    meaningEn: `An English word found in the Word Cross letter grid.`,
-    example: `You successfully discovered the word "${upper}"!`,
-    exampleVi: `Bạn đã tìm thấy thành công từ "${upper}" trên bảng chữ cái!`
+    meaningVi: `Chưa có nghĩa tiếng Việt offline cho "${upper}". Từ này có trong kho từ của game.`,
+    meaningEn: '',
+    example: '',
+    exampleVi: ''
   };
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage, Friend } from '../types';
-import { FirebaseService } from '../services/firebase';
+import { SupabaseService } from '../services/supabase';
 import { StorageService, DEFAULT_ACHIEVEMENTS } from '../services/storage';
 import { usePlayer } from '../context/PlayerContext';
 import { useGame } from '../context/GameContext';
@@ -45,7 +45,7 @@ const EMOJIS = ['🔥', '🎮', '⚡', '🏆', '💎', '😎', '🚀', '💯', '
 
 export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
   const { profile } = usePlayer();
-  const { friends } = useGame();
+  const { friends, activeGameId } = useGame();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [selectedTag, setSelectedTag] = useState<'general' | 'tip' | 'score' | 'question'>('general');
@@ -133,7 +133,7 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
 
   // Subscribe to real-time chat messages
   useEffect(() => {
-    const unsubscribe = FirebaseService.subscribeToChat((newMessages) => {
+    const unsubscribe = SupabaseService.subscribeToChat((newMessages) => {
       setMessages(newMessages);
 
       if (!isFirstLoadRef.current && !isOpen) {
@@ -171,7 +171,7 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
     setShowTipsMenu(false);
 
     try {
-      await FirebaseService.sendChatMessage({
+      await SupabaseService.sendChatMessage({
         senderId: profile.id,
         senderName: profile.username,
         senderAvatar: profile.avatar,
@@ -196,7 +196,7 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
 
   const handleLikeMessage = (messageId: string) => {
     soundEngine.play('click');
-    FirebaseService.toggleLikeChatMessage(messageId, profile.id);
+    SupabaseService.toggleLikeChatMessage(messageId, profile.id);
   };
 
   const filteredMessages = messages.filter((m) => {
@@ -212,38 +212,6 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
 
   return (
     <>
-      {/* Floating Launcher Button (visible when chat is closed or collapsed on desktop/tablet) */}
-      {!isOpen && (
-        <button
-          id="btn-global-chat-launcher"
-          type="button"
-          onClick={onToggle}
-          className="fixed bottom-20 right-4 sm:bottom-5 sm:right-5 z-40 hidden md:flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[#0f0f18]/95 hover:bg-[#151525] border border-indigo-500/40 text-white shadow-xl shadow-indigo-950/60 backdrop-blur-md transition-all hover:scale-105 active:scale-95 group cursor-pointer"
-          aria-label="Mở khung chat toàn cầu"
-        >
-          <div className="relative">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-indigo-400 group-hover:text-indigo-300">
-              <MessageSquare className="w-4 h-4" />
-            </div>
-            {/* Online pulsing green dot */}
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-[#0f0f18]" />
-          </div>
-
-          <div className="text-left">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-extrabold font-display uppercase tracking-wide text-white">Chat Toàn Cầu</span>
-              {unreadCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-bold">
-                  +{unreadCount}
-                </span>
-              )}
-            </div>
-            <span className="text-[10px] text-emerald-400 font-semibold block">{onlineCount} game thủ online</span>
-          </div>
-        </button>
-      )}
-
       {/* Floating Chat Window (Native Drawer on Mobile, Popover on Desktop) */}
       {isOpen && (
         <div className="fixed inset-0 z-[100] pointer-events-none flex flex-col justify-end sm:justify-start">
@@ -416,7 +384,7 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
                         </div>
                         <div>
                           <h4 className="text-xs font-black text-white group-hover:text-emerald-300 transition-colors">{friend.username}</h4>
-                          <p className="text-[10px] text-slate-400">{friend.currentTitle || `Lv.${friend.level}`} • {friend.elo || 1200} ELO</p>
+                          <p className="text-[10px] text-slate-400">{friend.isOnline ? 'Đang online' : 'Offline'}</p>
                         </div>
                       </div>
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all">
@@ -493,24 +461,6 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
                       <span className={`text-[11px] font-bold ${isMe ? 'text-indigo-400' : 'text-slate-200'}`}>
                         {msg.senderName}
                       </span>
-                      {msg.senderTitle && (() => {
-                        const rarity = getTitleRarity(msg.senderTitle);
-                        const rarityClasses = 
-                          rarity === 'legendary' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30 animate-title-shimmer shadow-[0_0_10px_rgba(245,158,11,0.2)]' :
-                          rarity === 'epic' ? 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30 animate-title-shimmer' :
-                          rarity === 'rare' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' :
-                          'bg-amber-500/10 text-amber-300/80 border-amber-500/20';
-                        return (
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold border ${rarityClasses}`}>
-                            {msg.senderTitle}
-                          </span>
-                        );
-                      })()}
-                      {msg.senderLevel && (
-                        <span className="text-[9px] px-1 py-0.2 rounded bg-white/5 text-slate-400 border border-white/10 font-mono">
-                          Lv.{msg.senderLevel}
-                        </span>
-                      )}
                       {msg.gameTipTag === 'tip' && (
                         <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
                           Mẹo 💡
