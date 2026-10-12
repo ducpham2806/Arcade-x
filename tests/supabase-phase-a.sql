@@ -1,0 +1,64 @@
+begin;
+select set_config('arcadex.test_a',gen_random_uuid()::text,true),set_config('arcadex.test_b',gen_random_uuid()::text,true);
+insert into auth.users(id,aud,role,email,email_confirmed_at,raw_app_meta_data,raw_user_meta_data)
+select current_setting('arcadex.test_a')::uuid,'authenticated','authenticated','phase-a-'||current_setting('arcadex.test_a')||'@example.invalid',now(),'{"provider":"email","providers":["email"]}'::jsonb,'{}'::jsonb
+union all select current_setting('arcadex.test_b')::uuid,'authenticated','authenticated','phase-a-'||current_setting('arcadex.test_b')||'@example.invalid',now(),'{"provider":"email","providers":["email"]}'::jsonb,'{}'::jsonb;
+set local role authenticated;
+do $test$
+declare a uuid:=current_setting('arcadex.test_a')::uuid;b uuid:=current_setting('arcadex.test_b')::uuid;path_a text:='players/'||a||'/game_sessions/phase-a'; rev bigint;r jsonb;q jsonb;attempts jsonb;ticket uuid;event uuid:=gen_random_uuid();h integer;blocked boolean;
+begin
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated','is_anonymous',false)::text,true);
+ perform public.arcadex_bind_player(a::text);
+ r:=public.arcadex_save_identity('QA-'||substr(a::text,1,8),'🎮');
+ if r->>'display_name'<>'QA-'||substr(a::text,1,8) then raise exception 'Identity roundtrip failed';end if;
+ perform public.arcadex_commit(jsonb_build_array(jsonb_build_object('path','players/'||a,'operation','set','data',jsonb_build_object('id',a,'username','Old name','avatar','🎮','accountState',jsonb_build_object('private',true)))));
+ select data into r from public.arcadex_read('players',a::text);
+ if r->>'username'<>'QA-'||substr(a::text,1,8) then raise exception 'Canonical identity guard failed';end if;
+ perform public.arcadex_commit(jsonb_build_array(jsonb_build_object('path',path_a,'operation','set','data','{"schemaVersion":1,"progress":{"level":3}}'::jsonb)),jsonb_build_array(jsonb_build_object('path',path_a,'version',0)));
+ select version,data into rev,r from public.arcadex_read('players/'||a||'/game_sessions','phase-a');
+ if r#>>'{progress,level}'<>'3' or rev is null then raise exception 'Save roundtrip failed';end if;
+ perform public.arcadex_commit(jsonb_build_array(jsonb_build_object('path',path_a,'operation','update','data','{"progress":{"level":4}}'::jsonb)),jsonb_build_array(jsonb_build_object('path',path_a,'version',rev)));
+ blocked:=false;
+ begin perform public.arcadex_commit(jsonb_build_array(jsonb_build_object('path',path_a,'operation','set','data','{"progress":{"level":1}}'::jsonb)),jsonb_build_array(jsonb_build_object('path',path_a,'version',rev)));
+ exception when serialization_failure then blocked:=true;end;
+ if not blocked then raise exception 'Stale revision not rejected';end if;
+ perform public.launcher_set_favorite('word-cross',true,a);
+ r:=public.launcher_library_state(a);
+ if jsonb_array_length(r)<>1 or not (r->0->>'favorite')::boolean then raise exception 'Library roundtrip failed';end if;
+ ticket:=gen_random_uuid();perform public.launcher_session_start('word-cross',ticket,a);perform public.launcher_session_finish(ticket,'completed',42,a);
+ ticket:=public.car_escape_start(1,a);
+ if ticket is null then raise exception 'Car ticket missing';end if;
+ r:=public.car_escape_submit(ticket,'[{"vehicleId":1,"to":3},{"vehicleId":5,"to":1},{"vehicleId":2,"to":0},{"vehicleId":7,"to":0},{"vehicleId":0,"to":4}]'::jsonb,1000,0,a);
+ if (r->>'score')::integer<100 or (r->>'stars')::integer<>3 then raise exception 'Car replay submission failed';end if;
+ if public.car_escape_submit(ticket,'[{"vehicleId":1,"to":3},{"vehicleId":5,"to":1},{"vehicleId":2,"to":0},{"vehicleId":7,"to":0},{"vehicleId":0,"to":4}]'::jsonb,1000,0,a)<>r then raise exception 'Car repeated submit changed result';end if;
+ r:=public.word_cross_start(1,a,false);ticket:=(r->>'id')::uuid;q:=r->'puzzle';
+ select jsonb_agg(jsonb_build_object('sr',w->'path'->0->'r','sc',w->'path'->0->'c','er',w->'path'->(jsonb_array_length(w->'path')-1)->'r','ec',w->'path'->(jsonb_array_length(w->'path')-1)->'c') order by ord)
+ into attempts from jsonb_array_elements(q->'words') with ordinality e(w,ord);
+ r:=public.word_cross_submit(ticket,attempts,1000,0,a);
+ if (r->>'score')::integer<100 then raise exception 'Word submit failed';end if;
+ if public.word_cross_submit(ticket,attempts,1000,0,a)<>r then raise exception 'Word repeated submit changed result';end if;
+ r:=public.shikaku_start(4,a);ticket:=(r->>'id')::uuid;q:=r->'puzzle';
+ h:=public.shikaku_hint(ticket,event,a);
+ if h<>1 or public.shikaku_hint(ticket,event,a)<>1 then raise exception 'Hint idempotency failed';end if;
+ r:=public.shikaku_submit(ticket,q->'solution',a);
+ if not (r->>'verified')::boolean or (r->>'hints')::int<>1 then raise exception 'Shikaku submit failed';end if;
+ if public.shikaku_submit(ticket,q->'solution',a)<>r then raise exception 'Shikaku repeated submit changed result';end if;
+ r:=public.cosmic_start('endless',1,a);
+ if r->>'id' is null or r#>>'{config,version}'<>'2' then raise exception 'Cosmic ticket failed';end if;
+ if has_function_privilege('authenticated','public.cosmic_accept(uuid,uuid,integer,integer,boolean,text)','execute') then raise exception 'Browser can accept Cosmic scores';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',b,'role','authenticated','is_anonymous',false)::text,true);
+ perform public.arcadex_bind_player(b::text);
+ if exists(select 1 from public.arcadex_read('players/'||a||'/game_sessions','phase-a')) then raise exception 'Foreign save visible';end if;
+ select data into r from public.arcadex_read('players',a::text);
+ if r ? 'accountState' then raise exception 'Private profile leaked';end if;
+ if exists(select 1 from public.arcadex_documents where path=path_a) then raise exception 'RLS foreign save visible';end if;
+ blocked:=false;begin perform public.arcadex_commit(jsonb_build_array(jsonb_build_object('path',path_a,'operation','set','data','{}'::jsonb)));exception when insufficient_privilege then blocked:=true;end;
+ if not blocked then raise exception 'Foreign write allowed';end if;
+ blocked:=false;begin perform public.launcher_library_state(a);exception when insufficient_privilege then blocked:=true;end;
+ if not blocked then raise exception 'Expected-owner guard failed';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',b,'role','authenticated','is_anonymous',true)::text,true);
+ blocked:=false;begin perform public.cosmic_start('endless',1,b);exception when insufficient_privilege then blocked:=true;end;
+ if not blocked then raise exception 'Anonymous ranked start allowed';end if;
+ raise notice 'PASS: identity, save/read, stale revision, library/session, Car replay/submit, Word submit, Shikaku hint/submit, Cosmic ticket, account isolation, RLS, owner guard, anonymous restriction.';
+end $test$;
+rollback;
