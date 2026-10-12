@@ -10,7 +10,7 @@ import { CloseButton } from './common/CloseButton';
 const AVATARS = ['🎮', '🐱', '🦊', '🤖', '🚀', '⚡'];
 export const ProfileModal: React.FC = () => {
   const { profile, updateUsername, updateAvatar } = usePlayer();
-  const { currentUser, isLoggedIn, logout, setAuthModalMode, saveIdentity } = useAuth();
+  const { currentUser, isLoggedIn, logout, setAuthModalMode, saveIdentity, requestPasswordReset } = useAuth();
   const { setActiveModal } = useGame();
   const [name, setName] = useState(profile.username);
   const [message, setMessage] = useState('');
@@ -53,6 +53,7 @@ export const ProfileModal: React.FC = () => {
           <fieldset><legend className="text-sm font-semibold text-slate-200 mb-3">Ảnh đại diện</legend><div className="flex flex-wrap gap-2">{AVATARS.map(avatar => <button key={avatar} type="button" aria-label={`Chọn ảnh đại diện ${avatar}`} aria-pressed={profile.avatar === avatar} disabled={busy} onClick={() => { void save(profile.username, avatar); }} className={`w-11 h-11 rounded-xl text-xl border ${profile.avatar === avatar ? 'border-lime-300 bg-lime-300/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{avatar}</button>)}</div></fieldset>
           <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
             {isLoggedIn ? <button id="btn-logout-profile" type="button" disabled={busy} className="simple-secondary-button" onClick={async () => { setBusy(true); try { const result = await logout(); if (result.success) setActiveModal('none'); else setMessage(result.error || 'Chưa đăng xuất được.'); } finally { setBusy(false); } }}><LogOut size={17}/>{busy ? 'Đang đăng xuất…' : 'Đăng xuất'}</button> : <><button id="btn-profile-login" type="button" className="simple-primary-button" onClick={() => openAuth('login')}><LogIn size={17}/>Đăng nhập</button><button id="btn-profile-register" type="button" className="simple-secondary-button" onClick={() => openAuth('register')}><UserPlus size={17}/>Đăng ký</button></>}
+            <>{isLoggedIn && currentUser?.email && <button id="btn-change-password-email" type="button" disabled={busy} className="simple-secondary-button" onClick={async () => { setBusy(true); try { const result = await requestPasswordReset(currentUser.email!); setMessage(result.message || result.error || "Chưa gửi được email."); } finally { setBusy(false); } }}>Gửi email đổi mật khẩu</button>}</>
             <button id="btn-profile-settings" type="button" className="simple-secondary-button" onClick={() => setActiveModal('settings')}><Settings size={17}/>Cài đặt</button>
           </div>
         </div>
@@ -61,3 +62,4 @@ export const ProfileModal: React.FC = () => {
     </section>
   </div>;
 };
+
