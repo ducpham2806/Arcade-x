@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import {
   InventoryItem,
   Rarity,
@@ -21,7 +21,7 @@ import { soundEngine } from '../services/audio';
 import { getItemSlot } from '../utils/rarity';
 import confetti from 'canvas-confetti';
 import { SHOP_THEMES, ShopTheme, convertThemeToInventoryItem } from '../data/shopThemes';
-import { FirebaseService } from '../services/firebase';
+import { SupabaseService, type CloudInventoryData } from '../services/supabase';
 import { hapticService } from '../services/haptics';
 import { ELO_TITLE_MILESTONES } from '../utils/eloRankSystem';
 
@@ -95,160 +95,85 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [cloudSyncStatus, setCloudSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
   const [lastCloudSyncTime, setLastCloudSyncTime] = useState<number | null>(null);
 
-  // Auto-sync inventory and chest collection to Firebase Firestore
+  const [cloudReady, setCloudReady] = useState(false);
+  const currentInventory = { items, chestCounts, forgeMastery, discoveredBlueprintIds };
+  const revisionRef = useRef<{ updatedAt: number; dirty: boolean; fingerprint: string }>(null);
+  if (!revisionRef.current) {
+    let metadata = { updatedAt: 0, dirty: false };
+    try { metadata = JSON.parse(localStorage.getItem('arcadex_inventory_sync_v1') || 'null') || metadata; } catch { /* initial inventory */ }
+    revisionRef.current = { ...metadata, fingerprint: JSON.stringify(currentInventory) };
+  }
+  const persistRevision = () => localStorage.setItem('arcadex_inventory_sync_v1', JSON.stringify({
+    updatedAt: revisionRef.current!.updatedAt, dirty: revisionRef.current!.dirty,
+  }));
+
+  // Persist local changes before accepting asynchronous cloud snapshots. A smaller
+  // quantity is a real consumption, not something to merge back with Math.max.
   useEffect(() => {
-    if (!profile.id) return;
-    const timer = setTimeout(async () => {
-      setCloudSyncStatus('syncing');
-      const ok = await FirebaseService.syncInventoryToCloud(
-        profile.id,
-        items,
-        chestCounts,
-        forgeMastery,
-        discoveredBlueprintIds
-      );
-      if (ok) {
-        setCloudSyncStatus('synced');
-        setLastCloudSyncTime(Date.now());
-      } else {
-        setCloudSyncStatus('error');
-      }
-    }, 1200);
+    const fingerprint = JSON.stringify({ items, chestCounts, forgeMastery, discoveredBlueprintIds });
+    if (fingerprint !== revisionRef.current!.fingerprint) {
+      revisionRef.current = { fingerprint, updatedAt: Math.max(Date.now(), revisionRef.current!.updatedAt + 1), dirty: true };
+    }
+    StorageService.saveInventory(items);
+    localStorage.setItem(CHEST_COUNT_STORAGE_KEY, JSON.stringify(chestCounts));
+    StorageService.saveForgeMastery(forgeMastery);
+    StorageService.saveDiscoveredBlueprintIds(discoveredBlueprintIds);
+    persistRevision();
+  }, [items, chestCounts, forgeMastery, discoveredBlueprintIds]);
 
-    return () => clearTimeout(timer);
-  }, [items, chestCounts, forgeMastery, discoveredBlueprintIds, profile.id]);
-
-  // Initial cloud restore and real-time synchronization on device/account change
   useEffect(() => {
-    if (!profile.id) return;
-
-    let isMounted = true;
-    FirebaseService.loadInventoryFromCloud(profile.id).then((cloudData) => {
-      if (!isMounted || !cloudData) return;
-
-      if (cloudData.items && Array.isArray(cloudData.items) && cloudData.items.length > 0) {
-        setItems((prevItems) => {
-          const merged = new Map<string, InventoryItem>();
-          prevItems.forEach((it) => merged.set(it.id, it));
-          cloudData.items!.forEach((it) => {
-            const existing = merged.get(it.id);
-            if (!existing) {
-              merged.set(it.id, it);
-            } else {
-              merged.set(it.id, {
-                ...existing,
-                count: Math.max(existing.count, it.count),
-                equipped: existing.equipped || it.equipped,
-              });
-            }
-          });
-          return Array.from(merged.values());
-        });
-      }
-
-      if (cloudData.chestCounts) {
-        setChestCounts((prev) => ({
-          common: Math.max(prev.common || 0, cloudData.chestCounts?.common || 0),
-          rare: Math.max(prev.rare || 0, cloudData.chestCounts?.rare || 0),
-          epic: Math.max(prev.epic || 0, cloudData.chestCounts?.epic || 0),
-          legendary: Math.max(prev.legendary || 0, cloudData.chestCounts?.legendary || 0),
-        }));
-      }
-
-      if (cloudData.forgeMastery && cloudData.forgeMastery.level) {
-        setForgeMastery((prev) =>
-          cloudData.forgeMastery!.level > prev.level ? cloudData.forgeMastery! : prev
-        );
-      }
-
-      setCloudSyncStatus('synced');
-      setLastCloudSyncTime(Date.now());
-    });
-
-    const unsubscribe = FirebaseService.subscribeToCloudInventory(profile.id, (cloudData) => {
-      if (!cloudData) return;
-      if (cloudData.items && Array.isArray(cloudData.items) && cloudData.items.length > 0) {
-        setItems((prevItems) => {
-          const merged = new Map<string, InventoryItem>();
-          prevItems.forEach((it) => merged.set(it.id, it));
-          cloudData.items!.forEach((it) => {
-            const existing = merged.get(it.id);
-            if (!existing) {
-              merged.set(it.id, it);
-            } else {
-              merged.set(it.id, {
-                ...existing,
-                count: Math.max(existing.count, it.count),
-                equipped: existing.equipped || it.equipped,
-              });
-            }
-          });
-          return Array.from(merged.values());
-        });
-      }
-      if (cloudData.chestCounts) {
-        setChestCounts((prev) => ({
-          common: Math.max(prev.common || 0, cloudData.chestCounts?.common || 0),
-          rare: Math.max(prev.rare || 0, cloudData.chestCounts?.rare || 0),
-          epic: Math.max(prev.epic || 0, cloudData.chestCounts?.epic || 0),
-          legendary: Math.max(prev.legendary || 0, cloudData.chestCounts?.legendary || 0),
-        }));
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      unsubscribe();
+    let mounted = true;
+    setCloudReady(false);
+    const applyCloud = (data: CloudInventoryData | null) => {
+      if (!mounted || !data) return;
+      const updatedAt = data.stateUpdatedAt ?? data.updatedAt ?? 0;
+      if (updatedAt <= revisionRef.current!.updatedAt) return;
+      const next = {
+        items: Array.isArray(data.items) ? data.items : StorageService.loadInventory(),
+        chestCounts: data.chestCounts ? { common: 0, rare: 0, epic: 0, legendary: 0, ...data.chestCounts } : chestCounts,
+        forgeMastery: data.forgeMastery ?? forgeMastery,
+        discoveredBlueprintIds: data.discoveredBlueprintIds ?? discoveredBlueprintIds,
+      };
+      revisionRef.current = { updatedAt, dirty: false, fingerprint: JSON.stringify(next) };
+      // Write immediately as well as updating React, so an immediate reload is safe.
+      StorageService.saveInventory(next.items);
+      localStorage.setItem(CHEST_COUNT_STORAGE_KEY, JSON.stringify(next.chestCounts));
+      StorageService.saveForgeMastery(next.forgeMastery);
+      StorageService.saveDiscoveredBlueprintIds(next.discoveredBlueprintIds);
+      persistRevision();
+      setItems(next.items);setChestCounts(next.chestCounts);setForgeMastery(next.forgeMastery);setDiscoveredBlueprintIds(next.discoveredBlueprintIds);
+      setCloudSyncStatus('synced');setLastCloudSyncTime(Date.now());
     };
+    SupabaseService.loadInventoryFromCloud(profile.id).then(applyCloud).finally(() => { if (mounted) setCloudReady(true); });
+    const unsubscribe = SupabaseService.subscribeToCloudInventory(profile.id, applyCloud);
+    return () => { mounted = false; unsubscribe(); };
   }, [profile.id]);
 
-  const manualSyncInventory = useCallback(async (): Promise<boolean> => {
+  const syncInventory = useCallback(async (): Promise<boolean> => {
     if (!profile.id) return false;
+    const revision = revisionRef.current!.updatedAt;
     setCloudSyncStatus('syncing');
-    const ok = await FirebaseService.syncInventoryToCloud(
-      profile.id,
-      items,
-      chestCounts,
-      forgeMastery,
-      discoveredBlueprintIds
-    );
-    if (ok) {
-      setCloudSyncStatus('synced');
-      setLastCloudSyncTime(Date.now());
-      hapticService.claimReward();
-    } else {
-      setCloudSyncStatus('error');
-    }
+    const ok = await SupabaseService.syncInventoryToCloud(profile.id, items, chestCounts,
+      forgeMastery, discoveredBlueprintIds, revision);
+    if (ok && revisionRef.current!.updatedAt === revision) {
+      revisionRef.current!.dirty = false;
+      persistRevision();
+      setCloudSyncStatus('synced');setLastCloudSyncTime(Date.now());
+    } else if (!ok) setCloudSyncStatus('error');
     return ok;
   }, [profile.id, items, chestCounts, forgeMastery, discoveredBlueprintIds]);
 
-  // Save to storage
   useEffect(() => {
-    StorageService.saveInventory(items);
-  }, [items]);
+    if (!cloudReady) return;
+    const timer = setTimeout(() => { void syncInventory(); }, 1200);
+    return () => clearTimeout(timer);
+  }, [cloudReady, syncInventory]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(CHEST_COUNT_STORAGE_KEY, JSON.stringify(chestCounts));
-    } catch {
-      // ignore
-    }
-  }, [chestCounts]);
-
-  // Reload inventory & chests when auth state changes
-  useEffect(() => {
-    const handleAuthChange = () => {
-      setItems(StorageService.loadInventory());
-      try {
-        const data = localStorage.getItem(CHEST_COUNT_STORAGE_KEY);
-        if (data) setChestCounts(JSON.parse(data));
-      } catch {
-        // ignore
-      }
-    };
-    window.addEventListener('arcadex_auth_changed', handleAuthChange);
-    return () => window.removeEventListener('arcadex_auth_changed', handleAuthChange);
-  }, []);
+  const manualSyncInventory = useCallback(async () => {
+    const ok = await syncInventory();
+    if (ok) hapticService.claimReward();
+    return ok;
+  }, [syncInventory]);
 
   const addChest = useCallback((type: 'common' | 'rare' | 'epic' | 'legendary', count: number = 1) => {
     setChestCounts(prev => ({

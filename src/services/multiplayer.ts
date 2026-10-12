@@ -1,6 +1,6 @@
 /**
  * Real-Time Multiplayer Board Game & Matchmaking Service
- * Powered by Firebase Firestore onSnapshot and Atomic Transactions
+ * Powered by Supabase Realtime and Atomic Transactions
  */
 import {
   collection,
@@ -17,9 +17,9 @@ import {
   runTransaction,
   serverTimestamp,
   arrayUnion,
-  Firestore,
-} from 'firebase/firestore';
-import { FirebaseService } from './firebase';
+  CloudDatabase,
+} from './cloudStore';
+import { SupabaseService } from './supabase';
 import {
   GameRoomData,
   MatchmakingQueueEntry,
@@ -32,18 +32,6 @@ import {
 
 export const BOARD_SIZE = 15; // 15x15 Caro / Gomoku standard tournament grid
 
-export function updatePlayersEloInMultiplayerTx(tx: any, db: any, gameId: string, hostUid: string, guestUid: string, eloChange: EloCalculationResult) {
-  if (hostUid) {
-    tx.set(doc(db, 'players', hostUid), {
-      stats: { highScores: { [`${gameId}-elo`]: eloChange.newHostElo } }
-    }, { merge: true });
-  }
-  if (guestUid) {
-    tx.set(doc(db, 'players', guestUid), {
-      stats: { highScores: { [`${gameId}-elo`]: eloChange.newGuestElo } }
-    }, { merge: true });
-  }
-}
 
 export const K_FACTOR = 32;
 
@@ -149,10 +137,10 @@ export function generateRoomCode(): string {
 }
 
 export class MultiplayerService {
-  private static getDb(): Firestore {
-    const db = FirebaseService.getDb();
+  private static getDb(): CloudDatabase {
+    const db = SupabaseService.getDb();
     if (!db) {
-      throw new Error('Firestore database is not initialized');
+      throw new Error('Supabase database is not initialized');
     }
     return db;
   }
@@ -511,7 +499,7 @@ export class MultiplayerService {
   }
 
   /**
-   * 5. Atomic Move Verification with Firestore runTransaction
+   * 5. Atomic Move Verification with Postgres transaction
    */
   public static async makeMove(
     roomId: string,
@@ -585,9 +573,7 @@ export class MultiplayerService {
 
       const nextTurn: PlayerRole = playerRole === 'host' ? 'guest' : 'host';
 
-      if (newStatus === 'finished' && eloChange) {
-        updatePlayersEloInMultiplayerTx(transaction, db, room.gameId, room.hostPlayer.uid, room.guestPlayer?.uid || '', eloChange);
-      }
+      // Postgres applies both ELO updates atomically when the room ends.
 
       // Atomic Update
       transaction.update(roomRef, {
@@ -640,7 +626,7 @@ export class MultiplayerService {
       const hostElo = room.hostPlayer.elo;
       const guestElo = room.guestPlayer?.elo || 1200;
       const eloChange = calculateEloChange(hostElo, guestElo, claimantRole);
-      updatePlayersEloInMultiplayerTx(transaction, db, room.gameId, room.hostPlayer.uid, room.guestPlayer?.uid || '', eloChange);
+        // Postgres applies both ELO updates atomically when the room ends.
 
       transaction.update(roomRef, {
         status: 'finished',
@@ -680,7 +666,7 @@ export class MultiplayerService {
       const now = Date.now();
 
       const forfeiterName = forfeitRole === 'host' ? room.hostPlayer.displayName : room.guestPlayer?.displayName;
-      updatePlayersEloInMultiplayerTx(transaction, db, room.gameId, room.hostPlayer.uid, room.guestPlayer?.uid || '', eloChange);
+        // Postgres applies both ELO updates atomically when the room ends.
 
       transaction.update(roomRef, {
         status: 'finished',
@@ -736,7 +722,7 @@ export class MultiplayerService {
         const hostElo = room.hostPlayer.elo;
         const guestElo = room.guestPlayer?.elo || 1200;
         const eloChange = calculateEloChange(hostElo, guestElo, 'draw');
-        updatePlayersEloInMultiplayerTx(transaction, db, room.gameId, room.hostPlayer.uid, room.guestPlayer?.uid || '', eloChange);
+        // Postgres applies both ELO updates atomically when the room ends.
 
         transaction.update(roomRef, {
           status: 'finished',

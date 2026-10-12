@@ -1,3 +1,4 @@
+import { GameArtwork } from '../../visuals/gameArt';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GameComponentProps } from '../../types';
@@ -241,7 +242,7 @@ const ModeCard = ({ icon, title, desc, onClick }: { icon: React.ReactNode, title
   </button>
 );
 
-export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOver }) => {
+export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOver, isPaused }) => {
   const { profile } = usePlayer();
   const intensity = profile?.gameIntensity || 'normal';
 
@@ -319,7 +320,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
   };
 
   useEffect(() => {
-    if (screen === 'playing' && mode === 'time' && !isWon && !isFailed && timeLeft > 0) {
+    if (!isPaused && screen === 'playing' && mode === 'time' && !isWon && !isFailed && timeLeft > 0) {
       const timer = setInterval(() => {
         setTimeLeft(t => {
           if (t <= 1) {
@@ -333,14 +334,14 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [screen, mode, isWon, isFailed, timeLeft, bridge]);
+  }, [screen, mode, isWon, isFailed, timeLeft, bridge, isPaused]);
 
   useEffect(() => {
-    if (screen === 'playing' && mode === 'score' && !isWon && !isFailed) {
+    if (!isPaused && screen === 'playing' && mode === 'score' && !isWon && !isFailed) {
       const timer = setInterval(() => setTimeLeft(t => t + 1), 1000);
       return () => clearInterval(timer);
     }
-  }, [screen, mode, isWon, isFailed]);
+  }, [screen, mode, isWon, isFailed, isPaused]);
 
   useEffect(() => {
     if (seeds.length === 0 || isWon || isFailed) return;
@@ -427,7 +428,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
   };
 
   const handleCellDown = (r: number, c: number) => {
-    if (isWon || isFailed) return;
+    if (isPaused || isWon || isFailed) return;
     
     const seed = seeds.find(s => s.r === r && s.c === c);
     if (seed) {
@@ -488,7 +489,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
   useEffect(() => {
     const handleUp = () => {
       if (activeSeedIdRef.current !== null) {
-        if (mode === 'strokes' && !isWon && !isFailed) {
+        if (!isPaused && mode === 'strokes' && !isWon && !isFailed) {
           setStrokesLeft(prev => prev - 1);
         }
       }
@@ -500,10 +501,10 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
       window.removeEventListener('pointerup', handleUp);
       window.removeEventListener('touchend', handleUp);
     };
-  }, [mode, isWon, isFailed]);
+  }, [mode, isWon, isFailed, isPaused]);
 
   const handleMove = (clientX: number, clientY: number) => {
-    if (activeSeedIdRef.current === null) return;
+    if (isPaused || activeSeedIdRef.current === null) return;
     const el = document.elementFromPoint(clientX, clientY);
     if (el) {
       const rStr = el.getAttribute('data-r');
@@ -538,7 +539,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
 
   if (screen === 'menu') {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-[#0a0b12] text-white p-4">
+      <div className="arcade-game-surface w-full h-full flex flex-col items-center justify-center bg-[#0a0b12] text-white p-4">
         <div className="w-full max-w-md bg-slate-900/80 p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col gap-6 relative">
           
           <button onClick={() => onGameOver(0)} className="absolute top-4 left-4 p-2 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-full transition-colors z-10 cursor-pointer">
@@ -546,6 +547,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
           </button>
           
           <div className="text-center mt-4">
+            <div className="arcade-menu-emblem"><GameArtwork gameId="draw-a-shape"/></div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold mb-2">
               <span>Độ khó: {intensity === 'casual' ? 'Thư Giãn' : intensity === 'hardcore' ? 'Khắc Nghiệt' : 'Tiêu Chuẩn'}</span>
               <span>• Max 24 Ô</span>
@@ -606,7 +608,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center bg-[#0a0b12] text-white p-3 sm:p-4 font-sans select-none overflow-hidden touch-none relative">
+    <div className="arcade-game-surface w-full h-full flex flex-col items-center bg-[#0a0b12] text-white p-3 sm:p-4 font-sans select-none overflow-hidden touch-none relative">
       {/* Top HUD */}
       <div className="w-full max-w-xl flex items-center justify-between p-3 sm:p-4 bg-slate-900/60 rounded-2xl border border-white/10 mb-4 shrink-0 mt-2 sm:mt-4">
         <div className="flex flex-col">
@@ -665,7 +667,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
-            className="relative bg-slate-900/60 p-1 sm:p-2.5 rounded-2xl border border-white/10 shadow-2xl"
+            className="arcade-board relative bg-slate-900/60 p-1 sm:p-2.5 rounded-2xl border border-white/10 shadow-2xl"
             style={{
               display: 'grid',
               gridTemplateRows: `repeat(${gridSize.R}, minmax(0, 1fr))`,
@@ -720,6 +722,8 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
                   `}
                   style={{
                     backgroundColor: bgColor,
+                    backgroundImage: 'linear-gradient(145deg, rgba(255,255,255,.18), transparent 60%)',
+                    boxShadow: 'inset 0 1px rgba(255,255,255,.18), inset 0 -2px rgba(0,0,0,.2)',
                     color: '#fff',
                     textShadow: '0 1px 3px rgba(0,0,0,0.8)'
                   }}

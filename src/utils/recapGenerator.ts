@@ -375,14 +375,6 @@ export async function generateGameRecapCardImage(params: RecapImageParams): Prom
   ctx.fillStyle = '#ffffff';
   ctx.fillText(params.achievedRank, badgeX + badgeW + 20, cursorY + 41);
 
-  // Rewards (Coins / EXP) on the right of the rank box
-  const rewX = contentX + rankBoxW - 280;
-  ctx.font = '700 15px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#fbbf24';
-  ctx.fillText(`+${params.coinsEarned} Xu`, rewX, cursorY + 41);
-
-  ctx.fillStyle = '#818cf8';
-  ctx.fillText(`+${params.expEarned} EXP`, rewX + 130, cursorY + 41);
   ctx.restore();
 
   // 9. Footer: Player Profile & Exact Timestamp
@@ -399,7 +391,7 @@ export async function generateGameRecapCardImage(params: RecapImageParams): Prom
 
   ctx.font = '600 14px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.fillStyle = '#a5b4fc';
-  ctx.fillText(`${params.playerTitle} • Cấp ${params.playerLevel}`, contentX + 50, footerY + 16);
+  ctx.fillText('ArcadeX • Chơi theo cách của bạn', contentX + 50, footerY + 16);
 
   // Timestamp on the Right
   const timeX = width - pad - 40;

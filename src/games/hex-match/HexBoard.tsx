@@ -63,7 +63,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
       )}
 
       {/* Hex Grid Stage */}
-      <div className="relative w-full max-w-[480px] bg-slate-950/70 border border-slate-800/80 rounded-3xl p-2 sm:p-3 shadow-2xl backdrop-blur-md flex flex-col items-center justify-center">
+      <div className="arcade-board relative w-full max-w-[480px] bg-slate-950/70 border border-slate-800/80 rounded-3xl p-2 sm:p-3 shadow-2xl backdrop-blur-md flex flex-col items-center justify-center">
         {grid.map((row, r) => {
           const isOdd = r % 2 === 1;
           return (

@@ -2,8 +2,8 @@ import { GameControlInfo, GameAchievementDef, DropRateConfig } from '../../types
 
 export const SHIKAKU_CONTROLS: GameControlInfo[] = [
   { key: 'Mouse/Touch', action: 'Draw', touchInstruction: 'Chạm và kéo thả trên màn hình để vẽ hình chữ nhật.' },
-  { key: 'Tap', action: 'Delete', touchInstruction: 'Chạm vào 1 ô vuông của hình đã vẽ để xóa nó.' },
-  { key: 'Undo', action: 'Revert', touchInstruction: 'Bấm nút Undo để quay lại bước trước.' },
+  { key: 'Tap', action: 'Delete', touchInstruction: 'Chạm vào vùng đã vẽ rồi bấm Xóa vùng để sửa.' },
+  { key: 'Undo', action: 'Revert', touchInstruction: 'Bấm Hoàn tác miễn phí để quay lại bước trước.' },
 ];
 
 export const SHIKAKU_ACHIEVEMENTS: GameAchievementDef[] = [

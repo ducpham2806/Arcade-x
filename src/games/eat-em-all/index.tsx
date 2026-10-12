@@ -517,9 +517,9 @@ export const EatEmAllGame: React.FC<GameComponentProps> = ({
     activePowerUps.slowmoTimer > 0;
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-between p-1 sm:p-2 text-white select-none overflow-hidden max-w-4xl mx-auto">
+    <div className="arcade-game-surface relative w-full h-full flex flex-col items-center justify-between p-1 sm:p-2 text-white select-none overflow-hidden max-w-4xl mx-auto">
       {/* Top HUD Bar */}
-      <div className="w-full bg-[#0e0e16]/95 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 mb-1 flex items-center justify-between shadow-xl gap-2 z-10 shrink-0">
+      <div className="arcade-combat-hud w-full bg-[#0e0e16]/95 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 mb-1 flex items-center justify-between shadow-xl gap-2 z-10 shrink-0">
         {/* Left: Score & Combo Multiplier Tag */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="flex flex-col">

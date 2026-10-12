@@ -1,218 +1,52 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GameConfig } from '../../types';
-import { Heart, Trophy, Bot, Play } from 'lucide-react';
+import { Heart, Trophy, Bot, Play, Info, LockKeyhole } from 'lucide-react';
+import { GameArtwork, artFor, artStyle } from '../../visuals/gameArt';
 
 export const getCategoryIcon = (category: string): string => {
   const cat = (category || '').toLowerCase();
-  if (cat.includes('puzzle') || cat.includes('trí tuệ')) return '🧩';
-  if (cat.includes('arcade') || cat.includes('cổ điển')) return '🕹️';
-  if (cat.includes('action') || cat.includes('hành động')) return '⚔️';
-  if (cat.includes('multiplayer') || cat.includes('đối kháng') || cat.includes('pvp') || cat.includes('online')) return '👥';
-  if (cat.includes('reflex') || cat.includes('phản xạ') || cat.includes('tốc độ')) return '⚡';
-  if (cat.includes('casual') || cat.includes('thư giãn')) return '🎲';
-  return '🎮';
+  if (cat.includes('puzzle')) return '🧩';
+  if (cat.includes('action')) return '⚔️';
+  if (cat.includes('multiplayer')) return '👥';
+  if (cat.includes('reflex')) return '⚡';
+  return '🕹️';
 };
-
 interface LazyGameCardProps {
-  game: GameConfig;
+  game: GameConfig & { accessModel?: 'free'|'premium'; availability?: 'published'|'maintenance' };
   personalHighScore: number;
   isFav: boolean;
-  stats?: { activePlayers: number; totalPlays: string; rating: number };
-  onOpenDetail: (gameId: string) => void;
-  onToggleFavorite: (gameId: string) => void;
-  onLaunchGame: (gameId: string, aiMode?: boolean) => void;
+  onOpenDetail: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
+  onLaunchGame: (id: string, aiMode?: boolean) => void;
 }
-
-export const LazyGameCard: React.FC<LazyGameCardProps> = ({
-  game,
-  personalHighScore,
-  isFav,
-  stats,
-  onOpenDetail,
-  onToggleFavorite,
-  onLaunchGame,
-}) => {
-  const [isIntersected, setIsIntersected] = useState<boolean>(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isIntersected) return;
-
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      setIsIntersected(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsIntersected(true);
-          observer.disconnect();
-        }
-      },
-      {
-        root: null,
-        rootMargin: '120px 0px', // Preload ahead of scrolling
-        threshold: 0.05,
-      }
-    );
-
-    const el = containerRef.current;
-    if (el) {
-      observer.observe(el);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [isIntersected]);
-
-  return (
-    <div
-      ref={containerRef}
-      id={`game-card-${game.id}`}
-      className="group relative rounded-xl sm:rounded-2xl bg-[#141414] border border-white/5 hover:border-indigo-500/50 p-2 sm:p-3 flex flex-col justify-between transition-all duration-200 hover:bg-[#171717] hover:shadow-lg hover:shadow-indigo-500/10 overflow-hidden min-h-[135px] sm:min-h-[148px]"
-    >
-      {!isIntersected ? (
-        /* Lightweight Skeleton Placeholder: Zero Cumulative Layout Shift (CLS = 0) */
-        <div className="w-full h-full flex flex-col justify-between animate-pulse">
-          <div>
-            <div className="flex items-start justify-between gap-1.5 mb-2">
-              <div
-                className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 shrink-0"
-                style={{ backgroundColor: `${game.themeColor || '#6366f1'}15` }}
-              />
-              <div className="flex items-center gap-1">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/5 rounded-lg" />
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/5" />
-              </div>
-            </div>
-            <div className="h-3.5 sm:h-4 w-24 sm:w-32 bg-white/10 rounded-md mb-2" />
-          </div>
-
-          <div className="pt-1.5 sm:pt-2 border-t border-white/5 flex items-center justify-between">
-            <div className="w-8 sm:w-12 h-4 sm:h-5 bg-white/5 rounded" />
-            <div className="flex items-center gap-1">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/5 rounded-lg" />
-              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/10 rounded-lg" />
-            </div>
-          </div>
+export const LazyGameCard: React.FC<LazyGameCardProps> = ({game, personalHighScore, isFav, onOpenDetail, onToggleFavorite, onLaunchGame}) => {
+  const [visible, setVisible] = useState(false);
+  const ref=useRef<HTMLDivElement>(null);
+  useEffect(()=>{
+    if(!('IntersectionObserver' in window)){setVisible(true);return;}
+    const observer=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){setVisible(true);observer.disconnect();}},{rootMargin:'240px'});
+    if(ref.current) observer.observe(ref.current);
+    return ()=>observer.disconnect();
+  },[]);
+  return <div ref={ref} id={`game-card-${game.id}`} className="arcade-cartridge" style={artStyle(game.id)}>
+    <button type="button" className="cartridge-cover" onClick={()=>onOpenDetail(game.id)} aria-label={`Khám phá ${game.title}`}>
+      {visible && <GameArtwork gameId={game.id}/>}
+      <span className="cartridge-category">{artFor(game.id).label}</span>
+    </button>
+    <button id={`btn-fav-card-${game.id}`} type="button" className={`cartridge-favorite ${isFav?'is-favorite':''}`} onClick={()=>onToggleFavorite(game.id)} aria-pressed={isFav} title={isFav?'Bỏ Yêu Thích':'Thêm Vào Yêu Thích'} aria-label={`${isFav?'Bỏ yêu thích':'Yêu thích'} ${game.title}`}>
+      <Heart size={16} fill={isFav?'currentColor':'none'}/>
+    </button>
+    <div className="cartridge-info">
+      <button type="button" className="cartridge-title" onClick={()=>onOpenDetail(game.id)}>{game.title}</button>
+      <p>{game.shortDesc}</p><span className="launcher-game-access">{game.availability==='maintenance'?'Đang bảo trì':game.accessModel==='premium'?'Cần mở khóa':'Chơi miễn phí'}</span>
+      <div className="cartridge-footer">
+        <span className="cartridge-record" title="Kỷ lục cá nhân"><Trophy size={13}/>{personalHighScore.toLocaleString()}</span>
+        <div className="cartridge-actions">
+          <button id={`btn-detail-card-${game.id}`} type="button" onClick={()=>onOpenDetail(game.id)} title="Cách chơi" aria-label={`Thể lệ ${game.title}`}><Info size={17}/></button>
+          {game.supportsAI && <button id={`btn-play-ai-${game.id}`} type="button" onClick={()=>onLaunchGame(game.id,true)} title="Luyện Với AI" aria-label={`Luyện với AI: ${game.title}`}><Bot size={16}/></button>}
+          <button id={`btn-play-${game.id}`} type="button" className="cartridge-play" disabled={game.availability==='maintenance'} onClick={()=>onLaunchGame(game.id)} title="Chơi Ngay" aria-label={`Chơi ${game.title}`}><Play size={14} fill="currentColor"/><span>{game.accessModel==='premium'?'MỞ GAME':'CHƠI'}</span></button>
         </div>
-      ) : (
-        /* Loaded Full Game Card with Smooth Fade-in */
-        <div className="w-full h-full flex flex-col justify-between transition-opacity duration-300 opacity-100">
-          <div>
-            {/* Card Header: Icon, Category Icon Badge & Favorite Heart */}
-            <div className="flex items-start justify-between gap-1.5 mb-1.5 sm:mb-2.5">
-              <div
-                className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg sm:text-2xl shadow-lg border border-white/10 group-hover:scale-105 group-hover:border-indigo-500/50 transition-all shrink-0 cursor-pointer"
-                style={{ backgroundColor: `${game.themeColor}25` }}
-                onClick={() => onOpenDetail(game.id)}
-                title={`Mở chi tiết ${game.title}`}
-              >
-                {game.icon}
-              </div>
-
-              <div className="flex items-center gap-1 min-w-0">
-                {/* Category Icon Badge (No Text) */}
-                <span
-                  className="text-xs sm:text-sm px-1.5 py-0.5 rounded bg-white/5 border border-white/10 flex items-center justify-center shadow-inner"
-                  title={`Thể loại: ${game.category}`}
-                >
-                  {getCategoryIcon(game.category)}
-                </span>
-                
-                <div className="hidden md:inline-flex items-center gap-1 text-[9px] text-slate-400 bg-[#0a0a0c] px-1.5 py-0.5 rounded border border-white/5">
-                  <span className="w-1 h-1 rounded-full bg-emerald-400" />
-                  <span>{(stats?.activePlayers || 500).toLocaleString()}</span>
-                </div>
-
-                {/* Favorite Heart Button */}
-                <button
-                  id={`btn-fav-card-${game.id}`}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleFavorite(game.id);
-                  }}
-                  className={`p-1 sm:p-1.5 rounded-lg border transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px] ${
-                    isFav
-                      ? 'bg-rose-500/20 text-rose-400 border-rose-500/50 shadow-sm'
-                      : 'bg-white/5 text-slate-500 border-white/5 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={isFav ? 'Bỏ Yêu Thích' : 'Thêm Vào Yêu Thích'}
-                >
-                  <Heart className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform active:scale-75 ${isFav ? 'fill-rose-500 text-rose-500' : ''}`} />
-                </button>
-              </div>
-            </div>
-
-            {/* Game Title - Click to open detail */}
-            <div
-              onClick={() => onOpenDetail(game.id)}
-              className="cursor-pointer group/title mb-1.5 sm:mb-2"
-            >
-              <div className="flex items-center gap-1">
-                <h4 className="text-xs sm:text-sm font-bold text-white group-hover/title:text-indigo-400 transition-colors font-display truncate">
-                  {game.title}
-                </h4>
-                {game.id === 'blocker' && (
-                  <span className="px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[7px] sm:text-[8px] font-black uppercase shrink-0">
-                    🪙 500
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Card Footer: High Score & Action Buttons */}
-          <div className="pt-1.5 sm:pt-2 border-t border-white/5 flex items-center justify-between gap-1">
-            <div className="flex items-center gap-1 text-left min-w-0" title="Kỷ lục cao nhất">
-              <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
-              <span className="text-[10px] sm:text-xs font-black font-mono text-yellow-500 truncate block leading-tight">
-                {personalHighScore.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1 shrink-0">
-              {/* Top 5 Button */}
-              <button
-                id={`btn-detail-card-${game.id}`}
-                type="button"
-                onClick={() => onOpenDetail(game.id)}
-                className="p-1 sm:p-1.5 rounded-lg bg-white/5 hover:bg-yellow-500/20 text-slate-300 hover:text-yellow-400 border border-white/10 hover:border-yellow-500/30 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px]"
-                title="Xem Top 5 & Thể Lệ"
-              >
-                <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-400" />
-              </button>
-
-              {/* AI Practice Button */}
-              {game.supportsAI && (
-                <button
-                  id={`btn-play-ai-${game.id}`}
-                  type="button"
-                  onClick={() => onLaunchGame(game.id, true)}
-                  className="p-1 sm:p-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px]"
-                  title="Luyện Với AI"
-                >
-                  <Bot className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-400" />
-                </button>
-              )}
-
-              {/* Play Button (Icon Only) */}
-              <button
-                id={`btn-play-${game.id}`}
-                type="button"
-                onClick={() => onLaunchGame(game.id)}
-                className="p-1.5 sm:p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center active:scale-95 cursor-pointer min-h-[26px] min-w-[26px] sm:min-h-[32px] sm:min-w-[32px]"
-                title="Chơi Ngay"
-              >
-                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
-  );
+  </div>;
 };

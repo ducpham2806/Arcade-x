@@ -41,6 +41,7 @@ import {
   cloneBoard,
   getLegalMovesForPiece,
   findKing,
+  hasLegalMoves,
   PIECE_SYMBOLS,
   PieceColor,
   serializeXiangqiBoard,
@@ -580,7 +581,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       // Check win condition (Captured Enemy King)
       const enemyColor: PieceColor = movingPiece.color === 'r' ? 'b' : 'r';
       const enemyKingPos = findKing(nextBoard, enemyColor);
-      const isCheckmate = !enemyKingPos || targetPiece?.type === 'k';
+      const isCheckmate = !enemyKingPos || targetPiece?.type === 'k' || !hasLegalMoves(nextBoard, enemyColor);
 
       setSelectedPos(null);
       setLegalMoves([]);
@@ -655,7 +656,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
 
             // Check if AI captured player's king
             const humanKingPos = findKing(aiNextBoard, 'r');
-            if (!humanKingPos || aiCapturedPiece?.type === 'k') {
+            if (!humanKingPos || aiCapturedPiece?.type === 'k' || !hasLegalMoves(aiNextBoard, 'r')) {
               setAiWinner('b');
               setAiEndReason('AI đã bắt được Tướng của bạn!');
               bridge.playSound('gameOver');
@@ -674,7 +675,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     (playMode === 'local_hotseat' && localWinner !== null);
 
   return (
-    <div className="relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
+    <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
       {/* VS Screen Pop when online opponent connects */}
       {showVersusScreen && roomState?.players.host && roomState.players.guest && (
         <VersusScreen
@@ -1023,7 +1024,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
           {/* ========================================================= */}
           {/* TRADITIONAL WOODEN XIANGQI BOARD MATRIX (9 x 10)         */}
           {/* ========================================================= */}
-          <div className="relative p-3 sm:p-5 rounded-3xl bg-gradient-to-br from-[#4a2e18] via-[#2d1b0f] to-[#1a100a] border-4 border-[#7a4e28] shadow-2xl shadow-black overflow-x-auto max-w-full">
+          <div className="arcade-board relative p-3 sm:p-5 rounded-3xl bg-gradient-to-br from-[#4a2e18] via-[#2d1b0f] to-[#1a100a] border-4 border-[#7a4e28] shadow-2xl shadow-black overflow-x-auto max-w-full">
             {/* Wooden Board Surface */}
             <div
               className="relative bg-[#d8ab76] border-2 border-[#5c3a1e] rounded-xl p-3 sm:p-4 shadow-inner"
@@ -1078,7 +1079,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                         {/* Piece Disc */}
                         {piece && (
                           <div
-                            className={`relative w-[88%] h-[88%] rounded-full flex items-center justify-center border-2 sm:border-4 shadow-md transition-transform ${
+                            className={`arcade-piece relative w-[88%] h-[88%] rounded-full flex items-center justify-center border-2 sm:border-4 shadow-md transition-transform ${
                               piece.color === 'r'
                                 ? 'bg-[#f5e6cb] border-[#b02a2a] text-[#b02a2a] shadow-red-950/50'
                                 : 'bg-[#e2d5c1] border-[#1a1a1a] text-[#1a1a1a] shadow-black/50'

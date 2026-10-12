@@ -1,6 +1,11 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { PostGameSummary } from '../launcher/PostGameSummary';
+import { useLauncher } from '../launcher/LauncherContext';
+import { GameSaveGate, GameLoadBoundary } from '../components/GameSaveGate';
+import { readGameSave } from '../services/gameSaves';
+import { GameArtwork, GameAtmosphere, artStyle } from '../visuals/gameArt';
+import React, { useState, useMemo, useCallback, useEffect, useRef, Suspense } from 'react';
 import { GameMetadata } from '../types';
-import { createGameBridge } from './GameBridge';
+import { createGameBridge, type CreateBridgeOptions } from './GameBridge';
 import { usePlayer } from '../context/PlayerContext';
 import { useInventory } from '../context/InventoryContext';
 import { useGame } from '../context/GameContext';
@@ -46,8 +51,14 @@ interface GameWrapperProps {
   onExit: () => void;
 }
 
+function readGameState(gameId: string): unknown {
+  return readGameSave(gameId);
+}
+
 export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, metadata, onExit }) => {
   const gameMeta = propMeta || metadata;
+  const {finishPlay,recordPlay}=useLauncher();
+  const endedRef=useRef(false);
   const { profile, recordGamePlayed, addExp, addCoins, addGems } = usePlayer();
   const { addChest, getEquippedSkinForGame, openChest } = useInventory();
   const {
@@ -59,6 +70,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     isMusicMuted,
     toggleMusic,
     setActiveModal,
+    openChat,
     openShareModal,
     isPracticeMode,
     isDailyChallengeMode,
@@ -66,6 +78,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     saveAndSuspendGame,
     autoSaveGameSession,
     pausedGameSession,
+    discardPausedGame,
   } = useGame();
 
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -73,7 +86,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const [showPreGameLoading, setShowPreGameLoading] = useState<boolean>(() => {
     try {
       const skipped = localStorage.getItem('arcadex_skip_pregame_loading');
-      return skipped !== 'true';
+      return skipped !== 'true' && localStorage.getItem(`launcher_guide_seen_${gameMeta.id}`) !== 'true';
     } catch {
       return true;
     }
@@ -118,6 +131,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   const sessionStartTimeRef = useRef<number>(Date.now());
   const isResumingThisGame = pausedGameSession && pausedGameSession.gameId === gameId;
+  const initialGameStateRef = useRef(readGameState(gameId) ?? (isResumingThisGame ? pausedGameSession.gameStateData : undefined));
   const initialTimeOffsetRef = useRef<number>(
     isResumingThisGame
       ? (pausedGameSession.timeElapsedSeconds ?? pausedGameSession.sessionStats?.timeElapsed ?? 0)
@@ -143,34 +157,10 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const [sessionSummaryData, setSessionSummaryData] = useState<{
-    timePlayedSeconds: number;
-    scoreEarned: number;
-    isHighScore: boolean;
-    droppedChest: string | null;
-    rankText: string;
-    coinsEarned: number;
-    expEarned: number;
-  } | null>(null);
-  const [showSessionSummaryModal, setShowSessionSummaryModal] = useState<boolean>(false);
-
   const handleTriggerExit = useCallback(() => {
     setShowExitConfirm(false);
-    const timePlayed = Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
-    const score = gameOverData?.score || highScore || 0;
-    const calculatedRank = calculateAchievedRank(gameId, score);
-
-    setSessionSummaryData({
-      timePlayedSeconds: timePlayed,
-      scoreEarned: score,
-      isHighScore: !!gameOverData?.isHighScore,
-      droppedChest: gameOverData?.droppedChest || null,
-      rankText: calculatedRank.rankText,
-      coinsEarned: Math.max(5, Math.floor(score / 15)),
-      expEarned: Math.max(10, Math.floor(score / 10)),
-    });
-    setShowSessionSummaryModal(true);
-  }, [gameOverData, highScore, gameId]);
+    onExit();
+  }, [onExit]);
 
   // Auto-pause whenever an overlay modal (leaderboard, quests, profile, etc.) is opened
   useEffect(() => {
@@ -250,12 +240,13 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const handleSaveAndExit = useCallback(() => {
     if (!gameMeta) return;
     const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
-    const score = currentScoreRef.current > 0 ? currentScoreRef.current : (highScore > 0 ? Math.round(highScore * 0.5) : 100);
+    const score = currentScoreRef.current;
     saveAndSuspendGame({
       gameId: gameMeta.id,
       gameTitle: gameMeta.title,
       gameIcon: gameMeta.icon,
       currentScore: score,
+      gameStateData: readGameState(gameMeta.id),
       isPracticeMode,
       isDailyChallengeMode,
       savedAt: Date.now(),
@@ -268,7 +259,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       },
     }, true);
     setHasAutoSaved(true);
-  }, [gameMeta, highScore, isPracticeMode, isDailyChallengeMode, saveAndSuspendGame]);
+  }, [gameMeta, isPracticeMode, isDailyChallengeMode, saveAndSuspendGame]);
 
   // Periodic background auto-saving to cloud during active gameplay
   useEffect(() => {
@@ -276,12 +267,13 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     const interval = setInterval(() => {
       if (document.hidden || isPaused) return;
       const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
-      const score = currentScoreRef.current > 0 ? currentScoreRef.current : (highScore > 0 ? Math.round(highScore * 0.5) : 100);
+      const score = currentScoreRef.current;
       autoSaveGameSession({
         gameId: gameMeta.id,
         gameTitle: gameMeta.title,
         gameIcon: gameMeta.icon,
         currentScore: score,
+        gameStateData: readGameState(gameMeta.id),
         isPracticeMode,
         isDailyChallengeMode,
         savedAt: Date.now(),
@@ -295,7 +287,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       });
     }, 30000);
     return () => clearInterval(interval);
-  }, [gameMeta, gameOverData, isPaused, isPracticeMode, isDailyChallengeMode, highScore, autoSaveGameSession]);
+  }, [gameMeta, gameOverData, isPaused, isPracticeMode, isDailyChallengeMode, autoSaveGameSession]);
 
   const rankInfo = useMemo(() => {
     if (!gameOverData) return null;
@@ -352,19 +344,18 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     };
   }, [gameOverData, gameMeta, profile]);
 
-  const bridge = useMemo(() => {
-    return createGameBridge({
+  const bridgeOptions: CreateBridgeOptions = {
       gameId: gameId,
-      dropRates: gameMeta?.dropRates || {
-        baseChestDropChance: 0.3,
-        scoreThresholdForDrop: 100,
+      dropRates: {
+        baseChestDropChance: 0,
+        scoreThresholdForDrop: Number.POSITIVE_INFINITY,
         chestWeights: [{ type: 'common', weight: 100 }],
       },
       onRecordScore: (gId, score) => recordGamePlayed(gId, score),
       onAddExp: (amt) => addExp(amt),
       onAddCoins: (amt) => addCoins(amt),
       onAddGems: (amt) => addGems(amt),
-      onAddChest: (cType) => addChest(cType),
+      onAddChest: (_cType) => {},
       onReportAchievement: (aId, val, isAbs) => reportAchievementProgress(aId, val, isAbs),
       onReportQuest: (qCat, delta) => reportQuestProgress(qCat, delta),
       onSubmitLeaderboard: async (gId, score, extraStats) => {
@@ -381,26 +372,25 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       onRecordMove: (count = 1) => {
         movesCountRef.current += count;
       },
-    });
-  }, [
-    gameId,
-    gameMeta?.dropRates,
-    recordGamePlayed,
-    addExp,
-    addCoins,
-    addGems,
-    addChest,
-    reportAchievementProgress,
-    reportQuestProgress,
-    submitGameScore,
-    getEquippedSkinForGame,
-  ]);
+    };
+  const bridgeOptionsRef = useRef(bridgeOptions);
+  bridgeOptionsRef.current = bridgeOptions;
+  // Keep the API identity stable, while callbacks and equipped skins stay current.
+  const bridge = useMemo(() => createGameBridge(new Proxy(bridgeOptions, {
+    get: (_target, key) => bridgeOptionsRef.current[key as keyof CreateBridgeOptions],
+  })), [gameId]);
 
   const handleGameOver = useCallback(
     async (finalScore: number, stats?: Record<string, number>) => {
+      if (endedRef.current) return;
+      endedRef.current=true;
+      finishPlay(finalScore);
+      discardPausedGame();
+      setIsPaused(true);
+      setGameOverData({score:finalScore,isHighScore:false,droppedChest:null,stats});
       try {
         const result = await bridge.submitScore(finalScore, stats);
-        if (result.isNewHighScore) {
+        if (result.isNewHighScore && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           confetti({
             particleCount: 100,
             spread: 80,
@@ -425,7 +415,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         });
       }
     },
-    [bridge]
+    [bridge,finishPlay,discardPausedGame]
   );
 
   // Mobile Swipe Gesture Handler for flick-based movement across all directional games
@@ -518,6 +508,13 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   }, []);
 
   const handleRestart = useCallback(() => {
+    endedRef.current=false;
+    recordPlay(gameId);
+    initialGameStateRef.current = ['tile-2048', 'neon-runner', 'car-escape', 'scoodoku', 'shikaku', 'word-cross', 'cosmic-defense'].includes(gameId) ? null : undefined;
+    currentScoreRef.current = 0;
+    movesCountRef.current = 0;
+    initialTimeOffsetRef.current = 0;
+    sessionStartTimeRef.current = Date.now();
     setGameOverData(null);
     setRecapCardImage(null);
     setMatchTimestamp('');
@@ -577,12 +574,12 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const GameComponent = gameMeta.component;
 
   return (
-    <div id="game-wrapper-viewport" className="fixed inset-0 z-50 bg-[#050505] flex flex-col select-none overflow-hidden font-sans">
+    <div id="game-wrapper-viewport" data-game={gameMeta.id} style={artStyle(gameMeta.id)} className="fixed inset-0 z-50 bg-[#050505] flex flex-col select-none overflow-hidden font-sans">
       {/* Top Header HUD */}
       <header className="h-12 sm:h-14 bg-[#0e0e0e]/95 backdrop-blur-md border-b border-white/5 px-2.5 sm:px-6 flex items-center justify-between z-30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-lg shrink-0">
-            {gameMeta.icon}
+            <GameArtwork gameId={gameMeta.id}/>
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -598,6 +595,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
             <div className="flex items-center gap-1.5 text-xs text-slate-400" title="Kỷ lục">
               <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
               <strong className="text-yellow-400 font-mono">{(highScore || 0).toLocaleString()}</strong>
+              <span id="game-save-status-slot" className="min-w-0 flex"/>
             </div>
           </div>
         </div>
@@ -669,26 +667,34 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       <main
         ref={viewportContainerRef}
         id="game-main-viewport"
-        style={cssVariables as React.CSSProperties}
+        style={{...cssVariables, ...(['cosmic-defense','blocker','shikaku'].includes(gameId)?{touchAction:'pan-y'}:{})} as React.CSSProperties}
         onTouchStart={handleStageTouchStart}
         onTouchEnd={handleStageTouchEnd}
         className="relative flex-1 w-full h-full bg-[#050505] flex items-center justify-center overflow-hidden p-0 scrollbar-thin select-none touch-none"
       >
+        <GameAtmosphere gameId={gameMeta.id}/>
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
           style={stageStyle}
         >
+          <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
+          <GameLoadBoundary onExit={onExit}>
+          <Suspense fallback={<div role="status" className="p-8 text-center text-slate-200">Đang tải game…</div>}>
           <GameComponent
             key={gameSessionKey}
             isPracticeMode={isPracticeMode}
             isDailyChallengeMode={isDailyChallengeMode}
             bridge={bridge}
+            initialState={initialGameStateRef.current}
             isPaused={isPaused || showPreGameLoading || gameOverData !== null || showExitConfirm || activeModal !== 'none' || resumeCountdown !== null}
             isMuted={isSoundMuted}
             onGameOver={handleGameOver}
             onRestart={handleRestart}
           />
+          </Suspense>
+          </GameLoadBoundary>
+          </GameSaveGate>
         </div>
 
         {/* Unpause / Resume 3-2-1 Countdown Overlay */}
@@ -773,17 +779,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                     </div>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setActiveModal('quests')}
-                    className="p-2.5 rounded-xl bg-[#141414] hover:bg-white/10 border border-white/5 transition-all text-xs flex items-center gap-2 cursor-pointer"
-                  >
-                    <Bell className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <div>
-                      <div className="font-bold text-white text-[11px]">Nhiệm Vụ / Báo Cáo</div>
-                      <div className="text-[9px] text-slate-400">Kiểm tra thông báo</div>
-                    </div>
-                  </button>
+
                 </div>
 
                 {/* Controls mini guide */}
@@ -832,6 +828,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={openChat} className="arcade-pause-chat col-span-2 w-full py-2 text-xs text-slate-300 hover:text-white border border-white/10 rounded-xl">Trò chuyện</button>
                   <button
                     id="btn-pause-save-exit"
                     type="button"
@@ -897,7 +894,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                     onClick={handleTriggerExit}
                     className="w-full py-2 px-3 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 active:scale-95 text-rose-400 border border-rose-500/30 font-semibold text-xs transition-all cursor-pointer"
                   >
-                    Hủy Ván
+                    Về thư viện
                   </button>
                 </div>
               </div>
@@ -905,282 +902,8 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
           </div>
         )}
 
-        {/* Post-Game Summary Modal Screen */}
-        {gameOverData && (
-          <div className="absolute inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in">
-            <div className="max-w-md w-full bg-[#0e0e0e] border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col text-center relative overflow-hidden my-auto max-h-[95vh]">
-              {/* Background ambient glow */}
-              <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-20 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        {gameOverData && <PostGameSummary gameId={gameId} title={gameMeta.title} score={gameOverData.score} isBest={gameOverData.isHighScore} recap={recapCardImage} onReplay={handleRestart} onHome={onExit} onShare={handleOpenRecapShare} onDownload={handleDownloadRecapDirect}/>}
 
-              {/* Header Title & Badge */}
-              <div className="shrink-0 mb-3 relative z-10">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[11px] sm:text-xs font-black tracking-wider uppercase mb-2 shadow-inner">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                  BẢNG TỔNG KẾT VÁN ĐẤU • POST-GAME
-                </div>
-
-                {gameOverData.isHighScore && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/40 text-yellow-400 text-xs font-bold mb-2 animate-bounce mx-auto">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    KỶ LỤC MỚI ĐƯỢC THIẾT LẬP!
-                  </div>
-                )}
-
-                <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight font-display drop-shadow-md">
-                  {(gameOverData.score || 0).toLocaleString()}
-                </h2>
-                <p className="text-xs text-slate-400 mt-0.5">Tổng điểm đạt được trong ván</p>
-              </div>
-
-              {/* Scrollable middle content */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar px-1 py-1 min-h-0 relative z-10 space-y-3">
-                {/* Rewards Earned Grid (Coins + EXP) */}
-                <div className="grid grid-cols-2 gap-2.5">
-                  <div className="bg-[#141414] border border-amber-500/25 rounded-2xl p-3 flex flex-col justify-between shadow-lg shadow-amber-500/5">
-                    <div className="flex items-center gap-2.5 mb-1.5">
-                      <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-base shrink-0 shadow-inner">
-                        <Coins className="w-5 h-5 text-amber-400 fill-amber-400/30" />
-                      </div>
-                      <div className="text-left overflow-hidden">
-                        <div className="text-[10px] sm:text-xs text-slate-400 font-medium truncate">Xu Nhận Được</div>
-                        <div className="text-sm sm:text-base font-black text-amber-300 font-mono truncate">
-                          +{gameOverData.coinsEarned ?? Math.max(5, Math.floor(gameOverData.score / 15))} Xu
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-[10px] text-amber-400/80 text-left font-medium">Đã cộng vào số dư</span>
-                  </div>
-
-                  <div className="bg-[#141414] border border-indigo-500/30 rounded-2xl p-3 flex flex-col justify-between shadow-lg shadow-indigo-500/5">
-                    <div className="flex items-center gap-2.5 mb-1.5">
-                      <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-base shrink-0 shadow-inner">
-                        <Zap className="w-5 h-5 text-indigo-400 fill-indigo-400/30" />
-                      </div>
-                      <div className="text-left overflow-hidden">
-                        <div className="text-[10px] sm:text-xs text-slate-400 font-medium truncate">Kinh Nghiệm</div>
-                        <div className="text-sm sm:text-base font-black text-indigo-300 font-mono truncate">
-                          +{gameOverData.expEarned ?? Math.max(10, Math.floor(gameOverData.score / 10))} EXP
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-[10px] text-indigo-400/80 text-left font-medium">Level {profile.level} ({profile.currentTitle || profile.equippedTitle || 'Tân Binh'})</span>
-                  </div>
-                </div>
-
-                {/* Dropped Chest Card if any */}
-                {gameOverData.droppedChest && (
-                  <div className="p-3.5 rounded-2xl bg-[#141414] border border-indigo-500/40 shadow-lg shadow-indigo-500/10 text-left animate-pulse">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        RƯƠNG BÁU RƠI TỰ DO!
-                      </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 text-slate-300 border border-white/10 uppercase font-bold">
-                        {CHEST_TYPES[gameOverData.droppedChest].name}
-                      </span>
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-slate-400 mb-2.5">
-                      Bạn vừa nhận được 1 <strong>{CHEST_TYPES[gameOverData.droppedChest].name}</strong> vào Kho Rương Đồ.
-                    </p>
-                    <button
-                      id="btn-open-dropped-chest"
-                      type="button"
-                      onClick={() => handleQuickOpenChest(gameOverData.droppedChest!)}
-                      className="w-full py-2 rounded-xl bg-white text-black hover:bg-indigo-300 active:scale-95 font-bold uppercase text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
-                    >
-                      🎁 Mở Rương Ngay Trong Kho Đồ
-                    </button>
-                  </div>
-                )}
-
-                {/* Achieved Rank Badge Banner */}
-                {rankInfo && (
-                  <div className="p-2.5 rounded-2xl bg-gradient-to-r from-[#17162e] via-[#1c1b3a] to-[#17162e] border border-cyan-500/30 flex items-center justify-between shadow-inner">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-base shrink-0 shadow-md">
-                        {rankInfo.tierIcon}
-                      </div>
-                      <div className="text-left">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] uppercase font-black text-cyan-300 tracking-wider">Xếp Hạng</span>
-                          <span className="text-[9px] text-slate-400 font-mono">• {rankInfo.tierName || rankInfo.tierBadge}</span>
-                        </div>
-                        <div className="text-xs sm:text-sm font-black text-white">{rankInfo.rankText}</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[9px] text-slate-400 font-mono block">Giờ đấu</span>
-                      <span className="text-[10px] font-mono text-cyan-300 font-bold">{matchTimestamp.split(' - ')[0] || 'Vừa xong'}</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Game Recap Card Preview & Share Hub */}
-                <div className="p-3 rounded-2xl bg-[#111224] border border-cyan-500/40 text-left shadow-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-cyan-300 uppercase tracking-wide">
-                      <Camera className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>Thẻ Tổng Kết Game Recap</span>
-                    </div>
-                    {isGeneratingRecap ? (
-                      <span className="text-[10px] text-amber-300 animate-pulse font-mono">Đang tạo thẻ...</span>
-                    ) : (
-                      <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" /> Sẵn sàng
-                      </span>
-                    )}
-                  </div>
-
-                  {recapCardImage && (
-                    <div className="mb-2.5 rounded-xl overflow-hidden border border-cyan-500/30 relative group shadow-md bg-black">
-                      <img
-                        src={recapCardImage}
-                        alt="Game Recap Preview"
-                        className="w-full h-auto object-cover max-h-28 sm:max-h-32 transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2 justify-between">
-                        <span className="text-[9px] font-mono text-white/90 font-bold">ArcadeX Recap</span>
-                        <button
-                          type="button"
-                          onClick={handleDownloadRecapDirect}
-                          className="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1 cursor-pointer transition-all active:scale-95"
-                        >
-                          <Download className="w-3 h-3" /> Tải về
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      id="btn-gameover-recap-share"
-                      type="button"
-                      onClick={handleOpenRecapShare}
-                      className="w-full py-2 px-2.5 rounded-xl bg-gradient-to-r from-cyan-600 via-indigo-600 to-fuchsia-600 hover:opacity-90 text-white font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span>Chia Sẻ</span>
-                    </button>
-
-                    <button
-                      id="btn-gameover-download-recap"
-                      type="button"
-                      onClick={handleDownloadRecapDirect}
-                      disabled={!recapCardImage}
-                      className="w-full py-2 px-2.5 rounded-xl bg-[#1a1b32] hover:bg-[#252648] disabled:opacity-50 text-cyan-300 border border-cyan-500/30 font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Tải Ảnh (.PNG)</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons: Play Again & Return Home (High Priority) */}
-              <div className="shrink-0 pt-3 border-t border-white/10 mt-2 grid grid-cols-2 gap-2.5 relative z-10">
-                <button
-                  id="btn-gameover-replay"
-                  type="button"
-                  onClick={handleRestart}
-                  title="Chơi Lại"
-                  aria-label="Chơi Lại"
-                  className="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 active:scale-95 text-white font-black uppercase text-xs sm:text-sm shadow-lg shadow-emerald-950/40 transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <RotateCcw className="w-5 h-5" />
-                </button>
-                <button
-                  id="btn-gameover-home"
-                  type="button"
-                  onClick={handleTriggerExit}
-                  title="Về Trang Chủ"
-                  aria-label="Về Trang Chủ"
-                  className="w-full py-3 px-3 rounded-xl bg-[#1a1a1a] hover:bg-white/10 active:scale-95 text-slate-200 hover:text-white font-bold text-xs sm:text-sm border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md"
-                >
-                  <Home className="w-5 h-5 text-slate-300" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Play Session Summary Popup */}
-        {showSessionSummaryModal && sessionSummaryData && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="max-w-md w-full bg-[#0e0e0e] border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl text-center relative overflow-hidden my-auto animate-in zoom-in-95 duration-200">
-              <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
-
-              <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-cyan-600/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center text-2xl shadow-lg shadow-cyan-500/20">
-                📊
-              </div>
-
-              <h3 className="text-xl font-bold text-white font-display mb-1">TỔNG KẾT PHIÊN CHƠI</h3>
-              <p className="text-xs text-slate-400 mb-6">{gameMeta?.title || 'Trò Chơi Arcade'}</p>
-
-              {/* Stats Grid - Icon only stats */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="p-3.5 rounded-2xl bg-[#141414] border border-white/5 text-center flex flex-col items-center justify-center" title="Thời gian chơi">
-                  <div className="flex items-center justify-center mb-1">
-                    <Clock className="w-5 h-5 text-indigo-400" />
-                  </div>
-                  <div className="text-base font-bold text-white font-mono">
-                    {Math.floor(sessionSummaryData.timePlayedSeconds / 60)}:{String(sessionSummaryData.timePlayedSeconds % 60).padStart(2, '0')}
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-[#141414] border border-white/5 text-center flex flex-col items-center justify-center" title="Điểm đạt được">
-                  <div className="flex items-center justify-center mb-1">
-                    <Trophy className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <div className="text-base font-bold text-amber-400 font-mono">
-                    {sessionSummaryData.scoreEarned.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-
-              {/* Milestones Reached */}
-              <div className="p-4 rounded-2xl bg-[#141414] border border-white/5 text-left space-y-2.5 mb-6">
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
-                  Cột Mốc & Phần Thưởng Trong Phiên
-                </h4>
-                <div className="space-y-1.5 text-xs text-slate-300">
-                  {sessionSummaryData.isHighScore && (
-                    <div className="flex items-center gap-2 text-yellow-400 font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-                      🔥 Kỷ Lục Điểm Cao Mới!
-                    </div>
-                  )}
-                  {sessionSummaryData.droppedChest && (
-                    <div className="flex items-center gap-2 text-indigo-400 font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                      🎁 Rương Báu ({sessionSummaryData.droppedChest.toUpperCase()})
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 text-cyan-400 font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                    ⭐ {sessionSummaryData.rankText}
-                  </div>
-                  <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    🪙 +{sessionSummaryData.coinsEarned} Coins, ✨ +{sessionSummaryData.expEarned} EXP
-                  </div>
-                </div>
-              </div>
-
-              <button
-                id="btn-session-summary-confirm"
-                type="button"
-                onClick={onExit}
-                title="Về Trang Chủ"
-                aria-label="Về Trang Chủ"
-                className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold uppercase text-xs shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Home className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        )}
       </main>
 
       {/* Animated Pre-Game Loading Screen for Mobile & Desktop Onboarding */}

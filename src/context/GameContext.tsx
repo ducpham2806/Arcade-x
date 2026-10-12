@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Achievement, DailyQuest,
   FriendQuest, LeaderboardEntry, GameMetadata, ActiveModal, ShareData, DailyChallenge, PausedGameSession, PlayerProfile,
   Friend, FriendChallenge, WeeklyQuest, WeeklyMilestoneReward, WeeklyResetTimer } from '../types';
 import { StorageService } from '../services/storage';
-import { FirebaseService } from '../services/firebase';
+import { SupabaseService } from '../services/supabase';
 import { MatchmakingService } from '../services/matchmakingService';
 import { QuestGeneratorService } from '../services/questGenerator';
 import { NotificationService } from '../services/notificationService';
@@ -11,6 +11,7 @@ import { soundEngine, audioManager, MusicTheme } from '../services/audio';
 import { hapticService } from '../services/haptics';
 import { usePlayer } from './PlayerContext';
 import confetti from 'canvas-confetti';
+import { useLauncher } from '../launcher/LauncherContext';
 
 export type { ActiveModal };
 
@@ -113,12 +114,14 @@ const GameContext = createContext<GameContextType | null>(null);
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { profile, addCoins, addGems, addExp } = usePlayer();
+  const { favorites, recentlyPlayed, toggleFavorite, authorize, recordPlay, finishPlay } = useLauncher();
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
   const [isPracticeMode, setIsPracticeMode] = useState<boolean>(false);
   const [isDailyChallengeMode, setIsDailyChallengeMode] = useState<boolean>(false);
   const [activeModalState, setActiveModalState] = useState<ActiveModal>('none');
   const setActiveModal = useCallback((modal: ActiveModal | null | undefined) => {
-    setActiveModalState(modal || 'none');
+    const available: ActiveModal[] = ['none', 'profile', 'settings', 'auth', 'share', 'gameDetail', 'leaderboard', 'pvpHistory'];
+    setActiveModalState(modal && available.includes(modal) ? modal : 'none');
   }, []);
   const activeModal = activeModalState;
   const [selectedGameForDetail, setSelectedGameForDetail] = useState<string | null>(null);
@@ -160,18 +163,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setComboTimer(timer);
   }, [comboTimer]);
 
-  const [friendQuests, setFriendQuests] = useState<FriendQuest[]>([
+  const [friendQuests, setFriendQuests] = useState<FriendQuest[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('arcadex_friend_quests_v1') || 'null');
+      if (Array.isArray(saved)) return saved;
+    } catch { /* start fresh */ }
+    return [
     {
       id: 'fq_1',
       title: 'Đồng Đội Săn Mồi',
       description: 'Cùng đạt tổng 1000 điểm trong Eat \'Em All',
       gameId: 'eat-em-all',
       target: 1000,
-      current: 750,
+      current: 0,
       status: 'active',
       participants: [
-        { name: 'Player1', avatar: '🐉', contribution: 450 },
-        { name: 'Bạn', avatar: '🎮', contribution: 300 }
+        { name: 'Player1', avatar: '🐉', contribution: 0 },
+        { name: 'Bạn', avatar: '🎮', contribution: 0 }
       ],
       rewardCoins: 500,
       rewardGems: 20,
@@ -180,35 +188,41 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     {
       id: 'fq_2',
       title: 'Bộ Đôi Hoàn Hảo',
-      description: 'Cả hai cùng qua màn 5 Block Puzzle',
-      gameId: 'block-puzzle',
+      description: 'Hoàn thành 2 ván Blocker',
+      gameId: 'blocker',
       target: 2,
-      current: 2,
-      status: 'completed',
+      current: 0,
+      status: 'active',
       participants: [
-        { name: 'Gosu', avatar: '🔥', contribution: 1 },
-        { name: 'Bạn', avatar: '🎮', contribution: 1 }
+        { name: 'Gosu', avatar: '🔥', contribution: 0 },
+        { name: 'Bạn', avatar: '🎮', contribution: 0 }
       ],
       rewardCoins: 1000,
       rewardGems: 50,
       rewardExp: 2500
     }
-  ]);
-  
-  const claimFriendQuest = useCallback((questId: string) => {
-    const quest = friendQuests.find(q => q.id === questId);
-    if (!quest || quest.status !== 'completed') return;
+    ];
+  });
+  const friendQuestsRef = useRef(friendQuests);
+  friendQuestsRef.current = friendQuests;
+  useEffect(() => {
+    localStorage.setItem('arcadex_friend_quests_v1', JSON.stringify(friendQuests));
+  }, [friendQuests]);
 
+  const claimFriendQuest = useCallback((questId: string) => {
+    const quest = friendQuestsRef.current.find(q => q.id === questId);
+    if (!quest || quest.status !== 'completed') return;
+    const next = friendQuestsRef.current.map(q => q.id === questId ? { ...q, status: 'claimed' as const } : q);
+    // Persist and update the synchronous guard before granting, including repeated clicks in one render.
+    localStorage.setItem('arcadex_friend_quests_v1', JSON.stringify(next));
+    friendQuestsRef.current = next;
+    setFriendQuests(next);
     addCoins(quest.rewardCoins);
     addGems(quest.rewardGems);
     addExp(quest.rewardExp);
     hapticService.claimReward();
     soundEngine.play('claim');
-
-    setFriendQuests(prev =>
-      prev.map(q => (q.id === questId ? { ...q, status: 'claimed' } : q))
-    );
-  }, [friendQuests, addCoins, addGems, addExp]);
+  }, [addCoins, addGems, addExp]);
 
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>(() => StorageService.loadLeaderboards());
   const [dailyChallenges, setDailyChallenges] = useState<Record<string, DailyChallenge>>(() => StorageService.loadAllDailyChallenges());
@@ -244,8 +258,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
   const [shareData, setShareData] = useState<ShareData | null>(null);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-  const [favorites, setFavorites] = useState<string[]>(() => StorageService.loadFavorites());
-  const [recentlyPlayed, setRecentlyPlayed] = useState<string[]>(() => StorageService.loadRecentlyPlayed());
   const [pausedGameSession, setPausedGameSession] = useState<PausedGameSession | null>(() => StorageService.loadPausedGame());
   const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null);
   const [activeQuestToast, setActiveQuestToast] = useState<{ id: string; title: string; current: number; target: number; isWeekly?: boolean } | null>(null);
@@ -258,13 +270,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [incomingChallenges, setIncomingChallenges] = useState<FriendChallenge[]>([]);
   const [activeIncomingChallenge, setActiveIncomingChallenge] = useState<FriendChallenge | null>(null);
 
-  // Heartbeat Presence Broadcast (Keep user alive in Firestore)
+  // Heartbeat Presence Broadcast (Keep user alive in Supabase)
   useEffect(() => {
     if (!profile?.id) return;
     const activity = activeGameId ? `Đang chơi ${activeGameId}` : 'Đang ở Sảnh Arcade';
-    FirebaseService.updatePlayerPresence(profile, activity);
+    SupabaseService.updatePlayerPresence(profile, activity);
     const interval = setInterval(() => {
-      FirebaseService.updatePlayerPresence(profile, activity);
+      SupabaseService.updatePlayerPresence(profile, activity);
     }, 45000);
     return () => clearInterval(interval);
   }, [profile, activeGameId]);
@@ -272,7 +284,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Subscribe to real-time incoming PvP challenges
   useEffect(() => {
     if (!profile?.id) return;
-    const unsub = FirebaseService.subscribeToIncomingChallenges(profile.id, (challenges) => {
+    const unsub = SupabaseService.subscribeToIncomingChallenges(profile.id, (challenges) => {
       setIncomingChallenges(challenges);
       if (challenges.length > 0) {
         const newest = challenges[0];
@@ -318,11 +330,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const searchMatches = await FirebaseService.searchPlayers(trimmed);
+      const searchMatches = await SupabaseService.searchPlayers(trimmed);
       let targetPlayer = searchMatches.find(p => p.username.toLowerCase() === trimmed.toLowerCase()) || searchMatches[0];
 
       if (!targetPlayer) {
-        // Create an organic arcade friend simulation if exact match not in firestore yet
+        // Create an organic arcade friend simulation if exact match not in the cloud directory yet
         const avatarPool = ['🥷', '🐉', '⚡', '👑', '🔥', '🦊', '🚀', '🐺'];
         const titlePool = ['Kỳ Thủ Thần Tốc', 'Thợ Săn Điểm Cao', 'Bậc Thầy Đấu Trí', 'Chiến Binh Ánh Sáng'];
         const randomAvatar = avatarPool[Math.floor(Math.random() * avatarPool.length)];
@@ -479,7 +491,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     soundEngine.play('sword');
     hapticService.tap();
-    await FirebaseService.sendFriendChallenge(challenge);
+    await SupabaseService.sendFriendChallenge(challenge);
 
     NotificationService.send({
       title: '⚔️ Đã Gửi Lời Thách Đấu!',
@@ -499,10 +511,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (accept) {
       soundEngine.play('win');
       confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
-      await FirebaseService.respondToFriendChallenge(challenge.id, 'accepted');
+      if (!await authorize(challenge.gameId)) return;
+      await SupabaseService.respondToFriendChallenge(challenge.id, 'accepted');
       setActiveIncomingChallenge(null);
       setActiveModal('none');
       // Launch target game
+      recordPlay(challenge.gameId);
       setActiveGameId(challenge.gameId);
       setIsDailyChallengeMode(false);
       setIsPracticeMode(false);
@@ -515,10 +529,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     } else {
       soundEngine.play('click');
-      await FirebaseService.respondToFriendChallenge(challenge.id, 'declined');
+      await SupabaseService.respondToFriendChallenge(challenge.id, 'declined');
       setActiveIncomingChallenge(null);
     }
-  }, []);
+  }, [authorize,recordPlay]);
 
   const triggerTestPvPChallenge = useCallback(() => {
     const testChallenge: FriendChallenge = {
@@ -564,83 +578,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [weeklyQuests]);
 
   const reportWeeklyQuestProgress = useCallback((typeOrCategory: string, progressDelta: number) => {
-    setWeeklyQuests(prev => {
-      let changed = false;
-      const updated = prev.map(q => {
-        let isMatch = false;
-        let isScoreMax = false;
+    // Platform progression was retired; game integrations keep a compatible callback.
 
-        if (q.id === typeOrCategory) {
-          isMatch = true;
-        } else if (
-          (typeOrCategory === 'play_any' || typeOrCategory === 'play_matches') &&
-          q.type === 'play_games'
-        ) {
-          isMatch = true;
-        } else if (
-          (typeOrCategory === 'score_any' || typeOrCategory === 'total_score' || typeOrCategory.startsWith('game_score:')) &&
-          q.type === 'total_score'
-        ) {
-          isMatch = true;
-        } else if (
-          (typeOrCategory === 'win_match' || typeOrCategory === 'win_matches') &&
-          q.type === 'win_matches'
-        ) {
-          isMatch = true;
-        } else if (
-          (typeOrCategory === 'open_chest' || typeOrCategory === 'craft_or_open') &&
-          q.type === 'open_chests'
-        ) {
-          isMatch = true;
-        } else if (
-          (typeOrCategory === 'craft_item' || typeOrCategory === 'craft_or_open') &&
-          q.type === 'craft_items'
-        ) {
-          isMatch = true;
-        } else if (
-          typeOrCategory === 'daily_challenge_completed' &&
-          q.type === 'daily_challenges'
-        ) {
-          isMatch = true;
-        }
-
-        if (isMatch) {
-          changed = true;
-          const newCurrent = isScoreMax ? Math.max(q.current, progressDelta) : q.current + progressDelta;
-          const completed = newCurrent >= q.target;
-          const updatedCurrent = Math.min(newCurrent, q.target);
-
-          setActiveQuestToast({
-            id: q.id,
-            title: q.title,
-            current: updatedCurrent,
-            target: q.target,
-            isWeekly: true,
-          });
-
-          if (completed && !q.completed) {
-            NotificationService.notifyQuestCompleted(
-              `⭐ Nhiệm Vụ Tuần: ${q.title}`,
-              `+${q.questPoints} Điểm Tuần, +${q.rewardCoins} Coins, +${q.rewardGems} Gems!`
-            );
-            soundEngine.play('win');
-            hapticService.claimReward();
-          }
-
-          return {
-            ...q,
-            current: updatedCurrent,
-            completed: completed || q.completed,
-          };
-        }
-        return q;
-      });
-
-      if (changed) {
-        StorageService.saveWeeklyQuests(updated);
-      }
-      return updated;
-    });
   }, []);
 
   const claimWeeklyQuest = useCallback((questId: string) => {
@@ -689,30 +628,32 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     StorageService.savePausedGame(session);
     setPausedGameSession(session);
     if (exitToHub) {
+      finishPlay();
       setActiveGameId(null);
       setIsDailyChallengeMode(false);
       hapticService.tap();
       soundEngine.play('click');
     }
     if (profile.id) {
-      FirebaseService.syncGameSessionToCloud(profile.id, session);
+      SupabaseService.syncGameSessionToCloud(profile.id, session);
     }
-  }, [profile.id]);
+  }, [profile.id, finishPlay]);
 
   const autoSaveGameSession = useCallback((session: PausedGameSession) => {
     saveAndSuspendGame(session, false);
   }, [saveAndSuspendGame]);
 
-  const resumePausedGame = useCallback(() => {
+  const resumePausedGame = useCallback(async () => {
     const session = pausedGameSession || StorageService.loadPausedGame();
-    if (!session) return;
+    if (!session || !await authorize(session.gameId)) return;
+    recordPlay(session.gameId);
     hapticService.tap();
     soundEngine.play('click');
     setIsPracticeMode(!!session.isPracticeMode);
     setIsDailyChallengeMode(!!session.isDailyChallengeMode);
     setActiveGameId(session.gameId);
     setActiveModal('none');
-  }, [pausedGameSession]);
+  }, [pausedGameSession, authorize, recordPlay]);
 
   const discardPausedGame = useCallback(() => {
     hapticService.tap();
@@ -720,14 +661,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     StorageService.clearPausedGame();
     setPausedGameSession(null);
     if (profile.id) {
-      FirebaseService.syncGameSessionToCloud(profile.id, null);
+      SupabaseService.syncGameSessionToCloud(profile.id, null);
     }
   }, [profile.id]);
 
   // Subscribe to Cloud Game Session (Cross-device auto-save and resume)
   useEffect(() => {
     if (!profile.id) return;
-    FirebaseService.loadGameSessionFromCloud(profile.id).then((cloudSession) => {
+    SupabaseService.loadGameSessionFromCloud(profile.id).then((cloudSession) => {
       if (cloudSession) {
         setPausedGameSession((prev) => {
           if (!prev || cloudSession.savedAt > prev.savedAt) {
@@ -739,7 +680,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    const unsubscribe = FirebaseService.subscribeToCloudGameSession(profile.id, (cloudSession) => {
+    const unsubscribe = SupabaseService.subscribeToCloudGameSession(profile.id, (cloudSession) => {
       if (cloudSession) {
         setPausedGameSession((prev) => {
           if (!prev || cloudSession.savedAt >= prev.savedAt) {
@@ -784,8 +725,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAchievements(StorageService.loadAchievements());
       setDailyQuests(StorageService.loadDailyQuests());
       setLeaderboards(StorageService.loadLeaderboards());
-      setFavorites(StorageService.loadFavorites());
-      setRecentlyPlayed(StorageService.loadRecentlyPlayed());
     };
     window.addEventListener('arcadex_auth_changed', handleAuthChange);
     return () => window.removeEventListener('arcadex_auth_changed', handleAuthChange);
@@ -803,16 +742,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [activeModal, activeGameId]);
 
-  const toggleFavorite = useCallback((gameId: string) => {
-    soundEngine.play('click');
-    setFavorites(prev => {
-      const exists = prev.includes(gameId);
-      const updated = exists ? prev.filter(id => id !== gameId) : [...prev, gameId];
-      StorageService.saveFavorites(updated);
-      return updated;
-    });
-  }, []);
-
   const getGameMusicTheme = (gameId: string): MusicTheme => {
     if (['dungeon-tap', 'mummy-escape'].includes(gameId)) return 'dungeon';
     if (['cyber-slice', 'neon-runner', 'car-escape', 'space-invaders', 'brick-breaker'].includes(gameId)) return 'action';
@@ -820,18 +749,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return 'arcade';
   };
 
-  const launchGame = useCallback((gameId: string, isPracticeMode = false, isDailyChallenge = false) => {
+  const launchGame = useCallback(async (gameId: string, isPracticeMode = false, isDailyChallenge = false) => {
+    if (!await authorize(gameId)) return;
+    recordPlay(gameId);
     setIsPracticeMode(isPracticeMode);
     setIsDailyChallengeMode(isDailyChallenge);
     soundEngine.play('click');
     
-    const updatedRecents = StorageService.recordRecentlyPlayed(gameId);
-    setRecentlyPlayed(updatedRecents);
     setActiveGameId(gameId);
     setActiveModal('none');
     setSelectedGameForDetail(null);
     audioManager.playMusic(getGameMusicTheme(gameId));
-  }, []);
+  }, [authorize, recordPlay]);
 
   const openGameDetail = useCallback((gameId: string) => {
     soundEngine.play('click');
@@ -860,7 +789,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       soundEngine.play('claim');
       confetti({ particleCount: 80, spread: 70 });
       setDailyChallenges(result.allChallenges);
-      FirebaseService.syncDailyChallenge(result.challenge, profile.id);
+      SupabaseService.syncDailyChallenge(result.challenge, profile.id);
     }
   }, [addCoins, addGems, addExp, profile.id, activeGameId]);
 
@@ -871,7 +800,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const result = StorageService.recordDailyChallengeAttempt(targetGameId, score, timeSpent);
     setDailyChallenges(result.allChallenges);
-    FirebaseService.syncDailyChallenge(result.challenge, profile.id);
+    SupabaseService.syncDailyChallenge(result.challenge, profile.id);
     if (result.newlyCompleted) {
       soundEngine.play('win');
       confetti({ particleCount: 100, spread: 80 });
@@ -880,11 +809,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [profile.id, activeGameId]);
 
   const exitGame = useCallback(() => {
+    finishPlay();
     soundEngine.play('click');
     setActiveGameId(null);
     setIsDailyChallengeMode(false);
     audioManager.playMusic(musicTheme);
-  }, [musicTheme]);
+  }, [musicTheme, finishPlay]);
 
   const toggleSound = useCallback(() => {
     const next = audioManager.toggleSound();
@@ -932,35 +862,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const reportAchievementProgress = useCallback((achievementId: string, progressDeltaOrValue: number, isAbsolute: boolean = false) => {
-    let newlyUnlockedAch: Achievement | null = null;
-    setAchievements(prev => {
-      return prev.map(ach => {
-        if (ach.id !== achievementId || ach.unlocked) return ach;
-        
-        const newProgress = isAbsolute ? progressDeltaOrValue : ach.current + progressDeltaOrValue;
-        const reached = newProgress >= ach.target;
+    // Platform progression was retired; game integrations keep a compatible callback.
 
-        if (reached && !ach.unlocked) {
-          newlyUnlockedAch = {
-            ...ach,
-            current: Math.min(newProgress, ach.target),
-            unlocked: true,
-          };
-        }
-
-        return {
-          ...ach,
-          current: Math.min(newProgress, ach.target),
-          unlocked: reached || ach.unlocked,
-        };
-      });
-    });
-
-    if (newlyUnlockedAch) {
-      soundEngine.play('win');
-      confetti({ particleCount: 75, spread: 70, origin: { y: 0.5 } });
-      setUnlockedAchievement(newlyUnlockedAch);
-    }
   }, []);
 
   const claimAchievement = useCallback((achievementId: string) => {
@@ -1000,108 +903,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [achievements, addExp, addCoins, addGems]);
 
   const reportQuestProgress = useCallback((questIdOrCategory: string, progressDelta: number) => {
-    setDailyQuests(prev => {
-      let changed = false;
-      const updated = prev.map(q => {
-        let isMatch = false;
-        let isScoreMax = false;
+    // Platform progression was retired; game integrations keep a compatible callback.
 
-        // 1. Direct ID match
-        if (q.id === questIdOrCategory) {
-          isMatch = true;
-        }
-        // 2. Play matches objective (e.g. 'Play 3 matches')
-        else if (
-          (questIdOrCategory === 'play_any' || questIdOrCategory === 'play_matches') &&
-          (q.type === 'play_matches' || q.id.includes('play'))
-        ) {
-          isMatch = true;
-        }
-        // 3. Total score objective
-        else if (
-          (questIdOrCategory === 'score_any' || questIdOrCategory === 'quest-score-1000' || questIdOrCategory === 'total_score') &&
-          (q.type === 'total_score' || q.id.includes('total-score') || q.id.includes('score-1000'))
-        ) {
-          isMatch = true;
-        }
-        // 4. Game-specific score objective (e.g. 'Score 500 in Hex')
-        else if (questIdOrCategory.startsWith('game_score:')) {
-          const targetGameId = questIdOrCategory.replace('game_score:', '');
-          if (q.type === 'game_score' && q.gameId === targetGameId) {
-            isMatch = true;
-            isScoreMax = true;
-          }
-        }
-        // 5. Win match objective
-        else if (
-          (questIdOrCategory === 'win_match' || questIdOrCategory === 'quest-win-1-match') &&
-          (q.type === 'win_match' || q.id.includes('win'))
-        ) {
-          isMatch = true;
-        }
-        // 6. Open chest objective
-        else if (
-          (questIdOrCategory === 'open_chest' || questIdOrCategory === 'quest-open-chest') &&
-          (q.type === 'open_chest' || q.id.includes('chest'))
-        ) {
-          isMatch = true;
-        }
-        // 7. Craft item objective
-        else if (
-          (questIdOrCategory === 'craft_item' || questIdOrCategory === 'quest-craft') &&
-          (q.type === 'craft_item' || q.id.includes('craft'))
-        ) {
-          isMatch = true;
-        }
-        else if (questIdOrCategory === 'craft_or_open') {
-          if (q.type === 'open_chest' || q.type === 'craft_item' || q.id.includes('chest') || q.id.includes('craft')) {
-            isMatch = true;
-          }
-        }
-
-        if (isMatch) {
-          changed = true;
-          const newCurrent = isScoreMax
-            ? Math.max(q.current, progressDelta)
-            : q.current + progressDelta;
-          const completed = newCurrent >= q.target;
-          const updatedCurrent = Math.min(newCurrent, q.target);
-
-          setActiveQuestToast({
-            id: q.id,
-            title: q.title,
-            current: updatedCurrent,
-            target: q.target,
-            isWeekly: false,
-          });
-
-          // Trigger notification if newly completed
-          if (completed && !q.completed) {
-            NotificationService.notifyQuestCompleted(
-              q.title,
-              `Nhận +${q.rewardCoins} Coins, +${q.rewardExp} EXP!`
-            );
-            soundEngine.play('win');
-            hapticService.claimReward();
-          }
-
-          return {
-            ...q,
-            current: updatedCurrent,
-            completed: completed || q.completed,
-          };
-        }
-        return q;
-      });
-
-      if (changed) {
-        StorageService.saveDailyQuests(updated);
-      }
-      return updated;
-    });
-
-    // Also forward progress seamlessly to Weekly Quests
-    reportWeeklyQuestProgress(questIdOrCategory, progressDelta);
   }, [reportWeeklyQuestProgress]);
 
   const claimDailyQuest = useCallback((questId: string) => {
@@ -1196,7 +999,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const submitGameScore = useCallback(async (gameId: string, score: number, extraStats?: Record<string, any>) => {
-    await FirebaseService.submitLeaderboardScore(gameId, profile.username, score, profile.avatar, profile.currentTitle, extraStats);
+    await SupabaseService.submitLeaderboardScore(gameId, profile.username, score, profile.avatar, profile.currentTitle, extraStats);
     setLeaderboards(StorageService.loadLeaderboards());
   }, [profile]);
 

@@ -1,634 +1,1063 @@
-import React, { useState, useEffect } from 'react';
-import { GameComponentProps } from '../../types';
-import { ShikakuBoard } from './ShikakuBoard';
-import { generateShikaku, ShikakuPuzzle, Rect, Point } from './generator';
-import { Trophy, Clock, RotateCcw, Home, RefreshCw, Pencil, PenTool, ZoomIn, CheckCheck, X, Move } from 'lucide-react';
-import { soundEngine } from '../../services/audio';
-import confetti from 'canvas-confetti';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  ArrowRight,
+  Check,
+  Clock,
+  HelpCircle,
+  Home,
+  Lightbulb,
+  RotateCcw,
+  Trash2,
+  X,
+  BookOpen,
+  CalendarDays,
+  Trophy,
+} from "lucide-react";
+import type { GameComponentProps } from "../../types";
+import { soundEngine } from "../../services/audio";
+import confetti from "canvas-confetti";
+import { generateShikaku, type ShikakuPuzzle, type Rect } from "./generator";
+import { validRegions, validShikakuPuzzle } from "./save";
+import {
+  checkRegion,
+  contains,
+  findCompletion,
+  solved,
+  tutorialPuzzle,
+  explainHint,
+  type HintExplanation,
+} from "./rules";
+import { ShikakuBoard } from "./ShikakuBoard";
+import "./shikaku.css";
+import {
+  LESSONS,
+  CHAPTERS,
+  hydrateJourney,
+  lessonOpen,
+  storeResult,
+  utcDay,
+  dailyPuzzle,
+  dailyKey,
+  samePuzzle,
+  type Journey,
+} from "./journey";
+import { startDaily, markHint, submitDaily } from "./ranking";
+import { SkDialog } from "./SkDialog";
+import { RankingPanel } from "./RankingPanel";
 
-export const ShikakuGame: React.FC<GameComponentProps> = ({
-    bridge,
-    isPaused,
-    isMuted,
-    onGameOver,
-    onRestart,
-}) => {
-    const [mode, setMode] = useState<'menu' | 'zen' | 'time' | 'limited'>('menu');
-    const [puzzle, setPuzzle] = useState<ShikakuPuzzle | null>(null);
-    const [userRects, setUserRects] = useState<Rect[]>([]);
-    const [pencilRects, setPencilRects] = useState<Rect[]>([]);
-    const [isPencilMode, setIsPencilMode] = useState<boolean>(false);
-    const [selectionMode, setSelectionMode] = useState<'2tap' | 'drag'>('2tap');
-    const [tapCorner1, setTapCorner1] = useState<Point | null>(null);
-    const [tapCorner2, setTapCorner2] = useState<Point | null>(null);
-    const [history, setHistory] = useState<Rect[][]>([]);
-    const [drawingStart, setDrawingStart] = useState<Point | null>(null);
-    const [drawingCurrent, setDrawingCurrent] = useState<Point | null>(null);
-
-    const [timeLeft, setTimeLeft] = useState(180);
-    const [score, setScore] = useState(0);
-    const [lives, setLives] = useState(3);
-    const [isGameOverModal, setIsGameOverModal] = useState(false);
-
-    const skinId = bridge.getSkin ? bridge.getSkin('shikaku') : 'default';
-
-    const PASTEL_COLORS = ['#fca5a5', '#fcd34d', '#86efac', '#93c5fd', '#d8b4fe', '#f9a8d4', '#fdba74', '#5eead4'];
-    const NEON_COLORS = ['#f43f5e', '#f59e0b', '#10b981', '#0ea5e9', '#8b5cf6', '#d946ef', '#14b8a6'];
-    const DEFAULT_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#06b6d4'];
-
-    const getColors = () => {
-        if (skinId === 'skin-shikaku-neon') return NEON_COLORS;
-        if (skinId === 'skin-shikaku-pastel') return PASTEL_COLORS;
-        return DEFAULT_COLORS;
-    };
-
-    const startNewPuzzle = (currentScore: number = 0) => {
-        let size = 4;
-        let maxBlockArea = 6;
-        
-        if (currentScore >= 1) { size = 5; maxBlockArea = 8; }
-        if (currentScore >= 3) { size = 6; maxBlockArea = 10; }
-        if (currentScore >= 6) { size = 7; maxBlockArea = 12; }
-        if (currentScore >= 10) { size = 8; maxBlockArea = 16; }
-        if (currentScore >= 15) { size = 9; maxBlockArea = 20; }
-        if (currentScore >= 20) { size = 10; maxBlockArea = 24; }
-
-        setPuzzle(generateShikaku(size, maxBlockArea));
-        setUserRects([]);
-        setPencilRects([]);
-        setHistory([]);
-        setDrawingStart(null);
-        setDrawingCurrent(null);
-        setTapCorner1(null);
-        setTapCorner2(null);
-    };
-
-    const startGame = (selectedMode: 'zen' | 'time' | 'limited') => {
-        setMode(selectedMode);
-        setScore(0);
-        setTimeLeft(selectedMode === 'time' ? 180 : 0);
-        setLives(3);
-        setIsGameOverModal(false);
-        startNewPuzzle(0);
-        if (bridge.saveGameState) bridge.saveGameState({ mode: selectedMode, score: 0 });
-    };
-
-    useEffect(() => {
-        if (mode === 'time' && timeLeft > 0 && !isPaused && !isGameOverModal) {
-            const t = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-            return () => clearInterval(t);
-        } else if (mode === 'time' && timeLeft === 0 && !isGameOverModal) {
-            if (!isMuted) soundEngine.play('gameOver');
-            if (onGameOver) onGameOver(score, { mode: 1 });
-            else bridge.submitScore(score, { mode: 1 });
-            setIsGameOverModal(true);
-        }
-    }, [mode, timeLeft, isPaused, isMuted, isGameOverModal, bridge, score, onGameOver]);
-
-    const pushHistory = (newRects: Rect[]) => {
-        setHistory(prev => [...prev, userRects]);
-        setUserRects(newRects);
-    };
-
-    const handleUndo = () => {
-        if (isPaused || isGameOverModal) return;
-        if (history.length > 0) {
-            const prev = history[history.length - 1];
-            setHistory(history.slice(0, -1));
-            setUserRects(prev);
-            if (!isMuted) soundEngine.play('click');
-            if (mode === 'limited') {
-                const nextLives = Math.max(0, lives - 1);
-                setLives(nextLives);
-                if (nextLives <= 0) {
-                    if (!isMuted) soundEngine.play('gameOver');
-                    if (onGameOver) onGameOver(score, { mode: 2 });
-                    else bridge.submitScore(score, { mode: 2 });
-                    setIsGameOverModal(true);
-                }
-            }
-        }
-    };
-
-    const handleResetPuzzle = () => {
-        if (isPaused || isGameOverModal) return;
-        if (userRects.length === 0) return;
-        pushHistory([]);
-        setUserRects([]);
-        if (!isMuted) soundEngine.play('click');
-    };
-
-    const handleDrawStart = (p: Point) => {
-        if (isPaused || isGameOverModal) return;
-        setDrawingStart(p);
-        setDrawingCurrent(p);
-        if (!isMuted) soundEngine.play('click');
-    };
-
-    const handleDrawMove = (p: Point) => {
-        if (isPaused || isGameOverModal) return;
-        if (drawingStart) setDrawingCurrent(p);
-    };
-
-    const handleDrawEnd = () => {
-        if (isPaused || isGameOverModal) return;
-        if (!drawingStart || !drawingCurrent || !puzzle) {
-            setDrawingStart(null);
-            setDrawingCurrent(null);
-            return;
-        }
-
-        const r1 = Math.min(drawingStart.r, drawingCurrent.r);
-        const r2 = Math.max(drawingStart.r, drawingCurrent.r);
-        const c1 = Math.min(drawingStart.c, drawingCurrent.c);
-        const c2 = Math.max(drawingStart.c, drawingCurrent.c);
-        const w = c2 - c1 + 1;
-        const h = r2 - r1 + 1;
-
-        if (isPencilMode) {
-            if (w === 1 && h === 1) {
-                const clickedPencilIndex = pencilRects.findIndex(r =>
-                    r1 >= r.r && r1 < r.r + r.h && c1 >= r.c && c1 < r.c + r.w
-                );
-                if (clickedPencilIndex !== -1) {
-                    setPencilRects(prev => prev.filter((_, idx) => idx !== clickedPencilIndex));
-                    setDrawingStart(null);
-                    setDrawingCurrent(null);
-                    if (!isMuted) soundEngine.play('click');
-                    return;
-                }
-            }
-            const newPencil: Rect = {
-                id: Math.random().toString(),
-                r: r1, c: c1, w, h,
-                color: '#38bdf8'
-            };
-            setPencilRects(prev => [...prev, newPencil]);
-            setDrawingStart(null);
-            setDrawingCurrent(null);
-            if (!isMuted) soundEngine.play('click');
-            return;
-        }
-
-        if (w === 1 && h === 1) {
-            const clickedExistingIndex = userRects.findIndex(r =>
-                r1 >= r.r && r1 < r.r + r.h && c1 >= r.c && c1 < r.c + r.w
-            );
-            if (clickedExistingIndex !== -1) {
-                const newRects = [...userRects];
-                newRects.splice(clickedExistingIndex, 1);
-                pushHistory(newRects);
-                setDrawingStart(null);
-                setDrawingCurrent(null);
-                if (!isMuted) soundEngine.play('click');
-                return;
-            }
-        }
-
-        const colors = getColors();
-        const newRect: Rect = {
-            id: Math.random().toString(),
-            r: r1, c: c1, w, h,
-            color: colors[Math.floor(Math.random() * colors.length)]
-        };
-
-        const filteredRects = userRects.filter(r => {
-            const overlapX = Math.max(0, Math.min(r.c + r.w, newRect.c + newRect.w) - Math.max(r.c, newRect.c));
-            const overlapY = Math.max(0, Math.min(r.r + r.h, newRect.r + newRect.h) - Math.max(r.r, newRect.r));
-            return overlapX <= 0 || overlapY <= 0;
-        });
-
-        filteredRects.push(newRect);
-        pushHistory(filteredRects);
-        setDrawingStart(null);
-        setDrawingCurrent(null);
-        if (!isMuted) soundEngine.play('click');
-    };
-
-    useEffect(() => {
-        if (!puzzle || userRects.length === 0) return;
-        const totalArea = userRects.reduce((sum, r) => sum + r.w * r.h, 0);
-        if (totalArea !== puzzle.size * puzzle.size) return;
-
-        let isWin = true;
-        for (const r of userRects) {
-            const containedHints = puzzle.hints.filter(h =>
-                h.r >= r.r && h.r < r.r + r.h && h.c >= r.c && h.c < r.c + r.w
-            );
-            if (containedHints.length !== 1 || containedHints[0].value !== r.w * r.h) {
-                isWin = false;
-                break;
-            }
-        }
-
-        if (isWin) {
-            if (!isMuted) soundEngine.play('levelUp');
-            confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-            const newScore = score + 1;
-            setScore(newScore);
-
-            // Reward platform progress
-            bridge.grantCoins(25);
-            bridge.grantExp(15);
-            bridge.reportProgress('shikaku_first_win', 1);
-            if (newScore >= 5) bridge.reportProgress('shikaku_score_5', 1);
-            if (newScore >= 10) bridge.reportProgress('shikaku_score_10', 1);
-            bridge.reportQuest('play_any', 1);
-            bridge.submitScore(newScore, {
-                mode: mode === 'time' ? 1 : (mode === 'limited' ? 2 : 0),
-                puzzlesSolved: newScore,
-            });
-
-            if (bridge.saveGameState) bridge.saveGameState({ mode, score: newScore });
-            setTimeout(() => startNewPuzzle(newScore), 1400);
-        }
-    }, [userRects, puzzle, isMuted, bridge, mode, score]);
-
-    const currentDrawingRect: Rect | null = drawingStart && drawingCurrent ? {
-        id: 'drawing',
-        r: Math.min(drawingStart.r, drawingCurrent.r),
-        c: Math.min(drawingStart.c, drawingCurrent.c),
-        w: Math.max(drawingStart.c, drawingCurrent.c) - Math.min(drawingStart.c, drawingCurrent.c) + 1,
-        h: Math.max(drawingStart.r, drawingCurrent.r) - Math.min(drawingStart.r, drawingCurrent.r) + 1,
-        color: isPencilMode ? '#38bdf8' : getColors()[0]
-    } : (tapCorner1 && tapCorner2 ? {
-        id: 'tap-preview',
-        r: Math.min(tapCorner1.r, tapCorner2.r),
-        c: Math.min(tapCorner1.c, tapCorner2.c),
-        w: Math.max(tapCorner1.c, tapCorner2.c) - Math.min(tapCorner1.c, tapCorner2.c) + 1,
-        h: Math.max(tapCorner1.r, tapCorner2.r) - Math.min(tapCorner1.r, tapCorner2.r) + 1,
-        color: isPencilMode ? '#38bdf8' : getColors()[0]
-    } : null);
-
-    const handleCellTap = (p: Point) => {
-        if (isPaused || isGameOverModal || !puzzle) return;
-
-        // If no corner 1 is active:
-        if (!tapCorner1) {
-            // Check if user tapped an existing rectangle -> tap to delete!
-            const clickedExistingIndex = userRects.findIndex(r =>
-                p.r >= r.r && p.r < r.r + r.h && p.c >= r.c && p.c < r.c + r.w
-            );
-            if (clickedExistingIndex !== -1) {
-                const newRects = [...userRects];
-                newRects.splice(clickedExistingIndex, 1);
-                pushHistory(newRects);
-                if (!isMuted) soundEngine.play('click');
-                return;
-            }
-
-            const clickedPencilIndex = pencilRects.findIndex(r =>
-                p.r >= r.r && p.r < r.r + r.h && p.c >= r.c && p.c < r.c + r.w
-            );
-            if (clickedPencilIndex !== -1) {
-                setPencilRects(prev => prev.filter((_, idx) => idx !== clickedPencilIndex));
-                if (!isMuted) soundEngine.play('click');
-                return;
-            }
-
-            // First tap: set Corner 1
-            setTapCorner1(p);
-            setTapCorner2(null);
-            if (!isMuted) soundEngine.play('click');
-            return;
-        }
-
-        // Corner 1 already selected:
-        if (tapCorner1 && !tapCorner2) {
-            // If clicking the exact same corner 1: select 1x1 block
-            setTapCorner2(p);
-            if (!isMuted) soundEngine.play('click');
-            return;
-        }
-
-        // Both corners already selected: tapping another cell changes Corner 2
-        if (tapCorner1 && tapCorner2) {
-            setTapCorner2(p);
-            if (!isMuted) soundEngine.play('click');
-        }
-    };
-
-    const handleConfirmTapRect = () => {
-        if (!tapCorner1 || !tapCorner2 || !puzzle) return;
-
-        const r1 = Math.min(tapCorner1.r, tapCorner2.r);
-        const r2 = Math.max(tapCorner1.r, tapCorner2.r);
-        const c1 = Math.min(tapCorner1.c, tapCorner2.c);
-        const c2 = Math.max(tapCorner1.c, tapCorner2.c);
-        const w = c2 - c1 + 1;
-        const h = r2 - r1 + 1;
-
-        if (isPencilMode) {
-            const newPencil: Rect = {
-                id: Math.random().toString(),
-                r: r1, c: c1, w, h,
-                color: '#38bdf8'
-            };
-            setPencilRects(prev => [...prev, newPencil]);
-            setTapCorner1(null);
-            setTapCorner2(null);
-            if (!isMuted) soundEngine.play('click');
-            return;
-        }
-
-        const colors = getColors();
-        const newRect: Rect = {
-            id: Math.random().toString(),
-            r: r1, c: c1, w, h,
-            color: colors[Math.floor(Math.random() * colors.length)]
-        };
-
-        const filteredRects = userRects.filter(r => {
-            const overlapX = Math.max(0, Math.min(r.c + r.w, newRect.c + newRect.w) - Math.max(r.c, newRect.c));
-            const overlapY = Math.max(0, Math.min(r.r + r.h, newRect.r + newRect.h) - Math.max(r.r, newRect.r));
-            return overlapX <= 0 || overlapY <= 0;
-        });
-
-        filteredRects.push(newRect);
-        pushHistory(filteredRects);
-        setTapCorner1(null);
-        setTapCorner2(null);
-        if (!isMuted) soundEngine.play('click');
-    };
-
-    const handleCancelTapSelection = () => {
-        setTapCorner1(null);
-        setTapCorner2(null);
-        if (!isMuted) soundEngine.play('click');
-    };
-
-    if (mode === 'menu') {
-        const isNeon = skinId === 'skin-shikaku-neon';
-        const isPastel = skinId === 'skin-shikaku-pastel';
-        
-        const menuBg = isNeon ? 'bg-[#0a0a1a]' : (isPastel ? 'bg-[#fdf2f8]' : 'bg-[#0f172a]');
-        const textStyle = isPastel ? 'text-slate-800' : 'text-white';
-        const pStyle = isPastel ? 'text-slate-500' : 'text-slate-400';
-
-        return (
-            <div className={`flex flex-col items-center justify-center h-full p-6 space-y-8 ${menuBg} transition-colors duration-300`}>
-                <div className="text-center space-y-3">
-                    <h1 className={`text-5xl font-black font-display tracking-tight ${
-                        isNeon ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 drop-shadow-[0_0_15px_rgba(6,182,212,0.6)]' :
-                        (isPastel ? 'text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500' : 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400')
-                    }`}>
-                        Shikaku
-                    </h1>
-                    <p className={`max-w-sm text-sm ${pStyle}`}>
-                        Vẽ các hình chữ nhật để lấp đầy bảng. Mỗi hình chỉ chứa 1 số, và diện tích bằng số đó.
-                    </p>
-                </div>
-
-                <div className="flex flex-col w-full max-w-xs space-y-4">
-                    <button onClick={() => startGame('zen')} className="px-6 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base transition-all active:scale-95 shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-3">
-                        <Trophy className="w-5 h-5" /> Zen Mode
-                    </button>
-                    <button onClick={() => startGame('time')} className="px-6 py-4 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-base transition-all active:scale-95 shadow-lg shadow-rose-500/25 flex items-center justify-center gap-3">
-                        <Clock className="w-5 h-5" /> Time Attack (3m)
-                    </button>
-                    <button onClick={() => startGame('limited')} className="px-6 py-4 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-base transition-all active:scale-95 shadow-lg shadow-amber-500/25 flex items-center justify-center gap-3">
-                        <RotateCcw className="w-5 h-5" /> 3 Lần Return (Hard)
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    const isNeon = skinId === 'skin-shikaku-neon';
-    const isPastel = skinId === 'skin-shikaku-pastel';
-    const bgClass = isNeon ? 'bg-[#05050f]' : (isPastel ? 'bg-[#fce7f3]' : 'bg-[#0f172a]');
-    const headerBg = isNeon ? 'bg-white/5 border-b border-cyan-900/30' : (isPastel ? 'bg-white/50 border-b border-pink-200 shadow-sm' : 'bg-white/5 border-b border-white/10');
-    const textClass = isPastel ? 'text-slate-800' : 'text-white';
-    const subTextClass = isPastel ? 'text-slate-500' : 'text-slate-400';
-
-    return (
-        <div className={`flex flex-col h-full ${bgClass} transition-colors duration-300 select-none`}>
-            {/* Header */}
-            <header className={`flex items-center justify-between px-4 py-3 ${headerBg}`}>
-                <button onClick={() => setMode('menu')} className={`p-2.5 rounded-xl transition-all active:scale-95 ${
-                    isPastel ? 'bg-white text-slate-600 hover:bg-pink-50 shadow-sm border border-pink-100' : 'bg-white/10 text-white hover:bg-white/20'
-                }`}>
-                    <Home className="w-5 h-5" />
-                </button>
-                
-                <div className="flex items-center gap-6">
-                    <div className="text-center">
-                        <div className={`text-[10px] font-bold uppercase tracking-widest ${subTextClass}`}>Score</div>
-                        <div className={`text-xl font-black leading-none ${textClass}`}>{score}</div>
-                    </div>
-                    {mode === 'time' && (
-                        <div className="text-center">
-                            <div className="text-[10px] text-rose-500 font-bold uppercase tracking-widest">Time</div>
-                            <div className="text-xl font-black text-rose-500 font-mono leading-none">
-                                {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
-                            </div>
-                        </div>
-                    )}
-                    {mode === 'limited' && (
-                        <div className="text-center">
-                            <div className="text-[10px] text-amber-500 font-bold uppercase tracking-widest">Returns</div>
-                            <div className="text-xl font-black text-amber-500 font-mono leading-none">{lives}</div>
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                    <button
-                        onClick={() => {
-                            setSelectionMode(selectionMode === '2tap' ? 'drag' : '2tap');
-                            setTapCorner1(null);
-                            setTapCorner2(null);
-                        }}
-                        title={selectionMode === '2tap' ? "Đang ở chế độ 2 Chạm (chọn 2 góc) - Bấm để chuyển sang Kéo Thả" : "Đang ở chế độ Kéo Thả - Bấm để chuyển sang 2 Chạm"}
-                        className={`p-2 sm:px-3 sm:py-2 rounded-xl border transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
-                            selectionMode === '2tap'
-                                ? 'bg-indigo-500/25 text-indigo-300 border-indigo-400/80 shadow-[0_0_12px_rgba(99,102,241,0.4)] ring-1 ring-indigo-400'
-                                : (isPastel ? 'bg-white text-slate-600 border-pink-200 hover:bg-pink-50' : 'bg-white/10 text-slate-300 border-white/10 hover:bg-white/20')
-                        }`}
-                    >
-                        {selectionMode === '2tap' ? <ZoomIn className="w-4 h-4 text-indigo-300 animate-pulse" /> : <Move className="w-4 h-4 text-slate-400" />}
-                        <span className="text-xs font-bold hidden sm:inline">{selectionMode === '2tap' ? '2 Chạm' : 'Kéo Thả'}</span>
-                    </button>
-
-                    <button
-                        onClick={() => setIsPencilMode(!isPencilMode)}
-                        title={isPencilMode ? "Đang ở chế độ Vẽ Nháp (Pencil) - Bấm để chuyển sang Vẽ Thật" : "Đang ở chế độ Vẽ Thật (Pen) - Bấm để chuyển sang Vẽ Nháp"}
-                        className={`p-2 sm:px-3 sm:py-2 rounded-xl border transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
-                            isPencilMode
-                                ? 'bg-cyan-500/25 text-cyan-300 border-cyan-400/80 shadow-[0_0_12px_rgba(6,182,212,0.4)] ring-1 ring-cyan-400'
-                                : (isPastel ? 'bg-white text-slate-600 border-pink-200 hover:bg-pink-50' : 'bg-white/10 text-slate-300 border-white/10 hover:bg-white/20')
-                        }`}
-                    >
-                        {isPencilMode ? <Pencil className="w-4 h-4 text-cyan-300" /> : <PenTool className="w-4 h-4 text-slate-400" />}
-                        <span className="text-xs font-bold hidden sm:inline">{isPencilMode ? 'Nháp' : 'Vẽ'}</span>
-                    </button>
-
-                    <button
-                        onClick={handleResetPuzzle}
-                        disabled={userRects.length === 0 && pencilRects.length === 0}
-                        title="Làm mới màn hiện tại"
-                        className={`p-2 sm:p-2.5 rounded-xl border transition-all active:scale-95 flex items-center justify-center ${
-                            userRects.length > 0 || pencilRects.length > 0
-                                ? (isPastel 
-                                    ? 'bg-white text-rose-600 border-rose-200 shadow-sm hover:bg-rose-50' 
-                                    : 'bg-rose-500/20 text-rose-300 border-rose-500/50 hover:bg-rose-500/30') 
-                                : (isPastel
-                                    ? 'bg-white/50 text-slate-400 border-transparent cursor-not-allowed'
-                                    : 'bg-white/5 text-slate-600 border-transparent cursor-not-allowed')
-                        }`}
-                    >
-                        <RefreshCw className="w-4 h-4" />
-                    </button>
-
-                    <button
-                        onClick={handleUndo}
-                        disabled={history.length === 0}
-                        title="Hoàn tác"
-                        className={`p-2 sm:p-2.5 rounded-xl border transition-all active:scale-95 flex items-center justify-center gap-1.5 ${
-                            history.length > 0 
-                                ? (isPastel 
-                                    ? 'bg-white text-indigo-600 border-indigo-200 shadow-sm hover:bg-indigo-50' 
-                                    : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50 hover:bg-indigo-500/30') 
-                                : (isPastel
-                                    ? 'bg-white/50 text-slate-400 border-transparent cursor-not-allowed'
-                                    : 'bg-white/5 text-slate-600 border-transparent cursor-not-allowed')
-                        }`}
-                    >
-                        <RotateCcw className="w-4 h-4" />
-                        {mode === 'limited' && <span className="text-xs font-bold font-mono">{lives}</span>}
-                    </button>
-                </div>
-            </header>
-
-            <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-between p-2 sm:p-4 max-w-2xl mx-auto">
-                {puzzle && (
-                    <div className="flex-1 w-full min-h-0 flex items-center justify-center relative">
-                        <ShikakuBoard
-                            size={puzzle.size}
-                            hints={puzzle.hints}
-                            userRects={userRects}
-                            pencilRects={pencilRects}
-                            currentDrawing={currentDrawingRect}
-                            onDrawStart={handleDrawStart}
-                            onDrawMove={handleDrawMove}
-                            onDrawEnd={handleDrawEnd}
-                            skinId={skinId}
-                            selectionMode={selectionMode}
-                            tapCorner1={tapCorner1}
-                            tapCorner2={tapCorner2}
-                            onCellTap={handleCellTap}
-                        />
-                    </div>
-                )}
-                
-                {/* Magnifier / 2-Tap Floating HUD */}
-                {selectionMode === '2tap' && tapCorner1 && (
-                    <div className="w-full max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2 sm:p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 my-1 shrink-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                            <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 font-bold text-xs shrink-0">
-                                <ZoomIn className="w-4 h-4 text-cyan-400 animate-pulse" />
-                            </div>
-                            <div className="truncate">
-                                <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">
-                                    {tapCorner2 ? (isPencilMode ? 'Xác Nhận Khung Nháp' : 'Xác Nhận Khối') : 'Chạm Góc Đối Diện'}
-                                </div>
-                                <div className="text-xs font-black text-cyan-300 truncate">
-                                    {tapCorner2 ? (
-                                        <>
-                                            Khối {Math.max(tapCorner1.c, tapCorner2.c) - Math.min(tapCorner1.c, tapCorner2.c) + 1}×{Math.max(tapCorner1.r, tapCorner2.r) - Math.min(tapCorner1.r, tapCorner2.r) + 1} ({(Math.max(tapCorner1.c, tapCorner2.c) - Math.min(tapCorner1.c, tapCorner2.c) + 1) * (Math.max(tapCorner1.r, tapCorner2.r) - Math.min(tapCorner1.r, tapCorner2.r) + 1)} ô)
-                                        </>
-                                    ) : (
-                                        <>Góc 1: [{tapCorner1.r + 1},{tapCorner1.c + 1}] ➜ Chạm góc 2</>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 shrink-0">
-                            {tapCorner2 && (
-                                <button
-                                    onClick={handleConfirmTapRect}
-                                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 active:scale-95 text-white text-xs font-bold shadow-md flex items-center gap-1 cursor-pointer"
-                                >
-                                    <CheckCheck className="w-3.5 h-3.5" />
-                                    <span>Tạo</span>
-                                </button>
-                            )}
-                            <button
-                                onClick={handleCancelTapSelection}
-                                className="p-1.5 sm:p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
-                                title="Hủy chọn"
-                            >
-                                <X className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {puzzle && (
-                    <div className={`py-1.5 text-[11px] sm:text-xs text-center font-medium max-w-[380px] px-2 shrink-0 ${subTextClass}`}>
-                        {selectionMode === '2tap' ? (
-                            <>Chế độ <strong className="text-cyan-400 font-bold">2 Chạm</strong>: Chạm góc 1 rồi chạm góc 2 để chọn khối không bị trượt tay. Chạm khối đã có để xóa.</>
-                        ) : (
-                            <>Chế độ <strong className="text-cyan-400 font-bold">Kéo Thả</strong>: Kéo từ góc này sang góc kia. Chạm khối đã có để xóa.</>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            {/* Game Over Modal Overlay */}
-            {isGameOverModal && (
-                <div className="absolute inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-                    <div className="w-full max-w-sm bg-slate-900 border border-white/20 rounded-3xl p-6 text-center shadow-2xl flex flex-col items-center text-white">
-                        <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 text-3xl mb-4 shadow-lg shadow-amber-500/20">
-                            {mode === 'time' ? '⏰' : '💔'}
-                        </div>
-
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-1">
-                            {mode === 'time' ? 'HẾT THỜI GIAN!' : 'HẾT LƯỢT RETURN!'}
-                        </h2>
-                        <p className="text-xs text-slate-400 mb-5">
-                            {mode === 'time'
-                                ? 'Đã hết 3 phút của chế độ Thử Thách Thời Gian'
-                                : 'Bạn đã sử dụng hết 3 lượt Hoàn tác (Return)'}
-                        </p>
-
-                        <div className="w-full bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 mb-6 flex items-center justify-around">
-                            <div className="text-center">
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Câu Đố Đã Giải</div>
-                                <div className="text-2xl font-black text-amber-400 font-mono">{score}</div>
-                            </div>
-                            <div className="w-px h-8 bg-slate-700" />
-                            <div className="text-center">
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Chế Độ</div>
-                                <div className="text-sm font-black text-indigo-300">
-                                    {mode === 'time' ? 'Time Attack' : (mode === 'limited' ? '3 Lần Return' : 'Zen')}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full space-y-2.5">
-                            <button
-                                onClick={() => startGame(mode)}
-                                className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black rounded-xl transition-all shadow-lg shadow-amber-400/20 active:scale-95 text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer"
-                            >
-                                <RotateCcw className="w-4 h-4" />
-                                <span>Chơi Lại Chế Độ Này</span>
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    setIsGameOverModal(false);
-                                    setMode('menu');
-                                }}
-                                className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold rounded-xl transition-all border border-slate-700 active:scale-95 text-xs uppercase cursor-pointer"
-                            >
-                                Quay Về Menu Shikaku
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
+type Mode = "zen" | "time";
+type Session = {
+  mode: Mode;
+  puzzle: ShikakuPuzzle;
+  userRects: Rect[];
+  pencilRects: Rect[];
+  history: Rect[][];
+  score: number;
+  timeLeft: number;
+  completed: boolean;
+  ended: boolean;
+  hintsUsed: number;
+  kind?: "free" | "lesson" | "daily";
+  lessonId?: number;
+  day?: string;
+  ticket?: string;
+  owner?: string;
+  elapsed?: number;
+  rewardCoins?: number;
+  verified?: boolean;
+};
+const safeNumber = (n: unknown, fallback = 0) =>
+  typeof n === "number" && Number.isFinite(n)
+    ? Math.max(0, Math.min(1000000, Math.floor(n)))
+    : fallback;
+const difficultyNames: Record<number, string> = {
+  4: "Làm quen",
+  5: "Thư giãn",
+  6: "Suy luận",
+  8: "Thử thách",
+};
+function restore(value: any): Session | null {
+  if (
+    !value ||
+    ![1, 2].includes(value.version) ||
+    !validShikakuPuzzle(value.puzzle) ||
+    !validRegions(value.puzzle.size, value.userRects)
+  )
+    return null;
+  let kind: Session["kind"] = "free";
+  if (
+    value.kind === "lesson" &&
+    LESSONS.some(
+      (l) => l.id === value.lessonId && samePuzzle(l.puzzle, value.puzzle),
+    )
+  )
+    kind = "lesson";
+  if (
+    value.kind === "daily" &&
+    typeof value.day === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value.day) &&
+    [4, 5, 6, 8].includes(value.puzzle.size)
+  ) {
+    try {
+      if (samePuzzle(dailyPuzzle(value.day, value.puzzle.size), value.puzzle))
+        kind = "daily";
+    } catch {}
+  }
+  return {
+    mode: value.mode === "time" ? "time" : "zen",
+    puzzle: value.puzzle,
+    userRects: value.userRects,
+    pencilRects: validRegions(value.puzzle.size, value.pencilRects, true)
+      ? value.pencilRects
+      : [],
+    history: Array.isArray(value.history)
+      ? value.history
+          .filter((r: unknown) => validRegions(value.puzzle.size, r))
+          .slice(-100)
+      : [],
+    score: safeNumber(value.score),
+    timeLeft: safeNumber(value.timeLeft, 180),
+    completed:
+      value.completed === true && solved(value.puzzle, value.userRects),
+    ended: value.ended === true || value.isGameOverModal === true,
+    hintsUsed: safeNumber(value.hintsUsed),
+    kind,
+    lessonId: kind === "lesson" ? value.lessonId : undefined,
+    day: kind === "daily" ? value.day : undefined,
+    ticket:
+      kind === "daily" && typeof value.ticket === "string"
+        ? value.ticket
+        : undefined,
+    owner:
+      kind === "daily" && typeof value.owner === "string"
+        ? value.owner
+        : undefined,
+    elapsed: safeNumber(value.elapsed),
+    rewardCoins: safeNumber(value.rewardCoins),
+    verified: value.verified === true,
+  };
 }
+export const ShikakuGame: React.FC<GameComponentProps> = ({
+  bridge,
+  isPaused,
+  isMuted,
+  onGameOver,
+  initialState,
+}) => {
+  const [saved] = useState<any>(() =>
+    initialState === undefined ? bridge.loadGameState() : initialState,
+  );
+  const [run, setRun] = useState<Session | null>(() => restore(saved));
+  const [menu, setMenu] = useState(
+    () => !restore(saved) || saved?.screen === "menu",
+  );
+  const [size, setSize] = useState(() =>
+    [4, 5, 6, 8].includes(saved?.difficulty) ? saved.difficulty : 4,
+  );
+  const [twoTap, setTwoTap] = useState(
+    () => saved?.version === 2 && saved.selectionMode === "2tap",
+  );
+  const [theme, setTheme] = useState(() =>
+    ["mint", "peach", "sky"].includes(saved?.theme) ? saved.theme : "mint",
+  );
+  const [tutorialSeen, setTutorialSeen] = useState(
+    () => saved?.tutorialSeen === true,
+  );
+  const [journey, setJourney] = useState<Journey>(() =>
+    hydrateJourney(saved?.journey),
+  );
+  const [panel, setPanel] = useState<"journey" | "ranking" | null>(null);
+  const [hintExplanation, setHintExplanation] =
+    useState<HintExplanation | null>(null);
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false),
+    alive = useRef(true),
+    currentRun = useRef(run),
+    submitting = useRef(new Set<string>());
+  currentRun.current = run;
+  const [rankStatus, setRankStatus] = useState("");
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
+  const [preview, setPreview] = useState<Rect | null>(null);
+  const [hint, setHint] = useState<Rect | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [help, setHelp] = useState(false);
+  const [notice, setNotice] = useState(
+    "Kéo từ một góc tới góc đối diện để tạo hình chữ nhật.",
+  );
+  const [hidden, setHidden] = useState(() => document.hidden);
+  const [resetConfirm, setResetConfirm] = useState(false);
+  const rewardGuard = useRef<ShikakuPuzzle | null>(
+    run?.completed ? run.puzzle : null,
+  );
+  const endGuard = useRef(false);
+  const helpClose = useRef<HTMLButtonElement>(null);
+  const helpOpener = useRef<HTMLElement | null>(null);
+  const active =
+    !!run &&
+    !menu &&
+    !help &&
+    !panel &&
+    !hintExplanation &&
+    !busy &&
+    !isPaused &&
+    !hidden &&
+    !run.completed &&
+    !run.ended;
+  const playSound = (name: "click" | "levelUp" | "gameOver") => {
+    if (!isMuted) soundEngine.play(name);
+  };
+  useEffect(() => {
+    const update = () => setHidden(document.hidden);
+    document.addEventListener("visibilitychange", update);
+    return () => document.removeEventListener("visibilitychange", update);
+  }, []);
+  useEffect(() => {
+    if (!active) {
+      setPreview(null);
+      setResetConfirm(false);
+    }
+  }, [active]);
+  useEffect(() => {
+    if (help) {
+      helpClose.current?.focus();
+    } else helpOpener.current?.focus();
+  }, [help]);
+  useEffect(() => {
+    bridge.saveGameState({
+      version: 2,
+      ...run,
+      screen: menu ? "menu" : "game",
+      difficulty: size,
+      selectionMode: twoTap ? "2tap" : "drag",
+      theme,
+      tutorialSeen,
+      journey,
+    });
+  }, [run, menu, size, twoTap, theme, tutorialSeen, journey, bridge]);
+  useEffect(() => {
+    if (!active) return;
+    const timer = window.setInterval(
+      () =>
+        setRun((r) =>
+          r && !r.completed && !r.ended
+            ? {
+                ...r,
+                timeLeft:
+                  r.mode === "time" ? Math.max(0, r.timeLeft - 1) : r.timeLeft,
+                elapsed: (r.elapsed ?? 0) + 1,
+              }
+            : r,
+        ),
+      1000,
+    );
+    return () => clearInterval(timer);
+  }, [active, run?.mode]);
+  useEffect(() => {
+    if (
+      !run ||
+      run.completed ||
+      run.ended ||
+      menu ||
+      isPaused ||
+      run.mode !== "time" ||
+      run.timeLeft > 0 ||
+      solved(run.puzzle, run.userRects) ||
+      endGuard.current
+    )
+      return;
+    endGuard.current = true;
+    setRun((r) => (r ? { ...r, ended: true } : r));
+    playSound("gameOver");
+    if (onGameOver) onGameOver(run.score, { mode: 1 });
+    else bridge.submitScore(run.score, { mode: 1 });
+  }, [run, menu, isPaused]);
+  useEffect(() => {
+    if (
+      !run ||
+      run.completed ||
+      run.ended ||
+      !solved(run.puzzle, run.userRects) ||
+      rewardGuard.current === run.puzzle
+    )
+      return;
+    rewardGuard.current = run.puzzle;
+    const score = run.score + 1;
+    const result = {
+      stars: Math.max(1, 3 - Math.min(2, run.hintsUsed)),
+      elapsed: run.elapsed ?? 0,
+      hints: run.hintsUsed,
+    };
+    const kind =
+      run.kind === "lesson" ? "lessons" : run.kind === "daily" ? "daily" : null;
+    const key =
+      run.kind === "lesson"
+        ? String(run.lessonId)
+        : run.kind === "daily"
+          ? dailyKey(run.day!, run.puzzle.size)
+          : "";
+    const coins = kind && journey[kind][key] ? 0 : 25;
+    if (kind) setJourney((j) => storeResult(j, kind, key, result));
+    setRun((r) =>
+      r ? { ...r, completed: true, score, rewardCoins: coins } : r,
+    );
+    playSound("levelUp");
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      confetti({
+        particleCount: 60,
+        spread: 65,
+        origin: { y: 0.6 },
+        disableForReducedMotion: true,
+      });
+    if (coins) {
+      bridge.grantCoins(coins);
+      bridge.grantExp(15);
+    }
+    bridge.reportProgress("shikaku_beginner", 1, true);
+    if (run.mode === "time" && score >= 5)
+      bridge.reportProgress("shikaku_speed", score, true);
+    if (run.mode === "zen" && score >= 10)
+      bridge.reportProgress("shikaku_master", score, true);
+    bridge.reportQuest("play_any", 1);
+    bridge.submitScore(score, {
+      mode: run.mode === "time" ? 1 : 0,
+      puzzlesSolved: score,
+    });
+  }, [run, bridge, isMuted, journey]);
+  const clearSelection = () => {
+    setPreview(null);
+    setHint(null);
+    setSelected(null);
+    setResetConfirm(false);
+    setHintExplanation(null);
+  };
+  const start = (mode: Mode, continuing = false) => {
+    const score = continuing && run ? run.score : 0;
+    const puzzle =
+      !tutorialSeen && !continuing && size === 4 && mode === "zen"
+        ? tutorialPuzzle
+        : generateShikaku(size, size === 4 ? 6 : size === 5 ? 8 : 12);
+    setTutorialSeen(true);
+    rewardGuard.current = null;
+    endGuard.current = false;
+    setRun({
+      mode,
+      puzzle,
+      userRects: [],
+      pencilRects: [],
+      history: [],
+      score,
+      timeLeft: continuing && run ? run.timeLeft : 180,
+      completed: false,
+      ended: false,
+      hintsUsed: 0,
+      kind: "free",
+      elapsed: 0,
+    });
+    clearSelection();
+    setMenu(false);
+    setPanel(null);
+    setRankStatus("");
+    setNotice(
+      size === 4
+        ? "Mỗi số là số ô cần bao quanh. Ví dụ: 4 = 2 × 2 hoặc 1 × 4."
+        : "Mỗi hình chứa đúng một số. Lấp kín bảng để hoàn thành.",
+    );
+  };
+  const replace = (rects: Rect[]) => {
+    setRun((r) =>
+      r
+        ? {
+            ...r,
+            userRects: rects,
+            history: [...r.history, r.userRects].slice(-100),
+          }
+        : r,
+    );
+    clearSelection();
+    playSound("click");
+  };
+  const commit = (rect: Rect, tap: boolean) => {
+    if (!active || !run) return;
+    if (tap) {
+      const existing = run.userRects.find((r) => contains(r, rect));
+      if (existing) {
+        setSelected(existing.id);
+        setNotice("Đã chọn vùng. Bấm Xóa vùng để sửa; Hoàn tác để khôi phục.");
+        return;
+      }
+    }
+    const check = checkRegion(run.puzzle, rect, run.userRects);
+    if (!check.valid) {
+      setNotice(check.text);
+      return;
+    }
+    replace([...run.userRects, { ...rect, id: crypto.randomUUID() }]);
+    setNotice("Đúng diện tích ✓ Tiếp tục ghép các vùng còn lại.");
+  };
+  const undo = () => {
+    if (!active || !run?.history.length) return;
+    setRun((r) =>
+      r
+        ? {
+            ...r,
+            userRects: r.history[r.history.length - 1],
+            history: r.history.slice(0, -1),
+          }
+        : r,
+    );
+    clearSelection();
+    setNotice("Đã hoàn tác · Bạn có thể thử cách khác.");
+    playSound("click");
+  };
+  const openPuzzle = (
+    puzzle: ShikakuPuzzle,
+    meta: Partial<Session>,
+    text: string,
+  ) => {
+    rewardGuard.current = null;
+    endGuard.current = false;
+    clearSelection();
+    setRankStatus("");
+    setRun({
+      mode: "zen",
+      puzzle,
+      userRects: [],
+      pencilRects: [],
+      history: [],
+      score: 0,
+      timeLeft: 180,
+      completed: false,
+      ended: false,
+      hintsUsed: 0,
+      elapsed: 0,
+      ...meta,
+    });
+    setMenu(false);
+    setPanel(null);
+    setNotice(text);
+  };
+  const startLesson = (id: number) => {
+    const lesson = LESSONS.find((l) => l.id === id);
+    if (!lesson || !lessonOpen(journey, id)) return;
+    openPuzzle(lesson.puzzle, { kind: "lesson", lessonId: id }, lesson.tip);
+  };
+  const daily = async () => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    const chosen = size;
+    try {
+      const ticket = await startDaily(chosen);
+      if (!alive.current) return;
+      openPuzzle(
+        ticket.puzzle,
+        {
+          kind: "daily",
+          day: ticket.day,
+          hintsUsed: ticket.hints,
+          ...(!ticket.finished
+            ? { ticket: ticket.id, owner: ticket.owner }
+            : {}),
+        },
+        ticket.finished
+          ? "Bạn đã có kết quả chính thức hôm nay. Ván này để luyện tập."
+          : "Câu đố hôm nay · Cùng bảng cho tất cả người chơi.",
+      );
+      setRankStatus(
+        ticket.finished
+          ? "Luyện tập · Đã có lượt chính thức."
+          : "Ván xếp hạng · Thời gian tính cả tạm dừng.",
+      );
+    } catch {
+      if (alive.current) {
+        const day = utcDay();
+        openPuzzle(
+          dailyPuzzle(day, chosen),
+          { kind: "daily", day },
+          "Câu đố hôm nay · Thành tích cá nhân vẫn được lưu.",
+        );
+        setRankStatus("Luyện tập · Đăng nhập và kết nối để xếp hạng.");
+      }
+    } finally {
+      busyRef.current = false;
+      if (alive.current) setBusy(false);
+    }
+  };
+  const sendRanking = async (r: Session) => {
+    if (!r.ticket || !r.owner || r.verified || submitting.current.has(r.ticket))
+      return;
+    submitting.current.add(r.ticket);
+    setRankStatus("Đang gửi thành tích…");
+    try {
+      const result = await submitDaily(r.ticket, r.owner, r.userRects);
+      if (alive.current && currentRun.current?.ticket === r.ticket) {
+        setRun((v) => (v ? { ...v, verified: true } : v));
+        setRankStatus(
+          `Đã xác thực · ${result.stars} ★ · ${Math.ceil(result.elapsed_ms / 1000)} giây máy chủ`,
+        );
+      }
+    } catch {
+      submitting.current.delete(r.ticket);
+      if (alive.current && currentRun.current?.ticket === r.ticket)
+        setRankStatus("Chưa gửi được · Đã lưu trên thiết bị.");
+    }
+  };
+  useEffect(() => {
+    if (run?.completed && run.kind === "daily" && run.ticket && !run.verified)
+      void sendRanking(run);
+  }, [run?.completed, run?.ticket]);
+  const suggest = async () => {
+    if (!active || !run || busyRef.current) return;
+    if (hint) {
+      setHint(null);
+      return;
+    }
+    const explanation = explainHint(run.puzzle, run.userRects);
+    if (!explanation.rect) {
+      setHintExplanation(explanation);
+      return;
+    }
+    busyRef.current = true;
+    setBusy(true);
+    let hints = run.hintsUsed + 1;
+    let detach = false;
+    try {
+      if (run.ticket && run.owner)
+        hints = await markHint(run.ticket, run.owner, crypto.randomUUID());
+    } catch {
+      detach = true;
+    } finally {
+      busyRef.current = false;
+      if (alive.current) setBusy(false);
+    }
+    if (!alive.current || currentRun.current?.puzzle !== run.puzzle) return;
+    setRun((r) =>
+      r
+        ? {
+            ...r,
+            hintsUsed: hints,
+            ...(detach ? { ticket: undefined, owner: undefined } : {}),
+          }
+        : r,
+    );
+    if (detach) setRankStatus("Luyện tập · Mất kết nối khi dùng gợi ý.");
+    setHintExplanation(explanation);
+    setSelected(null);
+  };
+  const progress = run
+    ? Math.round(
+        (run.userRects
+          .filter((r) => checkRegion(run.puzzle, r).valid)
+          .reduce((n, r) => n + r.w * r.h, 0) /
+          run.puzzle.size ** 2) *
+          100,
+      )
+    : 0;
+  const stars = run ? Math.max(1, 3 - Math.min(2, run.hintsUsed)) : 3;
+  const liveText =
+    preview && run
+      ? checkRegion(run.puzzle, preview, run.userRects).text
+      : notice;
+  const showHelp = () => {
+    helpOpener.current = document.activeElement as HTMLElement;
+    clearSelection();
+    setHelp(true);
+  };
+  return (
+    <div className={`sk-root sk-${theme}`}>
+      {menu ? (
+        <fieldset
+          disabled={busy}
+          className="sk-menu"
+          inert={help || !!panel || !!hintExplanation}
+          aria-hidden={help || !!panel || !!hintExplanation || undefined}
+        >
+          <div className="sk-brand" aria-hidden="true">
+            <i>4</i>
+            <i>6</i>
+            <i>2</i>
+          </div>
+          <div>
+            <p className="sk-eyebrow">GHÉP Ô · THƯ GIÃN · SUY LUẬN</p>
+            <h1>Shikaku</h1>
+            <p>Kéo một hình. Ghép cả bức tranh.</p>
+          </div>
+          {run && !run.ended && (
+            <button
+              className="sk-primary"
+              onClick={() => {
+                setMenu(false);
+                clearSelection();
+              }}
+            >
+              Tiếp tục · {run.puzzle.size} × {run.puzzle.size}
+              <ArrowRight size={20} />
+            </button>
+          )}
+          <div className="sk-menu-links">
+            <button
+              className="sk-secondary"
+              onClick={() => setPanel("journey")}
+            >
+              <BookOpen size={18} /> Hành trình học ·{" "}
+              {Object.keys(journey.lessons).length}/20
+            </button>
+            <button
+              className="sk-secondary"
+              onClick={() => setPanel("ranking")}
+            >
+              <Trophy size={18} /> Xếp hạng
+            </button>
+          </div>
+          <div className="sk-difficulties" role="group" aria-label="Độ khó">
+            {[4, 5, 6, 8].map((n) => (
+              <button
+                key={n}
+                aria-pressed={size === n}
+                onClick={() => setSize(n)}
+              >
+                <strong>
+                  {n} × {n}
+                </strong>
+                <small>{difficultyNames[n]}</small>
+              </button>
+            ))}
+          </div>
+          <button className="sk-primary" onClick={() => start("zen")}>
+            Chơi thư giãn <ArrowRight size={20} />
+          </button>
+          <button className="sk-secondary" onClick={() => start("time")}>
+            <Clock size={18} /> Thử thách 3 phút
+          </button>
+          <button
+            className="sk-secondary"
+            onClick={() => void daily()}
+            disabled={busy}
+          >
+            <CalendarDays size={18} />
+            {busy ? "Đang mở…" : `Câu đố hôm nay · ${utcDay()}`}
+          </button>
+          <p className="sk-menu-note">
+            Không mất mạng khi thử sai. Hoàn tác và gợi ý miễn phí.
+            <br />
+            Bắt đầu ván mới sẽ thay ván đang chơi.
+          </p>
+          <button className="sk-text-button" onClick={showHelp}>
+            <HelpCircle size={18} /> Cách chơi & giao diện
+          </button>
+        </fieldset>
+      ) : (
+        run && (
+          <div
+            className="sk-game"
+            aria-hidden={help || !!panel || !!hintExplanation || undefined}
+            inert={help || !!panel || !!hintExplanation}
+          >
+            <header className="sk-hud">
+              <button
+                aria-label="Menu Shikaku"
+                onClick={() => {
+                  clearSelection();
+                  setMenu(true);
+                }}
+              >
+                <Home size={20} />
+              </button>
+              <div>
+                <small>
+                  {run.kind === "lesson"
+                    ? `BÀI ${run.lessonId}/20`
+                    : run.kind === "daily"
+                      ? run.day === utcDay()
+                        ? "HÔM NAY"
+                        : run.day
+                      : run.mode === "zen"
+                        ? "THƯ GIÃN"
+                        : "THỬ THÁCH"}{" "}
+                  · {run.puzzle.size} × {run.puzzle.size}
+                </small>
+                <strong>
+                  {run.completed ? "Hoàn thành!" : `${progress}% đã ghép`}
+                </strong>
+              </div>
+              <div className="sk-counter">
+                {run.mode === "time"
+                  ? `${Math.floor(run.timeLeft / 60)}:${String(run.timeLeft % 60).padStart(2, "0")}`
+                  : `${run.score} ✓`}
+              </div>
+              <button aria-label="Cách chơi" onClick={showHelp}>
+                <HelpCircle size={21} />
+              </button>
+              <div
+                className="sk-progress"
+                role="progressbar"
+                aria-label="Bảng đã ghép"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <i style={{ width: `${progress}%` }} />
+              </div>
+            </header>
+            <div className="sk-board-wrap">
+              <ShikakuBoard
+                puzzle={run.puzzle}
+                rects={run.userRects}
+                notes={run.pencilRects}
+                preview={preview}
+                hint={hint}
+                selected={selected}
+                disabled={!active}
+                twoTap={twoTap}
+                onPreview={setPreview}
+                onCommit={commit}
+              />
+            </div>
+            <footer className="sk-bottom">
+              {run.completed ? (
+                <div className="sk-result" role="status">
+                  <div className="sk-stars" aria-label={`${stars} sao`}>
+                    {"★".repeat(stars)}
+                    <span>{"☆".repeat(3 - stars)}</span>
+                  </div>
+                  <p>
+                    {run.kind === "daily" ? (
+                      <small className="sk-rank-status">
+                        {rankStatus || "Thành tích cá nhân đã lưu."}
+                        {run.ticket && !run.verified && (
+                          <button onClick={() => void sendRanking(run)}>
+                            Gửi lại
+                          </button>
+                        )}
+                      </small>
+                    ) : (
+                      <>
+                        {run.hintsUsed === 0
+                          ? "Tự giải trọn vẹn!"
+                          : `Hoàn thành với ${run.hintsUsed} gợi ý.`}{" "}
+                        <b>
+                          {run.rewardCoins
+                            ? `+${run.rewardCoins} xu`
+                            : run.kind === "lesson"
+                              ? "Đã lưu sao tốt nhất"
+                              : "+25 xu"}
+                        </b>
+                      </>
+                    )}
+                  </p>
+                  <button
+                    className="sk-primary"
+                    onClick={() =>
+                      run.kind === "lesson"
+                        ? run.lessonId! < 20
+                          ? startLesson(run.lessonId! + 1)
+                          : setPanel("journey")
+                        : run.kind === "daily"
+                          ? (setMenu(true), setPanel("ranking"))
+                          : start(run.mode, true)
+                    }
+                  >
+                    {run.kind === "lesson"
+                      ? run.lessonId! < 20
+                        ? "Bài tiếp theo"
+                        : "Xem hành trình"
+                      : run.kind === "daily"
+                        ? "Xem xếp hạng"
+                        : "Câu tiếp theo"}{" "}
+                    <ArrowRight size={18} />
+                  </button>
+                </div>
+              ) : run.ended ? (
+                <div className="sk-result">
+                  <strong>Đã giải {run.score} câu đố</strong>
+                  <button
+                    className="sk-primary"
+                    onClick={() => start(run.mode)}
+                  >
+                    Chơi lại
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div
+                    className={`sk-feedback ${preview ? (checkRegion(run.puzzle, preview, run.userRects).valid ? "sk-good" : "sk-check") : ""}`}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {liveText}
+                  </div>
+                  <div className="sk-tools">
+                    <button
+                      onClick={undo}
+                      disabled={!active || !run.history.length}
+                    >
+                      <RotateCcw />
+                      <span>Hoàn tác</span>
+                    </button>
+                    <button
+                      onClick={suggest}
+                      disabled={!active}
+                      aria-pressed={!!hint}
+                    >
+                      <Lightbulb />
+                      <span>
+                        {busy ? "Đang xử lý…" : hint ? "Ẩn gợi ý" : "Gợi ý"}
+                      </span>
+                    </button>
+                    <button
+                      disabled={!active || !selected}
+                      onClick={() => {
+                        replace(run.userRects.filter((r) => r.id !== selected));
+                        setNotice("Đã xóa vùng. Bạn có thể hoàn tác.");
+                      }}
+                    >
+                      <Trash2 />
+                      <span>Xóa vùng</span>
+                    </button>
+                  </div>
+                  <small className="sk-footnote">
+                    {run.kind === "daily" ? (
+                      run.ticket ? (
+                        "Xếp hạng · Thời gian tính cả tạm dừng"
+                      ) : (
+                        "Luyện tập · Lưu thành tích cá nhân"
+                      )
+                    ) : (
+                      <>
+                        {twoTap ? "Chạm hai góc" : "Kéo hai góc"} · Chạm vùng đã
+                        đặt để chọn
+                      </>
+                    )}
+                  </small>
+                </>
+              )}
+            </footer>
+          </div>
+        )
+      )}
+      {panel === "journey" && (
+        <SkDialog title="Hành trình Shikaku" onClose={() => setPanel(null)}>
+          <p>
+            20 bài ngắn · Không giới hạn thời gian · Hoàn thành bài trước để mở
+            bài tiếp.
+          </p>
+          {CHAPTERS.map((chapter, c) => (
+            <section className="sk-chapter" key={c}>
+              <h3>
+                <span style={{ background: chapter.color }}>{c + 1}</span>
+                {chapter.title}
+              </h3>
+              <p>{chapter.skill}</p>
+              <div className="sk-lessons">
+                {LESSONS.filter((l) => l.chapter === c).map((l) => {
+                  const record = journey.lessons[String(l.id)];
+                  return (
+                    <button
+                      key={l.id}
+                      disabled={!lessonOpen(journey, l.id)}
+                      aria-label={`Bài ${l.id}: ${l.title}`}
+                      onClick={() => startLesson(l.id)}
+                    >
+                      <strong>{l.id}</strong>
+                      <span>{l.title}</span>
+                      <small>
+                        {record
+                          ? "★".repeat(record.stars)
+                          : lessonOpen(journey, l.id)
+                            ? `${l.puzzle.size} × ${l.puzzle.size}`
+                            : "Chưa mở"}
+                      </small>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </SkDialog>
+      )}
+      {panel === "ranking" && (
+        <RankingPanel
+          size={size}
+          journey={journey}
+          onClose={() => setPanel(null)}
+        />
+      )}
+      {hintExplanation && (
+        <SkDialog
+          title="Gợi ý suy luận"
+          onClose={() => setHintExplanation(null)}
+        >
+          <h3>
+            {hintExplanation.forced
+              ? "Một vùng bắt buộc"
+              : "Thử loại các khả năng"}
+          </h3>
+          <p>{hintExplanation.text}</p>
+          {hintExplanation.rect && (
+            <>
+              <p>
+                Hãy thử tự kéo trước. Bạn có thể xem khung nếu cần; không tính
+                thêm lượt gợi ý.
+              </p>
+              <button
+                className="sk-primary"
+                onClick={() => {
+                  setHint(hintExplanation.rect);
+                  setHintExplanation(null);
+                  setNotice(
+                    "Kéo theo khung nét đứt. Gợi ý này đã được tính một lần.",
+                  );
+                }}
+              >
+                Xem khung gợi ý
+              </button>
+              <button
+                className="sk-text-button"
+                onClick={() => setHintExplanation(null)}
+              >
+                Tự suy luận tiếp
+              </button>
+            </>
+          )}
+        </SkDialog>
+      )}
+      {help && (
+        <div
+          className="sk-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Hướng dẫn Shikaku"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setHelp(false);
+            if (e.key === "Tab") {
+              const buttons = Array.from(
+                e.currentTarget.querySelectorAll<HTMLButtonElement>(
+                  "button:not(:disabled)",
+                ),
+              );
+              const first = buttons[0],
+                last = buttons[buttons.length - 1];
+              if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }}
+        >
+          <header>
+            <h2>Cách chơi & giao diện</h2>
+            <button
+              ref={helpClose}
+              aria-label="Đóng hướng dẫn"
+              onClick={() => setHelp(false)}
+            >
+              <X />
+            </button>
+          </header>
+          <div className="sk-dialog-body">
+            <div
+              className="sk-demo"
+              aria-label="Ví dụ số 6 trong hình 3 cột, 2 hàng"
+            >
+              <b>6</b>
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+            <h3>Một số, một hình chữ nhật</h3>
+            <p>
+              Số <b>6</b> cần đúng <b>6 ô</b>: 3 × 2, 2 × 3 hoặc 1 × 6. Kéo từ
+              một góc đến góc đối diện rồi thả tay.
+            </p>
+            <ol>
+              <li>Mỗi hình chứa đúng một số.</li>
+              <li>Các hình không đè lên nhau.</li>
+              <li>
+                Lấp đầy bảng để hoàn thành. Có thể có nhiều lời giải đúng.
+              </li>
+            </ol>
+            <p>
+              Vùng xanh có dấu ✓ là đúng diện tích. Nếu không hợp lệ, thả tay sẽ
+              giữ nguyên bảng. Chạm vùng đã đặt rồi bấm <b>Xóa vùng</b> để sửa.
+            </p>
+            <h3>Thử thoải mái</h3>
+            <p>
+              Hoàn tác không trừ sao. Không dùng gợi ý: 3 sao; 1 gợi ý: 2 sao;
+              từ 2 gợi ý: 1 sao. Mỗi câu hoàn thành thưởng 25 xu. Bài học và câu
+              đố hằng ngày lưu sao tốt nhất. Thưởng xu lần đầu hoàn thành; chơi
+              lại không cộng thêm xu. Đọc lời giải thích được tính là một gợi ý;
+              xem tiếp khung của gợi ý đó không trừ thêm sao.
+            </p>
+            <p>
+              Đồng hồ chỉ chạy khi đang giải; dừng ở menu, hướng dẫn, khi ẩn ứng
+              dụng và sau khi giải xong.
+            </p>
+            <button
+              className="sk-secondary"
+              aria-pressed={twoTap}
+              onClick={() => setTwoTap(!twoTap)}
+            >
+              {twoTap ? <Check size={18} /> : null}Chạm hai góc thay cho kéo thả
+            </button>
+            <p className="sk-footnote">
+              Bàn phím: mũi tên di chuyển, Space/Enter chọn hai góc, Escape hủy.
+            </p>
+            <h3>Màu bàn chơi</h3>
+            <div className="sk-themes">
+              {(["mint", "peach", "sky"] as const).map((t, i) => (
+                <button
+                  key={t}
+                  className={`sk-${t}`}
+                  aria-pressed={theme === t}
+                  onClick={() => setTheme(t)}
+                >
+                  {["Vườn ngọc", "Nắng đào", "Mây xanh"][i]}
+                </button>
+              ))}
+            </div>
+            {run && !run.completed && (
+              <button
+                className="sk-secondary"
+                onClick={() => {
+                  if (!resetConfirm) {
+                    setResetConfirm(true);
+                    return;
+                  }
+                  setRun((r) =>
+                    r
+                      ? {
+                          ...r,
+                          history: [...r.history, r.userRects].slice(-100),
+                          userRects: [],
+                          pencilRects: [],
+                        }
+                      : r,
+                  );
+                  clearSelection();
+                  setHelp(false);
+                  setNotice(
+                    "Bảng đã trống. Hoàn tác để lấy lại các vùng vừa xóa.",
+                  );
+                }}
+              >
+                {resetConfirm
+                  ? "Xác nhận xóa các vùng"
+                  : "Làm lại bảng hiện tại"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

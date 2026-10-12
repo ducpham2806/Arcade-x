@@ -1591,7 +1591,7 @@ export class StorageService {
         const parsed: InventoryItem[] = JSON.parse(data);
         // Merge with any new items that might have been added to defaults
         const existingIds = new Set(parsed.map(i => i.id));
-        const missingDefaults = ALL_DEFAULT_ITEMS.filter(d => !existingIds.has(d.id));
+        const missingDefaults = ALL_DEFAULT_ITEMS.filter(d => !existingIds.has(d.id)).map(item => ({ ...item, count: 0, equipped: false }));
         return [...parsed, ...missingDefaults];
       }
     } catch {
@@ -2165,7 +2165,7 @@ export class StorageService {
   }
 
   public static loadFavorites(): string[] {
-    return this.loadGeneric<string[]>(STORAGE_KEYS.FAVORITES, ['neon-runner', 'tile-2048']);
+    return this.loadGeneric<string[]>(STORAGE_KEYS.FAVORITES, []);
   }
 
   public static saveFavorites(favorites: string[]): void {
@@ -2181,8 +2181,10 @@ export class StorageService {
   }
 
   public static loadRecentlyPlayed(): string[] {
-    return this.loadGeneric<string[]>(STORAGE_KEYS.RECENT_GAMES, ['neon-runner', 'tile-2048', 'cyber-slice']);
+    return this.loadGeneric<string[]>(STORAGE_KEYS.RECENT_GAMES, []);
   }
+
+  public static saveRecentlyPlayed(ids: string[]): void { this.saveGeneric<string[]>(STORAGE_KEYS.RECENT_GAMES, [...new Set(ids)].slice(0,12)); }
 
   public static recordRecentlyPlayed(gameId: string): string[] {
     const current = this.loadRecentlyPlayed().filter(id => id !== gameId);

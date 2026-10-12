@@ -152,7 +152,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
     }
   }, [roomData?.lastMove?.moveIndex]);
 
-  // 1. Online Room Realtime Listener (Firestore onSnapshot)
+  // 1. Online Room Realtime Listener (Supabase Realtime)
   useEffect(() => {
     if (!activeRoomId) return;
 
@@ -909,7 +909,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   };
 
   return (
-    <div className="relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
+    <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
       {/* Top Banner / Notification */}
       {errorMessage && (
         <div className="w-full max-w-lg mb-3 px-4 py-2.5 rounded-xl bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs flex items-center justify-between shadow-lg animate-in fade-in">
@@ -1295,7 +1295,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
             symbolMarker: screenMode === 'local_hotseat' ? localP1Symbol : mySymbol,
           }}
           board={
-            <div className="relative p-1 sm:p-2 rounded-xl sm:rounded-2xl bg-white border border-slate-300 shadow-2xl overflow-hidden w-full max-w-[480px]">
+            <div className="arcade-board relative p-1 sm:p-2 rounded-xl sm:rounded-2xl bg-white border border-slate-300 shadow-2xl overflow-hidden w-full max-w-[480px]">
               <div
                 className="grid bg-[#f8f9fa] border border-slate-300 w-full aspect-square"
                 style={{

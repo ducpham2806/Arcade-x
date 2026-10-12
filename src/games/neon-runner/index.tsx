@@ -1,3 +1,6 @@
+import { createFixedTicker } from './timing';
+import { randomStep } from '../tile-2048/engine';
+import { drawArenaBackdrop } from '../../visuals/arenaBackdrop';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { GameComponentProps } from '../../types';
 import { ArrowUp, ArrowDown, Shield, Sparkles, AlertTriangle } from 'lucide-react';
@@ -38,6 +41,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
   bridge,
   isPaused,
   onGameOver,
+  initialState,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -47,6 +51,10 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
   const [hasShield, setHasShield] = useState<boolean>(false);
   const [multiplierTimer, setMultiplierTimer] = useState<number>(0);
 
+  const candidate = initialState !== undefined ? initialState : bridge.loadGameState<any>();
+  const saved = candidate?.version === 1 && candidate.state && !candidate.state.isOver &&
+    [candidate.state.score, candidate.state.distance, candidate.state.speed, candidate.state.playerY, candidate.state.groundY, candidate.state.rngState].every(Number.isFinite) &&
+    Array.isArray(candidate.state.obstacles) && Array.isArray(candidate.state.collectibles) ? candidate.state : null;
   // Game state refs
   const stateRef = useRef({
     score: 0,
@@ -75,6 +83,10 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
     lastCollectibleDist: 0,
     isOver: false,
     groundY: 0,
+    rngState: crypto.getRandomValues(new Uint32Array(1))[0],
+    nextObstacleGap: 480,
+    lastCheckpoint: 0,
+    ...saved,
   });
 
   const jump = useCallback(() => {
@@ -132,6 +144,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
   const handleCanvasTouchEnd = (e: React.TouchEvent) => {
     if (!touchStartRef.current || !containerRef.current) return;
     const start = touchStartRef.current;
+    touchStartRef.current = null;
     const end = e.changedTouches[0];
     if (!end) return;
 
@@ -198,10 +211,15 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
 
       // Ergonomic ground height: elevated on mobile to avoid blocking by bottom controls
       const isMobileView = rect.height > rect.width || rect.width < 640;
+      const previousGround = stateRef.current.groundY;
       stateRef.current.groundY = isMobileView
         ? Math.floor(Math.min(rect.height - 125, Math.max(rect.height * 0.65, 260)))
         : rect.height - 85;
 
+      const groundDelta = previousGround ? stateRef.current.groundY - previousGround : 0;
+      stateRef.current.playerY += groundDelta;
+      stateRef.current.obstacles.forEach(obstacle => { obstacle.y += groundDelta; });
+      stateRef.current.collectibles.forEach(item => { item.y += groundDelta; item.baseY += groundDelta; });
       stateRef.current.playerX = Math.min(rect.width * 0.2, 90);
 
       if (stateRef.current.isGrounded) {
@@ -214,7 +232,9 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
 
     // Initial setup
     const s = stateRef.current;
-    s.playerY = s.groundY - s.playerHeight;
+    if (s.isGrounded) s.playerY = s.groundY - s.playerHeight;
+    setScore(Math.floor(s.score)); setMultiplier(s.multiplier); setHasShield(s.hasShield); setMultiplierTimer(Math.ceil(s.multiplierTimer / 60));
+    bridge.saveGameState({ version: 1, state: { ...s, particles: [], trail: [] } });
 
     const skin = bridge.getEquippedSkin();
     
@@ -247,8 +267,11 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
 
     let gridOffset = 0;
 
-    const updateAndDraw = () => {
-      if (!isPaused && !s.isOver) {
+    const ticker = createFixedTicker();
+    const randomGameplay = () => { const next = randomStep(s.rngState); s.rngState = next.state; return next.value; };
+    const updateAndDraw = (timestamp: number) => {
+      const steps = ticker.advance(timestamp, !isPaused && !s.isOver);
+      for (let tick = 0; tick < steps && !s.isOver; tick++) {
         const width = container.clientWidth;
         const height = container.clientHeight;
         const isMobileView = height > width || width < 640;
@@ -262,7 +285,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
         gridOffset = (gridOffset + s.speed) % 40;
 
         // Update score
-        const pointsToAdd = Math.round(s.speed * 0.08 * s.multiplier);
+        const pointsToAdd = s.speed * 0.08 * s.multiplier;
         s.score += pointsToAdd;
         setScore(Math.floor(s.score));
 
@@ -314,11 +337,12 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
         s.trail.forEach(t => t.alpha *= 0.85);
 
         // Fair obstacle spacing: at least 420-620px to allow ample reaction & recovery time
-        const minObstacleGap = Math.max(460 - s.speed * 12, 360) + Math.random() * 200;
+        const minObstacleGap = s.nextObstacleGap;
         if (s.distance - s.lastObstacleDist > minObstacleGap) {
           s.lastObstacleDist = s.distance;
+          s.nextObstacleGap = Math.max(420, s.speed * 110) + randomGameplay() * 160;
           const types: ('spike' | 'laser_high' | 'drone' | 'barrier')[] = ['spike', 'laser_high', 'drone', 'barrier'];
-          const type = types[Math.floor(Math.random() * types.length)];
+          const type = types[Math.floor(randomGameplay() * types.length)];
 
           let obsWidth = 28;
           let obsHeight = 34;
@@ -349,9 +373,9 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
         }
 
         // Spawn collectibles: pleasant rewards placed logically
-        if (s.distance - s.lastCollectibleDist > 220 + Math.random() * 220) {
+        if (s.distance - s.lastCollectibleDist > 220 + randomGameplay() * 220) {
           s.lastCollectibleDist = s.distance;
-          const roll = Math.random();
+          const roll = randomGameplay();
           let cType: 'coin' | 'shield' | 'multiplier' | 'gem' = 'coin';
           let cColor = '#fbbf24';
 
@@ -369,7 +393,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
             cColor = '#ec4899';
           }
 
-          const targetY = s.groundY - 36 - Math.random() * 45;
+          const targetY = s.groundY - 36 - randomGameplay() * 45;
           s.collectibles.push({
             x: width + 30,
             y: targetY,
@@ -431,6 +455,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
               // Game Over
               s.isOver = true;
               bridge.playSound('gameOver');
+              bridge.saveGameState({ version: 1, state: { ...s, isOver: true, particles: [], trail: [] } });
               onGameOver(Math.floor(s.score));
             }
           }
@@ -511,35 +536,19 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
         }
       }
 
+      if (!s.isOver && s.distance - s.lastCheckpoint > 500 && s.isGrounded &&
+          s.obstacles.every(obstacle => obstacle.x + obstacle.width < s.playerX || obstacle.x > s.playerX + 300)) {
+        s.lastCheckpoint = s.distance;
+        bridge.saveGameState({ version: 1, state: { ...s, particles: [], trail: [] } });
+        bridge.updateSessionState?.({ score: s.score });
+      }
+
       // RENDER
       const width = container.clientWidth;
       const height = container.clientHeight;
 
-      // Dark futuristic cyberpunk background
-      ctx.fillStyle = '#060913';
-      ctx.fillRect(0, 0, width, height);
-
-      // Grid horizon
       const horizonY = s.groundY;
-      const grad = ctx.createLinearGradient(0, 0, 0, horizonY);
-      grad.addColorStop(0, '#0a0e20');
-      grad.addColorStop(1, '#1a1638');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, horizonY);
-
-      // Sun glow
-      const sunGrad = ctx.createRadialGradient(width / 2, horizonY, 10, width / 2, horizonY, 200);
-      sunGrad.addColorStop(0, 'rgba(236, 72, 153, 0.2)');
-      sunGrad.addColorStop(1, 'rgba(10, 14, 32, 0)');
-      ctx.fillStyle = sunGrad;
-      ctx.fillRect(0, 0, width, horizonY);
-
-      // Cyber city background silhouette
-      ctx.fillStyle = '#0f1429';
-      for (let bx = 0; bx < width + 100; bx += 70) {
-        const bHeight = 40 + ((bx * 13) % 65);
-        ctx.fillRect(bx, horizonY - bHeight, 50, bHeight);
-      }
+      drawArenaBackdrop(ctx, 'city', width, height, horizonY);
 
       // Floor
       ctx.fillStyle = '#080c16';
@@ -596,6 +605,10 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
         // Inner core
         ctx.fillStyle = accentColor;
         ctx.fillRect(s.playerX + 6, s.playerY + 12, s.playerWidth - 12, 16);
+        const stride = s.isGrounded ? Math.sin(s.distance / 18) * 5 : 3;
+        ctx.strokeStyle = accentColor; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(s.playerX + 9, s.playerY + 32); ctx.lineTo(s.playerX + 8 + stride, s.playerY + 44);
+        ctx.moveTo(s.playerX + 24, s.playerY + 32); ctx.lineTo(s.playerX + 24 - stride, s.playerY + 44); ctx.stroke();
         // Visor
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(s.playerX + 16, s.playerY + 8, 12, 5);
@@ -816,13 +829,14 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
       ref={containerRef}
       onTouchStart={handleCanvasTouchStart}
       onTouchEnd={handleCanvasTouchEnd}
+      data-no-swipe="true"
       className="relative w-full h-full flex items-center justify-center overflow-hidden select-none touch-none"
     >
       <canvas ref={canvasRef} className="w-full h-full block" />
 
       {/* Top HUD: Score & Active Buffs */}
       <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-2 pointer-events-none z-10">
-        <div className="px-3 py-1.5 rounded-xl bg-slate-900/85 backdrop-blur-md border border-cyan-500/40 text-cyan-300 font-mono font-bold text-xs sm:text-sm shadow-lg shadow-cyan-500/20">
+        <div className="arcade-combat-hud px-3 py-1.5 rounded-xl bg-slate-900/85 backdrop-blur-md border border-cyan-500/40 text-cyan-300 font-mono font-bold text-xs sm:text-sm shadow-lg shadow-cyan-500/20">
           Điểm: {score.toLocaleString()}
         </div>
 
@@ -853,14 +867,10 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
         <button
           id="btn-touch-slide"
           type="button"
-          onTouchStart={(e) => {
-            e.stopPropagation();
-            slide();
-          }}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            slide();
-          }}
+          onTouchStart={e => e.stopPropagation()}
+          onTouchEnd={e => e.stopPropagation()}
+          onPointerDown={e => { e.stopPropagation(); slide(); }}
+          onClick={e => { if (e.detail === 0) slide(); }}
           className="pointer-events-auto h-12 sm:h-14 px-4 sm:px-6 rounded-xl bg-slate-900/60 active:bg-rose-950/70 backdrop-blur-md border border-rose-500/30 text-rose-300 active:scale-95 shadow-lg flex items-center gap-2 transition-all cursor-pointer"
         >
           <ArrowDown className="w-5 h-5 text-rose-400" />
@@ -874,14 +884,10 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
         <button
           id="btn-touch-jump"
           type="button"
-          onTouchStart={(e) => {
-            e.stopPropagation();
-            jump();
-          }}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            jump();
-          }}
+          onTouchStart={e => e.stopPropagation()}
+          onTouchEnd={e => e.stopPropagation()}
+          onPointerDown={e => { e.stopPropagation(); jump(); }}
+          onClick={e => { if (e.detail === 0) jump(); }}
           className="pointer-events-auto h-12 sm:h-14 px-4 sm:px-6 rounded-xl bg-cyan-950/60 active:bg-cyan-900/70 backdrop-blur-md border border-cyan-400/40 text-cyan-200 active:scale-95 shadow-lg shadow-cyan-500/20 flex items-center gap-2 transition-all cursor-pointer"
         >
           <ArrowUp className="w-5 h-5 text-cyan-300" />

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./visuals/arcade.css";
 
 :root {
   /* Custom High-Precision Arcade Cursors */

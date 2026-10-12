@@ -1,0 +1,4370 @@
+{
+ "game": "Cosmic Defend",
+ "version": "1.0",
+ "base_resolution": [
+  180,
+  320
+ ],
+ "display_scale": 6,
+ "ui_grid": [
+  360,
+  640
+ ],
+ "ui_scale": 3,
+ "sheets": {
+  "enemies": {
+   "file": "sprites/enemies.png",
+   "size": [
+    512,
+    219
+   ]
+  },
+  "items": {
+   "file": "sprites/items.png",
+   "size": [
+    512,
+    27
+   ]
+  },
+  "ship": {
+   "file": "sprites/ship.png",
+   "size": [
+    512,
+    145
+   ]
+  },
+  "ui": {
+   "file": "sprites/ui.png",
+   "size": [
+    512,
+    97
+   ]
+  },
+  "bosses": {
+   "file": "sprites/bosses.png",
+   "size": [
+    1024,
+    1277
+   ]
+  },
+  "portraits": {
+   "file": "sprites/portraits.png",
+   "size": [
+    512,
+    99
+   ]
+  },
+  "logo": {
+   "file": "sprites/logo.png",
+   "size": [
+    512,
+    58
+   ]
+  }
+ },
+ "sprites": {
+  "scout": {
+   "sheet": "sprites/enemies.png",
+   "x": 1,
+   "y": 1,
+   "w": 13,
+   "h": 13,
+   "frames": 2,
+   "stride": 14,
+   "fps": 6,
+   "pivot": [
+    6.5,
+    6.5
+   ]
+  },
+  "scout_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 29,
+   "y": 1,
+   "w": 13,
+   "h": 13,
+   "frames": 1,
+   "stride": 14,
+   "fps": 0,
+   "pivot": [
+    6.5,
+    6.5
+   ]
+  },
+  "gnat": {
+   "sheet": "sprites/enemies.png",
+   "x": 43,
+   "y": 1,
+   "w": 9,
+   "h": 9,
+   "frames": 2,
+   "stride": 10,
+   "fps": 8,
+   "pivot": [
+    4.5,
+    4.5
+   ]
+  },
+  "gnat_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 63,
+   "y": 1,
+   "w": 9,
+   "h": 9,
+   "frames": 1,
+   "stride": 10,
+   "fps": 0,
+   "pivot": [
+    4.5,
+    4.5
+   ]
+  },
+  "drone": {
+   "sheet": "sprites/enemies.png",
+   "x": 73,
+   "y": 1,
+   "w": 18,
+   "h": 20,
+   "frames": 2,
+   "stride": 19,
+   "fps": 4,
+   "pivot": [
+    9.0,
+    10.0
+   ]
+  },
+  "drone_tele": {
+   "sheet": "sprites/enemies.png",
+   "x": 111,
+   "y": 1,
+   "w": 18,
+   "h": 20,
+   "frames": 1,
+   "stride": 19,
+   "fps": 0,
+   "pivot": [
+    9.0,
+    10.0
+   ]
+  },
+  "drone_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 130,
+   "y": 1,
+   "w": 18,
+   "h": 20,
+   "frames": 1,
+   "stride": 19,
+   "fps": 0,
+   "pivot": [
+    9.0,
+    10.0
+   ]
+  },
+  "wasp": {
+   "sheet": "sprites/enemies.png",
+   "x": 149,
+   "y": 1,
+   "w": 20,
+   "h": 27,
+   "frames": 2,
+   "stride": 21,
+   "fps": 8,
+   "pivot": [
+    10.0,
+    13.5
+   ]
+  },
+  "wasp_tele": {
+   "sheet": "sprites/enemies.png",
+   "x": 191,
+   "y": 1,
+   "w": 20,
+   "h": 27,
+   "frames": 1,
+   "stride": 21,
+   "fps": 0,
+   "pivot": [
+    10.0,
+    13.5
+   ]
+  },
+  "wasp_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 212,
+   "y": 1,
+   "w": 20,
+   "h": 27,
+   "frames": 1,
+   "stride": 21,
+   "fps": 0,
+   "pivot": [
+    10.0,
+    13.5
+   ]
+  },
+  "moth": {
+   "sheet": "sprites/enemies.png",
+   "x": 233,
+   "y": 1,
+   "w": 28,
+   "h": 23,
+   "frames": 2,
+   "stride": 29,
+   "fps": 4,
+   "pivot": [
+    14.0,
+    11.5
+   ]
+  },
+  "moth_tele": {
+   "sheet": "sprites/enemies.png",
+   "x": 291,
+   "y": 1,
+   "w": 28,
+   "h": 23,
+   "frames": 1,
+   "stride": 29,
+   "fps": 0,
+   "pivot": [
+    14.0,
+    11.5
+   ]
+  },
+  "moth_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 320,
+   "y": 1,
+   "w": 28,
+   "h": 23,
+   "frames": 1,
+   "stride": 29,
+   "fps": 0,
+   "pivot": [
+    14.0,
+    11.5
+   ]
+  },
+  "hornet": {
+   "sheet": "sprites/enemies.png",
+   "x": 349,
+   "y": 1,
+   "w": 17,
+   "h": 22,
+   "frames": 2,
+   "stride": 18,
+   "fps": 10,
+   "pivot": [
+    8.5,
+    11.0
+   ]
+  },
+  "hornet_lock": {
+   "sheet": "sprites/enemies.png",
+   "x": 385,
+   "y": 1,
+   "w": 17,
+   "h": 22,
+   "frames": 1,
+   "stride": 18,
+   "fps": 0,
+   "pivot": [
+    8.5,
+    11.0
+   ]
+  },
+  "hornet_dash": {
+   "sheet": "sprites/enemies.png",
+   "x": 403,
+   "y": 1,
+   "w": 17,
+   "h": 22,
+   "frames": 1,
+   "stride": 18,
+   "fps": 0,
+   "pivot": [
+    8.5,
+    11.0
+   ]
+  },
+  "hornet_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 421,
+   "y": 1,
+   "w": 17,
+   "h": 22,
+   "frames": 1,
+   "stride": 18,
+   "fps": 0,
+   "pivot": [
+    8.5,
+    11.0
+   ]
+  },
+  "larva": {
+   "sheet": "sprites/enemies.png",
+   "x": 439,
+   "y": 1,
+   "w": 20,
+   "h": 18,
+   "frames": 2,
+   "stride": 21,
+   "fps": 6,
+   "pivot": [
+    10.0,
+    9.0
+   ]
+  },
+  "larva_crack": {
+   "sheet": "sprites/enemies.png",
+   "x": 481,
+   "y": 1,
+   "w": 20,
+   "h": 18,
+   "frames": 1,
+   "stride": 21,
+   "fps": 0,
+   "pivot": [
+    10.0,
+    9.0
+   ]
+  },
+  "larva_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 1,
+   "y": 29,
+   "w": 20,
+   "h": 18,
+   "frames": 1,
+   "stride": 21,
+   "fps": 0,
+   "pivot": [
+    10.0,
+    9.0
+   ]
+  },
+  "larva_small": {
+   "sheet": "sprites/enemies.png",
+   "x": 22,
+   "y": 29,
+   "w": 12,
+   "h": 11,
+   "frames": 2,
+   "stride": 13,
+   "fps": 6,
+   "pivot": [
+    6.0,
+    5.5
+   ]
+  },
+  "beetle": {
+   "sheet": "sprites/enemies.png",
+   "x": 48,
+   "y": 29,
+   "w": 37,
+   "h": 40,
+   "frames": 2,
+   "stride": 38,
+   "fps": 4,
+   "pivot": [
+    18.5,
+    20.0
+   ]
+  },
+  "beetle_fire": {
+   "sheet": "sprites/enemies.png",
+   "x": 124,
+   "y": 29,
+   "w": 37,
+   "h": 40,
+   "frames": 1,
+   "stride": 38,
+   "fps": 0,
+   "pivot": [
+    18.5,
+    20.0
+   ]
+  },
+  "beetle_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 162,
+   "y": 29,
+   "w": 37,
+   "h": 40,
+   "frames": 1,
+   "stride": 38,
+   "fps": 0,
+   "pivot": [
+    18.5,
+    20.0
+   ]
+  },
+  "mantis": {
+   "sheet": "sprites/enemies.png",
+   "x": 200,
+   "y": 29,
+   "w": 32,
+   "h": 38,
+   "frames": 2,
+   "stride": 33,
+   "fps": 5,
+   "pivot": [
+    16.0,
+    19.0
+   ]
+  },
+  "mantis_slash": {
+   "sheet": "sprites/enemies.png",
+   "x": 266,
+   "y": 29,
+   "w": 32,
+   "h": 38,
+   "frames": 1,
+   "stride": 33,
+   "fps": 0,
+   "pivot": [
+    16.0,
+    19.0
+   ]
+  },
+  "mantis_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 299,
+   "y": 29,
+   "w": 32,
+   "h": 38,
+   "frames": 1,
+   "stride": 33,
+   "fps": 0,
+   "pivot": [
+    16.0,
+    19.0
+   ]
+  },
+  "mantis_shield": {
+   "sheet": "sprites/enemies.png",
+   "x": 1,
+   "y": 70,
+   "w": 36,
+   "h": 36,
+   "frames": 8,
+   "stride": 37,
+   "fps": 0,
+   "pivot": [
+    18.0,
+    18.0
+   ],
+   "tags": {
+    "note": "8 huong cach nhau 45 do, cung 120 do"
+   }
+  },
+  "cicada": {
+   "sheet": "sprites/enemies.png",
+   "x": 297,
+   "y": 70,
+   "w": 22,
+   "h": 22,
+   "frames": 2,
+   "stride": 23,
+   "fps": 8,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "cicada_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 343,
+   "y": 70,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "heal_ring": {
+   "sheet": "sprites/enemies.png",
+   "x": 366,
+   "y": 70,
+   "w": 24,
+   "h": 24,
+   "frames": 4,
+   "stride": 25,
+   "fps": 12,
+   "pivot": [
+    12.0,
+    12.0
+   ],
+   "tags": {
+    "note": "vong hoi mau, 4 khung"
+   }
+  },
+  "minelayer": {
+   "sheet": "sprites/enemies.png",
+   "x": 1,
+   "y": 107,
+   "w": 27,
+   "h": 25,
+   "frames": 2,
+   "stride": 28,
+   "fps": 5,
+   "pivot": [
+    13.5,
+    12.5
+   ]
+  },
+  "minelayer_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 57,
+   "y": 107,
+   "w": 27,
+   "h": 25,
+   "frames": 1,
+   "stride": 28,
+   "fps": 0,
+   "pivot": [
+    13.5,
+    12.5
+   ]
+  },
+  "mine": {
+   "sheet": "sprites/enemies.png",
+   "x": 85,
+   "y": 107,
+   "w": 13,
+   "h": 13,
+   "frames": 2,
+   "stride": 14,
+   "fps": 3,
+   "pivot": [
+    6.5,
+    6.5
+   ]
+  },
+  "wraith": {
+   "sheet": "sprites/enemies.png",
+   "x": 113,
+   "y": 107,
+   "w": 23,
+   "h": 28,
+   "frames": 2,
+   "stride": 24,
+   "fps": 5,
+   "pivot": [
+    11.5,
+    14.0
+   ]
+  },
+  "wraith_fade": {
+   "sheet": "sprites/enemies.png",
+   "x": 161,
+   "y": 107,
+   "w": 23,
+   "h": 28,
+   "frames": 1,
+   "stride": 24,
+   "fps": 0,
+   "pivot": [
+    11.5,
+    14.0
+   ]
+  },
+  "wraith_faint": {
+   "sheet": "sprites/enemies.png",
+   "x": 185,
+   "y": 107,
+   "w": 23,
+   "h": 28,
+   "frames": 1,
+   "stride": 24,
+   "fps": 0,
+   "pivot": [
+    11.5,
+    14.0
+   ]
+  },
+  "wraith_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 209,
+   "y": 107,
+   "w": 23,
+   "h": 28,
+   "frames": 1,
+   "stride": 24,
+   "fps": 0,
+   "pivot": [
+    11.5,
+    14.0
+   ]
+  },
+  "commander": {
+   "sheet": "sprites/enemies.png",
+   "x": 233,
+   "y": 107,
+   "w": 47,
+   "h": 50,
+   "frames": 2,
+   "stride": 48,
+   "fps": 4,
+   "pivot": [
+    23.5,
+    25.0
+   ]
+  },
+  "commander_roar": {
+   "sheet": "sprites/enemies.png",
+   "x": 329,
+   "y": 107,
+   "w": 47,
+   "h": 50,
+   "frames": 1,
+   "stride": 48,
+   "fps": 0,
+   "pivot": [
+    23.5,
+    25.0
+   ]
+  },
+  "commander_hit": {
+   "sheet": "sprites/enemies.png",
+   "x": 377,
+   "y": 107,
+   "w": 47,
+   "h": 50,
+   "frames": 1,
+   "stride": 48,
+   "fps": 0,
+   "pivot": [
+    23.5,
+    25.0
+   ]
+  },
+  "buff_ring": {
+   "sheet": "sprites/enemies.png",
+   "x": 1,
+   "y": 158,
+   "w": 50,
+   "h": 50,
+   "frames": 3,
+   "stride": 51,
+   "fps": 10,
+   "pivot": [
+    25.0,
+    25.0
+   ]
+  },
+  "lock_ring": {
+   "sheet": "sprites/enemies.png",
+   "x": 154,
+   "y": 158,
+   "w": 26,
+   "h": 26,
+   "frames": 3,
+   "stride": 27,
+   "fps": 10,
+   "pivot": [
+    13.0,
+    13.0
+   ]
+  },
+  "aim_line": {
+   "sheet": "sprites/enemies.png",
+   "x": 235,
+   "y": 158,
+   "w": 1,
+   "h": 60,
+   "frames": 1,
+   "stride": 2,
+   "fps": 0,
+   "pivot": [
+    0.5,
+    30.0
+   ]
+  },
+  "explode_s": {
+   "sheet": "sprites/enemies.png",
+   "x": 237,
+   "y": 158,
+   "w": 16,
+   "h": 16,
+   "frames": 4,
+   "stride": 17,
+   "fps": 14,
+   "pivot": [
+    8.0,
+    8.0
+   ]
+  },
+  "explode_m": {
+   "sheet": "sprites/enemies.png",
+   "x": 305,
+   "y": 158,
+   "w": 32,
+   "h": 32,
+   "frames": 4,
+   "stride": 33,
+   "fps": 12,
+   "pivot": [
+    16.0,
+    16.0
+   ]
+  },
+  "hit_spark": {
+   "sheet": "sprites/enemies.png",
+   "x": 437,
+   "y": 158,
+   "w": 9,
+   "h": 9,
+   "frames": 2,
+   "stride": 10,
+   "fps": 20,
+   "pivot": [
+    4.5,
+    4.5
+   ]
+  },
+  "item_plasma": {
+   "sheet": "sprites/items.png",
+   "x": 1,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "tu_dong",
+    "nhom": "attack"
+   }
+  },
+  "item_missile": {
+   "sheet": "sprites/items.png",
+   "x": 27,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "tu_dong",
+    "nhom": "attack"
+   }
+  },
+  "item_bomb": {
+   "sheet": "sprites/items.png",
+   "x": 53,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "bam",
+    "nhom": "attack"
+   }
+  },
+  "item_laser": {
+   "sheet": "sprites/items.png",
+   "x": 79,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "bam",
+    "nhom": "attack"
+   }
+  },
+  "item_shield": {
+   "sheet": "sprites/items.png",
+   "x": 105,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "tu_dong",
+    "nhom": "defense"
+   }
+  },
+  "item_nano": {
+   "sheet": "sprites/items.png",
+   "x": 131,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "tu_dong",
+    "nhom": "defense"
+   }
+  },
+  "item_phase": {
+   "sheet": "sprites/items.png",
+   "x": 157,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "bam",
+    "nhom": "defense"
+   }
+  },
+  "item_magnet": {
+   "sheet": "sprites/items.png",
+   "x": 183,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "tu_dong",
+    "nhom": "booster"
+   }
+  },
+  "item_overdrive": {
+   "sheet": "sprites/items.png",
+   "x": 209,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "bam",
+    "nhom": "booster"
+   }
+  },
+  "item_amp": {
+   "sheet": "sprites/items.png",
+   "x": 235,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 2,
+   "stride": 13,
+   "fps": 4,
+   "pivot": [
+    6.0,
+    6.0
+   ],
+   "tags": {
+    "kind": "tu_dong",
+    "nhom": "booster"
+   }
+  },
+  "item_spawn": {
+   "sheet": "sprites/items.png",
+   "x": 261,
+   "y": 1,
+   "w": 16,
+   "h": 16,
+   "frames": 3,
+   "stride": 17,
+   "fps": 14,
+   "pivot": [
+    8.0,
+    8.0
+   ]
+  },
+  "item_pickup": {
+   "sheet": "sprites/items.png",
+   "x": 312,
+   "y": 1,
+   "w": 14,
+   "h": 14,
+   "frames": 4,
+   "stride": 15,
+   "fps": 16,
+   "pivot": [
+    7.0,
+    7.0
+   ]
+  },
+  "star_core": {
+   "sheet": "sprites/items.png",
+   "x": 372,
+   "y": 1,
+   "w": 7,
+   "h": 7,
+   "frames": 4,
+   "stride": 8,
+   "fps": 8,
+   "pivot": [
+    3.5,
+    3.5
+   ]
+  },
+  "credit_coin": {
+   "sheet": "sprites/items.png",
+   "x": 404,
+   "y": 1,
+   "w": 8,
+   "h": 8,
+   "frames": 4,
+   "stride": 9,
+   "fps": 10,
+   "pivot": [
+    4.0,
+    4.0
+   ]
+  },
+  "blueprint": {
+   "sheet": "sprites/items.png",
+   "x": 440,
+   "y": 1,
+   "w": 10,
+   "h": 10,
+   "frames": 1,
+   "stride": 11,
+   "fps": 0,
+   "pivot": [
+    5.0,
+    5.0
+   ]
+  },
+  "repair_kit": {
+   "sheet": "sprites/items.png",
+   "x": 451,
+   "y": 1,
+   "w": 11,
+   "h": 9,
+   "frames": 1,
+   "stride": 12,
+   "fps": 0,
+   "pivot": [
+    5.5,
+    4.5
+   ]
+  },
+  "score_chip": {
+   "sheet": "sprites/items.png",
+   "x": 463,
+   "y": 1,
+   "w": 2,
+   "h": 2,
+   "frames": 2,
+   "stride": 3,
+   "fps": 10,
+   "pivot": [
+    1.0,
+    1.0
+   ]
+  },
+  "bullet_plasma": {
+   "sheet": "sprites/items.png",
+   "x": 469,
+   "y": 1,
+   "w": 2,
+   "h": 6,
+   "frames": 1,
+   "stride": 3,
+   "fps": 0,
+   "pivot": [
+    1.0,
+    3.0
+   ]
+  },
+  "bullet_plasma_big": {
+   "sheet": "sprites/items.png",
+   "x": 472,
+   "y": 1,
+   "w": 4,
+   "h": 8,
+   "frames": 1,
+   "stride": 5,
+   "fps": 0,
+   "pivot": [
+    2.0,
+    4.0
+   ]
+  },
+  "bullet_missile": {
+   "sheet": "sprites/items.png",
+   "x": 477,
+   "y": 1,
+   "w": 3,
+   "h": 7,
+   "frames": 2,
+   "stride": 4,
+   "fps": 12,
+   "pivot": [
+    1.5,
+    3.5
+   ]
+  },
+  "bullet_enemy": {
+   "sheet": "sprites/items.png",
+   "x": 485,
+   "y": 1,
+   "w": 3,
+   "h": 3,
+   "frames": 1,
+   "stride": 4,
+   "fps": 0,
+   "pivot": [
+    1.5,
+    1.5
+   ]
+  },
+  "bullet_aimed": {
+   "sheet": "sprites/items.png",
+   "x": 489,
+   "y": 1,
+   "w": 2,
+   "h": 5,
+   "frames": 1,
+   "stride": 3,
+   "fps": 0,
+   "pivot": [
+    1.0,
+    2.5
+   ]
+  },
+  "bullet_shard": {
+   "sheet": "sprites/items.png",
+   "x": 492,
+   "y": 1,
+   "w": 3,
+   "h": 5,
+   "frames": 1,
+   "stride": 4,
+   "fps": 0,
+   "pivot": [
+    1.5,
+    2.5
+   ]
+  },
+  "bullet_bomb": {
+   "sheet": "sprites/items.png",
+   "x": 496,
+   "y": 1,
+   "w": 7,
+   "h": 7,
+   "frames": 2,
+   "stride": 8,
+   "fps": 6,
+   "pivot": [
+    3.5,
+    3.5
+   ]
+  },
+  "bullet_enemy_missile": {
+   "sheet": "sprites/items.png",
+   "x": 1,
+   "y": 18,
+   "w": 3,
+   "h": 7,
+   "frames": 1,
+   "stride": 4,
+   "fps": 0,
+   "pivot": [
+    1.5,
+    3.5
+   ]
+  },
+  "bullet_fire": {
+   "sheet": "sprites/items.png",
+   "x": 5,
+   "y": 18,
+   "w": 4,
+   "h": 4,
+   "frames": 1,
+   "stride": 5,
+   "fps": 0,
+   "pivot": [
+    2.0,
+    2.0
+   ]
+  },
+  "bullet_ice": {
+   "sheet": "sprites/items.png",
+   "x": 10,
+   "y": 18,
+   "w": 3,
+   "h": 5,
+   "frames": 1,
+   "stride": 4,
+   "fps": 0,
+   "pivot": [
+    1.5,
+    2.5
+   ]
+  },
+  "beam_tile": {
+   "sheet": "sprites/items.png",
+   "x": 14,
+   "y": 18,
+   "w": 6,
+   "h": 8,
+   "frames": 4,
+   "stride": 7,
+   "fps": 16,
+   "pivot": [
+    3.0,
+    4.0
+   ],
+   "tags": {
+    "note": "ghep doc, rong 6"
+   }
+  },
+  "shard_small": {
+   "sheet": "sprites/items.png",
+   "x": 42,
+   "y": 18,
+   "w": 2,
+   "h": 2,
+   "frames": 1,
+   "stride": 3,
+   "fps": 0,
+   "pivot": [
+    1.0,
+    1.0
+   ]
+  },
+  "aegis_lv1_l": {
+   "sheet": "sprites/ship.png",
+   "x": 1,
+   "y": 1,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv2_l": {
+   "sheet": "sprites/ship.png",
+   "x": 76,
+   "y": 1,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv3_l": {
+   "sheet": "sprites/ship.png",
+   "x": 151,
+   "y": 1,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv4_l": {
+   "sheet": "sprites/ship.png",
+   "x": 226,
+   "y": 1,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv5_l": {
+   "sheet": "sprites/ship.png",
+   "x": 301,
+   "y": 1,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv1_c": {
+   "sheet": "sprites/ship.png",
+   "x": 376,
+   "y": 1,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv2_c": {
+   "sheet": "sprites/ship.png",
+   "x": 1,
+   "y": 30,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv3_c": {
+   "sheet": "sprites/ship.png",
+   "x": 76,
+   "y": 30,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv4_c": {
+   "sheet": "sprites/ship.png",
+   "x": 151,
+   "y": 30,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv5_c": {
+   "sheet": "sprites/ship.png",
+   "x": 226,
+   "y": 30,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv1_r": {
+   "sheet": "sprites/ship.png",
+   "x": 301,
+   "y": 30,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv2_r": {
+   "sheet": "sprites/ship.png",
+   "x": 376,
+   "y": 30,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv3_r": {
+   "sheet": "sprites/ship.png",
+   "x": 1,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv4_r": {
+   "sheet": "sprites/ship.png",
+   "x": 76,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_lv5_r": {
+   "sheet": "sprites/ship.png",
+   "x": 151,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 3,
+   "stride": 25,
+   "fps": 9,
+   "pivot": [
+    12.0,
+    14.0
+   ],
+   "tags": {
+    "hitbox": [
+     10,
+     12,
+     4,
+     4
+    ]
+   }
+  },
+  "aegis_dmg3": {
+   "sheet": "sprites/ship.png",
+   "x": 226,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    14.0
+   ]
+  },
+  "aegis_dmg2": {
+   "sheet": "sprites/ship.png",
+   "x": 251,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    14.0
+   ]
+  },
+  "aegis_dmg1": {
+   "sheet": "sprites/ship.png",
+   "x": 276,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    14.0
+   ]
+  },
+  "aegis_hit_flash": {
+   "sheet": "sprites/ship.png",
+   "x": 301,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    14.0
+   ]
+  },
+  "aegis_cloak": {
+   "sheet": "sprites/ship.png",
+   "x": 326,
+   "y": 59,
+   "w": 24,
+   "h": 28,
+   "frames": 2,
+   "stride": 25,
+   "fps": 8,
+   "pivot": [
+    12.0,
+    14.0
+   ]
+  },
+  "aegis_shield": {
+   "sheet": "sprites/ship.png",
+   "x": 376,
+   "y": 59,
+   "w": 36,
+   "h": 36,
+   "frames": 3,
+   "stride": 37,
+   "fps": 8,
+   "pivot": [
+    18.0,
+    18.0
+   ]
+  },
+  "aegis_explode": {
+   "sheet": "sprites/ship.png",
+   "x": 1,
+   "y": 96,
+   "w": 48,
+   "h": 48,
+   "frames": 4,
+   "stride": 49,
+   "fps": 10,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "icon_back": {
+   "sheet": "sprites/ui.png",
+   "x": 1,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_next": {
+   "sheet": "sprites/ui.png",
+   "x": 14,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_up": {
+   "sheet": "sprites/ui.png",
+   "x": 27,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_down": {
+   "sheet": "sprites/ui.png",
+   "x": 40,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_close": {
+   "sheet": "sprites/ui.png",
+   "x": 53,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_plus": {
+   "sheet": "sprites/ui.png",
+   "x": 66,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_minus": {
+   "sheet": "sprites/ui.png",
+   "x": 79,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_check": {
+   "sheet": "sprites/ui.png",
+   "x": 92,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_pause": {
+   "sheet": "sprites/ui.png",
+   "x": 105,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_play": {
+   "sheet": "sprites/ui.png",
+   "x": 118,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_lock": {
+   "sheet": "sprites/ui.png",
+   "x": 131,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_home": {
+   "sheet": "sprites/ui.png",
+   "x": 144,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_shop": {
+   "sheet": "sprites/ui.png",
+   "x": 157,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_trophy": {
+   "sheet": "sprites/ui.png",
+   "x": 170,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_book": {
+   "sheet": "sprites/ui.png",
+   "x": 183,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_user": {
+   "sheet": "sprites/ui.png",
+   "x": 196,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_modes": {
+   "sheet": "sprites/ui.png",
+   "x": 209,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_wrench": {
+   "sheet": "sprites/ui.png",
+   "x": 222,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_sound_on": {
+   "sheet": "sprites/ui.png",
+   "x": 235,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_sound_off": {
+   "sheet": "sprites/ui.png",
+   "x": 248,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_warning": {
+   "sheet": "sprites/ui.png",
+   "x": 261,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_info": {
+   "sheet": "sprites/ui.png",
+   "x": 274,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_vibrate": {
+   "sheet": "sprites/ui.png",
+   "x": 287,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_star_small": {
+   "sheet": "sprites/ui.png",
+   "x": 300,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_skull": {
+   "sheet": "sprites/ui.png",
+   "x": 313,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "icon_gear": {
+   "sheet": "sprites/ui.png",
+   "x": 326,
+   "y": 1,
+   "w": 12,
+   "h": 12,
+   "frames": 1,
+   "stride": 13,
+   "fps": 0,
+   "pivot": [
+    6.0,
+    6.0
+   ]
+  },
+  "hp_full": {
+   "sheet": "sprites/ui.png",
+   "x": 339,
+   "y": 1,
+   "w": 9,
+   "h": 8,
+   "frames": 1,
+   "stride": 10,
+   "fps": 0,
+   "pivot": [
+    4.5,
+    4.0
+   ]
+  },
+  "hp_empty": {
+   "sheet": "sprites/ui.png",
+   "x": 349,
+   "y": 1,
+   "w": 9,
+   "h": 8,
+   "frames": 1,
+   "stride": 10,
+   "fps": 0,
+   "pivot": [
+    4.5,
+    4.0
+   ]
+  },
+  "star_full": {
+   "sheet": "sprites/ui.png",
+   "x": 359,
+   "y": 1,
+   "w": 11,
+   "h": 11,
+   "frames": 1,
+   "stride": 12,
+   "fps": 0,
+   "pivot": [
+    5.5,
+    5.5
+   ]
+  },
+  "star_empty": {
+   "sheet": "sprites/ui.png",
+   "x": 371,
+   "y": 1,
+   "w": 11,
+   "h": 11,
+   "frames": 1,
+   "stride": 12,
+   "fps": 0,
+   "pivot": [
+    5.5,
+    5.5
+   ]
+  },
+  "btn_primary": {
+   "sheet": "sprites/ui.png",
+   "x": 383,
+   "y": 1,
+   "w": 24,
+   "h": 16,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    8.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "btn_primary_pressed": {
+   "sheet": "sprites/ui.png",
+   "x": 408,
+   "y": 1,
+   "w": 24,
+   "h": 16,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    8.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "btn_secondary": {
+   "sheet": "sprites/ui.png",
+   "x": 433,
+   "y": 1,
+   "w": 24,
+   "h": 16,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    8.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "btn_secondary_pressed": {
+   "sheet": "sprites/ui.png",
+   "x": 458,
+   "y": 1,
+   "w": 24,
+   "h": 16,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    8.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "btn_danger": {
+   "sheet": "sprites/ui.png",
+   "x": 483,
+   "y": 1,
+   "w": 24,
+   "h": 16,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    8.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "btn_disabled": {
+   "sheet": "sprites/ui.png",
+   "x": 1,
+   "y": 18,
+   "w": 24,
+   "h": 16,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    8.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "panel": {
+   "sheet": "sprites/ui.png",
+   "x": 26,
+   "y": 18,
+   "w": 24,
+   "h": 24,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    12.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "panel_light": {
+   "sheet": "sprites/ui.png",
+   "x": 51,
+   "y": 18,
+   "w": 24,
+   "h": 24,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    12.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "popup": {
+   "sheet": "sprites/ui.png",
+   "x": 76,
+   "y": 18,
+   "w": 32,
+   "h": 32,
+   "frames": 1,
+   "stride": 33,
+   "fps": 0,
+   "pivot": [
+    16.0,
+    16.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "tab_on": {
+   "sheet": "sprites/ui.png",
+   "x": 109,
+   "y": 18,
+   "w": 24,
+   "h": 14,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    7.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "tab_off": {
+   "sheet": "sprites/ui.png",
+   "x": 134,
+   "y": 18,
+   "w": 24,
+   "h": 14,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    7.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "input_field": {
+   "sheet": "sprites/ui.png",
+   "x": 159,
+   "y": 18,
+   "w": 24,
+   "h": 14,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    7.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "toast": {
+   "sheet": "sprites/ui.png",
+   "x": 184,
+   "y": 18,
+   "w": 24,
+   "h": 14,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    7.0
+   ],
+   "tags": {
+    "nine_slice": [
+     4,
+     4,
+     4,
+     4
+    ]
+   }
+  },
+  "bar_seg_on": {
+   "sheet": "sprites/ui.png",
+   "x": 209,
+   "y": 18,
+   "w": 2,
+   "h": 5,
+   "frames": 1,
+   "stride": 3,
+   "fps": 0,
+   "pivot": [
+    1.0,
+    2.5
+   ]
+  },
+  "bar_seg_off": {
+   "sheet": "sprites/ui.png",
+   "x": 212,
+   "y": 18,
+   "w": 2,
+   "h": 5,
+   "frames": 1,
+   "stride": 3,
+   "fps": 0,
+   "pivot": [
+    1.0,
+    2.5
+   ]
+  },
+  "bar_seg_warn": {
+   "sheet": "sprites/ui.png",
+   "x": 215,
+   "y": 18,
+   "w": 2,
+   "h": 5,
+   "frames": 1,
+   "stride": 3,
+   "fps": 0,
+   "pivot": [
+    1.0,
+    2.5
+   ]
+  },
+  "toggle_off": {
+   "sheet": "sprites/ui.png",
+   "x": 218,
+   "y": 18,
+   "w": 24,
+   "h": 12,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    6.0
+   ]
+  },
+  "toggle_on": {
+   "sheet": "sprites/ui.png",
+   "x": 243,
+   "y": 18,
+   "w": 24,
+   "h": 12,
+   "frames": 1,
+   "stride": 25,
+   "fps": 0,
+   "pivot": [
+    12.0,
+    6.0
+   ]
+  },
+  "slider_knob": {
+   "sheet": "sprites/ui.png",
+   "x": 268,
+   "y": 18,
+   "w": 6,
+   "h": 6,
+   "frames": 1,
+   "stride": 7,
+   "fps": 0,
+   "pivot": [
+    3.0,
+    3.0
+   ]
+  },
+  "checkbox_off": {
+   "sheet": "sprites/ui.png",
+   "x": 275,
+   "y": 18,
+   "w": 10,
+   "h": 10,
+   "frames": 1,
+   "stride": 11,
+   "fps": 0,
+   "pivot": [
+    5.0,
+    5.0
+   ]
+  },
+  "checkbox_on": {
+   "sheet": "sprites/ui.png",
+   "x": 286,
+   "y": 18,
+   "w": 10,
+   "h": 10,
+   "frames": 1,
+   "stride": 11,
+   "fps": 0,
+   "pivot": [
+    5.0,
+    5.0
+   ]
+  },
+  "slot_hex": {
+   "sheet": "sprites/ui.png",
+   "x": 297,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "slot_hex_ready": {
+   "sheet": "sprites/ui.png",
+   "x": 320,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 2,
+   "stride": 23,
+   "fps": 4,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "slot_hex_cooldown": {
+   "sheet": "sprites/ui.png",
+   "x": 366,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_asteria": {
+   "sheet": "sprites/ui.png",
+   "x": 389,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_asteria_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 412,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_verdantia": {
+   "sheet": "sprites/ui.png",
+   "x": 435,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_verdantia_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 458,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_glacius": {
+   "sheet": "sprites/ui.png",
+   "x": 481,
+   "y": 18,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_glacius_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 1,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_pyrrhos": {
+   "sheet": "sprites/ui.png",
+   "x": 24,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_pyrrhos_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 47,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_aquaris": {
+   "sheet": "sprites/ui.png",
+   "x": 70,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_aquaris_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 93,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_machina": {
+   "sheet": "sprites/ui.png",
+   "x": 116,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_machina_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 139,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_umbra": {
+   "sheet": "sprites/ui.png",
+   "x": 162,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_umbra_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 185,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_tempest": {
+   "sheet": "sprites/ui.png",
+   "x": 208,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_tempest_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 231,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_crystalis": {
+   "sheet": "sprites/ui.png",
+   "x": 254,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_crystalis_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 277,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_nexus": {
+   "sheet": "sprites/ui.png",
+   "x": 300,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "planet_nexus_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 323,
+   "y": 51,
+   "w": 22,
+   "h": 22,
+   "frames": 1,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ]
+  },
+  "node_locked": {
+   "sheet": "sprites/ui.png",
+   "x": 346,
+   "y": 51,
+   "w": 14,
+   "h": 14,
+   "frames": 1,
+   "stride": 15,
+   "fps": 0,
+   "pivot": [
+    7.0,
+    7.0
+   ]
+  },
+  "node_open": {
+   "sheet": "sprites/ui.png",
+   "x": 361,
+   "y": 51,
+   "w": 14,
+   "h": 14,
+   "frames": 1,
+   "stride": 15,
+   "fps": 0,
+   "pivot": [
+    7.0,
+    7.0
+   ]
+  },
+  "node_done": {
+   "sheet": "sprites/ui.png",
+   "x": 376,
+   "y": 51,
+   "w": 14,
+   "h": 14,
+   "frames": 1,
+   "stride": 15,
+   "fps": 0,
+   "pivot": [
+    7.0,
+    7.0
+   ]
+  },
+  "node_boss": {
+   "sheet": "sprites/ui.png",
+   "x": 391,
+   "y": 51,
+   "w": 18,
+   "h": 18,
+   "frames": 1,
+   "stride": 19,
+   "fps": 0,
+   "pivot": [
+    9.0,
+    9.0
+   ]
+  },
+  "badge_booster": {
+   "sheet": "sprites/ui.png",
+   "x": 410,
+   "y": 51,
+   "w": 9,
+   "h": 9,
+   "frames": 1,
+   "stride": 10,
+   "fps": 0,
+   "pivot": [
+    4.5,
+    4.5
+   ]
+  },
+  "badge_mutator": {
+   "sheet": "sprites/ui.png",
+   "x": 420,
+   "y": 51,
+   "w": 9,
+   "h": 9,
+   "frames": 1,
+   "stride": 10,
+   "fps": 0,
+   "pivot": [
+    4.5,
+    4.5
+   ]
+  },
+  "notify_dot": {
+   "sheet": "sprites/ui.png",
+   "x": 430,
+   "y": 51,
+   "w": 2,
+   "h": 2,
+   "frames": 1,
+   "stride": 3,
+   "fps": 0,
+   "pivot": [
+    1.0,
+    1.0
+   ]
+  },
+  "cooldown_ring": {
+   "sheet": "sprites/ui.png",
+   "x": 1,
+   "y": 74,
+   "w": 22,
+   "h": 22,
+   "frames": 9,
+   "stride": 23,
+   "fps": 0,
+   "pivot": [
+    11.0,
+    11.0
+   ],
+   "tags": {
+    "note": "9 khung 0..8/8 tien do"
+   }
+  },
+  "boss01_grindjaw_idle": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 1,
+   "w": 93,
+   "h": 103,
+   "frames": 2,
+   "stride": 94,
+   "fps": 4,
+   "pivot": [
+    46.5,
+    51.5
+   ]
+  },
+  "boss01_grindjaw_weak": {
+   "sheet": "sprites/bosses.png",
+   "x": 189,
+   "y": 1,
+   "w": 93,
+   "h": 103,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    51.5
+   ]
+  },
+  "boss01_grindjaw_d1": {
+   "sheet": "sprites/bosses.png",
+   "x": 283,
+   "y": 1,
+   "w": 93,
+   "h": 103,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    51.5
+   ]
+  },
+  "boss01_grindjaw_d2": {
+   "sheet": "sprites/bosses.png",
+   "x": 377,
+   "y": 1,
+   "w": 93,
+   "h": 103,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    51.5
+   ]
+  },
+  "boss01_grindjaw_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 471,
+   "y": 1,
+   "w": 93,
+   "h": 103,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    51.5
+   ]
+  },
+  "boss02_sporemother_idle": {
+   "sheet": "sprites/bosses.png",
+   "x": 565,
+   "y": 1,
+   "w": 107,
+   "h": 120,
+   "frames": 2,
+   "stride": 108,
+   "fps": 4,
+   "pivot": [
+    53.5,
+    60.0
+   ]
+  },
+  "boss02_sporemother_weak": {
+   "sheet": "sprites/bosses.png",
+   "x": 781,
+   "y": 1,
+   "w": 107,
+   "h": 120,
+   "frames": 1,
+   "stride": 108,
+   "fps": 0,
+   "pivot": [
+    53.5,
+    60.0
+   ]
+  },
+  "boss02_sporemother_d1": {
+   "sheet": "sprites/bosses.png",
+   "x": 889,
+   "y": 1,
+   "w": 107,
+   "h": 120,
+   "frames": 1,
+   "stride": 108,
+   "fps": 0,
+   "pivot": [
+    53.5,
+    60.0
+   ]
+  },
+  "boss02_sporemother_d2": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 122,
+   "w": 107,
+   "h": 120,
+   "frames": 1,
+   "stride": 108,
+   "fps": 0,
+   "pivot": [
+    53.5,
+    60.0
+   ]
+  },
+  "boss02_sporemother_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 109,
+   "y": 122,
+   "w": 107,
+   "h": 120,
+   "frames": 1,
+   "stride": 108,
+   "fps": 0,
+   "pivot": [
+    53.5,
+    60.0
+   ]
+  },
+  "boss03_cryowyrm_head": {
+   "sheet": "sprites/bosses.png",
+   "x": 217,
+   "y": 122,
+   "w": 60,
+   "h": 60,
+   "frames": 2,
+   "stride": 61,
+   "fps": 3,
+   "pivot": [
+    30.0,
+    30.0
+   ]
+  },
+  "boss03_cryowyrm_head_roar": {
+   "sheet": "sprites/bosses.png",
+   "x": 339,
+   "y": 122,
+   "w": 60,
+   "h": 60,
+   "frames": 1,
+   "stride": 61,
+   "fps": 0,
+   "pivot": [
+    30.0,
+    30.0
+   ]
+  },
+  "boss03_cryowyrm_head_charge": {
+   "sheet": "sprites/bosses.png",
+   "x": 400,
+   "y": 122,
+   "w": 60,
+   "h": 60,
+   "frames": 1,
+   "stride": 61,
+   "fps": 0,
+   "pivot": [
+    30.0,
+    30.0
+   ]
+  },
+  "boss03_cryowyrm_head_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 461,
+   "y": 122,
+   "w": 60,
+   "h": 60,
+   "frames": 1,
+   "stride": 61,
+   "fps": 0,
+   "pivot": [
+    30.0,
+    30.0
+   ]
+  },
+  "boss03_cryowyrm_segment": {
+   "sheet": "sprites/bosses.png",
+   "x": 522,
+   "y": 122,
+   "w": 33,
+   "h": 33,
+   "frames": 2,
+   "stride": 34,
+   "fps": 3,
+   "pivot": [
+    16.5,
+    16.5
+   ]
+  },
+  "boss03_cryowyrm_segment_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 590,
+   "y": 122,
+   "w": 33,
+   "h": 33,
+   "frames": 1,
+   "stride": 34,
+   "fps": 0,
+   "pivot": [
+    16.5,
+    16.5
+   ]
+  },
+  "boss03_cryowyrm_tail": {
+   "sheet": "sprites/bosses.png",
+   "x": 624,
+   "y": 122,
+   "w": 28,
+   "h": 28,
+   "frames": 1,
+   "stride": 29,
+   "fps": 0,
+   "pivot": [
+    14.0,
+    14.0
+   ]
+  },
+  "boss04_ignarok_idle": {
+   "sheet": "sprites/bosses.png",
+   "x": 653,
+   "y": 122,
+   "w": 117,
+   "h": 137,
+   "frames": 2,
+   "stride": 118,
+   "fps": 4,
+   "pivot": [
+    58.5,
+    68.5
+   ]
+  },
+  "boss04_ignarok_weak": {
+   "sheet": "sprites/bosses.png",
+   "x": 889,
+   "y": 122,
+   "w": 117,
+   "h": 137,
+   "frames": 1,
+   "stride": 118,
+   "fps": 0,
+   "pivot": [
+    58.5,
+    68.5
+   ]
+  },
+  "boss04_ignarok_d1": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 260,
+   "w": 117,
+   "h": 137,
+   "frames": 1,
+   "stride": 118,
+   "fps": 0,
+   "pivot": [
+    58.5,
+    68.5
+   ]
+  },
+  "boss04_ignarok_d2": {
+   "sheet": "sprites/bosses.png",
+   "x": 119,
+   "y": 260,
+   "w": 117,
+   "h": 137,
+   "frames": 1,
+   "stride": 118,
+   "fps": 0,
+   "pivot": [
+    58.5,
+    68.5
+   ]
+  },
+  "boss04_ignarok_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 237,
+   "y": 260,
+   "w": 117,
+   "h": 137,
+   "frames": 1,
+   "stride": 118,
+   "fps": 0,
+   "pivot": [
+    58.5,
+    68.5
+   ]
+  },
+  "boss04_ignarok_fist": {
+   "sheet": "sprites/bosses.png",
+   "x": 355,
+   "y": 260,
+   "w": 36,
+   "h": 40,
+   "frames": 2,
+   "stride": 37,
+   "fps": 3,
+   "pivot": [
+    18.0,
+    20.0
+   ]
+  },
+  "boss05_abyssal_maw_idle": {
+   "sheet": "sprites/bosses.png",
+   "x": 429,
+   "y": 260,
+   "w": 127,
+   "h": 133,
+   "frames": 2,
+   "stride": 128,
+   "fps": 4,
+   "pivot": [
+    63.5,
+    66.5
+   ]
+  },
+  "boss05_abyssal_maw_weak": {
+   "sheet": "sprites/bosses.png",
+   "x": 685,
+   "y": 260,
+   "w": 127,
+   "h": 133,
+   "frames": 1,
+   "stride": 128,
+   "fps": 0,
+   "pivot": [
+    63.5,
+    66.5
+   ]
+  },
+  "boss05_abyssal_maw_d1": {
+   "sheet": "sprites/bosses.png",
+   "x": 813,
+   "y": 260,
+   "w": 127,
+   "h": 133,
+   "frames": 1,
+   "stride": 128,
+   "fps": 0,
+   "pivot": [
+    63.5,
+    66.5
+   ]
+  },
+  "boss05_abyssal_maw_d2": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 398,
+   "w": 127,
+   "h": 133,
+   "frames": 1,
+   "stride": 128,
+   "fps": 0,
+   "pivot": [
+    63.5,
+    66.5
+   ]
+  },
+  "boss05_abyssal_maw_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 129,
+   "y": 398,
+   "w": 127,
+   "h": 133,
+   "frames": 1,
+   "stride": 128,
+   "fps": 0,
+   "pivot": [
+    63.5,
+    66.5
+   ]
+  },
+  "boss05_abyssal_maw_tentacle": {
+   "sheet": "sprites/bosses.png",
+   "x": 257,
+   "y": 398,
+   "w": 24,
+   "h": 100,
+   "frames": 2,
+   "stride": 25,
+   "fps": 4,
+   "pivot": [
+    12.0,
+    50.0
+   ]
+  },
+  "boss06_overseer_idle": {
+   "sheet": "sprites/bosses.png",
+   "x": 307,
+   "y": 398,
+   "w": 133,
+   "h": 127,
+   "frames": 2,
+   "stride": 134,
+   "fps": 4,
+   "pivot": [
+    66.5,
+    63.5
+   ]
+  },
+  "boss06_overseer_weak": {
+   "sheet": "sprites/bosses.png",
+   "x": 575,
+   "y": 398,
+   "w": 133,
+   "h": 127,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    63.5
+   ]
+  },
+  "boss06_overseer_d1": {
+   "sheet": "sprites/bosses.png",
+   "x": 709,
+   "y": 398,
+   "w": 133,
+   "h": 127,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    63.5
+   ]
+  },
+  "boss06_overseer_d2": {
+   "sheet": "sprites/bosses.png",
+   "x": 843,
+   "y": 398,
+   "w": 133,
+   "h": 127,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    63.5
+   ]
+  },
+  "boss06_overseer_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 532,
+   "w": 133,
+   "h": 127,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    63.5
+   ]
+  },
+  "boss06_overseer_turret": {
+   "sheet": "sprites/bosses.png",
+   "x": 135,
+   "y": 532,
+   "w": 28,
+   "h": 28,
+   "frames": 2,
+   "stride": 29,
+   "fps": 4,
+   "pivot": [
+    14.0,
+    14.0
+   ]
+  },
+  "boss06_overseer_turret_dead": {
+   "sheet": "sprites/bosses.png",
+   "x": 193,
+   "y": 532,
+   "w": 28,
+   "h": 28,
+   "frames": 1,
+   "stride": 29,
+   "fps": 0,
+   "pivot": [
+    14.0,
+    14.0
+   ]
+  },
+  "boss07_veilweaver_idle": {
+   "sheet": "sprites/bosses.png",
+   "x": 222,
+   "y": 532,
+   "w": 93,
+   "h": 107,
+   "frames": 2,
+   "stride": 94,
+   "fps": 4,
+   "pivot": [
+    46.5,
+    53.5
+   ]
+  },
+  "boss07_veilweaver_weak": {
+   "sheet": "sprites/bosses.png",
+   "x": 410,
+   "y": 532,
+   "w": 93,
+   "h": 107,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    53.5
+   ]
+  },
+  "boss07_veilweaver_d1": {
+   "sheet": "sprites/bosses.png",
+   "x": 504,
+   "y": 532,
+   "w": 93,
+   "h": 107,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    53.5
+   ]
+  },
+  "boss07_veilweaver_d2": {
+   "sheet": "sprites/bosses.png",
+   "x": 598,
+   "y": 532,
+   "w": 93,
+   "h": 107,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    53.5
+   ]
+  },
+  "boss07_veilweaver_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 692,
+   "y": 532,
+   "w": 93,
+   "h": 107,
+   "frames": 1,
+   "stride": 94,
+   "fps": 0,
+   "pivot": [
+    46.5,
+    53.5
+   ]
+  },
+  "boss07_veilweaver_decoy": {
+   "sheet": "sprites/bosses.png",
+   "x": 786,
+   "y": 532,
+   "w": 93,
+   "h": 107,
+   "frames": 2,
+   "stride": 94,
+   "fps": 4,
+   "pivot": [
+    46.5,
+    53.5
+   ]
+  },
+  "boss08_thunderhead_idle": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 660,
+   "w": 133,
+   "h": 117,
+   "frames": 2,
+   "stride": 134,
+   "fps": 4,
+   "pivot": [
+    66.5,
+    58.5
+   ]
+  },
+  "boss08_thunderhead_weak": {
+   "sheet": "sprites/bosses.png",
+   "x": 269,
+   "y": 660,
+   "w": 133,
+   "h": 117,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    58.5
+   ]
+  },
+  "boss08_thunderhead_d1": {
+   "sheet": "sprites/bosses.png",
+   "x": 403,
+   "y": 660,
+   "w": 133,
+   "h": 117,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    58.5
+   ]
+  },
+  "boss08_thunderhead_d2": {
+   "sheet": "sprites/bosses.png",
+   "x": 537,
+   "y": 660,
+   "w": 133,
+   "h": 117,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    58.5
+   ]
+  },
+  "boss08_thunderhead_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 671,
+   "y": 660,
+   "w": 133,
+   "h": 117,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    58.5
+   ]
+  },
+  "boss08_thunderhead_charge": {
+   "sheet": "sprites/bosses.png",
+   "x": 805,
+   "y": 660,
+   "w": 133,
+   "h": 117,
+   "frames": 1,
+   "stride": 134,
+   "fps": 0,
+   "pivot": [
+    66.5,
+    58.5
+   ]
+  },
+  "boss08_thunderhead_rod": {
+   "sheet": "sprites/bosses.png",
+   "x": 939,
+   "y": 660,
+   "w": 14,
+   "h": 40,
+   "frames": 2,
+   "stride": 15,
+   "fps": 6,
+   "pivot": [
+    7.0,
+    20.0
+   ]
+  },
+  "boss08_thunderhead_rod_dead": {
+   "sheet": "sprites/bosses.png",
+   "x": 969,
+   "y": 660,
+   "w": 14,
+   "h": 40,
+   "frames": 1,
+   "stride": 15,
+   "fps": 0,
+   "pivot": [
+    7.0,
+    20.0
+   ]
+  },
+  "boss09_prism_face_R": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 778,
+   "w": 120,
+   "h": 130,
+   "frames": 2,
+   "stride": 121,
+   "fps": 4,
+   "pivot": [
+    60.0,
+    65.0
+   ]
+  },
+  "boss09_prism_face_Y": {
+   "sheet": "sprites/bosses.png",
+   "x": 243,
+   "y": 778,
+   "w": 120,
+   "h": 130,
+   "frames": 2,
+   "stride": 121,
+   "fps": 4,
+   "pivot": [
+    60.0,
+    65.0
+   ]
+  },
+  "boss09_prism_face_V": {
+   "sheet": "sprites/bosses.png",
+   "x": 485,
+   "y": 778,
+   "w": 120,
+   "h": 130,
+   "frames": 2,
+   "stride": 121,
+   "fps": 4,
+   "pivot": [
+    60.0,
+    65.0
+   ]
+  },
+  "boss09_prism_face_U": {
+   "sheet": "sprites/bosses.png",
+   "x": 727,
+   "y": 778,
+   "w": 120,
+   "h": 130,
+   "frames": 2,
+   "stride": 121,
+   "fps": 4,
+   "pivot": [
+    60.0,
+    65.0
+   ]
+  },
+  "boss09_prism_dark": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 909,
+   "w": 120,
+   "h": 130,
+   "frames": 1,
+   "stride": 121,
+   "fps": 0,
+   "pivot": [
+    60.0,
+    65.0
+   ]
+  },
+  "boss09_prism_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 122,
+   "y": 909,
+   "w": 120,
+   "h": 130,
+   "frames": 1,
+   "stride": 121,
+   "fps": 0,
+   "pivot": [
+    60.0,
+    65.0
+   ]
+  },
+  "boss09_prism_shard": {
+   "sheet": "sprites/bosses.png",
+   "x": 243,
+   "y": 909,
+   "w": 24,
+   "h": 24,
+   "frames": 2,
+   "stride": 25,
+   "fps": 6,
+   "pivot": [
+    12.0,
+    12.0
+   ]
+  },
+  "boss09_prism_lens": {
+   "sheet": "sprites/bosses.png",
+   "x": 293,
+   "y": 909,
+   "w": 30,
+   "h": 30,
+   "frames": 1,
+   "stride": 31,
+   "fps": 0,
+   "pivot": [
+    15.0,
+    15.0
+   ]
+  },
+  "boss10_xarkul_p1": {
+   "sheet": "sprites/bosses.png",
+   "x": 324,
+   "y": 909,
+   "w": 167,
+   "h": 183,
+   "frames": 2,
+   "stride": 168,
+   "fps": 4,
+   "pivot": [
+    83.5,
+    91.5
+   ]
+  },
+  "boss10_xarkul_p2": {
+   "sheet": "sprites/bosses.png",
+   "x": 660,
+   "y": 909,
+   "w": 167,
+   "h": 183,
+   "frames": 2,
+   "stride": 168,
+   "fps": 4,
+   "pivot": [
+    83.5,
+    91.5
+   ]
+  },
+  "boss10_xarkul_p3": {
+   "sheet": "sprites/bosses.png",
+   "x": 1,
+   "y": 1093,
+   "w": 167,
+   "h": 183,
+   "frames": 2,
+   "stride": 168,
+   "fps": 4,
+   "pivot": [
+    83.5,
+    91.5
+   ]
+  },
+  "boss10_xarkul_p4": {
+   "sheet": "sprites/bosses.png",
+   "x": 337,
+   "y": 1093,
+   "w": 167,
+   "h": 183,
+   "frames": 2,
+   "stride": 168,
+   "fps": 4,
+   "pivot": [
+    83.5,
+    91.5
+   ]
+  },
+  "boss10_xarkul_hit": {
+   "sheet": "sprites/bosses.png",
+   "x": 673,
+   "y": 1093,
+   "w": 167,
+   "h": 183,
+   "frames": 1,
+   "stride": 168,
+   "fps": 0,
+   "pivot": [
+    83.5,
+    91.5
+   ]
+  },
+  "portrait_kai_neutral": {
+   "sheet": "sprites/portraits.png",
+   "x": 1,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_kai_determined": {
+   "sheet": "sprites/portraits.png",
+   "x": 50,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_kai_shock": {
+   "sheet": "sprites/portraits.png",
+   "x": 99,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_lumi_neutral": {
+   "sheet": "sprites/portraits.png",
+   "x": 148,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_lumi_happy": {
+   "sheet": "sprites/portraits.png",
+   "x": 197,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_lumi_alert": {
+   "sheet": "sprites/portraits.png",
+   "x": 246,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_elara_neutral": {
+   "sheet": "sprites/portraits.png",
+   "x": 295,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_elara_stern": {
+   "sheet": "sprites/portraits.png",
+   "x": 344,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_elara_relieved": {
+   "sheet": "sprites/portraits.png",
+   "x": 393,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_xarkul_calm": {
+   "sheet": "sprites/portraits.png",
+   "x": 442,
+   "y": 1,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_xarkul_angry": {
+   "sheet": "sprites/portraits.png",
+   "x": 1,
+   "y": 50,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "portrait_xarkul_mock": {
+   "sheet": "sprites/portraits.png",
+   "x": 50,
+   "y": 50,
+   "w": 48,
+   "h": 48,
+   "frames": 1,
+   "stride": 49,
+   "fps": 0,
+   "pivot": [
+    24.0,
+    24.0
+   ]
+  },
+  "logo_stack": {
+   "sheet": "sprites/logo.png",
+   "x": 1,
+   "y": 1,
+   "w": 118,
+   "h": 56,
+   "frames": 1,
+   "stride": 119,
+   "fps": 0,
+   "pivot": [
+    59.0,
+    28.0
+   ]
+  },
+  "logo_wide": {
+   "sheet": "sprites/logo.png",
+   "x": 120,
+   "y": 1,
+   "w": 139,
+   "h": 18,
+   "frames": 1,
+   "stride": 140,
+   "fps": 0,
+   "pivot": [
+    69.5,
+    9.0
+   ]
+  }
+ },
+ "notes": {
+  "sheet_format": "Moi sprite la mot day khung ngang: khung i nam o x + i*stride, y, kich thuoc w*h. Anh PNG co nen trong suot, loc Nearest.",
+  "ship_layers": "Tau co san cac ban tong hop aegis_lv1..lv5 x huong l/c/r (3 khung lua). Lop phu hu hai aegis_dmg3/2/1 ve chong len, sau do aegis_shield neu co.",
+  "nine_slice": "Sprite UI co tag nine_slice [trai,tren,phai,duoi] tinh bang pixel UI.",
+  "pivot": "Pivot mac dinh la tam sprite.",
+  "tilt": "l = nghieng trai, c = giua, r = nghieng phai."
+ },
+ "palette_swaps": {
+  "skins": {
+   "ember": {
+    "W": "A",
+    "S": "O",
+    "B": "L",
+    "C": "O",
+    "D": "R"
+   },
+   "frostbite": {
+    "W": "W",
+    "S": "i",
+    "B": "g",
+    "C": "W",
+    "D": "i"
+   },
+   "verdant": {
+    "W": "V",
+    "S": "Z",
+    "B": "h",
+    "C": "V",
+    "D": "Z"
+   },
+   "royal_violet": {
+    "W": "p",
+    "S": "U",
+    "B": "F",
+    "C": "Y",
+    "D": "A"
+   },
+   "solar_flare": {
+    "W": "Y",
+    "S": "A",
+    "B": "O",
+    "C": "Q",
+    "D": "Y"
+   },
+   "striker": {
+    "W": "p",
+    "S": "R",
+    "B": "M",
+    "C": "O",
+    "D": "R"
+   },
+   "bulwark": {
+    "W": "V",
+    "S": "Z",
+    "B": "h",
+    "C": "i",
+    "D": "D"
+   },
+   "courier": {
+    "W": "Y",
+    "S": "A",
+    "B": "T",
+    "C": "Q",
+    "D": "Y"
+   }
+  },
+  "planet_enemy_tint": {
+   "note": "doi mau enemy theo hanh tinh: ap dung bang bang anh xa mau luc chay game",
+   "asteria": {},
+   "verdantia": {
+    "P": "Z",
+    "p": "V",
+    "M": "f"
+   },
+   "glacius": {
+    "P": "D",
+    "p": "i",
+    "M": "g"
+   },
+   "pyrrhos": {
+    "P": "O",
+    "p": "A",
+    "M": "L"
+   },
+   "aquaris": {
+    "P": "Z",
+    "p": "i",
+    "M": "h"
+   },
+   "machina": {
+    "P": "Y",
+    "p": "A",
+    "M": "j"
+   },
+   "umbra": {
+    "P": "U",
+    "p": "p",
+    "M": "k"
+   },
+   "tempest": {
+    "P": "B",
+    "p": "S",
+    "M": "l"
+   },
+   "crystalis": {
+    "P": "X",
+    "p": "p",
+    "M": "F"
+   },
+   "nexus": {
+    "P": "R",
+    "p": "O",
+    "M": "x"
+   }
+  }
+ },
+ "backgrounds": {
+  "bg_01_asteria_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_01_asteria_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_01_asteria_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_02_verdantia_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_02_verdantia_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_02_verdantia_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_03_glacius_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_03_glacius_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_03_glacius_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_04_pyrrhos_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_04_pyrrhos_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_04_pyrrhos_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_05_aquaris_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_05_aquaris_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_05_aquaris_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_06_machina_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_06_machina_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_06_machina_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_07_umbra_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_07_umbra_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_07_umbra_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_08_tempest_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_08_tempest_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_08_tempest_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_09_crystalis_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_09_crystalis_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_09_crystalis_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  },
+  "bg_10_nexus_far.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "far",
+   "scroll_px_per_s": 2
+  },
+  "bg_10_nexus_mid.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "mid",
+   "scroll_px_per_s": 4
+  },
+  "bg_10_nexus_near.png": {
+   "w": 180,
+   "h": 720,
+   "seamless": "doc",
+   "layer": "near",
+   "scroll_px_per_s": 10
+  }
+ },
+ "palette": {
+  "K": "#0B1020",
+  "W": "#F2F6FA",
+  "S": "#A9C1D9",
+  "B": "#6B7FA0",
+  "C": "#27E3FF",
+  "D": "#1496C9",
+  "O": "#FF8A1F",
+  "A": "#FFB84D",
+  "Y": "#FFD23F",
+  "R": "#FF3B3B",
+  "G": "#8C96A8",
+  "Q": "#FFFFFF",
+  "P": "#FF3D81",
+  "U": "#7A3CFF",
+  "Z": "#2DE2A8",
+  "E": "#2B3A5C",
+  "N": "#1B2440",
+  "M": "#7A1F3D",
+  "X": "#B400FF",
+  "V": "#7CFF6B",
+  "T": "#C9B79C",
+  "f": "#0F3A24",
+  "g": "#16405E",
+  "L": "#4A1409",
+  "h": "#06506B",
+  "j": "#232A45",
+  "k": "#1A0F2E",
+  "l": "#2F3E57",
+  "F": "#3A1A66",
+  "x": "#240033",
+  "p": "#FF7AF0",
+  "i": "#7AF4FF"
+ },
+ "story": {
+  "story_01_asteria.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_02_verdantia.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_03_glacius.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_04_pyrrhos.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_05_aquaris.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_06_machina_prime.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_07_umbra.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_08_tempest.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_09_crystalis.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_10_nexus_core.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_end_1_nap_loi_sao.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_end_2_to_me_sup_do.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  },
+  "story_end_3_cong_sang.png": {
+   "w": 180,
+   "h": 225,
+   "scale": 6
+  }
+ }
+}

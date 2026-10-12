@@ -1,3 +1,4 @@
+import { PlayerAvatar } from '../../visuals/PlayerAvatar';
 import React, { ReactNode } from 'react';
 import { Timer } from 'lucide-react';
 
@@ -78,7 +79,7 @@ export const PlayerCard = ({ player, isTop }: PlayerCardProps) => {
         {/* Avatar */}
         <div className="relative">
           {typeof player.avatar === 'string' && player.avatar.startsWith('http') ? (
-            <img src={player.avatar} alt={player.name} className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-800 border-2 border-slate-700 object-cover shadow-sm" />
+            <PlayerAvatar src={player.avatar} name={player.name}/>
           ) : (
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xl sm:text-2xl shadow-sm">
               {player.avatar}

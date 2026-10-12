@@ -216,7 +216,7 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
                 id={`scoodoku-cell-${r}-${c}`}
                 type="button"
                 onClick={() => onCellClick(r, c)}
-                className={`relative flex items-center justify-center transition-all duration-75 text-center ${bgClass} ${borderRight} ${borderBottom} ${
+                className={`arcade-piece relative flex items-center justify-center transition-all duration-75 text-center ${bgClass} ${borderRight} ${borderBottom} ${
                   cell.isGiven ? 'font-bold cursor-pointer' : 'cursor-pointer hover:brightness-110 active:scale-95'
                 }`}
               >

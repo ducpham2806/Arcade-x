@@ -285,11 +285,11 @@ export const CharacterInventoryModal: React.FC = () => {
         soundEngine.play('click');
         setActiveModal('none');
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-0 sm:p-4 overflow-hidden"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-7xl bg-[#0e1017] border border-white/15 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[94vh] sm:h-[740px] sm:max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"
+        className="arcade-inventory-panel w-full sm:max-w-4xl lg:max-w-5xl bg-[#0e1017] border border-white/15 rounded-none sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-full sm:h-[92vh] sm:max-h-[900px] animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Top Header Bar */}
         <div className="bg-gradient-to-r from-[#141726] via-[#1a1e33] to-[#141726] px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-white/10 flex items-center justify-between shrink-0">
@@ -379,8 +379,8 @@ export const CharacterInventoryModal: React.FC = () => {
               }`}
               title={
                 lastCloudSyncTime
-                  ? `Đã đồng bộ lên Firebase Cloud lúc ${new Date(lastCloudSyncTime).toLocaleTimeString('vi-VN')}. Bấm để đồng bộ ngay.`
-                  : 'Tự động đồng bộ với Firebase Firestore'
+                  ? `Đã đồng bộ lên Supabase Cloud lúc ${new Date(lastCloudSyncTime).toLocaleTimeString('vi-VN')}. Bấm để đồng bộ ngay.`
+                  : 'Tự động đồng bộ với Supabase'
               }
             >
               {cloudSyncStatus === 'syncing' ? (

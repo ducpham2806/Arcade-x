@@ -1,3 +1,4 @@
+import { MonsterArt } from '../../../visuals/MonsterArt';
 import React from 'react';
 import { TitanMonster, FloatingDamage, SlashEffect, DroppedLoot, StoryChapter, HeroAlly, ActiveSkill } from '../types';
 import { Skull, ShieldAlert, Sparkles, Coins, Flame, Package, Lock, Zap, Swords } from 'lucide-react';
@@ -63,8 +64,15 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
   return (
     <div
       onPointerDown={onTapArena}
-      className={`relative w-full h-[340px] sm:h-[380px] select-none touch-none overflow-hidden rounded-3xl flex flex-col justify-between p-3 border border-white/10 shadow-2xl transition-all duration-500 bg-gradient-to-b ${chapter.bgGradient}`}
+      className={`arcade-battle-scene relative w-full h-[340px] sm:h-[380px] select-none touch-none overflow-hidden rounded-3xl flex flex-col justify-between p-3 border border-white/10 shadow-2xl transition-all duration-500 bg-gradient-to-b ${chapter.bgGradient}`}
     >
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 600 380" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <path d="M0 380V0H112V290H160V30H205V290H395V30H440V290H488V0H600V380Z" fill="#080d1b" opacity=".5"/>
+        <path d="M205 290V140Q205 42 300 42Q395 42 395 140V290" fill="none" stroke="#c2a37a" strokeOpacity=".17" strokeWidth="13"/>
+        <path d="M0 315H600M0 355H600M90 290L35 380M230 290L210 380M370 290L390 380M510 290L565 380" stroke="#d5b48a" strokeOpacity=".12" strokeWidth="2"/>
+        <ellipse cx="300" cy="308" rx="120" ry="22" fill="#f7ac53" opacity=".06"/>
+        <path d="M98 95V242M502 95V242" stroke="#ffd69a" strokeOpacity=".22" strokeWidth="3"/>
+      </svg>
       {/* Subtle ambient lighting */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-black/75" />
 
@@ -193,7 +201,7 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
               : 'text-6xl sm:text-7xl drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)]'
           } ${heroSlashing ? 'scale-90 translate-y-1' : 'animate-[bounce_3s_infinite_ease-in-out]'}`}
         >
-          {monster.avatar}
+          <MonsterArt avatar={monster.avatar} boss={monster.isBoss}/>
 
           {/* Titan Boss Crown */}
           {monster.isBoss && (

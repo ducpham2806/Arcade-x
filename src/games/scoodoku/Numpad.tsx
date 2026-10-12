@@ -12,8 +12,6 @@ interface NumpadProps {
   onHint: () => void;
   canUndo: boolean;
   hintsAvailable: number;
-  hintCost: number;
-  playerCoins: number;
   hasSelectedCell: boolean;
   highlightedDigit: number | null;
   onHighlightDigit: (num: number | null) => void;
@@ -30,14 +28,12 @@ export const Numpad: React.FC<NumpadProps> = ({
   onHint,
   canUndo,
   hintsAvailable,
-  hintCost,
-  playerCoins,
   hasSelectedCell,
   highlightedDigit,
   onHighlightDigit,
 }) => {
   const digits = Array.from({ length: dimension }, (_, i) => i + 1);
-  const canAffordHint = playerCoins >= hintCost;
+  const canAffordHint = hintsAvailable > 0;
 
   return (
     <div className="w-full max-w-[500px] flex flex-col gap-2 select-none mx-auto">
@@ -106,18 +102,18 @@ export const Numpad: React.FC<NumpadProps> = ({
           id="scoodoku-btn-hint"
           type="button"
           onClick={onHint}
+          disabled={!canAffordHint}
           className={`relative flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bold text-xs border transition-all shadow-sm ${
             canAffordHint
               ? 'bg-gradient-to-b from-yellow-400 via-amber-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-stone-950 border-yellow-200 shadow-md active:scale-95'
               : 'bg-stone-200/70 dark:bg-stone-800/50 text-stone-500 dark:text-stone-500 border-stone-300 dark:border-stone-800 active:scale-95'
           }`}
-          title={`Gợi ý: Tiết lộ 1 số đúng cho ô đang chọn (Giá: ${hintCost} Arcade Coins, Phím H)`}
+          title="Tiết lộ một số đúng; 3 gợi ý miễn phí mỗi ván (phím H)"
         >
           <div className="flex items-center gap-1 mb-0.5">
             <Lightbulb className="w-4 h-4 text-stone-950" />
             <span className="flex items-center text-[10px] font-black px-1 py-0.2 rounded-md bg-stone-950/15 text-stone-950">
-              <Coins className="w-2.5 h-2.5 mr-0.5 text-amber-900" />
-              {hintCost}
+              Miễn phí
             </span>
           </div>
           <span className="text-[11px] sm:text-xs leading-tight">

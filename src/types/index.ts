@@ -144,7 +144,8 @@ export interface UserAccount {
   id: string;
   username: string;
   email?: string;
-  passwordHash: string;
+  provider?: 'supabase';
+  profileCompleted?: boolean;
   avatar: string;
   currentTitle: string;
   createdAt: number;
@@ -530,6 +531,7 @@ export interface GameBridgeAPI {
 }
 
 export interface GameComponentProps {
+  initialState?: unknown;
   bridge: GameBridgeAPI;
   isPaused: boolean;
   isMuted: boolean;

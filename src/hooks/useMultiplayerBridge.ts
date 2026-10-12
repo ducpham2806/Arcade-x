@@ -1,10 +1,10 @@
 /**
  * Universal Multiplayer Game Bridge Hook (useMultiplayerBridge)
- * Seamlessly connects any board or turn-based PvP game to Firestore real-time rooms
+ * Seamlessly connects any board or turn-based PvP game to Supabase real-time rooms
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { doc, onSnapshot, Firestore } from 'firebase/firestore';
-import { FirebaseService } from '../services/firebase';
+import { doc, onSnapshot, CloudDatabase } from '../services/cloudStore';
+import { SupabaseService } from '../services/supabase';
 import { MatchmakingService } from '../services/matchmakingService';
 import {
   StandardGameRoom,
@@ -59,7 +59,7 @@ export function useMultiplayerBridge(
   const [isLoading, setIsLoading] = useState<boolean>(Boolean(roomId));
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Subscribe to Firestore Game Room
+  // 1. Subscribe to Supabase Game Room
   useEffect(() => {
     if (!roomId) {
       setRoomState(null);
@@ -70,11 +70,12 @@ export function useMultiplayerBridge(
     setIsLoading(true);
     setError(null);
 
-    let db: Firestore;
+    let db: CloudDatabase;
     try {
-      db = FirebaseService.getDb();
+      db = SupabaseService.getDb();
+      if (!db) throw new Error('Supabase chưa được cấu hình.');
     } catch (err) {
-      setError('Firebase Firestore chưa được kết nối.');
+      setError('Supabase chưa được kết nối.');
       setIsLoading(false);
       return;
     }

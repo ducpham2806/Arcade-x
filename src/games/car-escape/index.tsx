@@ -1,493 +1,793 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, RefreshCw, Trophy, Coins, Settings, X, Check } from 'lucide-react';
-import { usePlayer } from '../../context/PlayerContext';
-import { useInventory } from '../../context/InventoryContext';
-import { soundEngine } from '../../services/audio';
-import { hapticService } from '../../services/haptics';
-import confetti from 'canvas-confetti';
-import { LevelMap } from './LevelMap';
-import { generatePuzzle, generateBossPuzzle } from './generator';
-import { Vehicle, LevelConfig } from './types';
-import { GameComponentProps } from '../../types';
-import { TopDownCar } from './TopDownCar';
-
-function getBounds(vehicle: Vehicle, allVehicles: Vehicle[], size: number) {
-  let min = 0;
-  let max = size - vehicle.length;
-  
-  if (vehicle.isTarget) {
-    max = size; // Allow moving off the right edge (winning condition)
-  }
-  
-  allVehicles.forEach(other => {
-    if (other.id === vehicle.id) return;
-    
-    if (vehicle.isHorizontal) {
-      if (other.isHorizontal) {
-        if (other.row === vehicle.row) {
-          if (other.col < vehicle.col) min = Math.max(min, other.col + other.length);
-          if (other.col > vehicle.col) max = Math.min(max, other.col - vehicle.length);
-        }
-      } else {
-        // Vertical other
-        if (other.row <= vehicle.row && other.row + other.length - 1 >= vehicle.row) {
-          if (other.col < vehicle.col) min = Math.max(min, other.col + 1);
-          if (other.col > vehicle.col) max = Math.min(max, other.col - vehicle.length);
-        }
-      }
-    } else {
-      // Vehicle is vertical
-      if (!other.isHorizontal) {
-        if (other.col === vehicle.col) {
-          if (other.row < vehicle.row) min = Math.max(min, other.row + other.length);
-          if (other.row > vehicle.row) max = Math.min(max, other.row - vehicle.length);
-        }
-      } else {
-        // Horizontal other
-        if (other.col <= vehicle.col && other.col + other.length - 1 >= vehicle.col) {
-          if (other.row < vehicle.row) min = Math.max(min, other.row + 1);
-          if (other.row > vehicle.row) max = Math.min(max, other.row - vehicle.length);
-        }
-      }
-    }
-  });
-  return { min, max };
-}
-
-export const CarEscapeGame: React.FC<GameComponentProps> = ({ bridge, isPaused, onGameOver }) => {
-  const { addCoins } = usePlayer();
-  const { items, getEquippedSkinForGame, equipItem, unequipItem } = useInventory();
-  
-  const [maxCompletedLevel, setMaxCompletedLevel] = useState(0);
-  const [currentLevelNum, setCurrentLevelNum] = useState<number | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
-  
-  const [config, setConfig] = useState<LevelConfig | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  
-  const [isWon, setIsWon] = useState(false);
-  const [moves, setMoves] = useState(0);
-  const startTimeRef = useRef<number>(Date.now());
-  
-  const equippedSkin = getEquippedSkinForGame('car-escape');
-  let targetEmoji = '🚑';
-  if (equippedSkin?.id === 'skin-car-escape-firetruck') targetEmoji = '🚒';
-  if (equippedSkin?.id === 'skin-car-escape-police') targetEmoji = '🚓';
-  if (equippedSkin?.id === 'skin-car-escape-sports') targetEmoji = '🏎️';
-
-  const boardRef = useRef<HTMLDivElement>(null);
-  
-  const [draggingId, setDraggingId] = useState<number | null>(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [dragStartPos, setDragStartPos] = useState({ col: 0, row: 0 });
-  
-  useEffect(() => {
-    const saved = localStorage.getItem('car-escape-progress-v2');
-    if (saved) {
-      try {
-        setMaxCompletedLevel(parseInt(saved, 10) || 0);
-      } catch (e) {}
-    }
-  }, []);
-
-  const loadLevel = useCallback((levelNum: number) => {
-    soundEngine.play('click');
-    hapticService.tap();
-    setCurrentLevelNum(levelNum);
-    setIsWon(false);
-    setMoves(0);
-    startTimeRef.current = Date.now();
-    
-    const newConfig = levelNum === 999 ? generateBossPuzzle() : generatePuzzle(levelNum);
-    setConfig(newConfig);
-    setVehicles(newConfig.vehicles);
-  }, []);
-
-  const handleLevelComplete = useCallback(() => {
-    soundEngine.play('win');
-    hapticService.success();
-    setIsWon(true);
-    
-    confetti({
-      particleCount: 150,
-      spread: 100,
-      origin: { y: 0.6 },
-    });
-
-    if (currentLevelNum) {
-      const timeTaken = (Date.now() - startTimeRef.current) / 1000;
-      let reward = 10;
-      if (timeTaken < 30) reward += 5;
-      if (currentLevelNum === 999) reward = 200; // Boss reward
-      
-      addCoins(reward);
-      
-      if (currentLevelNum !== 999) {
-        const nextMax = Math.max(maxCompletedLevel, currentLevelNum);
-        setMaxCompletedLevel(nextMax);
-        localStorage.setItem('car-escape-progress-v2', nextMax.toString());
-      }
-    }
-  }, [currentLevelNum, maxCompletedLevel, addCoins]);
-
-  // Touch & Mouse handling
-  const activeVehicle = useMemo(() => vehicles.find(v => v.id === draggingId), [vehicles, draggingId]);
-  
-  const handlePointerDown = (e: React.PointerEvent, v: Vehicle) => {
-    if (isWon) return;
-    e.preventDefault();
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    
-    setDraggingId(v.id);
-    setDragStartPos({ col: v.col, row: v.row });
-    
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-    
-    soundEngine.play('click');
-    hapticService.tap();
-  };
-
-  const lastBumpTimeRef = useRef<number>(0);
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (isWon || draggingId === null || !activeVehicle || !config || !boardRef.current) return;
-    
-    const boardRect = boardRef.current.getBoundingClientRect();
-    const cellSize = boardRect.width / config.size;
-    
-    const { min, max } = getBounds(activeVehicle, vehicles, config.size);
-    
-    let newCol = activeVehicle.col;
-    let newRow = activeVehicle.row;
-    let bumped = false;
-
-    if (activeVehicle.isHorizontal) {
-      const relativeX = e.clientX - boardRect.left - dragOffset.x;
-      let targetCol = Math.round(relativeX / cellSize);
-      if (targetCol < min || targetCol > max) bumped = true;
-      targetCol = Math.max(min, Math.min(max, targetCol));
-      newCol = targetCol;
-    } else {
-      const relativeY = e.clientY - boardRect.top - dragOffset.y;
-      let targetRow = Math.round(relativeY / cellSize);
-      if (targetRow < min || targetRow > max) bumped = true;
-      targetRow = Math.max(min, Math.min(max, targetRow));
-      newRow = targetRow;
-    }
-
-    if (bumped) {
-      const now = Date.now();
-      if (now - lastBumpTimeRef.current > 300) {
-        lastBumpTimeRef.current = now;
-        soundEngine.play('metalHit');
-        hapticService.error(); // Stronger vibration
-        boardRef.current.animate([
-          { transform: 'translate3d(-4px, 0, 0)' },
-          { transform: 'translate3d(4px, 0, 0)' },
-          { transform: 'translate3d(-3px, 0, 0)' },
-          { transform: 'translate3d(2px, 0, 0)' },
-          { transform: 'translate3d(0, 0, 0)' }
-        ], { duration: 250, easing: 'ease-in-out' });
-      }
-    }
-
-    if (newCol !== activeVehicle.col || newRow !== activeVehicle.row) {
-      setVehicles(prev => {
-        const nextVehicles = prev.map(v => v.id === draggingId ? { ...v, col: newCol, row: newRow } : v);
-        const currentTarget = nextVehicles.find(v => v.isTarget);
-        if (currentTarget && currentTarget.col >= config.size - currentTarget.length) {
-          setTimeout(() => handleLevelComplete(), 50);
-        }
-        return nextVehicles;
-      });
-      // Subtle haptic when snapping to a new grid cell
-      hapticService.tap();
-    }
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (draggingId === null || !config) return;
-    try {
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
-    
-    // Find current vehicle
-    const currentVeh = vehicles.find(v => v.id === draggingId);
-    if (currentVeh) {
-      if (currentVeh.col !== dragStartPos.col || currentVeh.row !== dragStartPos.row) {
-        setMoves(m => m + 1);
-        soundEngine.play('tap');
-      }
-      
-      // Check win
-      if (currentVeh.isTarget && currentVeh.col >= config.size - currentVeh.length) {
-        handleLevelComplete();
-      }
-    }
-    
-    setDraggingId(null);
-  };
-  
-  return (
-    <div className="relative w-full h-full max-w-4xl mx-auto flex flex-col justify-between p-1 sm:p-2 select-none bg-[#080c18] overflow-hidden text-white">
-      {currentLevelNum === null ? (
-        <LevelMap maxCompletedLevel={maxCompletedLevel} onSelectLevel={loadLevel} />
-      ) : (
-        <div className="flex-1 flex flex-col items-center p-4">
-          
-          {/* Header */}
-          <div className="w-full max-w-md flex items-center justify-between mb-8 mt-2">
-            <button 
-              onClick={() => setCurrentLevelNum(null)}
-              className="w-12 h-12 bg-slate-800/80 rounded-2xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div className="text-center">
-              <h2 className="text-2xl font-black font-display tracking-wide uppercase shadow-sm">
-                LEVEL {currentLevelNum}
-              </h2>
-              <div className="text-sm text-slate-400">
-                Thành phố {config?.city || 1}
-              </div>
-            </div>
-            {/* Empty space for balance */}
-            <div className="w-12 h-12" />
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Undo2,
+  Lightbulb,
+  RotateCcw,
+  Trophy,
+  Star,
+  X,
+  Play,
+  Infinity as InfinityIcon,
+} from "lucide-react";
+import { createPortal } from "react-dom";
+import type { GameComponentProps } from "../../types";
+import { useAuth } from "../../context/AuthContext";
+import { soundEngine } from "../../services/audio";
+import { useDialogFocus } from "../../launcher/useDialogFocus";
+import { TopDownBoard } from "./TopDownBoard";
+import { LevelMap } from "./LevelMap";
+import { RankingPanel } from "./RankingPanel";
+import { getLevel, endlessLevel } from "./generator";
+import { hydrateCarSave } from "./save";
+import {
+  applyMove,
+  won,
+  starsFor,
+  scoreFor,
+  MODE_LABELS,
+  type Move,
+} from "./engine";
+import { startRanked, submitRanked } from "./ranking";
+import type { CarSave, Run, LevelResult } from "./types";
+import { computeHint } from "./hints";
+import "./car-escape.css";
+function ResultDialog({
+  run,
+  endless,
+  result,
+  rankStatus,
+  onNext,
+  onRetry,
+  onMap,
+  onFinish,
+  onPractice,
+}: {
+  run: Run;
+  endless: CarSave["endless"];
+  result: LevelResult | null;
+  rankStatus: string;
+  onNext: () => void;
+  onRetry: () => void;
+  onMap: () => void;
+  onFinish: () => void;
+  onPractice: () => void;
+}) {
+  const ref = useDialogFocus(onMap);
+  return createPortal(
+    <div className="car-modal-overlay">
+      <section
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="car-result-title"
+        tabIndex={-1}
+        className="car-dialog"
+      >
+        <header>
+          <div>
+            <small>{endless ? "ĐƯỜNG DÀI" : `MÀN ${run.level}`}</small>
+            <h2 id="car-result-title">
+              {run.status === "won"
+                ? "Đường đã mở!"
+                : endless
+                  ? "Hết giờ đường dài"
+                  : run.mode === "turns"
+                    ? "Hết lượt di chuyển"
+                    : "Hết thời gian"}
+            </h2>
           </div>
-          
-          {/* Board Area */}
-          <div className="w-full max-w-md aspect-square relative mb-8">
-            {config && (
-              <div 
-                ref={boardRef}
-                className="w-full h-full bg-[#374151] rounded-2xl border-4 border-[#1f2937] relative shadow-2xl touch-none"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${config.size}, minmax(0, 1fr))`,
-                  gridTemplateRows: `repeat(${config.size}, minmax(0, 1fr))`,
-                }}
+          <button aria-label="Về bản đồ màn chơi" onClick={onMap}>
+            <X />
+          </button>
+        </header>
+        <div className="car-dialog-body">
+          <div className="car-result">
+            <div className="car-result-emblem">
+              {run.status === "won" ? "🚑" : "🚦"}
+            </div>
+            <h3>
+              {run.status === "won"
+                ? "Giải cứu thành công"
+                : "Thử lại một chiến thuật mới"}
+            </h3>
+            {result && (
+              <div
+                className="car-result-stars"
+                aria-label={`${result.stars} sao`}
               >
-                {/* Background Grid Cells */}
-                {Array.from({ length: config.size * config.size }).map((_, i) => (
-                  <div key={i} className="border border-[#4b5563]/30"></div>
+                {[1, 2, 3].map((n) => (
+                  <Star
+                    key={n}
+                    size={42}
+                    fill={result.stars >= n ? "currentColor" : "none"}
+                  />
                 ))}
-                
-                {/* Exit Marker */}
-                <div 
-                  className="absolute right-[-24px] h-[calc(100%_/_var(--size)_-_8px)] bg-red-500/10 border-2 border-dashed border-red-500/50 rounded-r-xl z-0 flex items-center justify-center animate-pulse"
-                  style={{
-                    '--size': config.size,
-                    top: `calc(${config.targetRow * 100 / config.size}% + 6px)`,
-                    width: '32px'
-                  } as React.CSSProperties}
-                >
-                  <span className="text-red-500 font-bold text-xs uppercase -rotate-90">Exit</span>
-                </div>
-                
-                {/* Vehicles */}
-                {vehicles.map(v => {
-                  const isDragging = v.id === draggingId;
-                  return (
-                    <motion.div
-                      key={v.id}
-                      onPointerDown={(e: any) => handlePointerDown(e, v)}
-                      onPointerMove={(e: any) => handlePointerMove(e)}
-                      onPointerUp={(e: any) => handlePointerUp(e)}
-                      onPointerCancel={(e: any) => handlePointerUp(e)}
-                      animate={{
-                        left: `${v.col * 100 / config.size}%`,
-                        top: `${v.row * 100 / config.size}%`,
-                        scale: isDragging ? 1.05 : 1,
-                        zIndex: isDragging ? 10 : 1
-                      }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 30,
-                        mass: 0.8
-                      }}
-                      className={`absolute top-0 left-0 p-1 touch-none select-none`}
-                      style={{
-                        width: `${(v.isHorizontal ? v.length : 1) * 100 / config.size}%`,
-                        height: `${(v.isHorizontal ? 1 : v.length) * 100 / config.size}%`,
-                      }}
-                    >
-                      <TopDownCar 
-                        color={v.color} 
-                        length={v.length} 
-                        isHorizontal={v.isHorizontal} 
-                        isTarget={v.isTarget}
-                        skinId={equippedSkin?.id}
-                      />
-                    </motion.div>
-                  );
-                })}
               </div>
             )}
+            <div className="car-result-stats">
+              <span>
+                <b>{run.moves}</b>Lượt
+              </span>
+              <span>
+                <b>{Math.ceil(run.elapsedMs / 1000)}s</b>Thời gian
+              </span>
+              <span>
+                <b>{endless?.score ?? result?.score ?? 0}</b>Điểm
+              </span>
+            </div>
+            {run.practice && (
+              <p>Luyện tập không tính sao và không gửi bảng xếp hạng.</p>
+            )}
+            <p>
+              Lời giải tối ưu: {run.optimalMoves} lượt.{" "}
+              {run.hints > 0
+                ? "Đã dùng hint: tối đa 1 sao."
+                : "3 sao khi ít lượt và còn ít nhất 30% thời gian trong màn đếm ngược."}
+            </p>
+            {run.status === "lost" && (
+              <p>
+                Không trừ sao đã đạt trước đó. Có thể chơi lại hoặc luyện không
+                giới hạn.
+              </p>
+            )}
+            <p className="car-muted">{rankStatus}</p>
+            {endless && run.status === "won" && (
+              <p>
+                +30 giây · Còn {Math.ceil(endless.remainingMs / 1000)} giây cho
+                chặng tiếp theo
+              </p>
+            )}
           </div>
-          
-          <div className="flex gap-6 items-center">
-            <div className="px-6 py-3 bg-slate-800/80 rounded-2xl flex flex-col items-center">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nước Đi</span>
-              <span className="text-2xl font-black text-white">{moves}</span>
+        </div>
+        <footer>
+          {run.status === "won" && (endless || run.level < 100) ? (
+            <button className="car-primary" onClick={onNext}>
+              <Play size={18} />
+              {endless ? "Chặng tiếp theo" : "Màn tiếp theo"}
+            </button>
+          ) : (
+            <button className="car-primary" onClick={onRetry}>
+              <RotateCcw size={18} />
+              Chơi lại
+            </button>
+          )}
+          {run.status === "lost" && !endless && (
+            <button onClick={onPractice}>Luyện không giới hạn</button>
+          )}
+          <button onClick={onMap}>Bản đồ màn chơi</button>
+          <button onClick={onFinish}>Kết thúc phiên</button>
+        </footer>
+      </section>
+    </div>,
+    document.body,
+  );
+}
+export const CarEscapeGame: React.FC<GameComponentProps> = ({
+  bridge,
+  isPaused,
+  onGameOver,
+  initialState,
+}) => {
+  const { currentUser } = useAuth();
+  const [save, setSave] = useState<CarSave>(() => {
+    const restored = hydrateCarSave(
+      initialState === undefined || initialState === null
+        ? bridge.loadGameState()
+        : initialState,
+    );
+    if (initialState === null) {
+      restored.run = null;
+      restored.endless = null;
+    }
+    try {
+      restored.legacyUnlocked = Math.max(
+        restored.legacyUnlocked,
+        Math.min(
+          100,
+          Number(localStorage.getItem("car-escape-progress-v2")) || 0,
+        ),
+      );
+    } catch {}
+    return restored;
+  });
+  const [sessionFinished, setSessionFinished] = useState(false);
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  const [hint, setHint] = useState<Move | null>(null),
+    [hintText, setHintText] = useState(""),
+    [ranking, setRanking] = useState<number | null>(null),
+    [rankStatus, setRankStatus] = useState(""),
+    [confirm, setConfirm] = useState<"restart" | "map" | "practice" | null>(
+      null,
+    ),
+    [thinking, setThinking] = useState(false);
+  const locked = isPaused || ranking !== null || confirm !== null || thinking;
+  const lockedRef = useRef(locked);
+  lockedRef.current = locked;
+  const ownerRef = useRef(currentUser?.id);
+  ownerRef.current = currentUser?.id;
+  const generation = useRef(0),
+    hintSequence = useRef(0),
+    alive = useRef(true);
+  const submitted = new Set<string>();
+  const submittedRef = useRef(submitted);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      generation.current++;
+      hintSequence.current++;
+    };
+  }, []);
+  useEffect(() => {
+    if (isPaused) {
+      hintSequence.current++;
+      setThinking(false);
+    }
+  }, [isPaused]);
+  const commit = useCallback((next: CarSave) => {
+    saveRef.current = next;
+    setSave(next);
+  }, []);
+  useEffect(() => {
+    bridge.saveGameState(save);
+    bridge.updateSessionState?.({
+      score: save.endless?.score || 0,
+      moves: save.run?.moves || 0,
+      timeElapsed: Math.floor((save.run?.elapsedMs || 0) / 1000),
+    });
+  }, [
+    save.run?.level,
+    save.run?.moves,
+    save.run?.hints,
+    save.run?.status,
+    save.run?.ticket,
+    save.run?.mode,
+    save.run?.practice,
+    Math.floor((save.run?.elapsedMs || 0) / 1000),
+    save.results,
+    save.endless?.stage,
+    save.endless?.score,
+    save.legacyUnlocked,
+    bridge,
+  ]);
+  const sendRanking = useCallback(
+    (run: Run, owner: string, sequence: number) => {
+      if (
+        !run.ticket ||
+        run.legacy ||
+        run.practice ||
+        submittedRef.current.has(run.ticket)
+      )
+        return;
+      submittedRef.current.add(run.ticket);
+      setRankStatus("Đang gửi lời giải để xác thực…");
+      void submitRanked(run, owner)
+        .then(() => {
+          if (
+            alive.current &&
+            sequence === generation.current &&
+            ownerRef.current === owner
+          )
+            setRankStatus(
+              "Lời giải đã được xác thực và gửi lên bảng xếp hạng.",
+            );
+        })
+        .catch(() => {
+          if (
+            alive.current &&
+            sequence === generation.current &&
+            ownerRef.current === owner
+          ) {
+            submittedRef.current.delete(run.ticket!);
+            setRankStatus(
+              "Chưa gửi được bảng xếp hạng. Sao và kết quả vẫn lưu trên thiết bị.",
+            );
+          }
+        });
+    },
+    [],
+  );
+  const start = useCallback(
+    (level: number, endless: CarSave["endless"] = null, practice = false) => {
+      const l = getLevel(level);
+      const run: Run = {
+        level,
+        config: {
+          size: l.size,
+          targetRow: l.targetRow,
+          city: l.city,
+          vehicles: l.vehicles.map((v) => ({ ...v })),
+        },
+        vehicles: l.vehicles.map((v) => ({ ...v })),
+        moves: 0,
+        history: [],
+        elapsedMs: 0,
+        hints: 0,
+        status: "playing",
+        mode: endless ? "endless" : practice ? "classic" : l.mode,
+        optimalMoves: l.optimalMoves,
+        moveLimit: practice || endless ? null : l.moveLimit,
+        timeLimitMs: practice || endless ? null : l.timeLimitMs,
+        assisted: practice,
+        practice,
+        path: [],
+        ticket: null,
+      };
+      const sequence = ++generation.current;
+      hintSequence.current++;
+      setHint(null);
+      setHintText("");
+      setRankStatus("Kết quả được lưu trên thiết bị.");
+      commit({ ...saveRef.current, run, endless });
+      const owner = ownerRef.current;
+      if (owner && !endless && !practice)
+        void startRanked(level, owner)
+          .then((ticket) => {
+            if (
+              alive.current &&
+              generation.current === sequence &&
+              ownerRef.current === owner &&
+              saveRef.current.run
+            ) {
+              const bound = { ...saveRef.current.run, ticket };
+              commit({ ...saveRef.current, run: bound });
+              if (bound.status === "won") sendRanking(bound, owner, sequence);
+            }
+          })
+          .catch(() => {
+            if (alive.current && generation.current === sequence)
+              setRankStatus(
+                "Ván này lưu trên thiết bị; chưa kết nối được bảng xếp hạng.",
+              );
+          });
+    },
+    [commit, sendRanking],
+  );
+  const resultFor = (run: Run): LevelResult => ({
+    stars: run.practice
+      ? 0
+      : starsFor(
+          run.optimalMoves,
+          run.moves,
+          run.hints,
+          run.elapsedMs,
+          run.timeLimitMs,
+        ),
+    moves: run.moves,
+    elapsedMs: run.elapsedMs,
+    hints: run.hints,
+    score: scoreFor(run.optimalMoves, run.moves, run.elapsedMs, run.hints),
+  });
+  const complete = (next: CarSave) => {
+    const run = next.run!,
+      result = resultFor(run);
+    run.status = "won";
+    if (next.endless)
+      next.endless = {
+        ...next.endless,
+        score: next.endless.score + result.score,
+        remainingMs: Math.min(180000, next.endless.remainingMs + 30000),
+      };
+    else if (!run.legacy && !run.assisted) {
+      const old = next.results[String(run.level)];
+      if (
+        !old ||
+        result.stars > old.stars ||
+        (result.stars === old.stars && result.score > old.score)
+      )
+        next.results = { ...next.results, [run.level]: result };
+    } else if (!run.legacy && run.hints > 0) {
+      const old = next.results[String(run.level)];
+      if (!old) next.results = { ...next.results, [run.level]: result };
+    }
+    soundEngine.play("win");
+    const owner = ownerRef.current;
+    if (owner && run.ticket && !next.endless && !run.legacy)
+      sendRanking(run, owner, generation.current);
+    return next;
+  };
+  const perform = (move: Move) => {
+    const previous = saveRef.current,
+      run = previous.run;
+    if (!run || run.status !== "playing" || lockedRef.current) return;
+    const vehicles = applyMove(run.vehicles, run.config.size, move);
+    if (!vehicles) return;
+    hintSequence.current++;
+    setHint(null);
+    setHintText("");
+    let next: CarSave = {
+      ...previous,
+      run: {
+        ...run,
+        vehicles,
+        moves: run.moves + 1,
+        history: [...run.history, run.vehicles].slice(-100),
+        path: [...run.path, move],
+      },
+    };
+    if (won(vehicles, run.config.size)) next = complete(next);
+    else if (run.moveLimit !== null && next.run!.moves >= run.moveLimit)
+      next.run!.status = "lost";
+    commit(next);
+    soundEngine.play("tap");
+  };
+  const undo = () => {
+    const run = saveRef.current.run;
+    if (
+      !run ||
+      lockedRef.current ||
+      run.status !== "playing" ||
+      !run.history.length
+    )
+      return;
+    const before = run.history.at(-1)!,
+      changed = run.vehicles.find((v) => {
+        const old = before.find((o) => o.id === v.id)!;
+        return v.row !== old.row || v.col !== old.col;
+      });
+    if (!changed) return;
+    const target = before.find((v) => v.id === changed.id)!;
+    const move = {
+      vehicleId: changed.id,
+      to: target.isHorizontal ? target.col : target.row,
+    };
+    const nextRun = {
+      ...run,
+      vehicles: before,
+      history: run.history.slice(0, -1),
+      moves: run.moves + 1,
+      path: [...run.path, move],
+    };
+    if (run.moveLimit !== null && nextRun.moves >= run.moveLimit)
+      nextRun.status = "lost";
+    hintSequence.current++;
+    setHint(null);
+    setHintText("");
+    commit({ ...saveRef.current, run: nextRun });
+  };
+  const requestHint = async () => {
+    const run = saveRef.current.run;
+    if (!run || lockedRef.current || run.status !== "playing") return;
+    const sequence = ++hintSequence.current;
+    setThinking(true);
+    setHintText("Đang tìm đường…");
+    await new Promise((r) => setTimeout(r, 30));
+    try {
+      const solution = await computeHint(run.config, run.vehicles);
+      if (
+        !alive.current ||
+        sequence !== hintSequence.current ||
+        saveRef.current.run !== run
+      )
+        return;
+      if (solution.status !== "solved" || !solution.moves.length) {
+        setHintText(
+          solution.status === "limit"
+            ? "Chưa tìm được trong giới hạn. Hãy hoàn tác hoặc thử lại."
+            : "Bàn này chưa có lời giải; hãy chơi lại.",
+        );
+        return;
+      }
+      const move = solution.moves[0],
+        v = run.vehicles.find((v) => v.id === move.vehicleId)!,
+        from = v.isHorizontal ? v.col : v.row,
+        delta = move.to - from;
+      setHint(move);
+      setHintText(
+        `${v.isTarget ? "Xe cứu hộ" : `Xe ${v.id}`}: trượt ${Math.abs(delta)} ô ${v.isHorizontal ? (delta > 0 ? "về phải" : "về trái") : delta > 0 ? "xuống" : "lên"}. Còn ${solution.moves.length} lượt tối ưu.`,
+      );
+      commit({
+        ...saveRef.current,
+        run: { ...run, hints: run.hints + 1, assisted: true },
+      });
+    } catch {
+      if (alive.current && sequence === hintSequence.current)
+        setHintText("Chưa tải được gợi ý. Bạn có thể thử lại.");
+    } finally {
+      if (alive.current && sequence === hintSequence.current)
+        setThinking(false);
+    }
+  };
+  useEffect(() => {
+    let last = performance.now();
+    const tick = () => {
+      const now = performance.now(),
+        delta = Math.min(1500, Math.max(0, now - last));
+      last = now;
+      const prev = saveRef.current,
+        r = prev.run;
+      if (!r || r.status !== "playing" || lockedRef.current || document.hidden)
+        return;
+      const run = { ...r, elapsedMs: r.elapsedMs + delta },
+        endless = prev.endless
+          ? {
+              ...prev.endless,
+              remainingMs: Math.max(0, prev.endless.remainingMs - delta),
+            }
+          : null;
+      if (
+        endless?.remainingMs === 0 ||
+        (run.timeLimitMs !== null && run.elapsedMs >= run.timeLimitMs)
+      )
+        run.status = "lost";
+      commit({ ...prev, run, endless });
+    };
+    const timer = setInterval(tick, 250);
+    return () => clearInterval(timer);
+  }, [commit]);
+  const toMap = () => {
+    generation.current++;
+    hintSequence.current++;
+    setThinking(false);
+    setHint(null);
+    setHintText("");
+    setConfirm(null);
+    commit({ ...saveRef.current, run: null, endless: null });
+  };
+  const run = save.run,
+    level = run ? getLevel(run.level) : null,
+    result = run?.status === "won" ? resultFor(run) : null;
+  const nextLevel = () => {
+    if (!run) return;
+    if (save.endless) {
+      const next = { ...save.endless, stage: save.endless.stage + 1 };
+      start(endlessLevel(next.seed, next.stage), next);
+    } else start(Math.min(100, run.level + 1));
+  };
+  const finish = () => {
+    if (!run) return;
+    setSessionFinished(true);
+    onGameOver(save.endless?.score ?? result?.score ?? 0, {
+      level: run.level,
+      moves: run.moves,
+      assisted: run.assisted ? 1 : 0,
+      mode: ["classic", "turns", "timed", "endless"].indexOf(run.mode),
+    });
+  };
+  return (
+    <div className="car-game arcade-game-surface">
+      {!run ? (
+        <LevelMap
+          results={save.results}
+          legacyUnlocked={save.legacyUnlocked}
+          onSelectLevel={(n) => start(n)}
+          onEndless={() => {
+            const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+            start(endlessLevel(seed, 1), {
+              seed,
+              stage: 1,
+              score: 0,
+              remainingMs: 120000,
+            });
+          }}
+          onRanking={setRanking}
+        />
+      ) : (
+        <div className="car-run">
+          <header className="car-run-header">
+            <button
+              aria-label="Về bản đồ màn chơi"
+              disabled={locked}
+              onClick={() => setConfirm("map")}
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              <h2>LEVEL {run.level}</h2>
+              <small>
+                {save.endless
+                  ? `Đường dài · Chặng ${save.endless.stage}`
+                  : run.legacy
+                    ? "Ván cũ · không xếp hạng"
+                    : run.practice
+                      ? "Luyện tập · không tính sao"
+                      : MODE_LABELS[run.mode]}{" "}
+                · {run.config.size}×{run.config.size}
+              </small>
+            </div>
+            <button
+              aria-label="Bảng xếp hạng màn này"
+              disabled={locked}
+              onClick={() => setRanking(run.level)}
+            >
+              <Trophy size={20} />
+            </button>
+          </header>
+          <div className="car-hud">
+            <div>
+              <strong>
+                {run.moves}
+                {run.moveLimit !== null ? `/${run.moveLimit}` : ""}
+              </strong>
+              <span>LƯỢT ĐÃ DÙNG</span>
+            </div>
+            <div
+              className={
+                (save.endless?.remainingMs ??
+                  (run.timeLimitMs !== null
+                    ? run.timeLimitMs - run.elapsedMs
+                    : Infinity)) < 15000
+                  ? "car-clock-low"
+                  : ""
+              }
+            >
+              <strong id="car-clock">
+                {Math.max(
+                  0,
+                  Math.ceil(
+                    (save.endless?.remainingMs ??
+                      (run.timeLimitMs !== null
+                        ? run.timeLimitMs - run.elapsedMs
+                        : run.elapsedMs)) / 1000,
+                  ),
+                )}
+                s
+              </strong>
+              <span>
+                {save.endless || run.timeLimitMs !== null
+                  ? "CÒN LẠI"
+                  : "THỜI GIAN"}
+              </span>
+            </div>
+            <div>
+              <strong>{run.optimalMoves}</strong>
+              <span>LƯỢT TỐI ƯU</span>
             </div>
           </div>
-          
-          {/* Win Popup Overlay */}
-          <AnimatePresence>
-            {isWon && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"
-              >
-                <motion.div
-                  initial={{ scale: 0.8, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.8, y: -20 }}
-                  className="bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700 p-8 rounded-3xl w-full max-w-sm text-center shadow-2xl relative overflow-hidden"
-                >
-                  <div className="absolute top-0 left-0 w-full h-32 bg-emerald-500/10 blur-3xl rounded-full" />
-                  
-                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                    <Trophy className="w-10 h-10 text-white" />
-                  </div>
-                  
-                  <h3 className="text-3xl font-black text-white font-display mb-2">{currentLevelNum === 999 ? "BOSS BỊ HẠ!" : "Thoát Hiểm!"}</h3>
-                  <p className="text-slate-400 mb-8">Bạn đã dọn đường thành công trong {moves} nước đi.</p>
-                  
-                  <div className="flex gap-4 mb-8 justify-center">
-                    <div className="flex items-center gap-2 bg-slate-950/50 px-4 py-2 rounded-xl">
-                      <Coins className="w-5 h-5 text-amber-400" />
-                      <span className="text-white font-bold">+{currentLevelNum === 999 ? 200 : 10} Xu</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-3">
-                    {currentLevelNum !== 999 && (
-                      <button
-                        onClick={() => {
-                          soundEngine.play('click');
-                          hapticService.tap();
-                          loadLevel(currentLevelNum! + 1);
-                        }}
-                        className="w-full py-3.5 rounded-xl font-bold text-base bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-105 transition-transform"
-                      >
-                        Màn Tiếp Theo
-                      </button>
-                    )}
-                    {onGameOver && (
-                      <button
-                        onClick={() => {
-                          soundEngine.play('click');
-                          setIsWon(false);
-                          const calculatedScore = Math.max(
-                            100,
-                            Math.round(1000 - Math.min(800, moves * 15))
-                          );
-                          onGameOver(calculatedScore, {
-                            level: currentLevelNum || 1,
-                            moves,
-                          });
-                        }}
-                        className="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-500 text-black hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
-                      >
-                        <Trophy className="w-4 h-4" />
-                        Bảng Tổng Kết Ván Đấu
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        soundEngine.play('click');
-                        hapticService.tap();
-                        setCurrentLevelNum(null);
-                      }}
-                      className="w-full py-3 rounded-xl font-bold text-base bg-slate-800 text-white hover:bg-slate-700 transition-colors"
-                    >
-                      Bản Đồ Màn Chơi
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          {/* Settings Modal */}
-          <AnimatePresence>
-            {showSettings && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-              >
-                <motion.div
-                  initial={{ scale: 0.9, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.9, y: 20 }}
-                  className="bg-slate-900 border border-slate-700 p-6 rounded-3xl w-full max-w-sm flex flex-col shadow-2xl max-h-[80vh] overflow-hidden"
-                >
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-white font-display">Tùy Chỉnh Xe</h3>
-                    <button 
-                      onClick={() => setShowSettings(false)}
-                      className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="overflow-y-auto custom-scrollbar flex-1 pr-2">
-                    <div className="grid gap-3">
-                      <button
-                        onClick={() => {
-                          if (equippedSkin) unequipItem(equippedSkin.id);
-                          hapticService.tap();
-                        }}
-                        className={`p-4 rounded-2xl border-2 flex items-center gap-4 transition-all text-left ${!equippedSkin ? "bg-indigo-500/20 border-indigo-500" : "bg-slate-800 border-slate-700 hover:border-slate-600"}`}
-                      >
-                        <div className="text-3xl">🚑</div>
-                        <div className="flex-1">
-                          <h4 className="font-bold text-white">Cứu Thương</h4>
-                        </div>
-                        {!equippedSkin && <Check className="w-5 h-5 text-indigo-400" />}
-                      </button>
-                      {items.filter(i => i.type === "skin" && i.gameId === "car-escape").map(skin => {
-                        const isEquipped = equippedSkin?.id === skin.id;
-                        return (
-                          <button
-                            key={skin.id}
-                            onClick={() => {
-                              equipItem(skin.id);
-                              hapticService.tap();
-                            }}
-                            className={`p-4 rounded-2xl border-2 flex items-center gap-4 transition-all text-left ${isEquipped ? "bg-indigo-500/20 border-indigo-500" : "bg-slate-800 border-slate-700 hover:border-slate-600"}`}
-                          >
-                            <div className="text-3xl">{skin.icon}</div>
-                            <div className="flex-1">
-                              <h4 className="font-bold text-white">{skin.name}</h4>
-                              <p className="text-xs text-slate-400 line-clamp-1">{skin.description}</p>
-                            </div>
-                            {isEquipped && <Check className="w-5 h-5 text-indigo-400" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <p className="text-center text-xs text-slate-500 mt-4">Mở khóa thêm xe từ Rương Kho Báu</p>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          
+          <div className="car-lesson">
+            <b>{level?.challenge ? "THỬ THÁCH" : "CHIẾN THUẬT"}</b>
+            <span>
+              {run.legacy
+                ? "Tiếp tục ván đã lưu. Màn mới có luật và độ khó mới."
+                : level?.lesson}
+            </span>
+          </div>
+          <TopDownBoard
+            config={run.config}
+            vehicles={run.vehicles}
+            disabled={locked || run.status !== "playing"}
+            hint={hint}
+            onMove={perform}
+          />
+          <div className="car-tools">
+            <button
+              aria-label="Hoàn tác nước đi"
+              title="Hoàn tác tính thêm 1 lượt"
+              disabled={
+                locked || run.status !== "playing" || !run.history.length
+              }
+              onClick={undo}
+            >
+              <Undo2 size={17} />
+              Hoàn tác
+            </button>
+            <button
+              id="car-hint"
+              disabled={locked || run.status !== "playing"}
+              onClick={() => void requestHint()}
+            >
+              <Lightbulb size={17} />
+              {thinking ? "Đang tìm…" : "Hint miễn phí"}
+            </button>
+            <button
+              aria-label="Chơi lại màn"
+              disabled={locked}
+              onClick={() => setConfirm("restart")}
+            >
+              <RotateCcw size={17} />
+            </button>
+          </div>
+          <p className="car-inline-hint" role="status">
+            {hintText ||
+              (run.hints
+                ? "Đã dùng hint · tối đa 1 sao"
+                : "3 sao: ít lượt · không hint")}
+          </p>
+          <p className="car-run-footer">
+            {run.ticket
+              ? "Xếp hạng dùng thời gian thực, kể cả tạm dừng."
+              : "Chạm để chọn · phím mũi tên, Shift để trượt hết đường"}
+          </p>
+          {run.status !== "playing" && !sessionFinished && (
+            <ResultDialog
+              run={run}
+              endless={save.endless}
+              result={result}
+              rankStatus={rankStatus}
+              onNext={nextLevel}
+              onRetry={() =>
+                start(
+                  save.endless ? endlessLevel(save.endless.seed, 1) : run.level,
+                  save.endless
+                    ? {
+                        ...save.endless,
+                        remainingMs: 120000,
+                        stage: 1,
+                        score: 0,
+                      }
+                    : null,
+                )
+              }
+              onMap={toMap}
+              onFinish={finish}
+              onPractice={() => start(run.level, null, true)}
+            />
+          )}
         </div>
+      )}
+      {ranking !== null && (
+        <RankingPanel
+          level={ranking}
+          result={save.results[String(ranking)]}
+          onClose={() => setRanking(null)}
+        />
+      )}{" "}
+      {confirm && (
+        <Confirmation
+          kind={confirm}
+          onCancel={() => setConfirm(null)}
+          onAccept={() => {
+            const kind = confirm;
+            setConfirm(null);
+            if (kind === "map") toMap();
+            else if (run)
+              start(
+                run.level,
+                save.endless
+                  ? { ...save.endless, remainingMs: 120000, stage: 1, score: 0 }
+                  : null,
+                kind === "practice",
+              );
+          }}
+        />
       )}
     </div>
   );
 };
+function Confirmation({
+  kind,
+  onCancel,
+  onAccept,
+}: {
+  kind: "restart" | "map" | "practice";
+  onCancel: () => void;
+  onAccept: () => void;
+}) {
+  const ref = useDialogFocus(onCancel);
+  return createPortal(
+    <div className="car-modal-overlay">
+      <section
+        className="car-dialog"
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="car-confirm-title"
+        tabIndex={-1}
+      >
+        <header>
+          <h2 id="car-confirm-title">
+            {kind === "map" ? "Về bản đồ màn chơi?" : "Bắt đầu lại màn này?"}
+          </h2>
+          <button aria-label="Hủy" onClick={onCancel}>
+            <X />
+          </button>
+        </header>
+        <div className="car-dialog-body">
+          <p>
+            Ván hiện tại sẽ kết thúc; nếu chơi lại, bàn sẽ bắt đầu từ đầu. Sao
+            và các màn đã mở vẫn được giữ.
+          </p>
+        </div>
+        <footer>
+          <button onClick={onCancel}>Tiếp tục chơi</button>
+          <button className="car-primary" onClick={onAccept}>
+            Xác nhận
+          </button>
+        </footer>
+      </section>
+    </div>,
+    document.body,
+  );
+}

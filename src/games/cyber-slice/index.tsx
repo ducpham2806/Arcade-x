@@ -1,3 +1,4 @@
+import { drawArenaBackdrop } from '../../visuals/arenaBackdrop';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { GameComponentProps } from '../../types';
 import { usePlayer } from '../../context/PlayerContext';
@@ -1353,6 +1354,11 @@ export const CyberSliceGame: React.FC<GameComponentProps> = ({
       // Dynamic cyberpunk background
       ctx.fillStyle = s.isFever ? '#180726' : s.isFrozen ? '#051624' : '#070a14';
       ctx.fillRect(-30, -30, width + 60, height + 60);
+
+      ctx.save();
+      ctx.globalAlpha = s.isFever || s.isFrozen ? 0.55 : 1;
+      drawArenaBackdrop(ctx, 'blade', width, height);
+      ctx.restore();
 
       // Subtle background grid lines
       ctx.strokeStyle = s.isFever

@@ -1,3 +1,4 @@
+import { readGameSave, writeGameSave } from '../services/gameSaves';
 import { GameBridgeAPI, SoundEffect, DropRateConfig } from '../types';
 import { soundEngine } from '../services/audio';
 
@@ -20,7 +21,10 @@ export interface CreateBridgeOptions {
 export function createGameBridge(opts: CreateBridgeOptions): GameBridgeAPI {
   return {
     submitScore: async (score: number, extraStats?: Record<string, number>) => {
-      const { isNewHighScore } = opts.onRecordScore(opts.gameId, score);
+      const scoreGameId = opts.gameId === 'tile-2048' && extraStats
+        ? `${opts.gameId}${extraStats.mode === 1 ? '-5x5' : extraStats.mode === 2 ? '-rush' : ''}${extraStats.assisted ? '-assisted' : ''}`
+        : opts.gameId;
+      const { isNewHighScore } = opts.onRecordScore(scoreGameId, score);
       
       // Update quests
       opts.onReportQuest('play_any', 1);
@@ -36,7 +40,7 @@ export function createGameBridge(opts: CreateBridgeOptions): GameBridgeAPI {
       opts.onReportAchievement('ach-first-game', 1, false);
 
       // Submit to leaderboard
-      await opts.onSubmitLeaderboard(opts.gameId, score, extraStats);
+      await opts.onSubmitLeaderboard(scoreGameId, score, extraStats);
 
       // Calculate EXP based on score
       const expEarned = Math.max(50, Math.floor(score / 10) + 60);
@@ -140,22 +144,8 @@ export function createGameBridge(opts: CreateBridgeOptions): GameBridgeAPI {
       return opts.getSkin(gameId || opts.gameId);
     },
 
-    saveGameState: (data: unknown) => {
-      try {
-        localStorage.setItem(`arcadex_gamestate_${opts.gameId}`, JSON.stringify(data));
-      } catch {
-        // ignore
-      }
-    },
-
-    loadGameState: <T>() => {
-      try {
-        const item = localStorage.getItem(`arcadex_gamestate_${opts.gameId}`);
-        return item ? (JSON.parse(item) as T) : null;
-      } catch {
-        return null;
-      }
-    },
+    saveGameState: (data: unknown) => { writeGameSave(opts.gameId, data); },
+    loadGameState: <T>() => readGameSave(opts.gameId) as T | null,
 
     updateSessionState: (state) => {
       if (opts.onUpdateSessionState) {

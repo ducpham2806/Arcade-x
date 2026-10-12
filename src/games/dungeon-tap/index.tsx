@@ -40,7 +40,7 @@ import { DungeonLeaderboardModal } from './components/DungeonLeaderboardModal';
 import { Swords, Users, Shield, BookOpen, Activity, Coins, Sparkles, Trophy, Flag, Zap, Calendar, Gift } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { usePlayer } from '../../context/PlayerContext';
-import { FirebaseService } from '../../services/firebase';
+import { SupabaseService } from '../../services/supabase';
 
 const SAVE_KEY = 'tap_titans_dungeon_save_v2';
 
@@ -245,7 +245,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
       lastSyncStageRef.current = maxStageReached;
       try {
         recordGamePlayed('dungeon-tap', maxStageReached);
-        FirebaseService.submitLeaderboardScore(
+        SupabaseService.submitLeaderboardScore(
           'dungeon-tap',
           profile?.username || 'Kiếm Sĩ Vô Danh',
           maxStageReached,
@@ -1108,7 +1108,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     // Sync highest floor level to real-time Leaderboard
     try {
       recordGamePlayed('dungeon-tap', maxStageReached);
-      FirebaseService.submitLeaderboardScore(
+      SupabaseService.submitLeaderboardScore(
         'dungeon-tap',
         profile?.username || 'Kiếm Sĩ Vô Danh',
         maxStageReached,
@@ -1460,7 +1460,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
   const unlockedAlliesCount = allies.filter((a) => a.unlocked).length;
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#070b14] text-slate-100 overflow-hidden select-none">
+    <div className="arcade-game-surface flex flex-col h-full w-full bg-[#070b14] text-slate-100 overflow-hidden select-none">
       {/* Top Header Bar */}
       <header className="flex items-center justify-between px-3 py-2 bg-slate-900/90 border-b border-white/10 shrink-0">
         {/* Stage & Chapter */}
@@ -1500,38 +1500,6 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
           >
             <Trophy className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400/40" />
             <span className="text-[11px] hidden md:inline">BXH</span>
-          </button>
-
-          {/* Quick Access: Vòng Quay May Mắn */}
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                bridge.playSound('powerup');
-              } catch {}
-              setActiveModal('spinWheel');
-            }}
-            title="Vòng Quay May Mắn (Daily Spin)"
-            className="flex items-center gap-1 px-2 py-1 rounded-xl bg-gradient-to-r from-amber-600/30 to-orange-600/30 hover:from-amber-600/50 hover:to-orange-600/50 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
-          >
-            <span className="text-sm leading-none">🎡</span>
-            <span className="text-[11px] hidden md:inline">Vòng Quay</span>
-          </button>
-
-          {/* Quick Access: Lịch Điểm Danh Tháng */}
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                bridge.playSound('click');
-              } catch {}
-              setActiveModal('monthlyLogin');
-            }}
-            title="Lịch Điểm Danh Tháng 30 Ngày (Daily Check-in)"
-            className="flex items-center gap-1 px-2 py-1 rounded-xl bg-gradient-to-r from-indigo-600/30 to-purple-600/30 hover:from-indigo-600/50 hover:to-purple-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
-          >
-            <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="text-[11px] hidden md:inline">Điểm Danh</span>
           </button>
 
           {/* Auto-Pickup Toggle Button */}
@@ -1776,7 +1744,7 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
         playerAvatar={profile?.avatar || '⚔️'}
         playerTitle={profile?.currentTitle || profile?.equippedTitle || 'Hiệp Sĩ Dungeon'}
         onRefreshScore={() => {
-          FirebaseService.submitLeaderboardScore(
+          SupabaseService.submitLeaderboardScore(
             'dungeon-tap',
             profile?.username || 'Kiếm Sĩ Vô Danh',
             maxStageReached,

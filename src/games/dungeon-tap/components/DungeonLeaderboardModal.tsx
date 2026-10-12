@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Flame, Crown, RefreshCw, X, Shield, Calendar, Sparkles } from 'lucide-react';
 import { LeaderboardEntry } from '../../../types';
-import { FirebaseService } from '../../../services/firebase';
+import { SupabaseService } from '../../../services/supabase';
 import { StorageService } from '../../../services/storage';
 import { formatNumber } from '../utils/upgradeMath';
 
@@ -34,7 +34,7 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
 
-  // Subscribe to real-time Firestore leaderboard for Dungeon Titan ('dungeon-tap')
+  // Subscribe to real-time Supabase leaderboard for Dungeon Titan ('dungeon-tap')
   useEffect(() => {
     if (!isOpen) return;
 
@@ -43,7 +43,7 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
 
     if (filterMode === 'daily') {
       const todayKey = StorageService.getTodayDateString();
-      unsubscribe = FirebaseService.subscribeToDailyLeaderboard(
+      unsubscribe = SupabaseService.subscribeToDailyLeaderboard(
         'dungeon-tap',
         todayKey,
         (entries) => {
@@ -53,7 +53,7 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
         50
       );
     } else {
-      unsubscribe = FirebaseService.subscribeToGameLeaderboard(
+      unsubscribe = SupabaseService.subscribeToGameLeaderboard(
         'dungeon-tap',
         (entries) => {
           setLiveEntries(entries);
@@ -84,7 +84,7 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
       if (onRefreshScore) {
         onRefreshScore();
       }
-      await FirebaseService.submitLeaderboardScore(
+      await SupabaseService.submitLeaderboardScore(
         'dungeon-tap',
         playerName,
         maxStageReached,
@@ -97,7 +97,7 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
         }
       );
     } catch (e) {
-      console.error('Error syncing score to Firestore leaderboard:', e);
+      console.error('Error syncing score to Supabase leaderboard:', e);
     } finally {
       setTimeout(() => setIsSyncing(false), 600);
     }
@@ -239,7 +239,7 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
           {isLoading ? (
             <div className="py-16 text-center flex flex-col items-center justify-center gap-2 text-slate-500 text-xs">
               <RefreshCw className="w-6 h-6 animate-spin text-amber-400" />
-              <span>Đang kết nối Firestore và tải bảng xếp hạng trực tiếp...</span>
+              <span>Đang kết nối Supabase và tải bảng xếp hạng trực tiếp...</span>
             </div>
           ) : liveEntries.length === 0 ? (
             <div className="py-16 text-center flex flex-col items-center justify-center gap-2 text-slate-500 text-xs">

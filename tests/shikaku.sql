@@ -1,0 +1,44 @@
+begin;
+create function public.sk_assert(ok boolean,label text) returns void language plpgsql as $$begin if not coalesce(ok,false) then raise exception 'FAIL: %',label;end if;raise notice 'PASS: %',label;end$$;
+create function public.sk_reject(cmd text) returns boolean language plpgsql as $$begin execute cmd;return false;exception when others then return true;end$$;
+\ir shikaku-fixtures.sql
+insert into auth.users(id) values('00000000-0000-4000-8000-000000000091'),('00000000-0000-4000-8000-000000000092') on conflict do nothing;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000091',true);
+select set_config('request.jwt.claims','{"is_anonymous":false}',true);
+select public.arcadex_save_identity('Shikaku SQL Hero','🎮');
+select public.shikaku_start(4,'00000000-0000-4000-8000-000000000091') as first \gset
+select set_config('test.sk_id',(:'first'::jsonb->>'id'),true);
+select set_config('test.sk_solution',(:'first'::jsonb->'puzzle'->'solution')::text,true);
+select public.sk_assert((public.shikaku_start(4,'00000000-0000-4000-8000-000000000091')->>'id')=current_setting('test.sk_id'),'start resumes one official daily ticket');
+select public.sk_assert(public.sk_reject($q$select public.shikaku_start(7,'00000000-0000-4000-8000-000000000091')$q$),'reject unsupported difficulty');
+select public.sk_assert(public.sk_reject($q$select public.shikaku_start(4,null)$q$),'reject missing expected account');
+select public.sk_assert(not has_table_privilege('authenticated','public.shikaku_runs','select') and not has_table_privilege('authenticated','public.shikaku_runs','update'),'private table cannot be read or modified directly');
+select public.sk_assert(public.shikaku_hint(current_setting('test.sk_id')::uuid,'10000000-0000-4000-8000-000000000091','00000000-0000-4000-8000-000000000091')=1,'hint counted on server');
+select public.sk_assert(public.shikaku_hint(current_setting('test.sk_id')::uuid,'10000000-0000-4000-8000-000000000091','00000000-0000-4000-8000-000000000091')=1,'hint retry idempotent');
+select public.sk_assert(public.sk_reject(format('select public.shikaku_submit(%L,%L,''00000000-0000-4000-8000-000000000091'')',current_setting('test.sk_id'),'[]')),'reject incomplete board');
+select public.sk_assert(public.sk_reject(format('select public.shikaku_submit(%L,%L,''00000000-0000-4000-8000-000000000091'')',current_setting('test.sk_id'),'[{"r":0,"c":0,"w":4,"h":4}]')),'reject area/clue violation');
+select public.sk_assert(public.sk_reject(format('select public.shikaku_submit(%L,%L,''00000000-0000-4000-8000-000000000091'')',current_setting('test.sk_id'),'[{"r":0,"c":0,"w":100,"h":100}]')),'reject outside board');
+select public.sk_assert(public.sk_reject(format('select public.shikaku_submit(%L,%L,''00000000-0000-4000-8000-000000000091'')',current_setting('test.sk_id'),'[{"r":"0","c":0,"w":2,"h":2}]')),'reject string coordinates');
+select public.sk_assert(public.sk_reject(format('select public.shikaku_submit(%L,%L,''00000000-0000-4000-8000-000000000091'')',current_setting('test.sk_id'),(jsonb_build_array(current_setting('test.sk_solution')::jsonb->0)||current_setting('test.sk_solution')::jsonb)::text)),'reject overlapping duplicate region');
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000092',true);
+select public.sk_assert(public.sk_reject(format('select public.shikaku_hint(%L,''20000000-0000-4000-8000-000000000091'',''00000000-0000-4000-8000-000000000092'')',current_setting('test.sk_id'))),'other account cannot mark hint');
+select public.sk_assert(public.sk_reject(format('select public.shikaku_submit(%L,%L,''00000000-0000-4000-8000-000000000092'')',current_setting('test.sk_id'),current_setting('test.sk_solution'))),'other account cannot submit');
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000091',true);
+reset role;
+update public.shikaku_runs set started_at=now()-interval '17 seconds' where id=current_setting('test.sk_id')::uuid;
+set local role authenticated;
+select public.shikaku_submit(current_setting('test.sk_id')::uuid,current_setting('test.sk_solution')::jsonb,'00000000-0000-4000-8000-000000000091') as result \gset
+select public.sk_assert((:'result'::jsonb->>'stars')::int=2,'stars derive from recorded hints');
+select public.sk_assert((:'result'::jsonb->>'elapsed_ms')::int=17000,'rank time derives from server clock');
+select public.sk_assert(public.shikaku_submit(current_setting('test.sk_id')::uuid,'[]','00000000-0000-4000-8000-000000000091')=:'result'::jsonb,'duplicate completion returns same verified result');
+select public.sk_assert(jsonb_array_length(public.shikaku_ranking(4,true))=1,'verified assisted result visible');
+select public.sk_assert(public.shikaku_ranking(4,false)='[]','assisted result not in pure ranking');
+select public.sk_assert(public.shikaku_ranking(5,true)='[]','different sizes ranked separately');
+select public.sk_assert(public.shikaku_ranking(4,true,date '2000-01-01')='[]','dates ranked separately');
+select public.sk_assert((public.shikaku_start(4,'00000000-0000-4000-8000-000000000091')->>'finished')::boolean,'finished daily returns practice status');
+select set_config('request.jwt.claims','{"is_anonymous":true}',true);
+select public.sk_assert(public.sk_reject($q$select public.shikaku_start(4,'00000000-0000-4000-8000-000000000091')$q$),'guest cannot start official attempt');
+reset role;
+select public.sk_assert(not has_function_privilege('anon','public.shikaku_start(integer,uuid)','execute') and has_function_privilege('anon','public.shikaku_ranking(integer,boolean,date)','execute'),'guest may view ranking but cannot write it');
+rollback;
