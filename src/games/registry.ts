@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { BLOSSOM_TITLE } from './hex-match/blossom/branding';
 const RainbowBlocksGame = lazy(() => import('./rainbow-blocks'));
 import { GameMetadata } from '../types';
 const NeonRunnerGame = lazy(() => import('./neon-runner').then(module => ({ default: module.NeonRunnerGame })));
@@ -299,7 +300,7 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
   },
   'hex-match': {
     id: 'hex-match',
-    title: 'Blossom Blast · Hex Collapse Puzzle',
+    title: BLOSSOM_TITLE,
     shortDesc: 'Chạm hoa, giải cứu khu vườn qua 100 màn',
     description: 'Chạm nhóm từ 3 hoa kề ngang hoặc dọc, ghép Ong Mật, Bom Hoa, Cầu Vồng và Mặt Trời để đánh thức Cây Sự Sống.',
     category: 'Puzzle',

@@ -713,53 +713,13 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
   },
 
   'hex-match': {
-    gameId: 'hex-match',
-    headlineObjective: 'Chạm vào các nhóm từ 3 khối lục giác cùng màu trở lên để kích nổ chuỗi và gia hạn thêm thời gian thi đấu!',
-    rules: [
-      'Cụm càng nhiều khối nổ cùng lúc thì điểm thưởng càng khổng lồ.',
-      'Mỗi lần kích nổ cụm lớn sẽ cộng thêm thời gian vào đồng hồ.',
-      'Trò chơi kết thúc khi đồng hồ đếm ngược về số 0.',
-    ],
-    mobileGestures: [
-      {
-        icon: '👆',
-        gesture: 'Chạm Nhóm Lục Giác',
-        action: 'Chạm vào khối màu có ít nhất 2 khối cùng màu kề bên',
-        badge: 'Kích nổ',
-      },
-      {
-        icon: '⚡',
-        gesture: 'Tạo Khối Đặc Biệt',
-        action: 'Phá nhóm 5+ khối để tạo khối sấm sét phá hàng',
-        badge: 'Power-up',
-      },
-      {
-        icon: '⏱️',
-        gesture: 'Nạp Đồng Hồ',
-        action: 'Thao tác liên tục để không bị cạn thời gian',
-        badge: 'Thời gian',
-      },
-    ],
-    proTip: 'Đừng vội phá các nhóm 3 ô nhỏ, hãy để chúng tích lũy thành cụm 7-8 ô để kích nổ bom cực mạnh!',
-    touchLayoutTip: 'Chạm trực tiếp vào trung tâm nhóm màu để nổ tức thì.',
-    gestureGuide: {
-      headlineTip: 'Chạm vào các cụm từ 3 ô lục giác cùng màu kề nhau để kích nổ gom điểm.',
-      layoutType: 'grid-touch',
-      zones: [
-        {
-          id: 'hex-arena',
-          name: 'Lưới Tổ Ong Lục Giác',
-          action: 'Chạm Kích Nổ Cụm Cùng Màu',
-          subAction: 'Nổ cụm lớn để tạo sét phá hàng và kéo dài thời gian',
-          colorTheme: 'purple',
-          position: { left: '5%', top: '10%', width: '90%', height: '80%' },
-          icon: '⬡',
-          badge: 'CHẠM NỔ LỤC GIÁC',
-          gestureType: 'tap',
-          interactiveTestMessage: 'BÙNG NỔ COMBO: Cụm lục giác nổ tung, đồng hồ được cộng thêm 3s!',
-        },
-      ],
-    },
+    gameId:'hex-match',
+    headlineObjective:'Chạm nhóm từ 3 hoa kề nhau, hoàn thành mục tiêu và đánh thức Cây Sự Sống qua 100 màn.',
+    rules:['Hoa cùng màu nối ngang hoặc dọc tạo thành một nhóm; chạm nhóm từ 3 hoa để thu hoạch.','Tạo và ghép Ong Mật, Bom Hoa, Cầu Vồng và Mặt Trời; mỗi loại có hiệu ứng và phạm vi riêng.','Đạt đủ mục tiêu trước khi hết lượt hoặc hết giờ; hướng dẫn mới xuất hiện khi gặp target, block hay boss mới.'],
+    mobileGestures:[{icon:'👆',gesture:'Chạm nhóm hoa',action:'Thu hoạch nhóm từ 3 hoa kề ngang hoặc dọc',badge:'Thu hoa'},{icon:'✨',gesture:'Chạm vật phẩm đặc biệt',action:'Kích hoạt sức mạnh hoặc ghép hai vật phẩm cạnh nhau',badge:'Sức mạnh'},{icon:'🌱',gesture:'Khu vườn',action:'Mở từ màn 15, đặt và trang trí khu vườn',badge:'Trang trí'}],
+    proTip:'Dành các nhóm lớn để tạo vật phẩm đặc biệt; ghép hai vật phẩm cạnh nhau để tạo combo mạnh.',
+    touchLayoutTip:'Bạn đồng hành được chọn tự động theo khu vực. Mục tiêu và vật phẩm được chuẩn bị trong một popup.',
+    gestureGuide:{headlineTip:'Chạm nhóm từ 3 hoa nối ngang hoặc dọc để thu hoạch.',layoutType:'grid-touch',zones:[{id:'blossom-board',name:'Vườn hoa',action:'Chạm nhóm hoa cùng màu',subAction:'Thu hoạch hoa và hoàn thành target của màn',colorTheme:'emerald',position:{left:'5%',top:'10%',width:'90%',height:'80%'},icon:'🌸',badge:'THU HOẠCH HOA',gestureType:'grid-tap',interactiveTestMessage:'Nhóm hoa được thu hoạch và mục tiêu được cập nhật.'}]},
   },
 
   'chess': {

@@ -11,6 +11,7 @@ import { soundEngine, audioManager, MusicTheme } from '../services/audio';
 import { hapticService } from '../services/haptics';
 import { usePlayer } from './PlayerContext';
 import confetti from 'canvas-confetti';
+import { BLOSSOM_TITLE } from '../games/hex-match/blossom/branding';
 import { useLauncher } from '../launcher/LauncherContext';
 
 export type { ActiveModal };
@@ -456,7 +457,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       xiangqi: 'Cờ Tướng PvP',
       'caro-gomoku': 'Cờ Caro Đấu Trí',
       'neon-runner': 'Neon Runner',
-      'hex-match': 'Hex Match',
+      'hex-match': BLOSSOM_TITLE,
       'tile-2048': '2048 Cyber',
       'cyber-slice': 'Blade Dash',
       'eat-em-all': "Eat 'Em All",

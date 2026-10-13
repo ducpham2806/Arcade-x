@@ -43,6 +43,7 @@ import {
   boosterAsset,
 } from "./blossom/assets";
 import "./blossom/blossom.css";
+import { BLOSSOM_TITLE, BLOSSOM_ICON, BLOSSOM_LOGO } from "./blossom/branding";
 import { BlossomVFX } from "./blossom/VFX";
 import { lessonsFor, Lesson } from "./blossom/tutorials";
 import { englishLesson } from "./blossom/tutorials-en";
@@ -754,7 +755,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     c.fillRect(0, 0, 960, 820);
     c.fillStyle = "#245331";
     c.font = "bold 38px sans-serif";
-    c.fillText("Blossom Blast · Khu vườn của tôi", 34, 58);
+    c.fillText(`${BLOSSOM_TITLE} · Khu vườn của tôi`, 34, 58, canvas.width - 68);
     for (let i = 0; i < 48; i++) {
       const x = 36 + (i % 8) * 110,
         y = 90 + Math.floor(i / 8) * 110;
@@ -780,15 +781,16 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     <header className="bb-header">
       <button
         className="bb-brand"
+        aria-label={BLOSSOM_TITLE}
         onClick={() => {
           if (screen === "play" && run?.status === "playing") setModal("pause");
           else setScreen("map");
         }}
       >
-        <img src={asset("png/characters/char_bibi.png")} alt="Bibi" />
-        <span>
-          Blossom <b>Blast</b>
-          <small>HEX COLLAPSE PUZZLE</small>
+        <img className="bb-brand-icon" src={asset(BLOSSOM_ICON)} alt="" />
+        <span className="bb-brand-lockup">
+          <img className="bb-brand-logo" src={asset(BLOSSOM_LOGO)} alt="Blossom Blast" />
+          <small>Nature's story</small>
         </span>
       </button>
       <div className="bb-wallet">
@@ -1143,7 +1145,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
               <div
                 className="bb-board"
                 role="group"
-                aria-label="Bàn Blossom Blast"
+                aria-label={`Bàn ${BLOSSOM_TITLE}`}
                 style={
                   {
                     gridTemplateColumns: `repeat(${run.level.cols},1fr)`,

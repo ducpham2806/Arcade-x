@@ -11,8 +11,8 @@ export function parseCatalog(raw: any): Catalog | null {
     const base = GAME_REGISTRY[row?.engine_key];
     if (!base || row.id !== base.id || seen.has(row.id) || !['published','maintenance'].includes(row.status) || !['free','premium'].includes(row.access_model)) return [];
     seen.add(row.id);
-    return [{...base,title:typeof row.title==='string'?row.title.slice(0,100):base.title,
-      shortDesc:typeof row.short_description==='string'?row.short_description.slice(0,500):base.shortDesc,
+    return [{...base,title:base.id==='hex-match'?base.title:typeof row.title==='string'?row.title.slice(0,100):base.title,
+      shortDesc:base.id==='hex-match'?base.shortDesc:typeof row.short_description==='string'?row.short_description.slice(0,500):base.shortDesc,
       category:['Arcade','Puzzle','Action','Reflex','Multiplayer'].includes(row.category)?row.category:base.category,
       availability:row.status,accessModel:row.access_model,supportsOffline:row.supports_offline===true,featured:row.featured===true,sortOrder:Number.isFinite(row.sort_order)?row.sort_order:100}];
   }).sort((a:CatalogGame,b:CatalogGame)=>a.sortOrder-b.sortOrder || a.id.localeCompare(b.id));

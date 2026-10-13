@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.6.0';
-export const APP_CODENAME = 'Ready to Play';
-export const APP_RELEASE_NOTES = 'Màn hình đăng nhập riêng, hồ sơ với tên duy nhất và cập nhật PWA an toàn.';
+export const CURRENT_APP_VERSION = '2.7.0';
+export const APP_CODENAME = "Nature's Story";
+export const APP_RELEASE_NOTES = "Blossom Blast: Nature's story — đầy đủ nâng cấp v0.8, logo mới và luồng vào game thống nhất. Rainbow Blocks và carousel 6 slide được giữ.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

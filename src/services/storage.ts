@@ -1,3 +1,4 @@
+import { BLOSSOM_TITLE } from '../games/hex-match/blossom/branding';
 import {
   InventoryItem,
   PlayerProfile,
@@ -1033,9 +1034,9 @@ export const DEFAULT_ACHIEVEMENTS: Achievement[] = [
     id: 'ach-hex-1000',
     gameId: 'hex-match',
     title: 'Bậc Thầy Xếp Lưới',
-    description: 'Đạt 1,000 điểm trong Hex Match.',
+    description: `Đạt 1,000 điểm trong ${BLOSSOM_TITLE}.`,
     icon: '🔷',
-    category: 'Hex Match',
+    category: BLOSSOM_TITLE,
     rarity: 'rare',
     target: 1000,
     current: 0,
@@ -1365,8 +1366,8 @@ export const DEFAULT_ACHIEVEMENTS: Achievement[] = [
 export const DEFAULT_DAILY_QUESTS: DailyQuest[] = [
   {
     id: 'quest-hex-score-500',
-    title: 'Thần Tài Hex Match',
-    description: 'Đạt từ 500 điểm trong game Hex Match hôm nay.',
+    title: 'Người chăm vườn',
+    description: `Đạt từ 500 điểm trong ${BLOSSOM_TITLE} hôm nay.`,
     gameId: 'hex-match',
     type: 'game_score',
     icon: '🔷',
@@ -2012,14 +2013,14 @@ export class StorageService {
       },
       'hex-match': {
         gameId: 'hex-match',
-        title: 'Nổ Dây Chuyền Lục Giác',
-        description: 'Đạt 4,000 điểm combo trong Hex Collapse',
+        title: 'Khu vườn bừng nở',
+        description: `Đạt 4,000 điểm combo trong ${BLOSSOM_TITLE}.`,
         targetScore: 4000,
         timeLimitSeconds: 180,
         rewardCoins: 450,
         rewardGems: 20,
         rewardExp: 120,
-        rewardTitle: 'Bậc Thầy Hex',
+        rewardTitle: 'Bậc Thầy Hoa',
       },
       'draw-a-shape': {
         gameId: 'draw-a-shape',
@@ -2601,7 +2602,7 @@ export const DEFAULT_SEED_FRIENDS: Friend[] = [
     elo: 1840,
     isOnline: true,
     lastSeen: Date.now() - 45000,
-    customStatus: 'Đang cày top Hex Match 🧩',
+    customStatus: `Đang khám phá ${BLOSSOM_TITLE} 🌸`,
     favoriteGameId: 'hex-match',
     friendshipDate: Date.now() - 86400000 * 20,
   },

@@ -2,7 +2,7 @@ import { PostGameSummary } from '../launcher/PostGameSummary';
 import { useLauncher } from '../launcher/LauncherContext';
 import { GameSaveGate, GameLoadBoundary } from '../components/GameSaveGate';
 import { readGameSave } from '../services/gameSaves';
-import { GameArtwork, GameAtmosphere, artStyle } from '../visuals/gameArt';
+import { GameArtwork, GameIcon, GameAtmosphere, artStyle } from '../visuals/gameArt';
 import React, { useState, useMemo, useCallback, useEffect, useRef, Suspense } from 'react';
 import { GameMetadata } from '../types';
 import { createGameBridge, type CreateBridgeOptions } from './GameBridge';
@@ -84,7 +84,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
   const [showPreGameLoading, setShowPreGameLoading] = useState<boolean>(() => {
-    if (gameMeta.id === 'rainbow-blocks') return false; // Own interactive tutorial and mode menu.
+    if (['rainbow-blocks','hex-match'].includes(gameMeta.id)) return false; // Own interactive tutorial and mode menu.
     try {
       const skipped = localStorage.getItem('arcadex_skip_pregame_loading');
       return skipped !== 'true' && localStorage.getItem(`launcher_guide_seen_${gameMeta.id}`) !== 'true';
@@ -587,7 +587,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       <header className="h-12 sm:h-14 bg-[#0e0e0e]/95 backdrop-blur-md border-b border-white/5 px-2.5 sm:px-6 flex items-center justify-between z-30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-lg shrink-0">
-            <GameArtwork gameId={gameMeta.id}/>
+            <GameIcon gameId={gameMeta.id}/>
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">

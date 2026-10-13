@@ -1,3 +1,4 @@
+import { BLOSSOM_TITLE } from '../games/hex-match/blossom/branding';
 import { DailyQuest, DailyQuestType } from '../types';
 
 export interface QuestTemplate {
@@ -22,11 +23,11 @@ export const QUEST_POOL: QuestTemplate[] = [
   // 1. Hex Match target score (Primary user requirement)
   {
     id: 'hex-score-500',
-    title: 'Thần Tài Hex Match',
-    description: 'Đạt từ 500 điểm trong game Hex Match hôm nay.',
+    title: 'Người chăm vườn',
+    description: `Đạt từ 500 điểm trong ${BLOSSOM_TITLE} hôm nay.`,
     type: 'game_score',
     gameId: 'hex-match',
-    icon: '🔷',
+    icon: '🌸',
     target: 500,
     rewardCoins: 350,
     rewardGems: 15,

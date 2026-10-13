@@ -1,4 +1,6 @@
 import React, { useId } from 'react';
+import {asset as blossomAsset} from '../games/hex-match/blossom/assets';
+import {BLOSSOM_ICON,BLOSSOM_LOGO} from '../games/hex-match/blossom/branding';
 import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
@@ -20,7 +22,7 @@ export const GAME_ART: Record<string, { color: string; secondary: string; label:
   'neon-runner': { color: '#5de5ff', secondary: '#e27bff', label: 'TỐC ĐỘ', world: 'Thành phố 2099' },
   'cosmic-defense': { color: '#9ca7ff', secondary: '#56e0ed', label: 'BẮN SÚNG', world: 'Phòng tuyến ngân hà' },
   'cyber-slice': { color: '#ff85ae', secondary: '#ffc365', label: 'HÀNH ĐỘNG', world: 'Vũ điệu lưỡi kiếm' },
-  'hex-match': { color: '#83efc9', secondary: '#fc91c9', label: 'GHÉP MÀU', world: 'Hành tinh kẹo ngọt' },
+  'hex-match': { color: '#bee39f', secondary: '#ffd78a', label: 'GHÉP HOA', world: 'Câu chuyện thiên nhiên' },
   'tile-2048': { color: '#ffd078', secondary: '#ff946b', label: 'GHÉP SỐ', world: 'Kho báu 2048' },
 };
 export const artFor = (id: string) => GAME_ART[id] || GAME_ART['cosmic-defense'];
@@ -113,7 +115,11 @@ function Scene({ id, a, b }: { id: string; a: string; b: string }) {
       <path d="M229 61H289M171 181V213" stroke={b} strokeWidth="18"/>
       {[[109,181],[229,181],[229,61],[289,61],[171,181],[171,213]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="13" fill={i<2?a:b} stroke="#fff" strokeWidth="3"/>)}
     </g>;
-    case 'hex-match': return <g transform="translate(206 122)">{Array.from({length:7},(_,i)=>{const x=i?Math.cos((i-1)*Math.PI/3)*65:0,y=i?Math.sin((i-1)*Math.PI/3)*65:0;return <g key={i} transform={`translate(${x} ${y})`}><path d="M0 -34L29 -17V17L0 34L-29 17V-17Z" fill={[a,b,'#ffd578'][i%3]} stroke="white" strokeOpacity=".6" strokeWidth="2"/><path d="M0 -22L19 -11V11L0 22L-19 11V-11Z" fill="none" stroke="white" strokeOpacity=".4"/><circle cy="-8" r="7" fill="white" opacity=".5"/></g>})}</g>;
+    case 'hex-match': return <g>
+      <image href={blossomAsset(BLOSSOM_ICON)} x="28" y="18" width="220" height="220" preserveAspectRatio="xMidYMid meet"/>
+      <image href={blossomAsset(BLOSSOM_LOGO)} x="240" y="66" width="160" height="72" preserveAspectRatio="xMidYMid meet"/>
+      <text x="320" y="161" textAnchor="middle" fill="#fff5d9" fontSize="14" fontWeight="700" fontFamily="system-ui, sans-serif">Nature's story</text>
+    </g>;
     case 'scoodoku': return <g transform="translate(121 27) rotate(-9 90 90)">
       <rect x="-10" y="-10" width="200" height="200" rx="16" fill="#d0a674" stroke="#ffe1b1" strokeWidth="3"/>
       {[1,9,4,7,5,2,3,6,8].map((n,i)=><Tile key={n} x={i%3*62} y={Math.floor(i/3)*62} color={i===4?'#a8dbc4':'#f5dfb6'} text={String(n)}/>)}
@@ -144,6 +150,10 @@ export function GameArtwork({ gameId, className = '' }: { gameId: string; classN
     <g className="game-artwork-scene"><Scene id={gameId} a={color} b={secondary}/></g>
     <path d="M22 43V22H43M377 22H398V43M22 207V228H43M377 228H398V207" stroke={color} strokeOpacity=".45"/>
   </svg>;
+}
+
+export function GameIcon({gameId}:{gameId:string}) {
+  return gameId==='hex-match'?<img src={blossomAsset(BLOSSOM_ICON)} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:8}}/>:<GameArtwork gameId={gameId}/>;
 }
 
 export function GameAtmosphere({ gameId }: {gameId: string}) {

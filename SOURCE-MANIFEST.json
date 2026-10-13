@@ -1,6 +1,6 @@
 {
   "project": "Arcade-x",
-  "revision": "netlify-production-badge-fix-2026-10-13",
+  "revision": "blossom-natures-story-integration-2026-10-13",
   "rainbowBlocksIncluded": true,
   "games": 19,
   "banner": {
@@ -11,9 +11,9 @@
   "validation": {
     "typecheck": "passed",
     "build": "passed",
-    "rainbow_tests": "26 passed",
-    "previous_regression": "launcher theme and Blossom UI passed",
-    "hosting_badge_test": "passed"
+    "targeted_regression": "92 passed: Blossom, launcher theme and Rainbow engine/hosting badge",
+    "blossom_review_audit": "21 pre-change runtime files identical to reviewed v0.8",
+    "brand_assets": "supplied original PNGs already on main"
   },
   "files": [
     {
@@ -45,6 +45,11 @@
       "path": "blossom-review.html",
       "bytes": 899,
       "sha256": "df405bbabf339ad9dfc5b04fd65c6b44fe52ff7aa2fe773bb07b244451b85116"
+    },
+    {
+      "path": "docs/BLOSSOM-MERGE-AUDIT.md",
+      "bytes": 3083,
+      "sha256": "8583bd2491cdc51a1f032da85babfe30518a6bb3191000e2c78305f2c99ad67b"
     },
     {
       "path": "docs/CLEANUP.json",
@@ -2993,8 +2998,8 @@
     },
     {
       "path": "scripts/launcher-preview.mjs",
-      "bytes": 2250,
-      "sha256": "b7e37e2fedfd8c676b3633880675a9663050379e8957897a53808c68c23ccb39"
+      "bytes": 2527,
+      "sha256": "7520388b5a0ccccaa17dc61c9ed254992f169fb8aaaefbb1f1d37e6119af066b"
     },
     {
       "path": "scripts/rainbow-preview.mjs",
@@ -3178,8 +3183,8 @@
     },
     {
       "path": "src/context/GameContext.tsx",
-      "bytes": 44739,
-      "sha256": "217a5422e71be1188ff9582b0a775ace85bf10e7eb1f31c80c807cdb1b1270db"
+      "bytes": 44810,
+      "sha256": "4f9696cbb058de624904e983bdfdb0a9ae670c692554d729554b5e993a3506c4"
     },
     {
       "path": "src/context/InventoryContext.tsx",
@@ -3193,8 +3198,8 @@
     },
     {
       "path": "src/data/gameOnboardingData.ts",
-      "bytes": 42098,
-      "sha256": "894d8dbe3d1f97b9dccb1641bb9d5475494c50848a69dc080cd2e8f433079435"
+      "bytes": 41764,
+      "sha256": "f36e9f84d2c9978d06fbd7708ea520229ffe73c7a85c34c82da33db09113ddfe"
     },
     {
       "path": "src/data/legendaryBlueprints.ts",
@@ -3213,8 +3218,8 @@
     },
     {
       "path": "src/games/GameWrapper.tsx",
-      "bytes": 39474,
-      "sha256": "e9c555fa982dd363507bc6430085936184ab77c822bfe19ab995a6412645d532"
+      "bytes": 39501,
+      "sha256": "a030c7b66eb9a2625fbf720c14abdfb9b7725e908067ef35617b5fd556ea45ec"
     },
     {
       "path": "src/games/blocker/blocker.css",
@@ -3648,13 +3653,18 @@
     },
     {
       "path": "src/games/hex-match/blossom/blossom.css",
-      "bytes": 56533,
-      "sha256": "b8949607639b1e604bf75557b63000861bf42a95d7410a609d00fc9d62d20c79"
+      "bytes": 58900,
+      "sha256": "2394952f4b734b9ea6cfc76047045ace24732e3db4b72579fce93794931106ae"
     },
     {
       "path": "src/games/hex-match/blossom/blueprints.json",
       "bytes": 21038,
       "sha256": "1739720bd46703fdd6fd65f6851206e2240a06be3f87c3bd55b7af16c223c36e"
+    },
+    {
+      "path": "src/games/hex-match/blossom/branding.ts",
+      "bytes": 183,
+      "sha256": "585d6d399db1eec5012bcade168ce80a2df76c080fb36bacb808f1544099ed1c"
     },
     {
       "path": "src/games/hex-match/blossom/engine.ts",
@@ -3723,8 +3733,8 @@
     },
     {
       "path": "src/games/hex-match/index.tsx",
-      "bytes": 77630,
-      "sha256": "ff2b1a9ec815efd8be5a3063a0ce6cb778a5ae641c3845eda941eb8d9e7c58de"
+      "bytes": 77858,
+      "sha256": "cba32f2ed98d7dcbd0c254fb2bfacdabdb95a6571a213426737cf942b7531181"
     },
     {
       "path": "src/games/mummy-escape/LevelClearToast.tsx",
@@ -3898,8 +3908,8 @@
     },
     {
       "path": "src/games/registry.ts",
-      "bytes": 20408,
-      "sha256": "268f63a3f2ff02e2ad6ef1a64906667def1474f0bbf9a8d4bfe9c38fc5431c55"
+      "bytes": 20445,
+      "sha256": "0d44f5083be1bc77bcead0b9a15906de1050b2824faa4eb3e59f17ffafd08799"
     },
     {
       "path": "src/games/scoodoku/Numpad.tsx",
@@ -4148,8 +4158,8 @@
     },
     {
       "path": "src/launcher/FeaturedCarousel.tsx",
-      "bytes": 6012,
-      "sha256": "4e4d683372c1deb32c5b508889fdc58e8435a61367a3e34735e71d425017b8db"
+      "bytes": 5974,
+      "sha256": "d5b49b76fb901a2185bcec3cc3fe131997f4a0bb09af28b0fe916996357e6840"
     },
     {
       "path": "src/launcher/LauncherContext.tsx",
@@ -4173,8 +4183,8 @@
     },
     {
       "path": "src/launcher/catalog.ts",
-      "bytes": 2635,
-      "sha256": "21f4e41ca951db7a8633f528947c352e9e4c23a31e84a2a4a68bbd48edcafe4f"
+      "bytes": 2705,
+      "sha256": "e16d98733ca2d6bcead0f7ee06d63e6763df5a37e57b594b0aa1c06ba645a2ca"
     },
     {
       "path": "src/launcher/launcher.css",
@@ -4268,13 +4278,13 @@
     },
     {
       "path": "src/services/questGenerator.ts",
-      "bytes": 8820,
-      "sha256": "0e02f1b2ae6c8a650a21d1f33a2b4a578e9db23efb7c49a1bcfe0085f2a54f6e"
+      "bytes": 8892,
+      "sha256": "73ac7ab267ec6a85801ed95c2728ac6ce3f79bf853079b32900b722ec4047f74"
     },
     {
       "path": "src/services/storage.ts",
-      "bytes": 109456,
-      "sha256": "d53f1e9b77c2233c5d001ef76fe832cc1c17bcac1978223eef83e223b433bb73"
+      "bytes": 109544,
+      "sha256": "94e41366fcaf372094ac1696c1a24a2b5eb03a009eda948a7d9e24dfc3b9fcdb"
     },
     {
       "path": "src/services/supabase.ts",
@@ -4288,8 +4298,8 @@
     },
     {
       "path": "src/services/updateService.ts",
-      "bytes": 2335,
-      "sha256": "3412b79b4b9692cec63745ce83437c5c0a8a8d82552160f8838fb76fabc21284"
+      "bytes": 2407,
+      "sha256": "ef0568a061b9daca0766dad2ce0883d77efd94959c99e248f47d001cc602e485"
     },
     {
       "path": "src/types/index.ts",
@@ -4358,8 +4368,8 @@
     },
     {
       "path": "src/visuals/gameArt.tsx",
-      "bytes": 15371,
-      "sha256": "5a4fa0e0e39447c346bbbb771d13aa4dbc6abef7cf81c5e82bbc130365d745f9"
+      "bytes": 15704,
+      "sha256": "c3299a8698aa47889e464c1de41adb4d765fc89a1bb138cf91ec3f453a9e8bcf"
     },
     {
       "path": "src/vite-env.d.ts",
@@ -4462,6 +4472,11 @@
       "sha256": "a6c606f17eab6a113e4d5790e8211f86c50736c1d9d459c73cdca0e9f7bb3689"
     },
     {
+      "path": "tests/blossom/branding-integration.test.ts",
+      "bytes": 2896,
+      "sha256": "7692caa56f7db19d75f6c5b741af1b5089f10f3c0f83581a89863ae907d3ab3e"
+    },
+    {
       "path": "tests/blossom/engine.test.ts",
       "bytes": 14546,
       "sha256": "891f2ae6e5e9cc39a6dabf3d618acc2ece43c1eea2f0a563cd3f9397e54b2059"
@@ -4542,14 +4557,14 @@
       "sha256": "ccae48c8e3f1a92a24940c8692a557fb1d599ba05baf67ddc5510c608eb2edce"
     },
     {
-      "path": "tests/launcher/theme.test.ts",
-      "bytes": 4162,
-      "sha256": "bc2be86e62def843d78b887959a07563f5148c3db78a6ee14a346e18c5f9efaf"
-    },
-    {
       "path": "tests/launcher.sql",
       "bytes": 9061,
       "sha256": "10b9383a3953a600a5b040c024c6b1e4b6044bda8619f38971cf13f8784f631e"
+    },
+    {
+      "path": "tests/launcher/theme.test.ts",
+      "bytes": 4162,
+      "sha256": "bc2be86e62def843d78b887959a07563f5148c3db78a6ee14a346e18c5f9efaf"
     },
     {
       "path": "tests/qc/helpers.ts",
