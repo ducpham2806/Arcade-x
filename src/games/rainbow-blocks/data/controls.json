@@ -1,0 +1,107 @@
+{
+  "actions": [
+    "MOVE_LEFT",
+    "MOVE_RIGHT",
+    "SOFT_DROP",
+    "HARD_DROP",
+    "ROTATE_CW",
+    "ROTATE_CCW",
+    "ROTATE_180",
+    "HOLD",
+    "PAUSE",
+    "RESTART"
+  ],
+  "keyboard": {
+    "MOVE_LEFT": [
+      "ArrowLeft",
+      "KeyA"
+    ],
+    "MOVE_RIGHT": [
+      "ArrowRight",
+      "KeyD"
+    ],
+    "SOFT_DROP": [
+      "ArrowDown",
+      "KeyS"
+    ],
+    "HARD_DROP": [
+      "Space"
+    ],
+    "ROTATE_CW": [
+      "ArrowUp",
+      "KeyX"
+    ],
+    "ROTATE_CCW": [
+      "KeyZ",
+      "ControlLeft"
+    ],
+    "ROTATE_180": [
+      "KeyV"
+    ],
+    "HOLD": [
+      "ShiftLeft",
+      "KeyC"
+    ],
+    "PAUSE": [
+      "KeyP",
+      "Escape"
+    ],
+    "RESTART": [
+      "KeyR"
+    ]
+  },
+  "gamepad": {
+    "MOVE": "dpad/leftStick",
+    "ROTATE_CW": "A",
+    "ROTATE_CCW": "B",
+    "HARD_DROP": "RT/Y",
+    "HOLD": "LB/RB",
+    "PAUSE": "Start"
+  },
+  "timing": {
+    "DASms": 170,
+    "ARRms": 40,
+    "softDropFactor": 20,
+    "inputBufferMs": 100
+  },
+  "touchGesture": {
+    "tapMaxMs": 200,
+    "tapMaxMovePx": 10,
+    "dragCellWidthPx": "cell width",
+    "flickMinVelocityPxPerMs": 0.6,
+    "flickMinDistancePx": 40,
+    "actions": {
+      "tap": "ROTATE_CW",
+      "twoFingerTap": "ROTATE_CCW",
+      "dragHorizontal": "MOVE",
+      "dragDownHold": "SOFT_DROP",
+      "flickDown": "HARD_DROP",
+      "flickUp": "HOLD",
+      "tapHoldBox": "HOLD"
+    }
+  },
+  "touchButtons": {
+    "minSizeDp": 56,
+    "sizesPx": {
+      "move": 160,
+      "rotateCW": 200,
+      "rotateCCW": 160,
+      "hardDrop": 160,
+      "softDrop": 160
+    },
+    "opacityRange": [
+      0.3,
+      1.0
+    ]
+  },
+  "haptics": {
+    "lock": 10,
+    "hardDrop": 20,
+    "clear": [
+      30,
+      50,
+      80
+    ],
+    "gameOver": 200
+  }
+}

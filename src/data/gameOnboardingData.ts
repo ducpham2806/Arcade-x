@@ -42,6 +42,12 @@ export interface GameOnboardingInfo {
 }
 
 export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
+  'rainbow-blocks': {
+    gameId:'rainbow-blocks',headlineObjective:'Xếp khối để lấp đầy hàng. Xoá 4 hàng cùng lúc để tạo Rainbow!',
+    rules:['Khối rơi trên bàn 10×20; lấp đầy hàng để xoá và ghi điểm.','Dùng bóng rơi để căn vị trí; mỗi khối chỉ được Giữ một lần.','Chọn 5 chế độ: Điểm cao, Thư giãn, Đua thời gian, Tốc độ riêng hoặc Sprint 40 hàng.'],
+    mobileGestures:[{icon:'↔',gesture:'Kéo ngang',action:'Di chuyển khối'},{icon:'↻',gesture:'Chạm',action:'Xoay khối'},{icon:'↓',gesture:'Vuốt xuống nhanh',action:'Thả ngay'},{icon:'↑',gesture:'Vuốt lên / chạm Giữ',action:'Giữ khối'}],
+    proTip:'Giữ mặt bàn thấp và để dành một cột trống cho thanh I để tạo Rainbow.',touchLayoutTip:'Có thể chuyển từ cử chỉ sang nút ảo trong Cài đặt.',
+  },
   'mummy-escape': {
     gameId: 'mummy-escape',
     headlineObjective: 'Điều khiển nhà thám hiểm vượt qua mê cung Kim Tự Tháp, lừa xác ướp rơi vào góc chết và tìm đường đến cầu thang thoát hiểm!',

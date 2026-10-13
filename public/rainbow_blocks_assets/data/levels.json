@@ -1,0 +1,92 @@
+{
+  "levels": [
+    {
+      "level": 1,
+      "scoreFrom": 0,
+      "cellsPerSecond": 1.0,
+      "msPerCell": 1000
+    },
+    {
+      "level": 2,
+      "scoreFrom": 1000,
+      "cellsPerSecond": 1.5,
+      "msPerCell": 667
+    },
+    {
+      "level": 3,
+      "scoreFrom": 3000,
+      "cellsPerSecond": 2.1,
+      "msPerCell": 476
+    },
+    {
+      "level": 4,
+      "scoreFrom": 6000,
+      "cellsPerSecond": 2.9,
+      "msPerCell": 345
+    },
+    {
+      "level": 5,
+      "scoreFrom": 10000,
+      "cellsPerSecond": 4.0,
+      "msPerCell": 250
+    },
+    {
+      "level": 6,
+      "scoreFrom": 15000,
+      "cellsPerSecond": 5.5,
+      "msPerCell": 182
+    },
+    {
+      "level": 7,
+      "scoreFrom": 22000,
+      "cellsPerSecond": 7.5,
+      "msPerCell": 133
+    },
+    {
+      "level": 8,
+      "scoreFrom": 30000,
+      "cellsPerSecond": 10,
+      "msPerCell": 100
+    },
+    {
+      "level": 9,
+      "scoreFrom": 40000,
+      "cellsPerSecond": 14,
+      "msPerCell": 71
+    },
+    {
+      "level": 10,
+      "scoreFrom": 52000,
+      "cellsPerSecond": 20,
+      "msPerCell": 50
+    },
+    {
+      "level": 11,
+      "scoreFrom": 66000,
+      "cellsPerSecond": 30,
+      "msPerCell": 33
+    },
+    {
+      "level": 12,
+      "scoreFrom": 82000,
+      "cellsPerSecond": 45,
+      "msPerCell": 22
+    },
+    {
+      "level": 13,
+      "scoreFrom": 102000,
+      "cellsPerSecond": 60,
+      "msPerCell": 17
+    }
+  ],
+  "afterLevel13": {
+    "scoreStep": 20000,
+    "cellsPerSecond": 60
+  },
+  "timeAttackScoreDivisor": 2,
+  "lockDelayMs": {
+    "default": 500,
+    "fromLevel10": 300
+  },
+  "maxLockResets": 15
+}

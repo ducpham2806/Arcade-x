@@ -1,7 +1,9 @@
 import React, { useId } from 'react';
+import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
 export const GAME_ART: Record<string, { color: string; secondary: string; label: string; world: string }> = {
+  'rainbow-blocks': { color:'#7fe6ff',secondary:'#d88beb',label:'GAME MỚI',world:'Cầu vồng sắc màu' },
   'word-cross': { color: '#c4a1ff', secondary: '#fb72bc', label: 'NGÔN TỪ', world: 'Thư viện ngân hà' },
   'car-escape': { color: '#ff9f6a', secondary: '#ff547c', label: 'GIẢI CỨU', world: 'Đường đua đô thị' },
   'dungeon-tap': { color: '#ffc76a', secondary: '#f46355', label: 'PHIÊU LƯU', world: 'Thành trì bóng tối' },
@@ -35,6 +37,12 @@ function Tile({ x, y, size = 56, color, text }: { x: number; y: number; size?: n
 }
 function Scene({ id, a, b }: { id: string; a: string; b: string }) {
   switch (id) {
+    case 'rainbow-blocks': return <g transform="translate(110 12) rotate(-10 112 100)">
+      <rect x="-10" y="-8" width="240" height="218" rx="20" fill="#0d1224" stroke="#18d8f5" strokeWidth="3"/>
+      {[[0,3,'j'],[0,2,'j'],[1,3,'j'],[2,3,'o'],[3,3,'o'],[2,2,'o'],[3,2,'o'],[4,3,'l'],[4,2,'l'],[4,1,'l'],[3,1,'l'],[0,0,'t'],[1,0,'t'],[2,0,'t'],[1,1,'t']].map(([x,y,k],i)=><image key={i} href={rainbowAsset(`blocks/block_${k}_base.svg`)} x={Number(x)*44} y={Number(y)*44+22} width="44" height="44"/>)}
+      <image href={rainbowAsset('fx/fx_rainbow_sweep.svg')} x="-20" y="175" width="260" height="36"/>
+    </g>;
+
     case 'word-cross': return <g transform="translate(118 24) rotate(-10 90 90)">
       <path d="M27 27L85 27L143 85L85 143" fill="none" stroke={b} strokeWidth="58" strokeLinejoin="round" opacity=".3" />
       {['W','O','R','A','D','D','X','S','!'].map((s,i)=><Tile key={i} x={i%3*62} y={Math.floor(i/3)*62} color={[a,'#eee4ff',b][i%3]} text={s} />)}

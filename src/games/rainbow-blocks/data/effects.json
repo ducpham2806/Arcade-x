@@ -1,0 +1,68 @@
+{
+  "clearTiers": {
+    "single": {
+      "shards": 6,
+      "lifeMs": 450,
+      "streak": true,
+      "shakePx": 0,
+      "vibrateMs": 30
+    },
+    "double": {
+      "shards": 8,
+      "sparks": 2,
+      "lifeMs": 550,
+      "ring": true,
+      "shakePx": 0,
+      "vibrateMs": 40
+    },
+    "triple": {
+      "shards": 10,
+      "sparks": 3,
+      "lifeMs": 650,
+      "streakAllRows": true,
+      "shakePx": 2,
+      "shakeMs": 150,
+      "vibrateMs": 60
+    },
+    "rainbow": {
+      "shards": 12,
+      "sparks": 4,
+      "confetti": 80,
+      "lifeMs": 900,
+      "confettiLifeMs": 1500,
+      "sweep": true,
+      "flash": true,
+      "hitStopMs": 150,
+      "shakePx": 4,
+      "shakeMs": 250,
+      "vibrateMs": 80
+    },
+    "perfectClear": {
+      "stars": 120,
+      "lifeMs": 1500,
+      "vibrateMs": 100
+    }
+  },
+  "maxParticles": {
+    "pc": 300,
+    "mobile": 150
+  },
+  "qualityScale": {
+    "high": 1.0,
+    "medium": 0.6,
+    "low": 0.3,
+    "off": 0.0
+  },
+  "popupText": {
+    "showMs": 220,
+    "holdMs": 500,
+    "floatPx": 40,
+    "fadeMs": 400,
+    "heightPx": {
+      "single": 48,
+      "double": 72,
+      "triple": 96,
+      "rainbow": 140
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+const RainbowBlocksGame = lazy(() => import('./rainbow-blocks'));
 import { GameMetadata } from '../types';
 const NeonRunnerGame = lazy(() => import('./neon-runner').then(module => ({ default: module.NeonRunnerGame })));
 import { NEON_RUNNER_ACHIEVEMENTS, NEON_RUNNER_DROP_RATES, NEON_RUNNER_CONTROLS } from './neon-runner/config';
@@ -40,6 +41,14 @@ const WordCrossGame = lazy(() => import('./word-cross').then(module => ({ defaul
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
+  'rainbow-blocks': {
+    id:'rainbow-blocks',title:'Rainbow Blocks',shortDesc:'Xếp sắc màu, xoá hàng và bật cầu vồng',
+    description:'Game khối rơi 10×20 với xoay SRS, giữ khối, bóng rơi và 5 chế độ chơi. Thử sức với Điểm cao, Đua thời gian, Thư giãn, Tốc độ riêng và Sprint 40 hàng.',
+    category:'Puzzle',difficulty:'Trung Bình',icon:'🌈',bannerGradient:'from-sky-900 via-indigo-900 to-violet-950',themeColor:'#1ec8f0',
+    tags:['Game mới','Xếp khối','Cầu vồng','Combo','Cảm ứng'],
+    controls:[{key:'← → / A D',action:'Di chuyển',touchInstruction:'Kéo ngang để di chuyển'},{key:'↑ / X · Z',action:'Xoay khối',touchInstruction:'Chạm để xoay'},{key:'Space',action:'Thả ngay',touchInstruction:'Vuốt nhanh xuống'},{key:'C / Shift',action:'Giữ khối',touchInstruction:'Chạm ô Giữ hoặc vuốt lên'},{key:'P',action:'Tạm dừng'}],
+    achievements:[],dropRates:{baseChestDropChance:0,scoreThresholdForDrop:1000,chestWeights:[]},component:RainbowBlocksGame,
+  },
   'word-cross': {
     id: 'word-cross',
     title: 'Word Cross',
@@ -326,6 +335,8 @@ export const ALL_GAMES_LIST = Object.values(GAME_REGISTRY);
 
 // 5 new & featured highlight games for the top slider
 export const FEATURED_SLIDER_GAME_IDS = [
+  'rainbow-blocks',
+  'hex-match',
   'word-cross',   // Newest release with Daily Puzzle & Vocab
   'car-escape',   // Hot 100-level parking puzzle
   'dungeon-tap',  // RPG Tap Titans Boss Rush

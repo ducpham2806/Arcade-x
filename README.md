@@ -1,6 +1,6 @@
 # Arcade-x · Source mới nhất · 13/10/2026
 
-Gói source hợp nhất các game hiện có, Blossom Blast v0.8 và UI/UX launcher mới nhất. Không bao gồm Rainbow Blocks. Không tiếp tục commit/push Git hoặc publish Netlify trong lượt đóng gói này.
+Gói source hợp nhất các game hiện có, Blossom Blast v0.8 và UI/UX launcher mới nhất. Đã bổ sung Rainbow Blocks (5 chế độ offline) và carousel 6 slide, chuyển mỗi 15 giây. Bản source hợp nhất; phát hành Netlify được thực hiện riêng.
 
 ## Chạy và build
 
@@ -22,12 +22,14 @@ Nếu cần kết nối backend, sao chép `.env.example` thành `.env.local`, �
 ```bash
 npm run preview:blossom
 npm run preview:launcher
+npm run preview:rainbow
 npx playwright install chromium
 npm run test:blossom
+npm run test:rainbow
 npx playwright test tests/launcher
 ```
 
-Hai file HTML duyệt được sinh ở thư mục cha của source. Bản launcher HTML phục vụ duyệt giao diện, không dùng để kiểm thử toàn bộ game có worker/asset ngoài. Có thể đặt `CHROMIUM_EXECUTABLE` nếu dùng Chromium đã cài trên máy. Các kiểm tra SQL yêu cầu Docker và chạy trong database test riêng; không kết nối production.
+Các file HTML duyệt được sinh ở thư mục cha của source. Bản launcher HTML phục vụ duyệt giao diện, banner và Rainbow Blocks; các game có worker/asset ngoài cần chạy bằng dev server. Có thể đặt `CHROMIUM_EXECUTABLE` nếu dùng Chromium đã cài trên máy. Các kiểm tra SQL yêu cầu Docker và chạy trong database test riêng; không kết nối production.
 
 ## Đã dọn
 
@@ -39,4 +41,10 @@ Hai file HTML duyệt được sinh ở thư mục cha của source. Bản launc
 
 TypeScript và production build thành công trực tiếp từ thư mục source đã dọn. 75 kiểm tra Blossom Blast/launcher đạt (1.8 phút), gồm mobile/desktop, 100 popup chuẩn bị, VFX, lưu tiến trình, garden và các bản HTML offline. Các game khác được giữ trong dependency graph và build thành công; chưa chạy lại toàn bộ kiểm thử gameplay của các game khác hay kiểm thử backend trong lượt đóng gói này.
 
-`verification/build.log` ghi kết quả build. `SOURCE-MANIFEST.json` ghi SHA-256 từng file để kiểm tra tính toàn vẹn.
+Lượt bổ sung Rainbow Blocks: typecheck và build đạt, 29 kiểm thử Rainbow/launcher theme/Blossom UI đạt (2 phút).
+
+Xem `docs/RAINBOW-BLOCKS.md` để biết phạm vi Rainbow Blocks, bản kỷ lục trên thiết bị và những hạng mục online chờ triển khai.
+
+`SOURCE-MANIFEST.json` ghi SHA-256 các file source để kiểm tra tính toàn vẹn.
+
+Cập nhật popup chuẩn bị Rainbow Blocks: khung cố định giữa các mode, công tắc dự đoán vị trí rơi có lưu lựa chọn; hồ sơ mới mặc định tắt. 26 kiểm thử Rainbow đạt trên bản cập nhật.

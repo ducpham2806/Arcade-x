@@ -5,6 +5,7 @@ import {usePlayer} from '../context/PlayerContext';
 import {useLauncher} from '../launcher/LauncherContext';
 import {normalizeSearch} from '../launcher/catalog';
 import {GameArtwork} from '../visuals/gameArt';
+import {FeaturedCarousel} from '../launcher/FeaturedCarousel';
 import {LazyGameCard} from './common/LazyGameCard';
 const categories=[['Tất Cả','Tất cả'],['Yêu Thích','Yêu thích'],['Puzzle','Giải đố'],['Arcade','Arcade'],['Action','Hành động'],['Reflex','Phản xạ'],['Multiplayer','Đối kháng']];
 const initialFilter=()=>{try{return JSON.parse(sessionStorage.getItem('launcher_library_filter')||'{}');}catch{return {};}};
@@ -18,12 +19,10 @@ export const GameCatalog:React.FC=()=>{
   return matches&&normalizeSearch([game.title,game.shortDesc,...game.tags].join(' ')).includes(normalizeSearch(query));
  }),[catalog,category,query,favorites]);
  const recent=recentlyPlayed.map(id=>catalog.games.find(game=>game.id===id)).filter(Boolean).slice(0,3);
- const featured=catalog.games.find(game=>game.featured&&game.availability==='published'&&game.accessModel==='free')||catalog.games[0];
+
  const reset=()=>{setQuery('');setCategory('Tất Cả');};
  return <div className="launcher-catalog arcade-catalog simple-catalog">
-  <section className="launcher-welcome"><div><p className="launcher-eyebrow">KHOẢNG NGHỈ CỦA BẠN</p><h1>Chơi một chút.<br/><span>Vui cả ngày.</span></h1><p>Game nhỏ, niềm vui lớn. Chọn một trò và bắt đầu thôi.</p><a className="launcher-primary" href="#game-library"><Grid2X2 size={18}/>Khám phá thư viện</a></div>
-   {featured&&<div className="welcome-game"><div className="welcome-sticker">HÔM NAY CHƠI GÌ?</div><button className="welcome-art" onClick={()=>openGameDetail(featured.id)} aria-label={`Khám phá ${featured.title}`}><GameArtwork gameId={featured.id}/></button><div className="welcome-caption"><div><span>GỢI Ý CHO BẠN</span><h2>{featured.title}</h2></div><button id="btn-launch-featured" aria-label={`Chơi game nổi bật ${featured.title}`} className="launcher-icon" onClick={()=>launchGame(featured.id)}><Play size={22} fill="currentColor"/></button></div></div>}
-  </section>
+  <FeaturedCarousel games={catalog.games} onPlay={launchGame} onDetail={openGameDetail}/>
   <div className="launcher-benefits"><span><Gamepad2 size={17}/>Chọn game và chơi ngay</span><span><Heart size={17}/>Lưu những trò bạn thích</span><span><CloudOff size={17}/>Game đơn hỗ trợ chơi offline</span></div>
   {recent.length>0&&<section id="recent-games" className="launcher-recents" aria-labelledby="heading-recently-played"><div className="launcher-section-title"><h2 id="heading-recently-played">Chơi gần đây</h2><span>Quay lại trò bạn thích</span></div><div>{recent.map(game=><button key={game!.id} id={`btn-play-recent-${game!.id}`} onClick={()=>launchGame(game!.id)}><div><GameArtwork gameId={game!.id}/></div><span>{game!.title}</span><ArrowUpRight size={19}/></button>)}</div></section>}
   <section id="game-library" className="launcher-library" aria-labelledby="heading-game-library">

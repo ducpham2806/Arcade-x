@@ -1,0 +1,59 @@
+{
+  "modes": [
+    {
+      "id": "free_play",
+      "leaderboard": false,
+      "speedUp": true,
+      "undo": 3
+    },
+    {
+      "id": "highest_score",
+      "leaderboard": true,
+      "speedUp": true
+    },
+    {
+      "id": "time_attack",
+      "leaderboard": true,
+      "durationsSec": [
+        60,
+        120,
+        180,
+        300
+      ],
+      "levelScoreDivisor": 2
+    },
+    {
+      "id": "custom_speed",
+      "leaderboard": true,
+      "speedRange": [
+        1,
+        20
+      ],
+      "speedUpOption": false,
+      "groups": {
+        "slow": [
+          1,
+          5
+        ],
+        "medium": [
+          6,
+          10
+        ],
+        "fast": [
+          11,
+          15
+        ],
+        "insane": [
+          16,
+          20
+        ]
+      }
+    },
+    {
+      "id": "sprint_40",
+      "leaderboard": true,
+      "targetLines": 40,
+      "phase": 2
+    }
+  ]
+}

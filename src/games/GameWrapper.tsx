@@ -84,6 +84,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
   const [showPreGameLoading, setShowPreGameLoading] = useState<boolean>(() => {
+    if (gameMeta.id === 'rainbow-blocks') return false; // Own interactive tutorial and mode menu.
     try {
       const skipped = localStorage.getItem('arcadex_skip_pregame_loading');
       return skipped !== 'true' && localStorage.getItem(`launcher_guide_seen_${gameMeta.id}`) !== 'true';
@@ -383,7 +384,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const handleGameOver = useCallback(
     async (finalScore: number, stats?: Record<string, number>) => {
       // Blossom owns its level result and Xu economy; keep the campaign mounted.
-      if (gameMeta.id === 'hex-match' && stats?.blossom === 1) {
+      if ((gameMeta.id === 'hex-match' && stats?.blossom === 1) || (gameMeta.id === 'rainbow-blocks' && stats?.rainbow === 1)) {
         bridge.updateSessionState?.({ score: finalScore, extra: stats });
         return;
       }
@@ -514,6 +515,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   const handleRestart = useCallback(() => {
     if (gameId === 'hex-match') { window.dispatchEvent(new Event('blossom:restart')); return; }
+    if (gameId === 'rainbow-blocks') { window.dispatchEvent(new Event('rainbow:restart')); return; }
     endedRef.current=false;
     recordPlay(gameId);
     initialGameStateRef.current = ['tile-2048', 'neon-runner', 'car-escape', 'scoodoku', 'shikaku', 'word-cross', 'cosmic-defense'].includes(gameId) ? null : undefined;
@@ -682,7 +684,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
-          style={gameId === 'hex-match' ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
+          style={['hex-match','rainbow-blocks'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
         >
           <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
           <GameLoadBoundary onExit={onExit}>

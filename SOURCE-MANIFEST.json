@@ -1,11 +1,18 @@
 {
   "project": "Arcade-x",
-  "revision": "latest-clean-2026-10-13",
-  "rainbowBlocksIncluded": false,
+  "revision": "merged-rainbow-preparation-2026-10-13",
+  "rainbowBlocksIncluded": true,
+  "games": 19,
+  "banner": {
+    "slides": 6,
+    "intervalMs": 15000,
+    "direction": "right-to-left"
+  },
   "validation": {
     "typecheck": "passed",
     "build": "passed",
-    "playwright": "75 passed (1.8m)"
+    "rainbow_tests": "26 passed",
+    "previous_regression": "launcher theme and Blossom UI passed"
   },
   "files": [
     {
@@ -30,8 +37,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 2951,
-      "sha256": "79838237d794f725ddfc248badca640aa2d409caad75dec189b974cf4b1d47c5"
+      "bytes": 3558,
+      "sha256": "49f962fc7ebb5ab295364aa83b8ff08572eabc08d4c259a167894d7ccf9bfccd"
     },
     {
       "path": "blossom-review.html",
@@ -42,6 +49,16 @@
       "path": "docs/CLEANUP.json",
       "bytes": 24777,
       "sha256": "fdaf8e73515c1a106c242387c455b7ce1896fa78280902ac2050198662c0079c"
+    },
+    {
+      "path": "docs/RAINBOW-BLOCKS.md",
+      "bytes": 4546,
+      "sha256": "d8aebfe7f2063ed8b511bb759eeb314fd58b2068ddaa41165776e12f747653de"
+    },
+    {
+      "path": "docs/Rainbow-Blocks-GDD.md",
+      "bytes": 52716,
+      "sha256": "e97222cca4a9a343733d9c4a6045f352edbbf467a32ddeba077febf45fce35c4"
     },
     {
       "path": "index.html",
@@ -60,8 +77,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 1678,
-      "sha256": "a2e30d89f2b11af02a66761bfbf31e614bbecb836de0fd77c74e54e451dd5964"
+      "bytes": 1790,
+      "sha256": "230708fcc53222cb59fa9b5939b52c945d085cc85b4944c7215a55d2532b8a98"
     },
     {
       "path": "playwright.config.ts",
@@ -2419,6 +2436,531 @@
       "sha256": "d996146ebec3a34794e02969e1b79fea86a45fb26283adb1b97cfa0c289f333d"
     },
     {
+      "path": "public/rainbow_blocks_assets/bg/bg_galaxy.svg",
+      "bytes": 10768,
+      "sha256": "4967e4fd2a10764866bb5f17e724f13bab38bf7fbbfba6c6cb49dfb68694143e"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/bg/bg_night.svg",
+      "bytes": 4709,
+      "sha256": "2821f6a7c10e535192d5aee2bffcd65591798067a7b1251f432ff2f274f29cfa"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/bg/bg_ocean.svg",
+      "bytes": 4738,
+      "sha256": "9f896c18d274bbb5afd075b474908fec71e2eaac0ca073974952ec0e73002ed7"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/bg/bg_sunset.svg",
+      "bytes": 4721,
+      "sha256": "a92a710e446ef42a206148d7e871a89df33fc11c550608c7677fe6b0d470b71e"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/bg/bg_teal.svg",
+      "bytes": 4712,
+      "sha256": "94843d4dd09b5a39f78af06e45dab72e70f34496e380f14538875d2b4598063a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_dim.svg",
+      "bytes": 967,
+      "sha256": "24c6120791f339963bfee433d18e6ce50f62de2a6bf310f48657571a34298351"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_i_base.svg",
+      "bytes": 967,
+      "sha256": "5ac5abc9bc05c8e8bc3d19798cc39553a3ad9da06c836ab369153f3129163232"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_j_base.svg",
+      "bytes": 967,
+      "sha256": "7fedb0652110ec1c1c715e134767f60a733a533350d5200f34f9904f3980d16e"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_l_base.svg",
+      "bytes": 967,
+      "sha256": "aa085a4f8ea861ac3ddac4ee12155f4e826c925ce74554998b4f81b3d965219a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_locked_flash.svg",
+      "bytes": 158,
+      "sha256": "16a3326558ad4be8a3a9f776ea0f783a28349ba62441ab2e5c7972ac615020a5"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_o_base.svg",
+      "bytes": 967,
+      "sha256": "8ffacf7a7be6980301aa8b65003aa15e13da9d9a94bc4a17fcefcbb8ac698f78"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_s_base.svg",
+      "bytes": 967,
+      "sha256": "366a51a60836ca6b4efc5111d7570124641fa5a645a5648b9a2533dd85c31fee"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_t_base.svg",
+      "bytes": 967,
+      "sha256": "d3c5409028afd9928240b156f190e3d378b60181f0cc50f8cb78a10f0b2b4d31"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/block_z_base.svg",
+      "bytes": 967,
+      "sha256": "0085ed4ddd6d398054d1f150cd866dae195af29eac6ced309bdd1768878e366d"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/cb_symbol_i.svg",
+      "bytes": 177,
+      "sha256": "c3fb7d498cab457cee432dd3dab9a9c89d344a148bd985b41f83d27335c9d34c"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/cb_symbol_j.svg",
+      "bytes": 158,
+      "sha256": "694b20af46b3b83c00aeb7b0dacdc4c0f57356dd50d123c5b56f3224c1b0025d"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/cb_symbol_l.svg",
+      "bytes": 158,
+      "sha256": "95b09fc1fda34aad088b3277dcf571b14da05486a1dbb2796a833d85fb6be201"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/cb_symbol_o.svg",
+      "bytes": 177,
+      "sha256": "fa32e5270d40305f8f9e2775b56843fbee458c42f4c64e99e5bc37547f932498"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/cb_symbol_s.svg",
+      "bytes": 231,
+      "sha256": "b6b2b8a29d93a83f6869d42d0659df7cf559d28b7fe481230c72b4431f7198a9"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/cb_symbol_t.svg",
+      "bytes": 163,
+      "sha256": "966636d8ed522ede1afb1efd12715d849e660089852aa3ba494c41483a5cc165"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/cb_symbol_z.svg",
+      "bytes": 233,
+      "sha256": "2556be1f392e155acf364dfc7b640f8e5748e84d6d4e2a99c72cdfbc1d43152f"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/ghost_i.svg",
+      "bytes": 233,
+      "sha256": "1eec95dda0b0cdde5eaaa17ea118db29a4b2a5e89a821aa51db46850f531be44"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/ghost_j.svg",
+      "bytes": 233,
+      "sha256": "3c1bd43d274b83e1ddb81af8733dababaf7fca90fe6da4cb9d05136a54249511"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/ghost_l.svg",
+      "bytes": 233,
+      "sha256": "16f34285f74f0d250bdad28ea08a389a012da3ac0cc24503b4f44491a0ce18a0"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/ghost_o.svg",
+      "bytes": 233,
+      "sha256": "ca888b81c39341473b2dd1fc920bceb8a7d56d0ccb640e0e78c8487ba237bbe0"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/ghost_s.svg",
+      "bytes": 233,
+      "sha256": "29d2e5f15af179d3c8f2e0b906162bccd737439ffe04e24dc8f7788161fdfe8a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/ghost_t.svg",
+      "bytes": 233,
+      "sha256": "22e00d3b23df3079a97ba07c7bb937121b34a8da46324c474af219e1df45058a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/blocks/ghost_z.svg",
+      "bytes": 233,
+      "sha256": "b118c0c19e2a3deab06fad7e91c65c19c2a75daccd69e47f12b753482c71cf98"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/board/board_bg.svg",
+      "bytes": 299,
+      "sha256": "ea9d43e49c97a0929d47016456df10f2b385fe04388fef96dc94ce7492ccba38"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/board/board_danger_overlay.svg",
+      "bytes": 335,
+      "sha256": "10654e9fb3b129fca7411e10b71c01ba1b7f166acbfcf6bd9d8d9f301577b087"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/board/board_frame_danger.svg",
+      "bytes": 562,
+      "sha256": "57d36e9659775b62c0565853fb24f6210553f50e20aa84a49fe4ae1264b548ff"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/board/board_frame_neon.svg",
+      "bytes": 562,
+      "sha256": "60f6ce0ed1da2df7e040d50ed9b9fa50bb83a68cb1065cff145660d7ec9320c2"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/board/board_grid_tile.svg",
+      "bytes": 169,
+      "sha256": "7900a0751a86289b3c5994d18db70232654dc28379212c84fc13ee79fbf47f98"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/data/controls.json",
+      "bytes": 1750,
+      "sha256": "2cfccf20155553fc1c6e58c8460b2a8e414ae6c6a04469ca933e9dc59553fb25"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/data/effects.json",
+      "bytes": 1184,
+      "sha256": "657f21b989f5eeb41e8997e44a12d4dde9707dc7f4de305e203cc804e2cedd03"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/data/levels.json",
+      "bytes": 1620,
+      "sha256": "6e40ac26fbaf7511a0e57978c63821e9c42204d9b798427e7571649216f78890"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/data/modes.json",
+      "bytes": 902,
+      "sha256": "7cd022f3c92a29cc142f041bcb60658a4f2f2e3932776d39e01b3c9f1154cd4a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/data/scoring.json",
+      "bytes": 388,
+      "sha256": "ac76d5e18b8b6db25fc971a62d47c11e18ef4a9dcd162eac17cbc13f603de4fa"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/data/tokens.json",
+      "bytes": 1138,
+      "sha256": "7627519378d7ee1515cb40b410d6c55a3f585b4059e415b4c66a4277e17bf3ff"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_circle_1.svg",
+      "bytes": 142,
+      "sha256": "a83dd0cea90e95e6d0494c513d34d571aa6f152a127f62d61054dc4eaec28f14"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_circle_2.svg",
+      "bytes": 142,
+      "sha256": "5d2ef6694179bfb087e1fffd1c004adb68d19f5bdc959fc193cc3b9c92b65299"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_circle_3.svg",
+      "bytes": 142,
+      "sha256": "13a9d93afff37a20e7c142cb334237a977a485c8a85980cc09d44ec6058bde10"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_circle_4.svg",
+      "bytes": 142,
+      "sha256": "22056919a06d7c53cc3bc7b9ab1bb85de75ce62a8e4f5f7b094813eb07cb8840"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_circle_5.svg",
+      "bytes": 142,
+      "sha256": "d4eaa009f7b51fc5506a43703232a4edaee0ab8f05351a712d79ea5ffd081789"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_circle_6.svg",
+      "bytes": 142,
+      "sha256": "06c4fb60ace7dee402fc3da5596de003b743266776b725926095a7983f4b2077"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_rect_1.svg",
+      "bytes": 160,
+      "sha256": "6921192d47679239fab12d3479a376fcfd45e9e82374b2c8256afc9572c862d7"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_rect_2.svg",
+      "bytes": 160,
+      "sha256": "6724a9b9b2f150bf5d3a64ce4001e94a68587c1fc4b25d55c63bc6caed32eb73"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_rect_3.svg",
+      "bytes": 160,
+      "sha256": "6cf996ab42f7939849b8a75352e069a4468e98256ba612ebb4b8527f883298fa"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_rect_4.svg",
+      "bytes": 160,
+      "sha256": "51047055ea1d9f3e14a96732bf3b1b462916e655173fb64913c6594c2e4e3d96"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_rect_5.svg",
+      "bytes": 160,
+      "sha256": "89c26dde29d0ac3e9b4589aeefc3c65ad6d06dd4c03112eb61c8ae8e890855fd"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_rect_6.svg",
+      "bytes": 160,
+      "sha256": "bcffca52b6fc89d2cd141a0b7d67c00538655e89ac24cef2c7258e5b79374c68"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_tri_1.svg",
+      "bytes": 146,
+      "sha256": "f6e5359a3b5b436aabd3e390b615200942aa430a9c86bdedc84d8c2fe90f1c53"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_tri_2.svg",
+      "bytes": 146,
+      "sha256": "f8f7510d4e1e69beac76da8c235702ea0d6b4affa40b083f50aa9b49dee3fafa"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_tri_3.svg",
+      "bytes": 146,
+      "sha256": "bd976e0e800c5dc8cf1e1b28a02384037aa4966e0fb1e18301e2fc460ee61755"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_tri_4.svg",
+      "bytes": 146,
+      "sha256": "577c0cb7a0f327f11d166f282432a938e758d40c9921c06a8ea814921f917800"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_tri_5.svg",
+      "bytes": 146,
+      "sha256": "4d6465c0ffcb8289fcd02efbe7d6d50e4ab9be981b82f99f2ff6b54579bc0a41"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_confetti_tri_6.svg",
+      "bytes": 146,
+      "sha256": "6f234d7943d24090583d007d4e5ee51df197453ae859fe716d4a33563ebae623"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_flash.svg",
+      "bytes": 125,
+      "sha256": "ca2f0ed09f13e6c1e882ba85cb767c2d46719726ecaf1cb8f3b92aa0e9963621"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_glow.svg",
+      "bytes": 282,
+      "sha256": "82214dcf59f38447bf947d3f876744655a9f54504b872776224fa91380d18c4e"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_rainbow_sweep.svg",
+      "bytes": 722,
+      "sha256": "1c0417bf07496291de36110ce08dd6a3f09c03f7948df4e3f4a82aca87d09ad1"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_ring.svg",
+      "bytes": 260,
+      "sha256": "3f8952d1cabb52cd1744fba9ab1e4f9488db95e62223ae99535b05953cd825ae"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_shard_01.svg",
+      "bytes": 147,
+      "sha256": "633ab11d24382433e52f2ef285fcbfaeab1be920b39aa01f0396a8f724e75065"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_shard_02.svg",
+      "bytes": 140,
+      "sha256": "a544227764cbfcc83cd20d059852240c045fb7c32c50c350696362e1802db81d"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_shard_03.svg",
+      "bytes": 142,
+      "sha256": "3f59ed97bed630118fc9d3f8459afbdc339e62fa44e2907d204eb4c568e7a578"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_spark.svg",
+      "bytes": 166,
+      "sha256": "4312260ff4ae5b8cedd7a5399ebe33fa0292e53bb52f277648f0efdf07af404d"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_star.svg",
+      "bytes": 221,
+      "sha256": "310129a068bb4783f71528f681af259cdff1a98e31184fbe6afb30280844ac7e"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_streak_h.svg",
+      "bytes": 466,
+      "sha256": "c5422fd2e8c9f4970997444780b2d0a36cdd5d6d645836251aa98346dd9dfcca"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/fx/fx_streak_v.svg",
+      "bytes": 555,
+      "sha256": "761f178f632fd2d3cdc0b43a2ba29e2ff9543bda308d99ade801152de90820a1"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_bolt.svg",
+      "bytes": 155,
+      "sha256": "42a17483e855a08a17adec42e9e40bb6ed23920b96e8fb7ea86e78e31295832b"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_clock.svg",
+      "bytes": 330,
+      "sha256": "a1fc655e6f49e44de058eae51dccc037714ed607016d5bde141c51b8c570e63e"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_close.svg",
+      "bytes": 218,
+      "sha256": "b71200eee6317b7739ab75daacdc0d4454fdcf0e794e8bf16a9522ddde337a39"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_home.svg",
+      "bytes": 229,
+      "sha256": "f022732486c0ed3532606bdc4d18c25c2135dd3e5fe60d20eae54cf4a4854c39"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_lock.svg",
+      "bytes": 365,
+      "sha256": "05afa4cda87c4b36530c69f287648cdd6ca571929333bbf18d0444713069bbd6"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_music.svg",
+      "bytes": 297,
+      "sha256": "30b7adf30c4523adc07e7c100c75f7fc6f39d35bb3048135b0cb69235dfe5c5f"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_pause.svg",
+      "bytes": 210,
+      "sha256": "288ec9b6a77f06e87aaa1cdf681e41a9f149c3473b51758d2991b4a5e3a29185"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_play.svg",
+      "bytes": 138,
+      "sha256": "287d108200ee8e46c3cf7dfaf8acf075781235e855ed165cffbb1b72caca5e65"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_question.svg",
+      "bytes": 280,
+      "sha256": "c6600a133124b950f70e8bac4da64d56e297b42ebf83f68b7dc5689a4dc3a47f"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_restart.svg",
+      "bytes": 331,
+      "sha256": "955bb961b18e685bde9081a59d4f0bffaa85948a38dcbe5ee4cbfa769110ec46"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_settings.svg",
+      "bytes": 430,
+      "sha256": "8a9235ef463c0781a4b2505aef624ecc49e1ea21e56fcf7820b256fa7c56912c"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_share.svg",
+      "bytes": 581,
+      "sha256": "c8da141541ea2097149752a0bbecffa949180831bef76614ed57ff0b9599f885"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_sound_off.svg",
+      "bytes": 363,
+      "sha256": "15406a5c99b021c59d3c39522c3d99af0b83fb4f99734796d8abdb8b5c8eee49"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_sound_on.svg",
+      "bytes": 375,
+      "sha256": "1807a1f6c5925d7d3e0cfeabf15c98118f5320a4642d02be6a3cdc137bf18930"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_star.svg",
+      "bytes": 218,
+      "sha256": "8534f18b7fdceed8a4c88d00da1dd31760ba4e54cdb01b36533ec55c0254139f"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_trophy.svg",
+      "bytes": 296,
+      "sha256": "18dc60e09cf044aa6f36d9ff7d76eaa58cbdbd337eaa101971dbe97d181a0f8a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_user.svg",
+      "bytes": 338,
+      "sha256": "61c4959bb77f4d41a53e497088305851600c3ed8ba20bae19712807cd50eae08"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/icons/icon_vibrate.svg",
+      "bytes": 374,
+      "sha256": "ff26a0cec6329cad8b9f65955e4090ca3e49636a426f8b2e691a9f4b392ef844"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/manifest.json",
+      "bytes": 3167,
+      "sha256": "f30aff40de2cb5ca4467ef9010d9c23f7a1fd2751f06c9320a6772b3dc5a3804"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/badge_new_best.svg",
+      "bytes": 843,
+      "sha256": "3aba438c5409555e26f7b22bde11f7d91ae39f673ede128001d285c0221b18f2"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/btn_disabled.svg",
+      "bytes": 542,
+      "sha256": "1ad9a864931d0ca8f38887cc29a5a19ad22bba8b31119b18e60d093549b097c7"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/btn_primary_normal.svg",
+      "bytes": 542,
+      "sha256": "3cf8ad68bcf4a818dd10d2138a52364debaa3be2744a74616f1d94fa6105172a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/btn_primary_pressed.svg",
+      "bytes": 463,
+      "sha256": "ef8640ed4e368d685028819c036ccadc82ff5b08618aa4e5698e9353503e7f23"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/btn_round_normal.svg",
+      "bytes": 210,
+      "sha256": "ba28725925ad78470b05fce945dd503cf2b210a0dcf4409075e6ab3e4abacf4a"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/btn_round_pressed.svg",
+      "bytes": 210,
+      "sha256": "3af4a1fa576381b71f9d4669c13a5cbcfd821d26ff5623fbcba9b186278a398d"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/btn_secondary_normal.svg",
+      "bytes": 542,
+      "sha256": "4e5b2cf4b83a65f00036f003c03f087b5337506813828dbf1504787471a00607"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/btn_secondary_pressed.svg",
+      "bytes": 463,
+      "sha256": "5e83d20b1e86599960411ddf131e7a5d18fd15e5e4798df9cf4e85a75ce55c4c"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/medal_bronze.svg",
+      "bytes": 318,
+      "sha256": "213e3ae7cb3be9c28ba783b8e2f10ca45e45d4ccba0ce69777815ad8cc16f7d8"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/medal_gold.svg",
+      "bytes": 318,
+      "sha256": "872bc5b958ecd1b40743c0213a460b07b32e7c03e7dac70859d2fcd164e59dfb"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/medal_silver.svg",
+      "bytes": 318,
+      "sha256": "f4b974f84a58f4f82c44aee246fba945775e0992c3da25c234116115b506ddc8"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/panel_hud.svg",
+      "bytes": 231,
+      "sha256": "3af06dbdbeaa20e27b4f1cee1b09a288d6baa1afbd6476f6d984a3876cd54ad8"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/panel_popup.svg",
+      "bytes": 273,
+      "sha256": "4d2d0a542b6c2d0bf2799cabaf732620cb5ab8f19ccf143282758dc0a0741cf3"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/progress_bar.svg",
+      "bytes": 289,
+      "sha256": "53e5b29366cabe618dbe85442fb6fd50899c1f0904b3ec904f0f11d307e7fc84"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/slider_knob.svg",
+      "bytes": 223,
+      "sha256": "85f73439fa136cb3280af21ea45dfb14dda971c67427b0c160d95456b6417e4f"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/slider_track.svg",
+      "bytes": 155,
+      "sha256": "7c39a9b83b6a6bccc41f812f243a93bcc6248b0eb5315e7369d86e63d45bac13"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/toggle_off.svg",
+      "bytes": 232,
+      "sha256": "d3840d482169b67454c726bbd818cb05299fe1350f5b62e2bbaa556900714d8c"
+    },
+    {
+      "path": "public/rainbow_blocks_assets/ui/toggle_on.svg",
+      "bytes": 232,
+      "sha256": "ef741d4cdf22b522979ff73c022ca266b94d5b07db2fe557d5d8496aa7de5643"
+    },
+    {
       "path": "scripts/blossom-bots.ts",
       "bytes": 5302,
       "sha256": "a2252ed8f3583ccf260f482c4f31f969c50bd84672b998f55c280a130ef91a1d"
@@ -2450,8 +2992,13 @@
     },
     {
       "path": "scripts/launcher-preview.mjs",
-      "bytes": 2062,
-      "sha256": "6c665be78ef01764cd080b6115989fadac98869c9cb3946b4f80432e69c98544"
+      "bytes": 2250,
+      "sha256": "b7e37e2fedfd8c676b3633880675a9663050379e8957897a53808c68c23ccb39"
+    },
+    {
+      "path": "scripts/rainbow-preview.mjs",
+      "bytes": 1547,
+      "sha256": "ea4b6df9b450b5b6dafa391e97834f1eb2d536063bdc561e9a38d4b78c9b3d05"
     },
     {
       "path": "scripts/run-blossom-seed-audit.mjs",
@@ -2485,8 +3032,8 @@
     },
     {
       "path": "src/components/GameCatalog.tsx",
-      "bytes": 5844,
-      "sha256": "a7e0821910cca8969c7f94b3754ffb385b8d92a182c1d2e03c48b7ba8dc3305c"
+      "bytes": 4921,
+      "sha256": "23304fad11c52c79e7f79aa13fffd94d8b82d9bc05391c5e565bbcdd6a9d27b8"
     },
     {
       "path": "src/components/GameDetailModal.tsx",
@@ -2645,8 +3192,8 @@
     },
     {
       "path": "src/data/gameOnboardingData.ts",
-      "bytes": 41183,
-      "sha256": "7baf83276ce49d6ea39e8b96e0bd18f5fb327479caa4b887062596bd5dfa4a13"
+      "bytes": 42098,
+      "sha256": "894d8dbe3d1f97b9dccb1641bb9d5475494c50848a69dc080cd2e8f433079435"
     },
     {
       "path": "src/data/legendaryBlueprints.ts",
@@ -2665,8 +3212,8 @@
     },
     {
       "path": "src/games/GameWrapper.tsx",
-      "bytes": 39185,
-      "sha256": "6bcd7b657698b2cf335b34acf4c8a33720fc8c240998ce144f2f8ee6d2f35fae"
+      "bytes": 39474,
+      "sha256": "e9c555fa982dd363507bc6430085936184ab77c822bfe19ab995a6412645d532"
     },
     {
       "path": "src/games/blocker/blocker.css",
@@ -3264,9 +3811,94 @@
       "sha256": "69c63c3c2592fb7f4d5aac54b6bd3954f49ab79782ac648ee43b2759463fca2a"
     },
     {
+      "path": "src/games/rainbow-blocks/assets.ts",
+      "bytes": 212,
+      "sha256": "e96ab7e7fa3536d9b8ec0a16a414e0b9b4c697dea3eff3529b7e01502cf4dbb8"
+    },
+    {
+      "path": "src/games/rainbow-blocks/audio.ts",
+      "bytes": 1574,
+      "sha256": "80b77710cf39ac0fe554c4d47c5116b2be45e3b5b8009f0a284e18582fdad0fe"
+    },
+    {
+      "path": "src/games/rainbow-blocks/core/engine.ts",
+      "bytes": 9518,
+      "sha256": "d041552d70626e9c7081619e426d03eab6910b45108f2e95c105ed71e9db33be"
+    },
+    {
+      "path": "src/games/rainbow-blocks/core/pieces.ts",
+      "bytes": 1746,
+      "sha256": "58b8eecfdb58372b04daaacdb7dd48431c1cd72668ad0f0ef9fc4f257ce06b44"
+    },
+    {
+      "path": "src/games/rainbow-blocks/data/controls.json",
+      "bytes": 1750,
+      "sha256": "2cfccf20155553fc1c6e58c8460b2a8e414ae6c6a04469ca933e9dc59553fb25"
+    },
+    {
+      "path": "src/games/rainbow-blocks/data/effects.json",
+      "bytes": 1184,
+      "sha256": "657f21b989f5eeb41e8997e44a12d4dde9707dc7f4de305e203cc804e2cedd03"
+    },
+    {
+      "path": "src/games/rainbow-blocks/data/levels.json",
+      "bytes": 1620,
+      "sha256": "6e40ac26fbaf7511a0e57978c63821e9c42204d9b798427e7571649216f78890"
+    },
+    {
+      "path": "src/games/rainbow-blocks/data/modes.json",
+      "bytes": 902,
+      "sha256": "7cd022f3c92a29cc142f041bcb60658a4f2f2e3932776d39e01b3c9f1154cd4a"
+    },
+    {
+      "path": "src/games/rainbow-blocks/data/scoring.json",
+      "bytes": 388,
+      "sha256": "ac76d5e18b8b6db25fc971a62d47c11e18ef4a9dcd162eac17cbc13f603de4fa"
+    },
+    {
+      "path": "src/games/rainbow-blocks/data/tokens.json",
+      "bytes": 1138,
+      "sha256": "7627519378d7ee1515cb40b410d6c55a3f585b4059e415b4c66a4277e17bf3ff"
+    },
+    {
+      "path": "src/games/rainbow-blocks/i18n.ts",
+      "bytes": 8195,
+      "sha256": "7a83aa91a2b938c0721e72b54a875f24f0adacf2d124a304b2da6927e5ce628f"
+    },
+    {
+      "path": "src/games/rainbow-blocks/index.tsx",
+      "bytes": 31444,
+      "sha256": "bff342ae6e4b393a37a62274b1e18c7c4f2bea44e37cd1c51f4b921eb4c9f2fc"
+    },
+    {
+      "path": "src/games/rainbow-blocks/input.ts",
+      "bytes": 2053,
+      "sha256": "4a7f8aa53d076e3e750934eba3c94bc46ebebe56e51162ee6cbfbb0ec86013b9"
+    },
+    {
+      "path": "src/games/rainbow-blocks/rainbow.css",
+      "bytes": 20165,
+      "sha256": "011a51357f37432b7a51f5a77087a7c1b2c9472620a6c657be1b7ceba11bdd32"
+    },
+    {
+      "path": "src/games/rainbow-blocks/render.ts",
+      "bytes": 4809,
+      "sha256": "d45c8e8a18c0562b3187eb180af10fafdd44c72aa5ca7190fe19f15374de29fc"
+    },
+    {
+      "path": "src/games/rainbow-blocks/review.tsx",
+      "bytes": 886,
+      "sha256": "4dce2fbbc91eb4b0aefab23593c6e85064ecac2e22658c164053b19fb8a9e3e0"
+    },
+    {
+      "path": "src/games/rainbow-blocks/storage.ts",
+      "bytes": 1395,
+      "sha256": "b31e759b2622d93b905baa89da192b7d905bc9fd49a1455d78b27cf6d9d5f31d"
+    },
+    {
       "path": "src/games/registry.ts",
-      "bytes": 19229,
-      "sha256": "a0b1c95fb9d2dd4a7a5487c16085aecd7df6930e11512e7a1388b429cc54901e"
+      "bytes": 20408,
+      "sha256": "268f63a3f2ff02e2ad6ef1a64906667def1474f0bbf9a8d4bfe9c38fc5431c55"
     },
     {
       "path": "src/games/scoodoku/Numpad.tsx",
@@ -3514,6 +4146,11 @@
       "sha256": "4e2923a4c82b0f7e891f6577be31c5d546ff0c0b7bb47469fec3c0bbf174f5f2"
     },
     {
+      "path": "src/launcher/FeaturedCarousel.tsx",
+      "bytes": 6012,
+      "sha256": "4e4d683372c1deb32c5b508889fdc58e8435a61367a3e34735e71d425017b8db"
+    },
+    {
       "path": "src/launcher/LauncherContext.tsx",
       "bytes": 6500,
       "sha256": "90a755c8182240579cf0010de532485d003f1952c0bf27f96b1e8ff4e6b3ec49"
@@ -3535,13 +4172,13 @@
     },
     {
       "path": "src/launcher/catalog.ts",
-      "bytes": 2606,
-      "sha256": "87aa45f709c5f01fef0a69aafd8a0552040488b6955b8b472fe89f1e34cc1065"
+      "bytes": 2635,
+      "sha256": "21f4e41ca951db7a8633f528947c352e9e4c23a31e84a2a4a68bbd48edcafe4f"
     },
     {
       "path": "src/launcher/launcher.css",
-      "bytes": 19899,
-      "sha256": "710cbd131809de9ec76f93e58d89eb540bf1851c89bfaa7f97cf8b918d99a1f7"
+      "bytes": 23728,
+      "sha256": "e23843dc2a8cb77b1877bfc40e5330859b88e1579e864fb11d8f459e2835e3a0"
     },
     {
       "path": "src/launcher/platform-theme.css",
@@ -3720,8 +4357,8 @@
     },
     {
       "path": "src/visuals/gameArt.tsx",
-      "bytes": 14573,
-      "sha256": "b8b8c9712012c892f6a7966a4b51946ff79a7c54d239d77cba134b52574e6bd2"
+      "bytes": 15371,
+      "sha256": "5a4fa0e0e39447c346bbbb771d13aa4dbc6abef7cf81c5e82bbc130365d745f9"
     },
     {
       "path": "src/vite-env.d.ts",
@@ -3944,6 +4581,21 @@
       "sha256": "0de561beddeb804d2f787f297c4e6016e5663371578f4bd2ba633330a71a8a98"
     },
     {
+      "path": "tests/rainbow/engine.test.ts",
+      "bytes": 5828,
+      "sha256": "12175c5dc86f6cb5635e2585497947458e9d3cecf95853141dc155709aed5f9f"
+    },
+    {
+      "path": "tests/rainbow/preparation.test.ts",
+      "bytes": 3089,
+      "sha256": "9529019190396e44473211b8db720cf8342f6ace7a1531c2ea7bd3aa36f2fad1"
+    },
+    {
+      "path": "tests/rainbow/ui.test.ts",
+      "bytes": 10141,
+      "sha256": "56ff36e7993149df8c312663a3897a46f581f3d3300d2a7dbd8d90d737d033f2"
+    },
+    {
       "path": "tests/run-supabase.sh",
       "bytes": 4013,
       "sha256": "338eab55f0dc5dfe8e35072dafb43f83f70ef2e83a8ae8075614d1e59f7eb06a"
@@ -3987,11 +4639,6 @@
       "path": "vercel.json",
       "bytes": 537,
       "sha256": "a93325af264c3c8ea308b1a39450767af54e2711e7c25f1b041122d7043462a1"
-    },
-    {
-      "path": "verification/build.log",
-      "bytes": 5899,
-      "sha256": "6524dbed98f144db8d0d94781c28ffb72153f8ed296a3e6225e0765435524416"
     },
     {
       "path": "vite.config.ts",
