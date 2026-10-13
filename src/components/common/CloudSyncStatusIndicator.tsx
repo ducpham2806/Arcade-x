@@ -121,3 +121,4 @@ export const CloudSyncStatusIndicator: React.FC = () => {
     </div>
   );
 };
+

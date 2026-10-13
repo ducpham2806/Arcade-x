@@ -77,3 +77,4 @@ export interface MatchmakingQueueRecord {
   matchedRoomId: string | null;
   createdAt: number;
 }
+

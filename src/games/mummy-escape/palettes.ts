@@ -180,3 +180,4 @@ export function saveScreenShakePreference(enabled: boolean): void {
     // ignore
   }
 }
+

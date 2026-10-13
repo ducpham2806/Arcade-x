@@ -17,3 +17,4 @@ export const MobileNav: React.FC = () => {
     <button id="mobile-nav-profile" type="button" onClick={() => setActiveModal('profile')}><UserRound size={20}/><span>Tài khoản</span></button>
   </nav>;
 };
+

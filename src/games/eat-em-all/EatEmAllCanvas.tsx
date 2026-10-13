@@ -1634,3 +1634,4 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
     </div>
   );
 };
+

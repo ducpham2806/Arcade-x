@@ -39,3 +39,4 @@ export const NEON_RUNNER_CONTROLS: GameControlInfo[] = [
   { key: 'Phím S / ↓', action: 'Trượt / Tránh chướng ngại vật trên cao' },
   { key: 'Chạm màn hình', action: 'Nút ảo Nhảy / Trượt cho điện thoại' },
 ];
+

@@ -53,3 +53,4 @@ export async function flushFavorites(owner:string):Promise<void>{
 }
 export async function startSession(owner:string,gameId:string,id:string){await requireOwner(owner);await rpc('launcher_session_start',{p_game_id:gameId,p_session_id:id,p_expected_owner:owner});}
 export async function finishSession(owner:string,id:string,outcome:'completed'|'left',score?:number){await requireOwner(owner);await rpc('launcher_session_finish',{p_session_id:id,p_outcome:outcome,p_expected_owner:owner,p_score:Number.isFinite(score)?Math.max(0,Math.floor(score!)):null});}
+

@@ -78,3 +78,4 @@ export const EffectBar: React.FC<EffectBarProps> = ({ effects }) => {
     </div>
   );
 };
+

@@ -391,3 +391,4 @@ export const TitanArena: React.FC<TitanArenaProps> = ({
     </div>
   );
 };
+

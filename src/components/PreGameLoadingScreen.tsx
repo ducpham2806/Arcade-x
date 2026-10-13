@@ -15,3 +15,4 @@ export const PreGameLoadingScreen:React.FC<Props>=({gameMeta,isSoundMuted,onTogg
   <footer><button className="launcher-secondary" onClick={onExit}><ArrowLeft size={18}/>Thư viện</button><button id="btn-pregame-start" className="launcher-primary" onClick={start}><Play size={18} fill="currentColor"/>Bắt đầu chơi</button></footer>
  </section></div>,document.body);
 };
+

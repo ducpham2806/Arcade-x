@@ -1,4 +1,0 @@
-sed -i 's/import { useGameBridge } from '\''..\/..\/hooks\/useGameBridge'\'';/import { GameComponentProps } from '\''..\/..\/types'\'';/' src/games/chess/index.tsx
-sed -i 's/import { MatchmakingModal, VersusScreen } from '\''..\/..\/components\/multiplayer\/MatchmakingModal'\'';/import { MatchmakingModal } from '\''..\/..\/components\/multiplayer\/MatchmakingModal'\'';\nimport { VersusScreen } from '\''..\/..\/components\/multiplayer\/VersusScreen'\'';/' src/games/chess/index.tsx
-sed -i 's/export const ChessGame: React.FC = () => {/export const ChessGame: React.FC<GameComponentProps> = ({ bridge, onGameOver, onRestart }) => {/' src/games/chess/index.tsx
-sed -i 's/const { player, unlockAchievement, dropLootItem, addScore, exitGame } = useGameBridge();/const { submitScore, reportProgress, triggerLootRoll } = bridge;/' src/games/chess/index.tsx

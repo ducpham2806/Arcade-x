@@ -454,3 +454,4 @@ export const EAT_EM_ALL_CONTROLS: GameControlInfo[] = [
   { key: 'Vật Phẩm Hỗ Trợ (Power-ups)', action: 'Nhặt Khiên (🛡️), Nam Châm (🧲), Tăng Tốc (⚡), Đóng Băng (❄️)' },
   { key: 'Thanh Cuồng Nộ (FURY x10)', action: 'Đầy thanh sẽ hóa cuồng nộ x10 điểm, nuốt trọn tất cả bom độc!' },
 ];
+

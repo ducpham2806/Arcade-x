@@ -107,3 +107,4 @@ export const FILL_THE_SPACE_CONTROLS: GameControlInfo[] = [
     touchInstruction: 'Chạm vào khối gỗ trên bàn để gỡ ra',
   },
 ];
+

@@ -1,0 +1,171 @@
+{
+  "revision": "review-v0.4",
+  "level": 87,
+  "noTools": true,
+  "companion": null,
+  "seed": 1,
+  "actions": [
+    {
+      "action": {
+        "type": "tap",
+        "cell": 52
+      },
+      "at": 0
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 77
+      },
+      "at": 1500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 61
+      },
+      "at": 3000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 47
+      },
+      "at": 4500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 47
+      },
+      "at": 6000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 46
+      },
+      "at": 7500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 70
+      },
+      "at": 9000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 10
+      },
+      "at": 10500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 1
+      },
+      "at": 12000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 11
+      },
+      "at": 13500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 2
+      },
+      "at": 15000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 1
+      },
+      "at": 16500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 4
+      },
+      "at": 18000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 13
+      },
+      "at": 19500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 13
+      },
+      "at": 21000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 18
+      },
+      "at": 22500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 19
+      },
+      "at": 24000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 18
+      },
+      "at": 25500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 69
+      },
+      "at": 27000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 7
+      },
+      "at": 28500
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 38
+      },
+      "at": 30000
+    },
+    {
+      "action": {
+        "type": "tap",
+        "cell": 46
+      },
+      "at": 31500
+    },
+    {
+      "action": {
+        "type": "merge",
+        "cell": 64,
+        "other": 65
+      },
+      "at": 33000
+    }
+  ]
+}

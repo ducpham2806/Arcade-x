@@ -278,3 +278,4 @@ export function buyFrame(s: BlockSave, frame: "gold" | "rainbow") {
   s.frame = frame;
   return true;
 }
+

@@ -318,3 +318,4 @@ export class QuestGeneratorService {
     return QUEST_POOL;
   }
 }
+

@@ -23,3 +23,4 @@ export function endlessLevel(seed: number, stage: number) {
   const max = Math.min(100, 10 + Math.floor((stage - 1) / 3) * 10);
   return 1 + ((x >>> 0) % max);
 }
+

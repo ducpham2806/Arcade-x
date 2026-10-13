@@ -242,3 +242,4 @@ export const CAMPAIGN_STAGES: StageLevelDef[] = [
     unlockStarsNeeded: 24,
   },
 ];
+

@@ -370,3 +370,4 @@ export function calculateMummyThreatPaths(
 
   return threatPaths;
 }
+

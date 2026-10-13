@@ -6,15 +6,17 @@ export function CosmicDialog({
   onClose,
   children,
   footer,
+  platform = false,
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  platform?: boolean;
 }) {
   const ref = useDialogFocus(onClose);
   return createPortal(
-    <div className="cd-overlay">
+    <div className={`${platform ? "platform-ui " : ""}cd-overlay`}>
       <section
         className="cd-dialog"
         ref={ref}
@@ -36,3 +38,4 @@ export function CosmicDialog({
     document.body,
   );
 }
+

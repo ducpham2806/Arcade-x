@@ -20,3 +20,4 @@ export function ChessPiece({type,color}:{type:PieceSymbol;color:Color}) {
     </g>
   </svg>;
 }
+

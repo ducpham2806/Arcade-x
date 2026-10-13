@@ -207,7 +207,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
+      className="platform-ui fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -427,3 +427,4 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
     </div>
   );
 };
+

@@ -246,3 +246,4 @@ class MummySoundSystem {
 }
 
 export const mummyAudio = new MummySoundSystem();
+

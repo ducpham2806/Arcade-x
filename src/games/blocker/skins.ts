@@ -26,3 +26,4 @@ export function chooseSkin(
     Math.min(pool.length - 1, Math.max(0, Math.floor(random() * pool.length)))
   ];
 }
+

@@ -10,3 +10,4 @@ export function ResumeCard({session,onResume,onDiscard}:{session:PausedGameSessi
   <button id="btn-resume-paused-game" className="launcher-primary" onClick={onResume}><Play size={17} fill="currentColor"/>Tiếp tục chơi</button><button id="btn-discard-paused-game" onClick={onDiscard} className="launcher-icon" aria-label="Hủy ván game"><Trash2 size={18}/></button>
  </aside>;
 }
+

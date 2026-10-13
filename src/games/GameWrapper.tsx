@@ -382,6 +382,11 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   const handleGameOver = useCallback(
     async (finalScore: number, stats?: Record<string, number>) => {
+      // Blossom owns its level result and Xu economy; keep the campaign mounted.
+      if (gameMeta.id === 'hex-match' && stats?.blossom === 1) {
+        bridge.updateSessionState?.({ score: finalScore, extra: stats });
+        return;
+      }
       if (endedRef.current) return;
       endedRef.current=true;
       finishPlay(finalScore);
@@ -508,6 +513,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   }, []);
 
   const handleRestart = useCallback(() => {
+    if (gameId === 'hex-match') { window.dispatchEvent(new Event('blossom:restart')); return; }
     endedRef.current=false;
     recordPlay(gameId);
     initialGameStateRef.current = ['tile-2048', 'neon-runner', 'car-escape', 'scoodoku', 'shikaku', 'word-cross', 'cosmic-defense'].includes(gameId) ? null : undefined;
@@ -667,7 +673,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       <main
         ref={viewportContainerRef}
         id="game-main-viewport"
-        style={{...cssVariables, ...(['cosmic-defense','blocker','shikaku'].includes(gameId)?{touchAction:'pan-y'}:{})} as React.CSSProperties}
+        style={{...cssVariables, ...(['cosmic-defense','blocker','shikaku','hex-match'].includes(gameId)?{touchAction:'pan-y'}:{})} as React.CSSProperties}
         onTouchStart={handleStageTouchStart}
         onTouchEnd={handleStageTouchEnd}
         className="relative flex-1 w-full h-full bg-[#050505] flex items-center justify-center overflow-hidden p-0 scrollbar-thin select-none touch-none"
@@ -676,7 +682,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
-          style={stageStyle}
+          style={gameId === 'hex-match' ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
         >
           <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
           <GameLoadBoundary onExit={onExit}>
@@ -922,3 +928,4 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     </div>
   );
 };
+

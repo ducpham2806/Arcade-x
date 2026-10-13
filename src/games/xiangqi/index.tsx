@@ -1430,3 +1430,4 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

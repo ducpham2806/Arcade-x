@@ -1,0 +1,12 @@
+import {build} from 'esbuild';
+import fs from 'node:fs';
+import path from 'node:path';
+const root=process.cwd();
+const result=await build({entryPoints:['src/launcher/review.tsx'],bundle:true,write:false,format:'iife',minify:true,outfile:'launcher.js',define:{'process.env.NODE_ENV':'"production"','import.meta.env':'{"DEV":true}'},loader:{'.png':'dataurl','.jpg':'dataurl','.svg':'dataurl','.woff2':'dataurl'},plugins:[{name:'review-css',setup(b){b.onLoad({filter:/\.css$/},()=>({contents:'',loader:'css'}));}}]});
+const js=result.outputFiles.find(f=>f.path.endsWith('.js')).text;
+const index=fs.readFileSync('dist/index.html','utf8');
+const cssPath=index.match(/<link rel="stylesheet"[^>]*href="([^"]+)"/)[1];
+let css=fs.readFileSync(path.join('dist',cssPath),'utf8');
+css=css.replace(/url\((?:"|')?(\/[^)'"\s]+)(?:"|')?\)/g,(all,p)=>{const f=path.join('public',p);if(!fs.existsSync(f))return all;const ext=path.extname(f);const mime={'.woff2':'font/woff2','.png':'image/png','.svg':'image/svg+xml','.jpg':'image/jpeg'}[ext];return mime?`url("data:${mime};base64,${fs.readFileSync(f).toString('base64')}")`:all;});
+const html=`<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>ArcadeX · Launcher UI review</title><style>${css}\n.launcher-review-tools{position:fixed;bottom:80px;left:12px;z-index:30;display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #dce4ed;border-radius:12px;background:#fffffff5;box-shadow:0 4px 20px #23304518;font:11px system-ui;color:#34445c}.launcher-review-tools select{max-width:180px;padding:6px;border:1px solid #dce4ed;border-radius:8px;background:white;color:#34445c}@media(min-width:768px){.launcher-review-tools{bottom:12px}}@media(max-width:400px){.launcher-review-tools span{display:none}}</style><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></html>`;
+fs.writeFileSync('../arcadex-launcher-review.html',html);console.log(JSON.stringify({bytes:Buffer.byteLength(html)}));

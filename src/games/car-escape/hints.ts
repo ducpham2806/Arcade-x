@@ -27,3 +27,4 @@ export function computeHint(
     worker.postMessage({ config, vehicles });
   });
 }
+

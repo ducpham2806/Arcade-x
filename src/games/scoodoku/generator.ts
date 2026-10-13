@@ -393,3 +393,4 @@ export function getSmartHint(
 
   return null;
 }
+

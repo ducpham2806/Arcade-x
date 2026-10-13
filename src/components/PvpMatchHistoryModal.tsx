@@ -40,7 +40,7 @@ export const PvpMatchHistoryModal: React.FC = () => {
   return (
     <div
       onClick={handleClose}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 select-none"
+      className="platform-ui fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 select-none"
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 15 }}
@@ -58,7 +58,7 @@ export const PvpMatchHistoryModal: React.FC = () => {
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider font-display">
-                Lịch Sử Đấu PvP & Thách Đấu
+                Lịch sử PvP
               </h2>
               <p className="text-xs text-slate-400">Kết quả các trận đối kháng trực tuyến gần đây</p>
             </div>
@@ -89,7 +89,7 @@ export const PvpMatchHistoryModal: React.FC = () => {
               </div>
               <h3 className="text-sm font-bold text-white">Chưa Có Trận Đấu PvP Nào</h3>
               <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
-                Hãy vào mục **Bạn Bè** trong Menu để thách đấu 1v1 hoặc tham gia các phòng game đối kháng ngay!
+                Chơi một game đối kháng để xem lịch sử trận đấu tại đây.
               </p>
             </div>
           ) : (
@@ -167,3 +167,4 @@ export const PvpMatchHistoryModal: React.FC = () => {
     </div>
   );
 };
+

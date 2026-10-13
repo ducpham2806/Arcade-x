@@ -20,3 +20,4 @@ export function parseCatalog(raw: any): Catalog | null {
   return {schemaVersion:1,games,commerceEnabled:raw.commerceEnabled===true,support:support?.enabled===true && ['bankName','account','beneficiary'].every(key=>typeof support[key]==='string' && support[key].length>0) ? {enabled:true,bankName:support.bankName,account:support.account,beneficiary:support.beneficiary,message:typeof support.message==='string'?support.message:''} : {enabled:false}};
 }
 export const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().trim();
+

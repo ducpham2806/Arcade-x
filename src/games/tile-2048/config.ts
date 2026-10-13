@@ -73,3 +73,4 @@ export const TILE_2048_CONTROLS: GameControlInfo[] = [
     action: 'Dùng kỹ năng hỗ trợ cứu cánh khi bàn cờ bị tắc nghẽn',
   },
 ];
+

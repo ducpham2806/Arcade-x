@@ -76,3 +76,4 @@ export interface EloCalculationResult {
   hostDelta: number;
   guestDelta: number;
 }
+

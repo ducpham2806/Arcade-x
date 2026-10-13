@@ -105,3 +105,4 @@ test('Choosing guest while a saved account loads cancels late hydration',async({
   backend.readDelay(1000);await page.reload();await page.locator('#btn-auth-loading-guest').click();await page.locator('#game-card-tile-2048').waitFor();
   await page.waitForTimeout(1600);expect(await current(page)).toBeNull();expect((await profile(page)).id).toMatch(/^guest_/);expect((await profile(page)).coins).toBe(200);
 });
+

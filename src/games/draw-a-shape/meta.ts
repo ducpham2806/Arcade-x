@@ -19,3 +19,4 @@ export const DrawAShapeMeta: GameMetadata = {
   dropRates: DRAW_SHAPE_DROP_RATES,
   component: DrawAShapeGame,
 };
+

@@ -98,7 +98,7 @@ export const VersusScreen: React.FC<VersusScreenProps> = ({
   return (
     <div
       id="versus-screen-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/92 backdrop-blur-xl animate-in fade-in duration-300 overflow-y-auto select-none"
+      className="platform-ui fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/92 backdrop-blur-xl animate-in fade-in duration-300 overflow-y-auto select-none"
     >
       {/* Dynamic Background Glow Beams */}
       <div className="absolute -top-32 -left-32 w-72 sm:w-96 h-72 sm:h-96 bg-rose-600/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
@@ -261,3 +261,4 @@ export const VersusScreen: React.FC<VersusScreenProps> = ({
     </div>
   );
 };
+

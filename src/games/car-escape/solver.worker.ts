@@ -6,3 +6,4 @@ self.onmessage = (e) => {
     self.postMessage({ status: "limit", moves: [], visited: 0 });
   }
 };
+

@@ -50,3 +50,4 @@ export const CYBER_SLICE_CONTROLS: GameControlInfo[] = [
   { key: 'Mục Tiêu Màn Chơi (Target)', action: 'Thu thập đủ số lượng quả yêu cầu để kết thúc và thắng màn' },
   { key: 'Quả Băng Giá ❄️ & Bão Táp 🌪️', action: 'Làm chậm thời gian Matrix hoặc kích hoạt mưa hoa quả' },
 ];
+

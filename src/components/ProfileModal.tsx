@@ -35,7 +35,7 @@ export const ProfileModal: React.FC = () => {
     } finally { setBusy(false); }
   };
   const openAuth = (mode: 'login' | 'register') => { setAuthModalMode(mode); setActiveModal('auth'); };
-  return <div className="arcadex-modal-overlay" onClick={close}>
+  return <div className="platform-ui arcadex-modal-overlay" onClick={close}>
     <section ref={dialogRef} tabIndex={-1} id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-title" className="arcadex-modal-container simple-profile-panel p-4 sm:p-6" onClick={e => e.stopPropagation()}>
       <header className="flex items-center justify-between gap-3 pb-4 border-b border-white/10 shrink-0">
         <div><h2 id="profile-title" className="text-xl font-bold text-white">Tài khoản của bạn</h2><p className="text-sm text-slate-400 mt-1">Thông tin cơ bản để chơi và lưu tiến trình.</p></div>

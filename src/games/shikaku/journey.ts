@@ -383,3 +383,4 @@ export function samePuzzle(a: ShikakuPuzzle, b: ShikakuPuzzle) {
     });
   return signature(a) === signature(b);
 }
+

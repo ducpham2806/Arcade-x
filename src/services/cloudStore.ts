@@ -157,3 +157,4 @@ export function onSnapshot(ref: Reference, ...args: any[]): () => void {
     if (channel) void ref.db.removeChannel(channel);
   };
 }
+

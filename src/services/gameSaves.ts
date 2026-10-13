@@ -129,3 +129,4 @@ export function resolveGameSave(id: string, choice: 'local' | 'remote'): void {
   localStorage.setItem(legacy(id), JSON.stringify(next.payload));
   announce(id, next.dirty ? 'pending' : 'synced');
 }
+

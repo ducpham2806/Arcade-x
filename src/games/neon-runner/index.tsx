@@ -900,3 +900,4 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

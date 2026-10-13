@@ -54,3 +54,4 @@ export function generateShikaku(size: number, maxBlockArea: number = 12, seed = 
 
   return { size, seed, contentVersion: 1, hints, solution: rects };
 }
+

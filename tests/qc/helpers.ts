@@ -25,3 +25,4 @@ export async function enterLauncher(page: Page) {
   else await page.locator('#btn-auth-play-guest').click();
   await page.locator('#game-library').waitFor();
 }
+

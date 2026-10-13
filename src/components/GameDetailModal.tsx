@@ -18,7 +18,7 @@ export const GameDetailModal: React.FC = () => {
   if (!game) return null;
   const guide = GAME_ONBOARDING_DATA[game.id];
   const favorite = favorites.includes(game.id);
-  return <div id="game-detail-modal-overlay" className="arcadex-modal-overlay" onClick={closeGameDetail}>
+  return <div id="game-detail-modal-overlay" className="platform-ui arcadex-modal-overlay" onClick={closeGameDetail}>
     <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="game-detail-title" className="arcadex-modal-container launcher-detail p-4 sm:p-6" onClick={e => e.stopPropagation()}>
       <header className="flex items-center justify-between gap-3 shrink-0 pb-4 border-b border-white/10"><div><h2 id="game-detail-title" className="text-xl font-bold text-white">{game.title}</h2><p className="text-sm text-slate-400">{game.category} · {game.difficulty}</p></div><CloseButton onClose={closeGameDetail}/></header>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar py-5 space-y-5">
@@ -30,3 +30,4 @@ export const GameDetailModal: React.FC = () => {
     </section>
   </div>;
 };
+

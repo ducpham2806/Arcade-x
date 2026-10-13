@@ -49,3 +49,4 @@ export const SHIKAKU_DROP_RATES: DropRateConfig = {
     { type: 'legendary', weight: 5 },
   ],
 };
+

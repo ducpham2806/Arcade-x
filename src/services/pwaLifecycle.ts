@@ -53,3 +53,4 @@ export async function installUpdate(): Promise<void> {
   sessionStorage.removeItem('arcadex_splash_completed');
   window.location.reload();
 }
+

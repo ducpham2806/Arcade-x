@@ -1,0 +1,454 @@
+{
+  "revision": "review-v0.4",
+  "samplePerLevel": 100,
+  "proposals": {
+    "11": {
+      "moves": 8,
+      "expectation": 156
+    },
+    "12": {
+      "moves": 11,
+      "expectation": 183
+    },
+    "13": {
+      "scoreTarget": 9800,
+      "moves": 20,
+      "expectation": 370
+    },
+    "14": {
+      "initialCollectSupply": 0.6,
+      "moves": 9,
+      "expectation": 175
+    },
+    "15": {
+      "scoreTarget": 9000,
+      "moves": 18,
+      "expectation": 379
+    },
+    "16": {
+      "moves": 11,
+      "expectation": 215
+    },
+    "17": {
+      "scoreTarget": 10800,
+      "moves": 20,
+      "expectation": 396
+    },
+    "18": {
+      "moves": 12,
+      "expectation": 267
+    },
+    "19": {
+      "initialCollectSupply": 0.6,
+      "moves": 5,
+      "expectation": 310
+    },
+    "21": {
+      "scoreTarget": 5950,
+      "moves": 22,
+      "expectation": 218
+    },
+    "22": {
+      "moves": 10,
+      "expectation": 126
+    },
+    "23": {
+      "moves": 4,
+      "expectation": 126
+    },
+    "24": {
+      "moves": 25,
+      "expectation": 162,
+      "goalTargets": [
+        7
+      ]
+    },
+    "25": {
+      "moves": 11,
+      "expectation": 130
+    },
+    "26": {
+      "moves": 6,
+      "expectation": 154
+    },
+    "27": {
+      "scoreTarget": 5900,
+      "moves": 22,
+      "expectation": 213
+    },
+    "28": {
+      "initialCollectSupply": 0.6,
+      "moves": 7,
+      "expectation": 313
+    },
+    "29": {
+      "moves": 6,
+      "expectation": 182
+    },
+    "31": {
+      "scoreTarget": 5950,
+      "moves": 22,
+      "expectation": 227
+    },
+    "32": {
+      "moves": 18,
+      "expectation": 154
+    },
+    "33": {
+      "scoreTarget": 5950,
+      "moves": 0,
+      "expectation": 180
+    },
+    "34": {
+      "moves": 10,
+      "expectation": 129
+    },
+    "35": {
+      "initialCollectSupply": 0.6,
+      "moves": 18,
+      "expectation": 178
+    },
+    "36": {
+      "expectation": 91,
+      "seconds": 28
+    },
+    "37": {
+      "scoreTarget": 5700,
+      "moves": 22,
+      "expectation": 210
+    },
+    "38": {
+      "initialCollectSupply": 0.6,
+      "moves": 14,
+      "expectation": 176
+    },
+    "39": {
+      "initialCollectSupply": 0.6,
+      "moves": 16,
+      "expectation": 183
+    },
+    "41": {
+      "scoreTarget": 6800,
+      "moves": 22,
+      "expectation": 241
+    },
+    "42": {
+      "moves": 5,
+      "expectation": 92,
+      "goalTargets": [
+        5
+      ],
+      "hazardCounts": {
+        "bug": 5
+      }
+    },
+    "43": {
+      "moves": 7,
+      "expectation": 119
+    },
+    "44": {
+      "initialCollectSupply": 0.6,
+      "moves": 15,
+      "expectation": 174
+    },
+    "45": {
+      "moves": 7,
+      "expectation": 117
+    },
+    "46": {
+      "moves": 4,
+      "expectation": 68
+    },
+    "47": {
+      "moves": 11,
+      "expectation": 138
+    },
+    "48": {
+      "moves": 6,
+      "expectation": 115
+    },
+    "49": {
+      "initialCollectSupply": 0.6,
+      "moves": 9,
+      "expectation": 388
+    },
+    "51": {
+      "scoreTarget": 7100,
+      "moves": 24,
+      "expectation": 244
+    },
+    "52": {
+      "scoreTarget": 7100,
+      "moves": 24,
+      "expectation": 241
+    },
+    "53": {
+      "scoreTarget": 8250,
+      "moves": 24,
+      "expectation": 270
+    },
+    "54": {
+      "moves": 14,
+      "expectation": 185
+    },
+    "55": {
+      "moves": 6,
+      "expectation": 116
+    },
+    "56": {
+      "scoreTarget": 10700,
+      "moves": 0,
+      "expectation": 260
+    },
+    "57": {
+      "moves": 19,
+      "expectation": 199
+    },
+    "58": {
+      "initialCollectSupply": 0.6,
+      "moves": 13,
+      "expectation": 222
+    },
+    "59": {
+      "scoreTarget": 10100,
+      "moves": 28,
+      "expectation": 279
+    },
+    "61": {
+      "moves": 29,
+      "expectation": 221
+    },
+    "62": {
+      "moves": 20,
+      "expectation": 188
+    },
+    "63": {
+      "initialCollectSupply": 0.6,
+      "moves": 30,
+      "expectation": 223
+    },
+    "64": {
+      "scoreTarget": 8950,
+      "moves": 26,
+      "expectation": 255
+    },
+    "65": {
+      "initialCollectSupply": 0.6,
+      "moves": 33,
+      "expectation": 217
+    },
+    "66": {
+      "hazardHp": 1,
+      "seconds": 78,
+      "expectation": 129
+    },
+    "67": {
+      "moves": 21,
+      "expectation": 183
+    },
+    "68": {
+      "moves": 27,
+      "expectation": 235
+    },
+    "69": {
+      "initialCollectSupply": 0.6,
+      "moves": 10,
+      "expectation": 487
+    },
+    "71": {
+      "scoreTarget": 6200,
+      "moves": 28,
+      "expectation": 178
+    },
+    "72": {
+      "initialCollectSupply": 0.6,
+      "moves": 20,
+      "expectation": 155
+    },
+    "73": {
+      "goalTargets": [
+        5,
+        5
+      ],
+      "seconds": 70,
+      "expectation": 73
+    },
+    "74": {
+      "hazardHp": 1,
+      "moves": 27,
+      "goalTargets": [
+        11
+      ],
+      "expectation": 145
+    },
+    "75": {
+      "hazardHp": 1,
+      "goalTargets": [
+        11
+      ],
+      "seconds": 75,
+      "expectation": 77
+    },
+    "76": {
+      "scoreTarget": 6200,
+      "moves": 28,
+      "expectation": 176
+    },
+    "77": {
+      "moves": 8,
+      "expectation": 115
+    },
+    "78": {
+      "hazardHp": 1,
+      "goalTargets": [
+        9,
+        8
+      ],
+      "seconds": 85,
+      "expectation": 91
+    },
+    "79": {
+      "initialCollectSupply": 0.6,
+      "moves": 29,
+      "expectation": 166
+    },
+    "80": {
+      "bossHP": 32,
+      "expectation": 106
+    },
+    "81": {
+      "hazardHp": 1,
+      "scoreTarget": 5600,
+      "moves": 28,
+      "expectation": 152
+    },
+    "82": {
+      "hazardHp": 1,
+      "moves": 29,
+      "goalTargets": [
+        7,
+        6,
+        3
+      ],
+      "expectation": 143
+    },
+    "83": {
+      "moves": 33,
+      "goalTargets": [
+        3,
+        2,
+        8
+      ],
+      "expectation": 146
+    },
+    "84": {
+      "initialCollectSupply": 0.9,
+      "hazardHp": 1,
+      "expectation": 90
+    },
+    "85": {
+      "moves": 16,
+      "expectation": 133
+    },
+    "86": {
+      "initialCollectSupply": 0.9,
+      "moves": 35,
+      "hazardHp": 1,
+      "expectation": 156
+    },
+    "87": {
+      "moves": 38,
+      "expectation": 354
+    },
+    "88": {
+      "initialCollectSupply": 0.6,
+      "moves": 37,
+      "expectation": 152
+    },
+    "89": {
+      "initialCollectSupply": 0.6,
+      "moves": 27,
+      "expectation": 173
+    },
+    "91": {
+      "hazardHp": 1,
+      "scoreTarget": 6450,
+      "moves": 30,
+      "expectation": 162
+    },
+    "92": {
+      "hazardHp": 1,
+      "moves": 33,
+      "goalTargets": [
+        6,
+        5,
+        6
+      ],
+      "expectation": 140
+    },
+    "93": {
+      "moves": 10,
+      "expectation": 123
+    },
+    "94": {
+      "moves": 35,
+      "expectation": 147,
+      "goalTargets": [
+        9,
+        9
+      ]
+    },
+    "95": {
+      "initialCollectSupply": 0.9,
+      "hazardHp": 1,
+      "expectation": 118
+    },
+    "96": {
+      "moves": 16,
+      "expectation": 133
+    },
+    "97": {
+      "initialCollectSupply": 0.9,
+      "moves": 39,
+      "hazardHp": 1,
+      "hazardHps": {
+        "rock": 2
+      },
+      "expectation": 187
+    },
+    "98": {
+      "initialCollectSupply": 0.6,
+      "moves": 34,
+      "expectation": 150
+    },
+    "99": {
+      "scoreTarget": 7900,
+      "moves": 36,
+      "expectation": 165
+    },
+    "20": {
+      "expectation": 151
+    },
+    "30": {
+      "expectation": 140
+    },
+    "40": {
+      "expectation": 133
+    },
+    "50": {
+      "expectation": 137
+    },
+    "60": {
+      "expectation": 132
+    },
+    "70": {
+      "expectation": 136
+    },
+    "90": {
+      "expectation": 105
+    },
+    "100": {
+      "expectation": 106
+    }
+  }
+}

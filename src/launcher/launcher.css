@@ -73,3 +73,4 @@
 .launcher-light #input-search-games::placeholder {color:#718198;opacity:1}
 @media(max-width:639px){.launcher-welcome {grid-template-columns:minmax(0,1fr) 105px}.launcher-welcome h1 {font-size:26px}.launcher-benefits {display:none}.welcome-caption button {min-height:44px;width:44px;padding:9px}.launcher-light .cartridge-favorite {width:44px;height:44px}}
 @media(max-width:359px){.launcher-welcome {grid-template-columns:1fr}.launcher-welcome h1 {font-size:32px}}
+

@@ -41,3 +41,4 @@ export interface UndoSnapshot {
   placedBlocks: PlacedBlock[];
   availableBlockIds: string[];
 }
+

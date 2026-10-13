@@ -1,0 +1,357 @@
+{
+ "anim_piece_heart_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 10,
+  "loop": true
+ },
+ "anim_piece_heart_shake": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 20,
+  "loop": false
+ },
+ "anim_piece_heart_land": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_heart_blast": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_star_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 10,
+  "loop": true
+ },
+ "anim_piece_star_shake": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 20,
+  "loop": false
+ },
+ "anim_piece_star_land": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_star_blast": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_leaf_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 10,
+  "loop": true
+ },
+ "anim_piece_leaf_shake": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 20,
+  "loop": false
+ },
+ "anim_piece_leaf_land": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_leaf_blast": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_drop_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 10,
+  "loop": true
+ },
+ "anim_piece_drop_shake": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 20,
+  "loop": false
+ },
+ "anim_piece_drop_land": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_drop_blast": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_orange_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 10,
+  "loop": true
+ },
+ "anim_piece_orange_shake": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 20,
+  "loop": false
+ },
+ "anim_piece_orange_land": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_orange_blast": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_flower_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 10,
+  "loop": true
+ },
+ "anim_piece_flower_shake": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 20,
+  "loop": false
+ },
+ "anim_piece_flower_land": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_piece_flower_blast": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_special_bee_h_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 12,
+  "loop": true
+ },
+ "anim_special_bee_v_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 12,
+  "loop": true
+ },
+ "anim_special_bloom_bomb_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 12,
+  "loop": true
+ },
+ "anim_special_rainbow_orb_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 12,
+  "loop": true
+ },
+ "anim_special_sun_idle": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 12,
+  "loop": true
+ },
+ "anim_hazard_rock_break": {
+  "frames": 7,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_hazard_ice_break": {
+  "frames": 7,
+  "cell": 128,
+  "fps": 24,
+  "loop": false
+ },
+ "anim_coin_spin": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 16,
+  "loop": true
+ },
+ "anim_star_pop": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 20,
+  "loop": false
+ },
+ "anim_node_current_pulse": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_01_sau_buom_xam_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_02_qua_tham_an_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_03_coi_xay_gio_xam_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_04_cua_khong_lo_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_05_nam_doc_khong_lo_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_06_bo_cap_xam_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_07_yeti_bui_xam_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_08_rong_bui_dam_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_09_nhen_dem_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_boss_10_nu_hoang_xam_idle": {
+  "frames": 6,
+  "cell": 256,
+  "fps": 8,
+  "loop": true
+ },
+ "anim_fx_bloom_bomb": {
+  "frames": 10,
+  "cell": 256,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_rainbow_burst": {
+  "frames": 10,
+  "cell": 256,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_sun_burst": {
+  "frames": 10,
+  "cell": 256,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_special_merge": {
+  "frames": 8,
+  "cell": 256,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_chain_spark": {
+  "frames": 6,
+  "cell": 128,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_hint_glow": {
+  "frames": 8,
+  "cell": 128,
+  "fps": 8,
+  "loop": true,
+  "blend": "additive"
+ },
+ "anim_fx_combo_burst": {
+  "frames": 8,
+  "cell": 256,
+  "fps": 24,
+  "loop": true,
+  "blend": "additive"
+ },
+ "anim_fx_blast_red": {
+  "frames": 7,
+  "cell": 192,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_blast_yellow": {
+  "frames": 7,
+  "cell": 192,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_blast_purple": {
+  "frames": 7,
+  "cell": 192,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_blast_blue": {
+  "frames": 7,
+  "cell": 192,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_blast_green": {
+  "frames": 7,
+  "cell": 192,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ },
+ "anim_fx_blast_orange": {
+  "frames": 7,
+  "cell": 192,
+  "fps": 30,
+  "loop": false,
+  "blend": "additive"
+ }
+}

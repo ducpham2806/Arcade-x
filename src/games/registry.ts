@@ -290,12 +290,12 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
   },
   'hex-match': {
     id: 'hex-match',
-    title: 'Hex Collapse Puzzle',
-    shortDesc: 'Xếp hình tổ ong ghép màu nổ dây chuyền',
-    description: 'Xếp các khối màu lục giác liền kề để kích hoạt phản ứng nổ dây chuyền kỳ ảo và tích lũy thời gian kéo dài ván đấu.',
+    title: 'Blossom Blast · Hex Collapse Puzzle',
+    shortDesc: 'Chạm hoa, giải cứu khu vườn qua 100 màn',
+    description: 'Chạm nhóm từ 3 hoa kề ngang hoặc dọc, ghép Ong Mật, Bom Hoa, Cầu Vồng và Mặt Trời để đánh thức Cây Sự Sống.',
     category: 'Puzzle',
     difficulty: 'Dễ',
-    icon: '🔷',
+    icon: '🌸',
     bannerGradient: 'from-emerald-900/60 via-teal-950/80 to-slate-900',
     themeColor: '#10b981',
     tags: ['Giải Đố', 'Xếp Hình', 'Combo Nổ', 'Trí Tuệ'],
@@ -332,3 +332,4 @@ export const FEATURED_SLIDER_GAME_IDS = [
   'mummy-escape', // Turn-based pyramid tactical puzzle
   'tile-2048',    // Jewel-dropping 2048 puzzle
 ];
+

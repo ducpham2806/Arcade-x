@@ -1,0 +1,106 @@
+{
+  "styles": {
+    "gloss": {
+      "default": true,
+      "note": "Hoa bóng: dùng cho bàn chơi; không mặt; 6 hình dạng riêng mỗi cụm",
+      "tiles": ["tile_dark_a", "tile_dark_b"],
+      "clusters": {
+        "1": [
+          "theme01_p1_rose_red",
+          "theme01_p2_pansy_yellow",
+          "theme01_p3_daisy_purple",
+          "theme01_p4_bellflower_blue",
+          "theme01_p5_cherry_pink",
+          "theme01_p6_lily_green"
+        ],
+        "2": [
+          "theme02_p1_strawberry_red",
+          "theme02_p2_orange_orange",
+          "theme02_p3_lemon_yellow",
+          "theme02_p4_apple_green",
+          "theme02_p5_grapes_purple",
+          "theme02_p6_cherries_magenta"
+        ],
+        "3": [
+          "theme03_p1_sunflower_yellow",
+          "theme03_p2_daisy_white",
+          "theme03_p3_tulip_orange",
+          "theme03_p4_bellflower_blue",
+          "theme03_p5_lily_pink",
+          "theme03_p6_cherry_lilac"
+        ],
+        "4": [
+          "theme04_p1_hibiscus_red",
+          "theme04_p2_starfish_orange",
+          "theme04_p3_shell_pink",
+          "theme04_p4_orchid_blue",
+          "theme04_p5_cherry_yellow",
+          "theme04_p6_lily_teal"
+        ],
+        "5": [
+          "theme05_p1_mushroom_red_red",
+          "theme05_p2_mushroom_flat_purple",
+          "theme05_p3_orchid_lilac",
+          "theme05_p4_bellflower_teal",
+          "theme05_p5_lily_pink",
+          "theme05_p6_pansy_orange"
+        ],
+        "6": [
+          "theme06_p1_cactus_pink",
+          "theme06_p2_sunflower_orange",
+          "theme06_p3_hibiscus_yellow",
+          "theme06_p4_tulip_red",
+          "theme06_p5_daisy_purple",
+          "theme06_p6_lily_teal"
+        ],
+        "7": [
+          "theme07_p1_snowflake_aqua",
+          "theme07_p2_rose_pink",
+          "theme07_p3_bellflower_lilac",
+          "theme07_p4_daisy_white",
+          "theme07_p5_tulip_blue",
+          "theme07_p6_lily_purple"
+        ],
+        "8": [
+          "theme08_p1_lotus_pink",
+          "theme08_p2_lily_white",
+          "theme08_p3_orchid_purple",
+          "theme08_p4_hibiscus_orange",
+          "theme08_p5_cherry_magenta",
+          "theme08_p6_bellflower_teal"
+        ],
+        "9": [
+          "theme09_p1_rose_aqua",
+          "theme09_p2_daisy_yellow",
+          "theme09_p3_pansy_magenta",
+          "theme09_p4_lily_lime",
+          "theme09_p5_bellflower_purple",
+          "theme09_p6_cherry_blue"
+        ],
+        "10": [
+          "theme10_p1_rose_gold",
+          "theme10_p2_sunflower_yellow",
+          "theme10_p3_lotus_pink",
+          "theme10_p4_hibiscus_red",
+          "theme10_p5_orchid_white",
+          "theme10_p6_pansy_orange"
+        ]
+      }
+    },
+    "chibi": {
+      "default": false,
+      "note": "Chibi có mặt: viên thân thiện; 3 trạng thái",
+      "tiles": ["tile_cell", "tile_cell_alt"],
+      "order": ["heart", "star", "leaf", "drop", "orange", "flower"],
+      "states": ["normal", "alert", "happy"],
+      "file_pattern": "pieces/piece_{id}_{state}"
+    }
+  },
+  "colors_by_level": {
+    "1-20": 4,
+    "21-70": 5,
+    "71-100": 6
+  },
+  "always_chibi": ["specials", "characters", "bosses", "ui", "items"],
+  "note": "Màu thứ i của màn dùng viên thứ i trong danh sách của cụm; vật phẩm đặc biệt, nhân vật, Boss và UI giữ phong cách chibi ở cả hai chế độ."
+}

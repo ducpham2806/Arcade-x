@@ -51,3 +51,4 @@ export type WordSave = {
   lastSeed: number | null;
   run: Run | null;
 };
+

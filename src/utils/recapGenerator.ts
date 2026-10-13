@@ -407,3 +407,4 @@ export async function generateGameRecapCardImage(params: RecapImageParams): Prom
 
   return canvas.toDataURL('image/png');
 }
+

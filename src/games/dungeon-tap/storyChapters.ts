@@ -219,3 +219,4 @@ export function generateMonsterForStage(stage: number): TitanMonster {
     theme: chapter.bgGradient,
   };
 }
+

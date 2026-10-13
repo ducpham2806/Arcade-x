@@ -73,3 +73,4 @@ export interface GameWinResult {
   gemsEarned: number;
   chestDropped: 'common' | 'rare' | 'epic' | 'legendary' | null;
 }
+

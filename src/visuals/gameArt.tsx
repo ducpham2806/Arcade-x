@@ -146,3 +146,4 @@ export function GameAtmosphere({ gameId }: {gameId: string}) {
     <span className="game-world-coordinate">✦ PLAY / EXPLORE / MASTER</span>
   </div>;
 }
+

@@ -28,3 +28,4 @@ export function MonsterArt({avatar,boss}:{avatar:string;boss:boolean}) {
     {boss&&<path d="M46 27L41 8L59 16L70 1L81 16L100 8L94 27Z" fill="#ffd075" stroke="#fff1be" strokeWidth="2"/>}
   </svg>;
 }
+

@@ -44,7 +44,7 @@ export function RankingPanel({
     };
   }, [level, assisted]);
   return createPortal(
-    <div className="car-modal-overlay">
+    <div className={`${gamePicker ? "platform-ui " : ""}car-modal-overlay`}>
       <section
         ref={ref}
         className="car-dialog"
@@ -113,3 +113,4 @@ export function RankingPanel({
     document.body,
   );
 }
+

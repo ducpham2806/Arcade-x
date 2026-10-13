@@ -1576,3 +1576,4 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

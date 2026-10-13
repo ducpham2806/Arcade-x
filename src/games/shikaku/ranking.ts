@@ -89,3 +89,4 @@ export async function readRankings(
   if (!Array.isArray(rows)) throw Error("Unavailable ranking");
   return rows;
 }
+

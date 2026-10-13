@@ -55,3 +55,4 @@ export const BLOCKER_CONTROLS: GameControlInfo[] = [
     action: 'Lấp đầy 1 hàng hoặc 1 cột để xóa khối và ghi điểm',
   },
 ];
+

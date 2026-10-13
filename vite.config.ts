@@ -24,8 +24,8 @@ export default defineConfig(() => {
           name: 'ArcadeX - Instant Game Launcher and PWA Platform',
           short_name: 'ArcadeX',
           description: 'Launcher mini-game đơn giản, đồng bộ tài khoản và hỗ trợ chơi ngoại tuyến.',
-          theme_color: '#050505',
-          background_color: '#050505',
+          theme_color: '#3f56d9',
+          background_color: '#f7f9fc',
           display: 'standalone',
           orientation: 'any',
           start_url: '/',
@@ -130,3 +130,4 @@ export default defineConfig(() => {
     },
   };
 });
+

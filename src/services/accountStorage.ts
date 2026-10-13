@@ -73,3 +73,4 @@ export function pendingGuestRegistration(email: string) {
   catch { return null; }
 }
 export function clearPendingRegistration(email: string) { localStorage.removeItem(PENDING_PREFIX + email); }
+

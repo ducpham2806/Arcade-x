@@ -1762,3 +1762,4 @@ export const DungeonTapGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

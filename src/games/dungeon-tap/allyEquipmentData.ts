@@ -533,3 +533,4 @@ export function calculateAllyItemPower(item: AllyEquipmentItem | null | undefine
     item.level * 3
   );
 }
+

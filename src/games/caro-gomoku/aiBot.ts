@@ -164,3 +164,4 @@ export function getBestBotMove(
   const bestMove = SimpleAI.getBestMove(boardState, rules, depth, true);
   return bestMove || { x: center, y: center };
 }
+

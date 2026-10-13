@@ -23,3 +23,4 @@ export const WORD_CROSS_DROP_RATES: DropRateConfig = {
   scoreThresholdForDrop: 0,
   chestWeights: [],
 };
+

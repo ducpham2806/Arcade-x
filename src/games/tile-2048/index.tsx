@@ -725,3 +725,4 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

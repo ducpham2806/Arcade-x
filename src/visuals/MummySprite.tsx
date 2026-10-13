@@ -14,3 +14,4 @@ export function MummySprite({kind}:{kind:'white'|'red'|'scorpion'}) {
       </g>}
   </svg>;
 }
+

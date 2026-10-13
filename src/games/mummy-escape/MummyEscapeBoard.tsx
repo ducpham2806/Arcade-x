@@ -803,3 +803,4 @@ export const MummyEscapeBoard: React.FC<MummyEscapeBoardProps> = ({
     </div>
   );
 };
+

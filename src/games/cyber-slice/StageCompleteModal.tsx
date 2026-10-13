@@ -238,3 +238,4 @@ export const StageCompleteModal: React.FC<StageCompleteModalProps> = ({
     </div>
   );
 };
+

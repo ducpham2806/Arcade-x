@@ -12,3 +12,4 @@ export function PostGameSummary({gameId,title,score,isBest,recap,onReplay,onHome
   </div><footer><button id="btn-gameover-home" className="launcher-secondary" onClick={onHome}><Home size={18}/>Về thư viện</button><button id="btn-gameover-replay" className="launcher-primary" onClick={onReplay}><RotateCcw size={18}/>Chơi lại</button></footer>
  </section></div>,document.body);
 }
+

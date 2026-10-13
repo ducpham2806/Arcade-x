@@ -1,0 +1,7 @@
+{
+  "levels": 100,
+  "seedsPerLevel": 20,
+  "totalValidated": 2000,
+  "rejected": 7,
+  "maxAuditMilliseconds": 12
+}

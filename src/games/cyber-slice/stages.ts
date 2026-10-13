@@ -266,3 +266,4 @@ export function saveStageStars(stageId: number, stars: number): void {
     }
   } catch {}
 }
+

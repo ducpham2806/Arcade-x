@@ -176,3 +176,4 @@ export interface GridPaletteTheme {
   accentBadgeBg: string;
   accentBadgeText: string;
 }
+

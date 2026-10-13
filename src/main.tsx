@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import './launcher/launcher.css';
+import './launcher/platform-theme.css';
 import { registerSW } from 'virtual:pwa-register';
 import { reportPwa, setPwaRegistration } from './services/pwaLifecycle';
 registerSW({
@@ -25,3 +26,4 @@ registerSW({
   onRegisterError() { reportPwa(80, 'Đang dùng ứng dụng trực tuyến; bộ nhớ ngoại tuyến chưa sẵn sàng.'); },
 });
 createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);
+

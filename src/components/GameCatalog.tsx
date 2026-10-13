@@ -34,3 +34,4 @@ export const GameCatalog:React.FC=()=>{
   </section>
  </div>;
 };
+

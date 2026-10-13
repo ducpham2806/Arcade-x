@@ -29,3 +29,4 @@ export function spawnBoardTile(grid: number[][], seed: number) {
   const next = grid.map(row => [...row]); next[r][c] = number.value < .9 ? 2 : 4;
   return { grid: next, seed: number.state, spawned: true };
 }
+

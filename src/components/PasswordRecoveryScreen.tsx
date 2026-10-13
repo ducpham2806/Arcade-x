@@ -20,7 +20,7 @@ export function PasswordRecoveryScreen({ state, onComplete, onCancel }: { state:
       else { setMessage(result.message || 'Đã gửi yêu cầu.'); if (state.status === 'ready') { setPassword(''); setConfirm(''); await onComplete(); } }
     } finally { setBusy(false); }
   };
-  return <main id="password-recovery-screen" className="min-h-dvh bg-[#080b12] text-slate-200 flex items-center justify-center p-4 sm:p-8">
+  return <main id="password-recovery-screen" className="platform-ui min-h-dvh bg-[#080b12] text-slate-200 flex items-center justify-center p-4 sm:p-8">
     <section className="w-full max-w-lg rounded-3xl border border-white/10 bg-[#101621] p-6 sm:p-10 space-y-5" aria-labelledby="recovery-title">
       <p className="text-xs font-bold tracking-widest text-lime-300">ARCADEX · TÀI KHOẢN</p>
       <h1 id="recovery-title" className="text-2xl font-bold text-white">{state.status === 'ready' ? 'Đặt mật khẩu mới' : 'Khôi phục tài khoản'}</h1>

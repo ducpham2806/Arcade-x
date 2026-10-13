@@ -139,6 +139,7 @@ const AppContent: React.FC = () => {
         )}
       </AnimatePresence>
 
+      <div className="platform-ui">
       {/* Global Modals & Overlays (Available from anywhere) */}
       {activeModal === 'profile' && <ProfileModal />}
       {activeModal === 'settings' && <SettingsModal />}
@@ -169,25 +170,26 @@ const AppContent: React.FC = () => {
       {/* Launcher Force Update Modal (Hidden when in-game, shown on launcher with persistent blur overlay) */}
       <ForceUpdateModal />
 
+      </div>
       {/* Primary Fixed Mobile Bottom Navigation Bar (Active on Main Menu & Hub) */}
       {!activeGameId && <MobileNav />}
 
       {/* Offline Status Indicator */}
-      <OfflineIndicator />
+      <div className="platform-ui"><OfflineIndicator /></div>
 
       {/* PWA Prompt */}
-      {activeModal !== 'auth' && !activeGameId && <PWAInstallPrompt />}
+      {activeModal !== 'auth' && !activeGameId && <div className="platform-ui"><PWAInstallPrompt /></div>}
 
       {/* Draggable Chat Bubble (Active across all games and views, draggable & closable) */}
 
 
       {/* Real-time Global Chat Floating Window - Rendered last so it sits on top of all views */}
-      <GlobalChat isOpen={isChatOpen} onToggle={toggleChat} onOpenShare={() => setActiveModal('share')} />
+      <div className="platform-ui"><GlobalChat isOpen={isChatOpen} onToggle={toggleChat} onOpenShare={() => setActiveModal('share')} /></div>
     </div>
   );
 };
 
-export function App() {
+export function App({ reviewControls }: { reviewControls?: React.ReactNode } = {}) {
   return (
     <AuthProvider>
       <LauncherProvider>
@@ -195,6 +197,7 @@ export function App() {
         <InventoryProvider>
           <GameProvider>
             <AppContent />
+            {reviewControls}
           </GameProvider>
         </InventoryProvider>
       </PlayerProvider>
@@ -204,3 +207,4 @@ export function App() {
 }
 
 export default App;
+

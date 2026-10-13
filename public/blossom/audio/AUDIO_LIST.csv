@@ -1,0 +1,58 @@
+﻿id,file,trigger,duration_s,note
+sfx_pop_1,audio/sfx/sfx_pop_1.wav,nổ nhóm thường (3 biến thể),0.12,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_pop_2,audio/sfx/sfx_pop_2.wav,nổ nhóm thường (3 biến thể),0.12,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_pop_3,audio/sfx/sfx_pop_3.wav,nổ nhóm thường (3 biến thể),0.12,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_01,audio/sfx/sfx_combo_01.wav,chạm combo thứ 1 (cao độ +0 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_02,audio/sfx/sfx_combo_02.wav,chạm combo thứ 2 (cao độ +1 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_03,audio/sfx/sfx_combo_03.wav,chạm combo thứ 3 (cao độ +2 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_04,audio/sfx/sfx_combo_04.wav,chạm combo thứ 4 (cao độ +3 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_05,audio/sfx/sfx_combo_05.wav,chạm combo thứ 5 (cao độ +4 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_06,audio/sfx/sfx_combo_06.wav,chạm combo thứ 6 (cao độ +5 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_07,audio/sfx/sfx_combo_07.wav,chạm combo thứ 7 (cao độ +6 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_08,audio/sfx/sfx_combo_08.wav,chạm combo thứ 8 (cao độ +7 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_09,audio/sfx/sfx_combo_09.wav,chạm combo thứ 9 (cao độ +8 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_10,audio/sfx/sfx_combo_10.wav,chạm combo thứ 10 (cao độ +9 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_11,audio/sfx/sfx_combo_11.wav,chạm combo thứ 11 (cao độ +10 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_combo_12,audio/sfx/sfx_combo_12.wav,chạm combo thứ 12 (cao độ +11 bán cung),0.35,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_invalid_tap,audio/sfx/sfx_invalid_tap.wav,chạm nhóm < 3 viên,0.14,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_special_create,audio/sfx/sfx_special_create.wav,tạo vật phẩm đặc biệt,0.6,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_bee_whoosh,audio/sfx/sfx_bee_whoosh.wav,Ong Mật quét,0.45,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_bloom_boom,audio/sfx/sfx_bloom_boom.wav,Bom Hoa nổ,0.4,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_rainbow_sweep,audio/sfx/sfx_rainbow_sweep.wav,Cầu Vồng kích hoạt,0.84,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_sun_burst,audio/sfx/sfx_sun_burst.wav,Mặt Trời kích hoạt,0.8,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_chain_ding,audio/sfx/sfx_chain_ding.wav,nổ dây chuyền,0.49,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_special_merge,audio/sfx/sfx_special_merge.wav,hợp nhất hai vật phẩm,0.56,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_star_1,audio/sfx/sfx_star_1.wav,sao thứ 1 hiện ra,0.7,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_star_2,audio/sfx/sfx_star_2.wav,sao thứ 2 hiện ra,0.7,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_star_3,audio/sfx/sfx_star_3.wav,sao thứ 3 hiện ra,0.7,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_win_jingle,audio/sfx/sfx_win_jingle.wav,thắng màn,1.6,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_lose_soft,audio/sfx/sfx_lose_soft.wav,thua màn (nhẹ nhàng),1.05,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_coin_get,audio/sfx/sfx_coin_get.wav,nhận Xu,0.41,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_coin_spend,audio/sfx/sfx_coin_spend.wav,trừ Xu khi mua,0.44,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_button_click,audio/sfx/sfx_button_click.wav,bấm nút,0.05,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_toggle,audio/sfx/sfx_toggle.wav,công tắc,0.04,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_popup_open,audio/sfx/sfx_popup_open.wav,mở popup,0.2,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_popup_close,audio/sfx/sfx_popup_close.wav,đóng popup,0.16,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_shuffle,audio/sfx/sfx_shuffle.wav,xáo trộn bàn,0.5,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_hazard_hit,audio/sfx/sfx_hazard_hit.wav,đánh trúng hazard (còn HP),0.12,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_hazard_clear,audio/sfx/sfx_hazard_clear.wav,hazard vỡ,0.28,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_seed_drop,audio/sfx/sfx_seed_drop.wav,hạt giống chạm đáy,0.23,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_bomb_tick,audio/sfx/sfx_bomb_tick.wav,bom hẹn giờ đếm,0.03,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_bomb_alarm,audio/sfx/sfx_bomb_alarm.wav,bom còn ≤ 3 lượt,0.25,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_pet_free,audio/sfx/sfx_pet_free.wav,giải cứu thú,0.29,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_boss_hit,audio/sfx/sfx_boss_hit.wav,trúng Boss,0.25,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_boss_phase,audio/sfx/sfx_boss_phase.wav,Boss đổi giai đoạn,0.9,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_unlock_chime,audio/sfx/sfx_unlock_chime.wav,mở khoá cụm/tính năng,0.84,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_hint_sparkle,audio/sfx/sfx_hint_sparkle.wav,nhóm gợi ý nhấp nháy,0.4,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_booster_start,audio/sfx/sfx_booster_start.wav,booster áp dụng đầu màn,0.6,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+sfx_bonus_time_tick,audio/sfx/sfx_bonus_time_tick.wav,mỗi lượt dư biến thành vật phẩm,0.12,placeholder tự tổng hợp (không bản quyền bên thứ ba); nên thay bằng bản thu/thiết kế chuyên nghiệp
+music_cluster01,(chưa có) audio/music/music_cluster01.ogg,nhạc nền cụm 1: Vườn Hoa Xuân,90,"90 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster02,(chưa có) audio/music/music_cluster02.ogg,nhạc nền cụm 2: Vườn Cây Ăn Quả,90,"92 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster03,(chưa có) audio/music/music_cluster03.ogg,nhạc nền cụm 3: Đồng Cỏ & Cối Xay Gió,90,"94 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster04,(chưa có) audio/music/music_cluster04.ogg,nhạc nền cụm 4: Bãi Biển Nhiệt Đới,90,"96 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster05,(chưa có) audio/music/music_cluster05.ogg,nhạc nền cụm 5: Rừng Nấm Kỳ Diệu,90,"98 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster06,(chưa có) audio/music/music_cluster06.ogg,nhạc nền cụm 6: Sa Mạc Xương Rồng,90,"100 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster07,(chưa có) audio/music/music_cluster07.ogg,nhạc nền cụm 7: Núi Tuyết Hoa Băng,90,"102 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster08,(chưa có) audio/music/music_cluster08.ogg,nhạc nền cụm 8: Đầm Sen Hoàng Hôn,90,"104 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster09,(chưa có) audio/music/music_cluster09.ogg,nhạc nền cụm 9: Thung Lũng Đom Đóm,90,"106 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"
+music_cluster10,(chưa có) audio/music/music_cluster10.ogg,nhạc nền cụm 10: Cung Điện Hoa Vàng,90,"110 BPM; vòng lặp 90 giây; 3 stem (nền, giai điệu, nhịp) vào lớp 2 khi combo ≥ 3 và lớp 3 khi combo ≥ 6; cần sáng tác hoặc lấy nhạc có giấy phép"

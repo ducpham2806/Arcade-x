@@ -1016,3 +1016,4 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     </div>
   );
 };
+

@@ -76,3 +76,4 @@ export const OfflineIndicator: React.FC = () => {
     </AnimatePresence>
   );
 };
+

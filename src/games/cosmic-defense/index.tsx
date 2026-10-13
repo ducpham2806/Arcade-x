@@ -2073,3 +2073,4 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

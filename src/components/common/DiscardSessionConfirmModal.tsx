@@ -59,7 +59,7 @@ export const DiscardSessionConfirmModal: React.FC<DiscardSessionConfirmModalProp
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      <div className="platform-ui fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -181,3 +181,4 @@ export const DiscardSessionConfirmModal: React.FC<DiscardSessionConfirmModalProp
     </AnimatePresence>
   );
 };
+

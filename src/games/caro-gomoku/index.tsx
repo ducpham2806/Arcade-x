@@ -1607,3 +1607,4 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

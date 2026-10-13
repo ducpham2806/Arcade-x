@@ -68,3 +68,4 @@ export function getBestXiangqiMove(
 
   return { from: allMoves[0].from, to: allMoves[0].to };
 }
+

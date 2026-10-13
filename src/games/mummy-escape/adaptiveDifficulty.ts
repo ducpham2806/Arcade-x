@@ -436,3 +436,4 @@ export function getAdaptiveProceduralOptions(
     trapDensity: baseOptions.trapDensity || (tuning.appliedMultiplierPercent > 0 ? 'high' : 'medium'),
   };
 }
+

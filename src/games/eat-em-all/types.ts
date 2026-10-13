@@ -106,3 +106,4 @@ export interface GameStats {
   gemsEaten: number;
   heartsCollected: number;
 }
+

@@ -178,3 +178,4 @@ export function getBestChessMove(
 
   return { from: bestMove.from as Square, to: bestMove.to as Square, promotion: bestMove.promotion || 'q' };
 }
+

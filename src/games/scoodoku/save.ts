@@ -5,3 +5,4 @@ export function validSudokuBoard(value: unknown): value is SudokuBoardState {
   const digit = (n: unknown) => Number.isInteger(n) && Number(n) >= 1 && Number(n) <= b.dimension;
   return b.cells.every((row,r) => Array.isArray(row) && row.length === b.dimension && row.every((cell,c) => cell && cell.row === r && cell.col === c && typeof cell.isGiven === 'boolean' && (cell.value === null || digit(cell.value)) && digit(cell.solutionValue) && Array.isArray(cell.notes) && cell.notes.every(digit) && (!cell.isGiven || cell.value === cell.solutionValue)));
 }
+

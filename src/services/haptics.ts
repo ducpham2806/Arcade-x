@@ -213,3 +213,4 @@ class HapticService {
 }
 
 export const hapticService = new HapticService();
+

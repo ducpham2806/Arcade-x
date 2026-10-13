@@ -1061,3 +1061,4 @@ export const ShikakuGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

@@ -215,3 +215,4 @@ export function explainHint(
     text: `Xét ${location}: ${value} = ${factors.join(" hoặc ")}. Còn ${count} vị trí hợp lệ về diện tích; hãy loại hình chứa số khác hoặc đè vùng cũ. Bấm xem khung nếu cần một cách ghép đã kiểm tra tới cuối bảng.`,
   };
 }
+

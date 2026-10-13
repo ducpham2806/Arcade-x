@@ -7,3 +7,4 @@ export function AccountAvatar({ avatar }: { avatar: string }) {
   }
   return <>{avatar || '🎮'}</>;
 }
+

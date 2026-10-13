@@ -53,3 +53,4 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
  return <Context.Provider value={{catalog,source,favorites,recentlyPlayed,toggleFavorite,authorize,recordPlay,finishPlay,notice,dismissNotice:()=>setNotice(''),refresh,busy}}>{children}</Context.Provider>;
 }
 export function useLauncher(){const value=useContext(Context);if(!value)throw new Error('LauncherProvider required');return value;}
+

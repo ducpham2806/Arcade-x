@@ -12,3 +12,4 @@
 ## 3. Gameplay Experience & Notifications
 - **In-Game Non-Intrusive Toasts**: When a player levels up or earns rewards inside a game match, display a toast notification (`LevelUpToast`) instead of interrupting gameplay with a blocking modal. Full level-up celebration banners appear on the launcher screen.
 - **Force Update Protection**: Force update modals must only appear when the user is on the launcher screen (`activeGameId === null`). Never block or interrupt an active game session.
+

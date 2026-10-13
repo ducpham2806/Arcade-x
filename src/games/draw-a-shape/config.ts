@@ -17,3 +17,4 @@ export const DRAW_SHAPE_CONTROLS: GameControlInfo[] = [
   { key: 'Touch/Drag', action: 'Kéo', touchInstruction: 'Kéo từ ô số để vẽ hình' },
   { key: 'Tap', action: 'Chạm', touchInstruction: 'Chạm vào ô đang vẽ để sửa' }
 ];
+

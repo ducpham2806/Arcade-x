@@ -25,7 +25,7 @@ export const GameActionConfirmModal: React.FC<GameActionConfirmModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="platform-ui fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -171,3 +171,4 @@ export const GameActionConfirmModal: React.FC<GameActionConfirmModalProps> = ({
     </AnimatePresence>
   );
 };
+

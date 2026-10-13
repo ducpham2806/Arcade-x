@@ -485,3 +485,4 @@ export function getWordDefinition(word: string): WordDefinition {
     exampleVi: ''
   };
 }
+

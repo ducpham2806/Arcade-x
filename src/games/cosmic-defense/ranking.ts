@@ -27,3 +27,4 @@ export async function submitRanked(run: CosmicSave["pending"][number]) {
   if (error || data?.error) throw error || new Error(data.error);
   return data;
 }
+

@@ -35,3 +35,4 @@ export const SplashScreen: React.FC<{ ready?: boolean; onComplete?: () => void; 
     </section>
   </main>;
 };
+

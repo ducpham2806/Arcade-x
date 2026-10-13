@@ -1316,3 +1316,4 @@ export const FillTheSpaceGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

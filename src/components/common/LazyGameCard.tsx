@@ -50,3 +50,4 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({game, personalHighSco
     </div>
   </div>;
 };
+

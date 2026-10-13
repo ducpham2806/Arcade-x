@@ -1,0 +1,228 @@
+{
+ "engine_notes": "Mọi lớp dùng blend cộng (additive). Số liệu là điểm khởi đầu, tinh chỉnh khi chơi thử. Thời gian tính bằng giây.",
+ "effects": {
+  "bee_beam": {
+   "trigger": "chạm Ong Mật",
+   "sound": "sfx_bee_whoosh",
+   "z_order": "trên viên, dưới chữ điểm",
+   "duration": 0.5,
+   "layers": [
+    {
+     "sprite": "vfx_fx/vfx_beam_gold",
+     "t": [
+      0,
+      0.5
+     ],
+     "scale_len": "0→bàn rộng trong 0.18 (ease-out), giữ 0.12, mờ 0.2",
+     "pos": "từ ô Ong, hai chiều"
+    },
+    {
+     "sprite": "vfx_fx/vfx_glow_gold",
+     "t": [
+      0,
+      0.3
+     ],
+     "note": "hai đầu vệt sáng chạy theo mũi vệt, scale 0.8"
+    },
+    {
+     "sprite": "vfx_fx/vfx_light_column",
+     "t": [
+      0.02,
+      0.4
+     ],
+     "note": "chỉ khi quét cột; mờ dần"
+    }
+   ],
+   "piece_removal": "viên nổ khi mũi vệt tới, trễ +0.02 mỗi ô",
+   "screen_shake": {
+    "amp_px": 4,
+    "dur": 0.15
+   }
+  },
+  "bloom_bomb": {
+   "trigger": "chạm Bom Hoa",
+   "sound": "sfx_bloom_boom",
+   "duration": 0.6,
+   "layers": [
+    {
+     "sprite": "anim_fx_bloom_bomb",
+     "scale": "ô×6 (≈ vùng 5×5)",
+     "t": [
+      0,
+      0.33
+     ]
+    }
+   ],
+   "piece_removal": "trễ 0.04 mỗi ô theo khoảng cách từ tâm",
+   "screen_shake": {
+    "amp_px": 8,
+    "dur": 0.25
+   },
+   "time_scale": {
+    "value": 0.9,
+    "dur": 0.15
+   }
+  },
+  "rainbow": {
+   "trigger": "chạm Cầu Vồng",
+   "sound": "sfx_rainbow_sweep",
+   "duration": 0.85,
+   "layers": [
+    {
+     "sprite": "vfx_fx/vfx_glow_cyan",
+     "t": [
+      0,
+      0.25
+     ],
+     "note": "quả cầu hút sáng, scale 1→1.6"
+    },
+    {
+     "sprite": "vfx_fx/vfx_beam_purple",
+     "t": [
+      0.25,
+      0.45
+     ],
+     "note": "một tia từ tâm tới mỗi viên mục tiêu, trễ 0.03 mỗi viên; xoay và co giãn theo khoảng cách"
+    },
+    {
+     "sprite": "anim_fx_rainbow_burst",
+     "t": [
+      0.45,
+      0.8
+     ],
+     "note": "phát tại mỗi viên mục tiêu, scale ô×3"
+    }
+   ],
+   "screen_flash": {
+    "color": "#fff",
+    "alpha": 0.12,
+    "dur": 0.1
+   }
+  },
+  "sun": {
+   "trigger": "chạm Mặt Trời",
+   "sound": "sfx_sun_burst",
+   "duration": 0.8,
+   "layers": [
+    {
+     "sprite": "anim_fx_sun_burst",
+     "t": [
+      0,
+      0.33
+     ],
+     "scale": "ô×8",
+     "note": "tia xoay 90° trong 0.5"
+    },
+    {
+     "sprite": "vfx_fx/vfx_beam_gold",
+     "t": [
+      0.1,
+      0.6
+     ],
+     "note": "3 hàng và 3 cột, mỗi vệt rộng 1 ô, mọc từ tâm trong 0.2"
+    },
+    {
+     "sprite": "vfx_fx/vfx_light_column",
+     "t": [
+      0.1,
+      0.5
+     ],
+     "note": "3 cột"
+    }
+   ],
+   "screen_shake": {
+    "amp_px": 10,
+    "dur": 0.3
+   },
+   "screen_flash": {
+    "color": "#fff6c0",
+    "alpha": 0.18,
+    "dur": 0.12
+   }
+  },
+  "special_merge": {
+   "trigger": "hợp nhất hai vật phẩm",
+   "sound": "sfx_special_merge",
+   "duration": 0.35,
+   "layers": [
+    {
+     "sprite": "anim_fx_special_merge",
+     "scale": "ô×4",
+     "t": [
+      0,
+      0.27
+     ]
+    }
+   ],
+   "next": "phát hiệu ứng kết hợp tương ứng sau khi loé"
+  },
+  "chain": {
+   "trigger": "nổ lan trúng vật phẩm khác",
+   "sound": "sfx_chain_ding",
+   "duration": 0.2,
+   "layers": [
+    {
+     "sprite": "anim_fx_chain_spark",
+     "scale": "ô×1.5",
+     "t": [
+      0,
+      0.2
+     ]
+    }
+   ],
+   "time_scale": {
+    "value": 0.85,
+    "dur": 0.3,
+    "when": "chain ≥ 3"
+   }
+  },
+  "blast_normal": {
+   "trigger": "nổ nhóm thường",
+   "sound": "sfx_pop_1..3",
+   "duration": 0.25,
+   "layers": [
+    {
+     "sprite": "anim_fx_blast_<màu>",
+     "scale": "ô×1.6",
+     "t": [
+      0,
+      0.23
+     ]
+    },
+    {
+     "sprite": "vfx/vfx_petal_*",
+     "note": "6–8 cánh/viên, sống 0.5, rơi theo trọng lực"
+    }
+   ],
+   "note": "chọn màu loé theo màu viên; nhóm ≥ 7 viên thêm rung 3 px"
+  },
+  "combo_burst": {
+   "trigger": "combo từ ×5",
+   "duration": 0.5,
+   "layers": [
+    {
+     "sprite": "anim_fx_combo_burst",
+     "scale": "ô×6",
+     "t": [
+      0,
+      0.5
+     ],
+     "note": "đặt sau nhãn combo"
+    }
+   ]
+  },
+  "hint": {
+   "trigger": "8 giây không chạm",
+   "sound": "sfx_hint_sparkle",
+   "duration": 1.2,
+   "loop": true,
+   "layers": [
+    {
+     "sprite": "anim_fx_hint_glow",
+     "scale": "ô×1.1"
+    }
+   ],
+   "piece": "nhún scale 1→1.06 mỗi 0.6"
+  }
+ }
+}

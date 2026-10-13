@@ -1262,3 +1262,4 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

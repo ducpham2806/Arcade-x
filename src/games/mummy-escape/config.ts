@@ -96,3 +96,4 @@ export const MUMMY_ESCAPE_DROP_RATES: DropRateConfig = {
     { type: 'legendary', weight: 2 },
   ],
 };
+

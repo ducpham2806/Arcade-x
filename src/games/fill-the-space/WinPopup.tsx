@@ -405,3 +405,4 @@ export const WinPopup: React.FC<WinPopupProps> = ({
     </div>
   );
 };
+

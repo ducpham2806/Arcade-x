@@ -152,3 +152,4 @@ export interface ActiveGameEffect {
   bgColor: string;
   glowColor: string;
 }
+

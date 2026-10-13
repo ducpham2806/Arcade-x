@@ -244,3 +244,4 @@ export const MummyEscapeTurnIndicator: React.FC<MummyEscapeTurnIndicatorProps> =
     </div>
   );
 };
+

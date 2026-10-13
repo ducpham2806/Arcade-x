@@ -285,3 +285,4 @@ export const STARTER_EQUIPMENT: Record<EquipmentSlot, EquipmentItem> = {
     },
   },
 };
+

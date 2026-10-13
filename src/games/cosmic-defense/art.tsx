@@ -362,3 +362,4 @@ export function addPaletteSkins(art: Art) {
     art["skin/" + name] = c;
   }
 }
+

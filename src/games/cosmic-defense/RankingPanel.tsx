@@ -42,7 +42,7 @@ export function CosmicRankingPanel({
     };
   }, [mode, revision]);
   return (
-    <CosmicDialog title="Cosmic · Bảng xếp hạng" onClose={onClose}>
+    <CosmicDialog platform={!!gamePicker} title="Cosmic · Bảng xếp hạng" onClose={onClose}>
       <div className="cd-list">
         {gamePicker}
         <p>
@@ -76,3 +76,4 @@ export function CosmicRankingPanel({
     </CosmicDialog>
   );
 }
+

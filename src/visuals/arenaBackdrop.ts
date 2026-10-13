@@ -42,3 +42,4 @@ export function drawArenaBackdrop(ctx: CanvasRenderingContext2D, kind: ArenaKind
   }
   ctx.drawImage(cache.canvas,0,0,width,height);
 }
+

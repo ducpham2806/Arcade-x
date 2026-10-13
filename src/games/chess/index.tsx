@@ -1439,3 +1439,4 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 };
 
 export default ChessGame;
+

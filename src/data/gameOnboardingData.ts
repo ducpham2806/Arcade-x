@@ -956,3 +956,4 @@ export const GAME_ONBOARDING_DATA: Record<string, GameOnboardingInfo> = {
     },
   },
 };
+

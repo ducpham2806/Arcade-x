@@ -1523,3 +1523,4 @@ export const DEFAULT_LEGENDARY_BLUEPRINTS: LegendaryBlueprint[] = [
     },
   },
 ];
+

@@ -49,3 +49,4 @@ export const CHESS_DROP_RATES: DropRateConfig = {
     { type: 'legendary', weight: 8 },
   ],
 };
+

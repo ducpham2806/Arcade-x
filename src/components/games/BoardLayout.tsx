@@ -183,3 +183,4 @@ export const BoardLayout = ({ header, topPlayer, bottomPlayer, board, controls, 
     </div>
   );
 };
+

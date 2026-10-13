@@ -14,3 +14,4 @@ export function useScrollLock(isLocked: boolean = true) {
     };
   }, [isLocked]);
 }
+

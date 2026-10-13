@@ -214,7 +214,7 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
     <>
       {/* Floating Chat Window (Native Drawer on Mobile, Popover on Desktop) */}
       {isOpen && (
-        <div className="fixed inset-0 z-[100] pointer-events-none flex flex-col justify-end sm:justify-start">
+        <div className="platform-ui fixed inset-0 z-[100] pointer-events-none flex flex-col justify-end sm:justify-start">
           {/* Mobile backdrop */}
           <div
             className="fixed inset-0 bg-black/80 backdrop-blur-sm pointer-events-auto transition-opacity"
@@ -706,3 +706,4 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ isOpen, onToggle }) => {
   </>
 );
 };
+

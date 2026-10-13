@@ -65,3 +65,4 @@ supabase?.auth.onAuthStateChange((event) => {
     bindings.clear();
   }
 });
+

@@ -55,3 +55,4 @@ export const getBossByPhase = (phase: number): BossDef => {
   const index = Math.min(phase - 1, BOSS_RUSH_ROSTER.length - 1);
   return BOSS_RUSH_ROSTER[Math.max(0, index)];
 };
+

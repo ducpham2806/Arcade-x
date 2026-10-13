@@ -58,3 +58,4 @@ export const CARO_GOMOKU_DROP_RATES: DropRateConfig = {
     { type: 'legendary', weight: 5 },
   ],
 };
+

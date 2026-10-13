@@ -232,3 +232,4 @@
  .simple-recents button > svg { display:none; }
 }
 @media(max-width:359px) { .simple-launcher-header #btn-header-profile > span:last-child { display:none; } }
+

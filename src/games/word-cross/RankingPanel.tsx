@@ -45,7 +45,7 @@ export function WordRankingPanel({
     0,
   );
   return (
-    <WordDialog title="Bảng thành tích Word Cross" onClose={onClose}>
+    <WordDialog platform={!!gamePicker} title="Bảng thành tích Word Cross" onClose={onClose}>
       {gamePicker}
       <div className="wc-tabs">
         {(["campaign", "level", "daily"] as const).map((k) => (
@@ -119,3 +119,4 @@ export function WordRankingPanel({
     </WordDialog>
   );
 }
+

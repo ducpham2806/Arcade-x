@@ -28,3 +28,4 @@ export function validShikakuPuzzle(value: unknown): value is ShikakuPuzzle {
     return clues.length === 1 && clues[0].value === rect.w * rect.h;
   });
 }
+

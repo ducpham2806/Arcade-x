@@ -1,0 +1,287 @@
+/* Platform theme: launcher services retain this theme even when opened over a game. */
+.platform-ui { --platform-ink:#233045; --platform-muted:#607084; --platform-line:#dce4ed; --platform-paper:#f7f9fc; --platform-brand:#3f56d9; color:var(--platform-ink); font-family:'Plus Jakarta Sans',system-ui,sans-serif; color-scheme:light; }
+.platform-ui h1,.platform-ui h2,.platform-ui h3 {font-family:'Plus Jakarta Sans',system-ui,sans-serif;letter-spacing:-.035em;color:var(--platform-ink);text-shadow:none;}
+.platform-ui :is(button,a,input,select,textarea):focus-visible {outline:3px solid var(--platform-brand);outline-offset:3px;}
+.platform-ui :is(.arcadex-modal-container,.arcadex-modal-container-xl,.arcadex-modal-container-md,.arcadex-modal-container-sm) {background:#fff;color:var(--platform-ink);border:1px solid var(--platform-line);box-shadow:0 24px 80px #23304526;}
+.platform-ui.arcadex-modal-overlay,.platform-ui .arcadex-modal-overlay,.platform-ui.fixed.inset-0[class*="bg-black"] {background:#23304566;backdrop-filter:blur(6px);}
+.platform-ui :is(input:not([type=range]):not([type=checkbox]),textarea,select) {color:var(--platform-ink);background:#fff;border-color:#b9c6d8;border-radius:12px;}
+.platform-ui ::placeholder {color:#718198;opacity:1;}
+.platform-ui .simple-primary-button {background:var(--platform-brand);color:white;border:1px solid var(--platform-brand);box-shadow:0 3px 0 #2d3daa;}
+.platform-ui :is(.font-display,.font-mono) {font-family:'Plus Jakarta Sans',system-ui,sans-serif;}
+.platform-ui [class*="shadow-"] {--tw-shadow-color:#23304514;}
+.platform-ui [class*="bg-gradient-"]:not(.bg-clip-text) {background-image:none;background-color:#eef2ff;}
+.platform-ui .bg-clip-text {background-image:none;color:var(--platform-ink);-webkit-text-fill-color:var(--platform-ink);}
+.platform-ui [class*="border-white"],.platform-ui [class*="border-neutral-"],.platform-ui [class*="border-slate-"] {border-color:var(--platform-line);}
+.platform-ui [class*="text-white"],.platform-ui [class*="text-slate-1"],.platform-ui [class*="text-slate-2"],.platform-ui [class*="text-neutral-1"],.platform-ui [class*="text-neutral-2"] {color:var(--platform-ink);}
+.platform-ui [class*="text-slate-3"],.platform-ui [class*="text-slate-4"],.platform-ui [class*="text-neutral-3"],.platform-ui [class*="text-neutral-4"] {color:var(--platform-muted);}
+.platform-ui [class*="text-slate-5"],.platform-ui [class*="text-neutral-5"] {color:#68788d;}
+.platform-ui [class*="bg-white/"] {background-color:#f0f4f9;}
+.platform-ui [class*="bg-black/"]:not(.fixed) {background-color:#eef2f7;}
+.platform-ui .custom-scrollbar {scrollbar-color:#bdc8d9 #f7f9fc;}
+.platform-ui .custom-scrollbar::-webkit-scrollbar-thumb {background:#bdc8d9;}
+.platform-ui .custom-scrollbar::-webkit-scrollbar-track {background:#f7f9fc;}
+.platform-ui :is(button,[role=tab]) {text-shadow:none;}
+.platform-ui button[aria-label*="Đóng"],.platform-ui button[title*="Đóng"] {width:44px;height:44px;min-width:44px;min-height:44px;background:#f0f4f9;color:#53667e;border:1px solid var(--platform-line);box-shadow:none;}
+.platform-ui button[aria-pressed=true]:not(.launcher-primary),.platform-ui button[aria-selected=true] {background:#e9edff;color:#3449b9;border-color:#aebbef;}
+@media(max-width:639px){
+ .platform-ui.arcadex-modal-overlay,.platform-ui .arcadex-modal-overlay {padding:0;}
+ .platform-ui :is(.arcadex-modal-container,.arcadex-modal-container-xl,.arcadex-modal-container-md,.arcadex-modal-container-sm) {width:100%;height:100dvh;max-height:100dvh;border-radius:0;border:0;}
+}
+@media(prefers-reduced-motion:reduce){.platform-ui *{scroll-behavior:auto!important;transition-duration:0s!important;animation-duration:.01ms!important;animation-iteration-count:1!important;}}
+.platform-ui [class*="bg-[#050505]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#06070d]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#060810]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#07080f]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#08080f]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#08090f]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#080b12]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#080d14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#090910]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#090a0f]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#090a12]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#090a14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0a0a0a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0a0a0e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0a0a0f]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0a0a10]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0a0a1a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0a0c16]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0a180a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0b0b10]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0b0c14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0b0c16]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0b121e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0c0c12]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0c0c14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0c0d16]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0c0d18]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0c0e1a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0c1813]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0d0d11]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0d0d12]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0d0d14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0d0d16]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0d0e14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0e0c18]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0e0e0e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0e0e12]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0e0e14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0e0e16]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0e1017]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0f0b1e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0f0f14]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0f0f18]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0f101c]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#0f111a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#101014]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#101017]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#101018]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#10111a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#101621]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#111118]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#11111c]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#11111d]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#11121d]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12111d]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#121218]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12121a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12121c]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12121e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#121220]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12131c]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12131e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12131f]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#12141a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#121422]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#121424]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#121522]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#131322]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#13141d]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#13141f]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#131522]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#14080e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#141208]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#141414]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#14141a]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#14141c]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#14141e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#141420]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#141424]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#141522]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#141624]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#141726]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#151522]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#151524]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#151525]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#151722]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#151726]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#16120b]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#161622]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#161624]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#181726]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#181822]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#1a1710]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#1a1c29]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#1a1d2e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#23273e]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#3b2010]"] {background-color:#fff;}
+.platform-ui [class*="bg-[#4a2e1b]"] {background-color:#fff;}
+.platform-ui [class*="bg-slate-600"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-slate-700"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-slate-800"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-slate-900"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-slate-950"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-neutral-600"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-neutral-700"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-neutral-800"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-neutral-900"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-neutral-950"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-gray-600"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-gray-700"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-gray-800"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-gray-900"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-gray-950"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-zinc-600"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-zinc-700"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-zinc-800"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-zinc-900"] {background-color:#f3f6fb;}
+.platform-ui [class*="bg-zinc-950"] {background-color:#f3f6fb;}
+.platform-ui [class*="text-indigo-100"] {color:#3f56d9;}
+.platform-ui [class*="text-indigo-200"] {color:#3f56d9;}
+.platform-ui [class*="text-indigo-300"] {color:#3f56d9;}
+.platform-ui [class*="text-indigo-400"] {color:#3f56d9;}
+.platform-ui [class*="bg-indigo-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-indigo-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-indigo-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-cyan-100"] {color:#08728c;}
+.platform-ui [class*="text-cyan-200"] {color:#08728c;}
+.platform-ui [class*="text-cyan-300"] {color:#08728c;}
+.platform-ui [class*="text-cyan-400"] {color:#08728c;}
+.platform-ui [class*="bg-cyan-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-cyan-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-cyan-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-sky-100"] {color:#126da8;}
+.platform-ui [class*="text-sky-200"] {color:#126da8;}
+.platform-ui [class*="text-sky-300"] {color:#126da8;}
+.platform-ui [class*="text-sky-400"] {color:#126da8;}
+.platform-ui [class*="bg-sky-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-sky-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-sky-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-blue-100"] {color:#3156bb;}
+.platform-ui [class*="text-blue-200"] {color:#3156bb;}
+.platform-ui [class*="text-blue-300"] {color:#3156bb;}
+.platform-ui [class*="text-blue-400"] {color:#3156bb;}
+.platform-ui [class*="bg-blue-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-blue-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-blue-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-emerald-100"] {color:#187650;}
+.platform-ui [class*="text-emerald-200"] {color:#187650;}
+.platform-ui [class*="text-emerald-300"] {color:#187650;}
+.platform-ui [class*="text-emerald-400"] {color:#187650;}
+.platform-ui [class*="bg-emerald-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-emerald-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-emerald-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-green-100"] {color:#287440;}
+.platform-ui [class*="text-green-200"] {color:#287440;}
+.platform-ui [class*="text-green-300"] {color:#287440;}
+.platform-ui [class*="text-green-400"] {color:#287440;}
+.platform-ui [class*="bg-green-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-green-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-green-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-teal-100"] {color:#17766f;}
+.platform-ui [class*="text-teal-200"] {color:#17766f;}
+.platform-ui [class*="text-teal-300"] {color:#17766f;}
+.platform-ui [class*="text-teal-400"] {color:#17766f;}
+.platform-ui [class*="bg-teal-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-teal-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-teal-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-amber-100"] {color:#8c6216;}
+.platform-ui [class*="text-amber-200"] {color:#8c6216;}
+.platform-ui [class*="text-amber-300"] {color:#8c6216;}
+.platform-ui [class*="text-amber-400"] {color:#8c6216;}
+.platform-ui [class*="bg-amber-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-amber-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-amber-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-yellow-100"] {color:#85610e;}
+.platform-ui [class*="text-yellow-200"] {color:#85610e;}
+.platform-ui [class*="text-yellow-300"] {color:#85610e;}
+.platform-ui [class*="text-yellow-400"] {color:#85610e;}
+.platform-ui [class*="bg-yellow-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-yellow-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-yellow-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-orange-100"] {color:#aa531b;}
+.platform-ui [class*="text-orange-200"] {color:#aa531b;}
+.platform-ui [class*="text-orange-300"] {color:#aa531b;}
+.platform-ui [class*="text-orange-400"] {color:#aa531b;}
+.platform-ui [class*="bg-orange-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-orange-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-orange-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-rose-100"] {color:#ae3551;}
+.platform-ui [class*="text-rose-200"] {color:#ae3551;}
+.platform-ui [class*="text-rose-300"] {color:#ae3551;}
+.platform-ui [class*="text-rose-400"] {color:#ae3551;}
+.platform-ui [class*="bg-rose-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-rose-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-rose-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-red-100"] {color:#b43d3d;}
+.platform-ui [class*="text-red-200"] {color:#b43d3d;}
+.platform-ui [class*="text-red-300"] {color:#b43d3d;}
+.platform-ui [class*="text-red-400"] {color:#b43d3d;}
+.platform-ui [class*="bg-red-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-red-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-red-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-purple-100"] {color:#7850b4;}
+.platform-ui [class*="text-purple-200"] {color:#7850b4;}
+.platform-ui [class*="text-purple-300"] {color:#7850b4;}
+.platform-ui [class*="text-purple-400"] {color:#7850b4;}
+.platform-ui [class*="bg-purple-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-purple-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-purple-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-violet-100"] {color:#7053bc;}
+.platform-ui [class*="text-violet-200"] {color:#7053bc;}
+.platform-ui [class*="text-violet-300"] {color:#7053bc;}
+.platform-ui [class*="text-violet-400"] {color:#7053bc;}
+.platform-ui [class*="bg-violet-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-violet-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-violet-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-fuchsia-100"] {color:#9651a0;}
+.platform-ui [class*="text-fuchsia-200"] {color:#9651a0;}
+.platform-ui [class*="text-fuchsia-300"] {color:#9651a0;}
+.platform-ui [class*="text-fuchsia-400"] {color:#9651a0;}
+.platform-ui [class*="bg-fuchsia-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-fuchsia-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-fuchsia-950"] {background-color:#eef2ff;}
+.platform-ui [class*="text-lime-100"] {color:#527521;}
+.platform-ui [class*="text-lime-200"] {color:#527521;}
+.platform-ui [class*="text-lime-300"] {color:#527521;}
+.platform-ui [class*="text-lime-400"] {color:#527521;}
+.platform-ui [class*="bg-lime-800"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-lime-900"] {background-color:#eef2ff;}
+.platform-ui [class*="bg-lime-950"] {background-color:#eef2ff;}
+
+.platform-ui button:is([class*="bg-indigo-5"],[class*="bg-indigo-6"],[class*="bg-cyan-6"],[class*="bg-blue-6"],[class*="from-indigo-6"],[class*="from-indigo-5"]) {background:#3f56d9;color:#fff;border-color:#3f56d9;}
+.platform-ui button:is([class*="bg-emerald-5"],[class*="from-emerald-5"]) {background:#277a52;color:white;}
+.platform-ui button:is([class*="bg-rose-6"],[class*="bg-red-6"]) {background:#b43d3d;color:white;}
+.platform-ui button:disabled {cursor:not-allowed;}
+.platform-ui [class*="from-indigo-600"][class*="rounded-tr-none"] {background:#3f56d9;color:white;}
+.platform-ui [class*="from-indigo-600"][class*="rounded-tr-none"] [class*="text-"] {color:white;}
+/* Custom legacy panels share the same frame as the standard dialogs. */
+.platform-ui.fixed.inset-0 > [class*="max-w-"]:not(.absolute) {background:#fff;border-color:#dce4ed;box-shadow:0 24px 80px #23304526;}
+.platform-ui #window-global-chat {background:#fff;border-color:#dce4ed;box-shadow:0 14px 48px #23304526;}
+@media(max-width:639px){
+ .platform-ui.fixed.inset-0:has(> [class*="max-w-"]) {padding:0;}
+ .platform-ui.fixed.inset-0 > [class*="max-w-"]:not(.absolute) {height:100dvh;max-height:100dvh;width:100%;border-radius:0;margin:0;border:0;}
+ .platform-ui #window-global-chat {height:100dvh;max-height:100dvh;margin:0;border-radius:0;border:0;}
+}
+.platform-ui:is(.cd-overlay,.wc-modal-overlay,.car-modal-overlay) {background:#23304566;padding:16px;backdrop-filter:blur(6px);}
+.platform-ui :is(.cd-dialog,.wc-dialog,.car-dialog) {background:#fff;color:#233045;border:1px solid #dce4ed;border-radius:24px;box-shadow:0 24px 80px #23304526;width:min(100%,1024px);height:92dvh;max-height:900px;}
+.platform-ui :is(.cd-dialog,.wc-dialog,.car-dialog) :is(header,footer) {background:#fff;color:#233045;border-color:#dce4ed;}
+.platform-ui :is(.cd-dialog,.wc-dialog,.car-dialog) button {background:#f0f4f9;color:#34445c;border:1px solid #dce4ed;border-radius:12px;min-height:44px;}
+.platform-ui :is(.cd-dialog,.wc-dialog,.car-dialog) :is(.cd-primary,.wc-primary,.car-primary) {background:#3f56d9;color:white;}
+@media(max-width:639px){.platform-ui:is(.cd-overlay,.wc-modal-overlay,.car-modal-overlay){padding:0}.platform-ui :is(.cd-dialog,.wc-dialog,.car-dialog){width:100%;height:100dvh;max-height:100dvh;border:0;border-radius:0}}
+.platform-ui h2 {text-transform:none;font-weight:800;letter-spacing:-.035em;}
+.platform-ui button[class*="bg-gradient-"]:not(.bg-clip-text) {background:#3f56d9;color:white;border-color:#3f56d9;}
+.platform-ui button:disabled[class] {background:#e8edf5;color:#64748b;opacity:1;box-shadow:none;}
+.platform-status-screen,.platform-ui#password-recovery-screen {background:#f7f9fc;color:#233045;}
+.platform-ui .platform-status-panel {background:white;color:#233045;border-color:#dce4ed;box-shadow:0 16px 48px #23304512;}
+.platform-ui [class~="bg-indigo-600"][class~="text-white"] {color:white;}

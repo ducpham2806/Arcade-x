@@ -164,3 +164,4 @@ export interface DroppedLoot {
   y: number;
   createdAt: number;
 }
+

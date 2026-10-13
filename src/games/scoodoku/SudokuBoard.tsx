@@ -312,3 +312,4 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
     </div>
   );
 };
+

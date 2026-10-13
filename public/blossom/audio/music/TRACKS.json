@@ -1,0 +1,72 @@
+[
+  {
+    "chapter": 1,
+    "bpm": 92,
+    "seconds": 20.87,
+    "file": "chapter-01.ogg",
+    "original": true
+  },
+  {
+    "chapter": 2,
+    "bpm": 100,
+    "seconds": 19.2,
+    "file": "chapter-02.ogg",
+    "original": true
+  },
+  {
+    "chapter": 3,
+    "bpm": 96,
+    "seconds": 20.0,
+    "file": "chapter-03.ogg",
+    "original": true
+  },
+  {
+    "chapter": 4,
+    "bpm": 88,
+    "seconds": 21.818,
+    "file": "chapter-04.ogg",
+    "original": true
+  },
+  {
+    "chapter": 5,
+    "bpm": 84,
+    "seconds": 22.857,
+    "file": "chapter-05.ogg",
+    "original": true
+  },
+  {
+    "chapter": 6,
+    "bpm": 98,
+    "seconds": 19.592,
+    "file": "chapter-06.ogg",
+    "original": true
+  },
+  {
+    "chapter": 7,
+    "bpm": 80,
+    "seconds": 24.0,
+    "file": "chapter-07.ogg",
+    "original": true
+  },
+  {
+    "chapter": 8,
+    "bpm": 76,
+    "seconds": 25.263,
+    "file": "chapter-08.ogg",
+    "original": true
+  },
+  {
+    "chapter": 9,
+    "bpm": 86,
+    "seconds": 22.326,
+    "file": "chapter-09.ogg",
+    "original": true
+  },
+  {
+    "chapter": 10,
+    "bpm": 90,
+    "seconds": 21.333,
+    "file": "chapter-10.ogg",
+    "original": true
+  }
+]

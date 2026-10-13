@@ -64,3 +64,4 @@ test('Missing profile schema explains setup is pending and still allows guest en
   await mockSupabase().install(context);await page.route('**/rest/v1/rpc/arcadex_get_identity',r=>r.fulfill({status:404,contentType:'application/json',body:JSON.stringify({code:'PGRST202',message:'Could not find the function'})}));
   await page.goto('/');await signup(page,'pending-schema@example.com');await expect(page.getByRole('status')).toContainText('Hệ thống tài khoản chưa được nâng cấp');await expect(page.locator('#game-library')).toHaveCount(0);await page.locator('#btn-auth-loading-guest').click();await expect(page.locator('#game-library')).toBeVisible();
 });
+

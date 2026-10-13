@@ -1677,3 +1677,4 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     </div>
   );
 };
+

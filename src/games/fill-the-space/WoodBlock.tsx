@@ -105,3 +105,4 @@ export const WoodBlock: React.FC<WoodBlockProps> = ({
     </div>
   );
 };
+

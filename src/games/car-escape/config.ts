@@ -34,3 +34,4 @@ export const CAR_ESCAPE_DROP_RATES: DropRateConfig = {
   chestWeights: [],
 };
 export const CAR_ESCAPE_ACHIEVEMENTS: GameAchievementDef[] = [];
+

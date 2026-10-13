@@ -25,3 +25,4 @@ export function isPlayerTop10(playerName: string): boolean {
   }
   return false;
 }
+

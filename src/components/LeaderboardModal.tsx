@@ -65,7 +65,7 @@ export const LeaderboardModal: React.FC<{ initialGameId?: string }> = ({
   }
   return (
     <div
-      className="arcadex-modal-overlay"
+      className="platform-ui arcadex-modal-overlay"
       onClick={() => setActiveModal("none")}
     >
       <section
@@ -138,3 +138,4 @@ export const LeaderboardModal: React.FC<{ initialGameId?: string }> = ({
     </div>
   );
 };
+

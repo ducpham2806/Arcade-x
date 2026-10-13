@@ -49,3 +49,4 @@ export const XIANGQI_DROP_RATES: DropRateConfig = {
     { type: 'legendary', weight: 8 },
   ],
 };
+

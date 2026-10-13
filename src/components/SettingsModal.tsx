@@ -20,3 +20,4 @@ export const SettingsModal:React.FC=()=>{
   </div><footer><p className="launcher-small">ArcadeX · {CURRENT_APP_VERSION}. Thay đổi được lưu tự động trên thiết bị.</p></footer>
  </section></div>;
 };
+

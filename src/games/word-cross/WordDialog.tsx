@@ -7,15 +7,17 @@ export function WordDialog({
   onClose,
   children,
   footer,
+  platform = false,
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  platform?: boolean;
 }) {
   const ref = useDialogFocus(onClose);
   return createPortal(
-    <div className="wc-modal-overlay">
+    <div className={`${platform ? "platform-ui " : ""}wc-modal-overlay`}>
       <section
         className="wc-dialog"
         ref={ref}
@@ -43,3 +45,4 @@ export function WordDialog({
     document.body,
   );
 }
+

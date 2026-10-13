@@ -54,3 +54,4 @@ export const CloseButton: React.FC<CloseButtonProps> = ({
     </button>
   );
 };
+

@@ -827,3 +827,4 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
     </div>
   );
 };
+

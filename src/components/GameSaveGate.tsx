@@ -48,3 +48,4 @@ export class GameLoadBoundary extends React.Component<{ children: React.ReactNod
     return this.props.children;
   }
 }
+

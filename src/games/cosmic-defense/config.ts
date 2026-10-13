@@ -18,3 +18,4 @@ export const COSMIC_DEFENSE_CONTROLS: GameControlInfo[] = [
   { key: "Q / Space · E · R", action: "Dùng item trong các slot tương ứng" },
   { key: "Escape", action: "Tạm dừng; luyện tập có thể tua lại 10 giây" },
 ];
+

@@ -269,3 +269,4 @@ export function weeklySeed(day: string) {
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
   return dailySeed(d.toISOString().slice(0, 10));
 }
+

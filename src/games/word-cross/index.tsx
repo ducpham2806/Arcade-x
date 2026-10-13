@@ -547,3 +547,4 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

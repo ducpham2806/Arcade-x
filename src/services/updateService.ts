@@ -67,3 +67,4 @@ export const checkPendingUpdate = (): UpdateInfo => ({
 export const simulateNewVersionForTest = (): void => { void import('./pwaLifecycle').then(m => m.checkForUpdate()).catch(() => {}); };
 export const triggerForceUpdateModal = (_targetVersion?: string): void => { simulateNewVersionForTest(); };
 export const executeForceUpdate = async (_newVersion?: string): Promise<void> => { const { installUpdate } = await import('./pwaLifecycle'); await installUpdate(); };
+

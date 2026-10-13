@@ -201,7 +201,7 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-40 flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 bg-black/80 backdrop-blur-md animate-in fade-in select-none"
+      className="platform-ui fixed inset-0 z-40 flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 bg-black/80 backdrop-blur-md animate-in fade-in select-none"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -427,3 +427,4 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
     </div>
   );
 };
+

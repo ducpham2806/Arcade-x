@@ -29,3 +29,4 @@ export const DUNGEON_TAP_CONTROLS: GameControlInfo[] = [
   { key: 'Kỹ Năng 1 - 4 (Active Skills)', action: 'Kích hoạt Thiên Kiếm, Cuồng Nộ, Bàn Tay Vàng, Phân Thân' },
   { key: 'Nâng Cấp & Trang Bị', action: 'Tăng cấp Kiếm Sĩ, chiêu mộ Đồng Đội và mặc trang bị rớt từ quái' },
 ];
+
