@@ -1,6 +1,6 @@
 {
   "project": "Arcade-x",
-  "revision": "merged-rainbow-preparation-2026-10-13",
+  "revision": "netlify-production-badge-fix-2026-10-13",
   "rainbowBlocksIncluded": true,
   "games": 19,
   "banner": {
@@ -12,7 +12,8 @@
     "typecheck": "passed",
     "build": "passed",
     "rainbow_tests": "26 passed",
-    "previous_regression": "launcher theme and Blossom UI passed"
+    "previous_regression": "launcher theme and Blossom UI passed",
+    "hosting_badge_test": "passed"
   },
   "files": [
     {
@@ -3877,8 +3878,8 @@
     },
     {
       "path": "src/games/rainbow-blocks/rainbow.css",
-      "bytes": 20165,
-      "sha256": "011a51357f37432b7a51f5a77087a7c1b2c9472620a6c657be1b7ceba11bdd32"
+      "bytes": 20366,
+      "sha256": "2a2d698c19354d6cf38cbdb66593d0c6b78f927a4bce875a36297ad4086c4298"
     },
     {
       "path": "src/games/rainbow-blocks/render.ts",
@@ -4584,6 +4585,11 @@
       "path": "tests/rainbow/engine.test.ts",
       "bytes": 5828,
       "sha256": "12175c5dc86f6cb5635e2585497947458e9d3cecf95853141dc155709aed5f9f"
+    },
+    {
+      "path": "tests/rainbow/hosting-badge.test.ts",
+      "bytes": 1429,
+      "sha256": "da9e001e6805a447fe473c879c7975fd526ec590a49ab19176e4c6b2f8a1a667"
     },
     {
       "path": "tests/rainbow/preparation.test.ts",
