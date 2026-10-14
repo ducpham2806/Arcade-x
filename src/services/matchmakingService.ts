@@ -1,3 +1,4 @@
+import { startOnlineQueue } from './onlineQueue';
 import { rankQueue } from './duelMatchmaking';
 /**
  * Core Matchmaking & Multiplayer Service
@@ -93,45 +94,8 @@ export class MatchmakingService {
     onError: (err: Error) => void
   ): Promise<() => void> {
     const db = this.getDb();
-    const queueCollection = collection(db, 'matchmaking_queue');
-    const queueDocId = `${gameId}_${player.uid}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-    const queueDocRef = doc(db, 'matchmaking_queue', queueDocId);
-
-    try {
-      // Find waiting opponent with status 'waiting'
-      const q = query(
-        queueCollection,
-        where('gameId', '==', gameId),
-        where('status', '==', 'waiting'),
-        limit(50)
-      );
-
-      const snapshot = await getDocs(q);
-      const candidates = rankQueue(snapshot.docs
-        .map((d) => ({ id: d.id, data: d.data() as MatchmakingQueueRecord }))
-        , player.uid, player.elo || 1200);
-
-      if (candidates.length > 0) {
-        // Matched with candidate - try to atomically lock one
-        for (const candidate of candidates) {
-          try {
-            const matchedRoomId = await runTransaction(db, async (tx) => {
-              const candidateRef = doc(db, 'matchmaking_queue', candidate.id);
-              const candidateSnap = await tx.get(candidateRef);
-              
-              if (!candidateSnap.exists()) {
-                throw new Error('Candidate no longer exists');
-              }
-              
-              const candidateData = candidateSnap.data() as MatchmakingQueueRecord;
-              if (candidateData.status !== 'waiting') {
-                throw new Error('Candidate already matched');
-              }
-
-              const roomId = `room_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-              const roomCode = generate6CharRoomCode();
-              const roomRef = doc(db, 'game_rooms', roomId);
-
+    return startOnlineQueue(db,{uid:player.uid,displayName:player.displayName,avatarUrl:player.avatarUrl,elo:player.elo||1200},gameId,(candidateData,roomId,now)=>{
+      const roomCode=generate6CharRoomCode();
               const hostPlayer: RoomPlayerData = {
                 uid: candidateData.uid,
                 name: candidateData.displayName,
@@ -154,7 +118,6 @@ export class MatchmakingService {
                 lastHeartbeat: Date.now(),
               };
 
-              const now = Date.now();
               const turnDuration = 45;
 
               const newRoom: StandardGameRoom = {
@@ -190,68 +153,8 @@ export class MatchmakingService {
                 updatedAt: now,
               };
 
-              tx.set(roomRef, newRoom);
-              tx.update(candidateRef, {
-                status: 'matched',
-                matchedRoomId: roomId,
-              });
-
-              return roomId;
-            });
-
-            if (matchedRoomId) {
-              onMatched(matchedRoomId);
-              return () => {};
-            }
-          } catch (e) {
-            // If transaction fails (e.g., candidate matched by someone else), try next candidate
-            console.warn('Matchmaking race condition mitigated, trying next candidate...');
-            continue;
-          }
-        }
-      }
-
-      // If no opponent found or all candidates were taken, wait in queue
-      const queueEntry: MatchmakingQueueRecord = {
-        uid: player.uid,
-        displayName: player.displayName,
-        avatarUrl: player.avatarUrl,
-        gameId,
-        elo: player.elo || 1200,
-        status: 'waiting',
-        matchedRoomId: null,
-        createdAt: Date.now(),
-      };
-
-      await setDoc(queueDocRef, queueEntry);
-      const heartbeat=setInterval(()=>{void updateDoc(queueDocRef,{lastHeartbeat:Date.now()}).catch(()=>{});},30000);
-
-      const unsubscribe = onSnapshot(
-        queueDocRef,
-        (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data() as MatchmakingQueueRecord;
-            if (data.status === 'matched' && data.matchedRoomId) {
-              clearInterval(heartbeat);
-              deleteDoc(queueDocRef).catch(() => {});
-              onMatched(data.matchedRoomId);
-            }
-          }
-        },
-        (error) => {
-          onError(error);
-        }
-      );
-
-      return () => {
-        clearInterval(heartbeat);
-        unsubscribe();
-        deleteDoc(queueDocRef).catch(() => {});
-      };
-    } catch (err) {
-      onError(err instanceof Error ? err : new Error(String(err)));
-      return () => {};
-    }
+      return newRoom;
+    },onMatched,onError);
   }
 
   /**
@@ -419,7 +322,8 @@ export class MatchmakingService {
       piece?: string;
       captured?: string;
     },
-    winCheckResult?: { isWin: boolean; isDraw?: boolean; endReason?: EndReason }
+    winCheckResult?: { isWin: boolean; isDraw?: boolean; endReason?: EndReason },
+    expectedBoardState?: any
   ): Promise<boolean> {
     const db = this.getDb();
     const roomRef = doc(db, 'game_rooms', roomId);
@@ -433,6 +337,7 @@ export class MatchmakingService {
         throw new Error('Trận đấu chưa bắt đầu hoặc đã kết thúc');
       }
 
+      if(expectedBoardState!==undefined&&JSON.stringify(room.boardState)!==JSON.stringify(expectedBoardState)){throw new Error('Bàn cờ đã thay đổi. Chờ đồng bộ rồi chọn lại nước đi.');}
       if (room.currentTurn !== playerUid) {
         throw new Error('Chưa tới lượt của bạn!');
       }

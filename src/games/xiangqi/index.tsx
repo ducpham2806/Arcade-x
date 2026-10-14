@@ -602,7 +602,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
 
       // Online Move
       if (activeRoomId) {
-        await makeMove(
+        const accepted=await makeMove(
           serializeXiangqiBoard(nextBoard),
           {
             from: [fromR, fromC],
@@ -612,6 +612,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
           },
           isCheckmate ? { isWin: true, endReason: 'CHECKMATE' } : undefined
         );
+        if(!accepted)setMoveHint('Nước đi chưa được máy chủ xác nhận. Chờ đồng bộ rồi chọn lại.');
       }
       // Local Hotseat Move
       else if (playMode === 'local_hotseat') {

@@ -1,3 +1,4 @@
+import { startOnlineQueue } from './onlineQueue';
 import { rankQueue } from './duelMatchmaking';
 /**
  * Real-Time Multiplayer Board Game & Matchmaking Service
@@ -156,46 +157,8 @@ export class MultiplayerService {
     onError: (err: Error) => void
   ): Promise<() => void> {
     const db = this.getDb();
-    const queueCollection = collection(db, 'matchmaking_queue');
-    const queueDocId = `${gameId}_${player.uid}`;
-    const queueDocRef = doc(db, 'matchmaking_queue', queueDocDocIdSafe(queueDocId));
-
-    try {
-      // Step A: Search for another waiting player in this queue (FIFO / close ELO)
-      const q = query(
-        queueCollection,
-        where('gameId', '==', gameId),
-        where('status', '==', 'waiting'),
-        limit(50)
-      );
-
-      const snapshot = await getDocs(q);
-      const candidates = rankQueue(snapshot.docs
-        .map((d) => ({ id: d.id, data: d.data() as MatchmakingQueueEntry }))
-        , player.uid, player.elo || 1200);
-
-      if (candidates.length > 0) {
-        // Matched with candidate - try to atomically lock one
-        for (const candidateDoc of candidates) {
-          try {
-            const matchedRoomId = await runTransaction(db, async (tx) => {
-              const candidateRef = doc(db, 'matchmaking_queue', candidateDoc.id);
-              const candidateSnap = await tx.get(candidateRef);
-              
-              if (!candidateSnap.exists()) {
-                throw new Error('Candidate no longer exists');
-              }
-              
-              const candidateData = candidateSnap.data() as MatchmakingQueueEntry;
-              if (candidateData.status !== 'waiting') {
-                throw new Error('Candidate already matched');
-              }
-
-              // Atomically create room and mark matched
-              const roomId = `room_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-              const roomCode = generateRoomCode();
-              const roomRef = doc(db, 'game_rooms', roomId);
-
+    return startOnlineQueue(db,{uid:player.uid,displayName:player.displayName,avatarUrl:player.avatar,elo:player.elo||1200},gameId,(candidateData,roomId,now)=>{
+      const roomCode=generateRoomCode();
               const hostPlayer: RoomPlayerInfo = {
                 uid: candidateData.uid,
                 displayName: candidateData.displayName,
@@ -216,7 +179,6 @@ export class MultiplayerService {
                 lastHeartbeat: Date.now(),
               };
 
-              const now = Date.now();
               const turnDuration = 30;
 
               const newRoom: GameRoomData = {
@@ -251,72 +213,8 @@ export class MultiplayerService {
                 updatedAt: now,
               };
 
-              tx.set(roomRef, newRoom);
-              tx.update(candidateRef, {
-                status: 'matched',
-                matchedRoomId: roomId,
-              });
-
-              return roomId;
-            });
-
-            if (matchedRoomId) {
-              onMatched(matchedRoomId);
-              return () => {};
-            }
-          } catch (e) {
-            console.warn('Matchmaking race condition mitigated, trying next candidate...');
-            continue;
-          }
-        }
-      }
-
-      // Step B: No opponent currently waiting -> Enter queue as 'waiting'
-      const queueEntry: MatchmakingQueueEntry = {
-        uid: player.uid,
-        displayName: player.displayName,
-        avatarUrl: player.avatar,
-        gameId,
-        elo: player.elo || 1200,
-        status: 'waiting',
-        matchedRoomId: null,
-        createdAt: Date.now(),
-      };
-
-      await setDoc(queueDocRef, queueEntry);
-      const heartbeat=setInterval(()=>{void updateDoc(queueDocRef,{lastHeartbeat:Date.now()}).catch(()=>{});},30000);
-
-      // Listen for when someone matches with us
-      const unsubscribe = onSnapshot(
-        queueDocRef,
-        (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data() as MatchmakingQueueEntry;
-            if (data.status === 'matched' && data.matchedRoomId) {
-              clearInterval(heartbeat);
-              // We've been matched!
-              // Cleanup our queue document
-              deleteDoc(queueDocRef).catch(() => {});
-              onMatched(data.matchedRoomId);
-            }
-          }
-        },
-        (error) => {
-          console.warn('Queue listener notice:', error);
-          onError(error);
-        }
-      );
-
-      return () => {
-        clearInterval(heartbeat);
-        unsubscribe();
-        deleteDoc(queueDocRef).catch(() => {});
-      };
-    } catch (err) {
-      console.error('Join quick match error:', err);
-      onError(err instanceof Error ? err : new Error(String(err)));
-      return () => {};
-    }
+      return newRoom;
+    },onMatched,onError);
   }
 
   /**

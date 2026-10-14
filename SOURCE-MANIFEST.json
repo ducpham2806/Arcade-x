@@ -1,6 +1,6 @@
 {
   "project": "Arcade-x",
-  "revision": "duel-upgrade-2026-10-15",
+  "revision": "online-sync-fix-2026-10-15",
   "published": false,
   "productionDatabaseChanged": false,
   "validation": {
@@ -74,6 +74,11 @@
       "path": "docs/DUEL-UPGRADE.md",
       "bytes": 2494,
       "sha256": "5863d1504ce1e0f673389802436ed24a0f7da2cb64463a1bc6e570b732bc47ff"
+    },
+    {
+      "path": "docs/ONLINE-SYNC-FIX.md",
+      "bytes": 2897,
+      "sha256": "542c23a1aa8aff25f2b5b0b180ff0b09a135dc534681a3c034232e0e52a27530"
     },
     {
       "path": "docs/PC-MOBILE-PARITY-AUDIT.md",
@@ -8137,8 +8142,8 @@
     },
     {
       "path": "src/games/caro-gomoku/index.tsx",
-      "bytes": 73753,
-      "sha256": "99b28c54a98088b316511b84a40bc0c5c245f87f09b51708ef3f7bfebfbed5ef"
+      "bytes": 73807,
+      "sha256": "921402c2472bd9a927b6bdc83e86784bd3256b02e1ac8276dc7fc1ea056909d5"
     },
     {
       "path": "src/games/chess/aiBot.ts",
@@ -8152,8 +8157,8 @@
     },
     {
       "path": "src/games/chess/index.tsx",
-      "bytes": 58250,
-      "sha256": "457472ea6b839b890ae181a9c0bb9434cfa494cd02790fd6cf41a4a8be274fa3"
+      "bytes": 59313,
+      "sha256": "1c9cb1aa1929cee190836b211bf09272579457873adada0111f73b86d9770f27"
     },
     {
       "path": "src/games/cosmic-defense/Dialog.tsx",
@@ -8962,8 +8967,8 @@
     },
     {
       "path": "src/games/xiangqi/index.tsx",
-      "bytes": 62626,
-      "sha256": "e355ad1d5d970c474d64f04cd2249759e7eed8b3908a320b7824adb899722c55"
+      "bytes": 62768,
+      "sha256": "471db80ef11f088b2363ea6f26d3c757f02e520686c5efadca8ca8f0ab66f7f4"
     },
     {
       "path": "src/games/xiangqi/rules.ts",
@@ -8977,8 +8982,8 @@
     },
     {
       "path": "src/hooks/useMultiplayerBridge.ts",
-      "bytes": 8807,
-      "sha256": "6dae9027ce641c44abaf7e7650d5f5fc4f7825f37616b7b2fac8109da62b09a6"
+      "bytes": 9089,
+      "sha256": "81dc3ae887945bca96f4c4971bdcf07c0279406ddea5905669d587fd1b2cd041"
     },
     {
       "path": "src/hooks/useOnlineStatus.ts",
@@ -9047,8 +9052,8 @@
     },
     {
       "path": "src/launcher/review.tsx",
-      "bytes": 1413,
-      "sha256": "6916619cba3fb7b6008cd9ba1db574a9660c7f3606ed6f3d54a0f1d502ef7653"
+      "bytes": 1406,
+      "sha256": "18510c793cf47d7484b0654cecd3426272a1f7476062babea1e36a70ee79bb11"
     },
     {
       "path": "src/launcher/useDialogFocus.ts",
@@ -9092,13 +9097,13 @@
     },
     {
       "path": "src/services/cloudStore.ts",
-      "bytes": 7899,
-      "sha256": "ca2fc5ba4bf2d754c7c6d4a9a95b082454173738679310e7979f14700c297ecd"
+      "bytes": 8542,
+      "sha256": "5d5b88649f783642e8bbb4aad71f612c719ab50fc297cf7f4efdfcaebcc55239"
     },
     {
       "path": "src/services/duelMatchmaking.ts",
-      "bytes": 680,
-      "sha256": "429abda6e128d570cee2a8a7a9751084b9ef301573a126256bde6892e4bc9668"
+      "bytes": 714,
+      "sha256": "bb65e6d2daf613fb5eaa5686ebed8eb0d0b8b7e248dd9967474e6d02982beb11"
     },
     {
       "path": "src/services/gameSaves.ts",
@@ -9112,18 +9117,23 @@
     },
     {
       "path": "src/services/matchmakingService.ts",
-      "bytes": 23140,
-      "sha256": "5535ba5b478e819945ebdcef658a20a205d21646ed73c5e788f1ce171db9e807"
+      "bytes": 20152,
+      "sha256": "c263aa79343cb627edb59fc5c12f74acf31c92404a0681ef7ca49cbe228b2b89"
     },
     {
       "path": "src/services/multiplayer.ts",
-      "bytes": 26315,
-      "sha256": "fcc4dbc421432e8a76603156dbdf6965f754a1d3b4cc762227b6eb876e58d2ac"
+      "bytes": 22866,
+      "sha256": "4337805fb8c08b071c91e165c78484bd367119d90a44990721ca67cdf31b2e42"
     },
     {
       "path": "src/services/notificationService.ts",
       "bytes": 6128,
       "sha256": "d4be0c8a28cbcec85967ff21842207283115bac640a9024983ab605d6efb0a7e"
+    },
+    {
+      "path": "src/services/onlineQueue.ts",
+      "bytes": 4727,
+      "sha256": "b585aa65bb2eed2399fccc33742323fdf4645f120aecbde0126010b9ac6b1517"
     },
     {
       "path": "src/services/pwaLifecycle.ts",
@@ -9152,8 +9162,8 @@
     },
     {
       "path": "src/services/updateService.ts",
-      "bytes": 2467,
-      "sha256": "cffdd89ef875c03d30bfa89a4cae642e586ae1320fbc6a43b170176a5bdde639"
+      "bytes": 2420,
+      "sha256": "402c0edd272dcea72cd9e2684423544d2297ae82cd66085ab51ded5df5e1affe"
     },
     {
       "path": "src/types/index.ts",
@@ -9701,6 +9711,11 @@
       "sha256": "bc2be86e62def843d78b887959a07563f5148c3db78a6ee14a346e18c5f9efaf"
     },
     {
+      "path": "tests/online/live.mjs",
+      "bytes": 6165,
+      "sha256": "3364639659f2d20c6fb81ae5cbc01711f63e671fd87bc278e557919d63008463"
+    },
+    {
       "path": "tests/parity/blossom.test.ts",
       "bytes": 4692,
       "sha256": "106462ad9ff1e3debe0573498ccc5ba7368470ace683f62abab98428e71392b9"
@@ -9841,11 +9856,19 @@
     "real_email_delivery": "not tested",
     "browser_e2e": "not tested"
   },
-  "git_base": "acebecc0af15ac5be645ca596fe062a117c8c38d",
+  "git_base": "f360d9a6941cd81d1a5d0b410c8b29ded6ad7d71",
   "duel_validation": {
     "engine": "9 regression checks passed",
     "learning_hub": "React DOM interactions passed",
     "worker": "real worker execution passed",
     "browser_and_two_device": "not verified"
+  },
+  "online_validation": {
+    "live_supabase": "two isolated anonymous sessions; simultaneous match, bidirectional moves and subscription/fallback delivery for all 3 games passed",
+    "guards": "out-of-turn and stale-board rejection passed",
+    "audit_cleanup": "all 4 audit identities, bindings, queues and 3 rooms removed",
+    "typecheck": "passed",
+    "build": "passed",
+    "manual_browser": "not performed"
   }
 }

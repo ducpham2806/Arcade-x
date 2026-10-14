@@ -442,7 +442,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
       try {
         await MultiplayerService.makeMove(roomData.roomId, myRole, x, y);
       } catch (err) {
-        console.warn('Move error:', err);
+        setErrorMessage(err instanceof Error?err.message:'Không gửi được nước đi.');
       }
     } else if (screenMode === 'ai_practice') {
       if (aiTurn !== 'human' || aiWinner) return;

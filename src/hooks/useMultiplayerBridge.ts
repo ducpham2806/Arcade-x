@@ -94,6 +94,7 @@ export function useMultiplayerBridge(
 
         const data = docSnap.data() as StandardGameRoom;
         setRoomState(data);
+        setError(null);
       },
       (err) => {
         setIsLoading(false);
@@ -174,13 +175,17 @@ export function useMultiplayerBridge(
       winCheckResult?: { isWin: boolean; isDraw?: boolean; endReason?: EndReason }
     ): Promise<boolean> => {
       if (!roomState || !profile?.id) return false;
+      if(!navigator.onLine){setError('Đang mất mạng. Nước đi chưa được gửi.');return false;}
+      try {
       return await MatchmakingService.executeMove(
         roomState.roomId,
         profile.id,
         newBoardState,
         moveDetails,
-        winCheckResult
+        winCheckResult,
+        roomState.boardState
       );
+      }catch(e){setError(e instanceof Error?e.message:'Không gửi được nước đi.');return false;}
     },
     [roomState, profile?.id]
   );

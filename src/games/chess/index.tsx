@@ -213,6 +213,9 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   const [isMatchmakingOpen, setIsMatchmakingOpen] = useState(false);
   const [showVersusScreen, setShowVersusScreen] = useState(false);
   const [isAiMode, setIsAiMode] = useState(!!isPracticeMode);
+  const moveLock=useRef(false);
+  const [moveSending,setMoveSending]=useState(false);
+  const [moveError,setMoveError]=useState('');
   const [botError,setBotError]=useState('');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [soundMuted, setSoundMuted] = useState(false);
@@ -636,6 +639,10 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
       const chess = chessInstanceRef.current;
       const pieceOnTarget = chess.get(to);
 
+      if(moveLock.current)return false;
+      if(activeRoomId&&!navigator.onLine){setMoveError('Đang mất mạng. Nước đi chưa được gửi.');return false;}
+      moveLock.current=true;setMoveSending(true);setMoveError('');
+      const beforeFen=chess.fen();let proposedFen='';
       try {
         const moveResult = chess.move({
           from,
@@ -645,8 +652,8 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
         if (!moveResult) return false;
 
-        const newFen = chess.fen();
-        setFen(newFen);
+        const newFen = chess.fen();proposedFen=newFen;
+        if(!activeRoomId)setFen(newFen);
         setSelectedSquare(null);
         setPendingPromotion(null);
         calculateCapturedPieces(chess);
@@ -663,7 +670,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         }
 
         const newHistory = [...moveHistory, moveResult.san];
-        setMoveHistory(newHistory);
+        if(!activeRoomId)setMoveHistory(newHistory);
 
         // Check game over
         let winCheckResult: { isWin: boolean; isDraw?: boolean; endReason?: any } | undefined = undefined;
@@ -687,7 +694,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
         // Multiplayer Sync
         if (activeRoomId && roomState) {
-          await mpMakeMove(
+          const accepted=await mpMakeMove(
             newFen,
             {
               from,
@@ -698,13 +705,16 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             },
             winCheckResult
           );
+          if(!accepted)throw new Error('Máy chủ chưa xác nhận nước đi. Hãy chọn lại sau khi đồng bộ.');
+          setFen(chessInstanceRef.current.fen());
         }
 
         return true;
       } catch (err) {
-        console.error('Invalid move attempt:', err);
+        if(activeRoomId&&chess.fen()===proposedFen){chess.load(beforeFen);setFen(beforeFen);calculateCapturedPieces(chess);}
+        setMoveError(err instanceof Error?err.message:'Không gửi được nước đi.');
         return false;
-      }
+      }finally{moveLock.current=false;setMoveSending(false);}
     },
     [moveHistory, activeRoomId, roomState, mpMakeMove, isAiMode, myColor, handleAiGameEnd]
   );
@@ -956,6 +966,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   return (
     <div className="arcade-game-surface min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-amber-950/40 text-slate-100 flex flex-col items-center justify-between p-2 sm:p-4 md:p-6 select-none font-sans">
 <ConnectionNotice active={!!activeRoomId}/>
+      {activeRoomId&&(moveSending||moveError)&&<p role="status" className="text-sm text-amber-200">{moveSending?'Đang chờ máy chủ xác nhận nước đi…':moveError}</p>}
       {activeRoomId&&syncError&&<p role="alert" className="p-2 text-amber-200">{syncError} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>startAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
       <LearningHub game="chess" lobby={!activeRoomId&&!isAiMode} roomId={activeRoomId} ended={chessInstanceRef.current.isGameOver()||roomState?.status==='ended'} result={matchResult} matchKey={activeRoomId ? activeRoomId+JSON.stringify(roomState?.lastMove) : fen} ranked={!!activeRoomId} board={fen} onResume={id=>{setActiveRoomId(id);setIsAiMode(false);}} onInvite={()=>setIsMatchmakingOpen(true)}/>

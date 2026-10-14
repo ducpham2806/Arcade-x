@@ -139,7 +139,10 @@ export function onSnapshot(ref: Reference, ...args: any[]): () => void {
             event: '*', schema: 'public', table: 'arcadex_documents',
             filter: ref.kind === 'document' ? `path=eq.${ref.path}` : `collection_path=eq.${collectionPath}`,
           }, () => { void refresh(); })
-          .subscribe(status => { if (status === 'SUBSCRIBED') void refresh(); });
+          .subscribe(status => {
+            if(status==='SUBSCRIBED')void refresh();
+            if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){onError(Object.assign(new Error('Kết nối trực tiếp gián đoạn; đang đồng bộ dự phòng.'),{code:'REALTIME_DEGRADED'}));void refresh();}
+          });
       }
       const serialized = JSON.stringify(rows);
       if (!stopped && serialized !== previous) {
@@ -149,11 +152,15 @@ export function onSnapshot(ref: Reference, ...args: any[]): () => void {
     } catch (error) { if (!stopped) onError(error); }
     finally { running = false; if (dirty && !stopped) { dirty = false; void refresh(); } }
   };
-  poll = setInterval(() => { void refresh(); }, 5000);
+  const isOnlineGame=ref.path.startsWith('game_rooms/')||ref.path.startsWith('matchmaking_queue/');
+  poll = setInterval(() => { void refresh(); }, isOnlineGame?1500:5000);
+  const onReturn=()=>{void refresh();};
+  if(typeof window!=='undefined'){window.addEventListener('online',onReturn);window.addEventListener('focus',onReturn);}
   void refresh();
   return () => {
     stopped = true;
     if (poll) clearInterval(poll);
+    if(typeof window!=='undefined'){window.removeEventListener('online',onReturn);window.removeEventListener('focus',onReturn);}
     if (channel) void ref.db.removeChannel(channel);
   };
 }
