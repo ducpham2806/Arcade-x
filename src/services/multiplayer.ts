@@ -1,3 +1,4 @@
+import { rankQueue } from './duelMatchmaking';
 /**
  * Real-Time Multiplayer Board Game & Matchmaking Service
  * Powered by Supabase Realtime and Atomic Transactions
@@ -165,13 +166,13 @@ export class MultiplayerService {
         queueCollection,
         where('gameId', '==', gameId),
         where('status', '==', 'waiting'),
-        limit(5)
+        limit(50)
       );
 
       const snapshot = await getDocs(q);
-      const candidates = snapshot.docs
+      const candidates = rankQueue(snapshot.docs
         .map((d) => ({ id: d.id, data: d.data() as MatchmakingQueueEntry }))
-        .filter((c) => c.data.uid !== player.uid);
+        , player.uid, player.elo || 1200);
 
       if (candidates.length > 0) {
         // Matched with candidate - try to atomically lock one
@@ -283,6 +284,7 @@ export class MultiplayerService {
       };
 
       await setDoc(queueDocRef, queueEntry);
+      const heartbeat=setInterval(()=>{void updateDoc(queueDocRef,{lastHeartbeat:Date.now()}).catch(()=>{});},30000);
 
       // Listen for when someone matches with us
       const unsubscribe = onSnapshot(
@@ -291,6 +293,7 @@ export class MultiplayerService {
           if (docSnap.exists()) {
             const data = docSnap.data() as MatchmakingQueueEntry;
             if (data.status === 'matched' && data.matchedRoomId) {
+              clearInterval(heartbeat);
               // We've been matched!
               // Cleanup our queue document
               deleteDoc(queueDocRef).catch(() => {});
@@ -305,6 +308,7 @@ export class MultiplayerService {
       );
 
       return () => {
+        clearInterval(heartbeat);
         unsubscribe();
         deleteDoc(queueDocRef).catch(() => {});
       };

@@ -1,8 +1,11 @@
+import { explainXiangqiMove } from './rules';
+import { LearningHub } from '../duel/LearningHub';
+import { ConnectionNotice } from '../duel/ConnectionNotice';
 /**
  * Xiangqi Online Multiplayer & Local Hotseat Game (Cờ Tướng PvP & Chơi Đôi 1 Máy)
  * Fully powered by useMultiplayerBridge, Local Hotseat Engine & MatchEndModal
  */
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Users,
   Bot,
@@ -47,7 +50,7 @@ import {
   serializeXiangqiBoard,
   deserializeXiangqiBoard,
 } from './rules';
-import { getBestXiangqiMove } from './aiBot';
+import { botMove } from '../duel/aiClient';
 
 type XiangqiPlayMode = 'lobby' | 'online' | 'ai' | 'local_hotseat';
 
@@ -78,6 +81,12 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   const [showVersusScreen, setShowVersusScreen] = useState(false);
 
   // Local AI Practice states
+  const aiRequest=useRef<AbortController|null>(null);
+  useEffect(()=>{ aiRequest.current?.abort();return ()=>aiRequest.current?.abort(); },[playMode]);
+  const [moveHint,setMoveHint]=useState('');
+  const [botError,setBotError]=useState('');
+  const [vnPieces,setVnPieces]=useState(()=>localStorage.getItem('arcadex_xiangqi_vn')==='1');
+  const pieceNames:Record<string,string>={k:'Tướng',a:'Sĩ',e:'Tượng',r:'Xe',c:'Pháo',h:'Mã',p:'Tốt'};
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('hard');
   const [aiBoard, setAiBoard] = useState<BoardMatrix>(INITIAL_XIANGQI_BOARD);
   const [aiTurn, setAiTurn] = useState<PieceColor>('r');
@@ -366,7 +375,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     }
     if (playMode === 'ai') {
       return {
-        name: `Kỳ Thủ AI (${aiDifficulty === 'easy' ? 'Tập Sự' : aiDifficulty === 'medium' ? 'Cao Thủ' : 'Kỳ Vương'})`,
+        name: `Kỳ Thủ AI (${aiDifficulty === 'easy' ? 'Tập Sự' : aiDifficulty === 'medium' ? 'Trung bình' : 'Khó'})`,
         avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=xiangqi_ai',
         elo: aiDifficulty === 'easy' ? 1000 : aiDifficulty === 'medium' ? 1400 : 1800,
         colorLabel: myColor === 'r' ? 'Quân Đen (Đi sau)' : 'Quân Đỏ (Đi trước)',
@@ -425,6 +434,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   };
 
   const handleStartAiPractice = (diff: 'easy' | 'medium' | 'hard') => {
+    aiRequest.current?.abort();setBotError('');
     setAiDifficulty(diff);
     setAiBoard(INITIAL_XIANGQI_BOARD);
     setAiTurn('r');
@@ -440,6 +450,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
 
   // Action handlers
   const handleRematch = async () => {
+    aiRequest.current?.abort();
     if (activeRoomId && roomState) {
       if (isRematchOfferedByOpponent) {
         setIsActionLoading(true);
@@ -536,6 +547,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
         return;
       }
 
+      setMoveHint('');
       setSelectedPos([r, c]);
       setPendingDest(null);
       const validDestinations = getLegalMovesForPiece(currentBoard, r, c);
@@ -544,6 +556,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       return;
     }
 
+    if(selectedPos&&!legalMoves.some(([a,b])=>a===r&&b===c)){setMoveHint(explainXiangqiMove(currentBoard,selectedPos,[r,c]));}
     // Case 2: Moving selected piece to valid destination
     if (selectedPos) {
       const isLegal = legalMoves.some(([lr, lc]) => lr === r && lc === c);
@@ -643,8 +656,12 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
 
         // AI Turn
         setAiTurn('b');
-        setTimeout(() => {
-          const aiMove = getBestXiangqiMove(nextBoard, 'b', aiDifficulty);
+      aiRequest.current?.abort();const controller=new AbortController();aiRequest.current=controller;
+      setTimeout(async () => {
+        if(controller.signal.aborted)return;
+        try{
+        const aiMove = await botMove<{from:[number,number];to:[number,number]}|null>('xiangqi',[nextBoard,'b',aiDifficulty],controller.signal);
+        if(controller.signal.aborted)return;
           if (aiMove) {
             const aiNextBoard = cloneBoard(nextBoard);
             const aiCapturedPiece = aiNextBoard[aiMove.to[0]][aiMove.to[1]];
@@ -664,7 +681,8 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
               setAiTurn('r');
             }
           }
-        }, 500);
+          }catch(e){if(!controller.signal.aborted)setBotError('Bot chưa phản hồi. Bạn có thể bắt đầu lại ván luyện.');}
+        }, 200);
       }
     }
   };
@@ -676,6 +694,12 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
 
   return (
     <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
+<ConnectionNotice active={!!activeRoomId}/>
+      {activeRoomId&&error&&<p role="alert" className="p-2 text-amber-200">{error} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
+      {moveHint&&<p role="status" className="text-sm text-amber-200 p-2">{moveHint}</p>}
+      {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
+      <button type="button" className="text-sm rounded-lg p-2 bg-slate-800 text-white" onClick={()=>{setVnPieces(!vnPieces);localStorage.setItem('arcadex_xiangqi_vn',vnPieces?'0':'1');}}>{vnPieces?'Quân: Tiếng Việt':'Quân: Chữ Hán'}</button>
+      <LearningHub game="xiangqi" lobby={playMode==='lobby'} roomId={activeRoomId} ended={!!isMatchEnded} result={matchResult} matchKey={activeRoomId ? activeRoomId+JSON.stringify(roomState?.lastMove) : JSON.stringify(playMode==='local_hotseat'?localBoard:aiBoard)} ranked={!!activeRoomId} board={playMode==='ai'?aiBoard:playMode==='local_hotseat'?localBoard:roomState?.boardState} onResume={id=>{setActiveRoomId(id);setPlayMode('online');}} onInvite={()=>setIsModalOpen(true)}/>
       {/* VS Screen Pop when online opponent connects */}
       {showVersusScreen && roomState?.players.host && roomState.players.guest && (
         <VersusScreen
@@ -685,25 +709,6 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
           onComplete={() => setShowVersusScreen(false)}
         />
       )}
-
-      {/* Matchmaking / Create Room Modal */}
-      <MatchmakingModal
-        isOpen={isModalOpen}
-        gameId="xiangqi"
-        gameTitle="Cờ Tướng (Xiangqi)"
-        initialBoardState={serializeXiangqiBoard(INITIAL_XIANGQI_BOARD)}
-        onClose={() => setIsModalOpen(false)}
-        onRoomReady={(roomId) => {
-          setIsModalOpen(false);
-          setActiveRoomId(roomId);
-          setPlayMode('online');
-        }}
-        onMatchFound={(roomId) => {
-          setIsModalOpen(false);
-          setActiveRoomId(roomId);
-          setPlayMode('online');
-        }}
-      />
 
       {/* ========================================================= */}
       {/* 1. LOBBY VIEW                                             */}
@@ -990,7 +995,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                         : 'bg-slate-800 text-amber-400 border-slate-700'
                     }`}
                   >
-                    00:{turnTimeLeft < 10 ? `0${turnTimeLeft}` : turnTimeLeft}
+                    {Math.floor(turnTimeLeft/60)}:{String(turnTimeLeft%60).padStart(2,'0')}
                   </div>
                 )}
               </div>
@@ -1086,7 +1091,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                             } ${isSelected ? 'scale-110 ring-4 ring-amber-400 z-10' : 'hover:scale-105'}`}
                           >
                             <span className="font-serif font-black text-base sm:text-xl select-none">
-                              {PIECE_SYMBOLS[piece.color][piece.type]}
+                              {vnPieces?pieceNames[piece.type]:PIECE_SYMBOLS[piece.color][piece.type]}
                             </span>
                           </div>
                         )}

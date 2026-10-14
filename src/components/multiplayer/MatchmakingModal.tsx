@@ -3,7 +3,7 @@
  * Complete UI: Quick Match (Radar pulse), Create Private Room (6-digit code & copy link),
  * Join by 6-char Room Code, AI Practice, and Versus Screen transition.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CloseButton } from '../common/CloseButton';
 import {
   Users,
@@ -50,6 +50,7 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
   onPracticeAi,
 }) => {
   const { profile } = usePlayer();
+  const [waitSeconds,setWaitSeconds]=useState(0);
   const [view, setView] = useState<ModalView>('main');
   const [inputCode, setInputCode] = useState('');
   const [createdRoomCode, setCreatedRoomCode] = useState<string | null>(null);
@@ -58,12 +59,19 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cancelQueueFn, setCancelQueueFn] = useState<(() => void) | null>(null);
 
+  useEffect(()=>{setWaitSeconds(0);if(view!=='searching')return;const start=Date.now();const timer=setInterval(()=>setWaitSeconds(Math.floor((Date.now()-start)/1000)),1000);return()=>clearInterval(timer);},[view]);
+  const queueRef=useRef<(() => void)|null>(null);
+  const queueGeneration=useRef(0);
+  const stopSearch=()=>{queueGeneration.current++;queueRef.current?.();queueRef.current=null;setCancelQueueFn(null);setView('main');};
+  const close=()=>{stopSearch();onClose();};
+  useEffect(()=>{if(!isOpen){queueGeneration.current++;queueRef.current?.();queueRef.current=null;setView('main');}},[isOpen]);
+  useEffect(()=>()=>{queueGeneration.current++;queueRef.current?.();},[]);
   // Close on Escape key press
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        close();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -94,6 +102,8 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
   // 1. Quick Match
   const handleQuickMatch = async () => {
     setErrorMessage(null);
+    stopSearch();
+    const generation=queueGeneration.current;
     setView('searching');
 
     try {
@@ -107,16 +117,20 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
         gameId,
         initialBoardState,
         (matchedRoomId) => {
+          if(generation!==queueGeneration.current)return;
+          queueRef.current?.();queueRef.current=null;
           triggerRoomReady(matchedRoomId);
         },
         (err) => {
+          if(generation!==queueGeneration.current)return;
           setErrorMessage(err.message || 'Lỗi tìm kiếm đối thủ.');
           setView('main');
         }
       );
 
       if (typeof cancel === 'function') {
-        setCancelQueueFn(() => cancel);
+        if(generation!==queueGeneration.current){cancel();return;}
+        queueRef.current=cancel;setCancelQueueFn(() => cancel);
       }
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Không thể kết nối hàng chờ.');
@@ -125,10 +139,7 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
   };
 
   const handleCancelSearch = async () => {
-    if (cancelQueueFn) {
-      cancelQueueFn();
-      setCancelQueueFn(null);
-    }
+    stopSearch();
     await MatchmakingService.cancelQueue(profile.id, gameId);
     setView('main');
   };
@@ -200,7 +211,7 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
 
   return (
     <div
-      onClick={onClose}
+      onClick={close}
       className="platform-ui fixed inset-0 z-40 flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 bg-black/80 backdrop-blur-md animate-in fade-in select-none"
     >
       <div
@@ -211,11 +222,12 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
         <div className="absolute top-5 right-5 z-20">
           <CloseButton
             id="btn-close-matchmaking"
-            onClose={onClose}
+            onClose={close}
             ariaLabel="Đóng cửa sổ ghép trận"
           />
         </div>
 
+        {view==='searching'&&<div role="status" className="text-center text-slate-200 text-sm"><p>Đã chờ {waitSeconds}s · Ưu tiên đối thủ gần trình độ, mở rộng khoảng ELO theo thời gian.</p>{waitSeconds>=20&&<button type="button" className="mt-2 rounded-xl bg-indigo-600 p-3 text-white" onClick={()=>{close();triggerStartAiPractice('medium');}}>Chơi với bot trong lúc ít người online</button>}</div>}
         {/* Error Notification */}
         {errorMessage && (
           <div className="p-3 rounded-2xl bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs flex items-center gap-2">

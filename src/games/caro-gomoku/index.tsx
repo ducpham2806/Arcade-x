@@ -1,3 +1,5 @@
+import { LearningHub } from '../duel/LearningHub';
+import { ConnectionNotice } from '../duel/ConnectionNotice';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import {
@@ -42,7 +44,7 @@ import {
   PlayerRole,
   QuickMessage,
 } from '../../types/multiplayer';
-import { getBestBotMove } from './aiBot';
+import { botMove as requestBotMove } from '../duel/aiClient';
 
 type ScreenMode = 'lobby' | 'matchmaking' | 'waiting_room' | 'playing' | 'ai_practice' | 'local_hotseat';
 
@@ -85,6 +87,9 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   const [myRole, setMyRole] = useState<PlayerRole>('host');
 
   // AI Practice State
+  const aiRequest=useRef<AbortController|null>(null);
+  useEffect(()=>{ aiRequest.current?.abort();return ()=>aiRequest.current?.abort(); },[screenMode]);
+  const [botError,setBotError]=useState('');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('hard');
   const [aiBoardState, setAiBoardState] = useState<Record<string, string>>({});
   const [aiTurn, setAiTurn] = useState<'human' | 'bot'>('human');
@@ -94,6 +99,8 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   const [aiMoveCount, setAiMoveCount] = useState(0);
 
   // Local Hotseat (Chơi đôi 1 thiết bị) State
+  const [series,setSeries]=useState({p1:0,p2:0});
+  const seriesLast=useRef('');
   const [localBoardState, setLocalBoardState] = useState<Record<string, string>>({});
   const [localTurn, setLocalTurn] = useState<'p1' | 'p2'>('p1');
   const [localP1Symbol, setLocalP1Symbol] = useState<'X' | 'O'>('X');
@@ -181,7 +188,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
         }
       },
       (err) => {
-        console.warn('Subscription error:', err);
+        setErrorMessage('Chưa đồng bộ được phòng. Đang giữ thế cờ và thử kết nối lại.');
       }
     );
 
@@ -359,8 +366,11 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
+  useEffect(()=>{if(screenMode!=='local_hotseat'||!localWinner||localWinner==='draw')return;const id=JSON.stringify(localBoardState);if(seriesLast.current===id)return;seriesLast.current=id;setSeries(p=>({...p,[localWinner]:p[localWinner]+1}));},[localWinner,screenMode,localBoardState]);
   // === LOCAL HOTSEAT SETUP & CONTROLS ===
   const handleStartLocalHotseat = () => {
+    aiRequest.current?.abort();
+    setSeries({p1:0,p2:0});seriesLast.current='';
     setLocalBoardState({});
     setLocalTurn('p1');
     setLocalP1Symbol('X');
@@ -470,8 +480,12 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
 
       // Bot turn
       setAiTurn('bot');
-      setTimeout(() => {
-        const botMove = getBestBotMove(updated, 'O', aiDifficulty);
+      aiRequest.current?.abort();const controller=new AbortController();aiRequest.current=controller;
+      setTimeout(async () => {
+        if(controller.signal.aborted)return;
+        try{
+        const botMove = await requestBotMove<{x:number;y:number}>('caro',[updated,'O',aiDifficulty],controller.signal);
+        if(controller.signal.aborted)return;
         const botUpdated = { ...updated, [`${botMove.x}_${botMove.y}`]: 'O' };
         setAiBoardState(botUpdated);
         setAiLastMove({ x: botMove.x, y: botMove.y, symbol: 'O' });
@@ -492,7 +506,8 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
         } else {
           setAiTurn('human');
         }
-      }, 500);
+        }catch(e){if(!controller.signal.aborted)setBotError('Bot chưa phản hồi. Hãy bắt đầu lại ván luyện.');}
+      }, 200);
     } else if (screenMode === 'local_hotseat') {
       if (localWinner) return;
       const cellKey = `${x}_${y}`;
@@ -540,6 +555,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   };
 
   const handleStartAiPractice = (diff: 'easy' | 'medium' | 'hard') => {
+    setBotError('');aiRequest.current?.abort();
     setAiDifficulty(diff);
     setAiBoardState({});
     setAiTurn('human');
@@ -708,7 +724,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
       : screenMode === 'local_hotseat'
       ? { displayName: 'Người chơi 2', avatar: '🤠', elo: 1200 }
       : {
-          displayName: `ArcadeX Bot (${aiDifficulty === 'easy' ? 'Tập sự' : aiDifficulty === 'medium' ? 'Cao thủ' : 'Bất bại'})`,
+          displayName: `ArcadeX Bot (${aiDifficulty === 'easy' ? 'Tập sự' : aiDifficulty === 'medium' ? 'Trung bình' : 'Khó'})`,
           avatar: '🤖',
           elo: aiDifficulty === 'easy' ? 1000 : aiDifficulty === 'medium' ? 1350 : 1600,
         };
@@ -808,7 +824,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
     }
     if (screenMode === 'ai_practice') {
       return {
-        name: `ArcadeX Bot (${aiDifficulty === 'easy' ? 'Tập sự' : aiDifficulty === 'medium' ? 'Cao thủ' : 'Bất bại'})`,
+        name: `ArcadeX Bot (${aiDifficulty === 'easy' ? 'Tập sự' : aiDifficulty === 'medium' ? 'Trung bình' : 'Khó'})`,
         avatar: '🤖',
         elo: aiDifficulty === 'easy' ? 1000 : aiDifficulty === 'medium' ? 1350 : 1600,
         colorLabel: opponentSymbol === 'X' ? 'Quân X (Đi trước)' : 'Quân O (Đi sau)',
@@ -835,6 +851,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   }, [screenMode, aiDifficulty, opponentSymbol, matchResult, roomData, myRole, localP2Symbol, localWinner]);
 
   const handleRematch = async () => {
+    aiRequest.current?.abort();
     if (screenMode === 'playing' && roomData) {
       if (isRematchOfferedByOpponent) {
         setIsActionLoading(true);
@@ -858,6 +875,8 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
         }
       }
     } else if (screenMode === 'local_hotseat') {
+      if(series.p1>=2||series.p2>=2)setSeries({p1:0,p2:0});
+      seriesLast.current='';
       // Swap starting sides for fairness
       const nextP1Symbol = localP1Symbol === 'X' ? 'O' : 'X';
       setLocalP1Symbol(nextP1Symbol);
@@ -910,6 +929,11 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
 
   return (
     <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
+<ConnectionNotice active={!!activeRoomId}/>
+      {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
+      <LearningHub game="caro-gomoku" lobby={screenMode==='lobby'} roomId={activeRoomId} ended={!!isMatchFinished} result={matchResult} matchKey={activeRoomId ? activeRoomId+JSON.stringify(roomData?.lastMove) : JSON.stringify(screenMode==='local_hotseat'?localBoardState:aiBoardState)} ranked={screenMode==='playing'} board={activeBoard} onResume={id=>{setActiveRoomId(id);setScreenMode('playing');}} onInvite={()=>{void handleCreateRoom();}}/>
+      {screenMode==='local_hotseat'&&<p className="rounded-xl bg-slate-800 px-4 py-2 text-white">Chuỗi đấu: P1 {series.p1} – {series.p2} P2 · {series.p1>=2?'P1 thắng chuỗi':series.p2>=2?'P2 thắng chuỗi':'Ai thắng 2 ván trước sẽ thắng chuỗi'}</p>}
+      <p className="text-xs text-slate-300">Luật Gomoku: từ 5 quân liên tiếp trở lên thắng, không xét chặn hai đầu.</p>
       {/* Top Banner / Notification */}
       {errorMessage && (
         <div className="w-full max-w-lg mb-3 px-4 py-2.5 rounded-xl bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs flex items-center justify-between shadow-lg animate-in fade-in">
@@ -1270,7 +1294,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
           topPlayer={{
             name:
               screenMode === 'ai_practice'
-                ? `ArcadeX Bot (${aiDifficulty === 'easy' ? 'Tập sự' : aiDifficulty === 'medium' ? 'Cao thủ' : 'Bất bại'})`
+                ? `ArcadeX Bot (${aiDifficulty === 'easy' ? 'Tập sự' : aiDifficulty === 'medium' ? 'Trung bình' : 'Khó'})`
                 : screenMode === 'local_hotseat'
                 ? 'Người chơi 2'
                 : opponentInfo?.displayName || 'Đối thủ',

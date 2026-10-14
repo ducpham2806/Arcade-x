@@ -1,4 +1,4 @@
-import { BOARD_SIZE } from '../../services/multiplayer';
+const BOARD_SIZE = 15;
 import { SimpleAI, MinimaxGameRule } from '../../services/SimpleAI';
 
 function getCandidateCells(boardState: Record<string, string>, radius: number): { x: number; y: number }[] {
@@ -97,6 +97,16 @@ function evaluatePosition(
   return totalScore;
 }
 
+export function caroWinner(state: Record<string,string>): string | null {
+ for(const key of Object.keys(state)) {
+  const [x,y]=key.split('_').map(Number), symbol=state[key];
+  for(const [dx,dy] of [[1,0],[0,1],[1,1],[1,-1]]) {
+   if([1,2,3,4].every(n=>state[`${x+dx*n}_${y+dy*n}`]===symbol)) return symbol;
+  }
+ }
+ return null;
+}
+
 export function getBestBotMove(
   boardState: Record<string, string>,
   botSymbol: 'X' | 'O',
@@ -110,6 +120,12 @@ export function getBestBotMove(
     return { x: center, y: center };
   }
 
+  const candidates = getCandidateCells(boardState, 1);
+  // A finished winning line is terminal, even if the opponent threatens a win.
+  for(const symbol of [botSymbol, humanSymbol]) {
+   const win=candidates.find(m=>caroWinner({...boardState,[`${m.x}_${m.y}`]:symbol})===symbol);
+   if(win)return win;
+  }
   if (difficulty === 'easy' && Math.random() < 0.4) {
     const cells = getCandidateCells(boardState, 1);
     if (cells.length > 0) return cells[Math.floor(Math.random() * cells.length)];
@@ -117,7 +133,7 @@ export function getBestBotMove(
 
   // Optimize for fast response using Minimax with depth 1 or 2 based on difficulty
   // For 'hard' difficulty, we use depth 2, otherwise depth 1
-  const depth = difficulty === 'hard' ? 2 : 1;
+  const depth = difficulty === 'hard' ? 3 : 1;
   const radius = difficulty === 'hard' ? 1 : 1;
 
   const rules: MinimaxGameRule<Record<string, string>, { x: number; y: number }> = {
@@ -132,7 +148,7 @@ export function getBestBotMove(
           return sB - sA;
         });
         // Take top 10 to keep branch factor small for Gomoku depth 2
-        return candidates.slice(0, 15);
+        return candidates.slice(0, 12);
       }
       return candidates;
     },
@@ -142,6 +158,8 @@ export function getBestBotMove(
     },
     evaluateState: (state) => {
       // Global evaluation
+      const winner=caroWinner(state);
+      if(winner) return winner===botSymbol ? 100000000 : -100000000;
       let aiScore = 0;
       let humanScore = 0;
       const occupied = Object.keys(state);
@@ -157,7 +175,7 @@ export function getBestBotMove(
       return aiScore - humanScore * 1.1; // Slightly defensive
     },
     isGameOver: (state) => {
-      return Object.keys(state).length >= BOARD_SIZE * BOARD_SIZE;
+      return !!caroWinner(state) || Object.keys(state).length >= BOARD_SIZE * BOARD_SIZE;
     }
   };
 

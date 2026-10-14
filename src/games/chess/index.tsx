@@ -1,3 +1,5 @@
+import { LearningHub } from '../duel/LearningHub';
+import { ConnectionNotice } from '../duel/ConnectionNotice';
 import { ChessPiece } from '../../visuals/ChessPiece';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Chess, Square, PieceSymbol, Color } from 'chess.js';
@@ -34,7 +36,7 @@ import { VersusScreen } from '../../components/multiplayer/VersusScreen';
 import { GameActionConfirmModal } from '../../components/multiplayer/GameActionConfirmModal';
 import { MatchEndModal, MatchEndReviewBar, MatchEndPlayerInfo } from '../../components/multiplayer/MatchEndModal';
 import { CHESS_ACHIEVEMENTS } from './config';
-import { getBestChessMove } from './aiBot';
+import { botMove } from '../duel/aiClient';
 
 // Standard Unicode Chess Pieces with SVG/Styling
 const CHESS_PIECE_SYMBOLS: Record<string, { symbol: string; name: string }> = {
@@ -211,6 +213,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   const [isMatchmakingOpen, setIsMatchmakingOpen] = useState(false);
   const [showVersusScreen, setShowVersusScreen] = useState(false);
   const [isAiMode, setIsAiMode] = useState(!!isPracticeMode);
+  const [botError,setBotError]=useState('');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [soundMuted, setSoundMuted] = useState(false);
 
@@ -251,6 +254,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
     myRole,
     isMyTurn,
     turnTimeLeft,
+    error:syncError,
     myInfo,
     opponentInfo,
     makeMove: mpMakeMove,
@@ -793,20 +797,25 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
     if (currentTurn === aiColor) {
       setIsThinkingAi(true);
-      const timer = setTimeout(() => {
-        const aiMove = getBestChessMove(chessInstanceRef.current.fen(), aiDifficulty);
+      const controller=new AbortController();
+      const timer = setTimeout(async () => {
+        try {
+        const aiMove = await botMove<{from:Square;to:Square;promotion?:string}>('chess',[chessInstanceRef.current.fen(),aiDifficulty],controller.signal);
+        if(controller.signal.aborted)return;
         if (aiMove) {
           executeMoveInternal(aiMove.from, aiMove.to, aiMove.promotion || 'q');
         }
-        setIsThinkingAi(false);
-      }, 650);
+        } catch(e) { if(!controller.signal.aborted)setBotError('Bot chưa phản hồi. Hãy bắt đầu lại ván luyện.'); }
+        if(!controller.signal.aborted)setIsThinkingAi(false);
+      }, 200);
 
-      return () => clearTimeout(timer);
+      return () => { clearTimeout(timer);controller.abort(); };
     }
   }, [isAiMode, fen, myColor, aiDifficulty, executeMoveInternal]);
 
   // Start AI Practice Game
   const startAiPractice = (diff: 'easy' | 'medium' | 'hard') => {
+    setBotError('');
     setActiveRoomId(null);
     setIsAiMode(true);
     setAiDifficulty(diff);
@@ -946,6 +955,10 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
   return (
     <div className="arcade-game-surface min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-amber-950/40 text-slate-100 flex flex-col items-center justify-between p-2 sm:p-4 md:p-6 select-none font-sans">
+<ConnectionNotice active={!!activeRoomId}/>
+      {activeRoomId&&syncError&&<p role="alert" className="p-2 text-amber-200">{syncError} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
+      {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>startAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
+      <LearningHub game="chess" lobby={!activeRoomId&&!isAiMode} roomId={activeRoomId} ended={chessInstanceRef.current.isGameOver()||roomState?.status==='ended'} result={matchResult} matchKey={activeRoomId ? activeRoomId+JSON.stringify(roomState?.lastMove) : fen} ranked={!!activeRoomId} board={fen} onResume={id=>{setActiveRoomId(id);setIsAiMode(false);}} onInvite={()=>setIsMatchmakingOpen(true)}/>
       {/* Top Header Bar */}
       
       {/* LOBBY VIEW */}
@@ -1109,7 +1122,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
           </header>
         }
         topPlayer={{
-          name: isAiMode ? `AI Đại Kiện Tướng` : opponentInfo?.name || 'Đối Thủ',
+          name: isAiMode ? `Bot luyện tập` : opponentInfo?.name || 'Đối Thủ',
           avatar: isAiMode ? 'https://api.dicebear.com/7.x/bottts/svg?seed=ChessMaster' : opponentInfo?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opponent',
           elo: opponentInfo?.elo || (isAiMode ? 1450 : 1200),
           isTurn: !isTurn && roomState?.status !== 'ended' && !chessInstanceRef.current.isGameOver(),

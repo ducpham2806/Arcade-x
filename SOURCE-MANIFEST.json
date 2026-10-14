@@ -1,6 +1,6 @@
 {
   "project": "Arcade-x",
-  "revision": "main-consolidation-2026-10-14",
+  "revision": "duel-upgrade-2026-10-15",
   "published": false,
   "productionDatabaseChanged": false,
   "validation": {
@@ -71,6 +71,11 @@
       "sha256": "27ee2b07ed3af22414c1d8188f8d93cfd1642a2e7d1e9bc1cea945e5a7fde10d"
     },
     {
+      "path": "docs/DUEL-UPGRADE.md",
+      "bytes": 2494,
+      "sha256": "5863d1504ce1e0f673389802436ed24a0f7da2cb64463a1bc6e570b732bc47ff"
+    },
+    {
       "path": "docs/PC-MOBILE-PARITY-AUDIT.md",
       "bytes": 2238,
       "sha256": "8856dfdedf596b6e37b41d6888585afcaa2d2907fdced3e7f3936b53c550bc55"
@@ -107,8 +112,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 1922,
-      "sha256": "80ab23f0b451aec980aa2d79ede58e3084ff21f7df5f5c07b600e8f9f94adfb8"
+      "bytes": 2064,
+      "sha256": "6833c8111fbf3ef5dffb219bc5c149aa0bfb3f98137b7e84ccaedfdb1115c4cd"
     },
     {
       "path": "playwright.config.ts",
@@ -7746,6 +7751,11 @@
       "sha256": "50c7b7b32d6820c6b1d92e9270b979da86f3fc96ec0003d271cab8894a1cff5d"
     },
     {
+      "path": "scripts/build-duel-worker.mjs",
+      "bytes": 275,
+      "sha256": "b5c6a8acec36f952e418c39a2fa9aa77cd1266939c01fb543ccf8f9c70813056"
+    },
+    {
       "path": "scripts/launcher-preview.mjs",
       "bytes": 4536,
       "sha256": "616f36d8a79e620ab80f260841b40286c4cd97da332c1dc56a9d59c2c2ce9dde"
@@ -7937,8 +7947,8 @@
     },
     {
       "path": "src/components/multiplayer/MatchmakingModal.tsx",
-      "bytes": 17259,
-      "sha256": "1dc161ea3fb8df6458801c896bd5db5bdf3ad3e368746068ef224eaa4f957a41"
+      "bytes": 18688,
+      "sha256": "78a5b240a1bc567ec4f39c4e1faf0a25a305679fe889eb7931c3e41ee6d0dac4"
     },
     {
       "path": "src/components/multiplayer/VersusScreen.tsx",
@@ -8117,8 +8127,8 @@
     },
     {
       "path": "src/games/caro-gomoku/aiBot.ts",
-      "bytes": 5220,
-      "sha256": "2a1e31fa4296b8b115b7dbcc1949121c7e289a4dd580f3b14b73ee1e11795b80"
+      "bytes": 5955,
+      "sha256": "2436666bebbc4e3c324a9f55ffc434acde8a5161cd783ab593be1f7de049da0b"
     },
     {
       "path": "src/games/caro-gomoku/config.ts",
@@ -8127,13 +8137,13 @@
     },
     {
       "path": "src/games/caro-gomoku/index.tsx",
-      "bytes": 71281,
-      "sha256": "8e2817b1cd7433d6fcf1e44c6ce47278de3bf6eb9e411a9a96be9c9a8bc6b030"
+      "bytes": 73753,
+      "sha256": "99b28c54a98088b316511b84a40bc0c5c245f87f09b51708ef3f7bfebfbed5ef"
     },
     {
       "path": "src/games/chess/aiBot.ts",
-      "bytes": 5208,
-      "sha256": "aa19a91466baa35dba6ee5696eb2091845d2f4c4f41b690d7fa10b644438db97"
+      "bytes": 5568,
+      "sha256": "888f8619dc359c05bf73f658809d691e146a29c468a92e6e4a0380cef9c597a0"
     },
     {
       "path": "src/games/chess/config.ts",
@@ -8142,8 +8152,8 @@
     },
     {
       "path": "src/games/chess/index.tsx",
-      "bytes": 56933,
-      "sha256": "33cddc162c74ee4549a16497d3dfb074eb557605d50c591cdc3cfe2d03c3827b"
+      "bytes": 58250,
+      "sha256": "457472ea6b839b890ae181a9c0bb9434cfa494cd02790fd6cf41a4a8be274fa3"
     },
     {
       "path": "src/games/cosmic-defense/Dialog.tsx",
@@ -8289,6 +8299,36 @@
       "path": "src/games/draw-a-shape/meta.ts",
       "bytes": 1172,
       "sha256": "f56783b771bceb9dd723322da9274b22ff0dfb495f7ee603aff2580800589602"
+    },
+    {
+      "path": "src/games/duel/ConnectionNotice.tsx",
+      "bytes": 1035,
+      "sha256": "0e6df829f83ae9a72edc402331f8678043bf8dbf7d6c4646410133c36e0db955"
+    },
+    {
+      "path": "src/games/duel/LearningHub.tsx",
+      "bytes": 15373,
+      "sha256": "9b7caf449bccee6dedc2dfcb3cf0aa794337f5aad4408e0ea30dc0ebc6425cd3"
+    },
+    {
+      "path": "src/games/duel/aiClient.ts",
+      "bytes": 1100,
+      "sha256": "1529006f0a2848510b3a09ee48c4feca2818972e92c697747fabaa653ab0e133"
+    },
+    {
+      "path": "src/games/duel/progress.ts",
+      "bytes": 1260,
+      "sha256": "e277a6f700b16978643bebe6d4a8c367a2e17427af09b01af57d9af33604360d"
+    },
+    {
+      "path": "src/games/duel/worker-source.json",
+      "bytes": 46769,
+      "sha256": "5a8ff5381fe76b6b149665e4e2fd2aae1258171836bdc2220d67f5991791114f"
+    },
+    {
+      "path": "src/games/duel/worker.ts",
+      "bytes": 485,
+      "sha256": "0033737136f7d97f56780d74e4a18ff7bc5e16c8caaf1571b6c10df2c9d38e74"
     },
     {
       "path": "src/games/dungeon-tap/allyEquipmentData.ts",
@@ -8912,8 +8952,8 @@
     },
     {
       "path": "src/games/xiangqi/aiBot.ts",
-      "bytes": 1913,
-      "sha256": "51af57e9b1083a678c9692264e9fadad03c6eb1ea26a4c0c18f2e958127c979c"
+      "bytes": 2652,
+      "sha256": "393d8a322b0413e86764ae58657ebd6b49486744040fdc1fed305a10c61d2dba"
     },
     {
       "path": "src/games/xiangqi/config.ts",
@@ -8922,13 +8962,13 @@
     },
     {
       "path": "src/games/xiangqi/index.tsx",
-      "bytes": 60736,
-      "sha256": "3d5c75d26be2fff4067d1064bcd8601125363b2d9c220d471679258bfb5ceeb8"
+      "bytes": 62626,
+      "sha256": "e355ad1d5d970c474d64f04cd2249759e7eed8b3908a320b7824adb899722c55"
     },
     {
       "path": "src/games/xiangqi/rules.ts",
-      "bytes": 12290,
-      "sha256": "34ff6ce2afacf2ac31f28ed8bbe4df64d25eefff50c12d0ccdf8e73dc62185a7"
+      "bytes": 13496,
+      "sha256": "fbee573e054618382544278a583b3c6cbce713b5d2ba06b85169e655bb73c26c"
     },
     {
       "path": "src/hooks/useDynamicViewportScale.ts",
@@ -9056,6 +9096,11 @@
       "sha256": "ca2fc5ba4bf2d754c7c6d4a9a95b082454173738679310e7979f14700c297ecd"
     },
     {
+      "path": "src/services/duelMatchmaking.ts",
+      "bytes": 680,
+      "sha256": "429abda6e128d570cee2a8a7a9751084b9ef301573a126256bde6892e4bc9668"
+    },
+    {
       "path": "src/services/gameSaves.ts",
       "bytes": 7229,
       "sha256": "3d0d499821c1c3de4ed3957a13b101f7bc19c583361a061a564452ebb963d7f7"
@@ -9067,13 +9112,13 @@
     },
     {
       "path": "src/services/matchmakingService.ts",
-      "bytes": 22851,
-      "sha256": "4bf7e6d9e5433cb02fd17ed216bd025aca78f0d7c1160711b4585f3cadd14d3d"
+      "bytes": 23140,
+      "sha256": "5535ba5b478e819945ebdcef658a20a205d21646ed73c5e788f1ce171db9e807"
     },
     {
       "path": "src/services/multiplayer.ts",
-      "bytes": 26073,
-      "sha256": "ce9f8e7e339681867491b8f5b3a6953377303e066c50b035628c788a487ea548"
+      "bytes": 26315,
+      "sha256": "fcc4dbc421432e8a76603156dbdf6965f754a1d3b4cc762227b6eb876e58d2ac"
     },
     {
       "path": "src/services/notificationService.ts",
@@ -9626,6 +9671,21 @@
       "sha256": "6161e5a826ab5d1dc712d82989933894b4ef32991e9d791ff3ca5f6167ca80d1"
     },
     {
+      "path": "tests/duel/engines.mjs",
+      "bytes": 3690,
+      "sha256": "1c7da654c0f6ea706c83c2cb118fe28fad9e47aa3667db91318a902f9b2463eb"
+    },
+    {
+      "path": "tests/duel/ui.cjs",
+      "bytes": 2840,
+      "sha256": "fd73ed2cfbe3bf0a08df1771f9835820d92c2bd919e54e5ecad6be962049b5bb"
+    },
+    {
+      "path": "tests/duel/worker.mjs",
+      "bytes": 1010,
+      "sha256": "8f7e21c1e828e8bb651ab909e80bcf1dbaa727799b5bce39eef4eeda450c3c6a"
+    },
+    {
       "path": "tests/identity.sql",
       "bytes": 3789,
       "sha256": "ccae48c8e3f1a92a24940c8692a557fb1d599ba05baf67ddc5510c608eb2edce"
@@ -9781,5 +9841,11 @@
     "real_email_delivery": "not tested",
     "browser_e2e": "not tested"
   },
-  "git_base": "acebecc0af15ac5be645ca596fe062a117c8c38d"
+  "git_base": "acebecc0af15ac5be645ca596fe062a117c8c38d",
+  "duel_validation": {
+    "engine": "9 regression checks passed",
+    "learning_hub": "React DOM interactions passed",
+    "worker": "real worker execution passed",
+    "browser_and_two_device": "not verified"
+  }
 }

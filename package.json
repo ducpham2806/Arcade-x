@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "build": "node scripts/build-duel-worker.mjs && vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
@@ -22,7 +22,8 @@
     "preview:launcher": "npm run build && node scripts/launcher-preview.mjs",
     "preview:rainbow": "node scripts/rainbow-preview.mjs",
     "test:rainbow": "playwright test tests/rainbow",
-    "test:readability": "node tests/readability/contrast.mjs && node tests/readability/dom-policy.cjs"
+    "test:readability": "node tests/readability/contrast.mjs && node tests/readability/dom-policy.cjs",
+    "test:duel": "node tests/duel/engines.mjs && node tests/duel/ui.cjs && node tests/duel/worker.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

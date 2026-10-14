@@ -450,3 +450,13 @@ export function deserializeXiangqiBoard(raw: any): BoardMatrix {
 }
 
 
+
+export function explainXiangqiMove(board:BoardMatrix,from:[number,number],to:[number,number]):string {
+ const [r,c]=from,[tr,tc]=to,p=board[r][c];if(!p)return 'Chọn một quân trước.';
+ if(board[tr]?.[tc]?.color===p.color)return 'Ô này đang có quân cùng bên.';
+ const dr=tr-r,dc=tc-c;
+ if(p.type==='h'&&((Math.abs(dr)===2&&Math.abs(dc)===1)||(Math.abs(dc)===2&&Math.abs(dr)===1))){const leg=board[r+(Math.abs(dr)===2?Math.sign(dr):0)][c+(Math.abs(dc)===2?Math.sign(dc):0)];if(leg)return 'Mã bị chặn chân. Hãy kiểm tra quân nằm sát hướng đi.';}
+ if(p.type==='e'&&Math.abs(dr)===2&&Math.abs(dc)===2&&board[r+dr/2][c+dc/2])return 'Tượng bị chặn mắt.';
+ if(p.type==='c'&&(r===tr||c===tc)){let count=0;for(let a=r+Math.sign(dr),b=c+Math.sign(dc);a!==tr||b!==tc;a+=Math.sign(dr),b+=Math.sign(dc))if(board[a][b])count++;if(board[tr][tc]&&count!==1)return 'Pháo cần đúng một quân làm ngòi để ăn quân.';if(!board[tr][tc]&&count!==0)return 'Pháo không được nhảy qua quân khi đi vào ô trống.';}
+ return 'Nước này không đúng cách đi của quân, ra ngoài phạm vi, hoặc làm lộ Tướng. Các chấm trên bàn là ô hợp lệ.';
+}

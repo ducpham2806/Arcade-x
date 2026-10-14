@@ -78,7 +78,7 @@ const KING_MID_PST = [
   [20, 30, 10, 0, 0, 10, 30, 20],
 ];
 
-function evaluateBoard(chess: Chess): number {
+export function evaluateBoard(chess: Chess): number {
   if (chess.isCheckmate()) {
     return chess.turn() === 'w' ? -99999 : 99999;
   }
@@ -137,6 +137,7 @@ export function getBestChessMove(
   const chess = new Chess(fen);
   const moves = chess.moves({ verbose: true });
   if (moves.length === 0) return null;
+  for(const m of moves){chess.move(m);const mate=chess.isCheckmate();chess.undo();if(mate)return {from:m.from,to:m.to,...(m.promotion?{promotion:m.promotion}:{})};}
   const isWhite = chess.turn() === 'w';
 
   if (difficulty === 'easy') {
@@ -151,31 +152,24 @@ export function getBestChessMove(
     return { from: randomMove.from, to: randomMove.to, promotion: randomMove.promotion };
   }
 
-  const searchDepth = difficulty === 'hard' ? 3 : 2;
-
-  const rules: MinimaxGameRule<Chess, Move> = {
-    getPossibleMoves: (state) => {
-      // Sort captures first for better alpha-beta pruning
-      const possible = state.moves({ verbose: true });
-      return possible.sort((a, b) => (b.captured ? 1 : 0) - (a.captured ? 1 : 0));
-    },
-    applyMove: (state, move, isAiTurn) => {
-      // Clone state
-      const newState = new Chess(state.fen());
-      newState.move(move);
-      return newState;
-    },
-    evaluateState: (state) => evaluateBoard(state),
-    isGameOver: (state) => state.isGameOver()
+  const deadline=performance.now()+(difficulty==='hard'?850:300);
+  const timeout={};
+  const search=(state:Chess,depth:number,alpha:number,beta:number):number=>{
+    if(performance.now()>deadline)throw timeout;
+    if(state.isCheckmate())return -100000-depth;
+    if(!depth||state.isGameOver())return evaluateBoard(state)*(state.turn()==='w'?1:-1);
+    let best=-Infinity;
+    const options=state.moves({verbose:true}).sort((a,b)=>(b.captured?PIECE_VALUES[b.captured]:0)-(a.captured?PIECE_VALUES[a.captured]:0));
+    for(const m of options){state.move(m);let score;try{score=-search(state,depth-1,-beta,-alpha);}finally{state.undo();}best=Math.max(best,score);alpha=Math.max(alpha,score);if(alpha>=beta)break;}
+    return best;
   };
-
-  const bestMove = SimpleAI.getBestMove(chess, rules, searchDepth, isWhite);
-  
-  if (!bestMove) {
-    const randomMove = moves[Math.floor(Math.random() * moves.length)];
-    return { from: randomMove.from, to: randomMove.to, promotion: randomMove.promotion };
+  let best=moves[0];
+  for(let depth=1;depth<=(difficulty==='hard'?4:2);depth++){
+    let candidate=best,value=-Infinity;
+    try{
+      for(const m of moves){chess.move(m);let v;try{v=-search(chess,depth-1,-Infinity,Infinity);}finally{chess.undo();}if(v>value){candidate=m;value=v;}}
+      best=candidate;
+    }catch(e){if(e!==timeout)throw e;break;}
   }
-
-  return { from: bestMove.from as Square, to: bestMove.to as Square, promotion: bestMove.promotion || 'q' };
+  return {from:best.from,to:best.to,...(best.promotion?{promotion:best.promotion}:{})};
 }
-

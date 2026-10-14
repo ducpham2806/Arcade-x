@@ -1,3 +1,4 @@
+import { rankQueue } from './duelMatchmaking';
 /**
  * Core Matchmaking & Multiplayer Service
  * High-performance Supabase Realtime & Atomic Transaction Engine
@@ -102,13 +103,13 @@ export class MatchmakingService {
         queueCollection,
         where('gameId', '==', gameId),
         where('status', '==', 'waiting'),
-        limit(5)
+        limit(50)
       );
 
       const snapshot = await getDocs(q);
-      const candidates = snapshot.docs
+      const candidates = rankQueue(snapshot.docs
         .map((d) => ({ id: d.id, data: d.data() as MatchmakingQueueRecord }))
-        .filter((c) => c.data.uid !== player.uid);
+        , player.uid, player.elo || 1200);
 
       if (candidates.length > 0) {
         // Matched with candidate - try to atomically lock one
@@ -223,6 +224,7 @@ export class MatchmakingService {
       };
 
       await setDoc(queueDocRef, queueEntry);
+      const heartbeat=setInterval(()=>{void updateDoc(queueDocRef,{lastHeartbeat:Date.now()}).catch(()=>{});},30000);
 
       const unsubscribe = onSnapshot(
         queueDocRef,
@@ -230,6 +232,7 @@ export class MatchmakingService {
           if (docSnap.exists()) {
             const data = docSnap.data() as MatchmakingQueueRecord;
             if (data.status === 'matched' && data.matchedRoomId) {
+              clearInterval(heartbeat);
               deleteDoc(queueDocRef).catch(() => {});
               onMatched(data.matchedRoomId);
             }
@@ -241,6 +244,7 @@ export class MatchmakingService {
       );
 
       return () => {
+        clearInterval(heartbeat);
         unsubscribe();
         deleteDoc(queueDocRef).catch(() => {});
       };
@@ -729,10 +733,10 @@ export class MatchmakingService {
       const now = Date.now();
 
       // Swap colors for fair rematch
-      const newHostColor: PlayerColor = room.players.host.color === 'RED' ? 'BLACK' : 'RED';
-      const newGuestColor: PlayerColor = newHostColor === 'RED' ? 'BLACK' : 'RED';
-
-      const firstTurnUid = newHostColor === 'RED' ? room.players.host.uid : (room.players.guest?.uid || room.players.host.uid);
+      // RED remains the legacy first-side code for both chess and Xiangqi.
+      const newHostColor:PlayerColor=room.players.host.color==='RED'?'BLACK':'RED';
+      const newGuestColor:PlayerColor=newHostColor==='RED'?'BLACK':'RED';
+      const firstTurnUid=newHostColor==='RED'?room.players.host.uid:(room.players.guest?.uid||room.players.host.uid);
 
       tx.update(roomRef, {
         'players.host.color': newHostColor,
