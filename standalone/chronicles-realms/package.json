@@ -1,0 +1,1 @@
+{"name":"chronicles-shattered-realms","version":"0.1.0","private":true,"description":"Sprite-based block breaker adventure using supplied Shattered Realms dev kit","scripts":{"build":"python3 build.py","test":"node tests/engine.cjs && node tests/ui.cjs","check":"node --check dist/engine.js && node --check dist/app.js"},"devDependencies":{"linkedom":"0.18.12"}}

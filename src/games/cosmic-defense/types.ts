@@ -94,7 +94,7 @@ export interface Level {
   waves: Wave[];
 }
 export interface RunConfig {
-  version: 2;
+  version: 2 | 3;
   level: number;
   seed: number;
   mode: Mode;
@@ -125,6 +125,11 @@ export interface Enemy {
   aimX: number;
   aimY: number;
   drop?: ItemKind;
+  flightSpeed?: number;
+  phaseOffset?: number;
+  separationX?: number;
+  separationY?: number;
+  attackPattern?: number;
 }
 export interface Bullet {
   x: number;
@@ -246,6 +251,8 @@ export interface Simulation {
   missileFire: number;
   lastHazard: number;
   lastSupply: number;
+  supplyDrops?: number;
+  reserveDropped?: boolean;
   lastHeavy: number;
   dashCooldown: number;
   message: string;

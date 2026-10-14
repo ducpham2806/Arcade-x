@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.7.0';
-export const APP_CODENAME = "Nature's Story";
-export const APP_RELEASE_NOTES = "Blossom Blast: Nature's story — đầy đủ nâng cấp v0.8, logo mới và luồng vào game thống nhất. Rainbow Blocks và carousel 6 slide được giữ.";
+export const CURRENT_APP_VERSION = '2.8.1';
+export const APP_CODENAME = "Cosmic Assault";
+export const APP_RELEASE_NOTES = "Cosmic Defend: nhịp tấn công nhanh hơn, đường bay và tốc độ đa dạng, chống chồng địch, vật phẩm từ địch bị hạ và miniboss báo đòn rõ ràng. Giữ các nâng cấp Blossom PC/mobile.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

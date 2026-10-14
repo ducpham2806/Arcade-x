@@ -22,7 +22,7 @@ export function CosmicRankingPanel({
       return;
     }
     void supabase
-      .rpc("cosmic_ranking", { p_mode: mode })
+      .rpc("cosmic_ranking_v3", { p_mode: mode })
       .abortSignal(AbortSignal.timeout(6000))
       .then(({ data, error }) => {
         if (!alive) return;
@@ -46,7 +46,7 @@ export function CosmicRankingPanel({
       <div className="cd-list">
         {gamePicker}
         <p>
-          Trang bị chuẩn hóa, không booster. Server chạy lại replay trước khi
+          Luật chiến đấu v3 · Trang bị chuẩn hóa, không booster. Server chạy lại replay trước khi
           công bố điểm.
         </p>
         <label>

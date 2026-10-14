@@ -6,7 +6,7 @@ import {
   loadArt,
   addPaletteSkins,
   drawGame,
-  ASSET_ROOT,
+  cosmicAsset,
   type Art,
 } from "./art";
 import { CosmicDialog } from "./Dialog";
@@ -344,19 +344,17 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     const token = ++generation.current,
       expected = owner.current;
     let config: RunConfig = {
-      version: 2,
+      version: 3,
       level: selected,
       seed:
-        ghostOn && saveRef.current.bestReplay?.config.level === selected
+        ghostOn && saveRef.current.bestReplay?.config.version === 3 && saveRef.current.bestReplay.config.level === selected
           ? saveRef.current.bestReplay.config.seed
           : mode === "daily"
             ? dailySeed(today())
             : mode === "weekly"
               ? weeklySeed(today())
               : (selected * 2654435761 +
-                  (saveRef.current.results[selected]
-                    ? saveRef.current.attempts[selected] || 0
-                    : 0)) >>>
+                  (saveRef.current.attempts[selected] || 0)) >>>
                 0,
       mode: isPracticeMode ? "practice" : mode,
       upgrades: { ...saveRef.current.upgrades },
@@ -408,6 +406,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
         const ranked = await startRanked(config.mode, selected, expected);
         if (!validConfig(ranked.config)) throw Error("config");
         config = ranked.config;
+        if (config.version === 2) setNotice("Ván xếp hạng dùng bộ quy tắc cũ của server; campaign và luyện tập có nhịp chiến đấu mới.");
         ticket = ranked.id;
       } catch {
         if (alive.current)
@@ -442,7 +441,8 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     ghost.current =
       best &&
       best.config.level === config.level &&
-      best.config.seed === config.seed
+      best.config.seed === config.seed &&
+      best.config.version === config.version
         ? {
             s: createSimulation(best.config),
             index: 0,
@@ -761,10 +761,12 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     </div>
   );
   const objective = (s?: Simulation) => {
+    const mini = s?.enemies.find(e => e.kind === "commander" && e.hp > 0);
     const spec = levelFor(
         s?.config.mode === "rush"
           ? (s.bossesKilled + 1) * 10
           : s?.config.level || selected,
+        s?.config.version ?? 3,
       ),
       value =
         spec.objective === "kills"
@@ -782,9 +784,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
                       ? Math.ceil(s.boss.hp)
                       : 0
                     : spec.objective === "mini"
-                      ? s?.enemies.find((e) => e.kind === "commander")
-                        ? 1
-                        : 0
+                      ? mini ? Math.ceil(mini.hp) : s?.miniKilled ? 1 : 0
                       : Math.floor((s?.frame || 0) / 60);
     const label =
       spec.objective === "kills"
@@ -800,12 +800,12 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
                 : spec.objective === "boss"
                   ? `Hạ ${PLANETS[spec.planet - 1].boss}`
                   : spec.objective === "mini"
-                    ? "Hạ mini-boss"
+                    ? mini ? `Chỉ huy${mini.hp < mini.maxHp * .45 ? " · Cuồng nộ" : ""}` : s?.miniKilled ? "Chỉ huy đã bị hạ" : "Hạ mini-boss"
                     : `Sống sót ${spec.duration}s`;
     return {
       label,
       value,
-      target: ["survive", "escort"].includes(spec.objective)
+      target: mini ? Math.ceil(mini.maxHp) : ["survive", "escort"].includes(spec.objective)
         ? spec.duration
         : spec.target,
     };
@@ -916,7 +916,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
                   · Lv{hud?.weapon || 1} · {Math.floor((hud?.frame || 0) / 60)}s
                 </small>
               </div>
-              {hud && hud.messageUntil > hud.frame && save.tutorial && (
+              {hud && hud.messageUntil > hud.frame && (save.tutorial || hud.message.startsWith("CHỈ HUY")) && (
                 <div className="cd-message">{hud.message}</div>
               )}
               <div
@@ -1009,6 +1009,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
             </div>
           </div>
           <p className="cd-gamehint">
+            {hud?.config.version === 2 && "Luật chiến đấu cũ · "}
             Kéo tương đối · Mũi tên/WASD · Q/E dùng item · Lõi trắng là hitbox
           </p>
         </div>
@@ -1958,7 +1959,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
         >
           <img
             className="cd-story"
-            src={`${ASSET_ROOT}story/story_${String(l.planet).padStart(2, "0")}_${STORY_KEYS[l.planet - 1]}.png`}
+            src={cosmicAsset(`story/story_${String(l.planet).padStart(2, "0")}_${STORY_KEYS[l.planet - 1]}.png`)}
             alt={p.theme}
           />
           <Sprite name="portrait_elara_stern" scale={2} />

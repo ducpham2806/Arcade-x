@@ -452,7 +452,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
       case 128:
         return 'bg-[#d7b0fa] text-[#3d2864] border-[#f0d5ff]';
       case 256:
-        return 'bg-amber-600 text-white border-yellow-300 shadow-amber-500/30';
+        return 'bg-amber-600 text-slate-950 border-yellow-300 shadow-amber-500/30';
       case 512:
         return 'bg-purple-600 text-white border-purple-300 shadow-purple-500/40';
       case 1024:
@@ -464,7 +464,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
       case 8192:
         return 'bg-gradient-to-tr from-cyan-500 to-blue-500 text-slate-950 border-cyan-200 font-black shadow-cyan-500/50';
       case 16384:
-        return 'bg-gradient-to-tr from-pink-500 to-rose-500 text-white border-pink-200 font-black shadow-pink-500/50';
+        return 'bg-gradient-to-tr from-pink-500 to-rose-500 text-slate-950 border-pink-200 font-black shadow-pink-500/50';
       default:
         return 'bg-gradient-to-tr from-violet-600 to-fuchsia-600 text-white border-fuchsia-300 font-black shadow-fuchsia-500/50';
     }
@@ -624,7 +624,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
           className={`flex-1 min-h-11 py-2 px-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1 transition-all ${
             undoCharges > 0 && history.length > 0
               ? 'bg-[#141414] hover:bg-indigo-600/20 border-indigo-500/40 text-indigo-300 shadow-sm active:scale-95 cursor-pointer'
-              : 'bg-[#0a0a0a] border-white/5 text-slate-600 cursor-not-allowed opacity-50'
+              : 'bg-[#0a0a0a] border-white/5 text-slate-300 cursor-not-allowed'
           }`}
           title="Hoàn tác nước đi"
         >
@@ -640,7 +640,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
           className={`flex-1 min-h-11 py-2 px-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1 transition-all ${
             shuffleCharges > 0
               ? 'bg-[#141414] hover:bg-amber-600/20 border-amber-500/40 text-amber-300 shadow-sm active:scale-95 cursor-pointer'
-              : 'bg-[#0a0a0a] border-white/5 text-slate-600 cursor-not-allowed opacity-50'
+              : 'bg-[#0a0a0a] border-white/5 text-slate-300 cursor-not-allowed'
           }`}
           title="Xáo trộn bàn cờ"
         >
@@ -656,7 +656,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
           className={`flex-1 min-h-11 py-2 px-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1 transition-all ${
             hammerCharges > 0
               ? 'bg-[#141414] hover:bg-rose-600/20 border-rose-500/40 text-rose-300 shadow-sm active:scale-95 cursor-pointer'
-              : 'bg-[#0a0a0a] border-white/5 text-slate-600 cursor-not-allowed opacity-50'
+              : 'bg-[#0a0a0a] border-white/5 text-slate-300 cursor-not-allowed'
           }`}
           title="Đập bỏ ô số 2 và 4"
         >

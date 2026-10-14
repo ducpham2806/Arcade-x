@@ -1,3 +1,4 @@
+import { buildAuthRedirect } from './authRedirect';
 import { supabase, pauseCloudIdentity, resumeCloudIdentity } from './supabaseClient';
 
 export type RecoveryState = { status: 'idle' | 'pending' | 'ready' | 'error'; owner?: string; error?: string };
@@ -79,5 +80,5 @@ export function clearRecovery() {
   notify({ status: 'idle' }); init = null; resumeCloudIdentity();
 }
 export function authRedirect(recovery = false) {
-  return new URL(recovery ? '/?auth=recovery' : '/?auth=confirmation', window.location.origin).href;
+  return buildAuthRedirect(window.location.href, recovery, import.meta.env.VITE_AUTH_REDIRECT_URL);
 }

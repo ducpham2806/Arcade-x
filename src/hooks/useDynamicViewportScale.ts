@@ -97,9 +97,7 @@ export function useDynamicViewportScale(
   const [isMobile, setIsMobile] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return (
-      window.innerWidth < 768 ||
-      'ontouchstart' in window ||
-      navigator.maxTouchPoints > 0
+      window.innerWidth < 768
     );
   });
 
@@ -145,9 +143,7 @@ export function useDynamicViewportScale(
     });
 
     setIsMobile(
-      window.innerWidth < 768 ||
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0
+      window.innerWidth < 768
     );
   }, []);
 

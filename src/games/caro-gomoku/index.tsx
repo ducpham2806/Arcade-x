@@ -1097,7 +1097,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
 
             <div className="relative flex py-2 items-center">
               <div className="flex-grow border-t border-slate-700"></div>
-              <span className="flex-shrink mx-3 text-slate-500 text-xs uppercase font-bold">hoặc tạo phòng riêng</span>
+              <span className="flex-shrink mx-3 text-slate-300 text-xs uppercase font-bold">hoặc tạo phòng riêng</span>
               <div className="flex-grow border-t border-slate-700"></div>
             </div>
 
@@ -1171,14 +1171,14 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
               <div className="text-[10px] text-amber-400 font-bold">Chủ Phòng (X)</div>
             </div>
 
-            <div className="text-slate-600 font-bold text-lg">VS</div>
+            <div className="text-slate-300 font-bold text-lg">VS</div>
 
             <div className="flex flex-col items-center gap-2">
-              <div className="w-14 h-14 rounded-2xl bg-white/5 border border-dashed border-slate-600 flex items-center justify-center text-xl text-slate-500 animate-pulse">
+              <div className="w-14 h-14 rounded-2xl bg-white/5 border border-dashed border-slate-600 flex items-center justify-center text-xl text-slate-300 animate-pulse">
                 ?
               </div>
-              <div className="text-xs font-medium text-slate-500">Đang chờ khách...</div>
-              <div className="text-[10px] text-slate-500">Khách Đấu (O)</div>
+              <div className="text-xs font-medium text-slate-300">Đang chờ khách...</div>
+              <div className="text-[10px] text-slate-300">Khách Đấu (O)</div>
             </div>
           </div>
 

@@ -1,3 +1,4 @@
+import * as legacy from "./legacy-engine.ts";
 import { BOSS_HP, ITEM_NAMES, levelFor, MUTATORS } from "./content.ts";
 import type {
   Simulation,
@@ -11,7 +12,7 @@ import type {
   ReplayEntry,
   Boss,
 } from "./types.ts";
-export const VERSION = 2,
+export const VERSION = 3,
   WIDTH = 180,
   HEIGHT = 320,
   FPS = 60,
@@ -38,7 +39,7 @@ const STATS: Record<EnemyKind, [number, number, number, number]> = {
   cicada: [12, 400, 9, 45],
   minelayer: [14, 400, 10, 43],
   wraith: [18, 400, 9, 63],
-  commander: [150, 2500, 20, 22],
+  commander: [420, 2500, 20, 22],
   generator: [55, 800, 12, 60],
   meteor: [6, 50, 8, 55],
   prism: [8, 200, 8, 80],
@@ -81,7 +82,7 @@ const speed = (s: Simulation) =>
 const caps = (s: Simulation) => {
   const band = Math.min(4, Math.floor(difficulty(s) / 20));
   return {
-    enemies: [6, 9, 12, 15, 18][band],
+    enemies: [16, 20, 24, 28, 32][band],
     bullets: [40, 70, 110, 160, 220][band],
     tele: [72, 66, 60, 54, 48][band],
     bulletSpeed: [96, 115, 134, 154, 176][band],
@@ -103,6 +104,7 @@ export function startingHp(integrity: number, hull: number) {
         : 2;
 }
 export function createSimulation(config: RunConfig): Simulation {
+  if (config.version === 2) return legacy.createSimulation(config);
   const standard = ["daily", "weekly", "endless", "rush"].includes(config.mode),
     u = standard
       ? (Object.fromEntries(
@@ -186,7 +188,9 @@ export function createSimulation(config: RunConfig): Simulation {
     fire: 0,
     missileFire: 0,
     lastHazard: 0,
-    lastSupply: 0,
+    lastSupply: -480,
+    supplyDrops: 0,
+    reserveDropped: false,
     lastHeavy: -999,
     dashCooldown: 0,
     message: "Kéo để bay · Tự động bắn",
@@ -232,6 +236,7 @@ function score(s: Simulation, base: number) {
   );
 }
 export function pickup(s: Simulation, kind: ItemKind) {
+  if (s.config.version === 2) return legacy.pickup(s, kind);
   const old = s.itemLevels[kind] || 0,
     mastery =
       s.config.upgrades.core >=
@@ -278,6 +283,7 @@ export function pickup(s: Simulation, kind: ItemKind) {
   if (kind === "amp") s.amp = (lvl === 1 ? 12 : 18) * 60;
 }
 export function useSlot(s: Simulation, index: number) {
+  if (s.config.version === 2) return legacy.useSlot(s, index);
   const kind = s.slots[index];
   if (
     !kind ||
@@ -293,7 +299,7 @@ export function useSlot(s: Simulation, index: number) {
   s.used++;
   if (kind === "bomb") {
     s.bullets = s.bullets.filter((b) => b.player);
-    for (const e of s.enemies) e.hp -= lvl >= 2 ? 250 : 150;
+    for (const e of s.enemies) e.hp -= e.kind === "commander" ? (lvl >= 2 ? 110 : 75) : lvl >= 2 ? 250 : 150;
     if (s.boss && s.boss.transition <= s.frame) {
       s.boss.hp -= (lvl >= 2 ? 250 : 150) * (s.boss.weak > s.frame ? 2 : 1);
       for (const p of s.boss.parts) p.hp -= 150;
@@ -307,6 +313,7 @@ export function useSlot(s: Simulation, index: number) {
     s.overdrive = Math.round((lvl >= 2 ? 8 : 6) * 60 * mult);
 }
 export function revive(s: Simulation) {
+  if (s.config.version === 2) return legacy.revive(s);
   if (s.status !== "revive" || !s.revive) return;
   s.revive = false;
   s.hp = 2;
@@ -316,6 +323,7 @@ export function revive(s: Simulation) {
   s.replay.push([s.frame, Math.round(s.x), Math.round(s.y), 16]);
 }
 export function endRun(s: Simulation) {
+  if (s.config.version === 2) return legacy.endRun(s);
   if (s.status !== "playing" && s.status !== "revive") return;
   s.replay.push([s.frame, Math.round(s.targetX), Math.round(s.targetY), 32]);
   s.status = "lost";
@@ -363,7 +371,7 @@ function spawn(
   drop?: ItemKind,
   at?: { x: number; y: number },
 ) {
-  if (s.enemies.length >= caps(s).enemies) return;
+  if (s.enemies.length >= caps(s).enemies) return false;
   const st = STATS[kind],
     p = planet(s),
     hp =
@@ -371,9 +379,17 @@ function spawn(
       (1 + 0.25 * (p - 1)) *
       (has(s, "iron") ? 1.5 : 1) *
       (s.config.mode === "ngplus" ? 1.5 : 1);
-  const x = at?.x ?? clamp(lane * 18, 10, 170),
-    y = at?.y ?? (path === 17 ? 345 : -20);
-  const born = at ? s.frame - Math.round(((y + 20) / st[3]) * 60) : s.frame;
+  let x = at?.x ?? clamp(lane * 18, st[2] + 2, WIDTH - st[2] - 2);
+  const y = at?.y ?? (path === 17 ? 345 : -20);
+  // A queued spawn waits for an entry gap instead of consuming the wave or stacking.
+  const candidates = [x, x + 30, x - 30, WIDTH - x, x + 60, x - 60];
+  const free = candidates.map(v => clamp(v, st[2] + 2, WIDTH - st[2] - 2)).find(v =>
+    s.enemies.every(e => e.hp <= 0 || Math.hypot(e.x - v, e.y - y) >= e.radius + st[2] + 3));
+  if (free === undefined) return false;
+  x = free;
+  const flightSpeed = .82 + random(s) * .36;
+  const phaseOffset = random(s) * Math.PI * 2;
+  const born = at ? s.frame - Math.round(((y + 20) / (st[3] * speed(s) * flightSpeed)) * 60) : s.frame;
   s.enemies.push({
     id: s.nextId++,
     kind,
@@ -390,8 +406,10 @@ function spawn(
     aimX: s.x,
     aimY: s.y,
     drop,
+    flightSpeed, phaseOffset, separationX: 0, separationY: 0, attackPattern: 0,
   });
   s.spawned++;
+  return true;
 }
 function bullet(s: Simulation, b: Bullet) {
   if (s.bullets.length >= 300) return;
@@ -695,11 +713,11 @@ function bossKilled(s: Simulation) {
 }
 function pathPosition(s: Simulation, e: Enemy) {
   const age = (s.frame - e.born) / 60,
-    v = STATS[e.kind][3] * speed(s),
+    v = STATS[e.kind][3] * speed(s) * (e.flightSpeed ?? 1),
     isHover = e.path === 7 || e.kind === "commander" || e.kind === "generator";
   if (isHover) {
     e.y = q(Math.min(e.kind === "generator" ? 95 : 70, -20 + age * v));
-    e.x = q(clamp(e.x0 + (planet(s) > 1 ? Math.sin(age) * 16 : 0), 12, 168));
+    e.x = q(clamp(e.x0 + Math.sin(age * (e.kind === "commander" ? .8 : 1.2) + (e.phaseOffset ?? 0)) * (e.kind === "commander" ? 36 : 13), 12, 168));
     if (age > 10 && e.kind !== "commander" && e.kind !== "generator")
       e.y = q(70 + (age - 10) * v);
     return;
@@ -709,15 +727,15 @@ function pathPosition(s: Simulation, e: Enemy) {
     e.x = q(clamp(e.x0 + (e.x0 < 90 ? 1 : -1) * age * v * 0.4, 8, 172));
   if ([3, 11, 16].includes(e.path))
     e.x = q(
-      clamp(e.x0 + Math.sin(age * 2.2) * (e.path === 11 ? 40 : 22), 8, 172),
+      clamp(e.x0 + Math.sin(age * 2.2 + (e.phaseOffset ?? 0)) * (e.path === 11 ? 40 : 22), 8, 172),
     );
   if (e.path === 4)
     e.x = q(clamp(e.x0 + (Math.abs(((age * 35) % 80) - 40) - 20), 8, 172));
   if ([5, 6, 8, 9, 12, 13].includes(e.path))
     e.x = q(
       clamp(
-        90 +
-          Math.cos(age * (e.path === 12 ? 3 : 2) + e.x0 / 35) *
+        e.x0 +
+          Math.cos(age * (e.path === 12 ? 3 : 2) + (e.phaseOffset ?? 0)) *
             (e.path === 9 ? Math.max(10, 45 - age * 6) : 40),
         8,
         172,
@@ -746,8 +764,52 @@ function pathPosition(s: Simulation, e: Enemy) {
     }
   }
 }
+function miniUpdate(s: Simulation, e: Enemy) {
+  if (e.y < 45 || s.frame < e.fire) return;
+  if (!e.tele) {
+    e.tele = s.frame + 54;
+    e.aimX = s.x;
+    e.aimY = s.y;
+    message(s, ['CHỈ HUY · Quạt đạn', 'CHỈ HUY · Khóa mục tiêu', 'CHỈ HUY · Vòng đạn'][(e.attackPattern ?? 0) % 3]);
+    return;
+  }
+  if (s.frame < e.tele) return;
+  const pattern = (e.attackPattern ?? 0) % 3;
+  const enraged = e.hp < e.maxHp * .45;
+  if (pattern === 0) aimed(s, e.x, e.y + e.radius, enraged ? 7 : 5, .25, 'shard', 1, Math.PI / 2);
+  if (pattern === 1) aimed(s, e.x, e.y + e.radius, 3, .14, 'aimed', 1, Math.atan2(e.aimY - (e.y + e.radius), e.aimX - e.x));
+  if (pattern === 2) ring(s, e.x, e.y, enraged ? 14 : 10, (e.attackPattern ?? 0) * .17);
+  e.attackPattern = (e.attackPattern ?? 0) + 1;
+  e.tele = 0;
+  e.fire = s.frame + (enraged ? 72 : 112);
+}
+
+function separateEnemies(s: Simulation) {
+  const alive = s.enemies.filter(e => e.hp > 0);
+  for (let pass = 0; pass < 6; pass++) for (let i = 0; i < alive.length; i++) for (let j = i + 1; j < alive.length; j++) {
+    const a = alive[i], b = alive[j];
+    const dx = b.x - a.x, dy = b.y - a.y, distance = Math.hypot(dx, dy), gap = a.radius + b.radius + 2;
+    if (distance >= gap) continue;
+    const nx = distance > .001 ? dx / distance : (a.id % 2 ? 1 : -1);
+    const ny = distance > .001 ? dy / distance : 0;
+    const push = (gap - distance) / 2 + .05;
+    for (const [e, sign] of [[a, -1], [b, 1]] as const) {
+      const x = e.x, y = e.y;
+      e.x = q(clamp(x + nx * push * sign, e.radius + 1, WIDTH - e.radius - 1));
+      e.y = q(y + ny * push * sign);
+      e.separationX = (e.separationX ?? 0) + e.x - x;
+      e.separationY = (e.separationY ?? 0) + e.y - y;
+    }
+  }
+}
+
 function enemyUpdate(s: Simulation, e: Enemy) {
   pathPosition(s, e);
+  e.x = q(clamp(e.x + (e.separationX ?? 0), e.radius + 1, WIDTH - e.radius - 1));
+  e.y = q(e.y + (e.separationY ?? 0));
+  e.separationX = (e.separationX ?? 0) * .97;
+  e.separationY = (e.separationY ?? 0) * .97;
+  if (e.kind === "commander") { miniUpdate(s, e); return; }
   if (e.kind === "cicada")
     for (const other of s.enemies)
       if (other.id !== e.id && Math.hypot(other.x - e.x, other.y - e.y) < 45)
@@ -767,7 +829,6 @@ function enemyUpdate(s: Simulation, e: Enemy) {
     ].includes(e.kind)
   )
     return;
-  if (s.frame % 1440 >= 1200) return;
   if (s.frame >= e.fire) {
     if (!e.tele) {
       e.tele = s.frame + caps(s).tele;
@@ -790,7 +851,6 @@ function enemyUpdate(s: Simulation, e: Enemy) {
         pierce: 0,
         hit: [],
       });
-    else if (e.kind === "commander") ring(s, e.x, e.y + 22, 8, s.frame / 60);
     else if (e.kind === "moth") aimed(s, e.x, e.y + 12, 1, 0, "bomb");
     else if (
       e.kind !== "wraith" ||
@@ -806,7 +866,7 @@ function enemyUpdate(s: Simulation, e: Enemy) {
         1,
         Math.atan2(e.aimY - e.y, e.aimX - e.x),
       );
-    e.fire = s.frame + Math.round(144 - difficulty(s) * 0.7);
+    e.fire = s.frame + Math.round((e.kind === "wasp" ? 100 : e.kind === "beetle" ? 175 : 140) - difficulty(s) * .5 + random(s) * 40);
     e.tele = 0;
   }
 }
@@ -824,21 +884,20 @@ function death(s: Simulation, e: Enemy) {
     spawn(s, "larva_small", 3, 2, undefined, { x: e.x - 8, y: e.y });
     spawn(s, "larva_small", 7, 2, undefined, { x: e.x + 8, y: e.y });
   }
-  if (e.kind === "commander") {
-    s.pickups.push(
-      { x: e.x - 12, y: e.y, kind: "plasma", born: s.frame },
-      { x: e.x + 12, y: e.y, kind: "nano", born: s.frame },
-    );
+  const reserve = !s.reserveDropped && s.config.boosters.includes("nano") && s.frame >= levelFor(s.config.level).duration * 30;
+  if (reserve) {
+    s.reserveDropped = true;
+    s.pickups.push({x: e.x, y: e.y, kind: "nano", born: s.frame});
   }
-  if (e.drop && !has(s, "dry"))
-    s.pickups.push({ x: e.x, y: e.y, kind: e.drop, born: s.frame });
-  const chance =
-    (planet(s) <= 2 ? 0.08 : planet(s) <= 7 ? 0.06 : 0.05) *
-    (s.config.boosters.includes("lucky") ? 1.25 : 1);
-  if (random(s, true) < chance) {
-    let kind = ITEMS[Math.floor(random(s, true) * ITEMS.length)];
-    if (has(s, "dry")) kind = "nano";
-    s.pickups.push({ x: e.x, y: e.y, kind, born: s.frame });
+  const chance = .035 * (s.config.boosters.includes("lucky") ? 1.25 : 1);
+  const rolledDrop = random(s, true) < chance;
+  const budget = 5 + Math.floor((planet(s) - 1) / 3);
+  if (!has(s, "dry") && (s.supplyDrops ?? 0) < budget && s.frame - s.lastSupply >= 480 &&
+      (e.drop || e.kind === "commander" || rolledDrop)) {
+    const kind = e.drop ?? (e.kind === "commander" ? (s.hp < s.maxHp ? "nano" : "plasma") : ITEMS[Math.floor(random(s, true) * ITEMS.length)]);
+    s.pickups.push({x: e.x, y: e.y, kind, born: s.frame});
+    s.lastSupply = s.frame;
+    s.supplyDrops = (s.supplyDrops ?? 0) + 1;
   }
   if (
     random(s, true) < 0.32 ||
@@ -982,7 +1041,7 @@ function spawnWaves(s: Simulation) {
   }
   if (s.config.mode === "endless") {
     if (
-      s.frame % Math.max(60, 240 - Math.floor(difficulty(s))) === 0 &&
+      s.frame % Math.max(24, 64 - Math.floor(difficulty(s) * .3)) === 0 &&
       s.enemies.length < caps(s).enemies
     )
       spawn(
@@ -999,7 +1058,7 @@ function spawnWaves(s: Simulation) {
           ] as EnemyKind[]
         )[Math.floor(random(s) * 7)],
         Math.floor(random(s) * 7) + 2,
-        7,
+        1 + Math.floor(random(s) * 9),
       );
     if (s.frame % 21600 === 0 && !s.boss)
       makeBoss(s, 1 + Math.floor(random(s) * 10));
@@ -1043,7 +1102,12 @@ function spawnWaves(s: Simulation) {
     has(s, "remix")
   )
     lane = 10 - lane;
-  spawn(s, w.enemy, lane, w.path, index === count - 1 ? w.drop : undefined);
+  if (w.formation === 2) lane = clamp(w.lane + (index % 3 - 1) * 2, 1, 9);
+  if (w.formation === 4) lane = 1 + ((index * 3 + s.waveIndex + s.config.seed % 9) % 9);
+  lane = clamp(lane + (random(s) - .5) * .6, 1, 9);
+  const routes = [1, 2, 3, 4, 5, 6, 8, 9, 11, 12, 15, 16];
+  const path = s.config.mode === "practice" || w.path === 7 ? w.path : routes[(Math.max(0, routes.indexOf(w.path)) + s.config.seed % 5) % routes.length];
+  if (!spawn(s, w.enemy, lane, path, index === count - 1 ? w.drop : undefined)) return;
   s.nextSpawn = s.frame + Math.round(w.delay * 60);
   s.waveSpawn++;
   if (s.waveSpawn >= count) {
@@ -1068,6 +1132,7 @@ function objectiveMet(s: Simulation) {
               : l.objective === "survive";
 }
 export function step(s: Simulation, input: Input, record = true) {
+  if (s.config.version === 2) return legacy.step(s, input, record);
   if (s.status !== "playing") return;
   // Input is quantized/sampled at 20 Hz; both live play and server replay use this exact schedule.
   if (s.frame % 3 === 0) {
@@ -1198,6 +1263,10 @@ export function step(s: Simulation, input: Input, record = true) {
       continue;
     }
     enemyUpdate(s, e);
+  }
+  separateEnemies(s);
+  for (const e of s.enemies) {
+    if (e.hp <= 0) continue;
     if (Math.hypot(e.x - s.x, e.y - s.y) < e.radius + 2) damage(s);
     if (l.objective === "escort" && e.y >= 300) {
       s.escortHp--;
@@ -1205,21 +1274,9 @@ export function step(s: Simulation, input: Input, record = true) {
     }
   }
   s.enemies = s.enemies.filter(
-    (e) => e.hp > 0 && e.y < 350 && e.y > -50 && s.frame - e.born < 1200,
+    (e) => e.hp > 0 && e.y < 350 && e.y > -50 && (e.kind === "commander" || e.kind === "generator" || s.frame - e.born < 1200),
   );
   updateBullets(s);
-  const supplyPeriod = l.stage === 10 ? 1200 : 1500;
-  if (s.frame === 1200 || s.frame % supplyPeriod === 0) {
-    const kind =
-      s.frame === 1200 ? "plasma" : s.hp < s.maxHp ? "nano" : "plasma";
-    if (!has(s, "dry") || kind === "nano")
-      s.pickups.push({ x: 90, y: 100, kind, born: s.frame });
-  }
-  if (s.frame === Math.round(l.duration * 30)) {
-    if (s.config.boosters.includes("magnet")) s.magnet = 900;
-    if (s.config.boosters.includes("nano"))
-      s.pickups.push({ x: 90, y: 160, kind: "nano", born: s.frame });
-  }
   for (const p of s.pickups) {
     p.y = q(p.y + 0.4);
     const d = Math.hypot(p.x - s.x, p.y - s.y);
@@ -1273,6 +1330,7 @@ export function step(s: Simulation, input: Input, record = true) {
     s.status = "lost";
 }
 export function resultFor(s: Simulation): Result {
+  if (s.config.version === 2) return legacy.resultFor(s);
   const l = levelFor(s.config.level),
     won = s.status === "won",
     secondary = s.hits <= 1 && (l.objective !== "escort" || s.escortHp >= 10),
@@ -1326,6 +1384,7 @@ export function replaySimulation(
   entries: ReplayEntry[],
   frames: number,
 ): Simulation {
+  if (config.version === 2) return legacy.replaySimulation(config, entries, frames);
   if (
     !Number.isInteger(frames) ||
     frames < 0 ||

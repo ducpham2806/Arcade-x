@@ -1,6 +1,7 @@
 import campaign from "./data/campaign.json" with { type: "json" };
 import type { Level, Upgrade, Booster, Mutator, ItemKind } from "./types.ts";
-export const LEVELS = campaign as Level[];
+import { buildEncounter } from "./encounters.ts";
+export const LEVELS = (campaign as Level[]).map(buildEncounter);
 export const PLANETS = [
   {
     name: "Asteria",
@@ -199,7 +200,7 @@ export const BOOSTERS: Record<
     name: "Nanobot Reserve",
     price: 200,
     unlock: 1,
-    description: "Nanobot đảm bảo giữa màn",
+    description: "Địch bị hạ sau giữa màn sẽ rơi Nanobot",
     icon: "nano",
   },
   revive: {
@@ -255,8 +256,8 @@ export const ITEM_NAMES: Record<ItemKind, string> = {
 export const BOSS_HP = [
   1200, 2000, 3000, 4200, 5600, 7200, 9000, 11000, 13500, 20000,
 ];
-export function levelFor(id: number) {
-  return LEVELS[Math.max(0, Math.min(99, Math.trunc(id) - 1))];
+export function levelFor(id: number, version = 3) {
+  return (version === 2 ? campaign as Level[] : LEVELS)[Math.max(0, Math.min(99, Math.trunc(id) - 1))];
 }
 export function upgradeCost(kind: Upgrade, level: number) {
   return Math.round(500 * 1.45 ** level * UPGRADE_INFO[kind].factor);

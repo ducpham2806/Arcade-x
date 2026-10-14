@@ -1,0 +1,946 @@
+{
+ "currency": "xu",
+ "rarity_price_range": {
+  "Thường": [
+   150,
+   400
+  ],
+  "Hiếm": [
+   600,
+   1500
+  ],
+  "Sử thi": [
+   2000,
+   4000
+  ],
+  "Huyền thoại": null
+ },
+ "skins": [
+  {
+   "id": "frame_forest",
+   "type": "frame",
+   "name": "Khung Rừng Neon",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_forest",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "frame_desert",
+   "type": "frame",
+   "name": "Khung Sa Mạc",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_desert",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "frame_ice",
+   "type": "frame",
+   "name": "Khung Băng Nguyên",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_ice",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "frame_lava",
+   "type": "frame",
+   "name": "Khung Núi Lửa",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_lava",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "frame_cyber",
+   "type": "frame",
+   "name": "Khung Thành Phố Điện Tử",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_cyber",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "frame_void",
+   "type": "frame",
+   "name": "Khung Pháo Đài Hư Không",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_void",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "frame_retro_metal",
+   "type": "frame",
+   "name": "Khung Kim loại retro",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_retro_metal",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "frame_neon_red",
+   "type": "frame",
+   "name": "Khung Neon đỏ pixel",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_neon_red",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "frame_wood",
+   "type": "frame",
+   "name": "Khung Gỗ ấm",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_wood",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "frame_candy",
+   "type": "frame",
+   "name": "Khung Kẹo ngọt",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_candy",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 3000
+  },
+  {
+   "id": "frame_royal_gold",
+   "type": "frame",
+   "name": "Khung Hoàng kim",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_royal_gold",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 3000
+  },
+  {
+   "id": "frame_rainbow_crystal",
+   "type": "frame",
+   "name": "Khung Pha lê cầu vồng",
+   "sheet": "sheet_frames.png",
+   "frame": "frame_rainbow_crystal",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 3000
+  },
+  {
+   "id": "paddle_forest",
+   "type": "paddle",
+   "name": "Thanh chắn Rừng Neon",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_forest",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "paddle_desert",
+   "type": "paddle",
+   "name": "Thanh chắn Sa Mạc",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_desert",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "paddle_ice",
+   "type": "paddle",
+   "name": "Thanh chắn Băng Nguyên",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_ice",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "paddle_lava",
+   "type": "paddle",
+   "name": "Thanh chắn Núi Lửa",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_lava",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "paddle_cyber",
+   "type": "paddle",
+   "name": "Thanh chắn Thành Phố Điện Tử",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_cyber",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "paddle_void",
+   "type": "paddle",
+   "name": "Thanh chắn Pháo Đài Hư Không",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_void",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "paddle_retro_arkanoid",
+   "type": "paddle",
+   "name": "Thanh chắn Vaus cổ điển",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_retro_arkanoid",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "paddle_pixel_red",
+   "type": "paddle",
+   "name": "Thanh chắn Pixel đỏ",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_pixel_red",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "paddle_candy",
+   "type": "paddle",
+   "name": "Thanh chắn Kẹo mút",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_candy",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "paddle_wing",
+   "type": "paddle",
+   "name": "Thanh chắn Cánh thiên thần",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_wing",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 2000
+  },
+  {
+   "id": "paddle_pirate_ship",
+   "type": "paddle",
+   "name": "Thanh chắn Thuyền hải tặc",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_pirate_ship",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 2000
+  },
+  {
+   "id": "paddle_rainbow",
+   "type": "paddle",
+   "name": "Thanh chắn Cầu vồng",
+   "sheet": "sheet_skin_paddles.png",
+   "frame": "paddle_rainbow",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 2000
+  },
+  {
+   "id": "ball_crystal",
+   "type": "ball",
+   "name": "Bóng Pha lê",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_crystal",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "ball_planet",
+   "type": "ball",
+   "name": "Bóng Hành tinh",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_planet",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "ball_pearl",
+   "type": "ball",
+   "name": "Bóng Ngọc trai",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_pearl",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "ball_smiley",
+   "type": "ball",
+   "name": "Bóng Mặt cười",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_smiley",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "ball_eyeball",
+   "type": "ball",
+   "name": "Bóng Nhãn cầu",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_eyeball",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "ball_disco",
+   "type": "ball",
+   "name": "Bóng Disco",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_disco",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "ball_pumpkin",
+   "type": "ball",
+   "name": "Bóng Bí ngô",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_pumpkin",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "ball_basketball",
+   "type": "ball",
+   "name": "Bóng Bóng rổ",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_basketball",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "ball_moon",
+   "type": "ball",
+   "name": "Bóng Mặt trăng",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_moon",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "ball_ladybug",
+   "type": "ball",
+   "name": "Bóng Bọ rùa",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_ladybug",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "ball_gem",
+   "type": "ball",
+   "name": "Bóng Đá quý",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_gem",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 2000
+  },
+  {
+   "id": "ball_star",
+   "type": "ball",
+   "name": "Bóng Ngôi sao",
+   "sheet": "sheet_skin_balls.png",
+   "frame": "ball_star",
+   "rarity": "Sử thi",
+   "unlock": "shop",
+   "price_xu": 2000
+  },
+  {
+   "id": "brick_pixel",
+   "type": "brick",
+   "name": "Bộ gạch Pixel",
+   "sheet": "sheet_skin_bricks.png",
+   "frame": "brick_pixel_normal",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "brick_candy",
+   "type": "brick",
+   "name": "Bộ gạch Kẹo",
+   "sheet": "sheet_skin_bricks.png",
+   "frame": "brick_candy_normal",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "brick_stone",
+   "type": "brick",
+   "name": "Bộ gạch Đá",
+   "sheet": "sheet_skin_bricks.png",
+   "frame": "brick_stone_normal",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "brick_glass",
+   "type": "brick",
+   "name": "Bộ gạch Thuỷ tinh",
+   "sheet": "sheet_skin_bricks.png",
+   "frame": "brick_glass_normal",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "brick_wood",
+   "type": "brick",
+   "name": "Bộ gạch Gỗ",
+   "sheet": "sheet_skin_bricks.png",
+   "frame": "brick_wood_normal",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 150
+  },
+  {
+   "id": "brick_jelly",
+   "type": "brick",
+   "name": "Bộ gạch Thạch",
+   "sheet": "sheet_skin_bricks.png",
+   "frame": "brick_jelly_normal",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 600
+  },
+  {
+   "id": "fx_confetti",
+   "type": "effect",
+   "name": "Hiệu ứng vỡ gạch: Hoa giấy",
+   "sheet": "sheet_skin_effects.png",
+   "frame": "fx_confetti_0",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "fx_hearts",
+   "type": "effect",
+   "name": "Hiệu ứng vỡ gạch: Trái tim",
+   "sheet": "sheet_skin_effects.png",
+   "frame": "fx_hearts_0",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "fx_pixels",
+   "type": "effect",
+   "name": "Hiệu ứng vỡ gạch: Pixel",
+   "sheet": "sheet_skin_effects.png",
+   "frame": "fx_pixels_0",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "fx_bubbles",
+   "type": "effect",
+   "name": "Hiệu ứng vỡ gạch: Bong bóng",
+   "sheet": "sheet_skin_effects.png",
+   "frame": "fx_bubbles_0",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "fx_stars",
+   "type": "effect",
+   "name": "Hiệu ứng vỡ gạch: Sao",
+   "sheet": "sheet_skin_effects.png",
+   "frame": "fx_stars_0",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "fx_leaves",
+   "type": "effect",
+   "name": "Hiệu ứng vỡ gạch: Lá",
+   "sheet": "sheet_skin_effects.png",
+   "frame": "fx_leaves_0",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "bg_synthwave",
+   "type": "background",
+   "name": "Nền synthwave",
+   "sheet": "sheet_skin_backgrounds.png",
+   "frame": "bg_synthwave",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "bg_candy",
+   "type": "background",
+   "name": "Nền candy",
+   "sheet": "sheet_skin_backgrounds.png",
+   "frame": "bg_candy",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "bg_nebula",
+   "type": "background",
+   "name": "Nền nebula",
+   "sheet": "sheet_skin_backgrounds.png",
+   "frame": "bg_nebula",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "bg_sunset_sea",
+   "type": "background",
+   "name": "Nền sunset sea",
+   "sheet": "sheet_skin_backgrounds.png",
+   "frame": "bg_sunset_sea",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "bg_sakura",
+   "type": "background",
+   "name": "Nền sakura",
+   "sheet": "sheet_skin_backgrounds.png",
+   "frame": "bg_sakura",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "bg_paper",
+   "type": "background",
+   "name": "Nền paper",
+   "sheet": "sheet_skin_backgrounds.png",
+   "frame": "bg_paper",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "bg_forest",
+   "type": "background",
+   "name": "Nền Rừng Neon",
+   "sheet": "sheet_backgrounds.png",
+   "frame": "bg_forest",
+   "rarity": "Hiếm",
+   "unlock": "region_progress",
+   "price_xu": null
+  },
+  {
+   "id": "bg_desert",
+   "type": "background",
+   "name": "Nền Sa Mạc",
+   "sheet": "sheet_backgrounds.png",
+   "frame": "bg_desert",
+   "rarity": "Hiếm",
+   "unlock": "region_progress",
+   "price_xu": null
+  },
+  {
+   "id": "bg_ice",
+   "type": "background",
+   "name": "Nền Băng Nguyên",
+   "sheet": "sheet_backgrounds.png",
+   "frame": "bg_ice",
+   "rarity": "Hiếm",
+   "unlock": "region_progress",
+   "price_xu": null
+  },
+  {
+   "id": "bg_lava",
+   "type": "background",
+   "name": "Nền Núi Lửa",
+   "sheet": "sheet_backgrounds.png",
+   "frame": "bg_lava",
+   "rarity": "Hiếm",
+   "unlock": "region_progress",
+   "price_xu": null
+  },
+  {
+   "id": "bg_cyber",
+   "type": "background",
+   "name": "Nền Thành Phố Điện Tử",
+   "sheet": "sheet_backgrounds.png",
+   "frame": "bg_cyber",
+   "rarity": "Hiếm",
+   "unlock": "region_progress",
+   "price_xu": null
+  },
+  {
+   "id": "bg_void",
+   "type": "background",
+   "name": "Nền Pháo Đài Hư Không",
+   "sheet": "sheet_backgrounds.png",
+   "frame": "bg_void",
+   "rarity": "Hiếm",
+   "unlock": "region_progress",
+   "price_xu": null
+  },
+  {
+   "id": "avatar_orb",
+   "type": "avatar",
+   "name": "Avatar orb",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_orb",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_pixel",
+   "type": "avatar",
+   "name": "Avatar pixel",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_pixel",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_cat",
+   "type": "avatar",
+   "name": "Avatar cat",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_cat",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_robot",
+   "type": "avatar",
+   "name": "Avatar robot",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_robot",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_ghost",
+   "type": "avatar",
+   "name": "Avatar ghost",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_ghost",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_fox",
+   "type": "avatar",
+   "name": "Avatar fox",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_fox",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_dragon",
+   "type": "avatar",
+   "name": "Avatar dragon",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_dragon",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_star",
+   "type": "avatar",
+   "name": "Avatar star",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_star",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_flame",
+   "type": "avatar",
+   "name": "Avatar flame",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_flame",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_snow",
+   "type": "avatar",
+   "name": "Avatar snow",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_snow",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_leaf",
+   "type": "avatar",
+   "name": "Avatar leaf",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_leaf",
+   "rarity": "Thường",
+   "unlock": "shop",
+   "price_xu": 275
+  },
+  {
+   "id": "avatar_crown",
+   "type": "avatar",
+   "name": "Avatar crown",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_crown",
+   "rarity": "Thường",
+   "unlock": "achievement",
+   "price_xu": null
+  },
+  {
+   "id": "avatar_frame_gold",
+   "type": "avatar_frame",
+   "name": "Khung avatar gold",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_frame_gold",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "avatar_frame_neon",
+   "type": "avatar_frame",
+   "name": "Khung avatar neon",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_frame_neon",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "avatar_frame_wood",
+   "type": "avatar_frame",
+   "name": "Khung avatar wood",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_frame_wood",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "avatar_frame_ice",
+   "type": "avatar_frame",
+   "name": "Khung avatar ice",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_frame_ice",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "avatar_frame_flame",
+   "type": "avatar_frame",
+   "name": "Khung avatar flame",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_frame_flame",
+   "rarity": "Hiếm",
+   "unlock": "shop",
+   "price_xu": 1050
+  },
+  {
+   "id": "avatar_frame_rainbow",
+   "type": "avatar_frame",
+   "name": "Khung avatar rainbow",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "avatar_frame_rainbow",
+   "rarity": "Sử thi",
+   "unlock": "achievement",
+   "price_xu": null
+  },
+  {
+   "id": "badge_collector",
+   "type": "badge",
+   "name": "Huy hiệu collector",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "badge_collector",
+   "rarity": "Huyền thoại",
+   "unlock": "achievement",
+   "price_xu": null
+  },
+  {
+   "id": "badge_combo",
+   "type": "badge",
+   "name": "Huy hiệu combo",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "badge_combo",
+   "rarity": "Huyền thoại",
+   "unlock": "achievement",
+   "price_xu": null
+  },
+  {
+   "id": "badge_slayer",
+   "type": "badge",
+   "name": "Huy hiệu slayer",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "badge_slayer",
+   "rarity": "Huyền thoại",
+   "unlock": "achievement",
+   "price_xu": null
+  },
+  {
+   "id": "badge_perfect",
+   "type": "badge",
+   "name": "Huy hiệu perfect",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "badge_perfect",
+   "rarity": "Huyền thoại",
+   "unlock": "achievement",
+   "price_xu": null
+  },
+  {
+   "id": "badge_streak",
+   "type": "badge",
+   "name": "Huy hiệu streak",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "badge_streak",
+   "rarity": "Huyền thoại",
+   "unlock": "achievement",
+   "price_xu": null
+  },
+  {
+   "id": "badge_champion",
+   "type": "badge",
+   "name": "Huy hiệu champion",
+   "sheet": "sheet_skin_profile.png",
+   "frame": "badge_champion",
+   "rarity": "Huyền thoại",
+   "unlock": "achievement",
+   "price_xu": null
+  }
+ ],
+ "sets": [
+  {
+   "id": "set_forest",
+   "name": "Bộ Rừng Neon",
+   "items": [
+    "frame_forest",
+    "paddle_forest",
+    "bg_forest"
+   ],
+   "full_set_bonus": {
+    "xu": 500,
+    "title": "Nhà sưu tầm Rừng Neon",
+    "effect": "ánh sáng riêng khi mặc cả bộ"
+   }
+  },
+  {
+   "id": "set_desert",
+   "name": "Bộ Sa Mạc",
+   "items": [
+    "frame_desert",
+    "paddle_desert",
+    "bg_desert"
+   ],
+   "full_set_bonus": {
+    "xu": 500,
+    "title": "Nhà sưu tầm Sa Mạc",
+    "effect": "ánh sáng riêng khi mặc cả bộ"
+   }
+  },
+  {
+   "id": "set_ice",
+   "name": "Bộ Băng Nguyên",
+   "items": [
+    "frame_ice",
+    "paddle_ice",
+    "bg_ice"
+   ],
+   "full_set_bonus": {
+    "xu": 500,
+    "title": "Nhà sưu tầm Băng Nguyên",
+    "effect": "ánh sáng riêng khi mặc cả bộ"
+   }
+  },
+  {
+   "id": "set_lava",
+   "name": "Bộ Núi Lửa",
+   "items": [
+    "frame_lava",
+    "paddle_lava",
+    "bg_lava"
+   ],
+   "full_set_bonus": {
+    "xu": 500,
+    "title": "Nhà sưu tầm Núi Lửa",
+    "effect": "ánh sáng riêng khi mặc cả bộ"
+   }
+  },
+  {
+   "id": "set_cyber",
+   "name": "Bộ Thành Phố Điện Tử",
+   "items": [
+    "frame_cyber",
+    "paddle_cyber",
+    "bg_cyber"
+   ],
+   "full_set_bonus": {
+    "xu": 500,
+    "title": "Nhà sưu tầm Thành Phố Điện Tử",
+    "effect": "ánh sáng riêng khi mặc cả bộ"
+   }
+  },
+  {
+   "id": "set_void",
+   "name": "Bộ Pháo Đài Hư Không",
+   "items": [
+    "frame_void",
+    "paddle_void",
+    "bg_void"
+   ],
+   "full_set_bonus": {
+    "xu": 500,
+    "title": "Nhà sưu tầm Pháo Đài Hư Không",
+    "effect": "ánh sáng riêng khi mặc cả bộ"
+   }
+  }
+ ]
+}

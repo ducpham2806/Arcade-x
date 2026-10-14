@@ -1,3 +1,4 @@
+import { readableCanvasText } from '../../accessibility/canvasText';
 import { createFixedTicker } from './timing';
 import { randomStep } from '../tile-2048/engine';
 import { drawArenaBackdrop } from '../../visuals/arenaBackdrop';
@@ -675,7 +676,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
           // Hazard label
           ctx.fillStyle = '#fca5a5';
           ctx.font = 'bold 8px monospace';
-          ctx.fillText('⚡ TRƯỢT', obs.x + 4, obs.y - 6);
+          readableCanvasText(ctx, '⚡ TRƯỢT', obs.x + 4, obs.y - 6);
         } else if (obs.type === 'drone') {
           // Spiked hazard flying drone with blinking danger light
           ctx.fillStyle = '#991b1b';
@@ -745,7 +746,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
           ctx.font = 'bold 11px sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('★', col.x, col.y + 0.5);
+          readableCanvasText(ctx, '★', col.x, col.y + 0.5);
         } else if (col.type === 'gem') {
           // Sparkling Cyan Diamond Gem
           ctx.fillStyle = '#ec4899';
@@ -781,7 +782,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
           ctx.font = 'bold 10px sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('🛡️', col.x, col.y);
+          readableCanvasText(ctx, '🛡️', col.x, col.y);
         } else if (col.type === 'multiplier') {
           // Violet 2X Multiplier Orb
           ctx.fillStyle = '#a855f7';
@@ -797,7 +798,7 @@ export const NeonRunnerGame: React.FC<GameComponentProps> = ({
           ctx.font = 'bold 10px monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('2X', col.x, col.y);
+          readableCanvasText(ctx, '2X', col.x, col.y);
         }
         ctx.restore();
       });

@@ -1,3 +1,5 @@
+import { installReadability } from './accessibility/readability.js';
+import './accessibility/readability.css';
 import React, { useState, useEffect } from 'react';
 import { LauncherProvider, useLauncher } from './launcher/LauncherContext';
 import { ResumeCard } from './launcher/ResumeCard';
@@ -32,6 +34,7 @@ import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy, Pause, Sa
 
 const AppContent: React.FC = () => {
   useRippleEffect();
+  useEffect(() => installReadability(), []);
   const launcher = useLauncher();
   const { openEntry, authModalMode, notice, dismissNotice } = useAuth();
   const [showSplash, setShowSplash] = useState(false);
@@ -110,7 +113,7 @@ const AppContent: React.FC = () => {
             {/* Platform News & System Updates Marquee Ticker */}
 
 
-            {notice && <div role="status" className="max-w-7xl mx-auto w-full px-6 py-3 text-sm text-indigo-200 flex gap-3"><p>{notice}</p><button onClick={dismissNotice} aria-label="Đóng thông báo">×</button></div>}
+            {notice && <div role="status" className="launcher-notice max-w-7xl mx-auto w-full px-6 py-3 text-sm flex gap-3"><p>{notice}</p><button onClick={dismissNotice} aria-label="Đóng thông báo">×</button></div>}
 
             {launcher.notice && <div className="launcher-notice" role="status"><span>{launcher.notice}</span><button onClick={launcher.dismissNotice} aria-label="Đóng thông báo thư viện">×</button></div>}
             {launcher.busy && <p className="launcher-notice" role="status">Đang chuẩn bị trò chơi…</p>}

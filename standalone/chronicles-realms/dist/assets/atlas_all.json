@@ -1,0 +1,3626 @@
+{
+ "version": "1.0",
+ "note": "frames[name]=[x,y,w,h] t\u00ednh b\u1eb1ng pixel trong file PNG c\u1ee7a sheet",
+ "sheets": {
+  "sheet_bricks": {
+   "image": "spritesheets/sheet_bricks.png",
+   "size": [
+    1152,
+    480
+   ],
+   "cell": [
+    144,
+    80
+   ],
+   "frames": {
+    "forest_normal": [
+     0,
+     0,
+     144,
+     80
+    ],
+    "forest_hard1": [
+     144,
+     0,
+     144,
+     80
+    ],
+    "forest_hard2": [
+     288,
+     0,
+     144,
+     80
+    ],
+    "forest_steel": [
+     432,
+     0,
+     144,
+     80
+    ],
+    "forest_special": [
+     576,
+     0,
+     144,
+     80
+    ],
+    "forest_ghost": [
+     720,
+     0,
+     144,
+     80
+    ],
+    "forest_chest": [
+     864,
+     0,
+     144,
+     80
+    ],
+    "forest_lock": [
+     1008,
+     0,
+     144,
+     80
+    ],
+    "desert_normal": [
+     0,
+     80,
+     144,
+     80
+    ],
+    "desert_hard1": [
+     144,
+     80,
+     144,
+     80
+    ],
+    "desert_hard2": [
+     288,
+     80,
+     144,
+     80
+    ],
+    "desert_steel": [
+     432,
+     80,
+     144,
+     80
+    ],
+    "desert_special": [
+     576,
+     80,
+     144,
+     80
+    ],
+    "desert_ghost": [
+     720,
+     80,
+     144,
+     80
+    ],
+    "desert_chest": [
+     864,
+     80,
+     144,
+     80
+    ],
+    "desert_lock": [
+     1008,
+     80,
+     144,
+     80
+    ],
+    "ice_normal": [
+     0,
+     160,
+     144,
+     80
+    ],
+    "ice_hard1": [
+     144,
+     160,
+     144,
+     80
+    ],
+    "ice_hard2": [
+     288,
+     160,
+     144,
+     80
+    ],
+    "ice_steel": [
+     432,
+     160,
+     144,
+     80
+    ],
+    "ice_special": [
+     576,
+     160,
+     144,
+     80
+    ],
+    "ice_ghost": [
+     720,
+     160,
+     144,
+     80
+    ],
+    "ice_chest": [
+     864,
+     160,
+     144,
+     80
+    ],
+    "ice_lock": [
+     1008,
+     160,
+     144,
+     80
+    ],
+    "lava_normal": [
+     0,
+     240,
+     144,
+     80
+    ],
+    "lava_hard1": [
+     144,
+     240,
+     144,
+     80
+    ],
+    "lava_hard2": [
+     288,
+     240,
+     144,
+     80
+    ],
+    "lava_steel": [
+     432,
+     240,
+     144,
+     80
+    ],
+    "lava_special": [
+     576,
+     240,
+     144,
+     80
+    ],
+    "lava_ghost": [
+     720,
+     240,
+     144,
+     80
+    ],
+    "lava_chest": [
+     864,
+     240,
+     144,
+     80
+    ],
+    "lava_lock": [
+     1008,
+     240,
+     144,
+     80
+    ],
+    "cyber_normal": [
+     0,
+     320,
+     144,
+     80
+    ],
+    "cyber_hard1": [
+     144,
+     320,
+     144,
+     80
+    ],
+    "cyber_hard2": [
+     288,
+     320,
+     144,
+     80
+    ],
+    "cyber_steel": [
+     432,
+     320,
+     144,
+     80
+    ],
+    "cyber_special": [
+     576,
+     320,
+     144,
+     80
+    ],
+    "cyber_ghost": [
+     720,
+     320,
+     144,
+     80
+    ],
+    "cyber_chest": [
+     864,
+     320,
+     144,
+     80
+    ],
+    "cyber_lock": [
+     1008,
+     320,
+     144,
+     80
+    ],
+    "void_normal": [
+     0,
+     400,
+     144,
+     80
+    ],
+    "void_hard1": [
+     144,
+     400,
+     144,
+     80
+    ],
+    "void_hard2": [
+     288,
+     400,
+     144,
+     80
+    ],
+    "void_steel": [
+     432,
+     400,
+     144,
+     80
+    ],
+    "void_special": [
+     576,
+     400,
+     144,
+     80
+    ],
+    "void_ghost": [
+     720,
+     400,
+     144,
+     80
+    ],
+    "void_chest": [
+     864,
+     400,
+     144,
+     80
+    ],
+    "void_lock": [
+     1008,
+     400,
+     144,
+     80
+    ]
+   }
+  },
+  "sheet_brick_break": {
+   "image": "spritesheets/sheet_brick_break.png",
+   "size": [
+    1152,
+    576
+   ],
+   "cell": [
+    144,
+    96
+   ],
+   "frames": {
+    "forest_break_0": [
+     0,
+     0,
+     144,
+     96
+    ],
+    "forest_break_1": [
+     144,
+     0,
+     144,
+     96
+    ],
+    "forest_break_2": [
+     288,
+     0,
+     144,
+     96
+    ],
+    "forest_break_3": [
+     432,
+     0,
+     144,
+     96
+    ],
+    "forest_break_4": [
+     576,
+     0,
+     144,
+     96
+    ],
+    "forest_break_5": [
+     720,
+     0,
+     144,
+     96
+    ],
+    "forest_break_6": [
+     864,
+     0,
+     144,
+     96
+    ],
+    "forest_break_7": [
+     1008,
+     0,
+     144,
+     96
+    ],
+    "desert_break_0": [
+     0,
+     96,
+     144,
+     96
+    ],
+    "desert_break_1": [
+     144,
+     96,
+     144,
+     96
+    ],
+    "desert_break_2": [
+     288,
+     96,
+     144,
+     96
+    ],
+    "desert_break_3": [
+     432,
+     96,
+     144,
+     96
+    ],
+    "desert_break_4": [
+     576,
+     96,
+     144,
+     96
+    ],
+    "desert_break_5": [
+     720,
+     96,
+     144,
+     96
+    ],
+    "desert_break_6": [
+     864,
+     96,
+     144,
+     96
+    ],
+    "desert_break_7": [
+     1008,
+     96,
+     144,
+     96
+    ],
+    "ice_break_0": [
+     0,
+     192,
+     144,
+     96
+    ],
+    "ice_break_1": [
+     144,
+     192,
+     144,
+     96
+    ],
+    "ice_break_2": [
+     288,
+     192,
+     144,
+     96
+    ],
+    "ice_break_3": [
+     432,
+     192,
+     144,
+     96
+    ],
+    "ice_break_4": [
+     576,
+     192,
+     144,
+     96
+    ],
+    "ice_break_5": [
+     720,
+     192,
+     144,
+     96
+    ],
+    "ice_break_6": [
+     864,
+     192,
+     144,
+     96
+    ],
+    "ice_break_7": [
+     1008,
+     192,
+     144,
+     96
+    ],
+    "lava_break_0": [
+     0,
+     288,
+     144,
+     96
+    ],
+    "lava_break_1": [
+     144,
+     288,
+     144,
+     96
+    ],
+    "lava_break_2": [
+     288,
+     288,
+     144,
+     96
+    ],
+    "lava_break_3": [
+     432,
+     288,
+     144,
+     96
+    ],
+    "lava_break_4": [
+     576,
+     288,
+     144,
+     96
+    ],
+    "lava_break_5": [
+     720,
+     288,
+     144,
+     96
+    ],
+    "lava_break_6": [
+     864,
+     288,
+     144,
+     96
+    ],
+    "lava_break_7": [
+     1008,
+     288,
+     144,
+     96
+    ],
+    "cyber_break_0": [
+     0,
+     384,
+     144,
+     96
+    ],
+    "cyber_break_1": [
+     144,
+     384,
+     144,
+     96
+    ],
+    "cyber_break_2": [
+     288,
+     384,
+     144,
+     96
+    ],
+    "cyber_break_3": [
+     432,
+     384,
+     144,
+     96
+    ],
+    "cyber_break_4": [
+     576,
+     384,
+     144,
+     96
+    ],
+    "cyber_break_5": [
+     720,
+     384,
+     144,
+     96
+    ],
+    "cyber_break_6": [
+     864,
+     384,
+     144,
+     96
+    ],
+    "cyber_break_7": [
+     1008,
+     384,
+     144,
+     96
+    ],
+    "void_break_0": [
+     0,
+     480,
+     144,
+     96
+    ],
+    "void_break_1": [
+     144,
+     480,
+     144,
+     96
+    ],
+    "void_break_2": [
+     288,
+     480,
+     144,
+     96
+    ],
+    "void_break_3": [
+     432,
+     480,
+     144,
+     96
+    ],
+    "void_break_4": [
+     576,
+     480,
+     144,
+     96
+    ],
+    "void_break_5": [
+     720,
+     480,
+     144,
+     96
+    ],
+    "void_break_6": [
+     864,
+     480,
+     144,
+     96
+    ],
+    "void_break_7": [
+     1008,
+     480,
+     144,
+     96
+    ]
+   }
+  },
+  "sheet_paddle": {
+   "image": "spritesheets/sheet_paddle.png",
+   "size": [
+    1152,
+    288
+   ],
+   "cell": [
+    288,
+    96
+   ],
+   "frames": {
+    "paddle_normal": [
+     0,
+     0,
+     288,
+     96
+    ],
+    "paddle_wide": [
+     288,
+     0,
+     288,
+     96
+    ],
+    "paddle_narrow": [
+     576,
+     0,
+     288,
+     96
+    ],
+    "paddle_laser": [
+     864,
+     0,
+     288,
+     96
+    ],
+    "paddle_magnet": [
+     0,
+     96,
+     288,
+     96
+    ],
+    "paddle_frozen": [
+     288,
+     96,
+     288,
+     96
+    ],
+    "paddle_stunned": [
+     576,
+     96,
+     288,
+     96
+    ],
+    "paddle_shield": [
+     864,
+     96,
+     288,
+     96
+    ],
+    "paddle_thrust_0": [
+     0,
+     192,
+     288,
+     96
+    ],
+    "paddle_thrust_1": [
+     288,
+     192,
+     288,
+     96
+    ],
+    "paddle_thrust_2": [
+     576,
+     192,
+     288,
+     96
+    ],
+    "paddle_thrust_3": [
+     864,
+     192,
+     288,
+     96
+    ]
+   }
+  },
+  "sheet_balls": {
+   "image": "spritesheets/sheet_balls.png",
+   "size": [
+    768,
+    192
+   ],
+   "cell": [
+    96,
+    96
+   ],
+   "frames": {
+    "ball_normal": [
+     0,
+     0,
+     96,
+     96
+    ],
+    "ball_mega": [
+     96,
+     0,
+     96,
+     96
+    ],
+    "ball_fire": [
+     192,
+     0,
+     96,
+     96
+    ],
+    "ball_bomb": [
+     288,
+     0,
+     96,
+     96
+    ],
+    "ball_electric": [
+     384,
+     0,
+     96,
+     96
+    ],
+    "ball_ice": [
+     480,
+     0,
+     96,
+     96
+    ],
+    "ball_ghost": [
+     576,
+     0,
+     96,
+     96
+    ],
+    "ball_meteor": [
+     672,
+     0,
+     96,
+     96
+    ],
+    "trail_normal": [
+     0,
+     96,
+     96,
+     96
+    ],
+    "trail_mega": [
+     96,
+     96,
+     96,
+     96
+    ],
+    "trail_fire": [
+     192,
+     96,
+     96,
+     96
+    ],
+    "trail_bomb": [
+     288,
+     96,
+     96,
+     96
+    ],
+    "trail_electric": [
+     384,
+     96,
+     96,
+     96
+    ],
+    "trail_ice": [
+     480,
+     96,
+     96,
+     96
+    ],
+    "trail_ghost": [
+     576,
+     96,
+     96,
+     96
+    ],
+    "trail_meteor": [
+     672,
+     96,
+     96,
+     96
+    ]
+   }
+  },
+  "sheet_boosters": {
+   "image": "spritesheets/sheet_boosters.png",
+   "size": [
+    560,
+    448
+   ],
+   "cell": [
+    112,
+    112
+   ],
+   "frames": {
+    "booster_big_paddle": [
+     0,
+     0,
+     112,
+     112
+    ],
+    "booster_multi_ball": [
+     112,
+     0,
+     112,
+     112
+    ],
+    "booster_mega_ball": [
+     224,
+     0,
+     112,
+     112
+    ],
+    "booster_fire_ball": [
+     336,
+     0,
+     112,
+     112
+    ],
+    "booster_laser": [
+     448,
+     0,
+     112,
+     112
+    ],
+    "booster_slow_ball": [
+     0,
+     112,
+     112,
+     112
+    ],
+    "booster_magnet": [
+     112,
+     112,
+     112,
+     112
+    ],
+    "booster_shield": [
+     224,
+     112,
+     112,
+     112
+    ],
+    "booster_extra_life": [
+     336,
+     112,
+     112,
+     112
+    ],
+    "booster_bomb_ball": [
+     448,
+     112,
+     112,
+     112
+    ],
+    "booster_chain_lightning": [
+     0,
+     224,
+     112,
+     112
+    ],
+    "booster_gold_rush": [
+     112,
+     224,
+     112,
+     112
+    ],
+    "booster_score_x2": [
+     224,
+     224,
+     112,
+     112
+    ],
+    "booster_time_freeze": [
+     336,
+     224,
+     112,
+     112
+    ],
+    "booster_bad_small_paddle": [
+     448,
+     224,
+     112,
+     112
+    ],
+    "booster_bad_fast_ball": [
+     0,
+     336,
+     112,
+     112
+    ],
+    "booster_bad_reverse": [
+     112,
+     336,
+     112,
+     112
+    ],
+    "booster_bad_heavy_paddle": [
+     224,
+     336,
+     112,
+     112
+    ],
+    "booster_bad_blind": [
+     336,
+     336,
+     112,
+     112
+    ],
+    "booster_bad_shrink_ball": [
+     448,
+     336,
+     112,
+     112
+    ]
+   }
+  },
+  "sheet_blockers": {
+   "image": "spritesheets/sheet_blockers.png",
+   "size": [
+    480,
+    480
+   ],
+   "cell": [
+    160,
+    160
+   ],
+   "frames": {
+    "blocker_steel_wall": [
+     0,
+     0,
+     160,
+     160
+    ],
+    "blocker_bumper": [
+     160,
+     0,
+     160,
+     160
+    ],
+    "blocker_black_hole": [
+     320,
+     0,
+     160,
+     160
+    ],
+    "blocker_turret": [
+     0,
+     160,
+     160,
+     160
+    ],
+    "blocker_asteroid": [
+     160,
+     160,
+     160,
+     160
+    ],
+    "blocker_fog": [
+     320,
+     160,
+     160,
+     160
+    ],
+    "blocker_wind": [
+     0,
+     320,
+     160,
+     160
+    ],
+    "blocker_gravity": [
+     160,
+     320,
+     160,
+     160
+    ],
+    "blocker_drone": [
+     320,
+     320,
+     160,
+     160
+    ]
+   }
+  },
+  "sheet_vfx": {
+   "image": "spritesheets/sheet_vfx.png",
+   "size": [
+    1024,
+    768
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": {
+    "vfx_spark_0": [
+     0,
+     0,
+     128,
+     128
+    ],
+    "vfx_spark_1": [
+     128,
+     0,
+     128,
+     128
+    ],
+    "vfx_spark_2": [
+     256,
+     0,
+     128,
+     128
+    ],
+    "vfx_spark_3": [
+     384,
+     0,
+     128,
+     128
+    ],
+    "vfx_spark_4": [
+     512,
+     0,
+     128,
+     128
+    ],
+    "vfx_spark_5": [
+     640,
+     0,
+     128,
+     128
+    ],
+    "vfx_spark_6": [
+     768,
+     0,
+     128,
+     128
+    ],
+    "vfx_spark_7": [
+     896,
+     0,
+     128,
+     128
+    ],
+    "vfx_ring_0": [
+     0,
+     128,
+     128,
+     128
+    ],
+    "vfx_ring_1": [
+     128,
+     128,
+     128,
+     128
+    ],
+    "vfx_ring_2": [
+     256,
+     128,
+     128,
+     128
+    ],
+    "vfx_ring_3": [
+     384,
+     128,
+     128,
+     128
+    ],
+    "vfx_ring_4": [
+     512,
+     128,
+     128,
+     128
+    ],
+    "vfx_ring_5": [
+     640,
+     128,
+     128,
+     128
+    ],
+    "vfx_ring_6": [
+     768,
+     128,
+     128,
+     128
+    ],
+    "vfx_ring_7": [
+     896,
+     128,
+     128,
+     128
+    ],
+    "vfx_explosion_0": [
+     0,
+     256,
+     128,
+     128
+    ],
+    "vfx_explosion_1": [
+     128,
+     256,
+     128,
+     128
+    ],
+    "vfx_explosion_2": [
+     256,
+     256,
+     128,
+     128
+    ],
+    "vfx_explosion_3": [
+     384,
+     256,
+     128,
+     128
+    ],
+    "vfx_explosion_4": [
+     512,
+     256,
+     128,
+     128
+    ],
+    "vfx_explosion_5": [
+     640,
+     256,
+     128,
+     128
+    ],
+    "vfx_explosion_6": [
+     768,
+     256,
+     128,
+     128
+    ],
+    "vfx_explosion_7": [
+     896,
+     256,
+     128,
+     128
+    ],
+    "vfx_ice_0": [
+     0,
+     384,
+     128,
+     128
+    ],
+    "vfx_ice_1": [
+     128,
+     384,
+     128,
+     128
+    ],
+    "vfx_ice_2": [
+     256,
+     384,
+     128,
+     128
+    ],
+    "vfx_ice_3": [
+     384,
+     384,
+     128,
+     128
+    ],
+    "vfx_ice_4": [
+     512,
+     384,
+     128,
+     128
+    ],
+    "vfx_ice_5": [
+     640,
+     384,
+     128,
+     128
+    ],
+    "vfx_ice_6": [
+     768,
+     384,
+     128,
+     128
+    ],
+    "vfx_ice_7": [
+     896,
+     384,
+     128,
+     128
+    ],
+    "vfx_electric_0": [
+     0,
+     512,
+     128,
+     128
+    ],
+    "vfx_electric_1": [
+     128,
+     512,
+     128,
+     128
+    ],
+    "vfx_electric_2": [
+     256,
+     512,
+     128,
+     128
+    ],
+    "vfx_electric_3": [
+     384,
+     512,
+     128,
+     128
+    ],
+    "vfx_electric_4": [
+     512,
+     512,
+     128,
+     128
+    ],
+    "vfx_electric_5": [
+     640,
+     512,
+     128,
+     128
+    ],
+    "vfx_electric_6": [
+     768,
+     512,
+     128,
+     128
+    ],
+    "vfx_electric_7": [
+     896,
+     512,
+     128,
+     128
+    ],
+    "vfx_star_0": [
+     0,
+     640,
+     128,
+     128
+    ],
+    "vfx_star_1": [
+     128,
+     640,
+     128,
+     128
+    ],
+    "vfx_star_2": [
+     256,
+     640,
+     128,
+     128
+    ],
+    "vfx_star_3": [
+     384,
+     640,
+     128,
+     128
+    ],
+    "vfx_star_4": [
+     512,
+     640,
+     128,
+     128
+    ],
+    "vfx_star_5": [
+     640,
+     640,
+     128,
+     128
+    ],
+    "vfx_star_6": [
+     768,
+     640,
+     128,
+     128
+    ],
+    "vfx_star_7": [
+     896,
+     640,
+     128,
+     128
+    ]
+   }
+  },
+  "sheet_ui_icons": {
+   "image": "spritesheets/sheet_ui_icons.png",
+   "size": [
+    672,
+    192
+   ],
+   "cell": [
+    96,
+    96
+   ],
+   "frames": {
+    "ui_heart": [
+     0,
+     0,
+     96,
+     96
+    ],
+    "ui_heart_empty": [
+     96,
+     0,
+     96,
+     96
+    ],
+    "ui_heart_lost": [
+     192,
+     0,
+     96,
+     96
+    ],
+    "ui_coin": [
+     288,
+     0,
+     96,
+     96
+    ],
+    "ui_star": [
+     384,
+     0,
+     96,
+     96
+    ],
+    "ui_star_empty": [
+     480,
+     0,
+     96,
+     96
+    ],
+    "ui_lock": [
+     576,
+     0,
+     96,
+     96
+    ],
+    "ui_play": [
+     0,
+     96,
+     96,
+     96
+    ],
+    "ui_pause": [
+     96,
+     96,
+     96,
+     96
+    ],
+    "ui_settings": [
+     192,
+     96,
+     96,
+     96
+    ],
+    "ui_shop": [
+     288,
+     96,
+     96,
+     96
+    ],
+    "ui_sound": [
+     384,
+     96,
+     96,
+     96
+    ],
+    "ui_trophy": [
+     480,
+     96,
+     96,
+     96
+    ]
+   }
+  },
+  "sheet_backgrounds": {
+   "image": "spritesheets/sheet_backgrounds.png",
+   "size": [
+    768,
+    768
+   ],
+   "cell": [
+    256,
+    384
+   ],
+   "frames": {
+    "bg_forest": [
+     0,
+     0,
+     256,
+     384
+    ],
+    "bg_desert": [
+     256,
+     0,
+     256,
+     384
+    ],
+    "bg_ice": [
+     512,
+     0,
+     256,
+     384
+    ],
+    "bg_lava": [
+     0,
+     384,
+     256,
+     384
+    ],
+    "bg_cyber": [
+     256,
+     384,
+     256,
+     384
+    ],
+    "bg_void": [
+     512,
+     384,
+     256,
+     384
+    ]
+   }
+  },
+  "sheet_characters": {
+   "image": "spritesheets/sheet_characters.png",
+   "size": [
+    1344,
+    384
+   ],
+   "cell": [
+    192,
+    192
+   ],
+   "frames": {
+    "pixel_idle": [
+     0,
+     0,
+     192,
+     192
+    ],
+    "pixel_happy": [
+     192,
+     0,
+     192,
+     192
+    ],
+    "pixel_sad": [
+     384,
+     0,
+     192,
+     192
+    ],
+    "pixel_shield": [
+     576,
+     0,
+     192,
+     192
+    ],
+    "orb_normal": [
+     768,
+     0,
+     192,
+     192
+    ],
+    "orb_happy": [
+     960,
+     0,
+     192,
+     192
+    ],
+    "orb_scared": [
+     1152,
+     0,
+     192,
+     192
+    ],
+    "orb_angry": [
+     0,
+     192,
+     192,
+     192
+    ],
+    "orb_sleepy": [
+     192,
+     192,
+     192,
+     192
+    ],
+    "orb_wink": [
+     384,
+     192,
+     192,
+     192
+    ],
+    "sage_idle": [
+     576,
+     192,
+     192,
+     192
+    ],
+    "sage_point": [
+     768,
+     192,
+     192,
+     192
+    ],
+    "ember_idle": [
+     960,
+     192,
+     192,
+     192
+    ],
+    "ember_hammer": [
+     1152,
+     192,
+     192,
+     192
+    ]
+   }
+  },
+  "sheet_bosses": {
+   "image": "spritesheets/sheet_bosses.png",
+   "size": [
+    2048,
+    1536
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": {
+    "treant_p1_idle": [
+     0,
+     0,
+     256,
+     256
+    ],
+    "treant_p1_attack": [
+     256,
+     0,
+     256,
+     256
+    ],
+    "treant_p2_idle": [
+     512,
+     0,
+     256,
+     256
+    ],
+    "treant_p2_attack": [
+     768,
+     0,
+     256,
+     256
+    ],
+    "treant_p3_idle": [
+     1024,
+     0,
+     256,
+     256
+    ],
+    "treant_p3_attack": [
+     1280,
+     0,
+     256,
+     256
+    ],
+    "treant_hurt": [
+     1536,
+     0,
+     256,
+     256
+    ],
+    "treant_weakpoint": [
+     1792,
+     0,
+     256,
+     256
+    ],
+    "pharaoh_p1_idle": [
+     0,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_p1_attack": [
+     256,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_p2_idle": [
+     512,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_p2_attack": [
+     768,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_p3_idle": [
+     1024,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_p3_attack": [
+     1280,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_hurt": [
+     1536,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_weakpoint": [
+     1792,
+     256,
+     256,
+     256
+    ],
+    "ice_queen_p1_idle": [
+     0,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_p1_attack": [
+     256,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_p2_idle": [
+     512,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_p2_attack": [
+     768,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_p3_idle": [
+     1024,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_p3_attack": [
+     1280,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_hurt": [
+     1536,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_weakpoint": [
+     1792,
+     512,
+     256,
+     256
+    ],
+    "magma_dragon_p1_idle": [
+     0,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_p1_attack": [
+     256,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_p2_idle": [
+     512,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_p2_attack": [
+     768,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_p3_idle": [
+     1024,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_p3_attack": [
+     1280,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_hurt": [
+     1536,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_weakpoint": [
+     1792,
+     768,
+     256,
+     256
+    ],
+    "ai_overseer_p1_idle": [
+     0,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_p1_attack": [
+     256,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_p2_idle": [
+     512,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_p2_attack": [
+     768,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_p3_idle": [
+     1024,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_p3_attack": [
+     1280,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_hurt": [
+     1536,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_weakpoint": [
+     1792,
+     1024,
+     256,
+     256
+    ],
+    "lord_fracture_p1_idle": [
+     0,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_p1_attack": [
+     256,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_p2_idle": [
+     512,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_p2_attack": [
+     768,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_p3_idle": [
+     1024,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_p3_attack": [
+     1280,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_hurt": [
+     1536,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_weakpoint": [
+     1792,
+     1280,
+     256,
+     256
+    ]
+   }
+  },
+  "sheet_boss_defeat": {
+   "image": "spritesheets/sheet_boss_defeat.png",
+   "size": [
+    2048,
+    1536
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": {
+    "treant_defeat_0": [
+     0,
+     0,
+     256,
+     256
+    ],
+    "treant_defeat_1": [
+     256,
+     0,
+     256,
+     256
+    ],
+    "treant_defeat_2": [
+     512,
+     0,
+     256,
+     256
+    ],
+    "treant_defeat_3": [
+     768,
+     0,
+     256,
+     256
+    ],
+    "treant_defeat_4": [
+     1024,
+     0,
+     256,
+     256
+    ],
+    "treant_defeat_5": [
+     1280,
+     0,
+     256,
+     256
+    ],
+    "treant_defeat_6": [
+     1536,
+     0,
+     256,
+     256
+    ],
+    "treant_defeat_7": [
+     1792,
+     0,
+     256,
+     256
+    ],
+    "pharaoh_defeat_0": [
+     0,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_defeat_1": [
+     256,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_defeat_2": [
+     512,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_defeat_3": [
+     768,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_defeat_4": [
+     1024,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_defeat_5": [
+     1280,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_defeat_6": [
+     1536,
+     256,
+     256,
+     256
+    ],
+    "pharaoh_defeat_7": [
+     1792,
+     256,
+     256,
+     256
+    ],
+    "ice_queen_defeat_0": [
+     0,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_defeat_1": [
+     256,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_defeat_2": [
+     512,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_defeat_3": [
+     768,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_defeat_4": [
+     1024,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_defeat_5": [
+     1280,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_defeat_6": [
+     1536,
+     512,
+     256,
+     256
+    ],
+    "ice_queen_defeat_7": [
+     1792,
+     512,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_0": [
+     0,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_1": [
+     256,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_2": [
+     512,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_3": [
+     768,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_4": [
+     1024,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_5": [
+     1280,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_6": [
+     1536,
+     768,
+     256,
+     256
+    ],
+    "magma_dragon_defeat_7": [
+     1792,
+     768,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_0": [
+     0,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_1": [
+     256,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_2": [
+     512,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_3": [
+     768,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_4": [
+     1024,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_5": [
+     1280,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_6": [
+     1536,
+     1024,
+     256,
+     256
+    ],
+    "ai_overseer_defeat_7": [
+     1792,
+     1024,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_0": [
+     0,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_1": [
+     256,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_2": [
+     512,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_3": [
+     768,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_4": [
+     1024,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_5": [
+     1280,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_6": [
+     1536,
+     1280,
+     256,
+     256
+    ],
+    "lord_fracture_defeat_7": [
+     1792,
+     1280,
+     256,
+     256
+    ]
+   }
+  },
+  "sheet_frames": {
+   "image": "spritesheets/sheet_frames.png",
+   "size": [
+    1600,
+    1680
+   ],
+   "cell": [
+    400,
+    560
+   ],
+   "frames": {
+    "frame_forest": [
+     0,
+     0,
+     400,
+     560
+    ],
+    "frame_desert": [
+     400,
+     0,
+     400,
+     560
+    ],
+    "frame_ice": [
+     800,
+     0,
+     400,
+     560
+    ],
+    "frame_lava": [
+     1200,
+     0,
+     400,
+     560
+    ],
+    "frame_cyber": [
+     0,
+     560,
+     400,
+     560
+    ],
+    "frame_void": [
+     400,
+     560,
+     400,
+     560
+    ],
+    "frame_retro_metal": [
+     800,
+     560,
+     400,
+     560
+    ],
+    "frame_neon_red": [
+     1200,
+     560,
+     400,
+     560
+    ],
+    "frame_wood": [
+     0,
+     1120,
+     400,
+     560
+    ],
+    "frame_candy": [
+     400,
+     1120,
+     400,
+     560
+    ],
+    "frame_royal_gold": [
+     800,
+     1120,
+     400,
+     560
+    ],
+    "frame_rainbow_crystal": [
+     1200,
+     1120,
+     400,
+     560
+    ]
+   }
+  },
+  "sheet_skin_paddles": {
+   "image": "spritesheets/sheet_skin_paddles.png",
+   "size": [
+    1152,
+    288
+   ],
+   "cell": [
+    288,
+    96
+   ],
+   "frames": {
+    "paddle_forest": [
+     0,
+     0,
+     288,
+     96
+    ],
+    "paddle_desert": [
+     288,
+     0,
+     288,
+     96
+    ],
+    "paddle_ice": [
+     576,
+     0,
+     288,
+     96
+    ],
+    "paddle_lava": [
+     864,
+     0,
+     288,
+     96
+    ],
+    "paddle_cyber": [
+     0,
+     96,
+     288,
+     96
+    ],
+    "paddle_void": [
+     288,
+     96,
+     288,
+     96
+    ],
+    "paddle_retro_arkanoid": [
+     576,
+     96,
+     288,
+     96
+    ],
+    "paddle_pixel_red": [
+     864,
+     96,
+     288,
+     96
+    ],
+    "paddle_candy": [
+     0,
+     192,
+     288,
+     96
+    ],
+    "paddle_wing": [
+     288,
+     192,
+     288,
+     96
+    ],
+    "paddle_pirate_ship": [
+     576,
+     192,
+     288,
+     96
+    ],
+    "paddle_rainbow": [
+     864,
+     192,
+     288,
+     96
+    ]
+   }
+  },
+  "sheet_skin_balls": {
+   "image": "spritesheets/sheet_skin_balls.png",
+   "size": [
+    576,
+    384
+   ],
+   "cell": [
+    96,
+    96
+   ],
+   "frames": {
+    "ball_crystal": [
+     0,
+     0,
+     96,
+     96
+    ],
+    "ball_planet": [
+     96,
+     0,
+     96,
+     96
+    ],
+    "ball_pearl": [
+     192,
+     0,
+     96,
+     96
+    ],
+    "ball_smiley": [
+     288,
+     0,
+     96,
+     96
+    ],
+    "ball_eyeball": [
+     384,
+     0,
+     96,
+     96
+    ],
+    "ball_disco": [
+     480,
+     0,
+     96,
+     96
+    ],
+    "ball_pumpkin": [
+     0,
+     96,
+     96,
+     96
+    ],
+    "ball_basketball": [
+     96,
+     96,
+     96,
+     96
+    ],
+    "ball_moon": [
+     192,
+     96,
+     96,
+     96
+    ],
+    "ball_ladybug": [
+     288,
+     96,
+     96,
+     96
+    ],
+    "ball_gem": [
+     384,
+     96,
+     96,
+     96
+    ],
+    "ball_star": [
+     480,
+     96,
+     96,
+     96
+    ],
+    "trail_crystal": [
+     0,
+     192,
+     96,
+     96
+    ],
+    "trail_planet": [
+     96,
+     192,
+     96,
+     96
+    ],
+    "trail_pearl": [
+     192,
+     192,
+     96,
+     96
+    ],
+    "trail_smiley": [
+     288,
+     192,
+     96,
+     96
+    ],
+    "trail_eyeball": [
+     384,
+     192,
+     96,
+     96
+    ],
+    "trail_disco": [
+     480,
+     192,
+     96,
+     96
+    ],
+    "trail_pumpkin": [
+     0,
+     288,
+     96,
+     96
+    ],
+    "trail_basketball": [
+     96,
+     288,
+     96,
+     96
+    ],
+    "trail_moon": [
+     192,
+     288,
+     96,
+     96
+    ],
+    "trail_ladybug": [
+     288,
+     288,
+     96,
+     96
+    ],
+    "trail_gem": [
+     384,
+     288,
+     96,
+     96
+    ],
+    "trail_star": [
+     480,
+     288,
+     96,
+     96
+    ]
+   }
+  },
+  "sheet_skin_bricks": {
+   "image": "spritesheets/sheet_skin_bricks.png",
+   "size": [
+    864,
+    240
+   ],
+   "cell": [
+    144,
+    80
+   ],
+   "frames": {
+    "brick_pixel_normal": [
+     0,
+     0,
+     144,
+     80
+    ],
+    "brick_candy_normal": [
+     144,
+     0,
+     144,
+     80
+    ],
+    "brick_stone_normal": [
+     288,
+     0,
+     144,
+     80
+    ],
+    "brick_glass_normal": [
+     432,
+     0,
+     144,
+     80
+    ],
+    "brick_wood_normal": [
+     576,
+     0,
+     144,
+     80
+    ],
+    "brick_jelly_normal": [
+     720,
+     0,
+     144,
+     80
+    ],
+    "brick_pixel_hard1": [
+     0,
+     80,
+     144,
+     80
+    ],
+    "brick_candy_hard1": [
+     144,
+     80,
+     144,
+     80
+    ],
+    "brick_stone_hard1": [
+     288,
+     80,
+     144,
+     80
+    ],
+    "brick_glass_hard1": [
+     432,
+     80,
+     144,
+     80
+    ],
+    "brick_wood_hard1": [
+     576,
+     80,
+     144,
+     80
+    ],
+    "brick_jelly_hard1": [
+     720,
+     80,
+     144,
+     80
+    ],
+    "brick_pixel_hard2": [
+     0,
+     160,
+     144,
+     80
+    ],
+    "brick_candy_hard2": [
+     144,
+     160,
+     144,
+     80
+    ],
+    "brick_stone_hard2": [
+     288,
+     160,
+     144,
+     80
+    ],
+    "brick_glass_hard2": [
+     432,
+     160,
+     144,
+     80
+    ],
+    "brick_wood_hard2": [
+     576,
+     160,
+     144,
+     80
+    ],
+    "brick_jelly_hard2": [
+     720,
+     160,
+     144,
+     80
+    ]
+   }
+  },
+  "sheet_skin_effects": {
+   "image": "spritesheets/sheet_skin_effects.png",
+   "size": [
+    768,
+    768
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": {
+    "fx_confetti_0": [
+     0,
+     0,
+     128,
+     128
+    ],
+    "fx_confetti_1": [
+     128,
+     0,
+     128,
+     128
+    ],
+    "fx_confetti_2": [
+     256,
+     0,
+     128,
+     128
+    ],
+    "fx_confetti_3": [
+     384,
+     0,
+     128,
+     128
+    ],
+    "fx_confetti_4": [
+     512,
+     0,
+     128,
+     128
+    ],
+    "fx_confetti_5": [
+     640,
+     0,
+     128,
+     128
+    ],
+    "fx_hearts_0": [
+     0,
+     128,
+     128,
+     128
+    ],
+    "fx_hearts_1": [
+     128,
+     128,
+     128,
+     128
+    ],
+    "fx_hearts_2": [
+     256,
+     128,
+     128,
+     128
+    ],
+    "fx_hearts_3": [
+     384,
+     128,
+     128,
+     128
+    ],
+    "fx_hearts_4": [
+     512,
+     128,
+     128,
+     128
+    ],
+    "fx_hearts_5": [
+     640,
+     128,
+     128,
+     128
+    ],
+    "fx_pixels_0": [
+     0,
+     256,
+     128,
+     128
+    ],
+    "fx_pixels_1": [
+     128,
+     256,
+     128,
+     128
+    ],
+    "fx_pixels_2": [
+     256,
+     256,
+     128,
+     128
+    ],
+    "fx_pixels_3": [
+     384,
+     256,
+     128,
+     128
+    ],
+    "fx_pixels_4": [
+     512,
+     256,
+     128,
+     128
+    ],
+    "fx_pixels_5": [
+     640,
+     256,
+     128,
+     128
+    ],
+    "fx_bubbles_0": [
+     0,
+     384,
+     128,
+     128
+    ],
+    "fx_bubbles_1": [
+     128,
+     384,
+     128,
+     128
+    ],
+    "fx_bubbles_2": [
+     256,
+     384,
+     128,
+     128
+    ],
+    "fx_bubbles_3": [
+     384,
+     384,
+     128,
+     128
+    ],
+    "fx_bubbles_4": [
+     512,
+     384,
+     128,
+     128
+    ],
+    "fx_bubbles_5": [
+     640,
+     384,
+     128,
+     128
+    ],
+    "fx_stars_0": [
+     0,
+     512,
+     128,
+     128
+    ],
+    "fx_stars_1": [
+     128,
+     512,
+     128,
+     128
+    ],
+    "fx_stars_2": [
+     256,
+     512,
+     128,
+     128
+    ],
+    "fx_stars_3": [
+     384,
+     512,
+     128,
+     128
+    ],
+    "fx_stars_4": [
+     512,
+     512,
+     128,
+     128
+    ],
+    "fx_stars_5": [
+     640,
+     512,
+     128,
+     128
+    ],
+    "fx_leaves_0": [
+     0,
+     640,
+     128,
+     128
+    ],
+    "fx_leaves_1": [
+     128,
+     640,
+     128,
+     128
+    ],
+    "fx_leaves_2": [
+     256,
+     640,
+     128,
+     128
+    ],
+    "fx_leaves_3": [
+     384,
+     640,
+     128,
+     128
+    ],
+    "fx_leaves_4": [
+     512,
+     640,
+     128,
+     128
+    ],
+    "fx_leaves_5": [
+     640,
+     640,
+     128,
+     128
+    ]
+   }
+  },
+  "sheet_skin_profile": {
+   "image": "spritesheets/sheet_skin_profile.png",
+   "size": [
+    768,
+    512
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": {
+    "avatar_orb": [
+     0,
+     0,
+     128,
+     128
+    ],
+    "avatar_pixel": [
+     128,
+     0,
+     128,
+     128
+    ],
+    "avatar_cat": [
+     256,
+     0,
+     128,
+     128
+    ],
+    "avatar_robot": [
+     384,
+     0,
+     128,
+     128
+    ],
+    "avatar_ghost": [
+     512,
+     0,
+     128,
+     128
+    ],
+    "avatar_fox": [
+     640,
+     0,
+     128,
+     128
+    ],
+    "avatar_dragon": [
+     0,
+     128,
+     128,
+     128
+    ],
+    "avatar_star": [
+     128,
+     128,
+     128,
+     128
+    ],
+    "avatar_flame": [
+     256,
+     128,
+     128,
+     128
+    ],
+    "avatar_snow": [
+     384,
+     128,
+     128,
+     128
+    ],
+    "avatar_leaf": [
+     512,
+     128,
+     128,
+     128
+    ],
+    "avatar_crown": [
+     640,
+     128,
+     128,
+     128
+    ],
+    "avatar_frame_gold": [
+     0,
+     256,
+     128,
+     128
+    ],
+    "avatar_frame_neon": [
+     128,
+     256,
+     128,
+     128
+    ],
+    "avatar_frame_wood": [
+     256,
+     256,
+     128,
+     128
+    ],
+    "avatar_frame_ice": [
+     384,
+     256,
+     128,
+     128
+    ],
+    "avatar_frame_flame": [
+     512,
+     256,
+     128,
+     128
+    ],
+    "avatar_frame_rainbow": [
+     640,
+     256,
+     128,
+     128
+    ],
+    "badge_collector": [
+     0,
+     384,
+     128,
+     128
+    ],
+    "badge_combo": [
+     128,
+     384,
+     128,
+     128
+    ],
+    "badge_slayer": [
+     256,
+     384,
+     128,
+     128
+    ],
+    "badge_perfect": [
+     384,
+     384,
+     128,
+     128
+    ],
+    "badge_streak": [
+     512,
+     384,
+     128,
+     128
+    ],
+    "badge_champion": [
+     640,
+     384,
+     128,
+     128
+    ]
+   }
+  },
+  "sheet_skin_backgrounds": {
+   "image": "spritesheets/sheet_skin_backgrounds.png",
+   "size": [
+    768,
+    768
+   ],
+   "cell": [
+    256,
+    384
+   ],
+   "frames": {
+    "bg_synthwave": [
+     0,
+     0,
+     256,
+     384
+    ],
+    "bg_candy": [
+     256,
+     0,
+     256,
+     384
+    ],
+    "bg_nebula": [
+     512,
+     0,
+     256,
+     384
+    ],
+    "bg_sunset_sea": [
+     0,
+     384,
+     256,
+     384
+    ],
+    "bg_sakura": [
+     256,
+     384,
+     256,
+     384
+    ],
+    "bg_paper": [
+     512,
+     384,
+     256,
+     384
+    ]
+   }
+  },
+  "sheet_gp_icons": {
+   "image": "spritesheets/sheet_gp_icons.png",
+   "size": [
+    768,
+    384
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": {
+    "skill_slow": [
+     0,
+     0,
+     128,
+     128
+    ],
+    "skill_beam": [
+     128,
+     0,
+     128,
+     128
+    ],
+    "skill_shield": [
+     256,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch": [
+     384,
+     0,
+     128,
+     128
+    ],
+    "overdrive": [
+     512,
+     0,
+     128,
+     128
+    ],
+    "combo_flame": [
+     640,
+     0,
+     128,
+     128
+    ],
+    "edit_brush": [
+     0,
+     128,
+     128,
+     128
+    ],
+    "edit_eraser": [
+     128,
+     128,
+     128,
+     128
+    ],
+    "edit_select": [
+     256,
+     128,
+     128,
+     128
+    ],
+    "edit_undo": [
+     384,
+     128,
+     128,
+     128
+    ],
+    "edit_redo": [
+     512,
+     128,
+     128,
+     128
+    ],
+    "edit_test": [
+     640,
+     128,
+     128,
+     128
+    ],
+    "edit_save": [
+     0,
+     256,
+     128,
+     128
+    ],
+    "edit_share": [
+     128,
+     256,
+     128,
+     128
+    ],
+    "hub_coin": [
+     256,
+     256,
+     128,
+     128
+    ],
+    "hub_portal": [
+     384,
+     256,
+     128,
+     128
+    ],
+    "hub_trophy": [
+     512,
+     256,
+     128,
+     128
+    ],
+    "hub_friend": [
+     640,
+     256,
+     128,
+     128
+    ]
+   }
+  },
+  "sheet_gp_vfx": {
+   "image": "spritesheets/sheet_gp_vfx.png",
+   "size": [
+    1024,
+    384
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": {
+    "perfect_catch_0": [
+     0,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch_1": [
+     128,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch_2": [
+     256,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch_3": [
+     384,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch_4": [
+     512,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch_5": [
+     640,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch_6": [
+     768,
+     0,
+     128,
+     128
+    ],
+    "perfect_catch_7": [
+     896,
+     0,
+     128,
+     128
+    ],
+    "overdrive_aura_0": [
+     0,
+     128,
+     128,
+     128
+    ],
+    "overdrive_aura_1": [
+     128,
+     128,
+     128,
+     128
+    ],
+    "overdrive_aura_2": [
+     256,
+     128,
+     128,
+     128
+    ],
+    "overdrive_aura_3": [
+     384,
+     128,
+     128,
+     128
+    ],
+    "overdrive_aura_4": [
+     512,
+     128,
+     128,
+     128
+    ],
+    "overdrive_aura_5": [
+     640,
+     128,
+     128,
+     128
+    ],
+    "overdrive_aura_6": [
+     768,
+     128,
+     128,
+     128
+    ],
+    "overdrive_aura_7": [
+     896,
+     128,
+     128,
+     128
+    ],
+    "time_slow_0": [
+     0,
+     256,
+     128,
+     128
+    ],
+    "time_slow_1": [
+     128,
+     256,
+     128,
+     128
+    ],
+    "time_slow_2": [
+     256,
+     256,
+     128,
+     128
+    ],
+    "time_slow_3": [
+     384,
+     256,
+     128,
+     128
+    ],
+    "time_slow_4": [
+     512,
+     256,
+     128,
+     128
+    ],
+    "time_slow_5": [
+     640,
+     256,
+     128,
+     128
+    ],
+    "time_slow_6": [
+     768,
+     256,
+     128,
+     128
+    ],
+    "time_slow_7": [
+     896,
+     256,
+     128,
+     128
+    ]
+   }
+  },
+  "sheet_gp_beam": {
+   "image": "spritesheets/sheet_gp_beam.png",
+   "size": [
+    384,
+    256
+   ],
+   "cell": [
+    96,
+    256
+   ],
+   "frames": {
+    "beam_0": [
+     0,
+     0,
+     96,
+     256
+    ],
+    "beam_1": [
+     96,
+     0,
+     96,
+     256
+    ],
+    "beam_2": [
+     192,
+     0,
+     96,
+     256
+    ],
+    "beam_3": [
+     288,
+     0,
+     96,
+     256
+    ]
+   }
+  },
+  "sheet_gp_wide": {
+   "image": "spritesheets/sheet_gp_wide.png",
+   "size": [
+    512,
+    576
+   ],
+   "cell": [
+    256,
+    64
+   ],
+   "frames": {
+    "shield_wall_0": [
+     0,
+     0,
+     256,
+     64
+    ],
+    "shield_wall_1": [
+     256,
+     0,
+     256,
+     64
+    ],
+    "shield_wall_2": [
+     0,
+     64,
+     256,
+     64
+    ],
+    "shield_wall_3": [
+     256,
+     64,
+     256,
+     64
+    ],
+    "energy_bar_0": [
+     0,
+     128,
+     256,
+     64
+    ],
+    "energy_bar_1": [
+     256,
+     128,
+     256,
+     64
+    ],
+    "energy_bar_2": [
+     0,
+     192,
+     256,
+     64
+    ],
+    "energy_bar_3": [
+     256,
+     192,
+     256,
+     64
+    ],
+    "energy_bar_4": [
+     0,
+     256,
+     256,
+     64
+    ],
+    "energy_bar_5": [
+     256,
+     256,
+     256,
+     64
+    ],
+    "overdrive_bar_0": [
+     0,
+     320,
+     256,
+     64
+    ],
+    "overdrive_bar_1": [
+     256,
+     320,
+     256,
+     64
+    ],
+    "overdrive_bar_2": [
+     0,
+     384,
+     256,
+     64
+    ],
+    "overdrive_bar_3": [
+     256,
+     384,
+     256,
+     64
+    ],
+    "text_perfect": [
+     0,
+     448,
+     256,
+     64
+    ],
+    "text_overdrive": [
+     256,
+     448,
+     256,
+     64
+    ],
+    "text_skill_ready": [
+     0,
+     512,
+     256,
+     64
+    ]
+   }
+  },
+  "sheet_orb_companion": {
+   "image": "spritesheets/sheet_orb_companion.png",
+   "size": [
+    600,
+    400
+   ],
+   "cell": [
+    200,
+    200
+   ],
+   "frames": {
+    "orb_lv1_base": [
+     0,
+     0,
+     200,
+     200
+    ],
+    "orb_lv2_headphones": [
+     200,
+     0,
+     200,
+     200
+    ],
+    "orb_lv3_wizard": [
+     400,
+     0,
+     200,
+     200
+    ],
+    "orb_lv4_crown": [
+     0,
+     200,
+     200,
+     200
+    ],
+    "orb_lv5_wings": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "orb_lv6_legend": [
+     400,
+     200,
+     200,
+     200
+    ]
+   }
+  },
+  "sheet_gp_special_bricks": {
+   "image": "spritesheets/sheet_gp_special_bricks.png",
+   "size": [
+    576,
+    160
+   ],
+   "cell": [
+    144,
+    80
+   ],
+   "frames": {
+    "chain_core_idle": [
+     0,
+     0,
+     144,
+     80
+    ],
+    "chain_core_active": [
+     144,
+     0,
+     144,
+     80
+    ],
+    "chain_link_h": [
+     288,
+     0,
+     144,
+     80
+    ],
+    "chain_link_v": [
+     432,
+     0,
+     144,
+     80
+    ],
+    "music_brick_0": [
+     0,
+     80,
+     144,
+     80
+    ],
+    "music_brick_1": [
+     144,
+     80,
+     144,
+     80
+    ],
+    "music_brick_2": [
+     288,
+     80,
+     144,
+     80
+    ],
+    "music_brick_3": [
+     432,
+     80,
+     144,
+     80
+    ]
+   }
+  },
+  "sheet_gp_picture_levels": {
+   "image": "spritesheets/sheet_gp_picture_levels.png",
+   "size": [
+    1024,
+    512
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": {
+    "picture_heart_bricks": [
+     0,
+     0,
+     256,
+     256
+    ],
+    "picture_heart_art": [
+     256,
+     0,
+     256,
+     256
+    ],
+    "picture_star_bricks": [
+     512,
+     0,
+     256,
+     256
+    ],
+    "picture_star_art": [
+     768,
+     0,
+     256,
+     256
+    ],
+    "picture_planet_bricks": [
+     0,
+     256,
+     256,
+     256
+    ],
+    "picture_planet_art": [
+     256,
+     256,
+     256,
+     256
+    ],
+    "picture_castle_bricks": [
+     512,
+     256,
+     256,
+     256
+    ],
+    "picture_castle_art": [
+     768,
+     256,
+     256,
+     256
+    ]
+   }
+  }
+ }
+}

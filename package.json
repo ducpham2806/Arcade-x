@@ -21,7 +21,8 @@
     "preview:blossom": "node scripts/blossom-preview.mjs",
     "preview:launcher": "npm run build && node scripts/launcher-preview.mjs",
     "preview:rainbow": "node scripts/rainbow-preview.mjs",
-    "test:rainbow": "playwright test tests/rainbow"
+    "test:rainbow": "playwright test tests/rainbow",
+    "test:readability": "node tests/readability/contrast.mjs && node tests/readability/dom-policy.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
@@ -44,6 +45,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "autoprefixer": "^10.4.21",
+    "linkedom": "^0.18.12",
     "tailwindcss": "^4.1.14",
     "typescript": "~5.8.2",
     "vite": "^6.2.3",

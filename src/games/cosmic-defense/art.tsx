@@ -2,6 +2,8 @@ import React from "react";
 import manifest from "./data/manifest.json" with { type: "json" };
 import { PLANETS } from "./content";
 import type { Simulation, CosmicSave } from "./types";
+declare global { interface Window { __COSMIC_ASSETS__?: Record<string, string> } }
+export const cosmicAsset = (path: string) => typeof window !== "undefined" && window.__COSMIC_ASSETS__?.[path] || ASSET_ROOT + path;
 export const ASSET_ROOT = "/games/cosmic-defense/";
 type Meta = {
   sheet: string;
@@ -33,7 +35,7 @@ export function Sprite({
       style={{
         width: m.w * scale,
         height: m.h * scale,
-        backgroundImage: `url(${ASSET_ROOT + m.sheet})`,
+        backgroundImage: `url(${cosmicAsset(m.sheet)})`,
         backgroundSize: `${manifest.sheets[m.sheet.split("/")[1].replace(".png", "")].size[0] * scale}px auto`,
         backgroundPosition: `-${m.x * scale}px -${m.y * scale}px`,
       }}
@@ -53,7 +55,7 @@ export async function loadArt(): Promise<Art> {
           const img = new Image();
           img.onload = () => resolve([path, img]);
           img.onerror = () => reject(new Error("Không tải được " + path));
-          img.src = ASSET_ROOT + path;
+          img.src = cosmicAsset(path);
         }),
     ),
   );
@@ -238,13 +240,28 @@ export function drawGame(
       drawSprite(ctx, art, "heal_ring", e.x, e.y, t, 1.5);
     if (e.kind === "commander") drawSprite(ctx, art, "buff_ring", e.x, e.y, t);
     if (e.tele > s.frame) {
-      ctx.strokeStyle = "#FF3D81";
-      ctx.setLineDash([2, 3]);
-      ctx.beginPath();
-      ctx.moveTo(e.x, e.y);
-      ctx.lineTo(e.aimX, e.aimY);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      const miniWarning = e.kind === "commander" && s.config.version === 3;
+      ctx.strokeStyle = miniWarning ? "#FFD23F" : "#FF3D81";
+      ctx.lineWidth = miniWarning ? 1.4 : 1;
+      ctx.setLineDash([3, 3]);
+      const pattern = (e.attackPattern ?? 0) % 3;
+      const originY = e.y + e.radius;
+      if (miniWarning && pattern === 2) {
+        ctx.beginPath(); ctx.arc(e.x, e.y, e.radius + 12, 0, Math.PI * 2); ctx.stroke();
+        const count = e.hp < e.maxHp * .45 ? 14 : 10;
+        for (let i = 0; i < count; i++) {
+          const angle = i * Math.PI * 2 / count + (e.attackPattern ?? 0) * .17;
+          ctx.beginPath(); ctx.moveTo(e.x + Math.cos(angle) * (e.radius + 3), e.y + Math.sin(angle) * (e.radius + 3));
+          ctx.lineTo(e.x + Math.cos(angle) * (e.radius + 22), e.y + Math.sin(angle) * (e.radius + 22)); ctx.stroke();
+        }
+      } else if (miniWarning && pattern === 0) {
+        ctx.fillStyle = "rgba(255,210,63,.12)";
+        ctx.beginPath(); ctx.moveTo(e.x, originY); ctx.arc(e.x, originY, 125, Math.PI / 2 - (e.hp < e.maxHp * .45 ? .75 : .5), Math.PI / 2 + (e.hp < e.maxHp * .45 ? .75 : .5)); ctx.closePath(); ctx.fill(); ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.moveTo(e.x, originY); ctx.lineTo(e.aimX, e.aimY); ctx.stroke();
+        ctx.beginPath(); ctx.arc(e.aimX, e.aimY, 7, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.setLineDash([]); ctx.lineWidth = 1;
       drawSprite(ctx, art, "lock_ring", e.x, e.y, t);
     }
     if (e.kind === "generator" || e.kind === "commander") {

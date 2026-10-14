@@ -13,7 +13,7 @@ export function effectTimeline(effects: Effect[], reduced = false) {
   return main.map(x => ({ ...x, delay: reduced ? 0 : x.effect.bonusIndex ? mainEnd + 250 + (x.effect.bonusIndex-1)*350 : x.delay, duration: reduced ? 180 : x.duration }));
 }
 export function effectDuration(run: Run, reduced = false) {
-  return Math.max(reduced ? 200 : 750, ...effectTimeline(run.effects, reduced).map(x=>x.delay+x.duration));
+  return Math.max(reduced ? 650 : 750, ...effectTimeline(run.effects, reduced).map(x=>x.delay+x.duration));
 }
 function EffectBatch({ run, reduced, onComplete }: { run: Run; reduced: boolean; onComplete?: () => void }) {
   const root = useRef<HTMLDivElement>(null), done = useRef(onComplete);
@@ -88,7 +88,7 @@ function EffectBatch({ run, reduced, onComplete }: { run: Run; reduced: boolean;
 const COLOR_NAMES=['red','yellow','purple','blue','green','orange'];
 function Sheet({name,x,y,size,delay,frames,cell,reduced}:{name:string;x:number;y:number;size:number;delay:number;frames:number;cell:number;reduced:boolean}) {
  return <svg data-sprite={name} x={x-size/2} y={y-size/2} width={size} height={size} viewBox={`0 0 ${cell} ${cell}`} overflow="hidden" className="bb-fx-sheet" style={{'--sheet-delay':`${delay}ms`,'--sheet-duration':`${reduced?150:frames/30*1000}ms`,'--sheet-steps':frames-1,'--sheet-end':`${-(frames-1)*cell}px`} as React.CSSProperties}>
-   <image href={asset(`png/anim/anim_fx_${name}.png`)} width={frames*cell} height={cell} className="bb-fx-strip"/>
+   <image href={asset(`png/anim/anim_fx_${name}.png`)} width={frames*cell} height={cell} className="bb-fx-strip" style={reduced?{transform:`translateX(${-Math.floor((frames-1)/2)*cell}px)`}:undefined}/>
  </svg>;
 }
 function Petals({x,y,color,delay,reduced,large=false}:{x:number;y:number;color:number;delay:number;reduced:boolean;large?:boolean}) {

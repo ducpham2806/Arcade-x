@@ -1,3 +1,4 @@
+import { readableCanvasText } from '../../accessibility/canvasText';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { GameComponentProps } from "../../types";
 import { Action, Level, Run, Save } from "./blossom/types";
@@ -755,7 +756,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     c.fillRect(0, 0, 960, 820);
     c.fillStyle = "#245331";
     c.font = "bold 38px sans-serif";
-    c.fillText(`${BLOSSOM_TITLE} · Khu vườn của tôi`, 34, 58, canvas.width - 68);
+    readableCanvasText(c, `${BLOSSOM_TITLE} · Khu vườn của tôi`, 34, 58, canvas.width - 68);
     for (let i = 0; i < 48; i++) {
       const x = 36 + (i % 8) * 110,
         y = 90 + Math.floor(i / 8) * 110;

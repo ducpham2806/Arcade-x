@@ -1,0 +1,242 @@
+{
+  "version": "0.1.0",
+  "validation": {
+    "engine_checks": 20,
+    "dom_checks": 9,
+    "visual_browser_qa": false
+  },
+  "content": {
+    "levels": 96,
+    "sprite_sheets": 26,
+    "frames": 547,
+    "skins": 84
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3886,
+      "sha256": "610e81dfa16afbf76a9d2ff7d44dee5cf76cb027c7bdb67b769a7e1a91f07b56"
+    },
+    {
+      "path": "build.py",
+      "bytes": 1131,
+      "sha256": "72be62e79652e5066e7765a5cecd9b7766b71b78de7664754b3336161540d500"
+    },
+    {
+      "path": "dist/app.js",
+      "bytes": 40110,
+      "sha256": "d69a68c99ac8d00776b0f6fa827e47cf55d2e2a0b97511703b553a0e98b7e68b"
+    },
+    {
+      "path": "dist/assets/atlas_all.json",
+      "bytes": 41796,
+      "sha256": "690bf8cec8828283d9026e6b77803afdacd92089d2c53d71f2b4a3c77c907dfe"
+    },
+    {
+      "path": "dist/assets/levels.json",
+      "bytes": 183666,
+      "sha256": "32945f85c3f8c6606c9ff7d6e53489279002cb11c3bc64134cdb542243b48ed0"
+    },
+    {
+      "path": "dist/assets/skins_catalog.json",
+      "bytes": 20536,
+      "sha256": "0d3adadd27b194fc4f87c3e77690f30176e270f801ae80f6bda38c7141717dda"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_backgrounds.png",
+      "bytes": 221234,
+      "sha256": "8ad0fc93c460421297ba39ea2605fbf4481ddf847e253388a52fe54fb89c6911"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_balls.png",
+      "bytes": 87679,
+      "sha256": "3158eeb81875319cf2f249e70a14dfc0b497acba3093d474e87dee412228659d"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_blockers.png",
+      "bytes": 129774,
+      "sha256": "1b2fb6b8c5888d9c2098cad70e735d854e6955fd7a49fdb1095aa7b2d4747ed1"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_boosters.png",
+      "bytes": 195478,
+      "sha256": "9b7e7c2c1f7dc4357943540b52a75ae9c0bc457e2260e9a5f5dd89d6ea5c34ce"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_boss_defeat.png",
+      "bytes": 3543960,
+      "sha256": "04f2b4166eff8678d1089f4ebd9357b13105338f6a8f35394e92746f9460e5cb"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_bosses.png",
+      "bytes": 1224749,
+      "sha256": "12b143e533637b0080b5aa5b9f1841be372511295dd6d30942932d6d3a98e835"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_brick_break.png",
+      "bytes": 597048,
+      "sha256": "a5fe02279b3eb532a0ca326f4ae5da5f01dfbffe773fa3246f0cd75245fcf358"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_bricks.png",
+      "bytes": 275427,
+      "sha256": "927d0fdaa3495fecb405ec4e4f9d2fb7a43ebe580070ca4cf61ab4c6edd440d6"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_characters.png",
+      "bytes": 195298,
+      "sha256": "0797815bf80141fefc5ec87f0b070c0bdd688990b7b4172fa5892356d5346426"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_frames.png",
+      "bytes": 412464,
+      "sha256": "9db3da9ec19d14063e8aeb4c8d69c607f8b94c249ed3b88fcb9f62957d340452"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_gp_beam.png",
+      "bytes": 48944,
+      "sha256": "3dc8301be63c3dc549f4d347b9f787f8e5b59eca287205beae1a5a279579374d"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_gp_icons.png",
+      "bytes": 375625,
+      "sha256": "000bb677ea42f05f0c63edf70d21bfe6275eddb503b45d7c9f28fbb9df00b8fd"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_gp_picture_levels.png",
+      "bytes": 203448,
+      "sha256": "e610861c743329ca8c1d2c4374f597229e6c666e396c34d93dda66ae381ec048"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_gp_special_bricks.png",
+      "bytes": 43789,
+      "sha256": "5c9aa4e72068c9fa4aa437488255e0c2fb82a7e8dd5ad7cd1cb66746ad820f70"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_gp_vfx.png",
+      "bytes": 289164,
+      "sha256": "d7be8f1a7dae0d634ff619b65567f4b3fa5c003152027ef8b6774cfd16d5e0fb"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_gp_wide.png",
+      "bytes": 144833,
+      "sha256": "3d1949fbeb9528a7cf573625f29dd6705e2446d95acd387b94ef2e388a3ab2be"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_orb_companion.png",
+      "bytes": 121586,
+      "sha256": "cd1ffd81fd30b520e2023e3806d687cfbec784262875c8206de9f9f9a0e5a351"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_paddle.png",
+      "bytes": 154026,
+      "sha256": "918558e1b4c842a387bd5c41df628076a6c44412a5e257252ec1f3d046403e7d"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_skin_backgrounds.png",
+      "bytes": 219830,
+      "sha256": "cddc52168903156c497ed273ba9725af29609c97eb118dc9828de60f467587ef"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_skin_balls.png",
+      "bytes": 111081,
+      "sha256": "caa8d6cbe8bfbddf8471530134472f488ce14ecd0b0d016070c6cf0989c610a7"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_skin_bricks.png",
+      "bytes": 183591,
+      "sha256": "62fe5f68ef8c3f078e5209b940678a6df9f392665da3c6d742e489fe1b602c63"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_skin_effects.png",
+      "bytes": 127434,
+      "sha256": "fb628e29468fda68765e899b87997609d25d5123ca92d572a79c48a60f01e191"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_skin_paddles.png",
+      "bytes": 148930,
+      "sha256": "82a20dd2c9102022c476d84832c9dcc0149e3e4f119d3a4942254dd0c895ad15"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_skin_profile.png",
+      "bytes": 383434,
+      "sha256": "61a43abb4f879654178c4a876fc8f137a7ee1a3ee79bcef05a81d6b61e327d11"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_ui_icons.png",
+      "bytes": 101823,
+      "sha256": "aac9e98b5bb0159ba28d7f76365dead11d74f55c4ad0103e763a21a85021f529"
+    },
+    {
+      "path": "dist/assets/spritesheets/sheet_vfx.png",
+      "bytes": 330088,
+      "sha256": "6736618e367da7cdbc6e24b521d3958927396a294fb63a8d7d6b12c3f12a6d71"
+    },
+    {
+      "path": "dist/contrast.js",
+      "bytes": 7526,
+      "sha256": "ade0b345847825499868c98f9de33855d41a20e82da20b933ef8bdf752521ff6"
+    },
+    {
+      "path": "dist/data.js",
+      "bytes": 156917,
+      "sha256": "2ff1d38b0bf69c7647c0e1414e3260f077473ead3d9d257c7551ff1eafb05acd"
+    },
+    {
+      "path": "dist/engine.js",
+      "bytes": 19194,
+      "sha256": "e33ad056a508cd67d3bfc2baa07e2ac2432756bf343739cd32fa824579ac00ed"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 1349,
+      "sha256": "19be98d7241987effcf3f9e228aa955ca81ca35c48d0380b828c5a51805440f6"
+    },
+    {
+      "path": "dist/style.css",
+      "bytes": 14012,
+      "sha256": "6a3b44ec4fb00e28a9267196c06a731ec719f3ab693f80c771f6f3221705f58d"
+    },
+    {
+      "path": "docs/ART-BIBLE.md",
+      "bytes": 14023,
+      "sha256": "98f7c0cfbe764a4e3fb413451d2e54654e05c9f5a4f0e715d7159aed4940b752"
+    },
+    {
+      "path": "docs/DEV_BRIEF.md",
+      "bytes": 9380,
+      "sha256": "e60adfa6f14c2cbc480f0705b2124aaba9b5e0846bd94b240e8bd8b5fdb8d4fd"
+    },
+    {
+      "path": "docs/READABILITY-AUDIT.md",
+      "bytes": 559,
+      "sha256": "387b350d50bb9a711414964991c38d0de7b29dcde4c53c624154749f11f24791"
+    },
+    {
+      "path": "docs/VERIFICATION.md",
+      "bytes": 982,
+      "sha256": "35392bd28cf2365462d631c0fe14d76ce7e46af2936d88efbe644ce8e1cf0ab5"
+    },
+    {
+      "path": "package.json",
+      "bytes": 363,
+      "sha256": "0cac2d593945032603a7aecf568697e42e8a069bee33869b725e9e4bae369fdd"
+    },
+    {
+      "path": "tests/engine.cjs",
+      "bytes": 6334,
+      "sha256": "cb116b3e303e8381c745974397f422e344fc009c951e8afd5c971bf439224530"
+    },
+    {
+      "path": "tests/ui.cjs",
+      "bytes": 5162,
+      "sha256": "4cfbd7b9664eef2827e074b72c02b64226adb8f7895d5d9c6f064669c0dff3dd"
+    }
+  ],
+  "readability_validation": {
+    "contrast_regressions": 8,
+    "dom_policy_checks": 5,
+    "visual_browser_qa": false,
+    "production_build": false
+  }
+}

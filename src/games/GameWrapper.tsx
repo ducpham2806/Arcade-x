@@ -84,7 +84,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
   const [showPreGameLoading, setShowPreGameLoading] = useState<boolean>(() => {
-    if (['rainbow-blocks','hex-match'].includes(gameMeta.id)) return false; // Own interactive tutorial and mode menu.
+    if (['rainbow-blocks','hex-match','boom-buddies'].includes(gameMeta.id)) return false; // Own interactive tutorial and mode menu.
     try {
       const skipped = localStorage.getItem('arcadex_skip_pregame_loading');
       return skipped !== 'true' && localStorage.getItem(`launcher_guide_seen_${gameMeta.id}`) !== 'true';
@@ -515,6 +515,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   const handleRestart = useCallback(() => {
     if (gameId === 'hex-match') { window.dispatchEvent(new Event('blossom:restart')); return; }
+    if (gameId === 'boom-buddies') { window.dispatchEvent(new Event('boom:restart')); return; }
     if (gameId === 'rainbow-blocks') { window.dispatchEvent(new Event('rainbow:restart')); return; }
     endedRef.current=false;
     recordPlay(gameId);
@@ -684,7 +685,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
-          style={['hex-match','rainbow-blocks'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
+          style={['hex-match','rainbow-blocks','boom-buddies'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
         >
           <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
           <GameLoadBoundary onExit={onExit}>

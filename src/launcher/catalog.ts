@@ -16,6 +16,8 @@ export function parseCatalog(raw: any): Catalog | null {
       category:['Arcade','Puzzle','Action','Reflex','Multiplayer'].includes(row.category)?row.category:base.category,
       availability:row.status,accessModel:row.access_model,supportsOffline:row.supports_offline===true,featured:row.featured===true,sortOrder:Number.isFinite(row.sort_order)?row.sort_order:100}];
   }).sort((a:CatalogGame,b:CatalogGame)=>a.sortOrder-b.sortOrder || a.id.localeCompare(b.id));
+  // Keep the local reviewed prototype visible in development without changing server catalog.
+  if(import.meta.env.DEV && !seen.has('boom-buddies')) games.push({...GAME_REGISTRY['boom-buddies'],availability:'published',accessModel:'free',supportsOffline:true,featured:false,sortOrder:999});
   const support=raw.support;
   return {schemaVersion:1,games,commerceEnabled:raw.commerceEnabled===true,support:support?.enabled===true && ['bankName','account','beneficiary'].every(key=>typeof support[key]==='string' && support[key].length>0) ? {enabled:true,bankName:support.bankName,account:support.account,beneficiary:support.beneficiary,message:typeof support.message==='string'?support.message:''} : {enabled:false}};
 }

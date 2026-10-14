@@ -61,7 +61,7 @@ export function emptySave(): CosmicSave {
 export function validConfig(c: RunConfig) {
   return (
     !!c &&
-    c.version === 2 &&
+    [2, 3].includes(c.version) &&
     Number.isInteger(c.level) &&
     c.level >= 1 &&
     c.level <= 100 &&

@@ -1,3 +1,4 @@
+import { readableCanvasText } from '../../accessibility/canvasText';
 import { FruitDef, FruitKind, BossId } from './types';
 
 export const FRUIT_DICTIONARY: Record<FruitKind, FruitDef> = {
@@ -495,7 +496,7 @@ export function drawWholeFruit(ctx: CanvasRenderingContext2D, kind: FruitKind, r
       ctx.font = `${r * 0.9}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('⭐', 0, 0);
+      readableCanvasText(ctx, '⭐', 0, 0);
       break;
     }
 
@@ -518,7 +519,7 @@ export function drawWholeFruit(ctx: CanvasRenderingContext2D, kind: FruitKind, r
       ctx.font = `${r * 0.85}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('❄️', 0, 0);
+      readableCanvasText(ctx, '❄️', 0, 0);
       break;
     }
 
@@ -541,7 +542,7 @@ export function drawWholeFruit(ctx: CanvasRenderingContext2D, kind: FruitKind, r
       ctx.font = `${r * 0.85}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('⚡', 0, 0);
+      readableCanvasText(ctx, '⚡', 0, 0);
       break;
     }
   }
@@ -801,7 +802,7 @@ export function drawCyberBomb(ctx: CanvasRenderingContext2D, r: number, timeTick
   ctx.font = `bold ${Math.round(r * 0.95)}px sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('☠️', 0, 1);
+  readableCanvasText(ctx, '☠️', 0, 1);
 
   // 6. "TRÁNH!" Danger Pill below
   ctx.shadowBlur = 0;
@@ -814,7 +815,7 @@ export function drawCyberBomb(ctx: CanvasRenderingContext2D, r: number, timeTick
   ctx.font = `black 9px sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('BOM TRÁNH', 0, r * 0.78);
+  readableCanvasText(ctx, 'BOM TRÁNH', 0, r * 0.78);
 
   ctx.restore();
 }
@@ -1056,7 +1057,7 @@ export function drawCyberBoss(
   ctx.font = 'bold 9px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillText(`${hp}/${maxHp} HP`, 0, barY + barHeight + 2);
+  readableCanvasText(ctx, `${hp}/${maxHp} HP`, 0, barY + barHeight + 2);
 
   ctx.restore();
 }

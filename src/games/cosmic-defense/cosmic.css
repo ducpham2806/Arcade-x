@@ -46,7 +46,7 @@
 }
 .cd-root button:disabled,
 .cd-dialog button:disabled {
-  opacity: 0.5;
+  opacity:1;
   cursor: default;
 }
 .cd-root .cd-primary,
@@ -344,7 +344,7 @@
 }
 .cd-game .cd-slot:disabled {
   border-color: #6b7fa0;
-  opacity: 0.65;
+  opacity:1;
 }
 .cd-message {
   position: absolute;
@@ -544,3 +544,7 @@
   }
 }
 
+
+.cd-root button:disabled,.cd-dialog:not(.platform-ui *) button:disabled{opacity:1;color:#b8cce1;background:#17273c;border-color:#5f7793}
+.cd-game .cd-slot:disabled{color:#b8cce1;opacity:1;background:#17273c}
+.cd-root .cd-primary:hover,.cd-dialog .cd-primary:hover{color:#081c29;background:#7af4ff}

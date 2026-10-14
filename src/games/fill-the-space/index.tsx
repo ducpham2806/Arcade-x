@@ -1018,7 +1018,7 @@ export const FillTheSpaceGame: React.FC<GameComponentProps> = ({
               {gameMode === 'classic' && (
                 <span
                   className={`text-[9px] px-1 py-0.2 rounded-full font-black ${
-                    undosRemaining > 0 ? 'bg-amber-950/70 text-amber-200' : 'bg-stone-900 text-stone-500'
+                    undosRemaining > 0 ? 'bg-amber-950/70 text-amber-200' : 'bg-stone-900 text-stone-300'
                   }`}
                 >
                   {undosRemaining}/3

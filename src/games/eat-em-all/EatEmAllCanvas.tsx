@@ -1,3 +1,4 @@
+import { readableCanvasText } from '../../accessibility/canvasText';
 import React, { useRef, useEffect, useCallback } from 'react';
 import {
   ElementMode,
@@ -920,7 +921,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.1}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🔥', 0, 0);
+            readableCanvasText(ctx, '🔥', 0, 0);
             break;
           }
 
@@ -931,7 +932,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.6}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('⭐', 0, 0);
+            readableCanvasText(ctx, '⭐', 0, 0);
             ctx.shadowBlur = 0;
             break;
           }
@@ -943,7 +944,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.5}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('💎', 0, 0);
+            readableCanvasText(ctx, '💎', 0, 0);
             ctx.shadowBlur = 0;
             break;
           }
@@ -955,7 +956,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.5}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('❤️', 0, 0);
+            readableCanvasText(ctx, '❤️', 0, 0);
             ctx.shadowBlur = 0;
             break;
           }
@@ -986,7 +987,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.1}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('💣', 0, 1);
+            readableCanvasText(ctx, '💣', 0, 1);
             break;
           }
 
@@ -996,7 +997,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.shadowBlur = 15;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('☠️', 0, 0);
+            readableCanvasText(ctx, '☠️', 0, 0);
             ctx.shadowBlur = 0;
             break;
           }
@@ -1007,7 +1008,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.shadowBlur = 18;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('⚡', 0, 0);
+            readableCanvasText(ctx, '⚡', 0, 0);
             ctx.shadowBlur = 0;
             break;
           }
@@ -1033,7 +1034,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.25}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🛡️', 0, 0);
+            readableCanvasText(ctx, '🛡️', 0, 0);
             break;
           }
 
@@ -1057,7 +1058,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.25}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🧲', 0, 0);
+            readableCanvasText(ctx, '🧲', 0, 0);
             break;
           }
 
@@ -1081,7 +1082,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.3}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('⚡', 0, 0);
+            readableCanvasText(ctx, '⚡', 0, 0);
             break;
           }
 
@@ -1105,7 +1106,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             ctx.font = `${r * 1.25}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('❄️', 0, 0);
+            readableCanvasText(ctx, '❄️', 0, 0);
             break;
           }
         }
@@ -1196,7 +1197,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
       ctx.font = '600 10px "Plus Jakarta Sans", sans-serif';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.textAlign = 'center';
-      ctx.fillText('◄  CHẠM & KÉO TẠI ĐÂY ĐỂ DI CHUYỂN  ►', width / 2, touchLaneY + 16);
+      readableCanvasText(ctx, '◄  CHẠM & KÉO TẠI ĐÂY ĐỂ DI CHUYỂN  ►', width / 2, touchLaneY + 16);
 
       // Interactive thumb tracking glow dot when touching
       if (p.isTouching) {
@@ -1370,11 +1371,11 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       if (furyActive) {
-        ctx.fillText('⚡', 0, -r - 12);
+        readableCanvasText(ctx, '⚡', 0, -r - 12);
       } else if (playerMode === 'ice') {
-        ctx.fillText('❄️', 0, -r - 12);
+        readableCanvasText(ctx, '❄️', 0, -r - 12);
       } else {
-        ctx.fillText('🔥', 0, -r - 12);
+        readableCanvasText(ctx, '🔥', 0, -r - 12);
       }
 
       // Skin Headpieces & Decorations
@@ -1487,7 +1488,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
         ctx.textAlign = 'center';
         ctx.shadowColor = '#000000';
         ctx.shadowBlur = 6;
-        ctx.fillText(ft.text, ft.x, ft.y);
+        readableCanvasText(ctx, ft.text, ft.x, ft.y);
         ctx.restore();
       }
 
@@ -1521,13 +1522,13 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
         ctx.textBaseline = 'middle';
         ctx.shadowColor = tier.color;
         ctx.shadowBlur = 10;
-        ctx.fillText(`COMBO x${combo}`, 0, -4);
+        readableCanvasText(ctx, `COMBO x${combo}`, 0, -4);
         ctx.shadowBlur = 0;
 
         // Multiplier & Tier icon tag
         ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
         ctx.fillStyle = tier.color;
-        ctx.fillText(`${tier.icon} ${tier.name} (x${comboMultiplier})`, 0, 12);
+        readableCanvasText(ctx, `${tier.icon} ${tier.name} (x${comboMultiplier})`, 0, 12);
 
         // Combo decay bar
         const fillW = Math.max(0, barWidth * comboDecayRatio);
@@ -1565,11 +1566,11 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
         ctx.textAlign = 'center';
         ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
         ctx.fillStyle = theme.accentColor;
-        ctx.fillText(`${banner.icon} ${banner.title.toUpperCase()}`, 0, -5);
+        readableCanvasText(ctx, `${banner.icon} ${banner.title.toUpperCase()}`, 0, -5);
 
         ctx.font = '11px "Plus Jakarta Sans", sans-serif';
         ctx.fillStyle = '#cbd5e1';
-        ctx.fillText(banner.subtitle, 0, 12);
+        readableCanvasText(ctx, banner.subtitle, 0, 12);
         ctx.restore();
       }
 
@@ -1587,7 +1588,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
         ctx.textAlign = 'center';
         ctx.shadowColor = '#ea580c';
         ctx.shadowBlur = 15;
-        ctx.fillText('🔥 FURY x10 ACTIVATED! NUỐT TẤT CẢ! 🔥', width / 2, height - 12);
+        readableCanvasText(ctx, '🔥 FURY x10 ACTIVATED! NUỐT TẤT CẢ! 🔥', width / 2, height - 12);
         ctx.restore();
       }
 

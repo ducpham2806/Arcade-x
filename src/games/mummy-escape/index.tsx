@@ -879,7 +879,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               className={`w-full py-2.5 px-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-between border shadow-lg transition-all cursor-pointer ${
                 history.length > 0 && !isVictory && revertCharges > 0
                   ? 'bg-gradient-to-b from-[#8f6826] to-[#593d11] hover:from-[#a77a2f] hover:to-[#6d4b17] text-yellow-200 border-[#d4af37] active:scale-[0.98]'
-                  : 'bg-stone-900 text-stone-600 border-stone-800 cursor-not-allowed opacity-60'
+                  : 'bg-stone-900 text-stone-300 border-stone-800 cursor-not-allowed opacity-60'
               }`}
             >
               <div className="flex items-center gap-1.5">
@@ -963,14 +963,14 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               disabled={isVictory || isCaught || isPaused || hintCooldown > 0}
               className={`w-full py-2.5 px-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-between transition-all cursor-pointer shadow-md border ${
                 hintCooldown > 0
-                  ? 'bg-stone-900/90 text-stone-500 border-stone-800 cursor-not-allowed'
+                  ? 'bg-stone-900/90 text-stone-300 border-stone-800 cursor-not-allowed'
                   : 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-stone-950 border-yellow-300 shadow-[0_0_15px_rgba(250,204,21,0.4)] active:scale-[0.98]'
               }`}
             >
               <div className="flex items-center gap-2">
                 <div
                   className={`p-1 rounded-lg ${
-                    hintCooldown > 0 ? 'bg-stone-800 text-stone-600' : 'bg-black/20 text-stone-950'
+                    hintCooldown > 0 ? 'bg-stone-800 text-stone-300' : 'bg-black/20 text-stone-950'
                   }`}
                 >
                   <Lightbulb className={`w-4 h-4 ${hintCooldown === 0 ? 'animate-bounce' : ''}`} />
@@ -1184,7 +1184,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                   className={`text-[9px] font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border transition-all ${
                     hintCooldown === 0 && !isVictory && !isCaught
                       ? 'bg-gradient-to-r from-yellow-600 to-amber-600 text-stone-950 font-black border-yellow-300 shadow cursor-pointer active:scale-95'
-                      : 'bg-stone-900 text-stone-500 border-stone-800 cursor-not-allowed'
+                      : 'bg-stone-900 text-stone-300 border-stone-800 cursor-not-allowed'
                   }`}
                 >
                   <Lightbulb className="w-2.5 h-2.5" />
@@ -1197,7 +1197,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                   className={`text-[9px] font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border ${
                     revertCharges > 0 && history.length > 0
                       ? 'bg-amber-950 text-amber-300 border-amber-500/40 cursor-pointer'
-                      : 'bg-stone-900 text-stone-600 border-stone-800 cursor-not-allowed'
+                      : 'bg-stone-900 text-stone-300 border-stone-800 cursor-not-allowed'
                   }`}
                 >
                   <Undo2 className="w-2.5 h-2.5" />
@@ -1622,7 +1622,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                         ? 'bg-amber-600/30 border-yellow-400 ring-2 ring-yellow-400 shadow-lg shadow-amber-500/30'
                         : isUnlocked
                         ? 'bg-[#281b0f] hover:bg-[#3b2817] border-[#7d5626] text-white'
-                        : 'bg-black/40 border-white/5 text-stone-600 cursor-not-allowed opacity-50'
+                        : 'bg-black/40 border-white/5 text-stone-300 cursor-not-allowed opacity-50'
                     }`}
                   >
                     <span className="text-sm font-black font-mono">#{idx + 1}</span>
@@ -1639,7 +1639,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                             className={`w-2.5 h-2.5 ${
                               s <= starsEarned
                                 ? 'text-yellow-400 fill-yellow-400'
-                                : 'text-stone-600'
+                                : 'text-stone-300'
                             }`}
                           />
                         ))}

@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { BLOSSOM_TITLE } from './hex-match/blossom/branding';
+const BoomBuddiesGame = lazy(() => import('./boom-buddies'));
 const RainbowBlocksGame = lazy(() => import('./rainbow-blocks'));
 import { GameMetadata } from '../types';
 const NeonRunnerGame = lazy(() => import('./neon-runner').then(module => ({ default: module.NeonRunnerGame })));
@@ -42,6 +43,13 @@ const WordCrossGame = lazy(() => import('./word-cross').then(module => ({ defaul
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
+  'boom-buddies': {
+    id:'boom-buddies',title:'Boom Buddies',shortDesc:'Đặt bom, né lửa · Bản thử điều khiển mượt',
+    description:'Bản thử offline: di chuyển liên tục, joystick giữ–kéo và bom nổ liền mạch. Tiến trình lưu trên thiết bị, chưa đồng bộ tài khoản hoặc bảng xếp hạng server.',
+    category:'Arcade',difficulty:'Trung Bình',icon:'💣',bannerGradient:'from-orange-700 via-amber-800 to-green-900',themeColor:'#d8732e',
+    tags:['Bản thử','Đặt bom','Joystick','Offline'],controls:[{key:'WASD / Mũi tên',action:'Di chuyển liên tục',touchInstruction:'Giữ và kéo joystick'},{key:'Space',action:'Đặt bom',touchInstruction:'Chạm nút bom khi đang di chuyển'},{key:'E',action:'Kỹ năng'},{key:'Escape',action:'Tạm dừng'}],
+    achievements:[],dropRates:{baseChestDropChance:0,scoreThresholdForDrop:Number.MAX_SAFE_INTEGER,chestWeights:[]},component:BoomBuddiesGame,
+  },
   'rainbow-blocks': {
     id:'rainbow-blocks',title:'Rainbow Blocks',shortDesc:'Xếp sắc màu, xoá hàng và bật cầu vồng',
     description:'Game khối rơi 10×20 với xoay SRS, giữ khối, bóng rơi và 5 chế độ chơi. Thử sức với Điểm cao, Đua thời gian, Thư giãn, Tốc độ riêng và Sprint 40 hàng.',

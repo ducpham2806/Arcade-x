@@ -4,7 +4,7 @@ import type { CosmicSave, Mode, RunConfig } from "./types";
 export async function startRanked(mode: Mode, level: number, owner: string) {
   if (!supabase || !navigator.onLine) throw new Error("offline");
   const { data, error } = await supabase
-    .rpc("cosmic_start", {
+    .rpc("cosmic_start_v3", {
       p_mode: mode,
       p_level: level,
       p_expected_owner: owner,

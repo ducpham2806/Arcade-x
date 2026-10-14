@@ -1,0 +1,15 @@
+/* Applied only to a measured low-contrast DOM label; scoped overrides are state-aware. */
+[data-ax-readable=true]{color:var(--ax-readable-color)!important;-webkit-text-fill-color:var(--ax-readable-color)!important}
+:where(.launcher-light,.platform-ui,.entry-screen,#splash-screen,#game-wrapper-viewport) :is(button,a,input,select,textarea,[role=tab]):focus-visible{outline:3px solid #5578e8;outline-offset:3px}
+:where(.launcher-light,.platform-ui,.entry-screen) :is(button:disabled,[aria-disabled=true]){opacity:1!important;color:#526176;background-color:#e5eaf1;box-shadow:none;border-color:#b7c3d2;cursor:not-allowed}
+:where(.launcher-light,.platform-ui,.entry-screen) :is(button:disabled,[aria-disabled=true]) :is(span,small,strong,b){opacity:1!important;color:inherit}
+#game-wrapper-viewport:not(.platform-ui) button:disabled:not(:has(img)):not(:has(canvas)){opacity:1!important;box-shadow:none;filter:none}
+#game-wrapper-viewport button:disabled :is(span,small,strong,b){opacity:1!important}
+.platform-ui ::placeholder,.launcher-light ::placeholder,.entry-screen ::placeholder{color:#586a81;opacity:1}
+.platform-ui select option,.entry-screen select option{color:#233045;background:white}
+.platform-ui button:is(.simple-primary-button,.launcher-primary,.cd-primary,.wc-primary,.car-primary,[class~="bg-indigo-600"],[class~="bg-indigo-500"],[class~="bg-blue-600"],[class~="bg-emerald-500"],[class~="bg-rose-600"]):not(:disabled) :is(span,strong,b,small){color:inherit}
+/* Primary labels must remain light even when nested headings are themed dark. */
+.platform-ui button:not(:disabled)[class*="bg-gradient-"] :is(h1,h2,h3,h4,span,strong,b,small){color:inherit}
+.launcher-light .launcher-notice{color:#344991}
+
+[data-ax-readable=true]>svg:not(.game-artwork):not(.monster-art){color:var(--ax-readable-color)!important}

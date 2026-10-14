@@ -41,7 +41,7 @@
 }
 .bp-root button:disabled,
 .bp-dialog button:disabled {
-  opacity: 0.45;
+  opacity:1;
   cursor: default;
   transform: none;
 }
@@ -67,7 +67,7 @@
 .bp-eyebrow {
   font-size: 10px;
   letter-spacing: 3px;
-  color: #627c91;
+  color:#4c657a;
   font-weight: 800;
 }
 .bp-top-actions {
@@ -124,7 +124,7 @@
   margin: 15px 0;
 }
 .bp-menu p {
-  color: #648094;
+  color:#4b6478;
   font-size: 14px;
 }
 .bp-root .bp-mode {
@@ -195,7 +195,7 @@
 }
 .bp-map p {
   font-size: 13px;
-  color: #627b8e;
+  color:#4c6578;
 }
 .bp-chapters {
   display: grid;
@@ -226,17 +226,17 @@
 }
 .bp-levels b {
   font-size: 24px;
-  color: #3da5b3;
+  color:#226a77;
 }
 .bp-levels strong {
   font-size: 13px;
 }
 .bp-levels small {
   font-size: 11px;
-  color: #607c90;
+  color:#4b6479;
 }
 .bp-stars {
-  color: #efb72b;
+  color:#805a0e;
   font-size: 24px;
   letter-spacing: 3px;
 }
@@ -255,7 +255,7 @@
   font-size: 9px;
   letter-spacing: 0.8px;
   display: block;
-  color: #648397;
+  color:#4b6378;
   font-weight: 800;
 }
 .bp-hud strong {
@@ -425,7 +425,7 @@
   border-radius: 4px;
 }
 .bp-tray-empty {
-  color: #93b6b3;
+  color:#456f6a;
   font-size: 24px;
 }
 .bp-tools {
@@ -444,7 +444,7 @@
 .bp-tools small {
   display: block;
   font-size: 9px;
-  color: #6d8393;
+  color:#4c6275;
   margin-top: 3px;
 }
 .bp-tools span {
@@ -453,7 +453,7 @@
 .bp-message {
   min-height: 30px;
   font-size: 11px;
-  color: #648094;
+  color:#4b6478;
   text-align: center;
   margin: 9px 0 0;
 }
@@ -478,7 +478,7 @@
   top: 40%;
   transform: translate(-50%, -50%);
   white-space: nowrap;
-  color: #ffb321;
+  color:#795209;
   text-shadow:
     0 3px 0 white,
     2px 0 white,
@@ -491,7 +491,7 @@
 .bp-combo small {
   display: block;
   text-align: center;
-  color: #20b7a5;
+  color:#167060;
   font-size: 23px;
 }
 .bp-board-cover {
@@ -617,7 +617,7 @@
 }
 .bp-shop-card small {
   font-size: 11px;
-  color: #6c8494;
+  color:#4c6377;
 }
 .bp-result {
   text-align: center;
@@ -632,7 +632,7 @@
 .bp-result > strong {
   display: block;
   font-size: 27px;
-  color: #c18e19;
+  color:#775414;
   background: #fff1bd;
   border-radius: 15px;
   padding: 14px;
@@ -887,7 +887,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  color: #698292;
+  color:#4c6377;
   font-size: 13px;
   margin-bottom: 20px;
 }
@@ -911,7 +911,7 @@
 }
 .bp-utility-grid button small {
   font-size: 12px;
-  color: #698292;
+  color:#4c6377;
 }
 .bp-playing {
   --bp-grid: #c2dcd5;
@@ -1441,7 +1441,7 @@
   color: #416d99 !important;
 }
 .bp-star-forecast {
-  color: #b08322;
+  color:#775414;
   font-size: 12px;
   letter-spacing: 1px;
   white-space: nowrap;

@@ -28,7 +28,7 @@
 }
 .wc-game button:disabled,
 .wc-dialog button:disabled {
-  opacity: 0.45;
+  opacity:1;
   cursor: default;
 }
 .wc-game button:focus-visible,
@@ -44,7 +44,7 @@
   box-shadow: 0 3px 0 #533a9b;
 }
 .wc-muted {
-  color: #64718a;
+  color:#4e5d76;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -76,7 +76,7 @@
 }
 .wc-map-header p {
   font-size: 12px;
-  color: #65728c;
+  color:#4f5e77;
 }
 .wc-logo {
   position: relative;
@@ -131,7 +131,7 @@
 .wc-daily p {
   margin: 5px 0 0;
   font-size: 12px;
-  color: #8a7753;
+  color:#69552f;
 }
 .wc-chapters {
   display: flex;
@@ -162,7 +162,7 @@
 }
 .wc-chapter-heading span {
   font-size: 11px;
-  color: #66718a;
+  color:#4f5d76;
 }
 .wc-level-grid {
   display: grid;
@@ -195,10 +195,10 @@
 .wc-level small,
 .wc-level > div > span {
   font-size: 10px;
-  color: #6e7b94;
+  color:#53617a;
 }
 .wc-stars {
-  color: #cb982e;
+  color:#805910;
   font-size: 17px;
   letter-spacing: 3px;
 }
@@ -258,14 +258,14 @@
 }
 .wc-hud span {
   font-size: 9px;
-  color: #748099;
+  color:#53627b;
 }
 .wc-lesson {
   flex-shrink: 0;
   margin: 8px 16px 6px;
   text-align: center;
   font-size: 11px;
-  color: #66718a;
+  color:#4f5d76;
 }
 .wc-board-area {
   flex: 1;
@@ -351,7 +351,7 @@
 }
 .wc-board-tip {
   font-size: 9px;
-  color: #76829a;
+  color:#53617a;
   margin: 6px 0 0;
   flex-shrink: 0;
   line-height: 16px;
@@ -410,7 +410,7 @@
 }
 .wc-footer {
   font-size: 9px;
-  color: #758098;
+  color:#546079;
   text-align: center;
   margin: 3px 12px 8px;
   flex-shrink: 0;
@@ -522,7 +522,7 @@
 }
 .wc-rank-list small {
   display: block;
-  color: #758197;
+  color:#546078;
 }
 .wc-result-art {
   text-align: center;
@@ -533,7 +533,7 @@
 .wc-result-stars {
   text-align: center;
   font-size: 44px;
-  color: #c4932a;
+  color:#805910;
   letter-spacing: 7px;
 }
 .wc-result-stats {

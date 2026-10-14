@@ -1279,7 +1279,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             <h3 className="font-semibold text-slate-300 border-b border-slate-800 pb-2">Biên Bản Nước Đi</h3>
             <div className="flex flex-wrap md:flex-col gap-2 overflow-y-auto max-h-[120px] md:max-h-none">
               {moveHistory.length === 0 ? (
-                <span className="italic opacity-60 text-slate-500 text-xs md:text-sm">Chưa có nước đi nào...</span>
+                <span className="italic text-slate-300 text-xs md:text-sm">Chưa có nước đi nào...</span>
               ) : (
                 moveHistory.map((move, idx) => (
                   <span

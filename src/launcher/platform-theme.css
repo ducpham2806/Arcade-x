@@ -1,22 +1,22 @@
 /* Platform theme: launcher services retain this theme even when opened over a game. */
-.platform-ui { --platform-ink:#233045; --platform-muted:#607084; --platform-line:#dce4ed; --platform-paper:#f7f9fc; --platform-brand:#3f56d9; color:var(--platform-ink); font-family:'Plus Jakarta Sans',system-ui,sans-serif; color-scheme:light; }
+.platform-ui { --platform-ink:#233045; --platform-muted:#536379; --platform-line:#dce4ed; --platform-paper:#f7f9fc; --platform-brand:#3f56d9; color:var(--platform-ink); font-family:'Plus Jakarta Sans',system-ui,sans-serif; color-scheme:light; }
 .platform-ui h1,.platform-ui h2,.platform-ui h3 {font-family:'Plus Jakarta Sans',system-ui,sans-serif;letter-spacing:-.035em;color:var(--platform-ink);text-shadow:none;}
 .platform-ui :is(button,a,input,select,textarea):focus-visible {outline:3px solid var(--platform-brand);outline-offset:3px;}
 .platform-ui :is(.arcadex-modal-container,.arcadex-modal-container-xl,.arcadex-modal-container-md,.arcadex-modal-container-sm) {background:#fff;color:var(--platform-ink);border:1px solid var(--platform-line);box-shadow:0 24px 80px #23304526;}
 .platform-ui.arcadex-modal-overlay,.platform-ui .arcadex-modal-overlay,.platform-ui.fixed.inset-0[class*="bg-black"] {background:#23304566;backdrop-filter:blur(6px);}
 .platform-ui :is(input:not([type=range]):not([type=checkbox]),textarea,select) {color:var(--platform-ink);background:#fff;border-color:#b9c6d8;border-radius:12px;}
-.platform-ui ::placeholder {color:#718198;opacity:1;}
+.platform-ui ::placeholder {color:#586a81;opacity:1;}
 .platform-ui .simple-primary-button {background:var(--platform-brand);color:white;border:1px solid var(--platform-brand);box-shadow:0 3px 0 #2d3daa;}
 .platform-ui :is(.font-display,.font-mono) {font-family:'Plus Jakarta Sans',system-ui,sans-serif;}
 .platform-ui [class*="shadow-"] {--tw-shadow-color:#23304514;}
 .platform-ui [class*="bg-gradient-"]:not(.bg-clip-text) {background-image:none;background-color:#eef2ff;}
 .platform-ui .bg-clip-text {background-image:none;color:var(--platform-ink);-webkit-text-fill-color:var(--platform-ink);}
 .platform-ui [class*="border-white"],.platform-ui [class*="border-neutral-"],.platform-ui [class*="border-slate-"] {border-color:var(--platform-line);}
-.platform-ui [class*="text-white"],.platform-ui [class*="text-slate-1"],.platform-ui [class*="text-slate-2"],.platform-ui [class*="text-neutral-1"],.platform-ui [class*="text-neutral-2"] {color:var(--platform-ink);}
-.platform-ui [class*="text-slate-3"],.platform-ui [class*="text-slate-4"],.platform-ui [class*="text-neutral-3"],.platform-ui [class*="text-neutral-4"] {color:var(--platform-muted);}
-.platform-ui [class*="text-slate-5"],.platform-ui [class*="text-neutral-5"] {color:#68788d;}
-.platform-ui [class*="bg-white/"] {background-color:#f0f4f9;}
-.platform-ui [class*="bg-black/"]:not(.fixed) {background-color:#eef2f7;}
+.platform-ui [class~="text-white"],.platform-ui :is([class~="text-slate-100"],[class~="text-slate-100/80"]),.platform-ui :is([class~="text-slate-200"],[class~="text-slate-200/80"]),.platform-ui :is([class~="text-neutral-100"],[class~="text-neutral-100/80"]),.platform-ui :is([class~="text-neutral-200"],[class~="text-neutral-200/80"]) {color:var(--platform-ink);}
+.platform-ui :is([class~="text-slate-300"],[class~="text-slate-300/80"]),.platform-ui :is([class~="text-slate-400"],[class~="text-slate-400/80"]),.platform-ui :is([class~="text-neutral-300"],[class~="text-neutral-300/80"]),.platform-ui :is([class~="text-neutral-400"],[class~="text-neutral-400/80"]) {color:var(--platform-muted);}
+.platform-ui :is([class~="text-slate-500"],[class~="text-slate-500/80"]),.platform-ui :is([class~="text-neutral-500"],[class~="text-neutral-500/80"]) {color:#536379;}
+.platform-ui :is([class~="bg-white/10"],[class~="bg-white/15"],[class~="bg-white/20"],[class~="bg-white/25"],[class~="bg-white/5"]) {background-color:#f0f4f9;}
+.platform-ui :is([class~="bg-black/20"],[class~="bg-black/30"],[class~="bg-black/40"],[class~="bg-black/50"],[class~="bg-black/60"],[class~="bg-black/70"],[class~="bg-black/75"],[class~="bg-black/80"],[class~="bg-black/85"],[class~="bg-black/90"],[class~="bg-black/92"],[class~="bg-black/95"]):not(.fixed) {background-color:#eef2f7;}
 .platform-ui .custom-scrollbar {scrollbar-color:#bdc8d9 #f7f9fc;}
 .platform-ui .custom-scrollbar::-webkit-scrollbar-thumb {background:#bdc8d9;}
 .platform-ui .custom-scrollbar::-webkit-scrollbar-track {background:#f7f9fc;}
@@ -126,142 +126,142 @@
 .platform-ui [class*="bg-[#23273e]"] {background-color:#fff;}
 .platform-ui [class*="bg-[#3b2010]"] {background-color:#fff;}
 .platform-ui [class*="bg-[#4a2e1b]"] {background-color:#fff;}
-.platform-ui [class*="bg-slate-600"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-slate-700"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-slate-800"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-slate-900"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-slate-950"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-neutral-600"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-neutral-700"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-neutral-800"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-neutral-900"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-neutral-950"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-gray-600"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-gray-700"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-gray-800"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-gray-900"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-gray-950"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-zinc-600"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-zinc-700"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-zinc-800"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-zinc-900"] {background-color:#f3f6fb;}
-.platform-ui [class*="bg-zinc-950"] {background-color:#f3f6fb;}
-.platform-ui [class*="text-indigo-100"] {color:#3f56d9;}
-.platform-ui [class*="text-indigo-200"] {color:#3f56d9;}
-.platform-ui [class*="text-indigo-300"] {color:#3f56d9;}
-.platform-ui [class*="text-indigo-400"] {color:#3f56d9;}
-.platform-ui [class*="bg-indigo-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-indigo-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-indigo-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-cyan-100"] {color:#08728c;}
-.platform-ui [class*="text-cyan-200"] {color:#08728c;}
-.platform-ui [class*="text-cyan-300"] {color:#08728c;}
-.platform-ui [class*="text-cyan-400"] {color:#08728c;}
-.platform-ui [class*="bg-cyan-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-cyan-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-cyan-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-sky-100"] {color:#126da8;}
-.platform-ui [class*="text-sky-200"] {color:#126da8;}
-.platform-ui [class*="text-sky-300"] {color:#126da8;}
-.platform-ui [class*="text-sky-400"] {color:#126da8;}
-.platform-ui [class*="bg-sky-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-sky-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-sky-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-blue-100"] {color:#3156bb;}
-.platform-ui [class*="text-blue-200"] {color:#3156bb;}
-.platform-ui [class*="text-blue-300"] {color:#3156bb;}
-.platform-ui [class*="text-blue-400"] {color:#3156bb;}
-.platform-ui [class*="bg-blue-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-blue-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-blue-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-emerald-100"] {color:#187650;}
-.platform-ui [class*="text-emerald-200"] {color:#187650;}
-.platform-ui [class*="text-emerald-300"] {color:#187650;}
-.platform-ui [class*="text-emerald-400"] {color:#187650;}
-.platform-ui [class*="bg-emerald-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-emerald-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-emerald-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-green-100"] {color:#287440;}
-.platform-ui [class*="text-green-200"] {color:#287440;}
-.platform-ui [class*="text-green-300"] {color:#287440;}
-.platform-ui [class*="text-green-400"] {color:#287440;}
-.platform-ui [class*="bg-green-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-green-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-green-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-teal-100"] {color:#17766f;}
-.platform-ui [class*="text-teal-200"] {color:#17766f;}
-.platform-ui [class*="text-teal-300"] {color:#17766f;}
-.platform-ui [class*="text-teal-400"] {color:#17766f;}
-.platform-ui [class*="bg-teal-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-teal-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-teal-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-amber-100"] {color:#8c6216;}
-.platform-ui [class*="text-amber-200"] {color:#8c6216;}
-.platform-ui [class*="text-amber-300"] {color:#8c6216;}
-.platform-ui [class*="text-amber-400"] {color:#8c6216;}
-.platform-ui [class*="bg-amber-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-amber-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-amber-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-yellow-100"] {color:#85610e;}
-.platform-ui [class*="text-yellow-200"] {color:#85610e;}
-.platform-ui [class*="text-yellow-300"] {color:#85610e;}
-.platform-ui [class*="text-yellow-400"] {color:#85610e;}
-.platform-ui [class*="bg-yellow-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-yellow-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-yellow-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-orange-100"] {color:#aa531b;}
-.platform-ui [class*="text-orange-200"] {color:#aa531b;}
-.platform-ui [class*="text-orange-300"] {color:#aa531b;}
-.platform-ui [class*="text-orange-400"] {color:#aa531b;}
-.platform-ui [class*="bg-orange-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-orange-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-orange-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-rose-100"] {color:#ae3551;}
-.platform-ui [class*="text-rose-200"] {color:#ae3551;}
-.platform-ui [class*="text-rose-300"] {color:#ae3551;}
-.platform-ui [class*="text-rose-400"] {color:#ae3551;}
-.platform-ui [class*="bg-rose-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-rose-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-rose-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-red-100"] {color:#b43d3d;}
-.platform-ui [class*="text-red-200"] {color:#b43d3d;}
-.platform-ui [class*="text-red-300"] {color:#b43d3d;}
-.platform-ui [class*="text-red-400"] {color:#b43d3d;}
-.platform-ui [class*="bg-red-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-red-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-red-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-purple-100"] {color:#7850b4;}
-.platform-ui [class*="text-purple-200"] {color:#7850b4;}
-.platform-ui [class*="text-purple-300"] {color:#7850b4;}
-.platform-ui [class*="text-purple-400"] {color:#7850b4;}
-.platform-ui [class*="bg-purple-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-purple-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-purple-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-violet-100"] {color:#7053bc;}
-.platform-ui [class*="text-violet-200"] {color:#7053bc;}
-.platform-ui [class*="text-violet-300"] {color:#7053bc;}
-.platform-ui [class*="text-violet-400"] {color:#7053bc;}
-.platform-ui [class*="bg-violet-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-violet-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-violet-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-fuchsia-100"] {color:#9651a0;}
-.platform-ui [class*="text-fuchsia-200"] {color:#9651a0;}
-.platform-ui [class*="text-fuchsia-300"] {color:#9651a0;}
-.platform-ui [class*="text-fuchsia-400"] {color:#9651a0;}
-.platform-ui [class*="bg-fuchsia-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-fuchsia-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-fuchsia-950"] {background-color:#eef2ff;}
-.platform-ui [class*="text-lime-100"] {color:#527521;}
-.platform-ui [class*="text-lime-200"] {color:#527521;}
-.platform-ui [class*="text-lime-300"] {color:#527521;}
-.platform-ui [class*="text-lime-400"] {color:#527521;}
-.platform-ui [class*="bg-lime-800"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-lime-900"] {background-color:#eef2ff;}
-.platform-ui [class*="bg-lime-950"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-slate-600"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-slate-700"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-slate-800"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-slate-900"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-slate-950"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-neutral-600"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-neutral-700"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-neutral-800"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-neutral-900"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-neutral-950"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-gray-600"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-gray-700"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-gray-800"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-gray-900"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-gray-950"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-zinc-600"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-zinc-700"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-zinc-800"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-zinc-900"] {background-color:#f3f6fb;}
+.platform-ui [class~="bg-zinc-950"] {background-color:#f3f6fb;}
+.platform-ui [class~="text-indigo-100"] {color:#3f56d9;}
+.platform-ui [class~="text-indigo-200"] {color:#3f56d9;}
+.platform-ui [class~="text-indigo-300"] {color:#3f56d9;}
+.platform-ui [class~="text-indigo-400"] {color:#3f56d9;}
+.platform-ui [class~="bg-indigo-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-indigo-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-indigo-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-cyan-100"] {color:#08728c;}
+.platform-ui [class~="text-cyan-200"] {color:#08728c;}
+.platform-ui [class~="text-cyan-300"] {color:#08728c;}
+.platform-ui [class~="text-cyan-400"] {color:#08728c;}
+.platform-ui [class~="bg-cyan-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-cyan-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-cyan-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-sky-100"] {color:#126da8;}
+.platform-ui [class~="text-sky-200"] {color:#126da8;}
+.platform-ui [class~="text-sky-300"] {color:#126da8;}
+.platform-ui [class~="text-sky-400"] {color:#126da8;}
+.platform-ui [class~="bg-sky-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-sky-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-sky-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-blue-100"] {color:#3156bb;}
+.platform-ui [class~="text-blue-200"] {color:#3156bb;}
+.platform-ui [class~="text-blue-300"] {color:#3156bb;}
+.platform-ui [class~="text-blue-400"] {color:#3156bb;}
+.platform-ui [class~="bg-blue-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-blue-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-blue-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-emerald-100"] {color:#187650;}
+.platform-ui [class~="text-emerald-200"] {color:#187650;}
+.platform-ui [class~="text-emerald-300"] {color:#187650;}
+.platform-ui [class~="text-emerald-400"] {color:#187650;}
+.platform-ui [class~="bg-emerald-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-emerald-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-emerald-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-green-100"] {color:#287440;}
+.platform-ui [class~="text-green-200"] {color:#287440;}
+.platform-ui [class~="text-green-300"] {color:#287440;}
+.platform-ui [class~="text-green-400"] {color:#287440;}
+.platform-ui [class~="bg-green-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-green-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-green-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-teal-100"] {color:#17766f;}
+.platform-ui [class~="text-teal-200"] {color:#17766f;}
+.platform-ui [class~="text-teal-300"] {color:#17766f;}
+.platform-ui [class~="text-teal-400"] {color:#17766f;}
+.platform-ui [class~="bg-teal-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-teal-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-teal-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-amber-100"] {color:#8c6216;}
+.platform-ui [class~="text-amber-200"] {color:#8c6216;}
+.platform-ui [class~="text-amber-300"] {color:#8c6216;}
+.platform-ui [class~="text-amber-400"] {color:#8c6216;}
+.platform-ui [class~="bg-amber-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-amber-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-amber-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-yellow-100"] {color:#85610e;}
+.platform-ui [class~="text-yellow-200"] {color:#85610e;}
+.platform-ui [class~="text-yellow-300"] {color:#85610e;}
+.platform-ui [class~="text-yellow-400"] {color:#85610e;}
+.platform-ui [class~="bg-yellow-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-yellow-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-yellow-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-orange-100"] {color:#aa531b;}
+.platform-ui [class~="text-orange-200"] {color:#aa531b;}
+.platform-ui [class~="text-orange-300"] {color:#aa531b;}
+.platform-ui [class~="text-orange-400"] {color:#aa531b;}
+.platform-ui [class~="bg-orange-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-orange-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-orange-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-rose-100"] {color:#ae3551;}
+.platform-ui [class~="text-rose-200"] {color:#ae3551;}
+.platform-ui [class~="text-rose-300"] {color:#ae3551;}
+.platform-ui [class~="text-rose-400"] {color:#ae3551;}
+.platform-ui [class~="bg-rose-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-rose-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-rose-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-red-100"] {color:#b43d3d;}
+.platform-ui [class~="text-red-200"] {color:#b43d3d;}
+.platform-ui [class~="text-red-300"] {color:#b43d3d;}
+.platform-ui [class~="text-red-400"] {color:#b43d3d;}
+.platform-ui [class~="bg-red-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-red-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-red-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-purple-100"] {color:#7850b4;}
+.platform-ui [class~="text-purple-200"] {color:#7850b4;}
+.platform-ui [class~="text-purple-300"] {color:#7850b4;}
+.platform-ui [class~="text-purple-400"] {color:#7850b4;}
+.platform-ui [class~="bg-purple-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-purple-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-purple-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-violet-100"] {color:#7053bc;}
+.platform-ui [class~="text-violet-200"] {color:#7053bc;}
+.platform-ui [class~="text-violet-300"] {color:#7053bc;}
+.platform-ui [class~="text-violet-400"] {color:#7053bc;}
+.platform-ui [class~="bg-violet-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-violet-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-violet-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-fuchsia-100"] {color:#9651a0;}
+.platform-ui [class~="text-fuchsia-200"] {color:#9651a0;}
+.platform-ui [class~="text-fuchsia-300"] {color:#9651a0;}
+.platform-ui [class~="text-fuchsia-400"] {color:#9651a0;}
+.platform-ui [class~="bg-fuchsia-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-fuchsia-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-fuchsia-950"] {background-color:#eef2ff;}
+.platform-ui [class~="text-lime-100"] {color:#527521;}
+.platform-ui [class~="text-lime-200"] {color:#527521;}
+.platform-ui [class~="text-lime-300"] {color:#527521;}
+.platform-ui [class~="text-lime-400"] {color:#527521;}
+.platform-ui [class~="bg-lime-800"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-lime-900"] {background-color:#eef2ff;}
+.platform-ui [class~="bg-lime-950"] {background-color:#eef2ff;}
 
-.platform-ui button:is([class*="bg-indigo-5"],[class*="bg-indigo-6"],[class*="bg-cyan-6"],[class*="bg-blue-6"],[class*="from-indigo-6"],[class*="from-indigo-5"]) {background:#3f56d9;color:#fff;border-color:#3f56d9;}
-.platform-ui button:is([class*="bg-emerald-5"],[class*="from-emerald-5"]) {background:#277a52;color:white;}
-.platform-ui button:is([class*="bg-rose-6"],[class*="bg-red-6"]) {background:#b43d3d;color:white;}
+.platform-ui button:is([class~="bg-indigo-5"],[class~="bg-indigo-6"],[class~="bg-cyan-6"],[class~="bg-blue-6"],[class*="from-indigo-6"],[class*="from-indigo-5"]) {background:#3f56d9;color:#fff;border-color:#3f56d9;}
+.platform-ui button:is([class~="bg-emerald-5"],[class*="from-emerald-5"]) {background:#277a52;color:white;}
+.platform-ui button:is([class~="bg-rose-6"],[class~="bg-red-6"]) {background:#b43d3d;color:white;}
 .platform-ui button:disabled {cursor:not-allowed;}
 .platform-ui [class*="from-indigo-600"][class*="rounded-tr-none"] {background:#3f56d9;color:white;}
 .platform-ui [class*="from-indigo-600"][class*="rounded-tr-none"] [class*="text-"] {color:white;}
@@ -285,3 +285,24 @@
 .platform-status-screen,.platform-ui#password-recovery-screen {background:#f7f9fc;color:#233045;}
 .platform-ui .platform-status-panel {background:white;color:#233045;border-color:#dce4ed;box-shadow:0 16px 48px #23304512;}
 .platform-ui [class~="bg-indigo-600"][class~="text-white"] {color:white;}
+
+/* Exact base utilities: inactive hover tokens cannot override normal text. */
+.platform-ui :is([class~="text-indigo-100"],[class~="text-indigo-200"],[class~="text-indigo-300"],[class~="text-indigo-400"],[class~="text-indigo-500"],[class~="text-indigo-600"]){color:#3449b9}
+.platform-ui :is([class~="text-blue-100"],[class~="text-blue-200"],[class~="text-blue-300"],[class~="text-blue-400"],[class~="text-blue-500"],[class~="text-blue-600"]){color:#285bac}
+.platform-ui :is([class~="text-cyan-100"],[class~="text-cyan-200"],[class~="text-cyan-300"],[class~="text-cyan-400"],[class~="text-cyan-500"],[class~="text-cyan-600"]){color:#126773}
+.platform-ui :is([class~="text-sky-100"],[class~="text-sky-200"],[class~="text-sky-300"],[class~="text-sky-400"],[class~="text-sky-500"],[class~="text-sky-600"]){color:#245f91}
+.platform-ui :is([class~="text-emerald-100"],[class~="text-emerald-200"],[class~="text-emerald-300"],[class~="text-emerald-400"],[class~="text-emerald-500"],[class~="text-emerald-600"]){color:#236646}
+.platform-ui :is([class~="text-green-100"],[class~="text-green-200"],[class~="text-green-300"],[class~="text-green-400"],[class~="text-green-500"],[class~="text-green-600"]){color:#316636}
+.platform-ui :is([class~="text-teal-100"],[class~="text-teal-200"],[class~="text-teal-300"],[class~="text-teal-400"],[class~="text-teal-500"],[class~="text-teal-600"]){color:#1b6865}
+.platform-ui :is([class~="text-amber-100"],[class~="text-amber-200"],[class~="text-amber-300"],[class~="text-amber-400"],[class~="text-amber-500"],[class~="text-amber-600"]){color:#79530c}
+.platform-ui :is([class~="text-yellow-100"],[class~="text-yellow-200"],[class~="text-yellow-300"],[class~="text-yellow-400"],[class~="text-yellow-500"],[class~="text-yellow-600"]){color:#79580e}
+.platform-ui :is([class~="text-orange-100"],[class~="text-orange-200"],[class~="text-orange-300"],[class~="text-orange-400"],[class~="text-orange-500"],[class~="text-orange-600"]){color:#98451a}
+.platform-ui :is([class~="text-red-100"],[class~="text-red-200"],[class~="text-red-300"],[class~="text-red-400"],[class~="text-red-500"],[class~="text-red-600"]){color:#a32e3a}
+.platform-ui :is([class~="text-rose-100"],[class~="text-rose-200"],[class~="text-rose-300"],[class~="text-rose-400"],[class~="text-rose-500"],[class~="text-rose-600"]){color:#a32e50}
+.platform-ui :is([class~="text-pink-100"],[class~="text-pink-200"],[class~="text-pink-300"],[class~="text-pink-400"],[class~="text-pink-500"],[class~="text-pink-600"]){color:#963668}
+.platform-ui :is([class~="text-violet-100"],[class~="text-violet-200"],[class~="text-violet-300"],[class~="text-violet-400"],[class~="text-violet-500"],[class~="text-violet-600"]){color:#6846a1}
+.platform-ui :is([class~="text-purple-100"],[class~="text-purple-200"],[class~="text-purple-300"],[class~="text-purple-400"],[class~="text-purple-500"],[class~="text-purple-600"]){color:#69459d}
+.platform-ui :is([class~="text-fuchsia-100"],[class~="text-fuchsia-200"],[class~="text-fuchsia-300"],[class~="text-fuchsia-400"],[class~="text-fuchsia-500"],[class~="text-fuchsia-600"]){color:#82358d}
+.platform-ui :is([class~="text-lime-100"],[class~="text-lime-200"],[class~="text-lime-300"],[class~="text-lime-400"],[class~="text-lime-500"],[class~="text-lime-600"]){color:#4b651d}
+.platform-ui button:is(.simple-primary-button,.launcher-primary,.cd-primary,.wc-primary,.car-primary,[class~="bg-indigo-600"],[class~="bg-indigo-500"],[class~="bg-blue-600"],[class~="bg-emerald-500"],[class~="bg-rose-600"]):not(:disabled) :is(span,strong,b,small){color:inherit}
+.platform-ui button[class*="bg-gradient-"]:not(:disabled) :is(span,strong,b,small,h1,h2,h3){color:inherit}

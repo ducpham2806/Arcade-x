@@ -1,11 +1,7 @@
 // Server bundle imports the SAME versioned engine/data as the browser. No score from the request is trusted.
 // @ts-nocheck -- Deno runtime; checked by supabase functions serve/deploy, not the browser tsc.
 import { createClient } from "npm:@supabase/supabase-js@2.117.3";
-import {
-  decodeReplay,
-  replaySimulation,
-  resultFor,
-} from "../../../src/games/cosmic-defense/engine.ts";
+import { verifyReplay } from "./verify.ts";
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -59,20 +55,7 @@ Deno.serve(async (req) => {
       .single();
     if (error || !run) return response({ error: "Invalid ticket" }, 403);
     if (run.finished_at) return response({ verified: true, score: run.score });
-    if (
-      run.pack_version !== 2 ||
-      Date.now() - Date.parse(run.started_at) > 86400000
-    )
-      return response({ error: "Ticket expired/version changed" }, 400);
-    const entries = decodeReplay(body.replay),
-      sim = replaySimulation(run.config, entries, body.frames);
-    if (
-      sim.frame !== body.frames ||
-      !["won", "lost"].includes(sim.status) ||
-      sim.frame < 1
-    )
-      return response({ error: "Incomplete replay" }, 400);
-    const result = resultFor(sim);
+    const { sim, result } = verifyReplay(run, body.replay, body.frames);
     const { data: accepted, error: acceptError } = await admin.rpc(
       "cosmic_accept",
       {

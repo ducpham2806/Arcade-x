@@ -1,9 +1,12 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import publicBackend from '../config/public-backend.json';
 import { StorageService } from './storage';
 
 const env = import.meta.env;
-const url = env.VITE_SUPABASE_URL?.trim();
-const key = (env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY)?.trim();
+// An explicit deployment override must supply a matching URL and key.
+const overridden = !!(env.VITE_SUPABASE_URL || env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY);
+const url = (overridden ? env.VITE_SUPABASE_URL : publicBackend.url)?.trim();
+const key = (overridden ? env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY : publicBackend.publishableKey)?.trim();
 
 // Only a publishable/anon key belongs in a browser bundle. Never use service_role.
 function initializeClient(): SupabaseClient | null {

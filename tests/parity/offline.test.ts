@@ -1,0 +1,11 @@
+import {test,expect} from '@playwright/test';
+import path from 'node:path';import {pathToFileURL} from 'node:url';
+import {launch,enterLauncher} from '../qc/helpers';
+import {createRun} from '../../src/games/hex-match/blossom/engine';
+import {LEVELS} from '../../src/games/hex-match/blossom/levels';
+import {defaultSave} from '../../src/games/hex-match/blossom/save';
+import {lessonsFor} from '../../src/games/hex-match/blossom/tutorials';
+for(const width of [390,1440])test(`offline launcher ${width}: Blossom keeps its native sprite assets and sun effect`,async({page})=>{
+ const s=defaultSave(),r=createRun(LEVELS[4],9);r.level.goals=[{kind:'score',target:9999999}];r.board[14].special='sun';s.active=r;s.tutorials=lessonsFor(r,[]).map(l=>l.id);await page.setViewportSize({width,height:900});await page.addInitScript(s=>localStorage.setItem('arcadex_blossom_v1',JSON.stringify(s)),s);await page.route('http://**/*',r=>r.abort());await page.route('https://**/*',r=>r.abort());const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(pathToFileURL(path.resolve('../arcadex-launcher-review.html')).href);await enterLauncher(page);await page.locator('#btn-play-hex-match').click();await expect(page.locator('.bb-board')).toBeVisible();await page.locator('[data-cell="14"]').click();const sprite=page.locator('[data-sprite=sun_burst] image').first();await expect(sprite).toHaveAttribute('href',/^data:image\/png;base64,/);await expect(page.locator('[data-beam-axis=h]')).toHaveCount(3);await expect(page.locator('[data-beam-axis=v]')).toHaveCount(3);expect(errors).toEqual([]);
+});
+test.describe('desktop with touch',()=>{test.use({hasTouch:true});test('touch-capable PC keeps the desktop viewport layout',async({page})=>{await page.setViewportSize({width:1440,height:900});await page.addInitScript(()=>{sessionStorage.setItem('arcadex_splash_completed','true');localStorage.setItem('arcadex_onboarding_completed_v1','true');localStorage.setItem('arcadex_skip_pregame_loading','true');});await page.route('**/*',r=>new URL(r.request().url()).hostname==='127.0.0.1'?r.continue():r.abort());await launch(page,'tile-2048');await expect(page.locator('#game-viewport-stage')).toHaveCSS('max-width','1100px');await page.setViewportSize({width:390,height:844});await expect(page.locator('#game-viewport-stage')).toHaveCSS('max-width','100%');});});

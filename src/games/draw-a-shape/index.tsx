@@ -638,7 +638,7 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
             className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
               hintsRemaining > 0 && !isWon && !isFailed
                 ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
-                : 'bg-white/5 border-white/5 text-slate-500 cursor-not-allowed opacity-50'
+                : 'bg-white/5 border-white/5 text-slate-300 cursor-not-allowed'
             }`}
             title="Gợi ý nét vẽ tiếp theo"
           >
