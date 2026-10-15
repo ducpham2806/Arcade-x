@@ -1,0 +1,1611 @@
+{
+  "version": 3,
+  "cellSizes": {
+    "boss": 160,
+    "enemy": 64,
+    "item": 64,
+    "pip": 64,
+    "tile": 48
+  },
+  "assets": [
+    {
+      "file": "bosses/gau_ri_set.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 271566,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/gau_ri_set.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7090,
+      "alpha": true
+    },
+    {
+      "file": "bosses/nu_hoang_bao_tu.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 293832,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/nu_hoang_bao_tu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7248,
+      "alpha": true
+    },
+    {
+      "file": "bosses/sau_khoan.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 240728,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/sau_khoan.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5150,
+      "alpha": true
+    },
+    {
+      "file": "bosses/pharaoh_cat.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 294284,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/pharaoh_cat.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7174,
+      "alpha": true
+    },
+    {
+      "file": "bosses/thuyen_truong_hac_sat.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 264996,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/thuyen_truong_hac_sat.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6468,
+      "alpha": true
+    },
+    {
+      "file": "bosses/yeti_bang_gia.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 314382,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/yeti_bang_gia.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8542,
+      "alpha": true
+    },
+    {
+      "file": "bosses/robot_mk7.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 288232,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/robot_mk7.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7306,
+      "alpha": true
+    },
+    {
+      "file": "bosses/rong_dung_nham.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 238052,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/rong_dung_nham.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5802,
+      "alpha": true
+    },
+    {
+      "file": "bosses/hiep_si_bong_dem.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 235874,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/hiep_si_bong_dem.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4962,
+      "alpha": true
+    },
+    {
+      "file": "bosses/vua_ri_set.webp",
+      "width": 640,
+      "height": 320,
+      "bytes": 301596,
+      "alpha": true
+    },
+    {
+      "file": "icons/bosses/vua_ri_set.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7124,
+      "alpha": true
+    },
+    {
+      "file": "enemies.webp",
+      "width": 320,
+      "height": 256,
+      "bytes": 136286,
+      "alpha": true
+    },
+    {
+      "file": "enemies-up.webp",
+      "width": 320,
+      "height": 256,
+      "bytes": 130254,
+      "alpha": true
+    },
+    {
+      "file": "enemies-side.webp",
+      "width": 320,
+      "height": 256,
+      "bytes": 130340,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_slime_rust.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4916,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_rat_machine.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6758,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_nam_lun.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6068,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_buom_bao_tu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7708,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_doi_hang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5570,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_golem_da.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 9028,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_xac_uop.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7252,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_bo_cap.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6358,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_cua_giap.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6888,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_hai_au.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6050,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_nguoi_tuyet.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7716,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_canh_cut.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6318,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_robot_tuan_tra.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7310,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_drone.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7252,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_quy_lua.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8172,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_golem_magma.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8228,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_ma_mo.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8526,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_bo_xuong.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7016,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_ri_set_binh.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7062,
+      "alpha": true
+    },
+    {
+      "file": "icons/enemy_robot_tuan_tra_2.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7492,
+      "alpha": true
+    },
+    {
+      "file": "icons/bomb_plus.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4866,
+      "alpha": true
+    },
+    {
+      "file": "icons/fire.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5062,
+      "alpha": true
+    },
+    {
+      "file": "icons/boots.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7392,
+      "alpha": true
+    },
+    {
+      "file": "icons/shield.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5850,
+      "alpha": true
+    },
+    {
+      "file": "icons/heart.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 3806,
+      "alpha": true
+    },
+    {
+      "file": "icons/gem.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4194,
+      "alpha": true
+    },
+    {
+      "file": "icons/coin.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5942,
+      "alpha": true
+    },
+    {
+      "file": "icons/remote.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4880,
+      "alpha": true
+    },
+    {
+      "file": "icons/hourglass.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5908,
+      "alpha": true
+    },
+    {
+      "file": "icons/magnet.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5744,
+      "alpha": true
+    },
+    {
+      "file": "icons/kick.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5722,
+      "alpha": true
+    },
+    {
+      "file": "icons/glove.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6066,
+      "alpha": true
+    },
+    {
+      "file": "icons/bomb_ice.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6082,
+      "alpha": true
+    },
+    {
+      "file": "icons/bomb_fire.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5250,
+      "alpha": true
+    },
+    {
+      "file": "icons/bomb_blackhole.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7028,
+      "alpha": true
+    },
+    {
+      "file": "icons/armor.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6044,
+      "alpha": true
+    },
+    {
+      "file": "icons/curse.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7240,
+      "alpha": true
+    },
+    {
+      "file": "icons/passwall.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6980,
+      "alpha": true
+    },
+    {
+      "file": "icons/pierce.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5320,
+      "alpha": true
+    },
+    {
+      "file": "icons/light.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5612,
+      "alpha": true
+    },
+    {
+      "file": "icons/radar.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6154,
+      "alpha": true
+    },
+    {
+      "file": "icons/treasure.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6636,
+      "alpha": true
+    },
+    {
+      "file": "icons/hammer.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6166,
+      "alpha": true
+    },
+    {
+      "file": "icons/revive.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6176,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_gau.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5792,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_nam_hoang_gia.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5772,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_tho_mo_vang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5114,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_pharaoh.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6356,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_thuyen_truong.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4644,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_yeti.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6522,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_robot.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6124,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_rong_con.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6676,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_hiep_si.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6206,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/vuong_mien_loi_sang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6454,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_len.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4660,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_cao_boi.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4672,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_dau_bep.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5384,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mu_phu_thuy.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5470,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/toc_choi_xu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5604,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/toc_hai_bim.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5780,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/toc_mohawk_neon.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6506,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/toc_trang_bac.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5892,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/toc_lua.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5812,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/toc_cau_vong.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7252,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/kinh_mat.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 2788,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/kinh_phi_cong.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5046,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mat_na_meo.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5654,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/rau_gia.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 2914,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/mat_na_he.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7150,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/kinh_vr.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5350,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_choang_reu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6582,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_bao_tu_tim.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7200,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_tho_mo.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5944,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_vai_co.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6964,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_hai_tac.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7082,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_long_trang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7644,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_giap_neon.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7646,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_dung_nham.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7242,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_bong_dem.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8000,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_anh_sang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8246,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_hoodie.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5738,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_phi_hanh_gia.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7290,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_bi_ngo.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6714,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_go.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4350,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_nam.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4946,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_bao_ho.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5456,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_cat.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5264,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_da_bien.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6866,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_tuyet.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6662,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_phan_luc.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6354,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_than_hong.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6788,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_ma.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6624,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/giay_hao_quang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6528,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ba_lo_mam_cay.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7034,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/canh_buom_phat_quang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6428,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/xeng_deo_lung.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6306,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/khan_choang_vang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6600,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/kiem_mini.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4508,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/khan_len_do.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5162,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/canh_may.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6000,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/canh_lua.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6354,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/ao_choang_suong.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6060,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/canh_anh_sang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6644,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_trai_reu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6704,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_nam.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5936,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_pha_le.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5938,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_ngoc_co.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6842,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_thung_rum.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6070,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_tuyet.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6296,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_mach_dien.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6278,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_magma.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6824,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_hon_ma.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6094,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_loi_sang.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7088,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_qua_cam.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6698,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_ngoi_sao.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6426,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_banh_kem.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6764,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/bom_meo.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7342,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_hoa_reu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6774,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_bao_tu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7490,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_tinh_the.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7746,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_bao_cat.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7536,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_song_bien.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7494,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_bong_tuyet.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7624,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_dien_tu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7832,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_phun_trao.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8474,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_linh_hon.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8238,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_cau_vong.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8346,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_phao_hoa.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8856,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_trai_tim.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8236,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/fx_hoa_anh_dao.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8574,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_slime_reu.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6466,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_mimi.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7904,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_chuot_chui.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6794,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_meo_cat.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7860,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_vet_bien.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 7434,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_canh_cut.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6438,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_gizmo_mini.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 6838,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_rong_lua.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 8204,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_ma_nho.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5626,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/pet_bum_mini.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5608,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/dau_hoa.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5736,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/dau_sao.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 5200,
+      "alpha": true
+    },
+    {
+      "file": "icons/cosmetics/dau_lua_mini.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 4816,
+      "alpha": true
+    },
+    {
+      "file": "pip.webp",
+      "width": 256,
+      "height": 256,
+      "bytes": 59452,
+      "alpha": true
+    },
+    {
+      "file": "tiles/0.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5418,
+      "alpha": false
+    },
+    {
+      "file": "tiles/1.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5200,
+      "alpha": false
+    },
+    {
+      "file": "tiles/2.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4960,
+      "alpha": false
+    },
+    {
+      "file": "tiles/3.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5438,
+      "alpha": false
+    },
+    {
+      "file": "tiles/4.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5736,
+      "alpha": false
+    },
+    {
+      "file": "tiles/5.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5560,
+      "alpha": false
+    },
+    {
+      "file": "tiles/6.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4544,
+      "alpha": false
+    },
+    {
+      "file": "tiles/7.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5044,
+      "alpha": false
+    },
+    {
+      "file": "tiles/8.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4996,
+      "alpha": false
+    },
+    {
+      "file": "tiles/9.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 3634,
+      "alpha": false
+    },
+    {
+      "file": "tiles/10.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4030,
+      "alpha": false
+    },
+    {
+      "file": "tiles/11.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4648,
+      "alpha": false
+    },
+    {
+      "file": "tiles/12.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4218,
+      "alpha": false
+    },
+    {
+      "file": "tiles/13.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4248,
+      "alpha": false
+    },
+    {
+      "file": "tiles/14.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4494,
+      "alpha": false
+    },
+    {
+      "file": "tiles/15.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 3396,
+      "alpha": false
+    },
+    {
+      "file": "tiles/16.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4944,
+      "alpha": false
+    },
+    {
+      "file": "tiles/17.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5058,
+      "alpha": false
+    },
+    {
+      "file": "tiles/18.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 3580,
+      "alpha": false
+    },
+    {
+      "file": "tiles/19.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 3722,
+      "alpha": false
+    },
+    {
+      "file": "tiles/20.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4552,
+      "alpha": false
+    },
+    {
+      "file": "tiles/21.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4832,
+      "alpha": false
+    },
+    {
+      "file": "tiles/22.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5618,
+      "alpha": false
+    },
+    {
+      "file": "tiles/23.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5204,
+      "alpha": false
+    },
+    {
+      "file": "tiles/24.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4020,
+      "alpha": false
+    },
+    {
+      "file": "tiles/25.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 3890,
+      "alpha": false
+    },
+    {
+      "file": "tiles/26.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4994,
+      "alpha": false
+    },
+    {
+      "file": "tiles/27.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4864,
+      "alpha": false
+    },
+    {
+      "file": "tiles/28.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4826,
+      "alpha": false
+    },
+    {
+      "file": "tiles/29.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5152,
+      "alpha": false
+    },
+    {
+      "file": "tiles/30.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5348,
+      "alpha": false
+    },
+    {
+      "file": "tiles/31.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4994,
+      "alpha": false
+    },
+    {
+      "file": "tiles/32.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4096,
+      "alpha": false
+    },
+    {
+      "file": "tiles/33.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4374,
+      "alpha": false
+    },
+    {
+      "file": "tiles/34.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4138,
+      "alpha": false
+    },
+    {
+      "file": "tiles/35.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4562,
+      "alpha": false
+    },
+    {
+      "file": "tiles/36.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4612,
+      "alpha": false
+    },
+    {
+      "file": "tiles/37.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4622,
+      "alpha": false
+    },
+    {
+      "file": "tiles/38.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4682,
+      "alpha": false
+    },
+    {
+      "file": "tiles/39.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5276,
+      "alpha": false
+    },
+    {
+      "file": "tiles/40.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4892,
+      "alpha": false
+    },
+    {
+      "file": "tiles/41.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4336,
+      "alpha": false
+    },
+    {
+      "file": "tiles/42.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5438,
+      "alpha": false
+    },
+    {
+      "file": "tiles/43.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4758,
+      "alpha": false
+    },
+    {
+      "file": "tiles/44.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 5148,
+      "alpha": false
+    },
+    {
+      "file": "tiles/45.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4636,
+      "alpha": false
+    },
+    {
+      "file": "tiles/46.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4070,
+      "alpha": false
+    },
+    {
+      "file": "tiles/47.webp",
+      "width": 48,
+      "height": 48,
+      "bytes": 4034,
+      "alpha": false
+    }
+  ],
+  "sources": [
+    {
+      "id": "bear",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "nu_hoang_bao_tu",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "sau_khoan",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "pharaoh_cat",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "thuyen_truong_hac_sat",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "yeti_bang_gia",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "robot_mk7",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "rong_dung_nham",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "hiep_si_bong_dem",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "vua_ri_set",
+      "width": 1774,
+      "height": 887
+    },
+    {
+      "id": "enemies",
+      "width": 1402,
+      "height": 1122
+    },
+    {
+      "id": "enemies-up",
+      "width": 1402,
+      "height": 1122
+    },
+    {
+      "id": "enemies-side",
+      "width": 1402,
+      "height": 1122
+    },
+    {
+      "id": "items-alpha",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "id": "wardrobe",
+      "width": 971,
+      "height": 1619
+    },
+    {
+      "id": "extras-alpha",
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "pip",
+      "width": 1230,
+      "height": 1278
+    },
+    {
+      "id": "tiles",
+      "width": 1086,
+      "height": 1448
+    }
+  ],
+  "totalBytes": 4411648,
+  "decodedBytes": 12386304
+}

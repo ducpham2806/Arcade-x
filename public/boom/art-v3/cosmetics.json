@@ -1,0 +1,1249 @@
+[
+  {
+    "slot": "hat",
+    "id": "mu_gau",
+    "vi": "Mũ Gấu",
+    "rarity": "Huyền thoại",
+    "set": "set1",
+    "overlay": "png_cos/wear_hat/mu_gau.png",
+    "icon": "png_cos/icons/icon_mu_gau.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_nam_hoang_gia",
+    "vi": "Mũ Nấm Hoàng Gia",
+    "rarity": "Huyền thoại",
+    "set": "set2",
+    "overlay": "png_cos/wear_hat/mu_nam_hoang_gia.png",
+    "icon": "png_cos/icons/icon_mu_nam_hoang_gia.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_tho_mo_vang",
+    "vi": "Mũ Thợ Mỏ Vàng",
+    "rarity": "Huyền thoại",
+    "set": "set3",
+    "overlay": "png_cos/wear_hat/mu_tho_mo_vang.png",
+    "icon": "png_cos/icons/icon_mu_tho_mo_vang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_pharaoh",
+    "vi": "Mũ Pharaoh",
+    "rarity": "Huyền thoại",
+    "set": "set4",
+    "overlay": "png_cos/wear_hat/mu_pharaoh.png",
+    "icon": "png_cos/icons/icon_mu_pharaoh.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_thuyen_truong",
+    "vi": "Mũ Thuyền Trưởng",
+    "rarity": "Huyền thoại",
+    "set": "set5",
+    "overlay": "png_cos/wear_hat/mu_thuyen_truong.png",
+    "icon": "png_cos/icons/icon_mu_thuyen_truong.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_yeti",
+    "vi": "Mũ Yeti",
+    "rarity": "Huyền thoại",
+    "set": "set6",
+    "overlay": "png_cos/wear_hat/mu_yeti.png",
+    "icon": "png_cos/icons/icon_mu_yeti.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_robot",
+    "vi": "Mũ Robot",
+    "rarity": "Huyền thoại",
+    "set": "set7",
+    "overlay": "png_cos/wear_hat/mu_robot.png",
+    "icon": "png_cos/icons/icon_mu_robot.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_rong_con",
+    "vi": "Mũ Rồng Con",
+    "rarity": "Huyền thoại",
+    "set": "set8",
+    "overlay": "png_cos/wear_hat/mu_rong_con.png",
+    "icon": "png_cos/icons/icon_mu_rong_con.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_hiep_si",
+    "vi": "Mũ Hiệp Sĩ",
+    "rarity": "Huyền thoại",
+    "set": "set9",
+    "overlay": "png_cos/wear_hat/mu_hiep_si.png",
+    "icon": "png_cos/icons/icon_mu_hiep_si.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "vuong_mien_loi_sang",
+    "vi": "Vương Miện Lõi Sáng",
+    "rarity": "Huyền thoại",
+    "set": "set10",
+    "overlay": "png_cos/wear_hat/vuong_mien_loi_sang.png",
+    "icon": "png_cos/icons/icon_vuong_mien_loi_sang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_len",
+    "vi": "Mũ Len",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hat/mu_len.png",
+    "icon": "png_cos/icons/icon_mu_len.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_cao_boi",
+    "vi": "Mũ Cao Bồi",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hat/mu_cao_boi.png",
+    "icon": "png_cos/icons/icon_mu_cao_boi.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_dau_bep",
+    "vi": "Mũ Đầu Bếp",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hat/mu_dau_bep.png",
+    "icon": "png_cos/icons/icon_mu_dau_bep.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hat",
+    "id": "mu_phu_thuy",
+    "vi": "Mũ Phù Thủy",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hat/mu_phu_thuy.png",
+    "icon": "png_cos/icons/icon_mu_phu_thuy.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hair",
+    "id": "toc_choi_xu",
+    "vi": "Tóc Chổi Xù",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hair/toc_choi_xu.png",
+    "icon": "png_cos/icons/icon_toc_choi_xu.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hair",
+    "id": "toc_hai_bim",
+    "vi": "Tóc Hai Bím",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hair/toc_hai_bim.png",
+    "icon": "png_cos/icons/icon_toc_hai_bim.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hair",
+    "id": "toc_mohawk_neon",
+    "vi": "Tóc Mohawk Neon",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hair/toc_mohawk_neon.png",
+    "icon": "png_cos/icons/icon_toc_mohawk_neon.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hair",
+    "id": "toc_trang_bac",
+    "vi": "Tóc Trắng Bạc",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_hair/toc_trang_bac.png",
+    "icon": "png_cos/icons/icon_toc_trang_bac.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hair",
+    "id": "toc_lua",
+    "vi": "Tóc Lửa",
+    "rarity": "Hiếm",
+    "set": "",
+    "overlay": "png_cos/wear_hair/toc_lua.png",
+    "icon": "png_cos/icons/icon_toc_lua.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "hair",
+    "id": "toc_cau_vong",
+    "vi": "Tóc Cầu Vồng",
+    "rarity": "Hiếm",
+    "set": "",
+    "overlay": "png_cos/wear_hair/toc_cau_vong.png",
+    "icon": "png_cos/icons/icon_toc_cau_vong.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "face",
+    "id": "kinh_mat",
+    "vi": "Kính Mát",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_face/kinh_mat.png",
+    "icon": "png_cos/icons/icon_kinh_mat.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "face",
+    "id": "kinh_phi_cong",
+    "vi": "Kính Phi Công",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_face/kinh_phi_cong.png",
+    "icon": "png_cos/icons/icon_kinh_phi_cong.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "face",
+    "id": "mat_na_meo",
+    "vi": "Mặt Nạ Mèo",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_face/mat_na_meo.png",
+    "icon": "png_cos/icons/icon_mat_na_meo.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "face",
+    "id": "rau_gia",
+    "vi": "Râu Giả",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_face/rau_gia.png",
+    "icon": "png_cos/icons/icon_rau_gia.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "face",
+    "id": "mat_na_he",
+    "vi": "Mặt Nạ Hề",
+    "rarity": "Hiếm",
+    "set": "",
+    "overlay": "png_cos/wear_face/mat_na_he.png",
+    "icon": "png_cos/icons/icon_mat_na_he.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "face",
+    "id": "kinh_vr",
+    "vi": "Kính VR",
+    "rarity": "Hiếm",
+    "set": "",
+    "overlay": "png_cos/wear_face/kinh_vr.png",
+    "icon": "png_cos/icons/icon_kinh_vr.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_choang_reu",
+    "vi": "Áo Choàng Rêu",
+    "rarity": "Hiếm",
+    "set": "set1",
+    "overlay": "png_cos/wear_outfit/ao_choang_reu.png",
+    "icon": "png_cos/icons/icon_ao_choang_reu.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_bao_tu_tim",
+    "vi": "Áo Bào Tử Tím",
+    "rarity": "Hiếm",
+    "set": "set2",
+    "overlay": "png_cos/wear_outfit/ao_bao_tu_tim.png",
+    "icon": "png_cos/icons/icon_ao_bao_tu_tim.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_tho_mo",
+    "vi": "Áo Thợ Mỏ",
+    "rarity": "Hiếm",
+    "set": "set3",
+    "overlay": "png_cos/wear_outfit/ao_tho_mo.png",
+    "icon": "png_cos/icons/icon_ao_tho_mo.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_vai_co",
+    "vi": "Áo Vải Cổ",
+    "rarity": "Hiếm",
+    "set": "set4",
+    "overlay": "png_cos/wear_outfit/ao_vai_co.png",
+    "icon": "png_cos/icons/icon_ao_vai_co.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_hai_tac",
+    "vi": "Áo Hải Tặc",
+    "rarity": "Hiếm",
+    "set": "set5",
+    "overlay": "png_cos/wear_outfit/ao_hai_tac.png",
+    "icon": "png_cos/icons/icon_ao_hai_tac.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_long_trang",
+    "vi": "Áo Lông Trắng",
+    "rarity": "Hiếm",
+    "set": "set6",
+    "overlay": "png_cos/wear_outfit/ao_long_trang.png",
+    "icon": "png_cos/icons/icon_ao_long_trang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_giap_neon",
+    "vi": "Áo Giáp Neon",
+    "rarity": "Hiếm",
+    "set": "set7",
+    "overlay": "png_cos/wear_outfit/ao_giap_neon.png",
+    "icon": "png_cos/icons/icon_ao_giap_neon.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_dung_nham",
+    "vi": "Áo Dung Nham",
+    "rarity": "Hiếm",
+    "set": "set8",
+    "overlay": "png_cos/wear_outfit/ao_dung_nham.png",
+    "icon": "png_cos/icons/icon_ao_dung_nham.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_bong_dem",
+    "vi": "Áo Bóng Đêm",
+    "rarity": "Hiếm",
+    "set": "set9",
+    "overlay": "png_cos/wear_outfit/ao_bong_dem.png",
+    "icon": "png_cos/icons/icon_ao_bong_dem.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_anh_sang",
+    "vi": "Áo Ánh Sáng",
+    "rarity": "Hiếm",
+    "set": "set10",
+    "overlay": "png_cos/wear_outfit/ao_anh_sang.png",
+    "icon": "png_cos/icons/icon_ao_anh_sang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_hoodie",
+    "vi": "Áo Hoodie",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_outfit/ao_hoodie.png",
+    "icon": "png_cos/icons/icon_ao_hoodie.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_phi_hanh_gia",
+    "vi": "Áo Phi Hành Gia",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_outfit/ao_phi_hanh_gia.png",
+    "icon": "png_cos/icons/icon_ao_phi_hanh_gia.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "outfit",
+    "id": "ao_bi_ngo",
+    "vi": "Áo Hóa Trang Bí Ngô",
+    "rarity": "Thường",
+    "set": "",
+    "overlay": "png_cos/wear_outfit/ao_bi_ngo.png",
+    "icon": "png_cos/icons/icon_ao_bi_ngo.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_go",
+    "vi": "Giày Gỗ",
+    "rarity": "Thường",
+    "set": "set1",
+    "overlay": "png_cos/wear_shoes/giay_go.png",
+    "icon": "png_cos/icons/icon_giay_go.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_nam",
+    "vi": "Giày Nấm",
+    "rarity": "Thường",
+    "set": "set2",
+    "overlay": "png_cos/wear_shoes/giay_nam.png",
+    "icon": "png_cos/icons/icon_giay_nam.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_bao_ho",
+    "vi": "Giày Bảo Hộ",
+    "rarity": "Thường",
+    "set": "set3",
+    "overlay": "png_cos/wear_shoes/giay_bao_ho.png",
+    "icon": "png_cos/icons/icon_giay_bao_ho.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_cat",
+    "vi": "Giày Cát",
+    "rarity": "Thường",
+    "set": "set4",
+    "overlay": "png_cos/wear_shoes/giay_cat.png",
+    "icon": "png_cos/icons/icon_giay_cat.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_da_bien",
+    "vi": "Giày Da Biển",
+    "rarity": "Thường",
+    "set": "set5",
+    "overlay": "png_cos/wear_shoes/giay_da_bien.png",
+    "icon": "png_cos/icons/icon_giay_da_bien.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_tuyet",
+    "vi": "Giày Tuyết",
+    "rarity": "Thường",
+    "set": "set6",
+    "overlay": "png_cos/wear_shoes/giay_tuyet.png",
+    "icon": "png_cos/icons/icon_giay_tuyet.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_phan_luc",
+    "vi": "Giày Phản Lực",
+    "rarity": "Thường",
+    "set": "set7",
+    "overlay": "png_cos/wear_shoes/giay_phan_luc.png",
+    "icon": "png_cos/icons/icon_giay_phan_luc.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_than_hong",
+    "vi": "Giày Than Hồng",
+    "rarity": "Thường",
+    "set": "set8",
+    "overlay": "png_cos/wear_shoes/giay_than_hong.png",
+    "icon": "png_cos/icons/icon_giay_than_hong.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_ma",
+    "vi": "Giày Ma",
+    "rarity": "Thường",
+    "set": "set9",
+    "overlay": "png_cos/wear_shoes/giay_ma.png",
+    "icon": "png_cos/icons/icon_giay_ma.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "shoes",
+    "id": "giay_hao_quang",
+    "vi": "Giày Hào Quang",
+    "rarity": "Thường",
+    "set": "set10",
+    "overlay": "png_cos/wear_shoes/giay_hao_quang.png",
+    "icon": "png_cos/icons/icon_giay_hao_quang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "ba_lo_mam_cay",
+    "vi": "Ba Lô Mầm Cây",
+    "rarity": "Thường",
+    "set": "set1",
+    "overlay": "png_cos/wear_back/ba_lo_mam_cay.png",
+    "icon": "png_cos/icons/icon_ba_lo_mam_cay.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "canh_buom_phat_quang",
+    "vi": "Cánh Bướm Phát Quang",
+    "rarity": "Thường",
+    "set": "set2",
+    "overlay": "png_cos/wear_back/canh_buom_phat_quang.png",
+    "icon": "png_cos/icons/icon_canh_buom_phat_quang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "xeng_deo_lung",
+    "vi": "Xẻng Đeo Lưng",
+    "rarity": "Thường",
+    "set": "set3",
+    "overlay": "png_cos/wear_back/xeng_deo_lung.png",
+    "icon": "png_cos/icons/icon_xeng_deo_lung.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "khan_choang_vang",
+    "vi": "Khăn Choàng Vàng",
+    "rarity": "Thường",
+    "set": "set4",
+    "overlay": "png_cos/wear_back/khan_choang_vang.png",
+    "icon": "png_cos/icons/icon_khan_choang_vang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "kiem_mini",
+    "vi": "Kiếm Mini Sau Lưng",
+    "rarity": "Thường",
+    "set": "set5",
+    "overlay": "png_cos/wear_back/kiem_mini.png",
+    "icon": "png_cos/icons/icon_kiem_mini.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "khan_len_do",
+    "vi": "Khăn Len Đỏ",
+    "rarity": "Thường",
+    "set": "set6",
+    "overlay": "png_cos/wear_back/khan_len_do.png",
+    "icon": "png_cos/icons/icon_khan_len_do.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "canh_may",
+    "vi": "Cánh Máy",
+    "rarity": "Thường",
+    "set": "set7",
+    "overlay": "png_cos/wear_back/canh_may.png",
+    "icon": "png_cos/icons/icon_canh_may.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "canh_lua",
+    "vi": "Cánh Lửa",
+    "rarity": "Thường",
+    "set": "set8",
+    "overlay": "png_cos/wear_back/canh_lua.png",
+    "icon": "png_cos/icons/icon_canh_lua.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "ao_choang_suong",
+    "vi": "Áo Choàng Sương",
+    "rarity": "Thường",
+    "set": "set9",
+    "overlay": "png_cos/wear_back/ao_choang_suong.png",
+    "icon": "png_cos/icons/icon_ao_choang_suong.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "back",
+    "id": "canh_anh_sang",
+    "vi": "Cánh Ánh Sáng",
+    "rarity": "Thường",
+    "set": "set10",
+    "overlay": "png_cos/wear_back/canh_anh_sang.png",
+    "icon": "png_cos/icons/icon_canh_anh_sang.png",
+    "canvas": [
+      48,
+      64
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_trai_reu",
+    "vi": "Bom Trái Rêu",
+    "rarity": "Hiếm",
+    "set": "set1",
+    "file": "png_cos/bomb_skins/bom_trai_reu.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_nam",
+    "vi": "Bom Nấm",
+    "rarity": "Hiếm",
+    "set": "set2",
+    "file": "png_cos/bomb_skins/bom_nam.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_pha_le",
+    "vi": "Bom Pha Lê",
+    "rarity": "Hiếm",
+    "set": "set3",
+    "file": "png_cos/bomb_skins/bom_pha_le.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_ngoc_co",
+    "vi": "Bom Ngọc Cổ",
+    "rarity": "Hiếm",
+    "set": "set4",
+    "file": "png_cos/bomb_skins/bom_ngoc_co.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_thung_rum",
+    "vi": "Bom Thùng Rum",
+    "rarity": "Hiếm",
+    "set": "set5",
+    "file": "png_cos/bomb_skins/bom_thung_rum.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_tuyet",
+    "vi": "Bom Tuyết",
+    "rarity": "Hiếm",
+    "set": "set6",
+    "file": "png_cos/bomb_skins/bom_tuyet.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_mach_dien",
+    "vi": "Bom Mạch Điện",
+    "rarity": "Hiếm",
+    "set": "set7",
+    "file": "png_cos/bomb_skins/bom_mach_dien.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_magma",
+    "vi": "Bom Magma",
+    "rarity": "Hiếm",
+    "set": "set8",
+    "file": "png_cos/bomb_skins/bom_magma.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_hon_ma",
+    "vi": "Bom Hồn Ma",
+    "rarity": "Hiếm",
+    "set": "set9",
+    "file": "png_cos/bomb_skins/bom_hon_ma.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_loi_sang",
+    "vi": "Bom Lõi Sáng",
+    "rarity": "Hiếm",
+    "set": "set10",
+    "file": "png_cos/bomb_skins/bom_loi_sang.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_qua_cam",
+    "vi": "Bom Quả Cam",
+    "rarity": "Thường",
+    "set": "",
+    "file": "png_cos/bomb_skins/bom_qua_cam.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_ngoi_sao",
+    "vi": "Bom Ngôi Sao",
+    "rarity": "Thường",
+    "set": "",
+    "file": "png_cos/bomb_skins/bom_ngoi_sao.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_banh_kem",
+    "vi": "Bom Bánh Kem",
+    "rarity": "Thường",
+    "set": "",
+    "file": "png_cos/bomb_skins/bom_banh_kem.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "bomb_skin",
+    "id": "bom_meo",
+    "vi": "Bom Mèo",
+    "rarity": "Thường",
+    "set": "",
+    "file": "png_cos/bomb_skins/bom_meo.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_hoa_reu",
+    "vi": "Nổ Hoa Rêu",
+    "rarity": "Sử thi",
+    "set": "set1",
+    "file": "png_cos/explosion_fx/fx_hoa_reu.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_bao_tu",
+    "vi": "Nổ Bào Tử Sáng",
+    "rarity": "Sử thi",
+    "set": "set2",
+    "file": "png_cos/explosion_fx/fx_bao_tu.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_tinh_the",
+    "vi": "Nổ Tinh Thể",
+    "rarity": "Sử thi",
+    "set": "set3",
+    "file": "png_cos/explosion_fx/fx_tinh_the.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_bao_cat",
+    "vi": "Nổ Bão Cát",
+    "rarity": "Sử thi",
+    "set": "set4",
+    "file": "png_cos/explosion_fx/fx_bao_cat.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_song_bien",
+    "vi": "Nổ Sóng Biển",
+    "rarity": "Sử thi",
+    "set": "set5",
+    "file": "png_cos/explosion_fx/fx_song_bien.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_bong_tuyet",
+    "vi": "Nổ Bông Tuyết",
+    "rarity": "Sử thi",
+    "set": "set6",
+    "file": "png_cos/explosion_fx/fx_bong_tuyet.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_dien_tu",
+    "vi": "Nổ Điện Từ",
+    "rarity": "Sử thi",
+    "set": "set7",
+    "file": "png_cos/explosion_fx/fx_dien_tu.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_phun_trao",
+    "vi": "Nổ Phun Trào",
+    "rarity": "Sử thi",
+    "set": "set8",
+    "file": "png_cos/explosion_fx/fx_phun_trao.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_linh_hon",
+    "vi": "Nổ Linh Hồn",
+    "rarity": "Sử thi",
+    "set": "set9",
+    "file": "png_cos/explosion_fx/fx_linh_hon.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_cau_vong",
+    "vi": "Nổ Cầu Vồng Sáng",
+    "rarity": "Sử thi",
+    "set": "set10",
+    "file": "png_cos/explosion_fx/fx_cau_vong.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_phao_hoa",
+    "vi": "Pháo Hoa",
+    "rarity": "Hiếm",
+    "set": "",
+    "file": "png_cos/explosion_fx/fx_phao_hoa.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_trai_tim",
+    "vi": "Trái Tim",
+    "rarity": "Hiếm",
+    "set": "",
+    "file": "png_cos/explosion_fx/fx_trai_tim.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "explosion_fx",
+    "id": "fx_hoa_anh_dao",
+    "vi": "Hoa Anh Đào",
+    "rarity": "Hiếm",
+    "set": "",
+    "file": "png_cos/explosion_fx/fx_hoa_anh_dao.png",
+    "canvas": [
+      48,
+      48
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_slime_reu",
+    "vi": "Slime Rêu",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set1",
+    "file": "png_cos/pets/pet_slime_reu.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_mimi",
+    "vi": "Mimi Nhỏ",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set2",
+    "file": "png_cos/pets/pet_mimi.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_chuot_chui",
+    "vi": "Chuột Chũi Đội Nón",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set3",
+    "file": "png_cos/pets/pet_chuot_chui.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_meo_cat",
+    "vi": "Mèo Cát",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set4",
+    "file": "png_cos/pets/pet_meo_cat.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_vet_bien",
+    "vi": "Vẹt Biển",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set5",
+    "file": "png_cos/pets/pet_vet_bien.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_canh_cut",
+    "vi": "Cánh Cụt Con",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set6",
+    "file": "png_cos/pets/pet_canh_cut.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_gizmo_mini",
+    "vi": "Gizmo Mini",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set7",
+    "file": "png_cos/pets/pet_gizmo_mini.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_rong_lua",
+    "vi": "Rồng Lửa Nhỏ",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set8",
+    "file": "png_cos/pets/pet_rong_lua.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_ma_nho",
+    "vi": "Ma Nhỏ Đáng Yêu",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set9",
+    "file": "png_cos/pets/pet_ma_nho.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "pet",
+    "id": "pet_bum_mini",
+    "vi": "Bùm Mini",
+    "rarity": "Pet (mở khi hạ boss)",
+    "set": "set10",
+    "file": "png_cos/pets/pet_bum_mini.png",
+    "canvas": [
+      40,
+      40
+    ]
+  },
+  {
+    "slot": "footprint",
+    "id": "dau_hoa",
+    "vi": "Dấu Hoa",
+    "rarity": "Thường",
+    "set": "",
+    "file": "png_cos/footprints/dau_hoa.png",
+    "canvas": [
+      24,
+      24
+    ]
+  },
+  {
+    "slot": "footprint",
+    "id": "dau_sao",
+    "vi": "Dấu Sao",
+    "rarity": "Thường",
+    "set": "",
+    "file": "png_cos/footprints/dau_sao.png",
+    "canvas": [
+      24,
+      24
+    ]
+  },
+  {
+    "slot": "footprint",
+    "id": "dau_lua_mini",
+    "vi": "Dấu Lửa Mini",
+    "rarity": "Thường",
+    "set": "",
+    "file": "png_cos/footprints/dau_lua_mini.png",
+    "canvas": [
+      24,
+      24
+    ]
+  }
+]
