@@ -29,7 +29,9 @@
     "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
     "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
     "test:boom-art": "node tests/boom-buddies/art-v3.mjs",
-    "preview:boom-art": "node scripts/boom-art-preview.mjs"
+    "preview:boom-art": "node scripts/boom-art-preview.mjs",
+    "test:boom-pip": "node tests/boom-buddies/pip-v4.mjs",
+    "export:boom-pip": "node scripts/export-pip-v4-review.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

@@ -1,3 +1,4 @@
+import {pipSprite, pipWearAnchor, PIP_WEAR_DOWN} from './pip-v4.js';
 // Raster art generated for this project; sprite state is tied to gameplay time.
 export const BOSS_IDS=['gau_ri_set','nu_hoang_bao_tu','sau_khoan','pharaoh_cat','thuyen_truong_hac_sat','yeti_bang_gia','robot_mk7','rong_dung_nham','hiep_si_bong_dem','vua_ri_set'];
 export const ENEMY_IDS=['enemy_slime_rust','enemy_rat_machine','enemy_nam_lun','enemy_buom_bao_tu','enemy_doi_hang','enemy_golem_da','enemy_xac_uop','enemy_bo_cap','enemy_cua_giap','enemy_hai_au','enemy_nguoi_tuyet','enemy_canh_cut','enemy_robot_tuan_tra','enemy_drone','enemy_quy_lua','enemy_golem_magma','enemy_ma_mo','enemy_bo_xuong','enemy_ri_set_binh','enemy_robot_tuan_tra_2'];
@@ -27,6 +28,7 @@ export function installArt(icons,cosmetics){
  for(const c of cosmetics)c.icon='../'+iconPath(c.id,true);
 }
 export function artSprite(renderer,ctx,key,x,y,w,h,time){
+ if(key.startsWith("pip_")&&pipSprite(renderer,ctx,key,x,y,w,h,time))return true;
  let file,frame=0,cols=1,rows=1;
  const enemy=key.match(/^enemies_4dir\/(.+)\/walk_(up|down|left|right)$/);
  const pip=key.match(/^pip_(?:bare|default)\/(idle|run|hit)_(up|down|left|right)$/);
@@ -56,15 +58,14 @@ export function artSprite(renderer,ctx,key,x,y,w,h,time){
  ctx.drawImage(image,(frame%cols)*cw,Math.floor(frame/cols)*ch,cw,ch,x,y,w,h);
  ctx.restore();return true;
 }
-export const WEAR_ANCHORS={back:[-.12,.1,1.24,.72],outfit:[.17,.46,.66,.43],shoes:[.19,.82,.62,.18],hair:[.14,.07,.72,.32],face:[.25,.25,.5,.2],hat:[.06,-.02,.88,.4]};
-export function drawWardrobe(renderer,ctx,equipped,dir,x,y,w,h,pass){
+export const WEAR_ANCHORS=PIP_WEAR_DOWN;
+export function drawWardrobe(renderer,ctx,equipped,dir,x,y,w,h,pass,visual={action:"idle",clock:0}){
  const slots=pass==='behind'?['back']:['outfit','shoes','hair','face','hat',...(dir==='up'?['back']:[])];
  for(const slot of slots){if(slot==='back'&&pass==='behind'&&dir==='up')continue;if(slot==='face'&&dir==='up')continue;
- const id=equipped[slot],a=WEAR_ANCHORS[slot];if(!id||!a)continue;
+ const id=equipped[slot],a=pipWearAnchor(slot,dir,visual);if(!id||!a)continue;
  const image=renderer.get(iconPath(id,true));if(!image)continue;
  ctx.save();ctx.imageSmoothingEnabled=false;
- const side=(dir==='left'||dir==='right')&&['face','hat','hair'].includes(slot),offset=side?(dir==='left'?-.06:.06):0;
- ctx.drawImage(image,x+(a[0]+offset)*w,y+a[1]*h,a[2]*w,a[3]*h);ctx.restore();
+ ctx.drawImage(image,x+a[0]*w,y+a[1]*h,a[2]*w,a[3]*h);ctx.restore();
  }
 }
 export function cosmeticBlast(ctx,effect,time,id){

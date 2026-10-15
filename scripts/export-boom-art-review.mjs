@@ -1,8 +1,9 @@
 // Build an offline art inspector; this does not claim to be a launcher deployment.
 import fs from'node:fs/promises';import path from'node:path';
 const out=process.argv[2]||'deliverables/bomb-buddies-art-v3-review.html';const root='public/boom/art-v3';
-const manifest=JSON.parse(await fs.readFile(root+'/manifest.json','utf8'));const assets={};for(const asset of manifest.assets)assets['art-v3/'+asset.file]='data:image/webp;base64,'+(await fs.readFile(root+'/'+asset.file)).toString('base64');
-const art=(await fs.readFile('src/games/boom-buddies/art-v3.js','utf8')).replaceAll('export ','');
+const manifest=JSON.parse(await fs.readFile(root+'/manifest.json','utf8'));const assets={};const pipManifest=JSON.parse(await fs.readFile('public/boom/art-v4/manifest.json','utf8'));for(const asset of pipManifest.assets)assets['art-v4/'+asset.file]='data:image/webp;base64,'+(await fs.readFile('public/boom/art-v4/'+asset.file)).toString('base64');for(const asset of manifest.assets)assets['art-v3/'+asset.file]='data:image/webp;base64,'+(await fs.readFile(root+'/'+asset.file)).toString('base64');
+const pip=(await fs.readFile('src/games/boom-buddies/pip-v4-rig.js','utf8')).replaceAll('export ','')+'\n'+(await fs.readFile('src/games/boom-buddies/pip-v4.js','utf8')).replace(/^import .*?;\n/,'').replaceAll('export ','');
+const art=pip+'\n'+(await fs.readFile('src/games/boom-buddies/art-v3.js','utf8')).replace(/^import .*?;\n/,'').replaceAll('export ','');
 const costumes=JSON.parse(await fs.readFile(root+'/cosmetics.json','utf8'));
 let html=await fs.readFile('docs/boom-art-review.html','utf8');html=html.replace(/<link rel="stylesheet"[^>]*>/,'').replace(/<button id="play">.*?<\/button>/,'').replace(/<select id="chapter".*?<\/select>/,'').replace(/<div id="game" hidden><\/div>/,'');
 html=html.replace(/import\{BOSS_IDS[^\n]+\n/,art+'\nconst ART_ASSETS='+JSON.stringify(assets)+';\n');html=html.replace("const costumes=await fetch('/boom/art-v3/cosmetics.json').then(r=>r.json());",'const costumes='+JSON.stringify(costumes)+';');

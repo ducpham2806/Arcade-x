@@ -1,0 +1,139 @@
+{
+  "version": 4,
+  "cell": 96,
+  "feetBaseline": 85,
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "assets": [
+    {
+      "file": "pip-move.webp",
+      "width": 384,
+      "height": 384,
+      "bytes": 79632,
+      "alpha": true
+    },
+    {
+      "file": "pip-actions.webp",
+      "width": 480,
+      "height": 384,
+      "bytes": 108776,
+      "alpha": true
+    },
+    {
+      "file": "pip-portrait.webp",
+      "width": 96,
+      "height": 96,
+      "bytes": 5898,
+      "alpha": true
+    }
+  ],
+  "frames": {
+    "pip-move.webp": [
+      "79c527cfe71255ee28804b273c76365151221acb6d995148dd014fac245b4934",
+      "f0de64ffde3d9bde5bb74f29ca3f0a83bce943657d49701e344e626c7d66cab5",
+      "b430761f82ce086e13e0c16a32aff3e0ba0543cb9caf3b396984e2eadbb6187b",
+      "eeeb1622413cdff9cdbe25500c5f183390f4e90eadec7a0558497a49b0fa5b73",
+      "98aa0c516d9fec02ef7d0fb3b2ba88f108bc8467c205eff15b62e561eebda819",
+      "1b9d013b1f538dfd78a91255e5127555079c401f163f1652bfc7c75c9a18c540",
+      "2d015aa870ce19ed48981ab879b43f1348403eb1172aba22660831764b304ff5",
+      "3cf2f19973a5021da4b7b173bbf4b7053e63d2a6a6187f122d0f32c9a3827539",
+      "845d045ccfd557c302cd453a0b93609ba66e62ad7edae61d9190ae2317aa0444",
+      "a6887208616545cf8e9969056ecb3bed1bbb4f60d47ff336078d39ccbcdc1e5f",
+      "136f0e8d530b037b257f2590a73de5c3e7b75fb078b51112661500d819c2c5cc",
+      "c14b1abd71f41e32e41e4194ae03112977ca70c5668e02c8936e478d848d625f",
+      "db6b09c603fb65bb01b4c59d697118bb59ce3e9c042c865b326972e883ac7391",
+      "2dae02705e8ff0d38b6ce8760aa3b1147f226ed4a44a9f421e1f7e3dca981783",
+      "674ac5fb985a5f33029c3fc33a707b519d17a1153ff8c01c5f615cf1f8a821c5",
+      "039329c12a511b23b7d330000da883bdc83a9fc8f2f9ce64d29b7ba964a05959"
+    ],
+    "pip-actions.webp": [
+      "d3889b37d9f39ea7c23594523cc777c454f35d47259b1858b4d0ef9d59794947",
+      "7d3003edf64c2218a1378bc0472d6474dc7080ba6d2269bbbf8584ef6f2186e3",
+      "7c6130035960252b2b275228079e9e919e7dc6a9d530e2e0d34846c2eda4fea1",
+      "2ae5e3dc18216309b9fc8bd1f9437b810604e6231aea6aca64daa384e13e303e",
+      "a34fa82b9adc9c9c34c72749e30f1bec632f932281396a4b8791a88e65fabfe5",
+      "aff37e1d722f4783a9d488d330e176e46cd54b02fe6cf83ceba9226856f59b7d",
+      "11b8d2037b5ddf38448bf160db65ba76e7cd5dd95b3eba764fcc05d1fba3f188",
+      "a00c77285ba6e598cd932e821ff78b27f1bd81473db337d1f31e8815b6bb93bc",
+      "dcd42ad16645fd0a23463cfa6d4c3fc3169394ec3ca0f69a3322dcb77fa80e48",
+      "1441a191ae5a014c8594e48af19a032832e71c1d8849662016094b523b82586a",
+      "6f2cfbf360f233a7ce60a89f45eb2e82a732b633d2ab1087d7dd8b72d28bd8fa",
+      "73d71574f20f8e593b9be243c17ddca1cdcf0152a2594235c23986b80e67a81f",
+      "c15d16908ff8087fc1c391d3b37f7fafe465ac58543e7e53032f75283354bb30",
+      "de53d5a918afe7174ea7ba921931120ce6cf74ed189b02407334b549ff3d197e",
+      "6d13f9739c049f4f8affcb7d2b9fc28a16319cf825fe742670d1196ce41552e2",
+      "a3d946313d8d6cc8f3803496d1e565c5ea3620f9e85df5432f05249e01deaad7",
+      "c73896d991a44670048bf2d030064a406d1e366bd1848f6df112d5f2a035e88f",
+      "12b27553d24964b01641392cb35c2065fa8c264d62c02aee404546f641c76cd8",
+      "9955d3c3a00da93b8ccaba64d6333b5c7902bc57332e31e0405330467ccd718c",
+      "fabe6438d303d62712bbdaff496cdc3bda1b7db27f65fc66a7b16c0e3016b387"
+    ]
+  },
+  "headTops": {
+    "pip-move.webp": [
+      0.13541666666666666,
+      0.13541666666666666,
+      0.13541666666666666,
+      0.13541666666666666,
+      0.14583333333333334,
+      0.125,
+      0.15625,
+      0.15625,
+      0.13541666666666666,
+      0.13541666666666666,
+      0.125,
+      0.13541666666666666,
+      0.13541666666666666,
+      0.13541666666666666,
+      0.125,
+      0.13541666666666666
+    ],
+    "pip-actions.webp": [
+      0.09375,
+      0.1875,
+      0.10416666666666667,
+      0.08333333333333333,
+      0.3645833333333333,
+      0.13541666666666666,
+      0.28125,
+      0.13541666666666666,
+      0.09375,
+      0.3125,
+      0.11458333333333333,
+      0.17708333333333334,
+      0.10416666666666667,
+      0.09375,
+      0.2604166666666667,
+      0.11458333333333333,
+      0.17708333333333334,
+      0.10416666666666667,
+      0.09375,
+      0.2604166666666667
+    ]
+  },
+  "canonicalRows": "down from movement row 0; up from rear correction; right from movement row 3; left mirrors right. Actions use front/right rows, corrected rear-action sheet, and mirrored right for left.",
+  "totalBytes": 194306,
+  "decodedBytes": 1363968,
+  "sourceSizes": {
+    "move": {
+      "width": 1254,
+      "height": 1254
+    },
+    "back": {
+      "width": 1254,
+      "height": 1254
+    },
+    "actions": {
+      "width": 1619,
+      "height": 971
+    },
+    "rearActions": {
+      "width": 1254,
+      "height": 1254
+    }
+  }
+}

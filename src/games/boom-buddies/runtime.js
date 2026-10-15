@@ -1,3 +1,4 @@
+import {pipVisual, drawPipGround} from './pip-v4.js';
 import {artSprite, installArt, bossPose, drawWardrobe, cosmeticBlast, iconPath, WEAR_ANCHORS} from './art-v3.js';
 // Recovered reviewed runtime; keeps bundled third-party notices.
 let mountBoom;
@@ -7624,6 +7625,7 @@ Error generating stack: ` + l.message + `
           if(!clear(nx,ny))break;
         }else break;
       }
+      p.walkDistance=(p.walkDistance||0)+Math.hypot(nx-p.px,ny-p.py);
       p.fromX=p.px;p.fromY=p.py;p.px=nx;p.py=ny;p.moving=true;p.lastMove=e.time;
     }
     const previousX=p.x,previousY=p.y;p.x=Math.round(p.px);p.y=Math.round(p.py);
@@ -7673,7 +7675,7 @@ Error generating stack: ` + l.message + `
       let [o, s] = Ke[t.dir];
       $a(e, l.x + o * 2, l.y + s * 2) && (l.x += o * 2, l.y += s * 2, l.chain = true);
     }
-    return e.bombs.push(l), (t.bombPass ||= []).push(l.id), oe(e, "bomb", "Bom \u0111\xE3 \u0111\u1EB7t"), true;
+    return e.bombs.push(l), t.placedAt=e.time, (t.bombPass ||= []).push(l.id), oe(e, "bomb", "Bom \u0111\xE3 \u0111\u1EB7t"), true;
   }
   function bn(e, a) {
     let t = [{ x: a.x, y: a.y, part: "center", rotation: 0 }];
@@ -7701,7 +7703,7 @@ Error generating stack: ` + l.message + `
   }
   function co(e, a = "explosion") {
     let t = e.player;
-    e.status !== "playing" || t.invulnerable > e.time || (t.shield > e.time ? (t.shield = 0, oe(e, "shield", "Khi\xEAn \u0111\xE3 ch\u1EB7n m\u1ED9t \u0111\xF2n")) : (t.hp--, e.damage++, oe(e, "hit", "Pip m\u1EA5t 1 tim!"), At(e, "hit", t.x, t.y)), t.invulnerable = e.time + 1500 + e.statGuard * 100, t.hp <= 0 && (e.status = "lost", e.reason = a === "time" ? "H\u1EBFt th\u1EDDi gian" : "Pip \u0111\xE3 h\u1EBFt tim", oe(e, "lose", e.reason)));
+    e.status !== "playing" || t.invulnerable > e.time || (t.shield > e.time ? (t.shield = 0, oe(e, "shield", "Khi\xEAn \u0111\xE3 ch\u1EB7n m\u1ED9t \u0111\xF2n")) : (t.hp--, t.hurtAt=e.time, e.damage++, oe(e, "hit", "Pip m\u1EA5t 1 tim!"), At(e, "hit", t.x, t.y)), t.invulnerable = e.time + 1500 + e.statGuard * 100, t.hp <= 0 && (e.status = "lost", e.reason = a === "time" ? "H\u1EBFt th\u1EDDi gian" : "Pip \u0111\xE3 h\u1EBFt tim", oe(e, "lose", e.reason)));
   }
   function Rx(e, a) {
     if (a.item) return;
@@ -8049,6 +8051,7 @@ Error generating stack: ` + l.message + `
   var Ln = class {
     constructor() {
       this.images = /* @__PURE__ */ new Map();
+      this.get("art-v4/pip-move.webp");this.get("art-v4/pip-actions.webp");
     }
     get(a) {
       let t = this.images.get(a);
@@ -8110,10 +8113,11 @@ Error generating stack: ` + l.message + `
       let _ = (d, y = false) => {
         let pos=boomPosition(d,t.time), M=pos.x*48, g=pos.y*48;
         r.save(), y && t.player.invulnerable > t.time && (r.globalAlpha = Math.floor(t.time / 100) % 2 ? 0.45 : 1);
-        let c = y ? `pip_${Object.keys(o).length ? "bare" : "default"}/${d.invulnerable>t.time+1200?"hit":d.moving?"run":"idle"}_${d.dir}` : `enemies_4dir/${d.kind === "enemy_nam_small" ? "enemy_nam_lun" : d.kind}/walk_${d.dir}`;
-        if(y)drawWardrobe(this,r,o,d.dir,M,g-16,48,64,"behind");
-        this.sprite(r,c,M,y?g-16:g,48,y?64:48,d.frozenAt ?? t.time);
-        if(y)drawWardrobe(this,r,o,d.dir,M,g-16,48,64,"front");
+        const visual=y?pipVisual(d,t.status,t.time):null;
+        const c=y?`pip_${Object.keys(o).length?'bare':'default'}/${visual.action}_${visual.dir}`:`enemies_4dir/${d.kind==='enemy_nam_small'?'enemy_nam_lun':d.kind}/walk_${d.dir}`;
+        if(y){drawPipGround(r,M,g-16,48,64,visual);drawWardrobe(this,r,o,d.dir,M,g-16,48,64,'behind',visual);}
+        this.sprite(r,c,M,y?g-16:g,48,y?64:48,y?visual.clock:d.frozenAt??t.time);
+        if(y)drawWardrobe(this,r,o,d.dir,M,g-16,48,64,'front',visual);
         y && t.player.shield > t.time && this.sprite(r, "fx/shield_bubble", M - 4, g - 16, 56, 64, t.time), !y && d.hp > 1 && (r.fillStyle = "#e9f0ef", r.fillRect(M + 12, g - 7, 24, 4)), d.frozen > t.time && (r.fillStyle = "#b5f1ff55", r.fillRect(M, g - 6, 48, 48)), r.restore();
       };
       for (let d of t.enemies.filter((y) => !y.deadUntil)) _(d);
@@ -8190,7 +8194,7 @@ Error generating stack: ` + l.message + `
   function Rt({ equipped: e = {}, size: a = 120 }) {
     const layers=['back','outfit','shoes','hair','face','hat'];
     return (0,f.jsxs)('div',{className:'boom-pip',style:{width:a,height:a*4/3,position:'relative'},children:[
-      (0,f.jsx)('span',{className:'boom-pip-base',role:'img','aria-label':'Pip',style:{position:'absolute',inset:0,backgroundImage:`url(${ve('art-v3/pip.webp')})`,backgroundSize:'400% 400%',backgroundPosition:'0% 0%',imageRendering:'pixelated',zIndex:1}}),
+      (0,f.jsx)('span',{className:'boom-pip-base',role:'img','aria-label':'Pip',style:{position:'absolute',inset:0,backgroundImage:`url(${ve('art-v4/pip-move.webp')})`,backgroundSize:'400% 400%',backgroundPosition:'0% 0%',imageRendering:'pixelated',zIndex:1}}),
       ...layers.filter(slot=>e[slot]).map(slot=>{const anchor=WEAR_ANCHORS[slot];return (0,f.jsx)('img',{src:ve(iconPath(e[slot],true)),alt:slot,style:{position:'absolute',left:`${anchor[0]*100}%`,top:`${anchor[1]*100}%`,width:`${anchor[2]*100}%`,height:`${anchor[3]*100}%`,objectFit:'contain',imageRendering:'pixelated',zIndex:slot==='back'?0:2}},slot);})
     ]});
   }

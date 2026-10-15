@@ -38,3 +38,7 @@ JavaScript syntax checks passed. Asset audit passed all 215 outputs: 10 boss she
 Offline art inspector startup was exercised with a minimal DOM/canvas test double: 10 boss cards, 143 inventory cards and 4 outfit directions resolve embedded assets. This is not a browser rendering test. Browser QA could not reach the local preview (connection refused); no full Arcade-x build, mobile GPU/FPS profile or end-to-end combat playthrough has been completed. Keep this change in draft review pending those checks. Existing art files remain available as renderer fallback.
 
 Run `npm run test:boom-art`; `npm run preview:boom-art` serves the gallery plus local game at port 4179 when the full repository is present. `scripts/export-boom-art-review.mjs` creates a self-contained offline art inspector; it deliberately does not claim to be a live launcher release.
+
+## Current player follow-up
+
+Pip's active body renderer now uses the separate [v4 character specification](BOOM-PIP-V4.md): 16 movement +20 action cells, true rear artwork, shared foot pivots, pose-following wardrobe landmarks and event-driven animation clocks. The original v3 Pip sheet remains a loading fallback. The additional three images total 194,306 compressed bytes /1,363,968 decoded bytes. Combined v3+v4 decoded assets remain about 13.1 MiB. This does not change the browser/performance verification limitations above.
