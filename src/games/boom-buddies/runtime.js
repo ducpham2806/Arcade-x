@@ -7456,15 +7456,68 @@ Error generating stack: ` + l.message + `
     return e.cells.map((a, t) => ({ t: a, i: t, x: t % e.level.width, y: Math.floor(t / e.level.width) })).filter((a) => a.t.wall === "none" && a.x > 0 && a.x < e.level.width - 1 && a.y > 0 && a.y < e.level.height - 1);
   }
   function ro(e, a, t, l) {
-    let o = Le(e).filter((n) => Re(n, e.player) > 4 && !e.enemies.some((u) => u.x === n.x && u.y === n.y)), s = o[Math.floor(_a(e) * o.length)];
+    let o = Le(e).filter((n) => Re(n, e.player) > 5 && $a(e,n.x,n.y) && !n.t.terrain && !n.t.switch && !n.t.item && !e.enemies.some((u) => Re(u,n)<2)), s = o[Math.floor(_a(e) * o.length)];
+    if(t===void 0&&!s){
+      o=Le(e).filter(n=>Re(n,e.player)>4&&$a(e,n.x,n.y)&&!['lava','spike','fire','door','conveyor','teleport'].includes(n.t.terrain)&&!e.enemies.some(u=>u.x===n.x&&u.y===n.y));
+      s=o[Math.floor(_a(e)*o.length)];
+    }
     if (t === void 0 && !s) return;
     let i = a || Ve[e.level.chapter - 1].enemies[Math.floor(_a(e) * 2)];
-    e.enemies.push({ id: ++e.sequence, x: t ?? s.x, y: l ?? s.y, fromX: t ?? s.x, fromY: l ?? s.y, dir: "down", lastMove: e.time, next: e.time + 1200, hp: /golem|giap|xac_uop|bo_xuong/.test(i) ? 2 : 1, kind: i, frozen: 0 });
+    e.enemies.push({ id: ++e.sequence, x: t ?? s.x, y: l ?? s.y, fromX: t ?? s.x, fromY: l ?? s.y, dir: "down", lastMove: e.time, next: e.time + 1400 + (e.enemies.length%4)*250, hp: /golem|giap|xac_uop|bo_xuong/.test(i) ? 2 : 1, kind: i, frozen: 0 });
+  }
+  // Authored blockout rules: keep an opening refuge, then vary tactical space by stage.
+  function boomBlockout(e) {
+    const {width:w,height:h,stage}=e.level;
+    const refuge=new Set(['1,1','2,1','3,1','3,2','3,3','2,3','1,3','1,2']);
+    const mid=2*Math.floor(h/4)+1;
+    for(let y=2;y<h-1;y+=2)for(let x=2;x<w-1;x+=2){
+      // Collection spine, cross-court, survival loop, and rescue hub.
+      if((stage===3&&x===4)||(stage===4&&y===mid-1)||
+         (stage===5&&(x===2||x===w-3))||(stage===6&&y===mid-1)){
+        const t=j(e,x,y);t.wall='none';t.hp=1;
+      }
+    }
+    e.layout={version:2,kind:['','training','duel','spine','crosscourt','survival-loop','rescue-hub','siege','boss-ring'][stage],refuge:[...refuge]};
+    return refuge;
+  }
+  function boomFinishBlockout(e,refuge) {
+    const cells=e.cells.map((t,i)=>({t,x:i%e.level.width,y:Math.floor(i/e.level.width)}));
+    // Keep opening refuge and objective interactions free of forced movement/hazards.
+    for(const c of cells)if(refuge.has(`${c.x},${c.y}`)||c.t.switch||c.t.item==='gem'||
+      ['cage','ice','machine'].includes(c.t.wall)||(c.x===e.gate.x&&c.y===e.gate.y))delete c.t.terrain;
+    // Keep paired traversal and visit objectives valid after safety cleanup.
+    const traversable=cells.filter(c=>c.t.wall==='none'&&!c.t.switch&&!c.t.item&&!refuge.has(`${c.x},${c.y}`)&&!(c.x===e.gate.x&&c.y===e.gate.y));
+    if(e.level.chapter===7||e.level.chapter===10){
+      cells.forEach(c=>{if(c.t.terrain==='teleport')delete c.t.terrain;});
+      const pair=[traversable[0],traversable[traversable.length-1]];
+      if(pair[0]&&pair[1]&&pair[0]!==pair[1])pair.forEach(c=>c.t.terrain='teleport');
+    }
+    const visits=e.level.goals.find(g=>g.kind==='visit')?.target||0;
+    let bridges=cells.filter(c=>c.t.wall==='none'&&c.t.terrain==='bridge').length;
+    for(const c of traversable)if(bridges<visits&&!['bridge','teleport'].includes(c.t.terrain)){c.t.terrain='bridge';bridges++;}
+    // A wall quota is a completion requirement, even after switches replace walls.
+    const target=e.level.goals.find(g=>g.kind==='wall')?.target||0;
+    let count=cells.filter(c=>!['hard','none','mirror'].includes(c.t.wall)).length;
+    for(const c of cells.filter(c=>c.t.wall==='none'&&!c.t.switch&&!c.t.item&&!['bridge','teleport'].includes(c.t.terrain)&&!refuge.has(`${c.x},${c.y}`)).reverse()){
+      if(count>=target)break;
+      c.t.wall=e.level.chapter===3?'cracked':'soft';c.t.hp=e.level.chapter===3?2:1;count++;
+    }
+    if(e.level.stage===8){
+      // Unbroken perimeter around the 3x3 boss footprint, with clean approaches.
+      for(const c of cells)if(c.x>0&&c.x<e.level.width-1&&c.y>0&&c.y<e.level.height-1){
+        if(c.x<=2||c.x>=6||c.y<=2||c.y>=6){
+          c.t.wall='none';c.t.hp=1;
+        }
+        delete c.t.terrain;delete c.t.item;
+      }
+      j(e,e.gate.x,e.gate.y).wall='soft';
+    }
   }
   function Gh(e, a = Date.now(), t = _n(), l = {}, o = "campaign", s = false) {
     let i = 3 + t.health, n = e.seconds ? e.seconds * 1e3 + (l.clock || 0) * 3e4 : 0, u = { version: 1, id: `${o}-${e.id}-${a}-${Date.now()}`, level: JSON.parse(JSON.stringify(e)), mode: o, seed: a >>> 0, rng: a >>> 0, time: 0, cells: [], player: { id: 0, x: 1, y: 1, fromX: 1, fromY: 1, dir: "down", lastMove: 0, next: 0, hp: i, maxHp: i, kind: "pip", frozen: 0, capacity: 1 + t.bombs + (l.bomb || 0), range: 1 + t.range, speed: 3 * (1 + t.speed * 0.05), fuse: 2500 - t.fuse * 100, shield: l.shield ? 2e4 : 0, armor: 0, passwall: 0, magnet: 0, invulnerable: 0, remote: false, kick: false, glove: false, pierce: 0, special: { fire: l.special || 0, ice: 0, blackhole: 0, light: 0 }, boots: 0 }, enemies: [], bombs: [], fx: [], warnings: [], gate: { x: e.width - 2, y: e.height - 2, revealed: false }, goals: Dx(), status: "playing", endingAt: 0, reason: "", score: 0, coins: 0, damage: 0, rescued: [], injured: 0, revived: false, usedBoosters: Object.values(l).reduce((c, h) => c + (h || 0), 0), collected: 0, lightShards: 0, placed: 0, wallsSinceDrop: 0, chainBest: 1, chainCount: 0, switchNext: 1, temperature: 100, terrainAt: 4e3, teleportAt: 0, slowUntil: 0, curseUntil: 0, radar: l.radar ? 1e4 : 0, hammer: l.hammer || 0, reviveTokens: l.revive || 0, treasure: !!l.treasure, visited: [], events: [], sequence: 0, paid: false, statGuard: t.guard, statLuck: t.luck, easy: s, limit: n };
     for (let c = 0; c < e.height; c++) for (let h = 0; h < e.width; h++) u.cells.push({ wall: h === 0 || c === 0 || h === e.width - 1 || c === e.height - 1 || h % 2 === 0 && c % 2 === 0 ? "hard" : "none", hp: 1 });
-    let r = Le(u).filter((c) => Re(c, u.player) > 2).sort((c, h) => c.i - h.i);
+    const refuge=boomBlockout(u);
+    let r = Le(u).filter((c) => !refuge.has(`${c.x},${c.y}`)).sort((c, h) => c.i - h.i);
     for (let c = r.length - 1; c > 0; c--) {
       let h = Math.floor(_a(u) * (c + 1));
       [r[c], r[h]] = [r[h], r[c]];
@@ -7473,15 +7526,21 @@ Error generating stack: ` + l.message + `
     for (let c of r.slice(0, x)) c.t.wall = e.chapter === 3 ? "cracked" : "soft", c.t.hp = c.t.wall === "cracked" ? 2 : 1;
     let m = r.slice(0, x).sort((c, h) => Re(h, u.player) - Re(c, u.player))[0];
     u.gate = { x: m.x, y: m.y, revealed: false };
-    let d = 1;
+    const objectiveCells=[...r].sort((a,b)=>a.y-b.y||a.x-b.x);
+    let d = 0;
+    const objectCount=e.goals.filter(g=>['collect','rescue','barrel','ice','machine','switch'].includes(g.kind)).reduce((n,g)=>n+g.target,0);
+    const objectSlots=Array.from({length:objectCount},(_,i)=>objectiveCells[Math.floor((i+.5)*objectiveCells.length/objectCount)]);
+    for(let i=objectSlots.length-1;i>=0;i--){const k=r.indexOf(objectSlots[i]);if(k>=0)r.splice(k,1);}
+    // Dedicated, evenly spaced objective slots must not be reused by the gate.
+
     for (let c of e.goals) if (["collect", "rescue", "barrel", "ice", "machine", "switch"].includes(c.kind)) for (let h = 0; h < c.target; h++) {
-      let b = r[d++];
+      let b = objectSlots[d++];
       if (!b) throw Error("Level has too many objects");
       c.kind === "switch" ? (b.t.wall = "none", b.t.switch = h + 1, b.t.lit = false) : c.kind === "collect" ? (b.t.wall = "soft", b.t.hp = 1, b.t.item = "gem") : (b.t.wall = c.kind === "rescue" ? "cage" : c.kind === "barrel" ? "barrel" : c.kind === "ice" ? "ice" : "machine", b.t.hp = 1);
     }
     let y = j(u, u.gate.x, u.gate.y);
     if (y.wall === "none" || y.item || y.wall === "cage") {
-      let c = r.slice(d).find((h) => h.t.wall === "soft" || h.t.wall === "cracked" || h.t.wall === "ice");
+      let c = r.find((h) => h.t.wall === "soft" || h.t.wall === "cracked" || h.t.wall === "ice");
       c ? u.gate = { x: c.x, y: c.y, revealed: false } : (y.wall = "soft", delete y.item, delete y.switch);
     }
     let S = ["bomb_plus", "kick", "pierce", "glove", "magnet", "bomb_fire", "hourglass", "armor", "bomb_blackhole", "shield"], M = r.find((c) => c.t.wall !== "none" && !c.t.item && c.x !== u.gate.x && c.y !== u.gate.y);
@@ -7499,7 +7558,7 @@ Error generating stack: ` + l.message + `
     }
     if (e.goals.some((c) => c.kind === "visit") && Le(u).filter((c) => Re(c, u.player) > 3).slice(0, 3).forEach((c) => c.t.terrain = "bridge"), e.chapter === 9 && [[2, 2], [6, 2], [2, e.height - 3], [6, e.height - 3]].forEach(([c, h]) => {
       let b = j(u, c, h);
-      b.wall = "mirror", b.hp = 99;
+      if(b.wall === "hard")b.wall = "mirror", b.hp = 99;
     }), e.stage === 8) {
       for (let h = 2; h <= 6; h++) for (let b = 2; b <= 6; b++) j(u, b, h).wall = "none";
       let c = oa[e.chapter - 1];
@@ -7510,7 +7569,9 @@ Error generating stack: ` + l.message + `
         let O = j(u, h, b);
         O.wall = "none", O.switch = C + 1;
       });
-    } else for (let c = 0; c < e.enemies; c++) ro(u);
+    }
+    boomFinishBlockout(u,refuge);
+    if(e.stage!==8)for (let c = 0; c < e.enemies; c++) ro(u);
     return oe(u, "start", e.name), u;
   }
   // Continuous world coordinates in tiles (48 design pixels per tile).
@@ -8435,3 +8496,4 @@ lucide-react/dist/esm/lucide-react.js:
 */
 
 export {mountBoom};
+
