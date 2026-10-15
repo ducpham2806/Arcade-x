@@ -285,10 +285,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Subscribe to real-time incoming PvP challenges
   useEffect(() => {
     if (!profile?.id) return;
+    const notified = new Set<string>();
     const unsub = SupabaseService.subscribeToIncomingChallenges(profile.id, (challenges) => {
       setIncomingChallenges(challenges);
       if (challenges.length > 0) {
         const newest = challenges[0];
+        if (notified.has(newest.id)) return;
+        notified.add(newest.id);
         setActiveIncomingChallenge(newest);
         const challengerName = newest.senderName || newest.fromName || 'Bạn bè';
         const gameName = newest.gameTitle || newest.gameName || 'Trò chơi';
@@ -296,8 +299,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           challengerName,
           gameName
         );
-        soundEngine.play('notification');
-        hapticService.tap();
+        // The toast owns the single notification sound.
       }
     });
     return () => unsub();

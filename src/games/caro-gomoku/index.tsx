@@ -1,3 +1,5 @@
+import {IngameChat} from '../../components/SocialChatThread';
+import '../../components/social.css';
 import { LearningHub } from '../duel/LearningHub';
 import { ConnectionNotice } from '../duel/ConnectionNotice';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -930,6 +932,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   return (
     <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
 <ConnectionNotice active={!!activeRoomId}/>
+<IngameChat roomId={activeRoomId}/>
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
       <LearningHub game="caro-gomoku" lobby={screenMode==='lobby'} roomId={activeRoomId} ended={!!isMatchFinished} result={matchResult} matchKey={activeRoomId ? activeRoomId+JSON.stringify(roomData?.lastMove) : JSON.stringify(screenMode==='local_hotseat'?localBoardState:aiBoardState)} ranked={screenMode==='playing'} board={activeBoard} onResume={id=>{setActiveRoomId(id);setScreenMode('playing');}} onInvite={()=>{void handleCreateRoom();}}/>
       {screenMode==='local_hotseat'&&<p className="rounded-xl bg-slate-800 px-4 py-2 text-white">Chuỗi đấu: P1 {series.p1} – {series.p2} P2 · {series.p1>=2?'P1 thắng chuỗi':series.p2>=2?'P2 thắng chuỗi':'Ai thắng 2 ván trước sẽ thắng chuỗi'}</p>}

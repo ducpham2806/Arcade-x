@@ -70,7 +70,7 @@ export class CentralizedAudioManager {
 
   // Settings with localStorage persistence
   private isSoundMuted: boolean = false;
-  private isMusicMuted: boolean = false;
+  private isMusicMuted: boolean = true;
   private soundVolume: number = 0.8;
   private musicVolume: number = 0.5;
   private currentTheme: MusicTheme = 'arcade';
@@ -93,6 +93,11 @@ export class CentralizedAudioManager {
       const soundMuted = localStorage.getItem('arcadex_sound_muted');
       if (soundMuted !== null) this.isSoundMuted = soundMuted === 'true';
 
+      // One-time reset of the old automatic beep loop; music is opt-in.
+      if (localStorage.getItem('arcadex_audio_policy') !== '2') {
+        localStorage.setItem('arcadex_music_muted', 'true');
+        localStorage.setItem('arcadex_audio_policy', '2');
+      }
       const musicMuted = localStorage.getItem('arcadex_music_muted');
       if (musicMuted !== null) this.isMusicMuted = musicMuted === 'true';
 
@@ -215,6 +220,11 @@ export class CentralizedAudioManager {
     this.setSoundMuted(muted);
   }
 
+  public setAllMuted(muted: boolean) {
+    this.setSoundMuted(muted);
+    this.setMusicMuted(muted);
+  }
+
   public getIsMuted(): boolean {
     return this.isSoundMuted;
   }
@@ -314,6 +324,7 @@ export class CentralizedAudioManager {
       this.bgmGain.gain.linearRampToValueAtTime(target, this.ctx.currentTime + 0.15);
     }
 
+    if (muted) this.stopMusic();
     if (!muted && !this.isMusicActive) {
       this.playMusic(this.currentTheme);
     }
@@ -375,6 +386,7 @@ export class CentralizedAudioManager {
       } catch {}
     }
 
+    if (this.isMusicMuted) { this.stopMusic(); return; }
     this.initCtx();
     if (!this.ctx) return;
 
@@ -428,7 +440,9 @@ export class CentralizedAudioManager {
 
   // Procedural Music Scheduler Loop
   private schedulerLoop() {
-    if (!this.ctx || !this.isMusicActive || !this.bgmFilter) return;
+    if (!this.ctx || !this.isMusicActive || this.isMusicMuted || !this.isDocumentVisible || !this.bgmFilter) return;
+    // Do not replay a backlog after returning from a hidden tab.
+    this.nextStepTime = Math.max(this.nextStepTime, this.ctx.currentTime);
 
     const theme = THEMES[this.currentTheme] || THEMES.arcade;
     const stepDuration = 60 / theme.bpm / 4; // 16th note in seconds

@@ -1,3 +1,5 @@
+import {IngameChat} from '../../components/SocialChatThread';
+import '../../components/social.css';
 import { explainXiangqiMove } from './rules';
 import { LearningHub } from '../duel/LearningHub';
 import { ConnectionNotice } from '../duel/ConnectionNotice';
@@ -696,6 +698,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   return (
     <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
 <ConnectionNotice active={!!activeRoomId}/>
+<IngameChat roomId={activeRoomId}/>
       {activeRoomId&&error&&<p role="alert" className="p-2 text-amber-200">{error} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
       {moveHint&&<p role="status" className="text-sm text-amber-200 p-2">{moveHint}</p>}
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}

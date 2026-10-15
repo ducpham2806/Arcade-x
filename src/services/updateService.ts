@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.9.1';
-export const APP_CODENAME = "Duel Online";
-export const APP_RELEASE_NOTES = "Đối kháng online: sửa tìm trận đồng thời, xác nhận nước đi, phục hồi đồng bộ; nâng bot và trung tâm luyện tập cho Caro, cờ vua, cờ tướng.";
+export const CURRENT_APP_VERSION = '2.10.0';
+export const APP_CODENAME = "Arcade Community";
+export const APP_RELEASE_NOTES = "Sửa âm thanh lặp; thêm chat chung, kênh game, inbox riêng, chat trong trận, bạn bè online và hồ sơ chi tiết.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

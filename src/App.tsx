@@ -67,6 +67,7 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const handleOpenModalEvent = (e: Event) => {
       const custom = e as CustomEvent<{ modal?: string }>;
+      if (custom.detail?.modal === 'friends') { openChat(); return; }
       if (custom.detail?.modal) {
         setActiveModal(custom.detail.modal as any);
       }

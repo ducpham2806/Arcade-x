@@ -1,8 +1,8 @@
 {
   "project": "Arcade-x",
-  "revision": "online-sync-fix-2026-10-15",
+  "revision": "community-2026-10-15",
   "published": false,
-  "productionDatabaseChanged": false,
+  "productionDatabaseChanged": true,
   "validation": {
     "typecheck": "passed",
     "build": "passed",
@@ -101,6 +101,11 @@
       "sha256": "e97222cca4a9a343733d9c4a6045f352edbbf467a32ddeba077febf45fce35c4"
     },
     {
+      "path": "docs/SOCIAL-COMMUNITY.md",
+      "bytes": 3989,
+      "sha256": "3bcc1f959365c0fd789f842de53df1c4454d5352b8d671a6488adda6f1a35ec4"
+    },
+    {
       "path": "index.html",
       "bytes": 2215,
       "sha256": "cca9c6ff9c1bf5fbd9da5936deab59bf39920aedbe38c7b0fb0a934ae4789d17"
@@ -117,8 +122,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 2064,
-      "sha256": "6833c8111fbf3ef5dffb219bc5c149aa0bfb3f98137b7e84ccaedfdb1115c4cd"
+      "bytes": 2142,
+      "sha256": "736f832ca325aafc53249c5a46e50b9f444caf169e4050d54d272a7bf87979a3"
     },
     {
       "path": "playwright.config.ts",
@@ -7782,8 +7787,8 @@
     },
     {
       "path": "src/App.tsx",
-      "bytes": 9554,
-      "sha256": "3749bed24e5d48e0aeea4302560c3c1a57cc9eadf1d6104413a9987c7f91913f"
+      "bytes": 9624,
+      "sha256": "ba86bd5f15c323d882c45c3b5105a63fb21ee02274cd773b1ac3008ddd751293"
     },
     {
       "path": "src/accessibility/canvasText.ts",
@@ -7837,8 +7842,8 @@
     },
     {
       "path": "src/components/GlobalChat.tsx",
-      "bytes": 34806,
-      "sha256": "71bea7eb67866b3d043efdba489a87d4d9b72ce82a217bc2fbda0bb973c1e90b"
+      "bytes": 9034,
+      "sha256": "291d165d1b09f73244451c1a652928e6f98749764cce00fec1c7ddafd4e96468"
     },
     {
       "path": "src/components/Header.tsx",
@@ -7876,9 +7881,14 @@
       "sha256": "f5cdd659f92dd7c2d6d2f7310259c30aff0a352fcd4496c245080e074b868b29"
     },
     {
+      "path": "src/components/ProfileDetails.tsx",
+      "bytes": 2799,
+      "sha256": "eb9d6a1061d3de555bde06895d5ed2678a85b1e053d2cb00d96ce487652784a2"
+    },
+    {
       "path": "src/components/ProfileModal.tsx",
-      "bytes": 6776,
-      "sha256": "3cef869659d52d4da74290f4db757193ee2c30fb45a2093941e64dbd39c67efd"
+      "bytes": 6853,
+      "sha256": "642231af879c29983274641b5e9285c24d444bb9a96f6dcfddce516472bda32d"
     },
     {
       "path": "src/components/PvpMatchHistoryModal.tsx",
@@ -7887,13 +7897,18 @@
     },
     {
       "path": "src/components/SettingsModal.tsx",
-      "bytes": 4684,
-      "sha256": "4b70e742611644fc6c5dc20d23bd7d59298f5b7f1b227f6ccac0ff4d621121f6"
+      "bytes": 4865,
+      "sha256": "81f44764f321f7d6175c261d6ec5acef321cb40978abc6f33db729f8b6b6e889"
     },
     {
       "path": "src/components/ShareModal.tsx",
       "bytes": 19231,
       "sha256": "725f1d440b5207e3ae855f6640b99e4e96fd326110d3a3e236723a4135906330"
+    },
+    {
+      "path": "src/components/SocialChatThread.tsx",
+      "bytes": 3121,
+      "sha256": "b56a2c4a91ae4f3705651519be4083693785cebcbdd5be8796bc02335b1efb2d"
     },
     {
       "path": "src/components/SplashScreen.tsx",
@@ -7961,6 +7976,11 @@
       "sha256": "4bfbde23df4aa954bb7690d165821899579f41b394ae17b70bbb654ae6baa2f7"
     },
     {
+      "path": "src/components/social.css",
+      "bytes": 3565,
+      "sha256": "c8ea9f2cd3d08453d77ccdcac1aeddb0046e7ca1ee2541c20682e9e0b67fd08e"
+    },
+    {
       "path": "src/config/public-backend.json",
       "bytes": 126,
       "sha256": "c9d3bc3e13c87c0da3f4619752cb60767d96f5d2c9706975a19a2b494c8f466d"
@@ -7972,8 +7992,8 @@
     },
     {
       "path": "src/context/GameContext.tsx",
-      "bytes": 44810,
-      "sha256": "4f9696cbb058de624904e983bdfdb0a9ae670c692554d729554b5e993a3506c4"
+      "bytes": 44914,
+      "sha256": "f18c5d05cca8b477200a098a13632e300976bee4d8ea9d4493959c87ea99d3b2"
     },
     {
       "path": "src/context/InventoryContext.tsx",
@@ -8142,8 +8162,8 @@
     },
     {
       "path": "src/games/caro-gomoku/index.tsx",
-      "bytes": 73807,
-      "sha256": "921402c2472bd9a927b6bdc83e86784bd3256b02e1ac8276dc7fc1ea056909d5"
+      "bytes": 73943,
+      "sha256": "20ab62d3ebd4329c079a969cba08f3e390a081bf4e4ca89b2d6795391d811be9"
     },
     {
       "path": "src/games/chess/aiBot.ts",
@@ -8157,8 +8177,8 @@
     },
     {
       "path": "src/games/chess/index.tsx",
-      "bytes": 59313,
-      "sha256": "1c9cb1aa1929cee190836b211bf09272579457873adada0111f73b86d9770f27"
+      "bytes": 59449,
+      "sha256": "c308b2236cb3bdc2a733bac9d61482b44c47befb2a05da835ac6c0ab2dea58e2"
     },
     {
       "path": "src/games/cosmic-defense/Dialog.tsx",
@@ -8967,8 +8987,8 @@
     },
     {
       "path": "src/games/xiangqi/index.tsx",
-      "bytes": 62768,
-      "sha256": "471db80ef11f088b2363ea6f26d3c757f02e520686c5efadca8ca8f0ab66f7f4"
+      "bytes": 62904,
+      "sha256": "7826c89f579cd953345fc411a281876efef6db5a3727b66964c694b9a587f9f7"
     },
     {
       "path": "src/games/xiangqi/rules.ts",
@@ -9057,8 +9077,8 @@
     },
     {
       "path": "src/launcher/useDialogFocus.ts",
-      "bytes": 1263,
-      "sha256": "166ee769f233d48192e81316783e64fe0020bc3568a312029e27efbc7f108fd5"
+      "bytes": 1306,
+      "sha256": "3c54209950d412f54c666dcdca028a5b80207521cfc126b402d5f79a7db323aa"
     },
     {
       "path": "src/main.tsx",
@@ -9077,8 +9097,8 @@
     },
     {
       "path": "src/services/audio.ts",
-      "bytes": 40076,
-      "sha256": "1c729cf690f029630678254bc5d15300d4026999a512e07e52dc23e11021eddc"
+      "bytes": 40727,
+      "sha256": "215786ee7a977ace253f695cf1858d47ce6431cd486a1fd14a60769d1bbb665e"
     },
     {
       "path": "src/services/auth.ts",
@@ -9146,6 +9166,11 @@
       "sha256": "73ac7ab267ec6a85801ed95c2728ac6ce3f79bf853079b32900b722ec4047f74"
     },
     {
+      "path": "src/services/social.ts",
+      "bytes": 1930,
+      "sha256": "0679d2164902d868875b6e7046b5fedae516315b435eda507dd45e1c21b45253"
+    },
+    {
       "path": "src/services/storage.ts",
       "bytes": 109544,
       "sha256": "94e41366fcaf372094ac1696c1a24a2b5eb03a009eda948a7d9e24dfc3b9fcdb"
@@ -9162,8 +9187,8 @@
     },
     {
       "path": "src/services/updateService.ts",
-      "bytes": 2420,
-      "sha256": "402c0edd272dcea72cd9e2684423544d2297ae82cd66085ab51ded5df5e1affe"
+      "bytes": 2372,
+      "sha256": "fa5244c8819a2743dec092e0b65b4877272ae9ba3cafcefa7757e38201936d32"
     },
     {
       "path": "src/types/index.ts",
@@ -9546,6 +9571,11 @@
       "sha256": "b109b99cc050bf3bd43b08aea70e13ed87da9fc33e3cec5617254c2d67afcd46"
     },
     {
+      "path": "supabase/social/schema.sql",
+      "bytes": 10314,
+      "sha256": "9eac71e990715f34115f14e47dc77dc0eb19d269679a3358dca05db08bb7f0e9"
+    },
+    {
       "path": "tests/auth/auth.spec.ts",
       "bytes": 10493,
       "sha256": "3ea1fabca9989d86668d68aa77d1cf7cedae32d4f490809de65cdcfa108a4963"
@@ -9806,6 +9836,21 @@
       "sha256": "57b4a7caaa30d43eb32a7bf24b37e690f67874e35c2a965f51514f92c5dd9558"
     },
     {
+      "path": "tests/social/audio.mjs",
+      "bytes": 2243,
+      "sha256": "5df71e248e89ca34bb84eb7535adc4ba6806570aaf4595dea84d8aa4217ab74c"
+    },
+    {
+      "path": "tests/social/live.mjs",
+      "bytes": 4364,
+      "sha256": "17d3fac10a8ee7a66905a053b56c5b8fe17ed13ca7b9f9dcfabf2b11c2e20a80"
+    },
+    {
+      "path": "tests/social/ui.cjs",
+      "bytes": 4430,
+      "sha256": "9928b8170f0620ac8569c2f2031fa2e9609cec86dc5621699ba56e036f549d5c"
+    },
+    {
       "path": "tests/supabase-phase-a.sql",
       "bytes": 6840,
       "sha256": "c809595df66b440f122c549d188481c0773b906128639a9d7cf5249eb15209ab"
@@ -9856,7 +9901,7 @@
     "real_email_delivery": "not tested",
     "browser_e2e": "not tested"
   },
-  "git_base": "f360d9a6941cd81d1a5d0b410c8b29ded6ad7d71",
+  "git_base": "587dbc5a5f58f7acec3d1286db6f7a8ad05bc381",
   "duel_validation": {
     "engine": "9 regression checks passed",
     "learning_hub": "React DOM interactions passed",
@@ -9870,5 +9915,15 @@
     "typecheck": "passed",
     "build": "passed",
     "manual_browser": "not performed"
+  },
+  "social_validation": {
+    "typecheck": "passed",
+    "build": "passed",
+    "audio": "passed",
+    "reactDOM": "passed: routing, recipient acceptance, failed-send draft retention and acknowledged send",
+    "live": "passed: three independent anonymous sessions; requests, profiles, inbox, channels, room privacy, blocking, unauthenticated and forged-actor denial; all audit data cleaned",
+    "roomSchemas": "passed: Caro, chess and Xiangqi sender/recipient/outsider checks in rollback transaction",
+    "rateLimit": "passed: ninth message rejected",
+    "duelRegression": "passed"
   }
 }

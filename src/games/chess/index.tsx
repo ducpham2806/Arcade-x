@@ -1,3 +1,5 @@
+import {IngameChat} from '../../components/SocialChatThread';
+import '../../components/social.css';
 import { LearningHub } from '../duel/LearningHub';
 import { ConnectionNotice } from '../duel/ConnectionNotice';
 import { ChessPiece } from '../../visuals/ChessPiece';
@@ -966,6 +968,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   return (
     <div className="arcade-game-surface min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-amber-950/40 text-slate-100 flex flex-col items-center justify-between p-2 sm:p-4 md:p-6 select-none font-sans">
 <ConnectionNotice active={!!activeRoomId}/>
+<IngameChat roomId={activeRoomId}/>
       {activeRoomId&&(moveSending||moveError)&&<p role="status" className="text-sm text-amber-200">{moveSending?'Đang chờ máy chủ xác nhận nước đi…':moveError}</p>}
       {activeRoomId&&syncError&&<p role="alert" className="p-2 text-amber-200">{syncError} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>startAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}

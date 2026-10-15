@@ -1,3 +1,4 @@
+import {ProfileDetails} from './ProfileDetails';
 import React, { useEffect, useState } from 'react';
 import {useDialogFocus} from '../launcher/useDialogFocus';
 import { LogIn, UserPlus, LogOut, Check, Settings } from 'lucide-react';
@@ -50,6 +51,7 @@ export const ProfileModal: React.FC = () => {
             <div className="flex gap-2"><input id="profile-name" value={name} onChange={e => setName(e.target.value)} minLength={3} maxLength={24} disabled={busy} required className="min-w-0 flex-1 rounded-xl px-3 py-2.5 border border-white/15 bg-slate-950 text-white"/><button id="btn-save-profile-name" type="submit" disabled={busy} className="simple-primary-button px-4"><Check size={17}/><span>Lưu</span></button></div>
             {message && <p role="status" className="text-sm text-indigo-200">{message}</p>}
           </form>
+          <ProfileDetails/>
           <fieldset><legend className="text-sm font-semibold text-slate-200 mb-3">Ảnh đại diện</legend><div className="flex flex-wrap gap-2">{AVATARS.map(avatar => <button key={avatar} type="button" aria-label={`Chọn ảnh đại diện ${avatar}`} aria-pressed={profile.avatar === avatar} disabled={busy} onClick={() => { void save(profile.username, avatar); }} className={`w-11 h-11 rounded-xl text-xl border ${profile.avatar === avatar ? 'border-lime-300 bg-lime-300/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{avatar}</button>)}</div></fieldset>
           <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
             {isLoggedIn ? <button id="btn-logout-profile" type="button" disabled={busy} className="simple-secondary-button" onClick={async () => { setBusy(true); try { const result = await logout(); if (result.success) setActiveModal('none'); else setMessage(result.error || 'Chưa đăng xuất được.'); } finally { setBusy(false); } }}><LogOut size={17}/>{busy ? 'Đang đăng xuất…' : 'Đăng xuất'}</button> : <><button id="btn-profile-login" type="button" className="simple-primary-button" onClick={() => openAuth('login')}><LogIn size={17}/>Đăng nhập</button><button id="btn-profile-register" type="button" className="simple-secondary-button" onClick={() => openAuth('register')}><UserPlus size={17}/>Đăng ký</button></>}
