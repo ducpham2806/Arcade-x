@@ -20,8 +20,8 @@ const server=http.createServer((req,res)=>{
   await ctx.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
   const page=await ctx.newPage();page.on('console',m=>console.log('BROWSER',m.type(),m.text()));page.on('framenavigated',f=>{if(f===page.mainFrame())console.log('NAV',f.url());});page.on('requestfailed',r=>console.log('FAILED',r.url(),r.failure()?.errorText));page.on('dialog',async d=>{console.log('DIALOG',d.message());await d.accept();});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(30000);
   try {
-    await page.goto(origin);await page.locator('#btn-auth-play-guest').click();await page.evaluate(()=>navigator.serviceWorker.ready);
-    await page.reload();await page.locator('#btn-auth-play-guest').click();await expect.poll(()=>page.evaluate(()=>!!navigator.serviceWorker.controller)).toBe(true);
+    await page.goto(origin);await expect(page.locator('#game-library')).toBeVisible();await page.evaluate(()=>navigator.serviceWorker.ready);
+    await page.reload();await expect(page.locator('#game-library')).toBeVisible();await expect.poll(()=>page.evaluate(()=>!!navigator.serviceWorker.controller)).toBe(true);
     await page.locator('#btn-play-tile-2048').click();await page.locator('#btn-pregame-start').click();await expect(page.locator('#tile-2048-board')).toBeVisible();
     release=2;
     await page.evaluate(async()=>{const reg=await navigator.serviceWorker.getRegistration();await reg.update();});
@@ -31,16 +31,16 @@ const server=http.createServer((req,res)=>{
     await page.screenshot({path:path.join(artifacts,'update-deferred-in-game.png')});
     await page.locator('#btn-game-pause').click();await page.locator('#btn-pause-save-exit').click();await expect(page.locator('#force-update-modal-overlay')).toBeVisible();
     await page.screenshot({path:path.join(artifacts,'update-ready.png')});
-    await page.locator('#btn-force-update-action').click();await expect(page.locator('#auth-entry-screen')).toBeVisible({timeout:25000});
+    await page.locator('#btn-force-update-action').click();await expect(page.locator('#game-library')).toBeVisible({timeout:25000});
     await expect(page.locator('meta[name="qc-release"]')).toHaveAttribute('content','2');
-    await page.locator('#btn-auth-play-guest').click();await expect(page.locator('#paused-game-banner')).toBeVisible();
+    await expect(page.locator('#game-library')).toBeVisible();await expect(page.locator('#paused-game-banner')).toBeVisible();
     // Re-open while an update is waiting: splash auto-installs before the entry screen.
     release=3;await page.evaluate(async()=>{const reg=await navigator.serviceWorker.getRegistration();await reg.update();});await expect.poll(()=>page.evaluate(()=>!!window.__arcadex_sw_update_pending)).toBe(true);
-    await page.reload();await expect(page.locator('#auth-entry-screen')).toBeVisible({timeout:25000});await expect(page.locator('meta[name="qc-release"]')).toHaveAttribute('content','3');
+    await page.reload();await expect(page.locator('#game-library')).toBeVisible({timeout:25000});await expect(page.locator('meta[name="qc-release"]')).toHaveAttribute('content','3');
     // Update failure must automatically continue to entry without blocking play.
-    failWorker=true;await page.reload();await expect(page.locator('#auth-entry-screen')).toBeVisible({timeout:10000});await page.locator('#btn-auth-play-guest').click();
+    failWorker=true;await page.reload();await expect(page.locator('#game-library')).toBeVisible({timeout:10000});await expect(page.locator('#game-library')).toBeVisible();
     expect(await page.locator('meta[name="qc-release"]').getAttribute('content')).toBe('3');
-    failWorker=false;await ctx.setOffline(true);await page.reload();await page.locator('#btn-auth-play-guest').click();await expect(page.locator('#paused-game-banner')).toBeVisible();
+    failWorker=false;await ctx.setOffline(true);await page.reload();await expect(page.locator('#game-library')).toBeVisible();await expect(page.locator('#paused-game-banner')).toBeVisible();
     await page.locator('#btn-resume-paused-game').click();await expect(page.locator('#tile-2048-board')).toBeVisible();
     const result={realWorkerUpgrade:true,inGameDeferred:true,manualActivation:true,startupAutoUpdate:true,updateFailureRecovery:true,offlineResume:true,errors};
     fs.writeFileSync(path.join(artifacts,'update.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));expect(errors).toEqual([]);

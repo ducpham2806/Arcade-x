@@ -31,7 +31,7 @@ function client() {
 function errorText(error: any): string {
   if (error?.code === 'PGRST202') return 'Hệ thống tài khoản chưa được nâng cấp. Bạn có thể chơi như khách trong lúc chờ.';
   if (error?.code === 'invalid_credentials') return 'Email hoặc mật khẩu chưa đúng.';
-  if (error?.code === 'email_not_confirmed') return 'Bạn cần xác nhận email trước khi đăng nhập. Hãy kiểm tra hộp thư và thư rác.';
+  if (error?.code === 'email_not_confirmed') return 'Máy chủ chưa mở phiên cho tài khoản này. Bạn có thể quay lại chơi ngay, không cần đăng nhập.';
   if (error?.code === 'user_already_exists') return 'Email này đã đăng ký. Hãy chuyển sang Đăng nhập.';
   if (error?.code === 'over_email_send_rate_limit' || error?.status === 429) return 'Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.';
   if (error?.code === 'email_address_invalid') return 'Địa chỉ email không hợp lệ.';
@@ -186,7 +186,7 @@ export class AuthService {
       if (params.keepGuestData) stageGuestRegistration(email, guest);
       else clearPendingRegistration(email);
       if (!data.session) return { success: true, needsEmailConfirmation: true,
-        message: 'Hãy mở email xác nhận (kiểm tra cả thư rác), sau đó đăng nhập. Bạn có thể tiếp tục chơi như khách trong lúc chờ.' };
+        message: 'Chưa mở được phiên tài khoản. Bạn vẫn có thể chơi ngay và đăng nhập sau.' };
       try { return await activateSession(data.session, epoch); }
       catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
     } catch (error) { return { success: false, error: errorText(error) }; }
@@ -318,4 +318,3 @@ export class AuthService {
     return saving;
   }
 }
-

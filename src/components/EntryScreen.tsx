@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Gamepad2, ArrowRight } from 'lucide-react';
+import { Gamepad2, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
-  const { currentUser, login, register, continueAsGuest, saveIdentity, authModalMode, logout, requestPasswordReset, resendConfirmation, notice } = useAuth();
+  const { currentUser, login, register, continueAsGuest, saveIdentity, authModalMode, logout, requestPasswordReset, notice } = useAuth();
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(authModalMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('🎮');
   const [keep, setKeep] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [confirmationNeeded, setConfirmationNeeded] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   useEffect(() => { if (!cooldown) return; const timer = setTimeout(() => setCooldown(value => Math.max(0,value-1)),1000); return () => clearTimeout(timer); }, [cooldown]);
   const setup = !!currentUser && !currentUser.profileCompleted;
@@ -23,11 +22,10 @@ export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
     try {
       const result = await operation();
       if (result.retryAfter) setCooldown(result.retryAfter);
-      if (result.needsEmailConfirmation) setConfirmationNeeded(true);
       if (!result.success) setError(result.error || 'Chưa thực hiện được. Hãy thử lại.');
-      else if (result.needsEmailConfirmation) { setMessage(result.message || 'Kiểm tra email để xác nhận tài khoản.'); setMode('login'); setPassword(''); setConfirm(''); }
+      else if (result.needsEmailConfirmation) { setMessage('Chưa mở được phiên tài khoản. Bạn có thể quay lại chơi ngay và đăng nhập sau.'); }
       else if (!enter && result.message) setMessage(result.message);
-      else if (enter && (!result.user || result.user.profileCompleted)) onEnter();
+      else if (enter) onEnter();
     } catch { setError('Chưa kết nối được máy chủ. Hãy thử lại.'); }
     finally { setBusy(false); }
   };
@@ -40,6 +38,7 @@ export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
         <p className="hidden md:block text-xs text-slate-500">Thư viện game · Máy tính & điện thoại</p>
       </div>
       <div className="bg-[#101621] p-6 sm:p-10 space-y-5">
+        <button id="btn-entry-back-to-games" type="button" disabled={busy} onClick={onEnter} className="simple-secondary-button w-full justify-center py-3">← Quay lại chơi ngay</button>
         <h2 className="text-2xl font-bold text-white">{setup ? 'Bạn muốn được gọi là gì?' : currentUser ? 'Chào mừng trở lại' : mode === 'forgot' ? 'Quên mật khẩu?' : 'Bắt đầu với ArcadeX'}</h2>
         {setup ? <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(() => saveIdentity(name, avatar), true); }}>
           <p className="text-sm text-slate-400">Thêm một cái tên và ảnh đại diện để bạn bè nhận ra bạn. Bạn có thể sửa sau trong Tài khoản.</p>
@@ -50,15 +49,15 @@ export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
           <button id="btn-complete-profile" disabled={busy} className="simple-primary-button w-full justify-center py-3">{busy ? 'Đang kiểm tra và lưu…' : 'Lưu hồ sơ & vào chơi'}<ArrowRight size={18}/></button>
         </form> : currentUser ? <div className="space-y-4"><p className="text-slate-300">{currentUser.avatar} {currentUser.username}</p><p className="text-sm text-slate-400 break-all">{currentUser.email}</p><button id="btn-entry-continue" onClick={onEnter} className="simple-primary-button w-full justify-center py-3">Vào thư viện game<ArrowRight size={18}/></button><button id="btn-logout-account" disabled={busy} onClick={() => {void run(logout,false);}} className="simple-secondary-button w-full justify-center py-3">Đăng xuất / dùng tài khoản khác</button></div> : <>
           <div className="flex rounded-xl bg-black/30 p-1">{(['login','register'] as const).map(v => <button id={`tab-auth-${v}`} key={v} type="button" onClick={() => {setMode(v);setError('');setMessage('');}} disabled={busy} aria-pressed={mode===v} className={`flex-1 rounded-lg py-2.5 text-sm font-bold ${mode===v?'bg-indigo-600 text-white':'text-slate-400'}`}>{v==='login'?'Đăng nhập':'Đăng ký'}</button>)}</div>
-          <form className="space-y-4" onSubmit={e => { e.preventDefault(); if (mode==='register' && password!==confirm) {setError('Mật khẩu xác nhận không trùng khớp.');return;} void run(() => mode==='forgot' ? requestPasswordReset(email) : mode==='login' ? login(email,password) : register({ email,password,keepGuestData:keep }),mode!=='forgot'); }}>
+          <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(() => mode==='forgot' ? requestPasswordReset(email) : mode==='login' ? login(email,password) : register({ email,password,keepGuestData:keep }),mode!=='forgot'); }}>
             <div><label className="block text-sm mb-2" htmlFor={mode==='login'?'input-login-identifier':'input-reg-email'}>Email</label><input id={mode==='login'?'input-login-identifier':'input-reg-email'} className={input} type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} disabled={busy}/></div>
-            {mode !== 'forgot' && <div><label className="block text-sm mb-2" htmlFor={mode==='login'?'input-login-password':'input-reg-password'}>Mật khẩu</label><input id={mode==='login'?'input-login-password':'input-reg-password'} className={input} type="password" minLength={mode==='register'?8:undefined} autoComplete={mode==='login'?'current-password':'new-password'} required value={password} onChange={e => setPassword(e.target.value)} disabled={busy}/></div>}
-            {mode==='register' && <><div><label className="block text-sm mb-2" htmlFor="input-reg-confirm-password">Nhập lại mật khẩu</label><input id="input-reg-confirm-password" className={input} type="password" autoComplete="new-password" required value={confirm} onChange={e=>setConfirm(e.target.value)} disabled={busy}/></div><label className="flex gap-2 text-xs text-slate-400"><input id="input-keep-guest-data" type="checkbox" checked={keep} onChange={e=>setKeep(e.target.checked)} disabled={busy}/>Giữ tiến trình khách trên thiết bị này</label><p className="text-xs text-slate-500">Ít nhất 8 ký tự. Sau khi xác nhận email và đăng nhập, bạn sẽ đặt tên hiển thị.</p></>}
+            {mode !== 'forgot' && <div><label className="block text-sm mb-2" htmlFor={mode==='login'?'input-login-password':'input-reg-password'}>Mật khẩu</label><div className="relative"><input id={mode==='login'?'input-login-password':'input-reg-password'} className={`${input} pr-12`} type={showPassword?'text':'password'} minLength={mode==='register'?8:undefined} autoComplete={mode==='login'?'current-password':'new-password'} required value={password} onChange={e => setPassword(e.target.value)} disabled={busy}/><button type="button" aria-label={showPassword?'Ẩn mật khẩu':'Hiện mật khẩu'} className="absolute right-3 top-3" onClick={()=>setShowPassword(v=>!v)}>{showPassword?<EyeOff size={20}/>:<Eye size={20}/>}</button></div></div>}
+            {mode==='register' && <><label className="flex gap-2 text-xs text-slate-400"><input id="input-keep-guest-data" type="checkbox" checked={keep} onChange={e=>setKeep(e.target.checked)} disabled={busy}/>Giữ tiến trình khách trên thiết bị này</label><p className="text-xs text-slate-500">Ít nhất 8 ký tự. Tên hiển thị và ảnh đại diện có thể bổ sung sau trong Tài khoản.</p></>}
             <button id={`btn-submit-${mode}`} disabled={busy || mode==='forgot' && cooldown>0} className="simple-primary-button py-3 w-full justify-center">{busy?'Đang xử lý…':mode==='forgot' ? cooldown ? `Gửi lại sau ${cooldown}s` : 'Gửi link khôi phục' : mode==='login'?'Đăng nhập':'Tạo tài khoản'}<ArrowRight size={18}/></button>
           </form>
           {mode==='login' && <button id="btn-forgot-password" disabled={busy} type="button" onClick={() => { setMode('forgot');setError('');setMessage('');setPassword(''); }} className="text-sm text-lime-300 py-2">Quên mật khẩu?</button>}
           {mode==='forgot' && <p className="text-xs text-slate-400">Nhập email đã đăng ký. Link khôi phục sẽ mở màn đặt mật khẩu mới.</p>}
-          {confirmationNeeded && mode==='login' && <button id="btn-resend-confirmation" type="button" disabled={busy || cooldown>0} onClick={() => void run(() => resendConfirmation(email),false)} className="simple-secondary-button w-full py-3 justify-center">{cooldown ? `Gửi lại sau ${cooldown}s` : 'Gửi lại email xác nhận'}</button>}
+
         </>}
         {notice && !message && !error && <p role="status" className="text-sm text-amber-300">{notice}</p>}
         {error && <p role="alert" className="text-sm text-rose-300">{error}</p>}{message && <p role="status" className="text-sm text-emerald-300">{message}</p>}
@@ -67,4 +66,3 @@ export const EntryScreen: React.FC<{ onEnter: () => void }> = ({ onEnter }) => {
     </section>
   </main>;
 };
-

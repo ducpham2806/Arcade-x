@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.10.2';
-export const APP_CODENAME = "On-Demand Game Packages";
-export const APP_RELEASE_NOTES = "Launcher nhẹ, tải gói game khi chọn chơi, splash riêng từng game; sửa lỗi cập nhật và thêm animation tiến trình.";
+export const CURRENT_APP_VERSION = '2.10.3';
+export const APP_CODENAME = "Play First";
+export const APP_RELEASE_NOTES = "Vào thẳng thư viện để chơi; đăng nhập và hồ sơ tùy chọn; công bố Boom Buddies, Rainbow Blocks và Shattered Realms.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

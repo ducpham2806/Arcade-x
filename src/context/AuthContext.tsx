@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [restoreError, setRestoreError] = useState('');
   const [notice, setNotice] = useState('');
-  const [entered, setEntered] = useState(false);
+  const [entered, setEntered] = useState(true);
   const [booted, setBooted] = useState(false);
   const [revision, setRevision] = useState(0);
 
@@ -66,9 +66,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => { clearInterval(interval); window.removeEventListener('pagehide', save); window.removeEventListener('online', save); };
   }, [loading, restoreError, currentUser?.id, recovery.status]);
 
-  const register = useCallback(async (params: RegisterParams) => apply(await AuthService.register(params)), [apply]);
-  const login = useCallback(async (email: string, password: string) => apply(await AuthService.login(email, password)), [apply]);
-  const logout = useCallback(async () => { const result = apply(await AuthService.logout()); if (result.success) setEntered(false); return result; }, [apply]);
+  const register = useCallback(async (params: RegisterParams) => { const result = apply(await AuthService.register(params)); if (result.success && !result.needsEmailConfirmation) setEntered(true); return result; }, [apply]);
+  const login = useCallback(async (email: string, password: string) => { const result = apply(await AuthService.login(email, password)); if (result.success && !result.needsEmailConfirmation) setEntered(true); return result; }, [apply]);
+  const logout = useCallback(async () => { const result = apply(await AuthService.logout()); if (result.success) setEntered(true); return result; }, [apply]);
   const saveIdentity = useCallback(async (name: string, avatar: string) => { const result = await AuthService.saveIdentity(name, avatar); if (result.success) setCurrentUser(AuthService.getCurrentUser()); return result; }, []);
   const continueAsGuest = useCallback(async () => apply(await AuthService.continueAsGuest()), [apply]);
   const openEntry = useCallback((mode: 'login' | 'register' = 'login') => { setAuthModalMode(mode); setEntered(false); }, []);
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {restoreError && <button type="button" onClick={retry} className="w-full rounded-xl bg-indigo-600 p-3 font-semibold">Thử lại kết nối</button>}
         <button id="btn-auth-loading-guest" type="button" onClick={async () => { const result = await continueAsGuest(); if (result.success) {setBooted(true);setEntered(true);} }} className="w-full rounded-xl border border-white/15 p-3 font-semibold">Chơi như khách</button>
       </div>
-    </div> : !entered || currentUser && !currentUser.profileCompleted ? <EntryScreen onEnter={() => setEntered(true)}/> : <React.Fragment key={revision}>{children}</React.Fragment>}
+    </div> : !entered ? <EntryScreen onEnter={() => setEntered(true)}/> : <React.Fragment key={revision}>{children}</React.Fragment>}
   </AuthContext.Provider>;
 };
 export function useAuth(): AuthContextType {
@@ -90,4 +90,3 @@ export function useAuth(): AuthContextType {
   if (!value) throw new Error('useAuth must be used within an AuthProvider');
   return value;
 }
-
