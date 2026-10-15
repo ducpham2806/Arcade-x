@@ -1,0 +1,7 @@
+import {build} from 'esbuild';import fs from 'node:fs';import path from 'node:path';import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);fs.mkdirSync('node_modules/.cache',{recursive:true});
+await build({entryPoints:['src/visuals/gameArt.tsx'],bundle:true,platform:'node',format:'cjs',outfile:'node_modules/.cache/game-art.cjs',external:['react'],define:{'import.meta.env':'{}'},loader:{'.png':'dataurl'}});
+global.window={};const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');const {GAME_ART,GameArtwork}=require('../node_modules/.cache/game-art.cjs');
+const inline=svg=>svg.replace(/href="(\/[^\"]+)"/g,(all,url)=>{const file=path.join('public',url);if(!fs.existsSync(file))throw Error('Missing art asset '+url);const mime=path.extname(file)==='.svg'?'image/svg+xml':'image/png';return `href="data:${mime};base64,${fs.readFileSync(file).toString('base64')}"`;});
+for(const [dir,variant] of [['icons','icon'],['banners','banner']]){fs.mkdirSync('public/game-art/'+dir,{recursive:true});for(const id of Object.keys(GAME_ART)){let svg=inline(renderToStaticMarkup(React.createElement(GameArtwork,{gameId:id,variant})));svg=svg.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ');svg=svg.replace(/width="420" height="250"/,'width="420" height="250"');svg=svg.replace(/href="/g,'xlink:href="');fs.writeFileSync(`public/game-art/${dir}/${id}.svg`,svg);}}
+console.log(`Exported ${Object.keys(GAME_ART).length} distinct game icons and banners`);

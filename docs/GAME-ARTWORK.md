@@ -1,0 +1,15 @@
+# Game identities 2.10.1
+
+Every one of the 21 launcher game IDs now has an explicit artwork identity. Boom Buddies reuses the original Pip/Bum sprites. Block Breaker reuses the Chronicles Orb sprite, with a paddle, brick wall and broken realm backdrop. Blossom and Rainbow Blocks retain their supplied sprites. Other games use their own vector scenes and themed backgrounds.
+
+The former shared star backdrop and generic 3×3 block fallback have been removed for registered games. Word Cross uses an open book and connected letters; Sudoku uses a full nine-by-nine paper grid; 2048 depicts two 1024 tiles merging; Blocker uses a six-by-six placement board and a movable L shape; Fill the Space uses a wooden shape tray. Chess, Xiangqi, Caro, runner, shooter and slice games have distinct silhouettes. Xiangqi pieces use Vietnamese labels.
+
+`src/visuals/gameArt.tsx` is the shared source for cards, game detail/loading screens, recents, resume/result cards and small header icons. Square icons use a dedicated framing variant. `public/game-art/icons` and `public/game-art/banners` contain 42 self-contained SVG exports. Run `npm run export:artwork` after changes and `npm run test:artwork` to check registry coverage, duplicate compositions and featured-game routing. Unknown game IDs receive a neutral fallback rather than borrowing another game's identity; new registered games must supply an explicit design.
+
+The new-game carousel prioritizes Boom Buddies, Block Breaker and Rainbow Blocks, with game-specific copy and the new-game sticker. Square framing avoids the former 1.4× crop on phones.
+
+Block Breaker opens the existing Chronicles engine through a local iframe. Vite packages the existing standalone files into `/chronicles-realms/`; the portable launcher embeds a complete offline copy. Parent messages can pause the game and suppress its sound; foreign-window messages are ignored. Progress remains in Chronicles' existing local save, with no platform reward or ranked-score bridge. No engine rules were rewritten. Its existing standalone entry remains usable.
+
+Like the previously reviewed Boom prototype, Block Breaker is appended to a remotely supplied catalog only in development/portable review. Bundled/offline catalog contains both. Preview-only access and favorites stay local for these two games, so a missing server catalog row cannot block the preview or stall the cloud favorites queue. Production access checks are retained. No server catalog publishing, database changes or website deployment were made in this change.
+
+Validation: TypeScript and production build passed; all 21 SVG icons were rasterized and visually inspected; artwork coverage/duplicate geometry/new-banner routing passed. Chronicles' 20 engine checks passed, and 11 DOM checks against the packaged source passed, including launcher pause/mute and outsider-message rejection. PWA packaging includes the Chronicles assets and excludes its navigation from the launcher shell fallback. No browser/device visual or touch QA was performed.

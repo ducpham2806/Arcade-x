@@ -1,8 +1,8 @@
 {
   "project": "Arcade-x",
-  "revision": "community-2026-10-15",
+  "revision": "game-identities-2026-10-15",
   "published": false,
-  "productionDatabaseChanged": true,
+  "productionDatabaseChanged": false,
   "validation": {
     "typecheck": "passed",
     "build": "passed",
@@ -76,6 +76,11 @@
       "sha256": "5863d1504ce1e0f673389802436ed24a0f7da2cb64463a1bc6e570b732bc47ff"
     },
     {
+      "path": "docs/GAME-ARTWORK.md",
+      "bytes": 3032,
+      "sha256": "11746cd1885856b4a66a3c2b4eae961999e5ffae9256afe1dc8188283d7c85f4"
+    },
+    {
       "path": "docs/ONLINE-SYNC-FIX.md",
       "bytes": 2897,
       "sha256": "542c23a1aa8aff25f2b5b0b180ff0b09a135dc534681a3c034232e0e52a27530"
@@ -122,8 +127,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 2142,
-      "sha256": "736f832ca325aafc53249c5a46e50b9f444caf169e4050d54d272a7bf87979a3"
+      "bytes": 2324,
+      "sha256": "d241440f87ceaf0155cf2a4dab08482ff9e7860368d304b94928e80e44b614f3"
     },
     {
       "path": "playwright.config.ts",
@@ -6921,6 +6926,216 @@
       "sha256": "a76280f4a8bc1f38a67a3dca7ffb29c7ac5a4c348863e51ba15a28417e5d7ada"
     },
     {
+      "path": "public/game-art/banners/blocker.svg",
+      "bytes": 5923,
+      "sha256": "0f1788e1b3561d3922bcec64b102b9dd2d67303f6b3f4538e8601b8abdc39496"
+    },
+    {
+      "path": "public/game-art/banners/boom-buddies.svg",
+      "bytes": 13901,
+      "sha256": "6e6b07de228a588c7778ae4a5b3c1a7ac3c3c4c090258209f767ca81a185d8a8"
+    },
+    {
+      "path": "public/game-art/banners/brick-breaker.svg",
+      "bytes": 165601,
+      "sha256": "5b5fdac35ee8a5462b79b8f7918e6dbf60010eb370a041b5c3762c35b1664f7d"
+    },
+    {
+      "path": "public/game-art/banners/car-escape.svg",
+      "bytes": 2761,
+      "sha256": "18ef47338d38bafb329cc97cd82ee4e6967c6453f8293c4ada7c20483054bfea"
+    },
+    {
+      "path": "public/game-art/banners/caro-gomoku.svg",
+      "bytes": 1882,
+      "sha256": "b37d75c8371fe9e82bebc6cbdf14038e8c0f843e80cb6b20d549622aa8bcda44"
+    },
+    {
+      "path": "public/game-art/banners/chess.svg",
+      "bytes": 2936,
+      "sha256": "162e8613b1f677096ae2f7f88afac9ce0ee47396989b562851308b8b08ebd6d7"
+    },
+    {
+      "path": "public/game-art/banners/cosmic-defense.svg",
+      "bytes": 2778,
+      "sha256": "646d777c9da65d4152e05fd41e7192b8ad544145bb84048c040b4228c58acb67"
+    },
+    {
+      "path": "public/game-art/banners/cyber-slice.svg",
+      "bytes": 1659,
+      "sha256": "e9ec14f2e75d57b74dc481eb7d4b6acea2eb50f5a1b589a3fe88c70258aa7546"
+    },
+    {
+      "path": "public/game-art/banners/draw-a-shape.svg",
+      "bytes": 2451,
+      "sha256": "27d7c4ed24e1fff81f5fcdc847cd72ffc87713fa9af3155556135600988e3615"
+    },
+    {
+      "path": "public/game-art/banners/dungeon-tap.svg",
+      "bytes": 1501,
+      "sha256": "877ee2eac46dc984008a7dd456ea88e0008108a2d03fafe1e5ce7451652c865b"
+    },
+    {
+      "path": "public/game-art/banners/eat-em-all.svg",
+      "bytes": 1651,
+      "sha256": "74592b16e9c40acc600800a22c8118be090509c2721e26a116e215f6f221cb69"
+    },
+    {
+      "path": "public/game-art/banners/fill-the-space.svg",
+      "bytes": 1927,
+      "sha256": "1c5dfc03db837fadf214a95189952279de49a16cde75cc8f05a851b8d0f80b1b"
+    },
+    {
+      "path": "public/game-art/banners/hex-match.svg",
+      "bytes": 223368,
+      "sha256": "a932975891eddf2ee1b1758f720e6ccf0e915f2b55d8c137f35b33c36a7b1aeb"
+    },
+    {
+      "path": "public/game-art/banners/mummy-escape.svg",
+      "bytes": 2153,
+      "sha256": "80d01457c20464fd2ccf2f1a381de3cfd6f4ea6f5d162dd65ce4846b66655932"
+    },
+    {
+      "path": "public/game-art/banners/neon-runner.svg",
+      "bytes": 2458,
+      "sha256": "bc5abd05465e477b69c4e5861fb8a42cdaf3ddbd85e80dd0ff96e159f5a4a241"
+    },
+    {
+      "path": "public/game-art/banners/rainbow-blocks.svg",
+      "bytes": 23039,
+      "sha256": "eef70f4ff2726a1a868359fafbceb4f61fe69566fc518832f2d1c60d443adeb6"
+    },
+    {
+      "path": "public/game-art/banners/scoodoku.svg",
+      "bytes": 3683,
+      "sha256": "a74a2f57da5d5d850ac04cd7e5645558132de1e8638fdb9f3e7cfa3a7e58ab9c"
+    },
+    {
+      "path": "public/game-art/banners/shikaku.svg",
+      "bytes": 3340,
+      "sha256": "afc3f39bf93f2d41f1c3dedb24ae923f33d548165996d8dcb7efe0c2d4da9377"
+    },
+    {
+      "path": "public/game-art/banners/tile-2048.svg",
+      "bytes": 2979,
+      "sha256": "1ab7fbcd0c6db86f3279cb24badb88e4e7527d98822145d013b725665fcf2bd9"
+    },
+    {
+      "path": "public/game-art/banners/word-cross.svg",
+      "bytes": 2462,
+      "sha256": "d1aa752b85412a73e5cdc657b145b8f0d585420346c2c1c33bb20bfa12a0118e"
+    },
+    {
+      "path": "public/game-art/banners/xiangqi.svg",
+      "bytes": 2375,
+      "sha256": "a148cc76e54a927b3fc33cb902bccaf9c625cd9046c48754642657020942c9d1"
+    },
+    {
+      "path": "public/game-art/icons/blocker.svg",
+      "bytes": 6004,
+      "sha256": "22e4916af31c68327488819e03b475e41b24d5a37065fe9ded5ca69dc5492429"
+    },
+    {
+      "path": "public/game-art/icons/boom-buddies.svg",
+      "bytes": 13982,
+      "sha256": "9206c3c7c7102db02d8d1bd98a67df23bfc9f635a66728d9f7a337aaf209f461"
+    },
+    {
+      "path": "public/game-art/icons/brick-breaker.svg",
+      "bytes": 165682,
+      "sha256": "ce1bd5b8b5722d3110c2e3d0d15da8843570138cd1b0cdac79b931c22b14b97a"
+    },
+    {
+      "path": "public/game-art/icons/car-escape.svg",
+      "bytes": 2842,
+      "sha256": "bbb506ba7790ab3f6356d1186775a6c41ffcd8842432330d14790c63579d517a"
+    },
+    {
+      "path": "public/game-art/icons/caro-gomoku.svg",
+      "bytes": 1963,
+      "sha256": "4d452726360bbe0ac86d3d1db014554e22410075a7c7bff336cbebdc5f83985b"
+    },
+    {
+      "path": "public/game-art/icons/chess.svg",
+      "bytes": 3017,
+      "sha256": "3ab0bc37cdd8904e12882fbffcd48532286605a73d6098bd24a725daa4c63e3f"
+    },
+    {
+      "path": "public/game-art/icons/cosmic-defense.svg",
+      "bytes": 2859,
+      "sha256": "3eb9559dbc1df3a1d633e1b85c18051d8bb9bb74f5bc3610c9c2805f00e777fa"
+    },
+    {
+      "path": "public/game-art/icons/cyber-slice.svg",
+      "bytes": 1740,
+      "sha256": "33d7f5f5826027dbf7694d535bdc011296da1a960d71a79106a34d4759865ba9"
+    },
+    {
+      "path": "public/game-art/icons/draw-a-shape.svg",
+      "bytes": 2532,
+      "sha256": "4c4554620a26f0a2ea58940cf68eb7fb8590ce34f3b7ddefd00ca3d33f247d3b"
+    },
+    {
+      "path": "public/game-art/icons/dungeon-tap.svg",
+      "bytes": 1582,
+      "sha256": "f06d4995b3a490b076f446fd58d9fffb5920d13df87dc0544b8a4dba364480e2"
+    },
+    {
+      "path": "public/game-art/icons/eat-em-all.svg",
+      "bytes": 1732,
+      "sha256": "2037c0a3d65ce491d235e2ed166b84d0881c1b04faf6d718e832ffe3db5472cd"
+    },
+    {
+      "path": "public/game-art/icons/fill-the-space.svg",
+      "bytes": 2008,
+      "sha256": "b31acdcb4b5823c2d4eed0d8afd712a32f208333df7a5fb1538a9fe179f3db2b"
+    },
+    {
+      "path": "public/game-art/icons/hex-match.svg",
+      "bytes": 171706,
+      "sha256": "ebf03e56268bb8dea0867eb4097df15de8090c2d689fb00d9aac1a961a6b39a0"
+    },
+    {
+      "path": "public/game-art/icons/mummy-escape.svg",
+      "bytes": 2234,
+      "sha256": "d6895970e46ca0924f84119028ddc11e7dbdf029a9a7f17a1a579165e3e2694f"
+    },
+    {
+      "path": "public/game-art/icons/neon-runner.svg",
+      "bytes": 2539,
+      "sha256": "3d69c47194075919f976e5c1321e998dc8adebdd6cfe18384bda08ec278e1bb3"
+    },
+    {
+      "path": "public/game-art/icons/rainbow-blocks.svg",
+      "bytes": 23120,
+      "sha256": "9794de1700cb5132f6830284c26984f90cb4ecbe2910c6ab6dafffe9d87c9fbe"
+    },
+    {
+      "path": "public/game-art/icons/scoodoku.svg",
+      "bytes": 3764,
+      "sha256": "85bc261cbbc6cc55a3026fe64dcdb24a35f2e4fbf39d43a023ad11d8ecca8fa0"
+    },
+    {
+      "path": "public/game-art/icons/shikaku.svg",
+      "bytes": 3421,
+      "sha256": "dddecb76bf519d46366096ce9f6448daba3e6e1e8e53bcb6fe55445aca1b3b90"
+    },
+    {
+      "path": "public/game-art/icons/tile-2048.svg",
+      "bytes": 3060,
+      "sha256": "786e113da2d0fd39906bd705100e3c8dca5c7b0a773b9aebdd98fe949cc0777e"
+    },
+    {
+      "path": "public/game-art/icons/word-cross.svg",
+      "bytes": 2543,
+      "sha256": "8a29d9c78a5df166bcba35ab61e280a00d7f4163ea961fdbdc943427fa3c748e"
+    },
+    {
+      "path": "public/game-art/icons/xiangqi.svg",
+      "bytes": 2456,
+      "sha256": "0309e294674168daae437c1752b94634bb5ec62d9bd1b355311b03f180a44d64"
+    },
+    {
       "path": "public/games/cosmic-defense/ASSET-README.md",
       "bytes": 4311,
       "sha256": "64963282d372a45aa0117b08b72ba628bf7749e0f0bea7d7a17935412a8fa129"
@@ -7766,9 +7981,14 @@
       "sha256": "b5c6a8acec36f952e418c39a2fa9aa77cd1266939c01fb543ccf8f9c70813056"
     },
     {
+      "path": "scripts/export-game-art.mjs",
+      "bytes": 1559,
+      "sha256": "4e7da1049f731b0932ac0718ab6d2f384886c9b0bc88d8e7b6cd5003e0ec3221"
+    },
+    {
       "path": "scripts/launcher-preview.mjs",
-      "bytes": 4536,
-      "sha256": "616f36d8a79e620ab80f260841b40286c4cd97da332c1dc56a9d59c2c2ce9dde"
+      "bytes": 5623,
+      "sha256": "3eaf3b68605e2d220c1a0e85f6e774e1c9da8f62bc217fb8d7785d47be189f2a"
     },
     {
       "path": "scripts/rainbow-preview.mjs",
@@ -8027,8 +8247,8 @@
     },
     {
       "path": "src/games/GameWrapper.tsx",
-      "bytes": 39627,
-      "sha256": "78ec9b3755a73444a100129376ac3b7d3a570e817405b2981036b6fcdfd71978"
+      "bytes": 39643,
+      "sha256": "566129eeba6798e067910c33a56cf8aae4c4e8b153709b51243a6fdd09c18942"
     },
     {
       "path": "src/games/blocker/blocker.css",
@@ -8074,6 +8294,11 @@
       "path": "src/games/boom-buddies/runtime.js",
       "bytes": 566811,
       "sha256": "dab5efc8cdcf9b3e08eaca2b1b6c7efbe0fc99c82837ff51d05161d108dc0294"
+    },
+    {
+      "path": "src/games/brick-breaker/index.tsx",
+      "bytes": 981,
+      "sha256": "25842d598c6fd1e1fca47f87ab97404fc5c21b2687c72ea3ff54b7090ad9acaf"
     },
     {
       "path": "src/games/car-escape/LevelMap.tsx",
@@ -8777,8 +9002,8 @@
     },
     {
       "path": "src/games/registry.ts",
-      "bytes": 21484,
-      "sha256": "ab03904d38cc73855490531cfb41d2a78c27086ca97fbe483dfac24350b9f331"
+      "bytes": 22495,
+      "sha256": "2174fcb9aeb8d639c3556eb85194ffac055e58c2a507eeb00164a12c388839c8"
     },
     {
       "path": "src/games/scoodoku/Numpad.tsx",
@@ -9027,13 +9252,13 @@
     },
     {
       "path": "src/launcher/FeaturedCarousel.tsx",
-      "bytes": 5974,
-      "sha256": "d5b49b76fb901a2185bcec3cc3fe131997f4a0bb09af28b0fe916996357e6840"
+      "bytes": 6476,
+      "sha256": "9ee3c2f3d302e50ea0f5e0b37ac6358297c00218f66fff4e7bdaed6f18e791b4"
     },
     {
       "path": "src/launcher/LauncherContext.tsx",
-      "bytes": 6500,
-      "sha256": "90a755c8182240579cf0010de532485d003f1952c0bf27f96b1e8ff4e6b3ec49"
+      "bytes": 6682,
+      "sha256": "caffd5deb43c42e38f4a49332ab4d360066070f534aa13ced26fc5459543fb8e"
     },
     {
       "path": "src/launcher/PostGameSummary.tsx",
@@ -9052,13 +9277,13 @@
     },
     {
       "path": "src/launcher/catalog.ts",
-      "bytes": 2997,
-      "sha256": "6592e33b7cb6e65f87dc6535e6aed994b253b707e48defcf47f4f4fff86bab42"
+      "bytes": 3217,
+      "sha256": "28c409afccd01913808ccc382ac52573efa3702a939dd91964d4c958380b1b14"
     },
     {
       "path": "src/launcher/launcher.css",
-      "bytes": 23728,
-      "sha256": "e23843dc2a8cb77b1877bfc40e5330859b88e1579e864fb11d8f459e2835e3a0"
+      "bytes": 24227,
+      "sha256": "b6439f220f08494e596234ff0bded732c4959e4a14e0506e9c6e27c7d2f7160e"
     },
     {
       "path": "src/launcher/platform-theme.css",
@@ -9067,8 +9292,8 @@
     },
     {
       "path": "src/launcher/repository.ts",
-      "bytes": 3959,
-      "sha256": "9afec79820e8db01bbde0d35445c79afc4e73eee2485c1abbd7c2a0c039b6c16"
+      "bytes": 4266,
+      "sha256": "c0795702804bb0873c5ff1b89a2ad15295e153b500081add2588c263bef93822"
     },
     {
       "path": "src/launcher/review.tsx",
@@ -9187,8 +9412,8 @@
     },
     {
       "path": "src/services/updateService.ts",
-      "bytes": 2372,
-      "sha256": "fa5244c8819a2743dec092e0b65b4877272ae9ba3cafcefa7757e38201936d32"
+      "bytes": 2355,
+      "sha256": "1cf5fc06b7f13640660a5aafca6518aa007d6ecf1cba921e77fc03f09060bf78"
     },
     {
       "path": "src/types/index.ts",
@@ -9257,8 +9482,8 @@
     },
     {
       "path": "src/visuals/gameArt.tsx",
-      "bytes": 15704,
-      "sha256": "c3299a8698aa47889e464c1de41adb4d765fc89a1bb138cf91ec3f453a9e8bcf"
+      "bytes": 27691,
+      "sha256": "78a375c7d57862cf5be8b32e12291240e44bc3e1a097dc8fbb25df9e8b749754"
     },
     {
       "path": "src/vite-env.d.ts",
@@ -9282,8 +9507,8 @@
     },
     {
       "path": "standalone/chronicles-realms/dist/app.js",
-      "bytes": 40110,
-      "sha256": "d69a68c99ac8d00776b0f6fa827e47cf55d2e2a0b97511703b553a0e98b7e68b"
+      "bytes": 40507,
+      "sha256": "50ce69554f08499bdbdac3ef2cbd3a67e924ab77c778b6b46e8c44c7f74ec61e"
     },
     {
       "path": "standalone/chronicles-realms/dist/assets/atlas_all.json",
@@ -9574,6 +9799,21 @@
       "path": "supabase/social/schema.sql",
       "bytes": 10314,
       "sha256": "9eac71e990715f34115f14e47dc77dc0eb19d269679a3358dca05db08bb7f0e9"
+    },
+    {
+      "path": "tests/artwork/access.mjs",
+      "bytes": 2161,
+      "sha256": "df2623ff1450643f9adfe5dec242858143a9c4e91dbaad93dbab2393109f7710"
+    },
+    {
+      "path": "tests/artwork/catalog.mjs",
+      "bytes": 3340,
+      "sha256": "6529a69f3dd1c78869d602f9b39d3c79aabb224abef6c2832459dfab078e3b7d"
+    },
+    {
+      "path": "tests/artwork/chronicles.cjs",
+      "bytes": 6583,
+      "sha256": "0d25c0013ac34ee14ad6881be931044baeb10a2aecee4ebe90677bad66097066"
     },
     {
       "path": "tests/auth/auth.spec.ts",
@@ -9882,8 +10122,8 @@
     },
     {
       "path": "vite.config.ts",
-      "bytes": 3924,
-      "sha256": "e63365f9fa3b88dfaf8f786398c9ffbbf9f72e44e40398d196e1251fb7584f43"
+      "bytes": 5252,
+      "sha256": "e64f4dbed1b8df97a91bb8fc5e890b349f28b5faa1894177e375129bc84d3b5e"
     }
   ],
   "readability_validation": {
@@ -9901,7 +10141,7 @@
     "real_email_delivery": "not tested",
     "browser_e2e": "not tested"
   },
-  "git_base": "587dbc5a5f58f7acec3d1286db6f7a8ad05bc381",
+  "git_base": "c399bfff944b8d71a6eac371087ebce2db0bf278",
   "duel_validation": {
     "engine": "9 regression checks passed",
     "learning_hub": "React DOM interactions passed",
@@ -9925,5 +10165,15 @@
     "roomSchemas": "passed: Caro, chess and Xiangqi sender/recipient/outsider checks in rollback transaction",
     "rateLimit": "passed: ninth message rejected",
     "duelRegression": "passed"
+  },
+  "artwork_validation": {
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "coverage": "21 game identities, 42 SVG exports",
+    "staticVisualReview": "21 rasterized icons inspected",
+    "chroniclesEngine": "20 checks passed",
+    "chroniclesDOM": "11 checks passed, including parent pause/mute and outsider-message rejection",
+    "browserQA": "not performed",
+    "previewAccess": "passed: reviewed free games, production/paid/maintenance restrictions and local favorites queue"
   }
 }

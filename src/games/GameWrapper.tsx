@@ -685,7 +685,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
-          style={['hex-match','rainbow-blocks','boom-buddies'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
+          style={['hex-match','rainbow-blocks','boom-buddies','brick-breaker'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
         >
           <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
           <GameLoadBoundary onExit={onExit}>

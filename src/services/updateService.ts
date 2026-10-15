@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.10.0';
-export const APP_CODENAME = "Arcade Community";
-export const APP_RELEASE_NOTES = "Sửa âm thanh lặp; thêm chat chung, kênh game, inbox riêng, chat trong trận, bạn bè online và hồ sơ chi tiết.";
+export const CURRENT_APP_VERSION = '2.10.1';
+export const APP_CODENAME = "Game Identities";
+export const APP_RELEASE_NOTES = "Icon và banner riêng cho từng game; thêm Boom Buddies và Block Breaker Chronicles vào banner game mới.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

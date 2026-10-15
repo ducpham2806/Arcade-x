@@ -24,7 +24,9 @@
     "test:rainbow": "playwright test tests/rainbow",
     "test:readability": "node tests/readability/contrast.mjs && node tests/readability/dom-policy.cjs",
     "test:duel": "node tests/duel/engines.mjs && node tests/duel/ui.cjs && node tests/duel/worker.mjs",
-    "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs"
+    "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs",
+    "export:artwork": "node scripts/export-game-art.mjs",
+    "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

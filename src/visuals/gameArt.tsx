@@ -1,10 +1,15 @@
 import React, { useId } from 'react';
+import boomPip from '../../public/boom/tiles/png/characters/pip_idle_front.png';
+import boomBum from '../../public/boom/tiles/png/characters/bum_front.png';
+import realmsOrb from '../../standalone/chronicles-realms/dist/assets/spritesheets/sheet_orb_companion.png';
 import {asset as blossomAsset} from '../games/hex-match/blossom/assets';
 import {BLOSSOM_ICON,BLOSSOM_LOGO} from '../games/hex-match/blossom/branding';
 import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
 export const GAME_ART: Record<string, { color: string; secondary: string; label: string; world: string }> = {
+  'boom-buddies': {color:'#ffa846',secondary:'#89ce57',label:'GAME MỚI',world:'Khu vườn bom vui nhộn'},
+  'brick-breaker': {color:'#67eece',secondary:'#a68dff',label:'GAME MỚI',world:'Chronicles · Sáu miền Aethra'},
   'rainbow-blocks': { color:'#7fe6ff',secondary:'#d88beb',label:'GAME MỚI',world:'Cầu vồng sắc màu' },
   'word-cross': { color: '#c4a1ff', secondary: '#fb72bc', label: 'NGÔN TỪ', world: 'Thư viện ngân hà' },
   'car-escape': { color: '#ff9f6a', secondary: '#ff547c', label: 'GIẢI CỨU', world: 'Đường đua đô thị' },
@@ -25,7 +30,9 @@ export const GAME_ART: Record<string, { color: string; secondary: string; label:
   'hex-match': { color: '#bee39f', secondary: '#ffd78a', label: 'GHÉP HOA', world: 'Câu chuyện thiên nhiên' },
   'tile-2048': { color: '#ffd078', secondary: '#ff946b', label: 'GHÉP SỐ', world: 'Kho báu 2048' },
 };
-export const artFor = (id: string) => GAME_ART[id] || GAME_ART['cosmic-defense'];
+export const canonicalArtId = (id:string) => ['block-breaker','chronicles-realms','chronicles-shattered-realms'].includes(id)?'brick-breaker':id==='bomb-buddies'?'boom-buddies':id;
+const UNKNOWN_ART={color:'#94a3b8',secondary:'#cbd5e1',label:'GAME',world:'Khám phá ArcadeX'};
+export const artFor = (id: string) => GAME_ART[canonicalArtId(id)] || UNKNOWN_ART;
 export const artStyle = (id: string) => ({ '--game-accent': artFor(id).color, '--game-secondary': artFor(id).secondary } as React.CSSProperties);
 
 function Tile({ x, y, size = 56, color, text }: { x: number; y: number; size?: number; color: string; text?: string }) {
@@ -37,21 +44,44 @@ function Tile({ x, y, size = 56, color, text }: { x: number; y: number; size?: n
     {text && <text x={size / 2} y={size / 2 + 8} textAnchor="middle" fill="#12213e" fontSize={text.length > 2 ? 18 : 26} fontWeight="900" fontFamily="system-ui, sans-serif">{text}</text>}
   </g>;
 }
-function Scene({ id, a, b }: { id: string; a: string; b: string }) {
+function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string }) {
   switch (id) {
+    case 'boom-buddies': return <g>
+      <path d="M80 208L128 112H318L365 208Z" fill="#639c3d" stroke="#c4ec92" strokeWidth="4"/>
+      {[0,1,2,3].map(i=><path key={i} d={`M${110+i*65} 205L${141+i*51} 116M105 ${136+i*21}H345`} stroke="#3d742d" strokeWidth="3"/>)}
+      <g fill="#bf8645" stroke="#724623" strokeWidth="3"><rect x="84" y="126" width="45" height="45" rx="5"/><path d="M88 130l37 37m0-37l-37 37"/><rect x="310" y="161" width="44" height="44" rx="5"/><path d="M314 165l36 36m0-36l-36 36"/></g>
+      <path d="M210 50L237 94L290 80L269 120L314 149L267 164L272 200L228 180L192 205L181 166L139 155L172 124L152 83L197 95Z" fill="#ff9c33" stroke="#ffd878" strokeWidth="5"/>
+      <image href={boomPip} x="130" y="48" width="111" height="145" preserveAspectRatio="xMidYMid meet" style={{imageRendering:'pixelated'}}/>
+      <image href={boomBum} x="240" y="115" width="82" height="82" preserveAspectRatio="xMidYMid meet"/>
+      <path d="M276 105l5-13m8 20l13-8m-36-1l-7-10" stroke="#fff8b5" strokeWidth="5" strokeLinecap="round"/>
+    </g>;
+    case 'brick-breaker': return <g>
+      <path d="M115 55L191 25L309 47L346 125L300 198L130 201L80 126Z" fill="#172841" stroke="#67eece" strokeOpacity=".35" strokeWidth="2"/>
+      {[[112,48,0],[172,48,1],[232,48,2],[292,48,3],[142,80,2],[202,80,0],[262,80,1]].map(([x,y,c],i)=><g key={i}><rect x={x} y={y} width="51" height="25" rx="4" fill={['#5fddad','#af8aff','#ffd275','#ff967e'][c]} stroke="#f4fff9" strokeOpacity=".6"/><path d={`M${x+7} ${y+6}h37`} stroke="#fff" strokeOpacity=".65" strokeWidth="2"/></g>)}
+      <path d="M209 189L264 116L278 94" stroke="#a68dff" strokeWidth="12" strokeLinecap="round" opacity=".3"/><path d="M209 189L264 116" stroke="#dcfff8" strokeWidth="3" strokeDasharray="6 7"/>
+      <path d="M272 94l18-5-4 18m-5-28l8-11m-28 23l-11-5" stroke="#ffd275" strokeWidth="4" strokeLinecap="round"/>
+      <g clipPath={`url(#${uid}-orb)`}><image href={realmsOrb} x="135" y="92" width="315" height="210"/></g>
+      <path d="M149 212L171 191H270L294 212L276 225H167Z" fill="#5473aa" stroke="#a7fff0" strokeWidth="4"/><path d="M173 199H267" stroke="#c0fff6" strokeWidth="4"/>
+      <path d="M112 185l-16 14 22 8m198-41l15 10-16 13" stroke="#ae8aff" strokeWidth="4"/>
+    </g>;
     case 'rainbow-blocks': return <g transform="translate(110 12) rotate(-10 112 100)">
       <rect x="-10" y="-8" width="240" height="218" rx="20" fill="#0d1224" stroke="#18d8f5" strokeWidth="3"/>
       {[[0,3,'j'],[0,2,'j'],[1,3,'j'],[2,3,'o'],[3,3,'o'],[2,2,'o'],[3,2,'o'],[4,3,'l'],[4,2,'l'],[4,1,'l'],[3,1,'l'],[0,0,'t'],[1,0,'t'],[2,0,'t'],[1,1,'t']].map(([x,y,k],i)=><image key={i} href={rainbowAsset(`blocks/block_${k}_base.svg`)} x={Number(x)*44} y={Number(y)*44+22} width="44" height="44"/>)}
       <image href={rainbowAsset('fx/fx_rainbow_sweep.svg')} x="-20" y="175" width="260" height="36"/>
     </g>;
 
-    case 'word-cross': return <g transform="translate(118 24) rotate(-10 90 90)">
-      <path d="M27 27L85 27L143 85L85 143" fill="none" stroke={b} strokeWidth="58" strokeLinejoin="round" opacity=".3" />
-      {['W','O','R','A','D','D','X','S','!'].map((s,i)=><Tile key={i} x={i%3*62} y={Math.floor(i/3)*62} color={[a,'#eee4ff',b][i%3]} text={s} />)}
+    case 'word-cross': return <g>
+      <path d="M95 197V70Q151 39 213 66Q271 38 331 66V196Q270 171 213 197Q153 174 95 197Z" fill="#f7e8d6" stroke="#7354ab" strokeWidth="5"/>
+      <path d="M213 68V192M108 80Q151 62 191 79M108 91Q151 73 191 91M236 83H312M236 97H300M236 112H307" fill="none" stroke="#b7a0a4" strokeWidth="3"/>
+      <path d="M132 122L183 156L237 135L286 158" fill="none" stroke="#a15ac8" strokeWidth="8" strokeLinecap="round"/>
+      {[[132,122,'W'],[183,156,'O'],[237,135,'R'],[286,158,'D']].map(([x,y,t])=><g key={t}><circle cx={Number(x)} cy={Number(y)} r="24" fill={t==='D'?b:a} stroke="#fff" strokeWidth="3"/><text x={Number(x)} y={Number(y)+9} textAnchor="middle" fill="#351953" fontSize="25" fontWeight="900">{t}</text></g>)}
     </g>;
-    case 'tile-2048': return <g transform="translate(116 18) rotate(-12 100 100)">
-      <rect x="-12" y="-12" width="212" height="212" rx="24" fill="#46263a" stroke={a} strokeWidth="2" />
-      {[2,4,8,16,32,64,128,512,2048].map((n,i)=><Tile key={n} x={i%3*65} y={Math.floor(i/3)*65} color={['#fff0c2','#ffc976','#ff9d65'][Math.floor(i/3)]} text={String(n)} />)}
+    case 'tile-2048': return <g>
+      <g transform="translate(76 87) rotate(-12 35 35)"><Tile x={0} y={0} size={83} color="#ffe7ac" text="1024"/></g>
+      <g transform="translate(164 46) rotate(10 35 35)"><Tile x={0} y={0} size={83} color="#ffd078" text="1024"/></g>
+      <path d="M139 191H227L214 176m13 15l-13 15" stroke="#fff6ce" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+      <g transform="translate(251 105) rotate(-8 50 50)"><Tile x={0} y={0} size={106} color="#ff9b58" text="2048"/></g>
+      <path d="M295 58l8-16m22 34l17-8M81 52l-8-12" stroke="#ffe9ac" strokeWidth="5" strokeLinecap="round"/>
     </g>;
     case 'car-escape': return <g transform="rotate(-14 210 125)">
       <rect x="90" y="35" width="258" height="172" rx="18" fill="#142a43" stroke="#405a72" strokeWidth="3" />
@@ -81,7 +111,7 @@ function Scene({ id, a, b }: { id: string; a: string; b: string }) {
     </g>;
     case 'xiangqi': return <g>
       <path d="M72 205L113 38H326L365 205Z" fill="#b98657" stroke="#edc28a" strokeWidth="3"/>{[0,1,2,3,4].map(i=><path key={i} d={`M${97+i*52} 195L${124+i*45} 48M100 ${64+i*29}H337`} stroke="#583b32" opacity=".5"/>)}
-      {[{x:176,y:105,t:'帥',c:'#c63842'},{x:275,y:156,t:'將',c:'#283c50'}].map(p=><g key={p.t}><ellipse cx={p.x} cy={p.y+9} rx="45" ry="43" fill="#6a4032"/><circle cx={p.x} cy={p.y} r="43" fill="#ffe1aa" stroke="#be925e" strokeWidth="4"/><circle cx={p.x} cy={p.y} r="34" fill="none" stroke={p.c} strokeWidth="2"/><text x={p.x} y={p.y+17} textAnchor="middle" fontSize="46" fontWeight="bold" fill={p.c}>{p.t}</text></g>)}
+      {[{x:176,y:105,t:'TƯỚNG',c:'#c63842'},{x:275,y:156,t:'SĨ',c:'#283c50'}].map(p=><g key={p.t}><ellipse cx={p.x} cy={p.y+9} rx="45" ry="43" fill="#6a4032"/><circle cx={p.x} cy={p.y} r="43" fill="#ffe1aa" stroke="#be925e" strokeWidth="4"/><circle cx={p.x} cy={p.y} r="34" fill="none" stroke={p.c} strokeWidth="2"/><text x={p.x} y={p.y+17} textAnchor="middle" fontSize={p.t.length>2?16:30} fontWeight="bold" fill={p.c}>{p.t}</text></g>)}
     </g>;
     case 'caro-gomoku': return <g transform="translate(123 30) rotate(-10 90 90)">
       {[0,1,2,3].map(i=><path key={i} d={`M${i*60} 0V180M0 ${i*60}H180`} stroke="#9bafff" strokeWidth="2" opacity=".35"/>)}
@@ -110,50 +140,81 @@ function Scene({ id, a, b }: { id: string; a: string; b: string }) {
       {[0,1,2].map(i=><g key={i} transform={`translate(${280+i*33} ${119+i*9}) rotate(45)`}><rect width="16" height="16" rx="4" fill={[b,'#ffd078','#f98fbf'][i]}/></g>)}
       <path d="M95 55L82 73M78 100L54 108M84 146L63 165" stroke={b} strokeWidth="5" strokeLinecap="round"/>
     </g>;
-    case 'draw-a-shape': return <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M109 181V61H171V120H289V181H229" stroke={a} strokeWidth="18"/><path d="M109 181V61H171V120H289V181H229" stroke="white" strokeWidth="3" opacity=".7"/>
-      <path d="M229 61H289M171 181V213" stroke={b} strokeWidth="18"/>
-      {[[109,181],[229,181],[229,61],[289,61],[171,181],[171,213]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="13" fill={i<2?a:b} stroke="#fff" strokeWidth="3"/>)}
+    case 'draw-a-shape': return <g>
+      <path d="M197 37L221 99L289 102L235 145L254 210L197 170L140 210L159 145L105 102L173 99Z" fill="#437997" fillOpacity=".3" stroke="#a9eaff" strokeWidth="3" strokeDasharray="6 7"/>
+      <path d="M197 37L221 99L289 102L235 145" fill="none" stroke={a} strokeWidth="12" strokeLinecap="round"/>
+      {[[197,37],[221,99],[289,102],[235,145],[254,210],[197,170],[140,210],[159,145],[105,102],[173,99]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="7" fill={i<4?'#ecfcff':b}/>)}
+      <g transform="rotate(32 300 168)"><rect x="290" y="81" width="24" height="119" rx="5" fill="#f285e1" stroke="#ffd7f3" strokeWidth="2"/><path d="M290 200l12 23 12-23" fill="#ffe6b5"/><path d="M298 216l4 7 4-7" fill="#233957"/><path d="M296 95v94" stroke="#fff" strokeOpacity=".7" strokeWidth="3"/></g>
     </g>;
     case 'hex-match': return <g>
       <image href={blossomAsset(BLOSSOM_ICON)} x="28" y="18" width="220" height="220" preserveAspectRatio="xMidYMid meet"/>
       <image href={blossomAsset(BLOSSOM_LOGO)} x="240" y="66" width="160" height="72" preserveAspectRatio="xMidYMid meet"/>
       <text x="320" y="161" textAnchor="middle" fill="#fff5d9" fontSize="14" fontWeight="700" fontFamily="system-ui, sans-serif">Nature's story</text>
     </g>;
-    case 'scoodoku': return <g transform="translate(121 27) rotate(-9 90 90)">
-      <rect x="-10" y="-10" width="200" height="200" rx="16" fill="#d0a674" stroke="#ffe1b1" strokeWidth="3"/>
-      {[1,9,4,7,5,2,3,6,8].map((n,i)=><Tile key={n} x={i%3*62} y={Math.floor(i/3)*62} color={i===4?'#a8dbc4':'#f5dfb6'} text={String(n)}/>)}
+    case 'scoodoku': return <g transform="translate(111 24) rotate(-5 99 99)">
+      <rect x="-8" y="-8" width="214" height="218" rx="15" fill="#f7e6bd" stroke="#976d41" strokeWidth="4"/>
+      <rect x="0" y="69" width="198" height="22" fill="#8cd9b5"/><rect x="110" width="22" height="198" fill="#e4c57e"/>
+      {[0,1,2,3,4,5,6,7,8,9].map(i=><path key={i} d={`M${i*22} 0V198M0 ${i*22}H198`} stroke="#6a4b30" strokeWidth={i%3===0?2:0.6} opacity={i%3===0?1:.4}/>)}
+      {[[0,0,8],[2,1,3],[4,0,1],[8,0,6],[1,3,4],[3,3,9],[5,3,7],[6,3,2],[8,4,5],[1,6,1],[4,7,4],[7,6,9],[5,8,2],[2,8,6]].map(([x,y,n])=><text key={`${x}-${y}`} x={x*22+11} y={y*22+17} textAnchor="middle" fill="#593b21" fontSize="17" fontWeight="700">{n}</text>)}
+      <circle cx="121" cy="80" r="12" fill="#ffe28b" stroke="#278064" strokeWidth="2"/><text x="121" y="86" textAnchor="middle" fill="#2c5a42" fontSize="18" fontWeight="900">5</text>
     </g>;
     case 'shikaku': return <g transform="translate(111 27) rotate(-9 98 96)">
       <rect x="-8" y="-8" width="210" height="204" rx="15" fill="#172b4e" stroke={a} strokeWidth="2"/>
       {[{x:0,y:0,w:122,h:57,c:a,t:6},{x:128,y:0,w:57,h:121,c:b,t:8},{x:0,y:63,w:57,h:122,c:'#f1b46e',t:4},{x:63,y:63,w:59,h:122,c:'#7adbc4',t:6},{x:128,y:127,w:57,h:58,c:'#f390bf',t:2}].map(p=><g key={p.t+'-'+p.x}><rect x={p.x} y={p.y} width={p.w} height={p.h} rx="9" fill={p.c} stroke="white" strokeOpacity=".4"/><text x={p.x+p.w/2} y={p.y+p.h/2+9} textAnchor="middle" fill="#17314b" fontSize="26" fontWeight="900">{p.t}</text></g>)}
     </g>;
-    default: return <g transform="translate(118 35) rotate(-12 95 90)">
-      <rect x="-10" y="-10" width="206" height="196" rx="20" fill={id==='blocker'?'#173e37':'#50382c'} stroke={a} strokeWidth="2"/>
-      {[0,1,2,3,4,5,6,7,8].map(i=><Tile key={i} x={i%3*64} y={Math.floor(i/3)*60} size={55} color={i===4?'#182b39':(i%3===0?b:a)} />)}
+    case 'blocker': return <g>
+      <rect x="99" y="20" width="215" height="201" rx="18" fill="#113d34" stroke="#a1e9ba" strokeWidth="3"/>
+      {Array.from({length:36},(_,i)=><rect key={i} x={111+i%6*32} y={32+Math.floor(i/6)*29} width="27" height="24" rx="4" fill="#23564a"/>)}
+      {[[0,0],[1,0],[0,1],[0,2],[2,3],[3,3],[4,3],[4,4]].map(([x,y],i)=><rect key={i} x={111+x*32} y={32+y*29} width="27" height="24" rx="5" fill={i<4?'#6be5a4':'#ffd766'} stroke="#ecffc9" strokeWidth="1"/>)}
+      <path d="M112 188H299" stroke="#ceffba" strokeWidth="7" strokeLinecap="round"/>
+      <g transform="translate(275 108) rotate(10)">{[[0,0],[0,1],[1,1]].map(([x,y],i)=><Tile key={i} x={x*35} y={y*35} size={32} color="#77e5ad"/>)}</g>
     </g>;
+    case 'fill-the-space': return <g>
+      <path d="M82 196L126 39H310L357 196Z" fill="#a77548" stroke="#f1ca91" strokeWidth="5"/>
+      <path d="M145 70H206V126H260V174H115Z" fill="#503622" stroke="#ffd9a2" strokeWidth="3" strokeDasharray="7 5"/>
+      <path d="M270 51H319V103H296V132H245V103H270Z" fill="#d4a16c" stroke="#fff0cf" strokeWidth="4"/>
+      <path d="M141 102V64H191V102H228V149H141Z" fill="#8dc8ad" stroke="#d1ffdf" strokeWidth="4" transform="rotate(-13 185 107)"/>
+      <path d="M222 203L243 172m0 0l-19 7m19-7l1 19" stroke="#fff0cc" strokeWidth="5" strokeLinecap="round"/>
+    </g>;
+    default: return <g><path d="M146 61H281V196H146Z" fill="#334155" stroke="#94a3b8" strokeWidth="3"/><path d="M178 102H249M178 126H237M178 150H227" stroke="#cbd5e1" strokeWidth="6"/><circle cx="213" cy="184" r="5" fill="#cbd5e1"/></g>;
   }
 }
-export function GameArtwork({ gameId, className = '' }: { gameId: string; className?: string }) {
-  const uid=useId().replace(/:/g,''); const {color,secondary}=artFor(gameId);
-  return <svg className={`game-artwork ${className}`} viewBox="0 0 420 250" fill="none" aria-hidden="true" focusable="false">
-    <defs>
-      <radialGradient id={`${uid}-sky`} cx=".64" cy=".45" r=".85"><stop stopColor={color} stopOpacity=".32"/><stop offset="1" stopColor="#070e20"/></radialGradient>
-      <linearGradient id={`${uid}-floor`} x2="0" y2="1"><stop stopColor={secondary} stopOpacity=".15"/><stop offset="1" stopColor={secondary} stopOpacity="0"/></linearGradient>
-    </defs>
-    <rect width="420" height="250" fill="#080f22"/>
-    <rect width="420" height="250" fill={`url(#${uid}-sky)`}/>
-    <circle cx="224" cy="117" r="101" stroke={color} strokeOpacity=".18"/>
-    <circle cx="224" cy="117" r="115" stroke={color} strokeOpacity=".1" strokeDasharray="5 12"/>
-    {Array.from({length:14},(_,i)=><circle key={i} cx={22+(i*83)%375} cy={16+(i*47)%207} r={i%3===0?1.8:1} fill="#e9f2ff" opacity={.2+(i%4)*.12}/>)}
-    <ellipse cx="224" cy="220" rx="147" ry="19" fill={`url(#${uid}-floor)`}/>
-    <g className="game-artwork-scene"><Scene id={gameId} a={color} b={secondary}/></g>
-    <path d="M22 43V22H43M377 22H398V43M22 207V228H43M377 228H398V207" stroke={color} strokeOpacity=".45"/>
-  </svg>;
+function Backdrop({id,a,b}:{id:string;a:string;b:string}){
+ switch(id){
+ case 'boom-buddies':return <g><path d="M0 0H420V250H0Z" fill="#d6ed9c"/><path d="M0 137Q94 112 182 159T420 126V250H0Z" fill="#84b04e"/>{Array.from({length:18},(_,i)=><circle key={i} cx={18+i*47%390} cy={154+i*29%91} r={i%2?3:5} fill="#619640"/>)}<path d="M0 41Q115 83 207 28T420 49" stroke="#efffcb" strokeWidth="32"/></g>;
+ case 'brick-breaker':return <g><path d="M0 0H420V250H0Z" fill="#12233a"/><path d="M0 44L103 7L79 116L0 172M420 12L331 70L401 112L420 216" fill="#284760"/><path d="M0 229L121 187L180 250M420 187L334 212L316 250" fill="#386460"/><path d="M42 0L80 84L28 129M377 0L331 70L374 130" fill="none" stroke="#8562bd" strokeWidth="4"/>{[[47,37],[360,177],[65,212],[353,33]].map(([x,y],i)=><path key={i} d={`M${x} ${y-8}l8 8-8 8-8-8Z`} fill={a} opacity=".5"/>)}</g>;
+ case 'rainbow-blocks':return <g>{['#25c6df','#4d6ecb','#ca6aac','#ffd873'].map((c,i)=><path key={c} d={`M${-80+i*125} 0l160 250h95L${15+i*125} 0Z`} fill={c} opacity=".17"/>)}<path d="M0 233Q209 120 420 229" stroke="#69e6dd" strokeWidth="18" opacity=".35"/></g>;
+ case 'word-cross':return <g><path d="M0 0H420V250H0Z" fill="#543479"/><path d="M0 216Q120 126 221 228T420 199V250H0Z" fill="#96619b"/>{['A','B','C','?'].map((t,i)=><text key={t} x={35+i*110} y={58+i%2*148} fontSize="44" fontWeight="900" fill="#d5b5f2" opacity=".2" transform={`rotate(${i%2?15:-15} ${35+i*110} ${58+i%2*148})`}>{t}</text>)}</g>;
+ case 'tile-2048':return <g><path d="M0 0H420V250H0Z" fill="#8b5126"/><path d="M0 202L109 89L225 214L359 37L420 93V250H0Z" fill="#dfa659" opacity=".35"/>{[0,1,2].map(i=><path key={i} d={`M${10+i*138} 0l55 35-55 35-55-35Z`} fill="#ffdca0" opacity=".17"/>)}</g>;
+ case 'car-escape':return <g><path d="M0 0H420V250H0Z" fill="#263947"/><path d="M-40 0L178 250H264L45 0Z" fill="#5d737a"/><path d="M420 0L269 250H326L450 53Z" fill="#e27d60" opacity=".35"/><path d="M0 0L220 250" stroke="#f8e3ae" strokeWidth="3" strokeDasharray="17 19"/></g>;
+ case 'dungeon-tap':return <g><path d="M0 250V82Q50 10 100 82V250M310 250V82Q360 10 410 82V250" fill="#35303d" stroke="#8f6142" strokeWidth="10"/><path d="M19 187l14-58 15 58m323 0l14-58 15 58" fill="#ffae47" opacity=".6"/></g>;
+ case 'mummy-escape':return <g><path d="M0 0H420V250H0Z" fill="#564632"/><path d="M0 190Q113 139 226 202T420 170V250H0Z" fill="#bd8b55"/><path d="M0 211Q119 176 238 217T420 210" stroke="#eddba1" strokeWidth="8" opacity=".4"/><circle cx="43" cy="46" r="38" fill="#d7b361" opacity=".5"/></g>;
+ case 'shikaku':return <g>{Array.from({length:16},(_,i)=><path key={i} d={`M${i*30} 0V250M0 ${i*25}H420`} stroke="#60b3db" strokeWidth="1" opacity=".2"/>)}<path d="M25 23H86V70H25ZM333 172H393V230H333Z" stroke="#bca2ff" strokeWidth="3"/></g>;
+ case 'eat-em-all':return <g><path d="M0 0H420V250H0Z" fill="#214b3b"/>{[[33,60,61],[357,183,93],[33,219,73]].map(([x,y,r],i)=><circle key={i} cx={x} cy={y} r={r} fill={i%2?'#61b888':'#95c455'} opacity=".35"/>)}<path d="M345 24l34 24-34 24-34-24Z" fill="#e4d173" opacity=".7"/></g>;
+ case 'scoodoku':return <g><path d="M0 0H420V250H0Z" fill="#886444"/><path d="M0 14L420 63M0 206L420 246" stroke="#ccac74" strokeWidth="18" opacity=".3"/><text x="29" y="121" fill="#f3dfb6" opacity=".2" fontSize="75" fontWeight="900">9</text><text x="339" y="208" fill="#f3dfb6" opacity=".2" fontSize="82" fontWeight="900">3</text></g>;
+ case 'fill-the-space':return <g><path d="M0 0H420V250H0Z" fill="#58422d"/>{Array.from({length:6},(_,i)=><path key={i} d={`M0 ${i*49}Q132 ${i*49-20} 269 ${i*49+10}T420 ${i*49}`} stroke="#ab825b" strokeWidth="5" opacity=".25"/>)}<path d="M26 29h40v39H26ZM339 201h55v30h-55Z" fill="#e6c68b" opacity=".2"/></g>;
+ case 'blocker':return <g><path d="M0 0H420V250H0Z" fill="#266448"/><path d="M0 0Q100 96 60 250M420 0Q320 96 367 250" fill="#417c42" stroke="#94b25e" strokeWidth="12"/>{[0,1,2].map(i=><path key={i} d={`M${23+i*170} ${20+i%2*170}l24 13-24 13-24-13Z`} fill="#bad18a" opacity=".4"/>)}</g>;
+ case 'chess':return <g><path d="M0 0H420V250H0Z" fill="#28364a"/>{Array.from({length:12},(_,i)=><rect key={i} x={i%6*80-25} y={Math.floor(i/6)*180-47} width="80" height="80" fill={i%2===Math.floor(i/6)%2?'#cfb889':'#53627a'} opacity=".22" transform="rotate(-12 210 125)"/>)}</g>;
+ case 'xiangqi':return <g><path d="M0 0H420V250H0Z" fill="#753d36"/><path d="M22 24H398V226H22Z" stroke="#d3a55c" strokeWidth="5"/>{[0,1,2,3].map(i=><path key={i} d={`M${31+i%2*342} ${31+Math.floor(i/2)*179}h16v16h-16v-16h-10`} stroke="#e9c183" strokeWidth="3"/>)}<path d="M0 120Q105 89 211 125T420 114" stroke="#301f31" strokeWidth="22" opacity=".35"/></g>;
+ case 'caro-gomoku':return <g><path d="M0 0H420V250H0Z" fill="#344375"/><circle cx="37" cy="53" r="35" fill="none" stroke="#fa9bc6" strokeWidth="10" opacity=".45"/><path d="M326 158l64 64m0-64l-64 64" stroke="#a4baff" strokeWidth="12" strokeLinecap="round" opacity=".45"/></g>;
+ case 'draw-a-shape':return <g><path d="M0 0H420V250H0Z" fill="#204d70"/>{[0,1,2,3,4].map(i=><path key={i} d={`M0 ${25+i*48}H420M${25+i*95} 0V250`} stroke="#afd2dd" strokeWidth="1" opacity=".16"/>)}<path d="M34 49l29 39-20 43M346 207l38-33-15-30" stroke={b} strokeWidth="4" strokeDasharray="4 7"/></g>;
+ case 'neon-runner':return <g><path d="M0 0H420V250H0Z" fill="#152541"/><path d="M0 250L173 0M420 250L252 0M0 164H420M0 218H420" stroke="#40dce4" strokeWidth="3" opacity=".35"/><path d="M0 17l87 40M420 13l-64 25" stroke="#c75ce1" strokeWidth="9" opacity=".45"/></g>;
+ case 'cosmic-defense':return <g>{Array.from({length:20},(_,i)=><circle key={i} cx={13+(i*83)%405} cy={11+(i*47)%239} r={i%4?1:2.2} fill="#e9f2ff" opacity={.2+(i%4)*.15}/>)}<path d="M0 214Q66 53 188 0" stroke="#5e4fad" strokeWidth="80" opacity=".2"/></g>;
+ case 'cyber-slice':return <g><path d="M0 0H420V250H0Z" fill="#5c253e"/><path d="M0 185L342 0H420L39 250H0Z" fill="#d64f83" opacity=".35"/><path d="M0 162L307 0M164 250L420 90" stroke="#ffc987" strokeWidth="5" opacity=".45"/></g>;
+ case 'hex-match':return <g><path d="M0 0H420V250H0Z" fill="#427347"/><path d="M0 226Q138 71 53 0M420 0Q269 76 387 250" fill="#6b9550" stroke="#b4c882" strokeWidth="8"/><circle cx="323" cy="29" r="67" fill="#d5db96" opacity=".3"/></g>;
+ default:return <g><path d="M0 0H420V250H0Z" fill="#243246"/></g>;
+ }
 }
 
+export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
+ const uid=useId().replace(/[^a-zA-Z0-9_-]/g,'');const id=canonicalArtId(gameId);const {color,secondary}=artFor(id);
+ return <svg className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} viewBox={variant==='icon'?'60 -25 300 300':'0 0 420 250'} preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true" focusable="false">
+ <defs><clipPath id={`${uid}-orb`}><rect x="135" y="92" width="105" height="105"/></clipPath><radialGradient id={`${uid}-sky`} cx=".5" cy=".35" r=".9"><stop stopColor={color} stopOpacity=".3"/><stop offset="1" stopColor="#071321"/></radialGradient></defs>
+ <rect x="0" y="-30" width="420" height="310" fill={`url(#${uid}-sky)`}/><g transform={variant==='icon'?'translate(0 -25) scale(1 1.2)':undefined}><Backdrop id={id} a={color} b={secondary}/></g>
+ <g className="game-artwork-scene" transform={variant==='icon'?'translate(18 8) scale(.9)':undefined}>{variant==='icon'&&id==='hex-match'?<image href={blossomAsset(BLOSSOM_ICON)} x="85" y="0" width="250" height="250"/>:<Scene id={id} a={color} b={secondary} uid={uid}/>}</g></svg>;
+}
 export function GameIcon({gameId}:{gameId:string}) {
-  return gameId==='hex-match'?<img src={blossomAsset(BLOSSOM_ICON)} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:8}}/>:<GameArtwork gameId={gameId}/>;
+ return canonicalArtId(gameId)==='hex-match'?<img src={blossomAsset(BLOSSOM_ICON)} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:8}}/>:<GameArtwork gameId={gameId} variant="icon"/>;
 }
 
 export function GameAtmosphere({ gameId }: {gameId: string}) {

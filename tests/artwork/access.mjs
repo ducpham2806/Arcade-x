@@ -1,0 +1,10 @@
+import {build} from 'esbuild';import {createRequire} from 'node:module';import assert from 'node:assert/strict';
+const require=createRequire(import.meta.url);global.window={};Object.defineProperty(global,'navigator',{value:{onLine:true},configurable:true});const saved=new Map();global.localStorage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,v)};global.accessCalls=0;
+for(const dev of [true,false]){
+ const file=`node_modules/.cache/art-access-${dev}.cjs`;
+ await build({entryPoints:['src/launcher/repository.ts'],bundle:true,platform:'node',format:'cjs',outfile:file,define:{'import.meta.env':JSON.stringify({DEV:dev})},loader:{'.png':'dataurl'},plugins:[{name:'isolated-server',setup(b){b.onResolve({filter:/\/registry$/},()=>({path:'games',namespace:'stub'}));b.onResolve({filter:/supabaseClient$/},()=>({path:'backend',namespace:'stub'}));b.onLoad({filter:/.*/,namespace:'stub'},args=>({contents:args.path==='games'?`export const GAME_REGISTRY={};export const ALL_GAMES_LIST=[];`:`export const supabase={rpc(){global.accessCalls++;return{abortSignal:async()=>({data:{allowed:false,reason:'unavailable'}})};},auth:{getSession:async()=>({data:{session:{user:{id:'owner',is_anonymous:false}}}})}};`,loader:'js'}));b.onLoad({filter:/\.css$/},()=>({contents:'',loader:'css'}));}}]});
+ const {checkAccess,enqueueFavorite,flushFavorites,pendingFavorites}=require('../../'+file);
+ for(const id of ['boom-buddies','brick-breaker']){const game={id,availability:'published',accessModel:'free',supportsOffline:true};const before=global.accessCalls;assert.equal((await checkAccess(game)).allowed,dev);assert.equal(global.accessCalls-before,dev?0:1);assert.equal((await checkAccess({...game,accessModel:'premium'})).allowed,false);assert.equal((await checkAccess({...game,availability:'maintenance'})).allowed,false);}
+ if(dev){enqueueFavorite('owner','brick-breaker',true);enqueueFavorite('owner','chess',true);await flushFavorites('owner');assert.deepEqual(pendingFavorites('owner'),[]);}
+}
+console.log('PASS reviewed free games open only in preview; production/paid/maintenance restrictions remain; local prototypes do not block cloud favorite queue');

@@ -81,3 +81,10 @@
 @media(max-width:639px){.featured-slide.launcher-welcome{grid-template-columns:minmax(0,1fr) 120px;min-height:278px;padding:22px 18px 55px;gap:12px}.featured-copy h1{font-size:26px!important;letter-spacing:-.7px}.featured-copy>p:not(.launcher-eyebrow){font-size:11px;line-height:1.6;max-width:240px}.featured-copy .launcher-eyebrow{font-size:8px;letter-spacing:1px}.featured-copy .launcher-primary{font-size:12px;padding:10px 12px;min-height:40px;margin-top:12px}.featured-copy .launcher-primary svg{width:14px}.featured-slide .welcome-game{display:block!important;width:120px}.featured-slide .welcome-art{width:120px;border-radius:16px;transform:rotate(2deg)}.featured-slide .welcome-caption{gap:4px;margin-top:10px}.featured-slide .welcome-caption h2{font-size:11px;line-height:1.3}.featured-slide .welcome-caption span{font-size:7px;letter-spacing:.7px}.featured-controls{left:18px;right:18px;bottom:12px}}
 @media(max-width:359px){.featured-slide.launcher-welcome{grid-template-columns:minmax(0,1fr) 90px;gap:8px;min-height:278px}.featured-slide .welcome-game,.featured-slide .welcome-art{width:90px}.featured-copy h1{font-size:22px!important}.featured-slide .welcome-caption .launcher-icon{display:none}.featured-slide .welcome-sticker{font-size:6px;padding:5px}.featured-dots button{width:24px}}
 @media(prefers-reduced-motion:reduce){.featured-track.is-animated,.featured-dots span{transition:none}}
+
+/* New game art uses a square composition so the bomb, Orb and paddle remain visible. */
+.featured-slide .welcome-art .game-artwork{transform:none}
+.featured-boom-buddies.launcher-welcome{background:linear-gradient(120deg,#fff3da,#edf2d1);border-color:#d4b178}
+.featured-brick-breaker.launcher-welcome{background:linear-gradient(120deg,#e1f6ec,#e9e5fb);border-color:#89baaf}
+.featured-boom-buddies .featured-copy h1 span{color:#934510}
+.featured-brick-breaker .featured-copy h1 span{color:#305f7b}

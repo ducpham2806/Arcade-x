@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'node:fs';
 import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
 
@@ -9,6 +10,22 @@ export default defineConfig(() => {
     plugins: [
       react(),
       tailwindcss(),
+      {name:'chronicles-existing-game',configureServer(server){
+        server.middlewares.use((req,res,next)=>{
+          if(!req.url?.startsWith('/chronicles-realms/'))return next();
+          const root=path.resolve('standalone/chronicles-realms/dist');let file:string;
+          try{file=path.resolve(root,decodeURIComponent(req.url.split('?')[0].slice('/chronicles-realms/'.length)));}catch{return next();}
+          if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile())return next();
+          const type:Record<string,string>={'.html':'text/html','.css':'text/css','.js':'text/javascript','.json':'application/json','.png':'image/png'};
+          res.setHeader('Content-Type',type[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file));
+        });
+      },generateBundle(){
+        const root=path.resolve('standalone/chronicles-realms/dist');
+        for(const relative of fs.readdirSync(root,{recursive:true})) {
+          const file=path.join(root,String(relative));if(!fs.statSync(file).isFile())continue;
+          this.emitFile({type:'asset',fileName:'chronicles-realms/'+String(relative).replaceAll(path.sep,'/'),source:fs.readFileSync(file)});
+        }
+      }},
       VitePWA({
         registerType: 'prompt',
         includeAssets: [
@@ -56,6 +73,7 @@ export default defineConfig(() => {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: '/index.html',
+          navigateFallbackDenylist: [/^\/chronicles-realms\//],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

@@ -3,8 +3,11 @@ import {ChevronLeft,ChevronRight,Pause,Play} from 'lucide-react';
 import type {CatalogGame} from './catalog';
 import {GameArtwork} from '../visuals/gameArt';
 export const FEATURED_INTERVAL=15_000;
-const priority=['rainbow-blocks','hex-match','car-escape','tile-2048','word-cross','blocker'];
+export const NEW_GAME_IDS=['boom-buddies','brick-breaker','rainbow-blocks'];
+const priority=[...NEW_GAME_IDS,'hex-match','car-escape','tile-2048','word-cross','blocker'];
 const copy:Record<string,{eyebrow:string;title:string;accent:string;body:string}>={
+ 'boom-buddies':{eyebrow:'GAME MỚI · BOOM BUDDIES',title:'Đặt bom thật khéo.',accent:'Cùng bạn bùng nổ.',body:'Khám phá mê cung, né ngọn lửa và mở lối đi cùng Pip và Bum.'},
+ 'brick-breaker':{eyebrow:'GAME MỚI · BLOCK BREAKER',title:'Giải phóng Orb.',accent:'Hàn gắn Aethra.',body:'Phá gạch, vượt sáu vùng đất và chinh phục 96 màn trong Chronicles.'},
  'rainbow-blocks':{eyebrow:'GAME MỚI · RAINBOW BLOCKS',title:'Xếp sắc màu.',accent:'Bật cầu vồng.',body:'Khối rơi rực rỡ, combo bùng nổ. Chinh phục kỷ lục theo cách của bạn.'},
  'hex-match':{eyebrow:'BLOSSOM BLAST · 100 MÀN',title:'Chạm một bông.',accent:'Nở cả khu vườn.',body:'Ghép hoa, đánh thức sức mạnh đặc biệt và viết tiếp hành trình khu vườn.'},
  'car-escape':{eyebrow:'THỬ THÁCH TƯ DUY',title:'Gỡ từng nút.',accent:'Mở đường thoát.',body:'Một bãi xe đông đúc. Bạn sẽ tìm lối ra bằng nước đi nào?'},
@@ -29,7 +32,7 @@ export function FeaturedCarousel({games,onPlay,onDetail}:{games:CatalogGame[];on
   <div className="featured-viewport"><div className={`featured-track ${animate?'is-animated':''}`} style={{transform:`translateX(-${index*100}%)`}}>
    {[...slides,slides[0]].map((game,i)=>{const c=copy[game.id]||{eyebrow:'HÔM NAY CHƠI GÌ?',title:'Chơi một chút.',accent:'Vui cả ngày.',body:game.shortDesc};return <div key={`${game.id}-${i}`} className={`launcher-welcome featured-slide featured-${game.id}`} role="group" aria-roledescription="slide" aria-label={`${i%count+1} / ${count}: ${game.title}`} aria-hidden={i!==index} inert={i!==index}>
     <div className="featured-copy"><p className="launcher-eyebrow">{c.eyebrow}</p><h1>{c.title}<br/><span>{c.accent}</span></h1><p>{c.body}</p><button className="launcher-primary" onClick={()=>onPlay(game.id)}><Play size={18} fill="currentColor"/>Chơi ngay</button></div>
-    <div className="welcome-game"><div className="welcome-sticker">{game.id==='rainbow-blocks'?'VỪA CẬP BẾN ✦':'GỢI Ý CHO BẠN'}</div><button className="welcome-art" onClick={()=>onDetail(game.id)} aria-label={`Khám phá ${game.title}`}><GameArtwork gameId={game.id}/></button><div className="welcome-caption"><div><span>{game.category==='Puzzle'?'GIẢI ĐỐ':'KHÁM PHÁ'}</span><h2>{game.title}</h2></div><button id={i===index?'btn-launch-featured':undefined} aria-label={`Chơi game nổi bật ${game.title}`} className="launcher-icon" onClick={()=>onPlay(game.id)}><Play size={22} fill="currentColor"/></button></div></div>
+    <div className="welcome-game"><div className="welcome-sticker">{NEW_GAME_IDS.includes(game.id)?'VỪA CẬP BẾN ✦':'GỢI Ý CHO BẠN'}</div><button className="welcome-art" onClick={()=>onDetail(game.id)} aria-label={`Khám phá ${game.title}`}><GameArtwork gameId={game.id} variant="icon"/></button><div className="welcome-caption"><div><span>{game.category==='Puzzle'?'GIẢI ĐỐ':'KHÁM PHÁ'}</span><h2>{game.title}</h2></div><button id={i===index?'btn-launch-featured':undefined} aria-label={`Chơi game nổi bật ${game.title}`} className="launcher-icon" onClick={()=>onPlay(game.id)}><Play size={22} fill="currentColor"/></button></div></div>
    </div>;})}
   </div></div>
   <div className="featured-controls"><div className="featured-dots" aria-label="Chọn slide">{slides.map((game,i)=><button key={game.id} aria-label={`Slide ${i+1}: ${game.title}`} aria-current={active===i?'true':undefined} onClick={()=>go(i)}><span/></button>)}</div><div className="featured-arrows"><button aria-label={paused?'Tiếp tục chuyển banner':'Tạm dừng chuyển banner'} aria-pressed={paused} onClick={()=>setPaused(p=>!p)}>{paused?<Play size={14}/>:<Pause size={14}/>}</button><button aria-label="Banner trước" onClick={()=>go(active===0?count-1:active-1)}><ChevronLeft size={18}/></button><button aria-label="Banner tiếp" onClick={()=>go(index+1)}><ChevronRight size={18}/></button></div></div>

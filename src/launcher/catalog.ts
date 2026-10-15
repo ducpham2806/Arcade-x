@@ -1,8 +1,10 @@
 import { ALL_GAMES_LIST, GAME_REGISTRY } from '../games/registry';
 import type { GameMetadata } from '../types';
 export type CatalogGame = GameMetadata & { availability: 'published' | 'maintenance'; accessModel: 'free' | 'premium'; supportsOffline: boolean; featured: boolean; sortOrder: number };
+export const LOCAL_REVIEW_GAME_IDS=['boom-buddies','brick-breaker'];
+export const isLocalReviewGame=(id:string)=>import.meta.env.DEV&&LOCAL_REVIEW_GAME_IDS.includes(id);
 export type Catalog = { schemaVersion: 1; games: CatalogGame[]; commerceEnabled: boolean; support: { enabled: boolean; bankName?: string; account?: string; beneficiary?: string; message?: string } };
-export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:['rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };
+export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:['boom-buddies','brick-breaker','rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };
 // Database metadata can select a bundled engine, never execute remote JavaScript.
 export function parseCatalog(raw: any): Catalog | null {
   if (raw?.schemaVersion !== 1 || !Array.isArray(raw.games)) return null;
@@ -16,8 +18,8 @@ export function parseCatalog(raw: any): Catalog | null {
       category:['Arcade','Puzzle','Action','Reflex','Multiplayer'].includes(row.category)?row.category:base.category,
       availability:row.status,accessModel:row.access_model,supportsOffline:row.supports_offline===true,featured:row.featured===true,sortOrder:Number.isFinite(row.sort_order)?row.sort_order:100}];
   }).sort((a:CatalogGame,b:CatalogGame)=>a.sortOrder-b.sortOrder || a.id.localeCompare(b.id));
-  // Keep the local reviewed prototype visible in development without changing server catalog.
-  if(import.meta.env.DEV && !seen.has('boom-buddies')) games.push({...GAME_REGISTRY['boom-buddies'],availability:'published',accessModel:'free',supportsOffline:true,featured:false,sortOrder:999});
+  // Reviewed new games are available in the local preview without publishing server catalog rows.
+  if(import.meta.env.DEV) for(const id of LOCAL_REVIEW_GAME_IDS) if(!seen.has(id)) games.push({...GAME_REGISTRY[id],availability:'published',accessModel:'free',supportsOffline:true,featured:true,sortOrder:999});
   const support=raw.support;
   return {schemaVersion:1,games,commerceEnabled:raw.commerceEnabled===true,support:support?.enabled===true && ['bankName','account','beneficiary'].every(key=>typeof support[key]==='string' && support[key].length>0) ? {enabled:true,bankName:support.bankName,account:support.account,beneficiary:support.beneficiary,message:typeof support.message==='string'?support.message:''} : {enabled:false}};
 }

@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { BLOSSOM_TITLE } from './hex-match/blossom/branding';
+const BrickBreakerGame = lazy(() => import('./brick-breaker'));
 const BoomBuddiesGame = lazy(() => import('./boom-buddies'));
 const RainbowBlocksGame = lazy(() => import('./rainbow-blocks'));
 import { GameMetadata } from '../types';
@@ -43,6 +44,13 @@ const WordCrossGame = lazy(() => import('./word-cross').then(module => ({ defaul
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
+  'brick-breaker': {
+    id:'brick-breaker',title:'Block Breaker · Chronicles',shortDesc:'Phá gạch, đồng hành cùng Orb · 96 màn, 6 vùng đất',
+    description:'Chronicles of the Shattered Realms: điều khiển thanh đỡ, giải phóng Orb và khôi phục sáu mảnh Lõi của Aethra. 96 màn chiến dịch, sáu boss và nhiều skin từ gói asset gốc. Tiến trình Chronicles được lưu riêng trên thiết bị.',
+    category:'Arcade',difficulty:'Trung Bình',tags:['Phá gạch','Orb','96 màn'],icon:'🔮',bannerGradient:'from-emerald-900 via-indigo-950 to-violet-900',themeColor:'#67eece',
+    controls:[{key:'← → / Kéo',action:'Di chuyển thanh đỡ'},{key:'Space / Chạm',action:'Phóng bóng'},{key:'E',action:'Kỹ năng'}],
+    achievements:[],dropRates:{baseChestDropChance:0,scoreThresholdForDrop:999999999,chestWeights:[]},component:BrickBreakerGame,
+  },
   'boom-buddies': {
     id:'boom-buddies',title:'Boom Buddies',shortDesc:'Đặt bom, né lửa · Bản thử điều khiển mượt',
     description:'Bản thử offline: di chuyển liên tục, joystick giữ–kéo và bom nổ liền mạch. Tiến trình lưu trên thiết bị, chưa đồng bộ tài khoản hoặc bảng xếp hạng server.',
@@ -329,7 +337,7 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     description: 'Vuốt các ô số để ghép thành 2048! Kết hợp những ô giống nhau, giữ ô lớn nhất ở một góc và thử phá kỷ lục điểm số của bạn.',
     category: 'Puzzle',
     difficulty: 'Trung Bình',
-    icon: '🔢',
+    icon: '🟨',
     bannerGradient: 'from-amber-900/60 via-yellow-950/80 to-slate-900',
     themeColor: '#f59e0b',
     tags: ['2048', 'Xếp Gạch', 'Ghép Số', 'Giải Đố', 'Vuốt Chạm'],
@@ -344,6 +352,8 @@ export const ALL_GAMES_LIST = Object.values(GAME_REGISTRY);
 
 // 5 new & featured highlight games for the top slider
 export const FEATURED_SLIDER_GAME_IDS = [
+  'boom-buddies',
+  'brick-breaker',
   'rainbow-blocks',
   'hex-match',
   'word-cross',   // Newest release with Daily Puzzle & Vocab

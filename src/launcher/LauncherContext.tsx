@@ -1,3 +1,4 @@
+import {isLocalReviewGame} from './catalog';
 import React,{createContext,useContext,useEffect,useState,useCallback,useRef} from 'react';
 import {useAuth} from '../context/AuthContext';
 import {StorageService} from '../services/storage';
@@ -22,9 +23,9 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
   const sync=async()=>{if(syncing)return;syncing=true;const revision=preferenceRevision.current;try{
    // Read canonical rows first; migrate only local favorites with no server row.
    const rows=await readLibrary(owner);if(!alive || ownerRef.current!==owner)return;
-   for(const id of StorageService.loadFavorites())if(!rows.some(row=>row.game_id===id)&&!pendingFavorites(owner).some(row=>row.gameId===id)&&catalogRef.current.games.some(game=>game.id===id))enqueueFavorite(owner,id,true);
+   for(const id of StorageService.loadFavorites())if(!isLocalReviewGame(id)&&!rows.some(row=>row.game_id===id)&&!pendingFavorites(owner).some(row=>row.gameId===id)&&catalogRef.current.games.some(game=>game.id===id))enqueueFavorite(owner,id,true);
    await flushFavorites(owner);const latest=await readLibrary(owner);if(!alive||ownerRef.current!==owner||revision!==preferenceRevision.current)return;
-   const desired=new Set(latest.filter(row=>row.favorite).map(row=>row.game_id));for(const row of pendingFavorites(owner)){if(row.favorite)desired.add(row.gameId);else desired.delete(row.gameId);}
+   const desired=new Set([...latest.filter(row=>row.favorite).map(row=>row.game_id),...StorageService.loadFavorites().filter(isLocalReviewGame)]);for(const row of pendingFavorites(owner)){if(row.favorite)desired.add(row.gameId);else desired.delete(row.gameId);}
    const favoriteIds=[...desired];setFavorites(favoriteIds);StorageService.saveFavorites(favoriteIds);
    const remoteRecent=latest.filter(row=>row.last_played_at).sort((a,b)=>Date.parse(b.last_played_at!)-Date.parse(a.last_played_at!)).map(row=>row.game_id);
    const merged=[...new Set([...StorageService.loadRecentlyPlayed(),...remoteRecent])].slice(0,12);setRecents(merged);StorageService.saveRecentlyPlayed(merged);
@@ -35,7 +36,7 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
  const toggleFavorite=useCallback((id:string)=>{
   preferenceRevision.current++;
   const previous=StorageService.loadFavorites();const favorite=!previous.includes(id);const next=favorite?[...previous,id]:previous.filter(v=>v!==id);
-  try{StorageService.saveFavorites(next);setFavorites(next);if(owner){enqueueFavorite(owner,id,favorite);void flushFavorites(owner).catch(()=>{if(ownerRef.current===owner)setNotice('Yêu thích đã lưu trên thiết bị. Sẽ đồng bộ khi kết nối lại.');});}}
+  try{StorageService.saveFavorites(next);setFavorites(next);if(owner&&!isLocalReviewGame(id)){enqueueFavorite(owner,id,favorite);void flushFavorites(owner).catch(()=>{if(ownerRef.current===owner)setNotice('Yêu thích đã lưu trên thiết bị. Sẽ đồng bộ khi kết nối lại.');});}}
   catch{setNotice('Bộ nhớ thiết bị đã đầy. Chưa lưu được thay đổi yêu thích.');}
  },[owner]);
  const authorizing=useRef(false);
@@ -49,7 +50,7 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
   }finally{authorizing.current=false;if(mounted.current)setBusy(false);}
  },[]);
  const finishPlay=useCallback((score?:number)=>{const previous=session.current;session.current=null;if(previous)void previous.start.then(()=>finishSession(previous.owner,previous.id,score===undefined?'left':'completed',score)).catch(()=>{});},[]);
- const recordPlay=useCallback((id:string)=>{finishPlay();const recent=StorageService.recordRecentlyPlayed(id);setRecents(recent);if(owner){const sid=crypto.randomUUID();const start=startSession(owner,id,sid);void start.catch(()=>{});session.current={id:sid,owner,start};}},[owner,finishPlay]);
+ const recordPlay=useCallback((id:string)=>{finishPlay();const recent=StorageService.recordRecentlyPlayed(id);setRecents(recent);if(owner&&!isLocalReviewGame(id)){const sid=crypto.randomUUID();const start=startSession(owner,id,sid);void start.catch(()=>{});session.current={id:sid,owner,start};}},[owner,finishPlay]);
  return <Context.Provider value={{catalog,source,favorites,recentlyPlayed,toggleFavorite,authorize,recordPlay,finishPlay,notice,dismissNotice:()=>setNotice(''),refresh,busy}}>{children}</Context.Provider>;
 }
 export function useLauncher(){const value=useContext(Context);if(!value)throw new Error('LauncherProvider required');return value;}
