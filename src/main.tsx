@@ -5,7 +5,7 @@ import './index.css';
 import './launcher/launcher.css';
 import './launcher/platform-theme.css';
 import { registerSW } from 'virtual:pwa-register';
-import { reportPwa, setPwaRegistration } from './services/pwaLifecycle';
+import { pwaState, reportPwa, setPwaRegistration } from './services/pwaLifecycle';
 registerSW({
   immediate: true,
   // The launcher owns activation/reload so games and duplicate worker events stay safe.
@@ -18,7 +18,7 @@ registerSW({
   onOfflineReady() { reportPwa(80, 'Đã lưu tài nguyên để chơi ngoại tuyến.'); },
   onRegisteredSW(_url, registration) {
     setPwaRegistration(registration);
-    reportPwa(50, 'Đã kết nối dịch vụ cập nhật.');
+    if (pwaState.progress < 80) reportPwa(50, 'Đã kết nối dịch vụ cập nhật.');
     const check = () => { if (navigator.onLine) void registration?.update().catch(() => {}); };
     setInterval(check, 60000);
     window.addEventListener('online', check);
@@ -26,4 +26,3 @@ registerSW({
   onRegisterError() { reportPwa(80, 'Đang dùng ứng dụng trực tuyến; bộ nhớ ngoại tuyến chưa sẵn sàng.'); },
 });
 createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);
-

@@ -1,0 +1,20 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const exportsForTest={};let requested=[];let failed=false;
+const manifests={alpha:['/alpha/one.png','/alpha/two.png'],beta:['/beta/one.png']};
+const source=fs.readFileSync('src/games/gamePackages.tsx','utf8');
+const code=ts.transpileModule(source,{fileName:'gamePackages.tsx',compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;
+vm.runInNewContext(code,{exports:exportsForTest,require(name){if(name==='react')return {lazy:loader=>({loader})};if(name==='./packageAssets.json')return manifests;if(name==='./GameWrapper')return {};throw Error(name);},AbortController,DOMException,setTimeout,clearTimeout,fetch:async(url,{signal})=>{requested.push(url);if(signal.aborted)throw Error('aborted');if(failed)throw Error('offline');return {ok:true,headers:{get:()=> 'image/png'},arrayBuffer:async()=>new ArrayBuffer(4)};}});
+(async()=>{
+ const {packageLazy,prepareGamePackage}=exportsForTest;let a=0,b=0;
+ packageLazy('alpha',async()=>{a++;return {default:()=>null};});packageLazy('beta',async()=>{b++;return {default:()=>null};});
+ assert.equal(a,0);assert.equal(b,0);assert.equal(requested.length,0);
+ let phases=[];await prepareGamePackage('alpha',new AbortController().signal,p=>phases.push(p));
+ assert.equal(a,1);assert.equal(b,0);assert.deepEqual(requested.sort(),manifests.alpha);assert.equal(phases.at(-1).progress,100);
+ requested=[];await prepareGamePackage('alpha',new AbortController().signal,()=>{});assert.equal(requested.length,0);assert.equal(a,1);
+ failed=true;await assert.rejects(prepareGamePackage('beta',new AbortController().signal,()=>{}));failed=false;
+ await prepareGamePackage('beta',new AbortController().signal,()=>{});assert.equal(b,1);
+ requested=[];const abort=new AbortController();abort.abort();await prepareGamePackage('alpha',abort.signal,()=>{});assert.equal(requested.length,0);
+ const registry=fs.readFileSync('src/games/registry.ts','utf8');assert.ok(!/\blazy\(/.test(registry));assert.equal((registry.match(/packageLazy\(/g)||[]).length,20);
+ const app=fs.readFileSync('src/App.tsx','utf8');assert.match(app,/<GamePackageGate[^>]*>[\s\S]*?<GameWrapper/);
+ console.log('PASS: registration downloads nothing; selected module/assets only; cached repeat; failure retry; abort; all 21 games registered; gate before game mount.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

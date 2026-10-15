@@ -23,9 +23,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
   <body class="bg-[#050505] text-slate-200 selection:bg-indigo-500 selection:text-white overflow-x-hidden min-h-screen">
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        #initial-boot{position:fixed;inset:0;display:grid;place-items:center;background:#f7f9fc;color:#263657;font:16px system-ui,sans-serif;text-align:center;padding:24px}
+        #initial-boot img{width:86px;height:86px;animation:initial-pulse 2s ease-in-out infinite}
+        #initial-boot h1{font-size:32px;letter-spacing:3px;margin:24px 0 12px}
+        #initial-boot p{color:#65738c;font-size:14px}
+        #initial-boot .track{width:min(76vw,320px);height:6px;background:#dce2ef;border-radius:99px;overflow:hidden;margin:24px auto}
+        #initial-boot .track:after{content:'';display:block;width:40%;height:100%;background:#4658df;border-radius:99px;animation:initial-sweep 1.8s ease-in-out infinite}
+        @keyframes initial-pulse{50%{transform:translateY(-6px)}}
+        @keyframes initial-sweep{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
+        @media(prefers-reduced-motion:reduce){#initial-boot img,#initial-boot .track:after{animation:none}}
+      </style>
+      <div id="initial-boot" role="status"><div><img src="/icon.svg" alt=""/><h1>ARCADEX</h1><p>Đang mở launcher…</p><div class="track" aria-hidden="true"></div><p>Chỉ tải game khi bạn chọn chơi.</p></div></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
-

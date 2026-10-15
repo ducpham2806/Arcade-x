@@ -6,10 +6,24 @@ import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
 
 export default defineConfig(() => {
+  const shellFiles = new Set<string>();
   return {
     plugins: [
       react(),
       tailwindcss(),
+      { name: 'launcher-shell-only', generateBundle(_options, bundle) {
+        // Follow static imports only. Dynamic game chunks are independent download packages.
+        const visit = (name: string) => {
+          if (shellFiles.has(name)) return;
+          const chunk = bundle[name]; if (!chunk || chunk.type !== 'chunk') return;
+          shellFiles.add(name);
+          const metadata = (chunk as unknown as { viteMetadata?: { importedCss: Set<string>; importedAssets: Set<string> } }).viteMetadata;
+          metadata?.importedCss.forEach(css => shellFiles.add(css));
+          metadata?.importedAssets.forEach(asset => shellFiles.add(asset));
+          chunk.imports.forEach(visit);
+        };
+        Object.values(bundle).forEach(chunk => { if (chunk.type === 'chunk' && chunk.isEntry) visit(chunk.fileName); });
+      } },
       {name:'chronicles-existing-game',configureServer(server){
         server.middlewares.use((req,res,next)=>{
           if(!req.url?.startsWith('/chronicles-realms/'))return next();
@@ -69,12 +83,24 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2,ttf,json}'],
+          // Keep installation small: games and artwork are cached on demand.
+          globPatterns: ['index.html', 'assets/*.{js,css,png,svg,webp,woff,woff2}'],
+          manifestTransforms: [async entries => ({ manifest: entries.filter(entry => !entry.url.startsWith('assets/') || shellFiles.has(entry.url)), warnings: [] })],
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/chronicles-realms\//],
           runtimeCaching: [
+            ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'chronicles-realms/assets'].map(prefix => ({
+              urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
+              handler: 'StaleWhileRevalidate' as const,
+              options: { cacheName: 'game-pack-' + prefix.replaceAll('/', '-'), expiration: { maxEntries: 1200, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },
+            })),
+            {
+              urlPattern: /\/chronicles-realms\/(?:index\.html)?$/i,
+              handler: 'NetworkFirst',
+              options: { cacheName: 'standalone-pages', networkTimeoutSeconds: 3, expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },
+            },
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'CacheFirst',
@@ -148,4 +174,3 @@ export default defineConfig(() => {
     },
   };
 });
-

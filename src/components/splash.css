@@ -1,0 +1,9 @@
+.arcadex-boot-logo { position: relative; animation: arcadex-boot-float 2.4s ease-in-out infinite; }
+.arcadex-boot-orbit { position: absolute; inset: -9px; border-radius: 32px; border: 2px solid transparent; border-top-color: #a3e635; border-bottom-color: #6366f1; animation: arcadex-boot-spin 2s linear infinite; }
+.arcadex-boot-bar { position: relative; overflow: hidden; }
+.arcadex-boot-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, #ffffff80 50%, transparent 80%); animation: arcadex-boot-shimmer 1.8s ease-in-out infinite; }
+.arcadex-boot-paused, .arcadex-boot-paused::after, .arcadex-boot-paused .arcadex-boot-orbit { animation-play-state: paused; }
+@keyframes arcadex-boot-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes arcadex-boot-spin { to { transform: rotate(360deg); } }
+@keyframes arcadex-boot-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .arcadex-boot-logo, .arcadex-boot-orbit, .arcadex-boot-bar::after { animation: none; } .arcadex-boot-bar { transition: none; } }

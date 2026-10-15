@@ -37,8 +37,8 @@ const server=http.createServer((req,res)=>{
     // Re-open while an update is waiting: splash auto-installs before the entry screen.
     release=3;await page.evaluate(async()=>{const reg=await navigator.serviceWorker.getRegistration();await reg.update();});await expect.poll(()=>page.evaluate(()=>!!window.__arcadex_sw_update_pending)).toBe(true);
     await page.reload();await expect(page.locator('#auth-entry-screen')).toBeVisible({timeout:25000});await expect(page.locator('meta[name="qc-release"]')).toHaveAttribute('content','3');
-    // Update failure keeps existing caches usable; user can explicitly continue.
-    failWorker=true;await page.reload();await expect(page.getByRole('button',{name:'Tiếp tục dùng bản hiện tại'})).toBeVisible();await page.getByRole('button',{name:'Tiếp tục dùng bản hiện tại'}).click();await page.locator('#btn-auth-play-guest').click();
+    // Update failure must automatically continue to entry without blocking play.
+    failWorker=true;await page.reload();await expect(page.locator('#auth-entry-screen')).toBeVisible({timeout:10000});await page.locator('#btn-auth-play-guest').click();
     expect(await page.locator('meta[name="qc-release"]').getAttribute('content')).toBe('3');
     failWorker=false;await ctx.setOffline(true);await page.reload();await page.locator('#btn-auth-play-guest').click();await expect(page.locator('#paused-game-banner')).toBeVisible();
     await page.locator('#btn-resume-paused-game').click();await expect(page.locator('#tile-2048-board')).toBeVisible();

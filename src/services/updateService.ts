@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.10.1';
-export const APP_CODENAME = "Game Identities";
-export const APP_RELEASE_NOTES = "Icon và banner riêng cho từng game; thêm Boom Buddies và Block Breaker Chronicles vào banner game mới.";
+export const CURRENT_APP_VERSION = '2.10.2';
+export const APP_CODENAME = "On-Demand Game Packages";
+export const APP_RELEASE_NOTES = "Launcher nhẹ, tải gói game khi chọn chơi, splash riêng từng game; sửa lỗi cập nhật và thêm animation tiến trình.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;
@@ -67,4 +67,3 @@ export const checkPendingUpdate = (): UpdateInfo => ({
 export const simulateNewVersionForTest = (): void => { void import('./pwaLifecycle').then(m => m.checkForUpdate()).catch(() => {}); };
 export const triggerForceUpdateModal = (_targetVersion?: string): void => { simulateNewVersionForTest(); };
 export const executeForceUpdate = async (_newVersion?: string): Promise<void> => { const { installUpdate } = await import('./pwaLifecycle'); await installUpdate(); };
-

@@ -1,6 +1,6 @@
 import { GameMetadata } from '../../types';
-import { lazy } from 'react';
-const DrawAShapeGame = lazy(() => import('./index').then(module => ({ default: module.DrawAShapeGame })));
+import { packageLazy } from '../gamePackages';
+const DrawAShapeGame = packageLazy('draw-a-shape', () => import('./index').then(module => ({ default: module.DrawAShapeGame })));
 import { DRAW_SHAPE_ACHIEVEMENTS, DRAW_SHAPE_CONTROLS, DRAW_SHAPE_DROP_RATES } from './config';
 
 export const DrawAShapeMeta: GameMetadata = {
@@ -19,4 +19,3 @@ export const DrawAShapeMeta: GameMetadata = {
   dropRates: DRAW_SHAPE_DROP_RATES,
   component: DrawAShapeGame,
 };
-

@@ -1,3 +1,4 @@
+import { GamePackageGate } from './components/GamePackageGate';
 import { installReadability } from './accessibility/readability.js';
 import './accessibility/readability.css';
 import React, { useState, useEffect } from 'react';
@@ -23,7 +24,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { SplashScreen } from './components/SplashScreen';
 import { MobileNav } from './components/MobileNav';
 import { GameErrorBoundary } from './components/common/GameErrorBoundary';
-import { GameWrapper } from './games/GameWrapper';
+const GameWrapper = React.lazy(() => import('./games/GameWrapper').then(module => ({ default: module.GameWrapper }))); 
 import { GAME_REGISTRY } from './games/registry';
 import { useRippleEffect } from './hooks/useRippleEffect';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
@@ -92,11 +93,13 @@ const AppContent: React.FC = () => {
             className="relative w-full min-h-screen"
           >
             <GameErrorBoundary onExit={exitGame}>
+              <GamePackageGate key={activeGameId} game={GAME_REGISTRY[activeGameId]} onExit={exitGame}>
               <GameWrapper
                 gameMeta={GAME_REGISTRY[activeGameId]}
                 metadata={GAME_REGISTRY[activeGameId]}
                 onExit={exitGame}
               />
+              </GamePackageGate>
             </GameErrorBoundary>
           </motion.div>
         ) : (
@@ -211,4 +214,3 @@ export function App({ reviewControls }: { reviewControls?: React.ReactNode } = {
 }
 
 export default App;
-
