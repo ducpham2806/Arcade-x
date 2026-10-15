@@ -1036,8 +1036,9 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
                 <small>
                   Độ bền {save.integrity}% · SL {sl} · {stars}/300 ★
                 </small>
+                <button id="cd-quick-play" className="cd-primary" disabled={busy} onClick={()=>void start()}>BAY NGAY · NHIỆM VỤ {selected}</button>
                 <button
-                  className="cd-primary"
+                  className="cd-secondary"
                   onClick={() => {
                     setMode("campaign");
                     go("planets");
@@ -2074,4 +2075,3 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
-

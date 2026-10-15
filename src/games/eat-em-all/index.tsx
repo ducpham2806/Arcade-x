@@ -695,7 +695,7 @@ export const EatEmAllGame: React.FC<GameComponentProps> = ({
 
         {/* Start / Mode Selector Overlay if not playing */}
         {!isPlaying && !showVictoryModal && (
-          <div className="absolute inset-0 bg-black/85 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-4 z-30 text-center animate-in fade-in duration-200">
+          <div className="legacy-menu absolute inset-0 bg-black/85 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-4 z-30 text-center animate-in fade-in duration-200">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-orange-500 p-0.5 shadow-2xl mb-3">
               <div className="w-full h-full bg-[#0c0c14] rounded-2xl flex items-center justify-center text-3xl">
                 😋
@@ -957,4 +957,3 @@ export const EatEmAllGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
-

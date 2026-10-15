@@ -71,7 +71,7 @@ export const PlayerCard = ({ player, isTop }: PlayerCardProps) => {
   const isActive = player.isTurn;
 
   return (
-    <div className={`w-full flex flex-col justify-between items-stretch bg-slate-900/60 backdrop-blur-md border rounded-xl sm:rounded-2xl p-2 sm:p-3 shadow-lg transition-colors ${isActive ? `${theme.border} ${theme.shadow}` : 'border-slate-800/80'}`}>
+    <div className={`launcher-player-card w-full flex flex-col justify-between items-stretch bg-slate-900/60 backdrop-blur-md border rounded-xl sm:rounded-2xl p-2 sm:p-3 shadow-lg transition-colors ${isActive ? `${theme.border} ${theme.shadow}` : 'border-slate-800/80'}`}>
       {/* 
         Use CSS Grid for perfect alignment of Avatar, Info (name/elo), and Right Side (timer/captured)
       */}
@@ -183,4 +183,3 @@ export const BoardLayout = ({ header, topPlayer, bottomPlayer, board, controls, 
     </div>
   );
 };
-

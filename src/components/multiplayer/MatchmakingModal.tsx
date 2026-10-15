@@ -212,10 +212,11 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
   return (
     <div
       onClick={close}
-      className="platform-ui fixed inset-0 z-40 flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 bg-black/80 backdrop-blur-md animate-in fade-in select-none"
+      className="game-ui-modal platform-ui fixed inset-0 z-40 flex items-center justify-center pt-16 pb-20 sm:pb-6 px-2 sm:px-4 bg-black/80 backdrop-blur-md animate-in fade-in select-none"
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        role="dialog" aria-modal="true" aria-label="Tìm trận và phòng chơi"
         className="relative w-full max-w-xl rounded-3xl bg-gradient-to-b from-[#161628] via-[#10101e] to-[#0a0a14] border border-indigo-500/40 p-6 sm:p-8 shadow-2xl shadow-indigo-950/80 space-y-6 max-h-[calc(100vh-9.5rem)] sm:max-h-[calc(100vh-6.5rem)] overflow-y-auto"
       >
         {/* Close Button */}
@@ -439,4 +440,3 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
     </div>
   );
 };
-

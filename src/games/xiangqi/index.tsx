@@ -1,3 +1,4 @@
+import {DuelLobby} from '../../components/games/DuelLobby';
 import {IngameChat} from '../../components/SocialChatThread';
 import '../../components/social.css';
 import { explainXiangqiMove } from './rules';
@@ -696,7 +697,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     (playMode === 'local_hotseat' && localWinner !== null);
 
   return (
-    <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
+    <div className="arcade-game-surface relative w-full min-h-0 max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
 <ConnectionNotice active={!!activeRoomId}/>
 <IngameChat roomId={activeRoomId}/>
       {activeRoomId&&error&&<p role="alert" className="p-2 text-amber-200">{error} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
@@ -717,151 +718,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       {/* ========================================================= */}
       {/* 1. LOBBY VIEW                                             */}
       {/* ========================================================= */}
-      {playMode === 'lobby' && !activeRoomId && (
-        <div className="w-full max-w-3xl flex flex-col gap-4 animate-in fade-in">
-          {/* Player Profile Banner */}
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-950/80 via-[#181310] to-[#120d0a] border border-amber-500/40 p-5 sm:p-6 shadow-2xl">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-3xl shadow-inner shadow-amber-400/30">
-                  {profile.avatar}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg sm:text-2xl font-black uppercase text-white font-display">
-                      {profile.username}
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-md bg-amber-500/30 border border-amber-400/40 text-[9px] sm:text-[10px] font-bold text-amber-300 uppercase">
-                      Kỳ Thủ Cờ Tướng
-                    </span>
-                  </div>
-                  <p className="text-[11px] sm:text-xs text-amber-200/70 mt-0.5">
-                    Thi đấu Cờ Tướng đối kháng thời gian thực & Chơi đôi 1 thiết bị
-                  </p>
-                </div>
-              </div>
-
-              {/* Stats ELO Badges */}
-              <div className="flex items-center gap-2.5 shrink-0">
-                <div className="px-3 py-1.5 rounded-xl bg-black/50 border border-amber-500/40 flex items-center gap-2">
-                  <Award className="w-4 h-4 text-amber-400" />
-                  <div>
-                    <div className="text-[9px] uppercase font-bold text-amber-300/80">Điểm ELO</div>
-                    <div className="text-base font-black text-amber-400 font-mono leading-none">{playerElo}</div>
-                  </div>
-                </div>
-
-                <div className="px-3 py-1.5 rounded-xl bg-black/50 border border-emerald-500/40 flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-emerald-400" />
-                  <div>
-                    <div className="text-[9px] uppercase font-bold text-emerald-300/80">Trận Thắng</div>
-                    <div className="text-base font-black text-emerald-400 font-mono leading-none">{playerWins}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-            {/* Card 1: Play Online PvP */}
-            <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-b from-amber-950/40 to-[#161210] border border-amber-500/30 p-4 sm:p-5 flex flex-col justify-between shadow-xl">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
-                  <Users className="w-5 h-5 text-amber-400" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black uppercase text-white font-display">
-                    Đấu Online PvP
-                  </h3>
-                  <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
-                    Ghép trận tự động theo ELO hoặc tạo phòng mã 6 số thách đấu bạn bè.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                id="btn-xiangqi-open-matchmaking"
-                onClick={() => setIsModalOpen(true)}
-                className="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-extrabold uppercase text-xs tracking-wider shadow-lg shadow-amber-600/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Zap className="w-4 h-4" />
-                <span>Tìm Trận / Tạo Phòng</span>
-              </button>
-            </div>
-
-            {/* Card 2: Chơi Đôi Cùng Thiết Bị (Local Hotseat) */}
-            <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-b from-emerald-950/40 to-[#0e1610] border border-emerald-500/40 p-4 sm:p-5 flex flex-col justify-between shadow-xl">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
-                  <Gamepad2 className="w-5 h-5 text-emerald-400" />
-                </div>
-                <div>
-                  <div className="inline-block px-2 py-0.5 rounded-md bg-emerald-500/30 text-[9px] font-bold text-emerald-300 uppercase tracking-wide mb-1">
-                    Không cần mạng (Offline)
-                  </div>
-                  <h3 className="text-base font-black uppercase text-white font-display">
-                    Chơi Đôi 1 Máy
-                  </h3>
-                  <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
-                    2 người thay phiên điều binh khiển tướng trực tiếp trên cùng một thiết bị.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                id="btn-xiangqi-local-hotseat"
-                onClick={handleStartLocalHotseat}
-                className="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-extrabold uppercase text-xs tracking-wider shadow-lg shadow-emerald-600/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Gamepad2 className="w-4 h-4" />
-                <span>Chơi Đôi Ngay</span>
-              </button>
-            </div>
-
-            {/* Card 3: Play AI Practice */}
-            <div className="rounded-2xl sm:rounded-3xl bg-[#141214] border border-white/10 p-4 sm:p-5 flex flex-col justify-between shadow-xl">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300">
-                  <Bot className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black uppercase text-white font-display">
-                    Luyện Tập Với Máy
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
-                    Luyện các thế cờ và sát cục với máy tính không cần kết nối mạng.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-3 gap-1.5">
-                <button
-                  id="btn-xiangqi-ai-easy"
-                  onClick={() => handleStartAiPractice('easy')}
-                  className="py-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold transition-all active:scale-95 cursor-pointer min-h-[40px] flex items-center justify-center"
-                >
-                  Tập Sự
-                </button>
-                <button
-                  id="btn-xiangqi-ai-med"
-                  onClick={() => handleStartAiPractice('medium')}
-                  className="py-2.5 rounded-xl bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition-all active:scale-95 cursor-pointer min-h-[40px] flex items-center justify-center"
-                >
-                  Cao Thủ
-                </button>
-                <button
-                  id="btn-xiangqi-ai-hard"
-                  onClick={() => handleStartAiPractice('hard')}
-                  className="py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-rose-300 text-[11px] font-bold transition-all active:scale-95 cursor-pointer min-h-[40px] flex items-center justify-center"
-                >
-                  Kỳ Thánh
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {playMode === 'lobby' && !activeRoomId && <DuelLobby gameId="xiangqi" title="Cờ tướng" username={profile.username} elo={playerElo} onAi={handleStartAiPractice} onOnline={()=>setIsModalOpen(true)} onLocal={handleStartLocalHotseat}/>} 
 
       {/* ========================================================= */}
       {/* 2. ACTIVE XIANGQI BOARD VIEW                              */}
@@ -869,7 +726,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       {(activeRoomId || playMode === 'ai' || playMode === 'local_hotseat') && (
         <div className="w-full flex flex-col items-center gap-3 animate-in fade-in">
           {/* Top Bar with Mode and Navigation */}
-          <div className="w-full max-w-[560px] flex items-center justify-between bg-slate-900/80 border border-slate-700/60 rounded-2xl px-4 py-2.5">
+          <div className="launcher-game-toolbar w-full max-w-[560px] flex items-center justify-between bg-slate-900/80 border border-slate-700/60 rounded-2xl px-4 py-2.5">
             <div className="flex items-center gap-2">
               <button
                 id="btn-xiangqi-surrender"
@@ -1439,4 +1296,3 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
-

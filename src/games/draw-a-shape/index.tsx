@@ -539,7 +539,8 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
 
   if (screen === 'menu') {
     return (
-      <div className="arcade-game-surface w-full h-full flex flex-col items-center justify-center bg-[#0a0b12] text-white p-4">
+      <div className="legacy-menu arcade-game-surface w-full h-full flex flex-col items-center justify-start bg-[#0a0b12] text-white p-4">
+        <div className="quick-play-strip"><button className="game-primary" id="draw-quick-play" onClick={()=>startGame('classic')}>Chơi ngay · Cổ điển →</button></div>
         <div className="w-full max-w-md bg-slate-900/80 p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col gap-6 relative">
           
           <button onClick={() => onGameOver(0)} className="absolute top-4 left-4 p-2 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-full transition-colors z-10 cursor-pointer">
@@ -827,4 +828,3 @@ export const DrawAShapeGame: React.FC<GameComponentProps> = ({ bridge, onGameOve
     </div>
   );
 };
-

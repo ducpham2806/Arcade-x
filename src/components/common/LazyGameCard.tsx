@@ -29,7 +29,7 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({game, personalHighSco
     return ()=>observer.disconnect();
   },[]);
   return <div ref={ref} id={`game-card-${game.id}`} className="arcade-cartridge" style={artStyle(game.id)}>
-    <button type="button" className="cartridge-cover" onClick={()=>onOpenDetail(game.id)} aria-label={`Khám phá ${game.title}`}>
+    <button type="button" className="cartridge-cover" disabled={game.availability==='maintenance'} onClick={()=>onLaunchGame(game.id)} aria-label={`Mở ${game.title}`}>
       {visible && <GameArtwork gameId={game.id}/>}
       <span className="cartridge-category">{artFor(game.id).label}</span>
     </button>
@@ -37,7 +37,7 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({game, personalHighSco
       <Heart size={16} fill={isFav?'currentColor':'none'}/>
     </button>
     <div className="cartridge-info">
-      <button type="button" className="cartridge-title" onClick={()=>onOpenDetail(game.id)}>{game.title}</button>
+      <button type="button" className="cartridge-title" disabled={game.availability==='maintenance'} onClick={()=>onLaunchGame(game.id)}>{game.title}</button>
       <p>{game.shortDesc}</p><span className="launcher-game-access">{game.availability==='maintenance'?'Đang bảo trì':game.accessModel==='premium'?'Cần mở khóa':'Chơi miễn phí'}</span>
       <div className="cartridge-footer">
         <span className="cartridge-record" title="Kỷ lục cá nhân"><Trophy size={13}/>{personalHighScore.toLocaleString()}</span>
@@ -50,4 +50,3 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({game, personalHighSco
     </div>
   </div>;
 };
-

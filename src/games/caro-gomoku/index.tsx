@@ -1,3 +1,4 @@
+import {DuelLobby} from '../../components/games/DuelLobby';
 import {IngameChat} from '../../components/SocialChatThread';
 import '../../components/social.css';
 import { LearningHub } from '../duel/LearningHub';
@@ -930,7 +931,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   };
 
   return (
-    <div className="arcade-game-surface relative w-full min-h-[640px] max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
+    <div className="arcade-game-surface relative w-full min-h-0 max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
 <ConnectionNotice active={!!activeRoomId}/>
 <IngameChat roomId={activeRoomId}/>
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
@@ -948,148 +949,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
       {/* ========================================================= */}
       {/* 1. LOBBY VIEW (Sảnh Chờ & Chọn Chế Độ)                    */}
       {/* ========================================================= */}
-      {screenMode === 'lobby' && (
-        <div className="w-full max-w-3xl flex flex-col gap-5 animate-in fade-in duration-300">
-          {/* Header Profile & ELO Card */}
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-950/90 via-[#101020] to-[#0c0c16] border border-indigo-500/30 p-5 sm:p-6 shadow-2xl shadow-indigo-950/60">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-3xl shadow-inner shadow-indigo-400/30">
-                  {profile.avatar}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl sm:text-2xl font-black italic uppercase tracking-tight text-white font-display">
-                      {profile.username}
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-md bg-indigo-500/30 border border-indigo-400/40 text-[10px] font-bold text-indigo-300 uppercase">
-                      Kỳ Thủ Ca-rô
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Hệ thống thi đấu Cờ Caro 15x15 Real-time & Chơi đôi cục bộ
-                  </p>
-                </div>
-              </div>
-
-              {/* ELO & Win Stats Badges */}
-              <div className="flex items-center gap-3">
-                <div className="px-4 py-2.5 rounded-2xl bg-black/40 border border-amber-500/30 flex items-center gap-2.5">
-                  <Award className="w-5 h-5 text-amber-400" />
-                  <div>
-                    <div className="text-[10px] uppercase font-bold text-amber-300/80">Điểm ELO</div>
-                    <div className="text-lg font-black text-amber-400 font-mono leading-none">{playerElo}</div>
-                  </div>
-                </div>
-
-                <div className="px-4 py-2.5 rounded-2xl bg-black/40 border border-emerald-500/30 flex items-center gap-2.5">
-                  <Zap className="w-5 h-5 text-emerald-400" />
-                  <div>
-                    <div className="text-[10px] uppercase font-bold text-emerald-300/80">Số Trận Thắng</div>
-                    <div className="text-lg font-black text-emerald-400 font-mono leading-none">{playerWins}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Action Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
-            {/* Card 1: Play Online PvP */}
-            <div className="rounded-3xl bg-gradient-to-b from-indigo-900/40 to-[#121220] border border-indigo-500/30 hover:border-indigo-400 p-5 flex flex-col justify-between shadow-xl hover:shadow-indigo-500/20 transition-all">
-              <div className="space-y-2.5">
-                <div className="w-11 h-11 rounded-2xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300">
-                  <Users className="w-5 h-5 text-indigo-400" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black uppercase text-white font-display">
-                    Đấu Online PvP
-                  </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                    Ghép trận tự động theo ELO hoặc tạo phòng mã 6 số để so tài cùng bạn bè từ xa.
-                  </p>
-                </div>
-              </div>
-              <button
-                id="btn-caro-matchmaking"
-                onClick={() => setScreenMode('matchmaking')}
-                className="mt-5 w-full py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-extrabold uppercase text-xs tracking-wider shadow-lg shadow-indigo-600/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Zap className="w-4 h-4" />
-                <span>Tìm Trận / Tạo Phòng</span>
-              </button>
-            </div>
-
-            {/* Card 2: Chơi Đôi Cùng Thiết Bị (Local Hotseat) */}
-            <div className="rounded-3xl bg-gradient-to-b from-teal-950/40 via-[#101b1b] to-[#0d1414] border border-teal-500/40 hover:border-teal-400 p-5 flex flex-col justify-between shadow-xl hover:shadow-teal-500/20 transition-all">
-              <div className="space-y-2.5">
-                <div className="w-11 h-11 rounded-2xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-300">
-                  <Gamepad2 className="w-5 h-5 text-teal-400" />
-                </div>
-                <div>
-                  <div className="inline-block px-2 py-0.5 rounded-md bg-teal-500/30 text-[9px] font-bold text-teal-300 uppercase tracking-wide mb-1">
-                    Không cần mạng (Offline)
-                  </div>
-                  <h3 className="text-base font-black uppercase text-white font-display">
-                    Chơi Đôi 1 Máy
-                  </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                    2 người thay phiên đi cờ trực tiếp trên cùng điện thoại / máy tính (Pass & Play).
-                  </p>
-                </div>
-              </div>
-              <button
-                id="btn-caro-local-hotseat"
-                onClick={handleStartLocalHotseat}
-                className="mt-5 w-full py-3 rounded-2xl bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-extrabold uppercase text-xs tracking-wider shadow-lg shadow-teal-600/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Gamepad2 className="w-4 h-4" />
-                <span>Chơi Đôi Ngay</span>
-              </button>
-            </div>
-
-            {/* Card 3: Play AI Practice */}
-            <div className="rounded-3xl bg-[#151522] border border-white/10 p-5 flex flex-col justify-between shadow-xl">
-              <div className="space-y-2.5">
-                <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
-                  <Bot className="w-5 h-5 text-amber-400" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black uppercase text-white font-display">
-                    Luyện Tập Với Máy
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Rèn luyện thế cờ, phản xạ và mẹo chặn 3-4 nước với thuật toán AI pattern.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5 grid grid-cols-3 gap-1.5">
-                <button
-                  id="btn-caro-ai-easy"
-                  onClick={() => handleStartAiPractice('easy')}
-                  className="py-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold transition-all active:scale-95 cursor-pointer min-h-[40px] flex items-center justify-center"
-                >
-                  Tập Sự
-                </button>
-                <button
-                  id="btn-caro-ai-med"
-                  onClick={() => handleStartAiPractice('medium')}
-                  className="py-2.5 rounded-xl bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition-all active:scale-95 cursor-pointer min-h-[40px] flex items-center justify-center"
-                >
-                  Cao Thủ
-                </button>
-                <button
-                  id="btn-caro-ai-hard"
-                  onClick={() => handleStartAiPractice('hard')}
-                  className="py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-rose-300 text-[11px] font-bold transition-all active:scale-95 cursor-pointer min-h-[40px] flex items-center justify-center"
-                >
-                  Bất Bại
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {screenMode === 'lobby' && <DuelLobby gameId="caro-gomoku" title="Cờ Caro" username={profile.username} elo={playerElo} onAi={handleStartAiPractice} onOnline={()=>setScreenMode('matchmaking')} onLocal={handleStartLocalHotseat}/>} 
 
       {/* ========================================================= */}
       {/* 2. MATCHMAKING SEARCHING VIEW                            */}
@@ -1634,4 +1494,3 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
-

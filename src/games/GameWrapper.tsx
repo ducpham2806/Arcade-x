@@ -1,3 +1,5 @@
+import {usesLauncherUi} from './gameUiPolicy';
+import './launcherGameUi.css';
 import { GameChatBubble } from '../components/GameChatBubble';
 import { PostGameSummary } from '../launcher/PostGameSummary';
 import { useLauncher } from '../launcher/LauncherContext';
@@ -85,15 +87,8 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
-  const [showPreGameLoading, setShowPreGameLoading] = useState<boolean>(() => {
-    if (['rainbow-blocks','hex-match','boom-buddies'].includes(gameMeta.id)) return false; // Own interactive tutorial and mode menu.
-    try {
-      const skipped = localStorage.getItem('arcadex_skip_pregame_loading');
-      return skipped !== 'true' && localStorage.getItem(`launcher_guide_seen_${gameMeta.id}`) !== 'true';
-    } catch {
-      return true;
-    }
-  });
+  // Help is available on demand; package readiness is the only launch gate.
+  const [showPreGameLoading, setShowPreGameLoading] = useState(false);
 
   const handleResume = useCallback(() => {
     setIsPaused(false);
@@ -585,7 +580,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const GameComponent = gameMeta.component;
 
   return (
-    <div id="game-wrapper-viewport" data-game={gameMeta.id} style={artStyle(gameMeta.id)} className="fixed inset-0 z-50 bg-[#050505] flex flex-col select-none overflow-hidden font-sans">
+    <div id="game-wrapper-viewport" data-game={gameMeta.id} data-game-ui={usesLauncherUi(gameId)?"launcher":"authored"} style={artStyle(gameMeta.id)} className="fixed inset-0 z-50 bg-[#050505] flex flex-col select-none overflow-hidden font-sans">
       {/* Top Header HUD */}
       <header className="h-12 sm:h-14 bg-[#0e0e0e]/95 backdrop-blur-md border-b border-white/5 px-2.5 sm:px-6 flex items-center justify-between z-30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -594,9 +589,9 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm sm:text-base font-bold text-white tracking-wide truncate">
+              <h1 className="text-sm sm:text-base font-bold text-white tracking-wide truncate"><button className="game-title-help" type="button" aria-label={`Cách chơi ${gameMeta.title}`} title="Xem cách chơi" onClick={()=>setShowPreGameLoading(true)}>
                 {gameMeta.title}
-              </h1>
+              </button></h1>
               {isDailyChallengeMode && (
                 <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-black uppercase tracking-wider animate-pulse">
                   🔥 Thử Thách 3 Phút
@@ -688,7 +683,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
-          style={['hex-match','rainbow-blocks','boom-buddies','brick-breaker'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
+          style={usesLauncherUi(gameId) ? {width:'100%',height:'100%',overflow:'auto',display:'block'} : ['hex-match','rainbow-blocks','boom-buddies','brick-breaker'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
         >
           <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
           <GameLoadBoundary onExit={onExit}>

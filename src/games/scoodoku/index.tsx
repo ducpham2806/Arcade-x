@@ -893,7 +893,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     return (
       <div
         id="scoodoku-menu-view"
-        className="arcade-game-surface relative w-full h-full min-h-[600px] flex flex-col items-center justify-between p-4 sm:p-6 text-amber-100 overflow-y-auto"
+        className="legacy-menu arcade-game-surface relative w-full h-full min-h-0 flex flex-col items-center justify-between p-4 sm:p-6 text-amber-100 overflow-y-auto"
         style={{
           backgroundColor: '#1c1008',
           backgroundImage: `
@@ -927,6 +927,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
           </p>
         </div>
 
+        <div className="quick-play-strip"><button id="scoodoku-quick-play" className="game-primary" onClick={()=>{const stage=CAMPAIGN_STAGES.find(stage=>!unlockedStars[stage.id])||CAMPAIGN_STAGES[CAMPAIGN_STAGES.length-1];startNewGame('campaign',stage.size,stage.difficulty,stage.id);}}>Chơi ngay · Màn tiếp theo →</button><span>Các chế độ khác ở bên dưới</span></div>
         {/* Game Mode Cards */}
         <div className="w-full max-w-md flex flex-col gap-2.5 z-10">
           {/* Mode 1: Campaign / Vượt Ải */}
@@ -1262,7 +1263,7 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
   return (
     <div
       id="scoodoku-playing-view"
-      className="arcade-game-surface relative w-full h-full min-h-[600px] flex flex-col items-center justify-between px-1 py-1 sm:p-4 text-amber-100 overflow-x-hidden overflow-y-auto select-none"
+      className="legacy-menu arcade-game-surface relative w-full h-full min-h-0 flex flex-col items-center justify-between px-1 py-1 sm:p-4 text-amber-100 overflow-x-hidden overflow-y-auto select-none"
       style={{
         backgroundColor: '#1f120a',
         backgroundImage: `
@@ -1576,4 +1577,3 @@ export const ScoodokuGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
-
