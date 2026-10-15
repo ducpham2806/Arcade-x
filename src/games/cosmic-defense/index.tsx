@@ -1,3 +1,4 @@
+import { SECTOR_DOCTRINES, STAGE_ROLES } from "./encounters";
 import React, { useEffect, useRef, useState } from "react";
 import type { GameComponentProps } from "../../types";
 import { useAuth } from "../../context/AuthContext";
@@ -344,10 +345,10 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     const token = ++generation.current,
       expected = owner.current;
     let config: RunConfig = {
-      version: 3,
+      version: 4,
       level: selected,
       seed:
-        ghostOn && saveRef.current.bestReplay?.config.version === 3 && saveRef.current.bestReplay.config.level === selected
+        ghostOn && saveRef.current.bestReplay?.config.version === 4 && saveRef.current.bestReplay.config.level === selected
           ? saveRef.current.bestReplay.config.seed
           : mode === "daily"
             ? dailySeed(today())
@@ -406,7 +407,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
         const ranked = await startRanked(config.mode, selected, expected);
         if (!validConfig(ranked.config)) throw Error("config");
         config = ranked.config;
-        if (config.version === 2) setNotice("Ván xếp hạng dùng bộ quy tắc cũ của server; campaign và luyện tập có nhịp chiến đấu mới.");
+        if (config.version < 4) setNotice("Ván xếp hạng dùng bộ quy tắc cũ của server; campaign và luyện tập có nhịp chiến đấu mới.");
         ticket = ranked.id;
       } catch {
         if (alive.current)
@@ -766,7 +767,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
         s?.config.mode === "rush"
           ? (s.bossesKilled + 1) * 10
           : s?.config.level || selected,
-        s?.config.version ?? 3,
+        s?.config.version ?? 4,
       ),
       value =
         spec.objective === "kills"
@@ -1181,6 +1182,7 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
                   {p.name} · Màn {l.stage}
                 </h2>
                 <p>{objective().label}</p>
+                <p>{STAGE_ROLES[l.stage - 1]} · {SECTOR_DOCTRINES[l.planet - 1]}</p>
                 <small>
                   Mục tiêu phụ: trúng tối đa 1 lần; hộ tống giữ ít nhất 10 HP.
                 </small>
@@ -1549,9 +1551,9 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
                         value={practicePath}
                         onChange={(e) => setPracticePath(+e.target.value)}
                       >
-                        {Array.from({ length: 17 }, (_, i) => (
+                        {Array.from({ length: 23 }, (_, i) => (
                           <option value={i + 1} key={i}>
-                            P{String(i + 1).padStart(2, "0")}
+                            P{String(i + 1).padStart(2, "0")} {i >= 17 ? ["Quét cánh", "Chữ S", "Bổ nhào quay đầu", "Gọng kìm", "Neo rồi rời", "Vòng cung"][i - 17] : ""}
                           </option>
                         ))}
                       </select>
@@ -2075,3 +2077,4 @@ export const CosmicDefenseGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+

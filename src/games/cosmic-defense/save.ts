@@ -61,7 +61,7 @@ export function emptySave(): CosmicSave {
 export function validConfig(c: RunConfig) {
   return (
     !!c &&
-    [2, 3].includes(c.version) &&
+    [2, 3, 4].includes(c.version) &&
     Number.isInteger(c.level) &&
     c.level >= 1 &&
     c.level <= 100 &&
@@ -125,7 +125,7 @@ export function validConfig(c: RunConfig) {
     (!c.practicePath ||
       (Number.isInteger(c.practicePath) &&
         c.practicePath >= 1 &&
-        c.practicePath <= 17)) &&
+        c.practicePath <= (c.version >= 4 ? 23 : 17))) &&
     (!c.practiceCount ||
       (Number.isInteger(c.practiceCount) &&
         c.practiceCount >= 1 &&
@@ -272,7 +272,7 @@ export function complete(
   sim: Simulation,
 ): { save: CosmicSave; result: Result } {
   const result = resultFor(sim),
-    l = levelFor(sim.config.level);
+    l = levelFor(sim.config.level, sim.config.version);
   let next: CosmicSave = { ...s, run: null };
   if (sim.config.mode === "practice") return { save: next, result };
   next = {
@@ -422,4 +422,5 @@ export function repair(
       }
     : s;
 }
+
 

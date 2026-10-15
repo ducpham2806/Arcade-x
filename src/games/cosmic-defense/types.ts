@@ -72,6 +72,8 @@ export interface Wave {
   lane: number;
   delay: number;
   drop?: ItemKind;
+  cue?: string;
+  escortThreat?: boolean;
 }
 export interface Level {
   id: number;
@@ -94,7 +96,7 @@ export interface Level {
   waves: Wave[];
 }
 export interface RunConfig {
-  version: 2 | 3;
+  version: 2 | 3 | 4;
   level: number;
   seed: number;
   mode: Mode;
@@ -130,6 +132,7 @@ export interface Enemy {
   separationX?: number;
   separationY?: number;
   attackPattern?: number;
+  escortThreat?: boolean;
 }
 export interface Bullet {
   x: number;
@@ -328,4 +331,5 @@ export interface CosmicSave {
     frame: number;
   }[];
 }
+
 

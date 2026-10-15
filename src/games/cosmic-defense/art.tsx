@@ -225,6 +225,15 @@ export function drawGame(
       e.kind === "wraith" && Math.floor((s.frame - e.born) / 120) % 2 ? 0.3 : 1;
     drawSprite(ctx, art, name, e.x, e.y, t);
     ctx.globalAlpha = 1;
+    if (e.escortThreat) {
+      ctx.strokeStyle = "#FF526E";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(e.x - 5, e.y - e.radius - 7);
+      ctx.lineTo(e.x, e.y - e.radius - 3);
+      ctx.lineTo(e.x + 5, e.y - e.radius - 7);
+      ctx.stroke();
+    }
     if (e.kind === "mantis")
       drawSprite(
         ctx,
@@ -240,7 +249,7 @@ export function drawGame(
       drawSprite(ctx, art, "heal_ring", e.x, e.y, t, 1.5);
     if (e.kind === "commander") drawSprite(ctx, art, "buff_ring", e.x, e.y, t);
     if (e.tele > s.frame) {
-      const miniWarning = e.kind === "commander" && s.config.version === 3;
+      const miniWarning = e.kind === "commander" && s.config.version >= 3;
       ctx.strokeStyle = miniWarning ? "#FFD23F" : "#FF3D81";
       ctx.lineWidth = miniWarning ? 1.4 : 1;
       ctx.setLineDash([3, 3]);
@@ -379,4 +388,5 @@ export function addPaletteSkins(art: Art) {
     art["skin/" + name] = c;
   }
 }
+
 

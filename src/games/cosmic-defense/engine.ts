@@ -1,3 +1,4 @@
+import * as v3 from "./legacy-v3-engine.ts";
 import * as legacy from "./legacy-engine.ts";
 import { BOSS_HP, ITEM_NAMES, levelFor, MUTATORS } from "./content.ts";
 import type {
@@ -12,7 +13,7 @@ import type {
   ReplayEntry,
   Boss,
 } from "./types.ts";
-export const VERSION = 3,
+export const VERSION = 4,
   WIDTH = 180,
   HEIGHT = 320,
   FPS = 60,
@@ -39,7 +40,7 @@ const STATS: Record<EnemyKind, [number, number, number, number]> = {
   cicada: [12, 400, 9, 45],
   minelayer: [14, 400, 10, 43],
   wraith: [18, 400, 9, 63],
-  commander: [420, 2500, 20, 22],
+  commander: [340, 2500, 20, 22],
   generator: [55, 800, 12, 60],
   meteor: [6, 50, 8, 55],
   prism: [8, 200, 8, 80],
@@ -105,6 +106,7 @@ export function startingHp(integrity: number, hull: number) {
 }
 export function createSimulation(config: RunConfig): Simulation {
   if (config.version === 2) return legacy.createSimulation(config);
+  if (config.version === 3) return v3.createSimulation(config);
   const standard = ["daily", "weekly", "endless", "rush"].includes(config.mode),
     u = standard
       ? (Object.fromEntries(
@@ -237,6 +239,7 @@ function score(s: Simulation, base: number) {
 }
 export function pickup(s: Simulation, kind: ItemKind) {
   if (s.config.version === 2) return legacy.pickup(s, kind);
+  if (s.config.version === 3) return v3.pickup(s, kind);
   const old = s.itemLevels[kind] || 0,
     mastery =
       s.config.upgrades.core >=
@@ -284,6 +287,7 @@ export function pickup(s: Simulation, kind: ItemKind) {
 }
 export function useSlot(s: Simulation, index: number) {
   if (s.config.version === 2) return legacy.useSlot(s, index);
+  if (s.config.version === 3) return v3.useSlot(s, index);
   const kind = s.slots[index];
   if (
     !kind ||
@@ -314,6 +318,7 @@ export function useSlot(s: Simulation, index: number) {
 }
 export function revive(s: Simulation) {
   if (s.config.version === 2) return legacy.revive(s);
+  if (s.config.version === 3) return v3.revive(s);
   if (s.status !== "revive" || !s.revive) return;
   s.revive = false;
   s.hp = 2;
@@ -324,6 +329,7 @@ export function revive(s: Simulation) {
 }
 export function endRun(s: Simulation) {
   if (s.config.version === 2) return legacy.endRun(s);
+  if (s.config.version === 3) return v3.endRun(s);
   if (s.status !== "playing" && s.status !== "revive") return;
   s.replay.push([s.frame, Math.round(s.targetX), Math.round(s.targetY), 32]);
   s.status = "lost";
@@ -458,7 +464,7 @@ function ring(s: Simulation, x: number, y: number, count: number, offset = 0) {
     aimed(s, x, y, 1, 0, "round", 1, offset + (Math.PI * 2 * i) / count);
 }
 function makeBoss(s: Simulation, p: number) {
-  const maxHp = BOSS_HP[p - 1],
+  const maxHp = Math.round(BOSS_HP[p - 1] * .72),
     parts: Boss["parts"] = [];
   if ([5, 6, 8].includes(p)) {
     const n = p === 8 ? 3 : 4;
@@ -466,8 +472,8 @@ function makeBoss(s: Simulation, p: number) {
       parts.push({
         x: 30 + (120 / (n - 1)) * i,
         y: p === 8 ? 118 : 90 + (i % 2) * 25,
-        hp: p === 5 ? 400 : p === 6 ? 600 : 500,
-        maxHp: p === 5 ? 400 : p === 6 ? 600 : 500,
+        hp: p === 5 ? 240 : p === 6 ? 360 : 300,
+        maxHp: p === 5 ? 240 : p === 6 ? 360 : 300,
         radius: 12,
         kind: p === 5 ? "tentacle" : p === 6 ? "turret" : "rod",
       });
@@ -540,7 +546,16 @@ function bossUpdate(s: Simulation) {
   if (p === 7) b.x = 36 + (Math.floor((s.frame - b.born) / 360) % 5) * 27;
   b.y = q((p === 10 ? 92 : p === 3 ? 48 : 68) + Math.sin(s.frame / 90) * 3);
   if (p === 10 && b.phase === 4) b.weak = s.frame + 300;
+  if (s.frame === b.fire - caps(s).tele && s.frame >= b.transition)
+    message(s, (b.pattern + 1) % 4 === 0 ? 'BOSS · Sắp lộ lõi, chuẩn bị phản công' : 'BOSS · Chuẩn bị đợt tấn công');
   if (s.frame < b.transition || s.frame < b.fire) return;
+  if ((b.pattern + 1) % 4 === 0) {
+    b.pattern++;
+    b.weak = s.frame + 135;
+    b.fire = s.frame + 165;
+    message(s, 'LỘ LÕI · Tập trung hỏa lực');
+    return;
+  }
   b.fire =
     s.frame + Math.max(45, 150 - b.phase * 15 - Math.floor(difficulty(s) / 3));
   b.pattern++;
@@ -723,6 +738,25 @@ function pathPosition(s: Simulation, e: Enemy) {
     return;
   }
   e.y = q(e.path === 17 ? 345 - age * v : -20 + age * v);
+  const side = e.x0 < 90 ? 1 : -1;
+  if (e.path === 18) e.x = q(clamp(e.x0 + side * Math.sin(Math.min(1, age / 3.8) * Math.PI) * 48, 10, 170));
+  if (e.path === 19) e.x = q(clamp(e.x0 + Math.sin(age * 1.65) * 29, 10, 170));
+  if (e.path === 20) {
+    // A visible swoop turns at y=150 and exits upward, never teleports.
+    const turn = 170 / v;
+    e.y = q(age < turn ? -20 + age * v : 150 - (age - turn) * v * 1.15);
+    e.x = q(clamp(e.x0 + side * Math.sin(Math.min(1, age / (turn * 2)) * Math.PI) * 38, 10, 170));
+  }
+  if (e.path === 21) e.x = q(clamp(e.x0 + side * (1 - Math.cos(age * 1.25)) * 24, 10, 170));
+  if (e.path === 22) {
+    const arrival = 100 / v;
+    e.y = q(age < arrival ? -20 + age * v : age < arrival + 3 ? 80 : 80 + (age - arrival - 3) * v);
+    e.x = q(clamp(e.x0 + Math.sin(age * 1.1) * 10, 10, 170));
+  }
+  if (e.path === 23) {
+    e.x = q(clamp(e.x0 + side * Math.sin(age * .9) * 55, 10, 170));
+    e.y = q(-20 + age * v * .85);
+  }
   if (e.path === 2)
     e.x = q(clamp(e.x0 + (e.x0 < 90 ? 1 : -1) * age * v * 0.4, 8, 172));
   if ([3, 11, 16].includes(e.path))
@@ -1091,23 +1125,20 @@ function spawnWaves(s: Simulation) {
     return;
   const count = w.count + (has(s, "swarm") ? Math.ceil(w.count * 0.5) : 0);
   const index = s.waveSpawn;
-  let lane =
-    w.formation === 1
-      ? 2 + (index % 7)
+  let lane = w.formation === 1
+    ? 1.5 + index * 7 / Math.max(1, count - 1)
+    : w.formation === 2
+      ? (index % 2 ? 8 : 2) + (Math.floor(index / 2) % 2 ? .6 : 0)
       : w.formation === 3
-        ? clamp(w.lane + (index % 2 ? 1 : -1) * Math.ceil(index / 2), 1, 9)
+        ? clamp(w.lane + (index % 2 ? 1 : -1) * Math.ceil(index / 2) * .8, 1, 9)
         : w.lane;
-  if (
-    ((s.config.seed >>> 4) % 2 === 1 && s.config.mode !== "campaign") ||
-    has(s, "remix")
-  )
-    lane = 10 - lane;
-  if (w.formation === 2) lane = clamp(w.lane + (index % 3 - 1) * 2, 1, 9);
-  if (w.formation === 4) lane = 1 + ((index * 3 + s.waveIndex + s.config.seed % 9) % 9);
-  lane = clamp(lane + (random(s) - .5) * .6, 1, 9);
-  const routes = [1, 2, 3, 4, 5, 6, 8, 9, 11, 12, 15, 16];
-  const path = s.config.mode === "practice" || w.path === 7 ? w.path : routes[(Math.max(0, routes.indexOf(w.path)) + s.config.seed % 5) % routes.length];
-  if (!spawn(s, w.enemy, lane, path, index === count - 1 ? w.drop : undefined)) return;
+  if (((s.config.seed >>> 4) % 2 === 1 && s.config.mode !== "campaign") || has(s, "remix")) lane = 10 - lane;
+  // Authored routes survive retries: variation is in speed, not random route substitution.
+  const activeCap = s.boss ? 8 : s.enemies.some(e => e.kind === 'commander') ? 12 : caps(s).enemies;
+  if (s.enemies.length >= activeCap) return;
+  if (!spawn(s, w.enemy, lane, w.path, index === count - 1 ? w.drop : undefined)) return;
+  s.enemies[s.enemies.length - 1].escortThreat = w.escortThreat;
+  if (index === 0 && w.cue) message(s, w.cue);
   s.nextSpawn = s.frame + Math.round(w.delay * 60);
   s.waveSpawn++;
   if (s.waveSpawn >= count) {
@@ -1133,6 +1164,7 @@ function objectiveMet(s: Simulation) {
 }
 export function step(s: Simulation, input: Input, record = true) {
   if (s.config.version === 2) return legacy.step(s, input, record);
+  if (s.config.version === 3) return v3.step(s, input, record);
   if (s.status !== "playing") return;
   // Input is quantized/sampled at 20 Hz; both live play and server replay use this exact schedule.
   if (s.frame % 3 === 0) {
@@ -1268,7 +1300,7 @@ export function step(s: Simulation, input: Input, record = true) {
   for (const e of s.enemies) {
     if (e.hp <= 0) continue;
     if (Math.hypot(e.x - s.x, e.y - s.y) < e.radius + 2) damage(s);
-    if (l.objective === "escort" && e.y >= 300) {
+    if (l.objective === "escort" && e.escortThreat && e.y >= 300) {
       s.escortHp--;
       e.y = 360;
     }
@@ -1296,6 +1328,9 @@ export function step(s: Simulation, input: Input, record = true) {
   s.pickups = s.pickups.filter((p) => s.frame - p.born < 480 && p.y < 335);
   if (
     l.stage >= 4 &&
+    !s.boss &&
+    !s.enemies.some(e => e.kind === 'commander') &&
+    l.waves.some(w => s.frame >= w.t * 60 && s.frame < (w.t + 2) * 60) &&
     s.config.mode !== "rush" &&
     s.frame - s.lastHazard > 900
   ) {
@@ -1331,6 +1366,7 @@ export function step(s: Simulation, input: Input, record = true) {
 }
 export function resultFor(s: Simulation): Result {
   if (s.config.version === 2) return legacy.resultFor(s);
+  if (s.config.version === 3) return v3.resultFor(s);
   const l = levelFor(s.config.level),
     won = s.status === "won",
     secondary = s.hits <= 1 && (l.objective !== "escort" || s.escortHp >= 10),
@@ -1385,6 +1421,7 @@ export function replaySimulation(
   frames: number,
 ): Simulation {
   if (config.version === 2) return legacy.replaySimulation(config, entries, frames);
+  if (config.version === 3) return v3.replaySimulation(config, entries, frames);
   if (
     !Number.isInteger(frames) ||
     frames < 0 ||
@@ -1464,4 +1501,5 @@ export function decodeReplay(text: string): ReplayEntry[] {
     ]);
   return entries;
 }
+
 
