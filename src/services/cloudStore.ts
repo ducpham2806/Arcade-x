@@ -72,6 +72,7 @@ export async function getDoc(ref: Reference) { return new DocumentSnapshot(ref, 
 export async function getDocs(ref: Reference) { return new QuerySnapshot(ref, await read(ref)); }
 
 async function commit(writes: Write[], reads: { path: string; version: number }[] = []) {
+  if (!writes.length) return;
   const client = await ensureCloudIdentity();
   // JSON removes undefined optional fields, preserving the existing serialization.
   const { error } = await client.rpc('arcadex_commit', {
@@ -109,7 +110,8 @@ export async function runTransaction<T>(db: CloudDatabase, callback: (tx: {
       await commit(writes, [...reads].map(([path, version]) => ({ path, version })));
       return result;
     } catch (error) {
-      if (error?.code !== '40001' || attempt === 4) throw error;
+      if (!['40001','PT409'].includes(error?.code) || attempt === 4) throw error;
+      await new Promise(resolve=>setTimeout(resolve,Math.min(2000,150*2**attempt)+Math.random()*150));
     }
   }
   throw new Error('Transaction retry limit reached');
@@ -127,7 +129,7 @@ export function onSnapshot(ref: Reference, ...args: any[]): () => void {
   let previous = '';
   let poll: ReturnType<typeof setInterval> | undefined;
   const refresh = async () => {
-    if (stopped) return;
+    if (stopped || document.hidden || !navigator.onLine) return;
     if (running) { dirty = true; return; }
     running = true;
     try {
@@ -153,15 +155,14 @@ export function onSnapshot(ref: Reference, ...args: any[]): () => void {
     finally { running = false; if (dirty && !stopped) { dirty = false; void refresh(); } }
   };
   const isOnlineGame=ref.path.startsWith('game_rooms/')||ref.path.startsWith('matchmaking_queue/');
-  poll = setInterval(() => { void refresh(); }, isOnlineGame?1500:5000);
+  poll = setInterval(() => { void refresh(); }, isOnlineGame?5000:30000);
   const onReturn=()=>{void refresh();};
-  if(typeof window!=='undefined'){window.addEventListener('online',onReturn);window.addEventListener('focus',onReturn);}
+  if(typeof window!=='undefined'){window.addEventListener('online',onReturn);window.addEventListener('focus',onReturn);document.addEventListener('visibilitychange',onReturn);}
   void refresh();
   return () => {
     stopped = true;
     if (poll) clearInterval(poll);
-    if(typeof window!=='undefined'){window.removeEventListener('online',onReturn);window.removeEventListener('focus',onReturn);}
+    if(typeof window!=='undefined'){window.removeEventListener('online',onReturn);window.removeEventListener('focus',onReturn);document.removeEventListener('visibilitychange',onReturn);}
     if (channel) void ref.db.removeChannel(channel);
   };
 }
-

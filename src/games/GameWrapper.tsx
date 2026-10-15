@@ -1,3 +1,4 @@
+import { GameChatBubble } from '../components/GameChatBubble';
 import { PostGameSummary } from '../launcher/PostGameSummary';
 import { useLauncher } from '../launcher/LauncherContext';
 import { GameSaveGate, GameLoadBoundary } from '../components/GameSaveGate';
@@ -75,6 +76,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     isPracticeMode,
     isDailyChallengeMode,
     activeModal,
+    isChatOpen,
     saveAndSuspendGame,
     autoSaveGameSession,
     pausedGameSession,
@@ -611,6 +613,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
         {/* Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <GameChatBubble/>
           <button
             id="btn-game-toggle-sound"
             type="button"
@@ -696,7 +699,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
             isDailyChallengeMode={isDailyChallengeMode}
             bridge={bridge}
             initialState={initialGameStateRef.current}
-            isPaused={isPaused || showPreGameLoading || gameOverData !== null || showExitConfirm || activeModal !== 'none' || resumeCountdown !== null}
+            isPaused={isChatOpen || isPaused || showPreGameLoading || gameOverData !== null || showExitConfirm || activeModal !== 'none' || resumeCountdown !== null}
             isMuted={isSoundMuted}
             onGameOver={handleGameOver}
             onRestart={handleRestart}
@@ -931,4 +934,3 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     </div>
   );
 };
-

@@ -9,10 +9,14 @@ export async function socialAction<T=unknown>(actor:string,action:string,target=
  if(error) throw new Error(error.message || 'Chưa kết nối được cộng đồng.');
  return data as T;
 }
-// Sequential polling avoids overlapping responses; focus/online recovery is immediate.
-export function watchSocial<T>(read:()=>Promise<T>,receive:(data:T)=>void,fail:(error:Error)=>void,ms=1800){
- let disposed=false,running=false,timer:ReturnType<typeof setTimeout>;let last='';
- const refresh=async()=>{if(disposed||running)return;running=true;clearTimeout(timer);try{const data=await read();if(!disposed){const serialized=JSON.stringify(data);if(serialized!==last){last=serialized;receive(data);}}}catch(e){last='';if(!disposed)fail(e instanceof Error?e:new Error('Mất kết nối.'));}finally{running=false;if(!disposed)timer=setTimeout(refresh,ms);}};
- void refresh();window.addEventListener('focus',refresh);window.addEventListener('online',refresh);
- return ()=>{disposed=true;clearTimeout(timer);window.removeEventListener('focus',refresh);window.removeEventListener('online',refresh);};
+// One request at a time. Idle/hidden clients stop polling; failures back off.
+export function watchSocial<T>(read:()=>Promise<T>,receive:(data:T)=>void,fail:(error:Error)=>void,ms=5000){
+ let disposed=false,running=false,timer:ReturnType<typeof setTimeout>;let last='',failures=0;
+ const refresh=async()=>{if(disposed||running)return;clearTimeout(timer);if(document.hidden||!navigator.onLine)return;running=true;
+  try{const data=await read();failures=0;if(!disposed){const serialized=JSON.stringify(data);if(serialized!==last){last=serialized;receive(data);}}}
+  catch(e){failures++;last='';if(!disposed)fail(e instanceof Error?e:new Error('Mất kết nối.'));}
+  finally{running=false;if(!disposed)timer=setTimeout(refresh,Math.min(60000,ms*2**Math.min(failures,4)));}
+ };
+ void refresh();window.addEventListener('focus',refresh);window.addEventListener('online',refresh);document.addEventListener('visibilitychange',refresh);
+ return ()=>{disposed=true;clearTimeout(timer);window.removeEventListener('focus',refresh);window.removeEventListener('online',refresh);document.removeEventListener('visibilitychange',refresh);};
 }

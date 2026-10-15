@@ -103,7 +103,7 @@ export async function syncGameSaves(ownerId: string): Promise<void> {
       p_reads: [{ path, version: saved.baseVersion }],
       p_writes: [{ path, operation: 'set', merge: false, data: { schemaVersion: 1, payload: saved.payload } }],
     });
-    if (writeError?.code === '40001') { announce(id, 'pending'); continue; }
+    if (['40001','PT409'].includes(writeError?.code)) { announce(id, 'pending'); continue; }
     if (writeError) throw writeError;
     // Read the server-assigned revision. Unknown revision stays dirty for safe retry.
     const { data: confirmed, error: confirmError } = await supabase.rpc('arcadex_read', { p_collection: `players/${ownerId}/game_sessions`, p_id: `save-${id}` });
@@ -129,4 +129,3 @@ export function resolveGameSave(id: string, choice: 'local' | 'remote'): void {
   localStorage.setItem(legacy(id), JSON.stringify(next.payload));
   announce(id, next.dirty ? 'pending' : 'synced');
 }
-
