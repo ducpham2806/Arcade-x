@@ -1,6 +1,6 @@
 export const CURRENT_APP_VERSION = '2.11.0';
 export const APP_CODENAME = "Play First";
-export const APP_RELEASE_NOTES = "Vào thẳng thư viện để chơi; đăng nhập và hồ sơ tùy chọn; công bố Boom Buddies, Rainbow Blocks và Shattered Realms.";
+export const APP_RELEASE_NOTES = "Sảnh game cờ đồng bộ launcher; mở game trực tiếp; hướng dẫn tùy chọn; vào nhanh chiến dịch và sửa bố cục.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

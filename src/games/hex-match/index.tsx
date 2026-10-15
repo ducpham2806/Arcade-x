@@ -436,8 +436,11 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     setResult(null);
     setChapter(l.chapter);
   }
-  function start() {
-    if (!prep) return;
+  function start(level: Level | null = prep, runMode: Run["mode"] = mode, boosters = selected) {
+    if (!level) return;
+    setMode(runMode);
+    setChapter(level.chapter);
+    setAnimating(false);
     setPracticeLessonId(null);
     const today = dayKey();
     if (saveRef.current.lastVisit !== today) {
@@ -453,12 +456,12 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
       }
       write(s);
     }
-    let l = structuredClone(prep);
+    let l = structuredClone(level);
     const loss = saveRef.current.losses[String(l.id)] || 0;
-    const chosen = selected.filter(
+    const chosen = boosters.filter(
       (k) => (saveRef.current.inventory[k] || 0) > 0,
     );
-    if (mode === "campaign" && l.id !== 100) {
+    if (runMode === "campaign" && l.id !== 100) {
       if (loss >= 3) l.beta += 0.1;
       if (loss === 5) {
         if (l.seconds) l.seconds += 7;
@@ -466,20 +469,20 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
       }
     }
     const seed =
-      mode === "daily"
+      runMode === "daily"
         ? hashSeed(`blossom-daily-v1:${dayKey()}`)
         : (retrySeed.current ?? hashSeed(`${Date.now()}:${l.id}`));
     const next = validatedRun(l, seed, {
-      mode,
-      dailyDate: mode === "daily" ? dayKey() : undefined,
+      mode: runMode,
+      dailyDate: runMode === "daily" ? dayKey() : undefined,
       id: crypto.randomUUID(),
       companion:
-        mode === "daily" || mode === "side" || l.bossHP > 0
+        runMode === "daily" || runMode === "side" || l.bossHP > 0
           ? "none"
           : regionCompanion(l).id,
       started: chosen.filter((k) => BOOSTERS[k].start),
     });
-    write(reserve(saveRef.current, next, mode === "campaign" ? chosen : []));
+    write(reserve(saveRef.current, next, runMode === "campaign" ? chosen : []));
     runRef.current = next;
     setRun(next);
     setScreen("play");
@@ -496,7 +499,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     setHintCells([]);
     sound("booster_start");
     if (
-      mode === "campaign" &&
+      runMode === "campaign" &&
       l.id % 10 === 1 &&
       !saveRef.current.badges.includes(`story${l.chapter}`)
     ) {
@@ -507,7 +510,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
       setStoryKind("intro");
       setModal("story");
     } else if (
-      mode === "campaign" &&
+      runMode === "campaign" &&
       l.id % 10 === 5 &&
       !saveRef.current.badges.includes(`story-mid-${l.chapter}`)
     ) {
@@ -953,13 +956,14 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                 </p>
                 <button
                   className="bb-primary"
-                  onClick={() =>
-                    prepare(
+                  onClick={() => {
+                    retrySeed.current = null;
+                    start(
                       LEVELS.find(
                         (l) => accessible(l.id) && !save.stars[l.id],
-                      ) || LEVELS[0],
-                    )
-                  }
+                      ) || LEVELS[0], "campaign", [],
+                    );
+                  }}
                 >
                   ▶ {t.play}
                 </button>
@@ -1948,7 +1952,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
               )}
               </div>
             </>,
-            <button className="bb-primary" onClick={start}>
+            <button className="bb-primary" onClick={() => start()}>
               ▶ {t.play}
             </button>,
             () => setPrep(null),
