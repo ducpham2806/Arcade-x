@@ -50,3 +50,7 @@ The 96-level rebuild now changes simulation, layouts, progression tuning and fai
 ### Optional campaign choices
 
 See `BLOCK-BREAKER-CHOICES-V4.md` and `block-choice-tuning.csv` for the 18 salvage routes, 96 optional mastery goals, and post-boss one-use support. All numerical tuning is provisional pending human playtests. Level Lab includes practice-only support simulation.
+
+### Hybrid silhouettes (v5)
+
+The current campaign combines legacy silhouettes with the enlarged v3/v4 campaign. See `BLOCK-BREAKER-HYBRID-V5.md` for the 25 formation families, before/after contact sheets and 192-run simulation evidence. Level Lab now compares Original / Dense / Combined and always launches the combined version.
