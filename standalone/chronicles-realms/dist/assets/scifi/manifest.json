@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "sourceSprites": 90,
+  "logicalFrames": 547,
+  "textures": [
+    {
+      "file": "core.webp",
+      "width": 768,
+      "height": 768,
+      "bytes": 277624
+    },
+    {
+      "file": "icons.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 170456
+    },
+    {
+      "file": "boss.webp",
+      "width": 768,
+      "height": 1152,
+      "bytes": 384174
+    },
+    {
+      "file": "bg.webp",
+      "width": 1152,
+      "height": 768,
+      "bytes": 297564
+    },
+    {
+      "file": "native.png",
+      "width": 768,
+      "height": 288,
+      "bytes": 21753
+    }
+  ],
+  "decodedBytes": 11894784,
+  "totalBytes": 1151571,
+  "notes": "90 generated source cells; legacy names map to shared forms, hue variants and procedural VFX. Boss phases share four authored poses per boss."
+}
