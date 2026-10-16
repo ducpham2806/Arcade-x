@@ -27,6 +27,7 @@ function arenaWalls(arena){const width=arena.width||432,l=(W-width)/2,r=W-l,cw=w
  if(arena.shape==='reactor'){add('left',92,70,.8);add('right',92,70,.8);add('left',295,54,.7);add('right',295,54,.7);}
  if(arena.shape==='hangar'){add('left',92,100,1.4);add('right',92,100,1.4);add('left',192,40,.6);add('right',192,40,.6);}
  return w;}
+const SUPPORT_CONFIG={wide:{multiplier:1.15,duration:20},shield:{rescues:1},energy:{charge:3}};
 class Game{
  constructor(data,index,opts={}){
   this.data=data;this.level=JSON.parse(JSON.stringify(data.levels[index]));this.index=index;this.seed=opts.seed||((Date.now()^index)>>>0);this.random=rng(this.seed);this.events=[];this.log=[];this.opts=opts;this.practice=!!opts.practice;this.time=0;this.score=0;this.coins=0;this.lives=this.level.lives;this.lost=0;this.combo=0;this.maxCombo=0;this.catchStreak=0;this.perfects=0;this.energy=0;this.drive=0;this.overdrive=0;this.effects={};this.shield=0;this.pity=0;this.px=W/2;this.target=W/2;this.pw=90*this.level.paddle_scale;this.speed=this.level.ball_speed*32;this.balls=[];this.bricks=[];this.drops=[];this.shots=[];this.hazards=[];this.lasers=[];this.laserCd=0;this.done=false;this.key=false;this.invulnerable=0;this.frozen=0;this.stunned=0;this.slippery=0;
@@ -35,15 +36,16 @@ class Game{
   this.blockers=(this.level.blockers||[]).map((b,i)=>({...b,x:this.left+b.x*this.cw,y:this.gridTop+b.y*this.rh,w:b.type==='steel_wall'?70:b.type==='drone'?72:34,h:b.type==='steel_wall'?16:b.type==='drone'?18:34,baseX:this.left+b.x*this.cw,cd:3+i,life:Infinity}));
   if(this.level.boss){this.boss={...this.level.boss,x:175,y:235,w:130,h:110,max:this.level.boss.hp,phase:1,cd:4,telegraph:null,hurt:0,guard:8,attackCount:0,weak:0};}
   if(this.boss)this.boss.initialShield=this.bricks.filter(b=>b.r<4&&isObjective(b)).length;
-  this.newBall();this.emit('start',{name:this.level.name});
+  this.mastery=this.level.mastery?{...this.level.mastery,progress:0,completed:false,failed:false}:null;this.firstVolleyClosed=false;this.volleyCount=0;this.volleySeen=new Set();this.maxReaction=0;this.launches=0;this.damageContext=null;this.sideCache=this.level.side_route?{...this.level.side_route.cache,opened:false,warning:0,spawned:false}:null;this.support=SUPPORT_CONFIG[opts.support]?{type:opts.support,remaining:opts.support==='wide'?20:0,shieldAvailable:opts.support==='shield',started:false}:null;
+  this.newBall();if(this.support?.type==='energy')this.energy=3;if(this.support?.type==='wide')this.pw*=1.15;this.emit('start',{name:this.level.name});
  }
  brick(t,r,c){return {t,r,c,x:this.left+c*this.cw+3,y:this.gridTop+r*this.rh+2,baseX:this.left+c*this.cw+3,w:this.cw-6,h:this.rh-5,hp:this.data.hp[t]||999,max:this.data.hp[t]||999,alive:true,revive:0,revivesLeft:this.level.design?.regen_limit??1,bombAt:t==='B'?8:0}}
  emit(type,obj={}){this.events.push({type,...obj});if(this.events.length>400)this.events.shift()}
  setTarget(x,record=true){this.target=clamp(x,this.left+this.pw/2,this.right-this.pw/2);if(record)this.log.push([Math.round(this.time*120),'move',Math.round(x*10)/10]);}
- newBall(){this.balls=[{x:this.px,y:PY-15,vx:0,vy:0,stuck:true,portalCd:0,trail:[],last:null}];this.effects={};this.speed=this.level.ball_speed*32;this.shield=0;this.invulnerable=1;}
- launch(){if(this.done)return;for(const b of this.balls)if(b.stuck){const a=(this.random()-.5)*.6;b.stuck=false;b.vx=Math.sin(a)*this.speed;b.vy=-Math.cos(a)*this.speed;}this.log.push([Math.round(this.time*120),'launch']);}
+ newBall(){this.balls=[{x:this.px,y:PY-15,vx:0,vy:0,stuck:true,portalCd:0,trail:[],last:null}];this.effects={};this.speed=this.level.ball_speed*32;this.shield=this.support?.shieldAvailable?1:0;this.invulnerable=1;}
+ launch(){if(this.done)return;if(this.balls.some(b=>b.stuck)){this.launches++;if(this.support&&!this.support.started){this.support.started=true;this.emit('support-used',{support:this.support.type});}}for(const b of this.balls)if(b.stuck){const a=(this.random()-.5)*.6;b.stuck=false;b.vx=Math.sin(a)*this.speed;b.vy=-Math.cos(a)*this.speed;}this.log.push([Math.round(this.time*120),'launch']);}
  skill(type='slow'){if(this.done||this.energy<5)return false;this.energy=0;this.log.push([Math.round(this.time*120),'skill',type]);if(type==='beam'){for(const b of this.bricks)if(b.alive&&Math.abs(b.x+b.w/2-this.px)<32){if(b.t!=='X')this.destroy(b,'beam')}if(this.boss&&Math.abs(this.boss.x+65-this.px)<85){this.boss.hp-=8;this.boss.hurt=.2;}this.emit('beam',{x:this.px,y:PY});}else if(type==='shield'){this.effects.skill_shield=12;}else this.effects.skill_slow=6;this.emit('skill',{skill:type});return true;}
- lose(reason){if(this.done||this.invulnerable>0)return;this.lives--;this.lost++;this.combo=0;this.catchStreak=0;this.drive=0;this.overdrive=0;this.shots=[];this.hazards=[];this.emit('life',{reason});if(this.lives<=0)this.finish(false);else this.newBall();}
+ lose(reason){if(this.done||this.invulnerable>0)return;this.firstVolleyClosed=true;this.checkMastery();this.lives--;this.lost++;this.combo=0;this.catchStreak=0;this.drive=0;this.overdrive=0;this.shots=[];this.hazards=[];this.emit('life',{reason});if(this.lives<=0)this.finish(false);else this.newBall();}
  apply(type){
   if(type==='extra_life')this.lives=Math.min(5,this.lives+1);
   else if(type==='shield')this.shield=1;
@@ -55,7 +57,8 @@ class Game{
  drop(b){const pool=this.level.booster_pool;if(this.dropCount>=(pool.drop_budget??Infinity)||this.drops.length>=2||this.time-this.lastDrop<(pool.drop_cooldown_sec??0)){this.pity++;return;}const rate=b.t==='K'?1:pool.drop_rate[b.t==='s'?'steel':b.t==='h'?'hard':'normal'];if(this.random()<rate||this.pity>=pool.pity_after){this.pity=0;this.dropCount++;this.lastDrop=this.time;const bad=Object.keys(pool.bad||{}).length&&this.random()<(pool.bad_chance??.16);this.drops.push({x:b.x+b.w/2,y:b.y,type:this.weighted(bad?pool.bad:pool.good),bad:!!bad});}else this.pity++;}
  destroy(b,cause){
   if(!b.alive||b.t==='X'||b.t==='M'&&cause!=='beam'||b.t==='L'&&!this.key)return;
-  b.alive=false;b.hp=0;this.lastProgress=this.time;if(b.t==='R'&&b.revivesLeft>0){b.revive=this.time+6;b.revivesLeft--;}this.combo++;this.maxCombo=Math.max(this.maxCombo,this.combo);const mult=Math.min(8,1+Math.floor(this.combo/4))*(this.overdrive>0?2:1)*(this.effects.score_x2?2:1);this.score+=(this.data.points[b.t]||10)*mult;if(this.effects.gold_rush)this.coins+=2;
+  if(this.damageContext?.source==='ball'){const key=b.r+','+b.c;if(!this.firstVolleyClosed&&this.launches===1&&!this.volleySeen.has(key)){this.volleySeen.add(key);this.volleyCount++;}this.damageContext.seen.add(key);this.maxReaction=Math.max(this.maxReaction,this.damageContext.seen.size);}
+  b.alive=false;b.hp=0;this.lastProgress=this.time;if(b.t==='R'&&b.revivesLeft>0){b.revive=this.time+6;b.revivesLeft--;}this.combo++;this.maxCombo=Math.max(this.maxCombo,this.combo);this.checkMastery();const mult=Math.min(8,1+Math.floor(this.combo/4))*(this.overdrive>0?2:1)*(this.effects.score_x2?2:1);this.score+=(this.data.points[b.t]||10)*mult;if(this.effects.gold_rush)this.coins+=2;
   this.drive=Math.min(12,this.drive+1);if(this.drive===12&&this.overdrive<=0){this.overdrive=5;this.drive=0;this.emit('overdrive');}
   this.emit('break',{x:b.x+b.w/2,y:b.y+b.h/2,t:b.t,mult});this.drop(b);
   if(b.t==='Y'){this.key=true;this.emit('message',{text:'Đã mở khoá gạch!'});}
@@ -66,7 +69,7 @@ class Game{
   if(b.t==='E'||this.effects.chain_lightning&&cause==='ball'){const group=(this.level.electric_groups||[]).find(g=>g.some(([r,c])=>r===b.r&&c===b.c));const nearby=this.bricks.filter(q=>q.alive&&q!==b&&(group?group.some(([r,c])=>r===q.r&&c===q.c):q.t==='E'&&Math.abs(q.r-b.r)+Math.abs(q.c-b.c)===1));for(const q of nearby.slice(0,5))this.destroy(q,'electric');this.emit('lightning',{x:b.x,y:b.y});}
   if(b.t==='U'){const bpm=this.level.rhythm?.bpm||100;const beat=(this.time*bpm/60)%1;if(beat<.15||beat>.85){this.score+=50;this.emit('message',{text:'ĐÚNG NHỊP +50'});}}
  }
- hit(b,ball){if(b.t==='X'||b.t==='M'||b.t==='L'&&!this.key)return;if(this.effects.meteor||this.effects.mega_ball||this.overdrive>0&&['n','h','p','g'].includes(b.t))b.hp=0;else b.hp-=this.effects.fire_ball?2:1;this.lastProgress=this.time;if(b.hp<=0)this.destroy(b,'ball');else this.emit('spark',{x:ball.x,y:ball.y});}
+ hit(b,ball,source='ball'){if(b.t==='X'||b.t==='M'||b.t==='L'&&!this.key)return;const previous=this.damageContext;this.damageContext={source,seen:new Set()};try{if(this.effects.meteor||this.effects.mega_ball||this.overdrive>0&&['n','h','p','g'].includes(b.t))b.hp=0;else b.hp-=this.effects.fire_ball?2:1;this.lastProgress=this.time;if(b.hp<=0)this.destroy(b,source);else this.emit('spark',{x:ball.x,y:ball.y});}finally{this.damageContext=previous;}}
  portal(b,ball){if(ball.portalCd>0)return false;const pair=(this.level.portals||[]).find(p=>[p.a,p.b].some(([r,c])=>r===b.r&&c===b.c));let dest;if(pair){const [r,c]=pair.a[0]===b.r&&pair.a[1]===b.c?pair.b:pair.a;dest=this.bricks.find(k=>k.r===r&&k.c===c&&k.alive);}else dest=this.bricks.find(k=>k.t==='P'&&k!==b&&k.alive);if(!dest)return false;ball.x=dest.x+dest.w/2;ball.y=dest.y+dest.h+8;ball.vy=Math.abs(ball.vy);ball.portalCd=.65;this.emit('portal',{x:ball.x,y:ball.y});return true;}
  bounce(ball,dt){
   let remaining=dt;const radius=this.effects.shrink_ball?3.5:6;
@@ -77,15 +80,17 @@ class Game{
    if(ball.vy>0)consider({x:this.px-this.pw/2,y:PY,w:this.pw,h:16},'paddle');
    for(const wall of this.walls)consider(wall,'wall');
    for(const b of this.bricks)if(b.alive&&b!==ball.last)consider(b,'brick',b);
-   for(const b of this.blockers)if(['bumper','steel_wall','asteroid','drone','worm'].includes(b.type))consider(b,'blocker',b);
+   if(this.sideCache&&!this.sideCache.opened)consider(this.sideCache,'salvage',this.sideCache);
+   for(const b of this.blockers)if(['bumper','steel_wall','asteroid','drone','worm','salvage_drone'].includes(b.type))consider(b,'blocker',b);
    if(this.boss&&this.boss.hp>0)consider(this.boss,'boss',this.boss);
    if(!contact){ball.x+=dx;ball.y+=dy;ball.last=null;break;}
    ball.x+=dx*contact.t;ball.y+=dy*contact.t;remaining*=1-contact.t;
    const {nx,ny,kind,obj}=contact;let reflect=true;
    if(kind==='paddle'){
-    const offset=clamp((ball.x-this.px)/(this.pw/2),-1,1),angle=offset*1.12,sp=Math.hypot(ball.vx,ball.vy);ball.vx=Math.sin(angle)*sp;ball.vy=-Math.cos(angle)*sp;ball.y=PY-radius-.1;reflect=false;this.combo=0;
-    if(Math.abs(offset)<.2){this.catchStreak++;this.perfects++;this.energy=Math.min(5,this.energy+1);this.score+=50*Math.min(3,this.catchStreak);this.emit('perfect',{x:this.px,y:PY});if(this.cleanupActive){const target=this.cleanupTarget();if(target){const a=clamp(Math.atan2(target.x+target.w/2-ball.x,PY-target.y-target.h/2),-.95,.95);ball.vx=Math.sin(a)*sp;ball.vy=-Math.cos(a)*sp;this.emit('cleanup-aim',{x:target.x+target.w/2,y:target.y+target.h/2});}}}else this.catchStreak=0;
+    const offset=clamp((ball.x-this.px)/(this.pw/2),-1,1),angle=offset*1.12,sp=Math.hypot(ball.vx,ball.vy);ball.vx=Math.sin(angle)*sp;ball.vy=-Math.cos(angle)*sp;ball.y=PY-radius-.1;reflect=false;this.combo=0;this.firstVolleyClosed=true;
+    if(Math.abs(offset)<.2){this.catchStreak++;this.perfects++;this.energy=Math.min(5,this.energy+1);this.score+=50*Math.min(3,this.catchStreak);this.emit('perfect',{x:this.px,y:PY});if(this.cleanupActive){const target=this.cleanupTarget();if(target){const a=clamp(Math.atan2(target.x+target.w/2-ball.x,PY-target.y-target.h/2),-.95,.95);ball.vx=Math.sin(a)*sp;ball.vy=-Math.cos(a)*sp;this.emit('cleanup-aim',{x:target.x+target.w/2,y:target.y+target.h/2});}}}else this.catchStreak=0;this.checkMastery();
     if(this.effects.magnet){ball.stuck=true;ball.vx=ball.vy=0;return;}
+   }else if(kind==='salvage'){this.openSideRoute();
    }else if(kind==='brick'){
     if(obj.t==='P'&&this.portal(obj,ball))return;
     const pierce=(this.effects.mega_ball||this.effects.meteor||this.overdrive>0&&['n','h','g','p'].includes(obj.t))&&obj.t!=='X'&&obj.t!=='M'&&!(obj.t==='L'&&!this.key);
@@ -101,7 +106,7 @@ class Game{
   // Conservative depenetration closes corner-contact escapes without teleporting a lost ball.
   for(let pass=0;pass<2;pass++)for(const wall of this.walls){if(ball.x>wall.x-radius&&ball.x<wall.x+wall.w+radius&&ball.y>wall.y-radius&&ball.y<wall.y+wall.h+radius){const faces=[{d:ball.x-(wall.x-radius),axis:'x',value:wall.x-radius-.02,sign:-1},{d:wall.x+wall.w+radius-ball.x,axis:'x',value:wall.x+wall.w+radius+.02,sign:1},{d:ball.y-(wall.y-radius),axis:'y',value:wall.y-radius-.02,sign:-1},{d:wall.y+wall.h+radius-ball.y,axis:'y',value:wall.y+wall.h+radius+.02,sign:1}].sort((a,b)=>a.d-b.d),f=faces[0];ball[f.axis]=f.value;ball[f.axis==='x'?'vx':'vy']=Math.abs(ball[f.axis==='x'?'vx':'vy'])*f.sign;}}
   if(ball.x<this.left+radius){ball.x=this.left+radius+.02;ball.vx=Math.abs(ball.vx);}if(ball.x>this.right-radius){ball.x=this.right-radius-.02;ball.vx=-Math.abs(ball.vx);}if(ball.y<98){ball.y=98.02;ball.vy=Math.abs(ball.vy);}
-  if(ball.y>PY+28&&(this.shield||this.effects.skill_shield)){if(!this.effects.skill_shield)this.shield=0;ball.y=PY+25;ball.vy=-Math.abs(ball.vy);this.emit('shield',{x:ball.x,y:PY+27});}
+  if(ball.y>PY+28&&(this.shield||this.effects.skill_shield)){if(!this.effects.skill_shield){this.shield=0;if(this.support?.shieldAvailable)this.support.shieldAvailable=false;}ball.y=PY+25;ball.vy=-Math.abs(ball.vy);this.emit('shield',{x:ball.x,y:PY+27});}
  }
  bossAttack(id){
   const b=this.boss;if(!b)return;b.attackCount++;this.emit('bossattack',{attack:id});const shot=(x,effect)=>this.shots.push({x,y:b.y+b.h,vx:0,vy:155,effect,r:8});
@@ -126,12 +131,12 @@ class Game{
   }
  }
  update(dt){
-  if(this.done)return;this.time+=dt;this.invulnerable=Math.max(0,this.invulnerable-dt);this.frozen=Math.max(0,this.frozen-dt);this.stunned=Math.max(0,this.stunned-dt);this.slippery=Math.max(0,this.slippery-dt);this.overdrive=Math.max(0,this.overdrive-dt);
+  if(this.done)return;this.time+=dt;if(this.support?.started&&this.support.type==='wide')this.support.remaining=Math.max(0,this.support.remaining-dt);this.tickSideRoute(dt);this.invulnerable=Math.max(0,this.invulnerable-dt);this.frozen=Math.max(0,this.frozen-dt);this.stunned=Math.max(0,this.stunned-dt);this.slippery=Math.max(0,this.slippery-dt);this.overdrive=Math.max(0,this.overdrive-dt);
   for(const k of Object.keys(this.effects)){this.effects[k]-=dt;if(this.effects[k]<=0)delete this.effects[k];}
-  const e=this.effects,ts=e.skill_slow?.6:1;this.pw=90*this.level.paddle_scale*(e.big_paddle?1.5:e.small_paddle?.6:1);let target=e.reverse?W-this.target:this.target;target=clamp(target,this.left+this.pw/2,this.right-this.pw/2);
+  const e=this.effects,ts=e.skill_slow?.6:1;this.pw=90*this.level.paddle_scale*(e.big_paddle?1.5:e.small_paddle?.6:1)*(this.support?.type==='wide'&&this.support.remaining>0?1.15:1);let target=e.reverse?W-this.target:this.target;target=clamp(target,this.left+this.pw/2,this.right-this.pw/2);
   const root=this.hazards.some(h=>h.type==='root'&&this.px>h.x&&this.px<h.x+h.w);if(this.stunned<=0&&this.frozen<=0){const max=dt*850*(e.heavy_paddle?.45:root?.6:1);this.px+=clamp((target-this.px)*(this.slippery?dt*4:1),-max,max);this.px=clamp(this.px,this.left+this.pw/2,this.right-this.pw/2);}
   for(const b of this.bricks){if(b.t==='V'){const m=(this.level.moving||[]).find(m=>m.cell[0]===b.r&&m.cell[1]===b.c);b.x=clamp(b.baseX+Math.sin(this.time*(m?.speed||1.2))*(m?.range||1)*this.cw,this.left,this.right-b.w);}if(!b.alive&&b.revive&&b.revive<this.time&&this.bricks.some(q=>q.alive&&isObjective(q))){b.alive=true;b.hp=b.max;b.revive=0;this.emit('portal',{x:b.x,y:b.y});}if(b.alive&&b.bombAt&&this.time>=b.bombAt){b.bombAt=0;this.destroy(b,'timer');this.lose('Bom hẹn giờ');}}
-  for(const b of this.blockers){b.life-=dt;if(['asteroid','drone','worm'].includes(b.type))b.x=clamp(b.baseX+Math.sin(this.time*(b.type==='worm'?2:1.3))*70,this.left,this.right-b.w);if(b.type==='turret'){b.cd-=dt*(e.time_freeze?0:ts);if(b.cd<=0){b.cd=4;this.shots.push({x:b.x+17,y:b.y+25,vx:0,vy:170,r:6,effect:'stun'});}}}
+  for(const b of this.blockers){b.life-=dt;if(b.type==='salvage_drone')b.x=b.baseX+Math.sin(this.time*1.7)*(b.range||0);if(['asteroid','drone','worm'].includes(b.type))b.x=clamp(b.baseX+Math.sin(this.time*(b.type==='worm'?2:1.3))*70,this.left,this.right-b.w);if(b.type==='turret'){b.cd-=dt*(e.time_freeze?0:ts);if(b.cd<=0){b.cd=4;this.shots.push({x:b.x+17,y:b.y+25,vx:0,vy:170,r:6,effect:'stun'});}}}
   this.blockers=this.blockers.filter(b=>b.life>0);
   for(const ball of this.balls.slice()){
    if(ball.stuck){ball.x=this.px;ball.y=PY-9;continue;}ball.portalCd=Math.max(0,(ball.portalCd||0)-dt);
@@ -144,7 +149,7 @@ class Game{
   }
   if(!this.balls.length&&!this.done)this.lose('Orb rơi xuống vực');
   if(e.laser){this.laserCd-=dt;if(this.laserCd<=0){this.laserCd=.28;for(const x of [this.px-this.pw*.35,this.px+this.pw*.35])this.lasers.push({x,y:PY});}}
-  for(const l of this.lasers){l.y-=dt*650;const b=this.bricks.find(b=>b.alive&&l.x>=b.x&&l.x<=b.x+b.w&&l.y<=b.y+b.h&&l.y>=b.y-12);if(b){this.hit(b,l);l.y=-20;}if(this.boss&&l.x>this.boss.x&&l.x<this.boss.x+130&&l.y<this.boss.y+110&&l.y>this.boss.y&&!this.bossGuarded()){this.boss.hp--;this.lastProgress=this.time;l.y=-20;}}
+  for(const l of this.lasers){l.y-=dt*650;const b=this.bricks.find(b=>b.alive&&l.x>=b.x&&l.x<=b.x+b.w&&l.y<=b.y+b.h&&l.y>=b.y-12);if(b){this.hit(b,l,'laser');l.y=-20;}if(this.boss&&l.x>this.boss.x&&l.x<this.boss.x+130&&l.y<this.boss.y+110&&l.y>this.boss.y&&!this.bossGuarded()){this.boss.hp--;this.lastProgress=this.time;l.y=-20;}}
   this.lasers=this.lasers.filter(l=>l.y>50);
   for(const d of this.drops){d.y+=dt*105;if(d.y>PY-12&&d.y<PY+24&&Math.abs(d.x-this.px)<this.pw/2+15){this.apply(d.type);d.y=H+30;}}
   this.drops=this.drops.filter(d=>d.y<H+20);
@@ -159,11 +164,14 @@ class Game{
   const remaining=this.bricks.filter(b=>b.alive&&isObjective(b)).length;if(!boss&&!this.cleanupActive&&remaining>0&&remaining<=(this.level.design?.cleanup_remaining??3)&&this.time-this.lastProgress>=(this.level.design?.cleanup_after_sec??16)){this.cleanupActive=true;this.emit('cleanup');}
   if(!this.done&&(boss?boss.hp<=0:!this.bricks.some(b=>b.alive&&isObjective(b))))this.finish(true);
  }
+ checkMastery(){const m=this.mastery;if(!m||m.completed||m.failed)return;const values={perfect:this.perfects,combo:this.maxCombo,volley:this.volleyCount,reaction:this.maxReaction};m.progress=Math.min(m.target,values[m.type]||0);if(m.progress>=m.target){m.completed=true;this.emit('mastery',{objective:m.type,target:m.target});}else if(m.type==='volley'&&this.firstVolleyClosed)m.failed=true;}
+ openSideRoute(){const cache=this.sideCache,route=this.level.side_route;if(this.done||!cache||cache.opened||!route)return false;cache.opened=true;cache.warning=route.windup_sec;const w=36,range=route.deflector_range,baseX=route.side==='left'?this.left+range+6:this.right-w-range-6;cache.sweep={x:baseX-range,y:cache.y+30,w:w+range*2,h:14};cache.drone={type:'salvage_drone',x:baseX,baseX,y:cache.y+30,w,h:14,range,life:route.deflector_sec,cd:0};this.apply(route.booster);this.emit('salvage',{booster:route.booster});return true;}
+ tickSideRoute(dt){const c=this.sideCache;if(!c?.opened||c.spawned)return;c.warning=Math.max(0,c.warning-dt);if(c.warning===0){c.spawned=true;this.blockers.push({...c.drone});this.emit('salvage-risk');}}
  bossGuarded(){return !!this.boss&&(this.boss.guard>0||this.bricks.filter(b=>b.alive&&b.r<4&&isObjective(b)).length>(this.level.boss?.shield_open_remaining||0));}
  cleanupTarget(){return this.bricks.filter(b=>b.alive&&isObjective(b)&&!(b.t==='L'&&!this.key)).sort((a,b)=>(a.t==='Y'?-1000:Math.abs(a.x+a.w/2-this.px))-(b.t==='Y'?-1000:Math.abs(b.x+b.w/2-this.px)))[0]||null;}
- finish(win){if(this.done)return;this.done=true;let stars=0;if(win){stars=1;if(this.score>=this.level.stars['2'].score_at_least)stars=2;if(this.score>=this.level.stars['3'].score_at_least&&this.lost<=this.level.stars['3'].lives_lost_at_most)stars=3;}this.result={win,stars,score:this.score,lost:this.lost,time:this.time,coins:this.coins};this.emit('end',this.result);}
+ finish(win){if(this.done)return;this.checkMastery();this.done=true;let stars=0;if(win){stars=1;if(this.score>=this.level.stars['2'].score_at_least)stars=2;if(this.score>=this.level.stars['3'].score_at_least&&this.lost<=this.level.stars['3'].lives_lost_at_most)stars=3;}this.result={win,stars,score:this.score,lost:this.lost,time:this.time,coins:this.coins,masteryComplete:!!this.mastery?.completed,sideRouteOpened:!!this.sideCache?.opened};this.emit('end',this.result);}
 }
-root.RealmsEngine={Game,sweep,rng,W,H,LEFT,RIGHT,TOP,PY,CW,RH,boostNames,arenaWalls,isObjective,attackZones};
+root.RealmsEngine={Game,sweep,rng,W,H,LEFT,RIGHT,TOP,PY,CW,RH,boostNames,arenaWalls,isObjective,attackZones,SUPPORT_CONFIG};
 if(typeof module!=='undefined')module.exports=root.RealmsEngine;
 })(typeof window!=='undefined'?window:globalThis);
 

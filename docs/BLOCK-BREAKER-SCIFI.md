@@ -46,3 +46,7 @@ Validation: 12 DOM integration checks pass, including selected sector, one detai
 ## Campaign follow-up
 
 The 96-level rebuild now changes simulation, layouts, progression tuning and fair boss telegraphs as documented in `BLOCK-BREAKER-LEVEL-DESIGN-V3.md`. The earlier statement that simulation was unchanged applies only to the original art/UI pass. The offline Level Lab provides before/after blockouts and direct practice access to each current stage. Five raster texture budgets remain unchanged.
+
+### Optional campaign choices
+
+See `BLOCK-BREAKER-CHOICES-V4.md` and `block-choice-tuning.csv` for the 18 salvage routes, 96 optional mastery goals, and post-boss one-use support. All numerical tuning is provisional pending human playtests. Level Lab includes practice-only support simulation.

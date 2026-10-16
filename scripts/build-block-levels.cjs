@@ -70,9 +70,14 @@ for(let index=0;index<96;index++){
  level.booster_pool={...old.booster_pool,drop_rate:{normal:.065,hard:.085,steel:.12,chest:1},pity_after:20,bad_chance:r===0?0:Math.min(.12,.04+r*.015),drop_cooldown_sec:5,drop_budget:boss?7:Math.max(3,Math.min(10,Math.floor(level.bricks_to_clear/12)))};
  level.booster_pool.good={...old.booster_pool.good};delete level.booster_pool.good.extra_life;delete level.booster_pool.good.magnet;if(r===0&&k<3)level.booster_pool.good={big_paddle:4,multi_ball:4,slow_ball:2,shield:2};
  level.booster_pool.bad=r<2?{small_paddle:1}:r<4?{small_paddle:2,fast_ball:1,heavy_paddle:1}:{small_paddle:2,fast_ball:1,heavy_paddle:1,reverse:1};
+ // Optional mechanics do not change the main grid or clear target budget.
+ const masteryType=chains.length?'reaction':isPrecision||boss?'perfect':k%3===0?'volley':'combo';
+ level.mastery={id:'mastery-'+level.id,type:masteryType,target:masteryType==='reaction'?4:masteryType==='perfect'?3+Math.floor(r/2):masteryType==='volley'?Math.min(10,5+r):8+r*2,reward_xu:10+r*2};
+ delete level.side_route;
+ if(!boss&&[3,7,11].includes(k)){const cacheW=Math.min(40,cw-2),cacheH=24,isLeft=(r+k)%2===0,cacheX=isLeft?left+5:480-left-cacheW-5,cacheY=Math.min(452,112+rows*rh+16);level.side_route={id:'salvage-'+level.id,cache:{x:cacheX,y:cacheY,w:cacheW,h:cacheH},side:isLeft?'left':'right',booster:['shield','multi_ball','big_paddle'][Math.floor((k-3)/4)],windup_sec:1.25,deflector_sec:9,deflector_range:18,reward_xu:12+r*2};}
  D.levels[index]=level;
 }
-D.version='3.0-orbital-levels';D.grid_cols='per-level';D.campaign_design={revision:3,arena_shapes:shapes,cols:[9,14],normal_target_sec:[65,250],notes:'Targets are design budgets until bot/human calibration; three lives in campaign precision trials.'};fs.writeFileSync(file,JSON.stringify(D));
+D.version='3.1-orbital-choices';D.grid_cols='per-level';D.campaign_design={revision:3,arena_shapes:shapes,cols:[9,14],normal_target_sec:[65,250],notes:'Targets are design budgets until bot/human calibration; three lives in campaign precision trials.'};fs.writeFileSync(file,JSON.stringify(D));
 // Synchronize embedded runtime data without dropping the atlas/skin compatibility metadata.
 const vm=require('vm'),context={window:{}};vm.runInNewContext(fs.readFileSync(root+'/data.js','utf8'),context);context.window.REALMS_DATA.levels=D;fs.writeFileSync(root+'/data.js','window.REALMS_DATA='+JSON.stringify(context.window.REALMS_DATA)+';\n');
 console.log(D.levels.map(l=>({id:l.id,blocks:l.bricks_to_clear,hits:l.hit_budget,cols:l.grid.cols,rows:l.grid.rows,shape:l.arena.shape,par:l.par_time_sec})).filter((l,i)=>i%16===0||i%16===14||i%16===15));
