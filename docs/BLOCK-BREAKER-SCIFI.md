@@ -42,3 +42,7 @@ The five-entry fixed navigation dock uses consistent SVG controls plus short Vie
 Game controls now use pause/launch/energy icons. Inventory categories, tasks, modes, resource counters and state indicators share the same icon language and beveled metal surfaces. Tasks show objective, progress, reward and claim icon; mode descriptions are expandable. No additional raster textures were loaded; six reusable sector canvases, a preview and a drone are at most about 1.3 MiB of UI canvas storage. The renderer texture budget remains unchanged.
 
 Validation: 12 DOM integration checks pass, including selected sector, one detail panel, locked play, sixteen locked mission sockets and all navigation labels. Existing gameplay/progression, practice reward protection, shop ownership, launcher pause/mute and daily claim checks pass. Native Canvas2D frame/skin/booster checks pass after adapting the UI test fixture. Browser layout and actual device testing remain unverified: no browser-control skill is available in this environment. No production merge or deployment was performed.
+
+## Campaign follow-up
+
+The 96-level rebuild now changes simulation, layouts, progression tuning and fair boss telegraphs as documented in `BLOCK-BREAKER-LEVEL-DESIGN-V3.md`. The earlier statement that simulation was unchanged applies only to the original art/UI pass. The offline Level Lab provides before/after blockouts and direct practice access to each current stage. Five raster texture budgets remain unchanged.

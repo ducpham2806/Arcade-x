@@ -1,0 +1,1135 @@
+{
+  "checks": "96 layouts: cell bounds, no brick/wall/moving sweep overlap, target reachability, metadata references, campaign ramp",
+  "chapters": [
+    {
+      "chapter": 1,
+      "blocks": [
+        36,
+        53
+      ],
+      "meanBlocks": 44.3,
+      "par": [
+        66,
+        112
+      ]
+    },
+    {
+      "chapter": 2,
+      "blocks": [
+        48,
+        65
+      ],
+      "meanBlocks": 55.9,
+      "par": [
+        79,
+        125
+      ]
+    },
+    {
+      "chapter": 3,
+      "blocks": [
+        60,
+        82
+      ],
+      "meanBlocks": 70.1,
+      "par": [
+        92,
+        139
+      ]
+    },
+    {
+      "chapter": 4,
+      "blocks": [
+        72,
+        94
+      ],
+      "meanBlocks": 82.1,
+      "par": [
+        106,
+        155
+      ]
+    },
+    {
+      "chapter": 5,
+      "blocks": [
+        84,
+        106
+      ],
+      "meanBlocks": 94.1,
+      "par": [
+        122,
+        169
+      ]
+    },
+    {
+      "chapter": 6,
+      "blocks": [
+        96,
+        118
+      ],
+      "meanBlocks": 106.1,
+      "par": [
+        137,
+        186
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "id": "L1-01",
+      "blocks": 36,
+      "hits": 38,
+      "cols": 9,
+      "rows": 7,
+      "width": 384,
+      "shape": "open",
+      "par": 66,
+      "minReactionGap": 337
+    },
+    {
+      "id": "L1-02",
+      "blocks": 37,
+      "hits": 39,
+      "cols": 9,
+      "rows": 7,
+      "width": 384,
+      "shape": "open",
+      "par": 69,
+      "minReactionGap": 337
+    },
+    {
+      "id": "L1-03",
+      "blocks": 39,
+      "hits": 41,
+      "cols": 9,
+      "rows": 7,
+      "width": 384,
+      "shape": "open",
+      "par": 72,
+      "minReactionGap": 337
+    },
+    {
+      "id": "L1-04",
+      "blocks": 37,
+      "hits": 39,
+      "cols": 9,
+      "rows": 7,
+      "width": 384,
+      "shape": "chamfer",
+      "par": 75,
+      "minReactionGap": 337
+    },
+    {
+      "id": "L1-05",
+      "blocks": 37,
+      "hits": 39,
+      "cols": 9,
+      "rows": 7,
+      "width": 384,
+      "shape": "chamfer",
+      "par": 79,
+      "minReactionGap": 337
+    },
+    {
+      "id": "L1-06",
+      "blocks": 37,
+      "hits": 39,
+      "cols": 9,
+      "rows": 7,
+      "width": 388,
+      "shape": "chamfer",
+      "par": 82,
+      "minReactionGap": 337
+    },
+    {
+      "id": "L1-07",
+      "blocks": 45,
+      "hits": 48,
+      "cols": 9,
+      "rows": 8,
+      "width": 388,
+      "shape": "stepped",
+      "par": 85,
+      "minReactionGap": 309
+    },
+    {
+      "id": "L1-08",
+      "blocks": 45,
+      "hits": 48,
+      "cols": 9,
+      "rows": 8,
+      "width": 388,
+      "shape": "stepped",
+      "par": 89,
+      "minReactionGap": 309
+    },
+    {
+      "id": "L1-09",
+      "blocks": 45,
+      "hits": 48,
+      "cols": 9,
+      "rows": 8,
+      "width": 388,
+      "shape": "stepped",
+      "par": 92,
+      "minReactionGap": 309
+    },
+    {
+      "id": "L1-10",
+      "blocks": 47,
+      "hits": 51,
+      "cols": 9,
+      "rows": 8,
+      "width": 388,
+      "shape": "waist",
+      "par": 95,
+      "minReactionGap": 309
+    },
+    {
+      "id": "L1-11",
+      "blocks": 48,
+      "hits": 52,
+      "cols": 9,
+      "rows": 8,
+      "width": 392,
+      "shape": "waist",
+      "par": 99,
+      "minReactionGap": 309
+    },
+    {
+      "id": "L1-12",
+      "blocks": 53,
+      "hits": 57,
+      "cols": 9,
+      "rows": 9,
+      "width": 392,
+      "shape": "waist",
+      "par": 102,
+      "minReactionGap": 281
+    },
+    {
+      "id": "L1-13",
+      "blocks": 53,
+      "hits": 57,
+      "cols": 9,
+      "rows": 9,
+      "width": 392,
+      "shape": "reactor",
+      "par": 105,
+      "minReactionGap": 281
+    },
+    {
+      "id": "L1-14",
+      "blocks": 53,
+      "hits": 58,
+      "cols": 9,
+      "rows": 9,
+      "width": 392,
+      "shape": "reactor",
+      "par": 109,
+      "minReactionGap": 281
+    },
+    {
+      "id": "L1-15",
+      "blocks": 53,
+      "hits": 58,
+      "cols": 9,
+      "rows": 9,
+      "width": 392,
+      "shape": "reactor",
+      "par": 112,
+      "minReactionGap": 281
+    },
+    {
+      "id": "L1-16",
+      "blocks": 24,
+      "hits": 44,
+      "cols": 9,
+      "rows": 4,
+      "width": 396,
+      "shape": "open",
+      "par": 120,
+      "minReactionGap": 429
+    },
+    {
+      "id": "L2-01",
+      "blocks": 48,
+      "hits": 52,
+      "cols": 10,
+      "rows": 8,
+      "width": 392,
+      "shape": "chamfer",
+      "par": 79,
+      "minReactionGap": 317
+    },
+    {
+      "id": "L2-02",
+      "blocks": 49,
+      "hits": 53,
+      "cols": 10,
+      "rows": 8,
+      "width": 392,
+      "shape": "chamfer",
+      "par": 82,
+      "minReactionGap": 317
+    },
+    {
+      "id": "L2-03",
+      "blocks": 51,
+      "hits": 56,
+      "cols": 10,
+      "rows": 8,
+      "width": 392,
+      "shape": "chamfer",
+      "par": 85,
+      "minReactionGap": 317
+    },
+    {
+      "id": "L2-04",
+      "blocks": 48,
+      "hits": 52,
+      "cols": 10,
+      "rows": 8,
+      "width": 392,
+      "shape": "stepped",
+      "par": 88,
+      "minReactionGap": 317
+    },
+    {
+      "id": "L2-05",
+      "blocks": 48,
+      "hits": 52,
+      "cols": 10,
+      "rows": 8,
+      "width": 392,
+      "shape": "stepped",
+      "par": 91,
+      "minReactionGap": 317
+    },
+    {
+      "id": "L2-06",
+      "blocks": 48,
+      "hits": 53,
+      "cols": 10,
+      "rows": 8,
+      "width": 396,
+      "shape": "stepped",
+      "par": 95,
+      "minReactionGap": 317
+    },
+    {
+      "id": "L2-07",
+      "blocks": 57,
+      "hits": 63,
+      "cols": 10,
+      "rows": 9,
+      "width": 396,
+      "shape": "waist",
+      "par": 99,
+      "minReactionGap": 290
+    },
+    {
+      "id": "L2-08",
+      "blocks": 59,
+      "hits": 65,
+      "cols": 10,
+      "rows": 9,
+      "width": 396,
+      "shape": "waist",
+      "par": 102,
+      "minReactionGap": 290
+    },
+    {
+      "id": "L2-09",
+      "blocks": 60,
+      "hits": 66,
+      "cols": 10,
+      "rows": 9,
+      "width": 396,
+      "shape": "waist",
+      "par": 105,
+      "minReactionGap": 290
+    },
+    {
+      "id": "L2-10",
+      "blocks": 59,
+      "hits": 65,
+      "cols": 10,
+      "rows": 9,
+      "width": 396,
+      "shape": "reactor",
+      "par": 108,
+      "minReactionGap": 290
+    },
+    {
+      "id": "L2-11",
+      "blocks": 60,
+      "hits": 66,
+      "cols": 10,
+      "rows": 9,
+      "width": 400,
+      "shape": "reactor",
+      "par": 111,
+      "minReactionGap": 290
+    },
+    {
+      "id": "L2-12",
+      "blocks": 65,
+      "hits": 72,
+      "cols": 10,
+      "rows": 10,
+      "width": 400,
+      "shape": "reactor",
+      "par": 115,
+      "minReactionGap": 263
+    },
+    {
+      "id": "L2-13",
+      "blocks": 62,
+      "hits": 69,
+      "cols": 10,
+      "rows": 10,
+      "width": 400,
+      "shape": "hangar",
+      "par": 118,
+      "minReactionGap": 263
+    },
+    {
+      "id": "L2-14",
+      "blocks": 62,
+      "hits": 69,
+      "cols": 10,
+      "rows": 10,
+      "width": 400,
+      "shape": "hangar",
+      "par": 121,
+      "minReactionGap": 263
+    },
+    {
+      "id": "L2-15",
+      "blocks": 62,
+      "hits": 69,
+      "cols": 10,
+      "rows": 10,
+      "width": 400,
+      "shape": "hangar",
+      "par": 125,
+      "minReactionGap": 263
+    },
+    {
+      "id": "L2-16",
+      "blocks": 28,
+      "hits": 54,
+      "cols": 10,
+      "rows": 4,
+      "width": 404,
+      "shape": "open",
+      "par": 136,
+      "minReactionGap": 429
+    },
+    {
+      "id": "L3-01",
+      "blocks": 60,
+      "hits": 67,
+      "cols": 11,
+      "rows": 9,
+      "width": 400,
+      "shape": "stepped",
+      "par": 92,
+      "minReactionGap": 299
+    },
+    {
+      "id": "L3-02",
+      "blocks": 61,
+      "hits": 68,
+      "cols": 11,
+      "rows": 9,
+      "width": 400,
+      "shape": "stepped",
+      "par": 95,
+      "minReactionGap": 299
+    },
+    {
+      "id": "L3-03",
+      "blocks": 63,
+      "hits": 70,
+      "cols": 11,
+      "rows": 9,
+      "width": 400,
+      "shape": "stepped",
+      "par": 98,
+      "minReactionGap": 299
+    },
+    {
+      "id": "L3-04",
+      "blocks": 64,
+      "hits": 72,
+      "cols": 11,
+      "rows": 9,
+      "width": 400,
+      "shape": "waist",
+      "par": 102,
+      "minReactionGap": 299
+    },
+    {
+      "id": "L3-05",
+      "blocks": 62,
+      "hits": 69,
+      "cols": 11,
+      "rows": 9,
+      "width": 400,
+      "shape": "waist",
+      "par": 105,
+      "minReactionGap": 299
+    },
+    {
+      "id": "L3-06",
+      "blocks": 68,
+      "hits": 80,
+      "cols": 11,
+      "rows": 9,
+      "width": 404,
+      "shape": "waist",
+      "par": 110,
+      "minReactionGap": 299
+    },
+    {
+      "id": "L3-07",
+      "blocks": 69,
+      "hits": 78,
+      "cols": 11,
+      "rows": 10,
+      "width": 404,
+      "shape": "reactor",
+      "par": 112,
+      "minReactionGap": 273
+    },
+    {
+      "id": "L3-08",
+      "blocks": 71,
+      "hits": 80,
+      "cols": 11,
+      "rows": 10,
+      "width": 404,
+      "shape": "reactor",
+      "par": 115,
+      "minReactionGap": 273
+    },
+    {
+      "id": "L3-09",
+      "blocks": 72,
+      "hits": 81,
+      "cols": 11,
+      "rows": 10,
+      "width": 404,
+      "shape": "reactor",
+      "par": 118,
+      "minReactionGap": 273
+    },
+    {
+      "id": "L3-10",
+      "blocks": 71,
+      "hits": 80,
+      "cols": 11,
+      "rows": 10,
+      "width": 404,
+      "shape": "hangar",
+      "par": 121,
+      "minReactionGap": 273
+    },
+    {
+      "id": "L3-11",
+      "blocks": 72,
+      "hits": 82,
+      "cols": 11,
+      "rows": 10,
+      "width": 408,
+      "shape": "hangar",
+      "par": 125,
+      "minReactionGap": 273
+    },
+    {
+      "id": "L3-12",
+      "blocks": 77,
+      "hits": 91,
+      "cols": 11,
+      "rows": 11,
+      "width": 408,
+      "shape": "hangar",
+      "par": 130,
+      "minReactionGap": 247
+    },
+    {
+      "id": "L3-13",
+      "blocks": 79,
+      "hits": 90,
+      "cols": 11,
+      "rows": 11,
+      "width": 408,
+      "shape": "open",
+      "par": 132,
+      "minReactionGap": 247
+    },
+    {
+      "id": "L3-14",
+      "blocks": 80,
+      "hits": 91,
+      "cols": 11,
+      "rows": 11,
+      "width": 408,
+      "shape": "open",
+      "par": 135,
+      "minReactionGap": 247
+    },
+    {
+      "id": "L3-15",
+      "blocks": 82,
+      "hits": 94,
+      "cols": 11,
+      "rows": 11,
+      "width": 408,
+      "shape": "open",
+      "par": 139,
+      "minReactionGap": 247
+    },
+    {
+      "id": "L3-16",
+      "blocks": 32,
+      "hits": 64,
+      "cols": 11,
+      "rows": 4,
+      "width": 412,
+      "shape": "open",
+      "par": 152,
+      "minReactionGap": 429
+    },
+    {
+      "id": "L4-01",
+      "blocks": 72,
+      "hits": 85,
+      "cols": 12,
+      "rows": 10,
+      "width": 408,
+      "shape": "waist",
+      "par": 106,
+      "minReactionGap": 283
+    },
+    {
+      "id": "L4-02",
+      "blocks": 73,
+      "hits": 86,
+      "cols": 12,
+      "rows": 10,
+      "width": 408,
+      "shape": "waist",
+      "par": 109,
+      "minReactionGap": 283
+    },
+    {
+      "id": "L4-03",
+      "blocks": 75,
+      "hits": 89,
+      "cols": 12,
+      "rows": 10,
+      "width": 408,
+      "shape": "waist",
+      "par": 113,
+      "minReactionGap": 283
+    },
+    {
+      "id": "L4-04",
+      "blocks": 76,
+      "hits": 90,
+      "cols": 12,
+      "rows": 10,
+      "width": 408,
+      "shape": "reactor",
+      "par": 116,
+      "minReactionGap": 283
+    },
+    {
+      "id": "L4-05",
+      "blocks": 74,
+      "hits": 88,
+      "cols": 12,
+      "rows": 10,
+      "width": 408,
+      "shape": "reactor",
+      "par": 119,
+      "minReactionGap": 283
+    },
+    {
+      "id": "L4-06",
+      "blocks": 80,
+      "hits": 99,
+      "cols": 12,
+      "rows": 10,
+      "width": 412,
+      "shape": "reactor",
+      "par": 125,
+      "minReactionGap": 283
+    },
+    {
+      "id": "L4-07",
+      "blocks": 81,
+      "hits": 96,
+      "cols": 12,
+      "rows": 11,
+      "width": 412,
+      "shape": "hangar",
+      "par": 126,
+      "minReactionGap": 258
+    },
+    {
+      "id": "L4-08",
+      "blocks": 83,
+      "hits": 99,
+      "cols": 12,
+      "rows": 11,
+      "width": 412,
+      "shape": "hangar",
+      "par": 130,
+      "minReactionGap": 258
+    },
+    {
+      "id": "L4-09",
+      "blocks": 84,
+      "hits": 103,
+      "cols": 12,
+      "rows": 11,
+      "width": 412,
+      "shape": "hangar",
+      "par": 134,
+      "minReactionGap": 258
+    },
+    {
+      "id": "L4-10",
+      "blocks": 83,
+      "hits": 99,
+      "cols": 12,
+      "rows": 11,
+      "width": 412,
+      "shape": "open",
+      "par": 136,
+      "minReactionGap": 258
+    },
+    {
+      "id": "L4-11",
+      "blocks": 84,
+      "hits": 103,
+      "cols": 12,
+      "rows": 11,
+      "width": 416,
+      "shape": "open",
+      "par": 141,
+      "minReactionGap": 258
+    },
+    {
+      "id": "L4-12",
+      "blocks": 89,
+      "hits": 113,
+      "cols": 12,
+      "rows": 12,
+      "width": 416,
+      "shape": "open",
+      "par": 146,
+      "minReactionGap": 233
+    },
+    {
+      "id": "L4-13",
+      "blocks": 91,
+      "hits": 112,
+      "cols": 12,
+      "rows": 12,
+      "width": 416,
+      "shape": "chamfer",
+      "par": 148,
+      "minReactionGap": 233
+    },
+    {
+      "id": "L4-14",
+      "blocks": 92,
+      "hits": 113,
+      "cols": 12,
+      "rows": 12,
+      "width": 416,
+      "shape": "chamfer",
+      "par": 151,
+      "minReactionGap": 233
+    },
+    {
+      "id": "L4-15",
+      "blocks": 94,
+      "hits": 116,
+      "cols": 12,
+      "rows": 12,
+      "width": 416,
+      "shape": "chamfer",
+      "par": 155,
+      "minReactionGap": 233
+    },
+    {
+      "id": "L4-16",
+      "blocks": 36,
+      "hits": 75,
+      "cols": 12,
+      "rows": 4,
+      "width": 420,
+      "shape": "open",
+      "par": 168,
+      "minReactionGap": 429
+    },
+    {
+      "id": "L5-01",
+      "blocks": 84,
+      "hits": 107,
+      "cols": 13,
+      "rows": 11,
+      "width": 416,
+      "shape": "reactor",
+      "par": 122,
+      "minReactionGap": 269
+    },
+    {
+      "id": "L5-02",
+      "blocks": 85,
+      "hits": 108,
+      "cols": 13,
+      "rows": 11,
+      "width": 416,
+      "shape": "reactor",
+      "par": 125,
+      "minReactionGap": 269
+    },
+    {
+      "id": "L5-03",
+      "blocks": 87,
+      "hits": 111,
+      "cols": 13,
+      "rows": 11,
+      "width": 416,
+      "shape": "reactor",
+      "par": 129,
+      "minReactionGap": 269
+    },
+    {
+      "id": "L5-04",
+      "blocks": 88,
+      "hits": 112,
+      "cols": 13,
+      "rows": 11,
+      "width": 416,
+      "shape": "hangar",
+      "par": 132,
+      "minReactionGap": 269
+    },
+    {
+      "id": "L5-05",
+      "blocks": 86,
+      "hits": 110,
+      "cols": 13,
+      "rows": 11,
+      "width": 416,
+      "shape": "hangar",
+      "par": 135,
+      "minReactionGap": 269
+    },
+    {
+      "id": "L5-06",
+      "blocks": 92,
+      "hits": 121,
+      "cols": 13,
+      "rows": 11,
+      "width": 420,
+      "shape": "hangar",
+      "par": 141,
+      "minReactionGap": 269
+    },
+    {
+      "id": "L5-07",
+      "blocks": 93,
+      "hits": 118,
+      "cols": 13,
+      "rows": 12,
+      "width": 420,
+      "shape": "open",
+      "par": 142,
+      "minReactionGap": 245
+    },
+    {
+      "id": "L5-08",
+      "blocks": 95,
+      "hits": 121,
+      "cols": 13,
+      "rows": 12,
+      "width": 420,
+      "shape": "open",
+      "par": 146,
+      "minReactionGap": 245
+    },
+    {
+      "id": "L5-09",
+      "blocks": 96,
+      "hits": 122,
+      "cols": 13,
+      "rows": 12,
+      "width": 420,
+      "shape": "open",
+      "par": 149,
+      "minReactionGap": 245
+    },
+    {
+      "id": "L5-10",
+      "blocks": 95,
+      "hits": 121,
+      "cols": 13,
+      "rows": 12,
+      "width": 420,
+      "shape": "chamfer",
+      "par": 152,
+      "minReactionGap": 245
+    },
+    {
+      "id": "L5-11",
+      "blocks": 96,
+      "hits": 123,
+      "cols": 13,
+      "rows": 12,
+      "width": 424,
+      "shape": "chamfer",
+      "par": 156,
+      "minReactionGap": 245
+    },
+    {
+      "id": "L5-12",
+      "blocks": 101,
+      "hits": 133,
+      "cols": 13,
+      "rows": 13,
+      "width": 424,
+      "shape": "chamfer",
+      "par": 161,
+      "minReactionGap": 221
+    },
+    {
+      "id": "L5-13",
+      "blocks": 103,
+      "hits": 131,
+      "cols": 13,
+      "rows": 13,
+      "width": 424,
+      "shape": "stepped",
+      "par": 163,
+      "minReactionGap": 221
+    },
+    {
+      "id": "L5-14",
+      "blocks": 104,
+      "hits": 133,
+      "cols": 13,
+      "rows": 13,
+      "width": 424,
+      "shape": "stepped",
+      "par": 166,
+      "minReactionGap": 221
+    },
+    {
+      "id": "L5-15",
+      "blocks": 106,
+      "hits": 135,
+      "cols": 13,
+      "rows": 13,
+      "width": 424,
+      "shape": "stepped",
+      "par": 169,
+      "minReactionGap": 221
+    },
+    {
+      "id": "L5-16",
+      "blocks": 40,
+      "hits": 89,
+      "cols": 13,
+      "rows": 4,
+      "width": 428,
+      "shape": "open",
+      "par": 184,
+      "minReactionGap": 429
+    },
+    {
+      "id": "L6-01",
+      "blocks": 96,
+      "hits": 126,
+      "cols": 14,
+      "rows": 12,
+      "width": 424,
+      "shape": "hangar",
+      "par": 137,
+      "minReactionGap": 257
+    },
+    {
+      "id": "L6-02",
+      "blocks": 97,
+      "hits": 128,
+      "cols": 14,
+      "rows": 12,
+      "width": 424,
+      "shape": "hangar",
+      "par": 141,
+      "minReactionGap": 257
+    },
+    {
+      "id": "L6-03",
+      "blocks": 99,
+      "hits": 130,
+      "cols": 14,
+      "rows": 12,
+      "width": 424,
+      "shape": "hangar",
+      "par": 144,
+      "minReactionGap": 257
+    },
+    {
+      "id": "L6-04",
+      "blocks": 100,
+      "hits": 132,
+      "cols": 14,
+      "rows": 12,
+      "width": 424,
+      "shape": "open",
+      "par": 147,
+      "minReactionGap": 257
+    },
+    {
+      "id": "L6-05",
+      "blocks": 98,
+      "hits": 129,
+      "cols": 14,
+      "rows": 12,
+      "width": 424,
+      "shape": "open",
+      "par": 150,
+      "minReactionGap": 257
+    },
+    {
+      "id": "L6-06",
+      "blocks": 104,
+      "hits": 141,
+      "cols": 14,
+      "rows": 12,
+      "width": 428,
+      "shape": "open",
+      "par": 156,
+      "minReactionGap": 257
+    },
+    {
+      "id": "L6-07",
+      "blocks": 105,
+      "hits": 141,
+      "cols": 14,
+      "rows": 13,
+      "width": 428,
+      "shape": "chamfer",
+      "par": 159,
+      "minReactionGap": 234
+    },
+    {
+      "id": "L6-08",
+      "blocks": 107,
+      "hits": 144,
+      "cols": 14,
+      "rows": 13,
+      "width": 428,
+      "shape": "chamfer",
+      "par": 162,
+      "minReactionGap": 234
+    },
+    {
+      "id": "L6-09",
+      "blocks": 108,
+      "hits": 145,
+      "cols": 14,
+      "rows": 13,
+      "width": 428,
+      "shape": "chamfer",
+      "par": 165,
+      "minReactionGap": 234
+    },
+    {
+      "id": "L6-10",
+      "blocks": 107,
+      "hits": 144,
+      "cols": 14,
+      "rows": 13,
+      "width": 428,
+      "shape": "stepped",
+      "par": 169,
+      "minReactionGap": 234
+    },
+    {
+      "id": "L6-11",
+      "blocks": 108,
+      "hits": 146,
+      "cols": 14,
+      "rows": 13,
+      "width": 432,
+      "shape": "stepped",
+      "par": 172,
+      "minReactionGap": 234
+    },
+    {
+      "id": "L6-12",
+      "blocks": 113,
+      "hits": 156,
+      "cols": 14,
+      "rows": 14,
+      "width": 432,
+      "shape": "stepped",
+      "par": 177,
+      "minReactionGap": 211
+    },
+    {
+      "id": "L6-13",
+      "blocks": 115,
+      "hits": 155,
+      "cols": 14,
+      "rows": 14,
+      "width": 432,
+      "shape": "waist",
+      "par": 179,
+      "minReactionGap": 211
+    },
+    {
+      "id": "L6-14",
+      "blocks": 116,
+      "hits": 156,
+      "cols": 14,
+      "rows": 14,
+      "width": 432,
+      "shape": "waist",
+      "par": 183,
+      "minReactionGap": 211
+    },
+    {
+      "id": "L6-15",
+      "blocks": 118,
+      "hits": 159,
+      "cols": 14,
+      "rows": 14,
+      "width": 432,
+      "shape": "waist",
+      "par": 186,
+      "minReactionGap": 211
+    },
+    {
+      "id": "L6-16",
+      "blocks": 44,
+      "hits": 102,
+      "cols": 14,
+      "rows": 4,
+      "width": 432,
+      "shape": "open",
+      "par": 200,
+      "minReactionGap": 429
+    }
+  ]
+}
