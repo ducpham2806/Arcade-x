@@ -5,5 +5,5 @@ const result=await build({entryPoints:['scripts/eat-journey-review.tsx'],bundle:
 const js=result.outputFiles.find(f=>f.path.endsWith('.js')).text;
 const css=result.outputFiles.find(f=>f.path.endsWith('.css')).text;
 let html=await readFile('eat-review.html','utf8');
-html=html.replace('</head>',`<style>${css}</style></head>`).replace('<script type="module" src="/scripts/eat-journey-review.tsx"></script>',`<script>${js.replaceAll('</script','<\\/script')}</script>`);
+html=html.replace('</head>',()=>`<style>${css}</style></head>`).replace('<script type="module" src="/scripts/eat-journey-review.tsx"></script>',()=>`<script>${js.replaceAll('</script','<\\/script')}</script>`);
 await writeFile(output,html);console.log(output);
