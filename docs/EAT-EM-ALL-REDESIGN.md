@@ -47,7 +47,7 @@ Các trụ cột: đọc được trước khi phản xạ; lựa chọn có đ�
 
 `arcadex_eat_journey_v2` lưu màn mở, sao, bùa trên trình duyệt. Giữ nguyên khóa v1; lấy mốc mở cũ khi chưa có v2, không chuyển sao cũ vì luật qua màn đã thay đổi. Tiến trình v2 chưa đồng bộ tài khoản/cloud. Skin lấy từ bridge hiện tại. Sinh tồn và 60 giây vẫn có thể chơi từ tab riêng. Bản review dùng bridge giả nên không trao tiền/XP vào tài khoản.
 
-Bản này dùng lại phần vẽ Canvas và âm thanh tổng hợp, bổ sung nhân vật đại diện Nốm trên bản đồ bằng CSS. Boss hiện thể hiện bằng tên, cảnh báo lõi, giáp và cửa phản công; chưa có spritesheet boss riêng hay cutscene. Sáu pattern là ngữ pháp đường rơi trong game hứng ngang, không phải địa hình di chuyển tự do.
+Art v3 thay toàn bộ phần vẽ bằng asset SVG gốc: Nốm 18 biến thể, bốn thủ vệ × ba trạng thái, 29 biểu tượng. Nền minh họa bốn vùng được tạo riêng, chuyển WebP 169 KiB. UI và Canvas dùng chung nguồn asset. Vẫn dùng âm thanh tổng hợp; chưa có cutscene hoặc âm thanh mới. Sáu pattern là ngữ pháp đường rơi trong game hứng ngang, không phải địa hình di chuyển tự do.
 
 ## Xác minh đã chạy
 
@@ -59,3 +59,5 @@ Bản này dùng lại phần vẽ Canvas và âm thanh tổng hợp, bổ sung 
 ## Changelog
 
 2026-10-17: thay chiến dịch 12 màn bằng 24 màn có truyện, deficit-driven spawns, mục tiêu chính xác, boss theo pha, cứu linh hồn, Fury thủ công, bùa, ba sao, thưởng lần đầu, UI điện thoại và desktop; giữ bản live nguyên trạng chờ duyệt.
+
+2026-10-17, Art v3: hình ảnh fantasy thống nhất, các trạng thái nhân vật/boss, vật phẩm và booster riêng, bản đồ có đường hành trình, Sổ linh thú, giao diện viền đồng/giấy cổ, xuất 59 SVG và manifest. Kiểm tra thêm native Canvas2D trong ba chương, có thực thi hứng vật phẩm. Chưa kiểm tra bố cục CSS trong trình duyệt thật hay đo GPU trên điện thoại.

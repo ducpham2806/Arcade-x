@@ -1,0 +1,718 @@
+{
+  "version": 3,
+  "style": "storybook-fantasy",
+  "lighting": "upper-left",
+  "background": "world.webp",
+  "assets": [
+    {
+      "id": "ice",
+      "file": "svg/ice.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1207
+    },
+    {
+      "id": "fire",
+      "file": "svg/fire.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1250
+    },
+    {
+      "id": "star",
+      "file": "svg/star.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1200
+    },
+    {
+      "id": "gem",
+      "file": "svg/gem.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1174
+    },
+    {
+      "id": "heart",
+      "file": "svg/heart.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1192
+    },
+    {
+      "id": "bomb",
+      "file": "svg/bomb.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1378
+    },
+    {
+      "id": "poison",
+      "file": "svg/poison.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1305
+    },
+    {
+      "id": "fury_pill",
+      "file": "svg/fury_pill.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1051
+    },
+    {
+      "id": "power_shield",
+      "file": "svg/power_shield.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1175
+    },
+    {
+      "id": "power_magnet",
+      "file": "svg/power_magnet.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1145
+    },
+    {
+      "id": "power_speed",
+      "file": "svg/power_speed.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1159
+    },
+    {
+      "id": "power_slowmo",
+      "file": "svg/power_slowmo.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1210
+    },
+    {
+      "id": "seed",
+      "file": "svg/seed.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1157
+    },
+    {
+      "id": "ember",
+      "file": "svg/ember.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1250
+    },
+    {
+      "id": "memory",
+      "file": "svg/memory.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1126
+    },
+    {
+      "id": "void",
+      "file": "svg/void.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1135
+    },
+    {
+      "id": "lock",
+      "file": "svg/lock.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1191
+    },
+    {
+      "id": "play",
+      "file": "svg/play.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 992
+    },
+    {
+      "id": "pause",
+      "file": "svg/pause.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1057
+    },
+    {
+      "id": "map",
+      "file": "svg/map.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1208
+    },
+    {
+      "id": "infinity",
+      "file": "svg/infinity.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1062
+    },
+    {
+      "id": "clock",
+      "file": "svg/clock.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1210
+    },
+    {
+      "id": "arrow",
+      "file": "svg/arrow.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1052
+    },
+    {
+      "id": "sound",
+      "file": "svg/sound.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1092
+    },
+    {
+      "id": "muted",
+      "file": "svg/muted.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1069
+    },
+    {
+      "id": "close",
+      "file": "svg/close.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1024
+    },
+    {
+      "id": "check",
+      "file": "svg/check.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1043
+    },
+    {
+      "id": "crown",
+      "file": "svg/crown.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1090
+    },
+    {
+      "id": "book",
+      "file": "svg/book.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1117
+    },
+    {
+      "id": "nom-ice-idle",
+      "file": "svg/nom-ice-idle.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2027
+    },
+    {
+      "id": "nom-ice-eat",
+      "file": "svg/nom-ice-eat.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2167
+    },
+    {
+      "id": "nom-ice-hurt",
+      "file": "svg/nom-ice-hurt.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2095
+    },
+    {
+      "id": "nom-ice-happy",
+      "file": "svg/nom-ice-happy.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 1831
+    },
+    {
+      "id": "nom-ice-sleep",
+      "file": "svg/nom-ice-sleep.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 1845
+    },
+    {
+      "id": "nom-ice-fury",
+      "file": "svg/nom-ice-fury.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2257
+    },
+    {
+      "id": "nom-fire-idle",
+      "file": "svg/nom-fire-idle.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2027
+    },
+    {
+      "id": "nom-fire-eat",
+      "file": "svg/nom-fire-eat.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2167
+    },
+    {
+      "id": "nom-fire-hurt",
+      "file": "svg/nom-fire-hurt.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2095
+    },
+    {
+      "id": "nom-fire-happy",
+      "file": "svg/nom-fire-happy.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 1831
+    },
+    {
+      "id": "nom-fire-sleep",
+      "file": "svg/nom-fire-sleep.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 1845
+    },
+    {
+      "id": "nom-fire-fury",
+      "file": "svg/nom-fire-fury.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2257
+    },
+    {
+      "id": "nom-dual-idle",
+      "file": "svg/nom-dual-idle.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2027
+    },
+    {
+      "id": "nom-dual-eat",
+      "file": "svg/nom-dual-eat.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2167
+    },
+    {
+      "id": "nom-dual-hurt",
+      "file": "svg/nom-dual-hurt.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2095
+    },
+    {
+      "id": "nom-dual-happy",
+      "file": "svg/nom-dual-happy.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 1831
+    },
+    {
+      "id": "nom-dual-sleep",
+      "file": "svg/nom-dual-sleep.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 1845
+    },
+    {
+      "id": "nom-dual-fury",
+      "file": "svg/nom-dual-fury.svg",
+      "width": 256,
+      "height": 256,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 192,
+      "bytes": 2257
+    },
+    {
+      "id": "guardian-1-idle",
+      "file": "svg/guardian-1-idle.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1335
+    },
+    {
+      "id": "guardian-1-attack",
+      "file": "svg/guardian-1-attack.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1406
+    },
+    {
+      "id": "guardian-1-hurt",
+      "file": "svg/guardian-1-hurt.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1336
+    },
+    {
+      "id": "guardian-2-idle",
+      "file": "svg/guardian-2-idle.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1293
+    },
+    {
+      "id": "guardian-2-attack",
+      "file": "svg/guardian-2-attack.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1364
+    },
+    {
+      "id": "guardian-2-hurt",
+      "file": "svg/guardian-2-hurt.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1294
+    },
+    {
+      "id": "guardian-3-idle",
+      "file": "svg/guardian-3-idle.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1318
+    },
+    {
+      "id": "guardian-3-attack",
+      "file": "svg/guardian-3-attack.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1389
+    },
+    {
+      "id": "guardian-3-hurt",
+      "file": "svg/guardian-3-hurt.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1319
+    },
+    {
+      "id": "guardian-4-idle",
+      "file": "svg/guardian-4-idle.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1223
+    },
+    {
+      "id": "guardian-4-attack",
+      "file": "svg/guardian-4-attack.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1294
+    },
+    {
+      "id": "guardian-4-hurt",
+      "file": "svg/guardian-4-hurt.svg",
+      "width": 320,
+      "height": 320,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 256,
+      "bytes": 1224
+    }
+  ],
+  "worldBytes": 173044,
+  "sourceCount": 59
+}

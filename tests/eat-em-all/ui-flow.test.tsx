@@ -22,6 +22,11 @@ function props(){return (globalThis as any).__eatProps;}
 async function eat(type:string,n:number){await act(async()=>{for(let i=0;i<n;i++)props().onEatItem({id:i,type});});}
 async function tick(n:number){for(let i=0;i<n;i++){now+=100;await act(async()=>{for(const fn of [...timers.values()])fn();});}}
 assert.ok(text().includes('TRÁI TIM'));
+await click(button('Sổ linh thú'));
+assert.ok(document.querySelector('[role="dialog"][aria-label="Sổ linh thú"]'));
+assert.ok(document.querySelectorAll('.eat-artbook img').length>=22);
+await click(document.querySelector('[aria-label="Đóng sổ"]'));
+assert.equal(document.querySelector('.eat-artbook'),null);
 await click(button('CHƯƠNG 1'));
 await click(document.querySelectorAll('.eat-node')[0]);
 await click(button('LÊN ĐƯỜNG'));
