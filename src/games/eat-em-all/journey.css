@@ -16,3 +16,5 @@
 
 .eat-sequence-result[data-result-complete="true"] .eat-star-slot>.eat-art{animation:none}.eat-sequence-result[data-result-complete="true"] .eat-star-sparks{display:none}
 @container(max-height:650px){.eat-sequence-result{padding:8px 14px;gap:5px}.eat-sequence-result>.eat-art{max-height:65px}.eat-sequence-result>h2{font-size:23px}.eat-target-tally{min-height:31px;padding:2px 8px}.eat-result-targets{gap:4px}.eat-sequence-stars{min-height:48px}.eat-result-actions>.eat-primary{min-height:46px}.eat-sequence-result .eat-result-options .eat-icon-btn{width:35px;height:35px}}
+
+.eat-retry-hint{margin:0;text-align:center;font-size:12px;line-height:1.4;color:#d8e9dc;max-width:290px;align-self:center}

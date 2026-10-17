@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { ActivePowerUps, BackgroundTheme, ElementMode, FallingItem, ItemType, PowerUpType } from './types';
 import type { CampaignStage } from './campaign';
-import { bossPhase, planDrop } from './encounters';
+import { bossPhase, planDrop, safeDropLane } from './encounters';
 import { ART_SOURCES, artUrl, worldUrl } from './art';
 import { eatAudio } from './audio';
 import {AURAS} from './economy';
@@ -29,7 +29,7 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
   const [assetState,setAssetState]=useState<'loading'|'ready'|'fallback'>('loading');
   const artRef=useRef<Record<string,CanvasImageSource>>({});
   const body=useRef({x:180,target:180,y:360,r:42,chew:0,hurt:0,turn:0,prevElement:props.playerMode});
-  const game=useRef({time:0,lastSpawn:0,sequence:0,nextId:1,items:[] as FallingItem[],motes:[] as Mote[],labels:[] as Label[],keys:new Set<string>(),lastBossHits:0,bossHit:0,celebrationTime:0});
+  const game=useRef({time:0,nextSpawnAt:.65,sequence:0,nextId:1,items:[] as FallingItem[],motes:[] as Mote[],labels:[] as Label[],keys:new Set<string>(),lastBossHits:0,bossHit:0,celebrationTime:0});
 
   useEffect(()=>{eatAudio.setMuted(props.isMuted);},[props.isMuted]);
   useEffect(()=>{
@@ -67,13 +67,23 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
     const burst=(x:number,y:number,color:string,count=12)=>{const g=game.current;for(let i=0;i<count&&g.motes.length<MAX_PARTICLES;i++){const a=i/count*Math.PI*2;g.motes.push({x,y,vx:Math.cos(a)*(25+Math.random()*70),vy:Math.sin(a)*(25+Math.random()*70)-20,age:0,ttl:.4+Math.random()*.25,color,size:2+Math.random()*3});}};
     const label=(x:number,y:number,text:string,color='#fff1be')=>{const list=game.current.labels;if(list.length>=MAX_LABELS)list.shift();list.push({x,y,age:0,text,color});};
     const spawn=(width:number,height:number,p:EatEmAllCanvasProps)=>{
-      const g=game.current;if(g.items.length>=MAX_ITEMS)return;
-      let type:ItemType='ice',lane=2,drift=0,speed=p.speedMultiplier;
-      if(p.campaignStage){const counts=Object.fromEntries(Object.entries(p.campaignStage.targetItems).map(([k,n])=>[k,(n||0)-(p.remainingTargets?.[k as ItemType]||0)]));const plan=planDrop(p.campaignStage,g.sequence,counts,p.stageElapsed||0);type=plan.type;lane=plan.lane;drift=plan.drift;speed=plan.speed;}
-      else {const roll=Math.random();if(roll<p.bombChance)type='bomb';else if(roll<p.bombChance+p.poisonChance)type='poison';else if(roll<p.bombChance+p.poisonChance+(p.powerUpChance||.045))type=(['power_shield','power_magnet','power_speed','power_slowmo'] as ItemType[])[Math.floor(Math.random()*4)];else type=(['ice','fire','star','gem','fury_pill','heart'] as ItemType[])[Math.random()<.8?Math.floor(Math.random()*2):2+Math.floor(Math.random()*4)];lane=g.sequence%5;drift=(Math.random()-.5)*.3;}
-      const margin=Math.max(38,body.current.r);const x=margin+(width-margin*2)*lane/4;
-      // Flight includes the top entry zone; bosses are scenery, never collidable.
-      g.items.push({id:g.nextId++,x,y:-30,vx:drift*35,vy:(height-70)/3.1*speed,radius:type==='bomb'?23:20,type,rotation:0,rotSpeed:(g.sequence%2?1:-1)*.25,wobble:g.sequence, wobbleSpeed:1,scale:1,isEaten:false,alpha:1});g.sequence++;
+      const g=game.current;if(g.items.length>=MAX_ITEMS)return false;
+      let type:ItemType='ice',lane=2,drift=0,speed=p.speedMultiplier,warningLeft=0,speedClass:'slow'|'normal'|'fast'|'rush'='normal',beat='lead',flight=3.1/speed,interval=p.spawnIntervalMs;
+      const margin=Math.max(38,body.current.r);
+      if(p.campaignStage){
+        const counts=Object.fromEntries(Object.entries(p.campaignStage.targetItems).map(([k,n])=>[k,(n||0)-(p.remainingTargets?.[k as ItemType]||0)]));
+        const plan=planDrop(p.campaignStage,g.sequence,counts,p.stageElapsed||0);
+        const safe=safeDropLane(plan,g.time,body.current.y,width,margin,g.items);
+        if(safe===null)return false;
+        type=plan.type;lane=safe;drift=plan.drift;speed=plan.speed;warningLeft=plan.warningSeconds;speedClass=plan.speedClass;beat=plan.beat;flight=plan.flightSeconds;interval=plan.intervalMs;
+      }else {
+        const roll=Math.random();if(roll<p.bombChance)type='bomb';else if(roll<p.bombChance+p.poisonChance)type='poison';else if(roll<p.bombChance+p.poisonChance+(p.powerUpChance||.045))type=(['power_shield','power_magnet','power_speed','power_slowmo'] as ItemType[])[Math.floor(Math.random()*4)];else type=(['ice','fire','star','gem','fury_pill','heart'] as ItemType[])[Math.random()<.8?Math.floor(Math.random()*2):2+Math.floor(Math.random()*4)];
+        lane=g.sequence%5;drift=(Math.random()-.5)*.3;
+        const factor=.7+Math.random()*.9;flight=Math.max(1.25,3.1/(speed*factor));speedClass=factor>1.3?'fast':factor<.9?'slow':'normal';warningLeft=speedClass==='fast'?.32:0;interval*=.55+Math.random()*.9;
+      }
+      const x=margin+(width-margin*2)*lane/4;
+      g.items.push({id:g.nextId++,x,y:-30,vx:drift*35,vy:(body.current.y+30)/flight,radius:type==='bomb'?23:20,type,rotation:0,rotSpeed:(g.sequence%2?1:-1)*.25,wobble:g.sequence,wobbleSpeed:1,scale:1,isEaten:false,alpha:1,warningLeft,speedClass,beat});
+      g.sequence++;g.nextSpawnAt=g.time+interval/1000;return true;
     };
     const draw=(now:number)=>{
       raf=requestAnimationFrame(draw);const dt=Math.min(.05,(now-last)/1000);last=now;
@@ -96,9 +106,11 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
         b.target=Math.max(b.r,Math.min(width-b.r,b.target));b.x+=(b.target-b.x)*(1-Math.exp(-dt*18));
         b.chew=Math.max(0,b.chew-dt);b.hurt=Math.max(0,b.hurt-dt);b.turn=Math.max(0,b.turn-dt);g.bossHit=Math.max(0,g.bossHit-dt);
         if(b.prevElement!==p.playerMode){b.turn=.3;b.prevElement=p.playerMode;burst(b.x,b.y,p.playerMode==='ice'?'#b7f8ed':'#ffca83',10);}
-        if(g.time-g.lastSpawn>p.spawnIntervalMs/1000){spawn(width,height,p);g.lastSpawn=g.time;}
+        if(g.time>=g.nextSpawnAt&&!spawn(width,height,p))g.nextSpawnAt=g.time+.15;
         for(let i=g.items.length-1;i>=0;i--){
-          const it=g.items[i],slow=p.activePowerUps.slowmoTimer>0?.48:1;
+          const it=g.items[i];
+          if((it.warningLeft||0)>0){it.warningLeft=Math.max(0,(it.warningLeft||0)-dt);continue;}
+          const slow=p.activePowerUps.slowmoTimer>0?.48:1;
           const edible=p.furyActive||it.type===p.playerMode||['star','gem','heart','fury_pill'].includes(it.type)||it.type.startsWith('power_');
           if(p.activePowerUps.magnetTimer>0&&edible){const dx=b.x-it.x,dy=b.y-it.y,dist=Math.max(1,Math.hypot(dx,dy));if(dist<200){it.x+=dx/dist*170*dt;it.y+=dy/dist*170*dt;}}
           it.y+=it.vy*slow*dt;it.x=Math.max(30,Math.min(width-30,it.x+it.vx*dt));it.rotation+=it.rotSpeed*dt;
@@ -107,7 +119,7 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
             b.chew=.25;
             if(it.type.startsWith('power_')){p.onCollectPowerUp(it.type.replace('power_','') as PowerUpType);eatAudio.playPowerUp();burst(it.x,it.y,'#d6b9fa',18);label(b.x,b.y-62,'BẢO HỘ!');}
             else if(edible){p.onEatItem(it);eatAudio.playMunch(it.type==='gem'||p.furyActive);burst(it.x,it.y,it.type==='fire'?'#ffd19b':it.type==='ice'?'#b4ffff':'#f6d993');label(b.x,b.y-60,it.type==='heart'?'+1 ♥':p.furyActive?'FURY!':it.type==='gem'&&p.campaignStage?.objective==='rescue'?'ĐÃ GIẢI CỨU!':`+${(it.type==='star'?50:it.type==='gem'?100:20)*p.comboMultiplier}`);
-              if(p.campaignStage?.objective==='boss'){const phase=bossPhase(p.stageElapsed||0);if(phase.vulnerable&&it.type===phase.element){g.bossHit=.35;burst(width/2,height*.2,'#fff0ba',20);}}
+              if(p.campaignStage?.objective==='boss'){const phase=bossPhase(p.stageElapsed||0,p.campaignStage?.chapter||1);if(phase.vulnerable&&it.type===phase.element){g.bossHit=.35;burst(width/2,height*.2,'#fff0ba',20);}}
             }else if(p.activePowerUps.shield){p.onConsumeShield();burst(b.x,b.y,'#b9eaf2',20);eatAudio.playShieldBlock();label(b.x,b.y-62,'KHIÊN CHẶN!');}
             else if(b.hurt<=0){b.hurt=1.25;p.onHitHazard(it);eatAudio.playHurt();burst(b.x,b.y,'#f2aaa1',16);label(b.x,b.y-62,'−1 ♥','#ffc2b3');}
             g.items.splice(i,1);
@@ -129,7 +141,12 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       // A shallow foreground ledge anchors Nốm without hiding his feet.
       const ledge=ctx.createLinearGradient(0,b.y+35,0,height);ledge.addColorStop(0,'#273f32');ledge.addColorStop(1,'#0b2526');ctx.fillStyle=ledge;ctx.beginPath();ctx.moveTo(0,b.y+51);ctx.quadraticCurveTo(width*.5,b.y+39,width,b.y+51);ctx.lineTo(width,height);ctx.lineTo(0,height);ctx.closePath();ctx.fill();ctx.strokeStyle='#a4ac6e66';ctx.lineWidth=2;ctx.stroke();
       const boss=p.campaignStage?.objective==='boss';
-      if(boss){const phase=bossPhase(p.stageElapsed||0);const size=Math.max(108,Math.min(176,width*.32,height*.32));const y=Math.max(83,height*.22);const breathe=reduced?0:Math.sin(g.time*1.7)*3;const attack=phase.warning;ctx.save();ctx.globalAlpha=.9;ctx.fillStyle=phase.element==='ice'?'#8edddd25':'#f6bc7825';ctx.beginPath();ctx.ellipse(width/2,y,size*.52,size*.45,0,0,Math.PI*2);ctx.fill();const recoil=g.bossHit>0&&!reduced?Math.sin(g.bossHit*50)*4:0;sprite(ctx,`guardian-${chapter}-${g.bossHit>0?'hurt':attack?'attack':'idle'}`,width/2+recoil,y+breathe,size);ctx.restore();if(phase.vulnerable){sprite(ctx,phase.element,width/2,y+size*.25,28);}}
+      if(boss){const phase=bossPhase(p.stageElapsed||0,chapter);if(phase.phase==='warning'||phase.phase==='attack'){
+        ctx.save();ctx.globalAlpha=phase.phase==='attack'?.13:.07;ctx.fillStyle=chapter===1?'#a9d487':chapter===2?'#f6b368':chapter===3?'#9ad9f3':'#e5addf';
+        for(const lane of phase.lanes){const x=b.r+(width-b.r*2)*lane/4;ctx.fillRect(x-19,0,38,b.y-45);}ctx.restore();
+        for(const lane of phase.lanes){const x=b.r+(width-b.r*2)*lane/4;ctx.strokeStyle='#e6ca99';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-5,24);ctx.lineTo(x,15);ctx.lineTo(x+5,24);ctx.stroke();}
+      }}
+      if(boss){const phase=bossPhase(p.stageElapsed||0,p.campaignStage?.chapter||1);const size=Math.max(108,Math.min(176,width*.32,height*.32));const y=Math.max(83,height*.22);const breathe=reduced?0:Math.sin(g.time*1.7)*3;const attack=phase.phase==='warning'||phase.phase==='attack';ctx.save();ctx.globalAlpha=.9;ctx.fillStyle=phase.element==='ice'?'#8edddd25':'#f6bc7825';ctx.beginPath();ctx.ellipse(width/2,y,size*.52,size*.45,0,0,Math.PI*2);ctx.fill();const recoil=g.bossHit>0&&!reduced?Math.sin(g.bossHit*50)*4:0;sprite(ctx,`guardian-${chapter}-${g.bossHit>0?'hurt':attack?'attack':'idle'}`,width/2+recoil,y+breathe,size);ctx.restore();if(phase.vulnerable){sprite(ctx,phase.element,width/2,y+size*.25,28);}}
       // Cosmetic auras sit behind the hero and never cover falling items.
       const aura=AURAS.find(a=>a.id===p.auraId);
       if(aura){ctx.save();ctx.strokeStyle=aura.color+'88';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(b.x,b.y+15,b.r*1.25,b.r*.6,0,0,Math.PI*2);ctx.stroke();for(let i=0;i<2;i++){const angle=i*Math.PI+(reduced?0:g.time*.9);sprite(ctx,aura.icon,b.x+Math.cos(angle)*b.r*1.15,b.y-5+Math.sin(angle)*b.r*.55,19);}ctx.restore();}
@@ -149,11 +166,13 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       // Foreground gameplay items must stay above the hero, including near misses.
       for(const it of g.items){
         if(p.celebrating&&victoryProgress>.35)continue;
+        if((it.warningLeft||0)>0){ctx.save();ctx.globalAlpha=.75;ctx.fillStyle=it.type==='fire'?'#fbc788':'#b7eee5';ctx.beginPath();ctx.moveTo(it.x,10);ctx.lineTo(it.x-7,22);ctx.lineTo(it.x+7,22);ctx.closePath();ctx.fill();sprite(ctx,it.type,it.x,40,23);ctx.restore();continue;}
         if(['bomb','poison'].includes(it.type)&&it.y<60){ctx.strokeStyle='#f9bd8c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(it.x-6,15);ctx.lineTo(it.x,5);ctx.lineTo(it.x+6,15);ctx.stroke();}
         ctx.save();if(p.celebrating)ctx.globalAlpha=Math.max(0,1-victoryProgress/.35);ctx.translate(it.x,it.y);ctx.rotate(it.rotation);
         // Ice uses facets; fire uses curved flame. Both are readable at 40px.
         const selected=it.type===p.playerMode||p.furyActive;
         if(selected){ctx.strokeStyle=p.playerMode==='ice'?'#a9f4e688':'#ffcc8b88';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,it.radius+5,0,Math.PI*2);ctx.stroke();}
+        if(it.speedClass==='fast'||it.speedClass==='rush'){ctx.strokeStyle=it.type==='fire'?'#ffc482a0':'#b1e8e5a0';ctx.lineWidth=2;for(let n=0;n<2;n++){ctx.beginPath();ctx.moveTo((n?1:-1)*9,-it.radius-5);ctx.lineTo((n?1:-1)*9,-it.radius-17);ctx.stroke();}}
         sprite(ctx,it.type,0,0,it.radius*2.5);
         if(it.type==='gem'&&p.campaignStage?.objective==='rescue'){ctx.fillStyle='#fff7d5';ctx.beginPath();ctx.ellipse(-5,0,2,3,0,0,Math.PI*2);ctx.ellipse(5,0,2,3,0,0,Math.PI*2);ctx.fill();}
         ctx.restore();

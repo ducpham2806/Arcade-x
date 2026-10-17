@@ -21,7 +21,7 @@ for(const s of CAMPAIGN_STAGES) {
   // shield transitions; this proves resource/time feasibility, not human balance.
   for(const frameRate of [30,60,120]) {
     let now=0,seq=0,hits=0;const counts:Partial<Record<ItemType,number>>={};
-    let nextSpawn=s.spawnIntervalMs/1000;
+    let nextSpawn=.65;
     const falling:{at:number;type:ItemType}[]=[];
     while(now<s.timeLimit&&!stageComplete(s,counts,hits)) {
       now+=1/frameRate;
@@ -30,14 +30,14 @@ for(const s of CAMPAIGN_STAGES) {
         assert.ok(p.lane>=0&&p.lane<=4);
         assert.ok(Math.abs(p.drift)<=.75);
         if(s.bombChance+s.poisonChance===0)assert.ok(!['bomb','poison'].includes(p.type));
-        falling.push({at:now+3.1/p.speed,type:p.type});
-        nextSpawn+=s.spawnIntervalMs/1000;
+        falling.push({at:now+p.warningSeconds+p.flightSeconds,type:p.type});
+        nextSpawn=now+p.intervalMs/1000;
       }
       for(let i=falling.length-1;i>=0;i--){
         const item=falling[i];if(item.at>now)continue;falling.splice(i,1);
         if(['bomb','poison'].includes(item.type)||item.type.startsWith('power_'))continue;
         counts[item.type]=(counts[item.type]||0)+1;
-        const phase=bossPhase(now);
+        const phase=bossPhase(now,s.chapter);
         if(s.objective==='boss'&&phase.vulnerable&&item.type===phase.element)hits++;
       }
     }
