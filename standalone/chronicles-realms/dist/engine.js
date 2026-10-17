@@ -44,7 +44,7 @@ class Game{
  setTarget(x,record=true){this.target=clamp(x,this.left+this.pw/2,this.right-this.pw/2);if(record)this.log.push([Math.round(this.time*120),'move',Math.round(x*10)/10]);}
  newBall(){this.balls=[{x:this.px,y:PY-15,vx:0,vy:0,stuck:true,portalCd:0,trail:[],last:null}];this.effects={};this.speed=this.level.ball_speed*32;this.shield=this.support?.shieldAvailable?1:0;this.invulnerable=1;}
  launch(){if(this.done)return;if(this.balls.some(b=>b.stuck)){this.launches++;if(this.support&&!this.support.started){this.support.started=true;this.emit('support-used',{support:this.support.type});}}for(const b of this.balls)if(b.stuck){const a=(this.random()-.5)*.6;b.stuck=false;b.vx=Math.sin(a)*this.speed;b.vy=-Math.cos(a)*this.speed;}this.log.push([Math.round(this.time*120),'launch']);}
- skill(type='slow'){if(this.done||this.energy<5)return false;this.energy=0;this.log.push([Math.round(this.time*120),'skill',type]);if(type==='beam'){for(const b of this.bricks)if(b.alive&&Math.abs(b.x+b.w/2-this.px)<32){if(b.t!=='X')this.destroy(b,'beam')}if(this.boss&&Math.abs(this.boss.x+65-this.px)<85){this.boss.hp-=8;this.boss.hurt=.2;}this.emit('beam',{x:this.px,y:PY});}else if(type==='shield'){this.effects.skill_shield=12;}else this.effects.skill_slow=6;this.emit('skill',{skill:type});return true;}
+ skill(type='slow'){if(this.done||this.energy<5)return false;this.energy=0;this.log.push([Math.round(this.time*120),'skill',type]);if(type==='beam'){for(const b of this.bricks)if(b.alive&&Math.abs(b.x+b.w/2-this.px)<32){if(b.t!=='X')this.destroy(b,'beam')}if(this.boss&&Math.abs(this.boss.x+65-this.px)<85){this.boss.hp-=8;this.boss.hurt=.2;this.emit('bosshit',{x:this.boss.x+65,y:this.boss.y+55});}this.emit('beam',{x:this.px,y:PY});}else if(type==='shield'){this.effects.skill_shield=12;}else this.effects.skill_slow=6;this.emit('skill',{skill:type});return true;}
  lose(reason){if(this.done||this.invulnerable>0)return;this.firstVolleyClosed=true;this.checkMastery();this.lives--;this.lost++;this.combo=0;this.catchStreak=0;this.drive=0;this.overdrive=0;this.shots=[];this.hazards=[];this.emit('life',{reason});if(this.lives<=0)this.finish(false);else this.newBall();}
  apply(type){
   if(type==='extra_life')this.lives=Math.min(5,this.lives+1);
@@ -109,7 +109,7 @@ class Game{
   if(ball.y>PY+28&&(this.shield||this.effects.skill_shield)){if(!this.effects.skill_shield){this.shield=0;if(this.support?.shieldAvailable)this.support.shieldAvailable=false;}ball.y=PY+25;ball.vy=-Math.abs(ball.vy);this.emit('shield',{x:ball.x,y:PY+27});}
  }
  bossAttack(id){
-  const b=this.boss;if(!b)return;b.attackCount++;this.emit('bossattack',{attack:id});const shot=(x,effect)=>this.shots.push({x,y:b.y+b.h,vx:0,vy:155,effect,r:8});
+  const b=this.boss;if(!b)return;const visualStart={shots:this.shots.length,hazards:this.hazards.length,blockers:this.blockers.length,bricks:this.bricks.length};b.visualAttack={id,at:this.time,x:b.telegraph?.x??this.px};b.attackCount++;this.emit('bossattack',{attack:id});const shot=(x,effect)=>this.shots.push({x,y:b.y+b.h,vx:0,vy:155,effect,r:8});
   switch(id){
    case 'fruit_drop':shot(b.telegraph.x,'stun');break;
    case 'root_zone':this.hazards.push({x:b.telegraph.x-65,w:130,t:2.5,type:'root'});break;
@@ -129,6 +129,7 @@ class Game{
    case 'split_clones':b.clones=6;break;
    case 'shatter_field':this.effects.gravity=6;for(const x of [80,240,400])shot(x,'lethal');break;
   }
+  for(const [key,start]of Object.entries(visualStart))for(const item of this[key].slice(start)){item.attack??=id;item.born??=this.time;}
  }
  update(dt){
   if(this.done)return;this.time+=dt;if(this.support?.started&&this.support.type==='wide')this.support.remaining=Math.max(0,this.support.remaining-dt);this.tickSideRoute(dt);this.invulnerable=Math.max(0,this.invulnerable-dt);this.frozen=Math.max(0,this.frozen-dt);this.stunned=Math.max(0,this.stunned-dt);this.slippery=Math.max(0,this.slippery-dt);this.overdrive=Math.max(0,this.overdrive-dt);
@@ -149,7 +150,7 @@ class Game{
   }
   if(!this.balls.length&&!this.done)this.lose('Orb rơi xuống vực');
   if(e.laser){this.laserCd-=dt;if(this.laserCd<=0){this.laserCd=.28;for(const x of [this.px-this.pw*.35,this.px+this.pw*.35])this.lasers.push({x,y:PY});}}
-  for(const l of this.lasers){l.y-=dt*650;const b=this.bricks.find(b=>b.alive&&l.x>=b.x&&l.x<=b.x+b.w&&l.y<=b.y+b.h&&l.y>=b.y-12);if(b){this.hit(b,l,'laser');l.y=-20;}if(this.boss&&l.x>this.boss.x&&l.x<this.boss.x+130&&l.y<this.boss.y+110&&l.y>this.boss.y&&!this.bossGuarded()){this.boss.hp--;this.lastProgress=this.time;l.y=-20;}}
+  for(const l of this.lasers){l.y-=dt*650;const b=this.bricks.find(b=>b.alive&&l.x>=b.x&&l.x<=b.x+b.w&&l.y<=b.y+b.h&&l.y>=b.y-12);if(b){this.hit(b,l,'laser');l.y=-20;}if(this.boss&&l.x>this.boss.x&&l.x<this.boss.x+130&&l.y<this.boss.y+110&&l.y>this.boss.y&&!this.bossGuarded()){this.boss.hp--;this.boss.visualHurtUntil=this.time+.12;this.emit('bosshit',{x:l.x,y:l.y});this.lastProgress=this.time;l.y=-20;}}
   this.lasers=this.lasers.filter(l=>l.y>50);
   for(const d of this.drops){d.y+=dt*105;if(d.y>PY-12&&d.y<PY+24&&Math.abs(d.x-this.px)<this.pw/2+15){this.apply(d.type);d.y=H+30;}}
   this.drops=this.drops.filter(d=>d.y<H+20);
@@ -159,7 +160,7 @@ class Game{
   this.hazards=this.hazards.filter(h=>h.t>0);
   const boss=this.boss;if(boss&&boss.hp>0){boss.hurt=Math.max(0,boss.hurt-dt);boss.guard=Math.max(0,boss.guard-dt);boss.clones=Math.max(0,(boss.clones||0)-dt);boss.x=175+Math.sin(this.time*.75)*(boss.clones>0?90:105);const phase=boss.hp/boss.max>.66?1:boss.hp/boss.max>.33?2:3;if(phase!==boss.phase){boss.phase=phase;this.emit('phase',{phase});boss.cd=2;}
    if(!e.time_freeze&&this.bricks.filter(b=>b.alive&&b.r<4&&isObjective(b)).length<=boss.initialShield-(this.level.boss?.pressure_after_breaks||0)){if(boss.telegraph){boss.telegraph.t-=dt*ts;if(boss.telegraph.t<=0){this.bossAttack(boss.telegraph.id);boss.telegraph=null;boss.cd=boss.attacks.find(a=>a.phase===phase).cooldown;}}
-    else {boss.cd-=dt*ts;if(boss.cd<=0){const a=boss.attacks.find(a=>a.phase===phase);const id=a.id==='combo_cycle'?['fruit_drop','sand_bullets','ice_bricks','flame_columns','scan_beam'][Math.floor((boss.attackCount+1)/2)%5]:a.id;boss.telegraph={id,t:a.telegraph,x:this.px,text:a.effect,zones:attackZones(id,this.px,this.left,this.right,this.pw)};this.emit('warning',{text:a.effect});}}}
+    else {boss.cd-=dt*ts;if(boss.cd<=0){const a=boss.attacks.find(a=>a.phase===phase);const id=a.id==='combo_cycle'?['fruit_drop','sand_bullets','ice_bricks','flame_columns','scan_beam'][Math.floor((boss.attackCount+1)/2)%5]:a.id;boss.telegraph={id,t:a.telegraph,total:a.telegraph,x:this.px,text:a.effect,zones:attackZones(id,this.px,this.left,this.right,this.pw)};this.emit('warning',{text:a.effect});}}}
   }
   const remaining=this.bricks.filter(b=>b.alive&&isObjective(b)).length;if(!boss&&!this.cleanupActive&&remaining>0&&remaining<=(this.level.design?.cleanup_remaining??3)&&this.time-this.lastProgress>=(this.level.design?.cleanup_after_sec??16)){this.cleanupActive=true;this.emit('cleanup');}
   if(!this.done&&(boss?boss.hp<=0:!this.bricks.some(b=>b.alive&&isObjective(b))))this.finish(true);

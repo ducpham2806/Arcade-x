@@ -54,3 +54,7 @@ See `BLOCK-BREAKER-CHOICES-V4.md` and `block-choice-tuning.csv` for the 18 salva
 ### Hybrid silhouettes (v5)
 
 The current campaign combines legacy silhouettes with the enlarged v3/v4 campaign. See `BLOCK-BREAKER-HYBRID-V5.md` for the 25 formation families, before/after contact sheets and 192-run simulation evidence. Level Lab now compares Original / Dense / Combined and always launches the combined version.
+
+### Boss presentation v6
+
+See `BLOCK-BREAKER-BOSS-ART-V6.md`: 54 authored pose regions, 24 shared VFX frames, timed state transitions and exact danger geometry. Build the base atlas before applying `scripts/build-block-boss-art.cjs`. Boss Lab offers state/attack inspection and real practice play; current campaign silhouettes remain unchanged.
