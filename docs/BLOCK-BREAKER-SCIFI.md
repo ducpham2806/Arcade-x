@@ -58,3 +58,7 @@ The current campaign combines legacy silhouettes with the enlarged v3/v4 campaig
 ### Boss presentation v6
 
 See `BLOCK-BREAKER-BOSS-ART-V6.md`: 54 authored pose regions, 24 shared VFX frames, timed state transitions and exact danger geometry. Build the base atlas before applying `scripts/build-block-boss-art.cjs`. Boss Lab offers state/attack inspection and real practice play; current campaign silhouettes remain unchanged.
+
+### Boss cropping correction
+
+The current `boss-v7.webp` fixes source-grid cuts across 34 affected poses and keeps clone overlays inside the canvas. See `BLOCK-BREAKER-BOSS-CROP-FIX.md`; Boss Lab includes a direct nine-pose inspector.

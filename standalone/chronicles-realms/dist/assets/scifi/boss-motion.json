@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "ids": [
     "treant",
     "pharaoh",
@@ -24,6 +24,9 @@
     0.5
   ],
   "body": {
+    "file": "boss-v7.webp",
+    "width": 1728,
+    "height": 1152,
     "frames": [
       [
         0,
@@ -32,7 +35,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         192,
@@ -41,7 +44,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         384,
@@ -50,7 +53,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         576,
@@ -59,7 +62,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         768,
@@ -68,7 +71,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         960,
@@ -77,7 +80,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1152,
@@ -86,7 +89,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1344,
@@ -95,7 +98,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1536,
@@ -104,7 +107,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         0,
@@ -113,7 +116,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         192,
@@ -122,7 +125,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         384,
@@ -131,7 +134,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         576,
@@ -140,7 +143,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         768,
@@ -149,7 +152,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         960,
@@ -158,7 +161,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1152,
@@ -167,7 +170,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1344,
@@ -176,7 +179,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1536,
@@ -185,7 +188,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         0,
@@ -194,7 +197,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         192,
@@ -203,7 +206,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         384,
@@ -212,7 +215,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         576,
@@ -221,7 +224,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         768,
@@ -230,7 +233,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         960,
@@ -239,7 +242,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1152,
@@ -248,7 +251,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1344,
@@ -257,7 +260,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1536,
@@ -266,7 +269,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         0,
@@ -275,7 +278,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         192,
@@ -284,7 +287,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         384,
@@ -293,7 +296,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         576,
@@ -302,7 +305,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         768,
@@ -311,7 +314,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         960,
@@ -320,7 +323,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1152,
@@ -329,7 +332,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1344,
@@ -338,7 +341,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1536,
@@ -347,7 +350,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         0,
@@ -356,7 +359,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         192,
@@ -365,7 +368,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         384,
@@ -374,7 +377,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         576,
@@ -383,7 +386,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         768,
@@ -392,7 +395,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         960,
@@ -401,7 +404,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1152,
@@ -410,7 +413,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1344,
@@ -419,7 +422,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1536,
@@ -428,7 +431,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         0,
@@ -437,7 +440,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         192,
@@ -446,7 +449,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         384,
@@ -455,7 +458,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         576,
@@ -464,7 +467,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         768,
@@ -473,7 +476,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         960,
@@ -482,7 +485,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1152,
@@ -491,7 +494,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1344,
@@ -500,7 +503,7 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ],
       [
         1536,
@@ -509,22 +512,11 @@
         192,
         0,
         1,
-        "scifi/boss-v6.webp"
+        "scifi/boss-v7.webp"
       ]
     ],
-    "bands": [
-      0,
-      185,
-      324,
-      484,
-      622,
-      802,
-      1024
-    ],
-    "width": 1728,
-    "height": 1152,
-    "file": "boss-v6.webp",
-    "bytes": 976664
+    "bytes": 618752,
+    "importAudit": "boss-import-audit.json"
   },
   "vfx": {
     "frames": [

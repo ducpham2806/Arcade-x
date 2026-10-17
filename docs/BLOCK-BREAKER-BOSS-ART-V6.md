@@ -42,3 +42,7 @@ Boss Lab uses the same engine attack constructors and renderer in an explicit pr
 - Boss Lab smoke checks cover six boss choices, automatic state order, practice gameplay handoff and return; Level Lab three-version comparison and embedded startup also pass.
 
 Remaining validation: actual mobile GPU frame time, browser layout/touch handling and whether fresh players can identify each attack before taking damage. Particle/overlay budgets are structural limits; they are not measured GPU sign-off.
+
+## Cropping correction
+
+Superseding import details: `BLOCK-BREAKER-BOSS-CROP-FIX.md`. Fixed source rectangles were unsafe for irregular pose wingspans even when the final atlas had transparent gutters. The current pipeline uses source ownership, copies all high-alpha body pixels, loads `boss-v7.webp`, and validates 2,484 unclipped native render cases.
