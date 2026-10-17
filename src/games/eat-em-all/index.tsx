@@ -1,959 +1,195 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { GameComponentProps } from '../../types';
-import { usePlayer } from '../../context/PlayerContext';
-import {
-  ElementMode,
-  GameMode,
-  Difficulty,
-  FallingItem,
-  GameStats,
-  ActivePowerUps,
-  BackgroundTheme,
-  PowerUpType,
-} from './types';
-import { DIFFICULTY_PRESETS, STAGES_CONFIG, getComboTier, THEME_CONFIGS } from './config';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type { GameComponentProps } from '../../types';
+import type { ActivePowerUps, ElementMode, FallingItem, GameMode, ItemType, PowerUpType } from './types';
+import { CAMPAIGN_STAGES, CHAPTERS } from './campaign';
+import { bossPhase, quotaProgress, stageComplete } from './encounters';
+import { getComboTier } from './config';
 import { EatEmAllCanvas } from './EatEmAllCanvas';
 import { eatAudio } from './audio';
-import {
-  Heart,
-  Zap,
-  Flame,
-  Snowflake,
-  Target,
-  Clock,
-  Infinity as InfinityIcon,
-  Play,
-  RotateCcw,
-  Sparkles,
-  ChevronRight,
-  Shield,
-  RefreshCw,
-  Compass,
-} from 'lucide-react';
+import './journey.css';
 
-const STORAGE_KEY_UNLOCKED_STAGE = 'arcadex_eat_em_all_unlocked_stage';
-const STORAGE_KEY_STAGE_STARS = 'arcadex_eat_em_all_stage_stars';
+const SAVE_KEY = 'arcadex_eat_journey_v2';
+type Charm = 'shelter' | 'spark' | 'rhythm';
+type Save = { unlocked: number; stars: Record<number, number>; charm: Charm };
+function readSave(): Save {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+    const legacy = Number(localStorage.getItem('arcadex_eat_em_all_unlocked_stage')) || 1;
+    return { unlocked: Math.min(CAMPAIGN_STAGES.length, Math.max(1, Math.floor(Number(raw?.unlocked) || legacy))), stars: Object.fromEntries(Object.entries(raw?.stars && typeof raw.stars === 'object' ? raw.stars : {}).map(([k,v])=>[k,Math.max(0,Math.min(3,Math.floor(Number(v)||0)))])), charm: ['shelter','spark','rhythm'].includes(raw?.charm) ? raw.charm : 'shelter' };
+  } catch { return { unlocked: 1, stars: {}, charm: 'shelter' }; }
+}
+const blankPowers = (): ActivePowerUps => ({ shield: false, shieldHits: 0, magnetTimer: 0, speedTimer: 0, slowmoTimer: 0 });
+const ICON: Partial<Record<ItemType,string>> = { ice:'❄', fire:'🔥', star:'⭐', gem:'💎' };
+interface Run {
+  mode: GameMode; stageId: number; element: ElementMode; score: number; lives: number; elapsed: number;
+  counts: Partial<Record<ItemType,number>>; combo: number; maxCombo: number; comboUntil: number;
+  energy: number; furyUntil: number; furyCount: number; bossHits: number; invulnerableUntil: number;
+  powers: ActivePowerUps; eaten: number; hits: number; status: 'brief'|'playing'|'won'|'lost';
+  message: string; messageUntil: number; charm: Charm;
+}
+function freshRun(stageId: number, mode: GameMode, charm: Charm): Run {
+  return { mode, stageId, element:'ice', score:0, lives:3, elapsed:0, counts:{}, combo:0, maxCombo:0, comboUntil:0, energy:0, furyUntil:0, furyCount:0, bossHits:0, invulnerableUntil:0, powers:{ ...blankPowers(), shield:charm==='shelter', shieldHits:charm==='shelter'?1:0 }, eaten:0, hits:0, status:'brief', message:'', messageUntil:0, charm };
+}
+const CHARMS: {id:Charm;name:string;description:string;unlock:number}[] = [
+  {id:'shelter',name:'🛡 Vỏ ấm',description:'Bắt đầu với một khiên; hợp khi khám phá màn mới.',unlock:1},
+  {id:'spark',name:'⚡ Tàn lửa',description:'Nạp Fury nhanh hơn 25%; đổi lấy việc không có khiên đầu màn.',unlock:7},
+  {id:'rhythm',name:'🎵 Nhịp rừng',description:'Giữ combo 5 giây thay vì 3,5 giây; hợp săn điểm.',unlock:13},
+];
 
-export const EatEmAllGame: React.FC<GameComponentProps> = ({
-  bridge,
-  isPaused: externalPaused,
-  isMuted,
-  onGameOver,
-}) => {
-  // Game Configuration State
-  const [gameMode, setGameMode] = useState<GameMode>('target');
-  const { profile } = usePlayer();
-  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
-  const [currentStageId, setCurrentStageId] = useState<number>(1);
-  const [unlockedStage, setUnlockedStage] = useState<number>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY_UNLOCKED_STAGE);
-    return saved ? parseInt(saved, 10) : 1;
-  });
-  const [stageStars, setStageStars] = useState<Record<number, number>>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY_STAGE_STARS);
-    return saved ? JSON.parse(saved) : {};
-  });
+export const EatEmAllGame: React.FC<GameComponentProps> = ({ bridge, isPaused, isMuted, onGameOver, isPracticeMode }) => {
+  const [save,setSave] = useState<Save>(readSave);
+  const [selected,setSelected] = useState(() => readSave().unlocked);
+  const [chapterId,setChapterId] = useState(() => CAMPAIGN_STAGES[readSave().unlocked-1].chapter);
+  const [mode,setMode] = useState<GameMode>('target');
+  const [screen,setScreen] = useState<'map'|'run'>('map');
+  const [paused,setPaused] = useState(false);
+  const [attempt,setAttempt] = useState(0);
+  const [,redraw] = useState(0);
+  const runRef = useRef<Run>(freshRun(selected,mode,save.charm));
+  const latest = useRef({ bridge, onGameOver, isPracticeMode });
+  latest.current = { bridge,onGameOver,isPracticeMode };
+  const r = runRef.current;
+  const stage = CAMPAIGN_STAGES[r.stageId-1];
+  const choice = CAMPAIGN_STAGES[selected-1];
+  const chapter = CHAPTERS.find(c=>c.id===chapterId)!;
+  const force = useCallback(() => redraw(n=>n+1),[]);
+  const persist = useCallback((next:Save) => { setSave(next); try { localStorage.setItem(SAVE_KEY,JSON.stringify(next)); } catch { /* Play remains available when storage is full. */ } },[]);
+  const saveRef=useRef(save); saveRef.current=save;
+  const rewardGuard=useRef(false);
+  useEffect(()=>{ eatAudio.setMuted(isMuted); },[isMuted]);
 
-  // Show Stage Picker modal
-  const [showStagePicker, setShowStagePicker] = useState<boolean>(false);
-
-  // In-Game Play State
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [playerMode, setPlayerMode] = useState<ElementMode>('ice');
-  const [score, setScore] = useState<number>(0);
-  const [lives, setLives] = useState<number>(3);
-  const [maxLives, setMaxLives] = useState<number>(3);
-
-  // Time Attack Mode timer (60s)
-  const [timeLeft, setTimeLeft] = useState<number>(60);
-
-  // Target Mode progress
-  const [targetProgress, setTargetProgress] = useState<number>(0);
-  const [targetGoal, setTargetGoal] = useState<number>(20);
-  const [collectedCounts, setCollectedCounts] = useState<Record<string, number>>({});
-
-  // Elemental Fury system
-  const [furyEnergy, setFuryEnergy] = useState<number>(0); // 0 to 100
-  const [furyActive, setFuryActive] = useState<boolean>(false);
-  const [furyTimer, setFuryTimer] = useState<number>(0);
-
-  // Combo system
-  const [combo, setCombo] = useState<number>(0);
-  const [maxCombo, setMaxCombo] = useState<number>(0);
-  const comboDecayTimerRef = useRef<number>(0);
-  const [comboDecayRatio, setComboDecayRatio] = useState<number>(0);
-
-  // Power-Up system
-  const [activePowerUps, setActivePowerUps] = useState<ActivePowerUps>({
-    shield: false,
-    shieldHits: 0,
-    magnetTimer: 0,
-    speedTimer: 0,
-    slowmoTimer: 0,
-  });
-
-  // Victory modal state
-  const [showVictoryModal, setShowVictoryModal] = useState<boolean>(false);
-
-  // Overall Match Stats
-  const statsRef = useRef<GameStats>({
-    score: 0,
-    itemsEaten: 0,
-    bombsAvoided: 0,
-    furyActivatedCount: 0,
-    maxCombo: 0,
-    iceEaten: 0,
-    fireEaten: 0,
-    starsEaten: 0,
-    gemsEaten: 0,
-    heartsCollected: 0,
-  });
-
-  const currentStage = STAGES_CONFIG.find((s) => s.id === currentStageId) || STAGES_CONFIG[0];
-  const diffPreset = DIFFICULTY_PRESETS[difficulty];
-
-  // Game Intensity Profile settings applied globally
-  const intensityMultiplier = profile?.gameIntensity === 'casual' ? 0.75 : profile?.gameIntensity === 'hardcore' ? 1.5 : 1;
-
-
-  // Dynamic Background Theme calculation
-  const currentTheme: BackgroundTheme = (() => {
-    if (gameMode === 'target') {
-      return currentStage.theme || 'day';
-    }
-    if (gameMode === 'endless') {
-      if (score < 400) return 'day';
-      if (score < 900) return 'sunset';
-      if (score < 1600) return 'night';
-      if (score < 2500) return 'space';
-      return 'solar';
-    }
-    // Time Attack Mode
-    if (timeLeft > 40) return 'day';
-    if (timeLeft > 20) return 'sunset';
-    return 'night';
-  })();
-
-  // Report space theme achievement when player enters space
-  useEffect(() => {
-    if (isPlaying && currentTheme === 'space') {
-      bridge.reportProgress('ach-eat-space-theme', 1);
-    }
-  }, [isPlaying, currentTheme, bridge]);
-
-  // Initialize Game Session
-  const startNewGame = useCallback(
-    (mode: GameMode = gameMode, stageId: number = currentStageId) => {
-      const stage = STAGES_CONFIG.find((s) => s.id === stageId) || STAGES_CONFIG[0];
-      const initialLives = mode === 'time' ? 99 : diffPreset.initialLives;
-
-      setGameMode(mode);
-      setCurrentStageId(stageId);
-      setScore(0);
-      setLives(initialLives);
-      setMaxLives(initialLives);
-      setTimeLeft(60);
-      setFuryEnergy(0);
-      setFuryActive(false);
-      setFuryTimer(0);
-      setCombo(0);
-      setMaxCombo(0);
-      comboDecayTimerRef.current = 0;
-      setComboDecayRatio(0);
-      setActivePowerUps({
-        shield: false,
-        shieldHits: 0,
-        magnetTimer: 0,
-        speedTimer: 0,
-        slowmoTimer: 0,
-      });
-      setPlayerMode('ice');
-      setShowVictoryModal(false);
-      setShowStagePicker(false);
-
-      if (mode === 'target') {
-        setTargetProgress(0);
-        setTargetGoal(stage.targetCount);
-        setCollectedCounts({});
-      }
-
-      statsRef.current = {
-        score: 0,
-        itemsEaten: 0,
-        bombsAvoided: 0,
-        furyActivatedCount: 0,
-        maxCombo: 0,
-        iceEaten: 0,
-        fireEaten: 0,
-        starsEaten: 0,
-        gemsEaten: 0,
-        heartsCollected: 0,
-      };
-
-      setIsPlaying(true);
-    },
-    [gameMode, currentStageId, diffPreset]
-  );
-
-  // Switch element mode
-  const handleSwitchMode = useCallback(() => {
-    setPlayerMode((prev) => (prev === 'ice' ? 'fire' : 'ice'));
-  }, []);
-
-  // Collect a Power-Up buff
-  const handleCollectPowerUp = useCallback(
-    (type: PowerUpType) => {
-      setActivePowerUps((prev) => {
-        switch (type) {
-          case 'shield':
-            return { ...prev, shield: true, shieldHits: 1 };
-          case 'magnet':
-            return { ...prev, magnetTimer: 8.0 };
-          case 'speed':
-            return { ...prev, speedTimer: 8.0 };
-          case 'slowmo':
-            return { ...prev, slowmoTimer: 6.0 };
-          default:
-            return prev;
-        }
-      });
-      bridge.reportProgress('ach-eat-powerup-collector', 1);
-    },
-    [bridge]
-  );
-
-  // Consume active shield protection
-  const handleConsumeShield = useCallback(() => {
-    setActivePowerUps((prev) => ({
-      ...prev,
-      shield: false,
-      shieldHits: 0,
-    }));
-  }, []);
-
-  // Stage Victory Handler
-  const handleStageVictory = useCallback(() => {
-    setIsPlaying(false);
-    eatAudio.playWin();
-
-    // Calculate stars: 3 stars if >= 2 lives, 2 stars if 1 life
-    const stars = lives >= 2 ? 3 : 2;
-    const newStars = { ...stageStars, [currentStageId]: Math.max(stageStars[currentStageId] || 0, stars) };
-    setStageStars(newStars);
-    try {
-      localStorage.setItem(STORAGE_KEY_STAGE_STARS, JSON.stringify(newStars));
-    } catch {
-      // ignore
-    }
-
-    const nextStage = Math.min(12, Math.max(unlockedStage, currentStageId + 1));
-    setUnlockedStage(nextStage);
-    try {
-      localStorage.setItem(STORAGE_KEY_UNLOCKED_STAGE, nextStage.toString());
-    } catch {
-      // ignore
-    }
-
-    // Grant bonus coins and exp
-    const stageBonus = currentStageId * 50 + 100;
-    bridge.grantCoins(stageBonus);
-    bridge.grantExp(currentStageId * 30 + 50);
-
-    if (currentStageId >= 5) {
-      bridge.reportProgress('ach-eat-target-stage-5', 1);
-    }
-
-    setShowVictoryModal(true);
-  }, [lives, stageStars, currentStageId, unlockedStage, bridge]);
-
-  // Handle Successfully Eating an Item
-  const handleEatItem = useCallback(
-    (item: FallingItem) => {
-      const comboTier = getComboTier(combo);
-      const isFury = furyActive;
-      const multiplier = isFury ? 10 : comboTier.multiplier;
-
-      let basePoints = 20;
-      let furyGain = 8;
-
-      if (item.type === 'star') {
-        basePoints = 50;
-        furyGain = 14;
-        statsRef.current.starsEaten++;
-      } else if (item.type === 'gem') {
-        basePoints = 100;
-        furyGain = 22;
-        statsRef.current.gemsEaten++;
-      } else if (item.type === 'heart') {
-        basePoints = 30;
-        furyGain = 10;
-        setLives((prev) => Math.min(maxLives, prev + 1));
-        statsRef.current.heartsCollected++;
-      } else if (item.type === 'fury_pill') {
-        basePoints = 40;
-        furyGain = 35;
-      } else if (item.type === 'ice') {
-        statsRef.current.iceEaten++;
-      } else if (item.type === 'fire') {
-        statsRef.current.fireEaten++;
-      } else if (item.type === 'bomb' || item.type === 'poison') {
-        // Devoured in Fury mode!
-        basePoints = 200;
-        furyGain = 0;
-      }
-
-      const pointsEarned = Math.round(basePoints * multiplier * diffPreset.scoreBonus);
-      const nextScore = score + pointsEarned;
-      statsRef.current.score = nextScore;
-      setScore(nextScore);
-
-      statsRef.current.itemsEaten++;
-
-      // Reset combo decay timer to 3.5 seconds
-      comboDecayTimerRef.current = 3.5;
-      setComboDecayRatio(1.0);
-
-      // Increment combo count & check tier sounds
-      const nextCombo = combo + 1;
-      setCombo(nextCombo);
-      if (nextCombo > maxCombo) {
-        setMaxCombo(nextCombo);
-        statsRef.current.maxCombo = nextCombo;
-      }
-
-      // Trigger combo sound effects at tier boundaries
-      if (nextCombo === 5 || nextCombo === 10 || nextCombo === 15 || nextCombo === 20 || nextCombo === 30) {
-        const tier = getComboTier(nextCombo);
-        eatAudio.playComboTier(tier.multiplier);
-      }
-
-      if (nextCombo >= 15) {
-        bridge.reportProgress('ach-eat-combo-master', nextCombo);
-      }
-
-      // Charge Fury Bar if not active
-      if (!isFury) {
-        const nextEnergy = Math.min(100, furyEnergy + furyGain);
-        if (nextEnergy >= 100) {
-          setFuryEnergy(0);
-          setFuryActive(true);
-          setFuryTimer(8.0);
-          eatAudio.playFuryStart();
-          statsRef.current.furyActivatedCount++;
-          bridge.reportProgress('ach-eat-fury-master', 1);
-        } else {
-          setFuryEnergy(nextEnergy);
+  const finish = useCallback((won:boolean) => {
+    const run=runRef.current;
+    if(run.status!=='playing') return;
+    run.status=won?'won':'lost';
+    const s=CAMPAIGN_STAGES[run.stageId-1];
+    if(won && run.mode==='target') {
+      eatAudio.playWin();
+      // Three independent stars: completion, damage discipline, rhythm mastery.
+      const stars=1+Number(run.hits<=1)+Number(run.maxCombo>=Math.min(12,Math.ceil(s.targetCount/2)));
+      if(!latest.current.isPracticeMode) {
+        const prior=saveRef.current;
+        const firstClear=!prior.stars[s.id];
+        const next={...prior,unlocked:Math.min(CAMPAIGN_STAGES.length,Math.max(prior.unlocked,s.id+1)),stars:{...prior.stars,[s.id]:Math.max(prior.stars[s.id]||0,stars)}};
+        saveRef.current=next; persist(next);
+        // Rewards for first clear only; replay is for stars and score, no farming loop.
+        if(firstClear && !rewardGuard.current) {
+          rewardGuard.current=true;
+          latest.current.bridge.grantCoins(100+s.chapter*25);
+          latest.current.bridge.grantExp(50+s.chapter*15);
+          if(s.id===5) latest.current.bridge.reportProgress('ach-eat-target-stage-5',5,true);
         }
       }
+    } else if(!won) eatAudio.playHurt();
+    if(run.mode==='endless') latest.current.bridge.reportProgress('ach-eat-endless-1500',run.score,true);
+    force();
+  },[force,persist]);
 
-      // Update Target Mode Progress
-      if (gameMode === 'target') {
-        setCollectedCounts((prev) => ({
-          ...prev,
-          [item.type]: (prev[item.type] || 0) + 1,
-        }));
+  const start = (stageId=selected, nextMode=mode) => {
+    runRef.current=freshRun(stageId,nextMode,save.charm);
+    rewardGuard.current=false;setPaused(false);setAttempt(n=>n+1);setScreen('run');force();
+  };
+  const switchMode=useCallback(()=>{
+    const run=runRef.current;if(run.status!=='playing')return;
+    run.element=run.element==='ice'?'fire':'ice';force();
+  },[force]);
+  const activateFury=useCallback(()=>{
+    const run=runRef.current;if(run.status!=='playing'||run.energy<100||run.furyUntil>run.elapsed)return;
+    run.energy=0;run.furyUntil=run.elapsed+5;run.furyCount++;
+    eatAudio.playFuryStart();latest.current.bridge.reportProgress('ach-eat-fury-master',1);force();
+  },[force]);
+  useEffect(()=>{
+    const key=(e:KeyboardEvent)=>{if(e.code==='KeyF'&&!e.repeat&&!isPaused&&!paused){e.preventDefault();activateFury();}};
+    window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
+  },[activateFury,isPaused,paused]);
 
-        const nextProgress = targetProgress + 1;
-        setTargetProgress(nextProgress);
-        if (nextProgress >= targetGoal) {
-          handleStageVictory();
-        }
+  const eat=useCallback((item:FallingItem)=>{
+    const run=runRef.current;if(run.status!=='playing')return;
+    const s=CAMPAIGN_STAGES[run.stageId-1];
+    const fury=run.furyUntil>run.elapsed;
+    run.eaten++;run.counts[item.type]=(run.counts[item.type]||0)+1;
+    run.combo++;run.maxCombo=Math.max(run.combo,run.maxCombo);run.comboUntil=run.elapsed+(run.charm==='rhythm'?5:3.5);
+    const base=item.type==='gem'?100:item.type==='star'?50:20;
+    run.score+=base*(fury?5:getComboTier(run.combo).multiplier);
+    if(!fury)run.energy=Math.min(100,run.energy+(item.type==='fury_pill'?25:6)*(run.charm==='spark'?1.25:1));
+    if(item.type==='heart')run.lives=Math.min(3,run.lives+1);
+    if(run.mode==='target'&&s.objective==='boss') {
+      const phase=bossPhase(run.elapsed);
+      if(phase.vulnerable && item.type===phase.element) {
+        run.bossHits++;run.message='Lõi cộng hưởng! −1 giáp';run.messageUntil=run.elapsed+1;
       }
-
-      // Report achievements progress
-      bridge.reportProgress('ach-eat-first-game', 1);
-    },
-    [
-      combo,
-      furyActive,
-      diffPreset.scoreBonus,
-      score,
-      maxCombo,
-      furyEnergy,
-      gameMode,
-      targetProgress,
-      targetGoal,
-      maxLives,
-      bridge,
-      handleStageVictory,
-    ]
-  );
-
-  // Handle Hitting a Hazard (Bomb or Mismatched Element)
-  const handleHitHazard = useCallback(
-    (item: FallingItem) => {
-      // Break combo
-      setCombo(0);
-      comboDecayTimerRef.current = 0;
-      setComboDecayRatio(0);
-
-      if (gameMode === 'time') {
-        // Time penalty in time attack mode instead of death
-        setTimeLeft((prev) => Math.max(0, prev - 4));
-        setScore((prev) => {
-          const next = Math.max(0, prev - 50);
-          statsRef.current.score = next;
-          return next;
-        });
-        return;
-      }
-
-      const nextLives = Math.max(0, lives - 1);
-      setLives(nextLives);
-
-      if (nextLives <= 0) {
-        // Game Over!
-        setIsPlaying(false);
-        eatAudio.playHurt();
-        onGameOver(statsRef.current.score, {
-          itemsEaten: statsRef.current.itemsEaten,
-          furyActivated: statsRef.current.furyActivatedCount,
-          maxCombo: statsRef.current.maxCombo,
-        });
-
-        // Report endless score achievement if applicable
-        if (gameMode === 'endless') {
-          bridge.reportProgress('ach-eat-endless-1500', statsRef.current.score, true);
-        }
-      }
-    },
-    [gameMode, lives, onGameOver, bridge]
-  );
-
-  // Timer loop for Time Attack, Fury, Combo Decay, and Power-Up durations
-  useEffect(() => {
-    if (!isPlaying || externalPaused) return;
-
-    const timer = setInterval(() => {
-      // Countdown for Time Attack Mode
-      if (gameMode === 'time') {
-        setTimeLeft((prev) => {
-          const next = Math.max(0, prev - 0.1);
-          return Number(next.toFixed(1));
-        });
-      }
-
-      // Countdown for Fury State
-      if (furyActive) {
-        setFuryTimer((prev) => {
-          const next = Math.max(0, prev - 0.1);
-          return Number(next.toFixed(1));
-        });
-      }
-
-      // Countdown for Combo Decay (3.5s window per correct eat)
-      if (comboDecayTimerRef.current > 0) {
-        comboDecayTimerRef.current = Math.max(0, comboDecayTimerRef.current - 0.1);
-        setComboDecayRatio(comboDecayTimerRef.current / 3.5);
-        if (comboDecayTimerRef.current <= 0) {
-          setCombo(0);
-        }
-      }
-
-      // Countdown for Active Power-Ups
-      setActivePowerUps((prev) => {
-        if (prev.magnetTimer <= 0 && prev.speedTimer <= 0 && prev.slowmoTimer <= 0) {
-          return prev;
-        }
-        return {
-          ...prev,
-          magnetTimer: Math.max(0, prev.magnetTimer - 0.1),
-          speedTimer: Math.max(0, prev.speedTimer - 0.1),
-          slowmoTimer: Math.max(0, prev.slowmoTimer - 0.1),
-        };
-      });
-    }, 100);
-
-    return () => clearInterval(timer);
-  }, [isPlaying, externalPaused, gameMode, furyActive]);
-
-  // Handle Fury expiration
-  useEffect(() => {
-    if (furyActive && furyTimer <= 0) {
-      setFuryActive(false);
-      setFuryEnergy(0);
     }
-  }, [furyActive, furyTimer]);
+    if(run.combo===15)latest.current.bridge.reportProgress('ach-eat-combo-master',15,true);
+    latest.current.bridge.reportProgress('ach-eat-first-game',1);
+    if(run.mode==='target'&&stageComplete(s,run.counts,run.bossHits))finish(true);
+    force();
+  },[force,finish]);
+  const hurt=useCallback(()=>{
+    const run=runRef.current;if(run.status!=='playing'||run.elapsed<run.invulnerableUntil)return;
+    run.invulnerableUntil=run.elapsed+1.25;run.combo=0;run.hits++;
+    run.message='Đổi hệ đúng màu • Né đường bom';run.messageUntil=run.elapsed+2;
+    if(run.mode==='time')run.score=Math.max(0,run.score-100);
+    else {run.lives--;if(run.lives<=0)finish(false);}
+    force();
+  },[finish,force]);
+  const collect=useCallback((type:PowerUpType)=>{
+    const run=runRef.current;if(run.status!=='playing')return;
+    if(type==='shield'){run.powers.shield=true;run.powers.shieldHits=1;}
+    if(type==='magnet')run.powers.magnetTimer=6;
+    if(type==='speed')run.powers.speedTimer=6;
+    if(type==='slowmo')run.powers.slowmoTimer=5;
+    latest.current.bridge.reportProgress('ach-eat-powerup-collector',1);force();
+  },[force]);
+  const consume=useCallback(()=>{runRef.current.powers.shield=false;runRef.current.powers.shieldHits=0;force();},[force]);
 
-  // Handle Time Attack expiration
-  useEffect(() => {
-    if (isPlaying && gameMode === 'time' && timeLeft <= 0) {
-      setIsPlaying(false);
-      onGameOver(statsRef.current.score, {
-        itemsEaten: statsRef.current.itemsEaten,
-        furyActivated: statsRef.current.furyActivatedCount,
-        maxCombo: statsRef.current.maxCombo,
-      });
-    }
-  }, [isPlaying, gameMode, timeLeft, onGameOver]);
+  useEffect(()=>{
+    if(screen!=='run'||paused||isPaused||r.status!=='playing')return;
+    let last=performance.now();
+    const timer=window.setInterval(()=>{
+      const run=runRef.current;if(run.status!=='playing')return;
+      const now=performance.now();const dt=Math.min(.2,(now-last)/1000);last=now;
+      if(document.hidden)return;
+      run.elapsed+=dt;
+      if(run.elapsed>run.comboUntil)run.combo=0;
+      run.powers={...run.powers,magnetTimer:Math.max(0,run.powers.magnetTimer-dt),speedTimer:Math.max(0,run.powers.speedTimer-dt),slowmoTimer:Math.max(0,run.powers.slowmoTimer-dt)};
+      const s=CAMPAIGN_STAGES[run.stageId-1];
+      if(run.mode==='target'&&run.elapsed>=s.timeLimit)finish(false);
+      if(run.mode==='time'&&run.elapsed>=60)finish(true);
+      force();
+    },100);
+    return()=>clearInterval(timer);
+  },[screen,paused,isPaused,r.status,finish,force]);
+  // Do not submit campaign clears as game-over: the launcher would unmount the story result.
+  const exit = () => {const run=runRef.current;latest.current.onGameOver(run.score,{itemsEaten:run.eaten,maxCombo:run.maxCombo,furyActivated:run.furyCount});};
+  const backToMap=()=>{setScreen('map');setSelected(r.stageId);setChapterId(stage.chapter);};
+  const fury=r.furyUntil>r.elapsed;
+  const remaining=Object.fromEntries(Object.entries(stage.targetItems).map(([k,n])=>[k,Math.max(0,(n||0)-(r.counts[k as ItemType]||0))]));
+  const phase=bossPhase(r.elapsed);
+  const countStars=(save.stars[selected]||0);
 
-  // Speed calculation based on mode and difficulty
-  const effectiveSpeedMultiplier =
-    diffPreset.speedMultiplier * intensityMultiplier *
-    (gameMode === 'target'
-      ? currentStage.fallSpeedMultiplier
-      : gameMode === 'endless'
-      ? 1 + Math.min(2.5, score / 600)
-      : 1.25);
-
-  const effectiveSpawnInterval = Math.max(
-    380,
-    (diffPreset.spawnIntervalMs / intensityMultiplier) *
-      (gameMode === 'target'
-        ? currentStage.spawnIntervalMs / 1000
-        : gameMode === 'endless'
-        ? Math.max(0.5, 1 - score / 3000)
-        : 0.8)
-  );
-
-  const activeComboTier = getComboTier(combo);
-  const currentThemeConfig = THEME_CONFIGS[currentTheme] || THEME_CONFIGS.day;
-
-  // Check if any power-up is active
-  const hasActivePowerUp =
-    activePowerUps.shield ||
-    activePowerUps.magnetTimer > 0 ||
-    activePowerUps.speedTimer > 0 ||
-    activePowerUps.slowmoTimer > 0;
-
-  return (
-    <div className="arcade-game-surface relative w-full h-full flex flex-col items-center justify-between p-1 sm:p-2 text-white select-none overflow-hidden max-w-4xl mx-auto">
-      {/* Top HUD Bar */}
-      <div className="arcade-combat-hud w-full bg-[#0e0e16]/95 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 mb-1 flex items-center justify-between shadow-xl gap-2 z-10 shrink-0">
-        {/* Left: Score & Combo Multiplier Tag */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex flex-col">
-            <span className="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-              <span>ĐIỂM SỐ</span>
-              {combo > 1 && (
-                <span
-                  className="px-1.5 py-0.2 text-[9px] rounded font-mono font-black"
-                  style={{ backgroundColor: `${activeComboTier.color}33`, color: activeComboTier.color }}
-                >
-                  x{activeComboTier.multiplier}
-                </span>
-              )}
-            </span>
-            <span className="text-base sm:text-2xl font-black font-mono text-yellow-400 tracking-tight leading-none mt-0.5">
-              {score.toLocaleString()}
-            </span>
-          </div>
-
-          {/* Theme Indicator Tag */}
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-slate-300">
-            <span>{currentThemeConfig.icon}</span>
-            <span className="truncate max-w-[90px]">{currentThemeConfig.name}</span>
-          </div>
-        </div>
-
-        {/* Center: Current Element Indicator (With Click / Space to switch) */}
-        <div className="flex flex-col items-center">
-          <button
-            id="btn-switch-element-hud"
-            type="button"
-            onClick={handleSwitchMode}
-            className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-xl border text-xs sm:text-sm font-black flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer ${
-              playerMode === 'ice'
-                ? 'bg-cyan-950/90 border-cyan-400 text-cyan-300 shadow-cyan-500/20'
-                : 'bg-orange-950/90 border-orange-500 text-orange-300 shadow-orange-500/20'
-            }`}
-            title="Nhấn để đổi hệ BĂNG / LỬA (Phím Space)"
-          >
-            {playerMode === 'ice' ? (
-              <>
-                <Snowflake className="w-4 h-4 text-cyan-300 animate-spin-slow" />
-                <span>BĂNG ❄</span>
-              </>
-            ) : (
-              <>
-                <Flame className="w-4 h-4 text-orange-400 animate-bounce" />
-                <span>LỬA 🔥</span>
-              </>
-            )}
-            <span className="text-[9px] opacity-70 bg-white/10 px-1 py-0.5 rounded font-mono hidden sm:inline">
-              [SPACE]
-            </span>
-          </button>
-        </div>
-
-        {/* Right: Lives or Time Left */}
-        <div className="flex items-center gap-2">
-          {gameMode === 'time' ? (
-            <div className="flex flex-col items-end">
-              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                THỜI GIAN
-              </span>
-              <div
-                className={`flex items-center gap-1 font-mono text-sm sm:text-xl font-black ${
-                  timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-emerald-400'
-                }`}
-              >
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>{timeLeft}s</span>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-end">
-              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                MẠNG
-              </span>
-              <div className="flex items-center gap-0.5 sm:gap-1 text-rose-500">
-                {Array.from({ length: maxLives }).map((_, i) => (
-                  <Heart
-                    key={i}
-                    className={`w-3.5 h-3.5 sm:w-5 sm:h-5 transition-all ${
-                      i < lives ? 'fill-rose-500 text-rose-500 scale-100' : 'text-slate-600 scale-90 opacity-40'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+  return <div className="eat-journey" data-testid="eat-journey">
+    {screen==='map'?<div className="eat-scroll">
+      <header className="eat-hero"><div><div className="eat-eyebrow">Eat Em All · Hành trình mới</div><h1 className="eat-title">TRÁI TIM<br/>HAI NGUYÊN TỐ</h1><p className="eat-sub">Một chiếc bụng nhỏ. Hai nguồn sức mạnh.<br/>Cùng Nốm tìm lại những mảnh tim bị Vực Đói đánh cắp.</p></div><div className="eat-spirit" role="img" aria-label="Nốm, linh thú nửa băng nửa lửa"/></header>
+      <nav className="eat-tabs" aria-label="Chế độ">{([['target','🧭 Câu chuyện'],['endless','∞ Sinh tồn'],['time','⏱ 60 giây']] as const).map(([id,label])=><button key={id} aria-pressed={mode===id} onClick={()=>setMode(id)}>{label}</button>)}</nav>
+      {mode==='target'?<>
+        <div className="eat-chapters">{CHAPTERS.map(c=><button key={c.id} className="eat-chapter" aria-pressed={chapterId===c.id} disabled={save.unlocked<c.startStage} onClick={()=>{setChapterId(c.id);setSelected(Math.min(save.unlocked,c.startStage));}}><span>{c.icon} CHƯƠNG {c.id}</span><b>{c.title}</b><small>{save.unlocked<c.startStage?'🔒 Tiếp tục hành trình':`${CAMPAIGN_STAGES.filter(s=>s.chapter===c.id&&save.stars[s.id]).length}/6 đã hồi sinh`}</small></button>)}</div>
+        <div className="eat-region"><div><div className="eat-eyebrow">{chapter.subtitle}</div><h2>{chapter.icon} {chapter.title}</h2></div><span className="eat-stars">{Object.values(save.stars).reduce((a,b)=>a+(Number(b)||0),0)} ★</span></div>
+        <div className="eat-map" aria-label="Bản đồ màn chơi">{CAMPAIGN_STAGES.filter(s=>s.chapter===chapterId).map(s=><button key={s.id} className="eat-node" disabled={s.id>save.unlocked} aria-pressed={selected===s.id} onClick={()=>setSelected(s.id)}><strong>{s.id>save.unlocked?'🔒':s.objective==='boss'?'👁':s.objective==='rescue'?'💎':s.id}</strong><small>{s.title.replace(/^Màn \d+: /,'')}</small><div className="eat-stars">{'★'.repeat(save.stars[s.id]||0)}{'☆'.repeat(3-(save.stars[s.id]||0))}</div></button>)}</div>
+        <section className="eat-brief"><div><div className="eat-eyebrow">MÀN {choice.id} · {choice.beat==='boss'?'Đối đầu thủ vệ':choice.objective==='rescue'?'Giải cứu ký ức':'Khám phá'}</div><h3>{choice.title}</h3><p>{choice.story}</p><div className="eat-goals">{Object.entries(choice.targetItems).map(([k,n])=><span key={k}>{ICON[k as ItemType]} {n}{k==='gem'&&choice.objective==='rescue'?' linh hồn':''}</span>)}{choice.bossHits&&<span>👁 Phá {choice.bossHits} giáp</span>}<span>⏱ {choice.timeLimit}s</span></div><p>{choice.description}</p></div><button className="eat-primary" onClick={()=>start()}> {countStars?'CHƠI LẠI':'LÊN ĐƯỜNG'} →</button></section>
+      </>:<section className="eat-brief"><div><h3>{mode==='endless'?'Bụng đói bất tận':'Bữa tiệc chớp nhoáng'}</h3><p>{mode==='endless'?'Giữ ba trái tim qua các đợt rơi ngày càng nhanh. Chọn thời điểm dùng Fury để thoát hiểm.':'Một phút giữ nhịp, đổi hệ và tối ưu chuỗi ăn. Va chạm mất 100 điểm.'}</p></div><button className="eat-primary" onClick={()=>start()}>BẮT ĐẦU →</button></section>}
+      <div className="eat-eyebrow" style={{marginTop:20}}>Bùa đồng hành · chọn một</div><div className="eat-loadout">{CHARMS.map(c=><button className="eat-chip" key={c.id} title={c.description} disabled={save.unlocked<c.unlock} aria-pressed={save.charm===c.id} onClick={()=>persist({...save,charm:c.id})}>{save.unlocked<c.unlock?'🔒 ':''}{c.name}</button>)}</div><p className="eat-sub">{CHARMS.find(c=>c.id===save.charm)?.description}</p>
+      <p className="eat-help">Kéo để di chuyển · Space đổi Băng/Lửa · F tung Fury<br/>★ Hoàn thành · ★ Trúng đòn tối đa 1 lần · ★ Đạt combo yêu cầu<br/>Bỏ qua món khó để giữ mạng. Không cần ăn tất cả.</p>
+    </div>:<>
+      <header className="eat-hud"><button className="eat-secondary" style={{margin:0,padding:'6px 10px'}} aria-label="Tạm dừng" onClick={()=>setPaused(true)}>Ⅱ</button><div><small>{r.mode==='target'?`MÀN ${stage.id} · ${CHAPTERS[stage.chapter-1].title}`:'THỬ THÁCH'}</small><div><strong>{r.score.toLocaleString()}</strong> <small> {r.combo>1?`×${getComboTier(r.combo).multiplier} · ${r.combo} chuỗi`:''}</small></div></div><div style={{textAlign:'right'}}><div aria-label={`${r.lives} mạng`}>{r.mode==='time'?'⏱':'♥'.repeat(Math.max(0,r.lives))}</div><small>{Math.max(0,Math.ceil((r.mode==='target'?stage.timeLimit:r.mode==='time'?60:0)-r.elapsed)) || (r.mode==='endless'?Math.floor(r.elapsed):0)}s {r.powers.shield?'🛡':''}</small></div></header>
+      <div className="eat-goalbar">{r.mode==='target'?Object.entries(stage.targetItems).map(([k,n])=><span key={k} className={(r.counts[k as ItemType]||0)>=n!?'done':''}>{ICON[k as ItemType]} {Math.min(n!,r.counts[k as ItemType]||0)}/{n}{k==='gem'&&stage.objective==='rescue'?' linh hồn':''}</span>):<span>{r.mode==='endless'?'Sống sót • Giữ nhịp • Vượt kỷ lục':'Ăn đúng hệ • Săn chuỗi điểm'}</span>}<span style={{color:'#fcd68a'}}> {r.element==='ice'?'❄ BĂNG':'🔥 LỬA'}</span></div>
+      <div className="eat-board"><EatEmAllCanvas key={attempt} playerMode={r.element} onSwitchMode={switchMode} isPaused={isPaused||paused||r.status!=='playing'} isGameOver={r.status==='won'||r.status==='lost'} isMuted={isMuted} lives={r.lives} furyActive={fury} speedMultiplier={r.mode==='target'?stage.fallSpeedMultiplier:1+Math.min(.8,r.elapsed/120)} spawnIntervalMs={r.mode==='target'?stage.spawnIntervalMs:Math.max(430,900-r.elapsed*2)} bombChance={.14} poisonChance={r.elapsed>20?.06:0} powerUpChance={.045} combo={r.combo} comboMultiplier={getComboTier(r.combo).multiplier} comboDecayRatio={Math.max(0,(r.comboUntil-r.elapsed)/(r.charm==='rhythm'?5:3.5))} activePowerUps={r.powers} currentTheme={r.mode==='target'?stage.theme:r.elapsed>60?'space':'night'} onEatItem={eat} onHitHazard={hurt} onCollectPowerUp={collect} onConsumeShield={consume} stageElapsed={r.elapsed} campaignStage={r.mode==='target'?stage:undefined} remainingTargets={remaining} skinId={bridge.getEquippedSkin?.()||'default'}/>
+      {r.mode==='target'&&stage.objective==='boss'&&<div className="eat-boss">👁 {stage.bossName} · {Math.max(0,(stage.bossHits||0)-r.bossHits)} giáp<div>{phase.warning?`⚠ Lõi ${phase.element==='ice'?'BĂNG':'LỬA'} sắp mở…`:`Hứng ${phase.element==='ice'?'❄ Băng':'🔥 Lửa'} để phản công!`}</div><div className="eat-bar"><i style={{width:`${Math.max(0,1-r.bossHits/(stage.bossHits||1))*100}%`}}/></div></div>}
+      {r.messageUntil>r.elapsed&&<div className="eat-narrator" role="status">{r.message}</div>}
       </div>
-
-      {/* Active Power-Ups Ribbon */}
-      {hasActivePowerUp && (
-        <div className="w-full bg-[#11111e]/90 border border-white/10 rounded-lg sm:rounded-xl px-2 py-1 mb-1 flex items-center justify-center gap-2 sm:gap-3 z-10 shrink-0 overflow-x-auto">
-          {activePowerUps.shield && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-400 text-cyan-300 text-[10px] sm:text-[11px] font-bold shadow-[0_0_10px_rgba(6,182,212,0.4)] animate-pulse shrink-0">
-              <Shield className="w-3 h-3 text-cyan-300" />
-              <span>KHIÊN</span>
-            </div>
-          )}
-
-          {activePowerUps.magnetTimer > 0 && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-purple-950/80 border border-purple-400 text-purple-300 text-[10px] sm:text-[11px] font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)] shrink-0">
-              <span>🧲</span>
-              <span>HÚT: {activePowerUps.magnetTimer.toFixed(1)}s</span>
-            </div>
-          )}
-
-          {activePowerUps.speedTimer > 0 && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-950/80 border border-amber-400 text-amber-300 text-[10px] sm:text-[11px] font-bold shadow-[0_0_10px_rgba(245,158,11,0.4)] shrink-0">
-              <Zap className="w-3 h-3 text-amber-300" />
-              <span>TỐC ĐỘ: {activePowerUps.speedTimer.toFixed(1)}s</span>
-            </div>
-          )}
-
-          {activePowerUps.slowmoTimer > 0 && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-sky-950/80 border border-sky-400 text-sky-300 text-[10px] sm:text-[11px] font-bold shadow-[0_0_10px_rgba(56,189,248,0.4)] shrink-0">
-              <Snowflake className="w-3 h-3 text-sky-300" />
-              <span>CHẬM: {activePowerUps.slowmoTimer.toFixed(1)}s</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Target Mode Specific: Progress Bar to Finish Stage */}
-      {gameMode === 'target' && (
-        <div className="w-full bg-[#11111c] border border-white/10 rounded-lg sm:rounded-xl px-2.5 py-1 mb-1 shadow-md shrink-0">
-          <div className="flex items-center justify-between text-[11px] sm:text-xs mb-0.5">
-            <span className="font-bold text-slate-300 flex items-center gap-1 truncate">
-              <Target className="w-3 h-3 text-indigo-400" />
-              <span className="truncate">{currentStage.title}</span>
-            </span>
-            <span className="font-mono font-bold text-yellow-400 shrink-0">
-              {targetProgress} / {targetGoal} ({Math.min(100, Math.round((targetProgress / targetGoal) * 100))}%)
-            </span>
-          </div>
-          <div className="w-full h-1.5 sm:h-2 bg-black/60 rounded-full overflow-hidden border border-white/10 relative">
-            <div
-              className="h-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-amber-400 transition-all duration-300 shadow-[0_0_12px_rgba(99,102,241,0.6)]"
-              style={{ width: `${Math.min(100, (targetProgress / targetGoal) * 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Canvas Game Arena */}
-      <div className="relative w-full flex-1 min-h-[460px] sm:min-h-[520px] flex items-center justify-center">
-        <EatEmAllCanvas
-          playerMode={playerMode}
-          onSwitchMode={handleSwitchMode}
-          isPaused={externalPaused || !isPlaying}
-          isGameOver={!isPlaying}
-          isMuted={isMuted}
-          lives={lives}
-          furyActive={furyActive}
-          speedMultiplier={effectiveSpeedMultiplier}
-          spawnIntervalMs={effectiveSpawnInterval}
-          bombChance={diffPreset.bombRate}
-          poisonChance={0.06}
-          powerUpChance={currentStage.powerUpChance || 0.14}
-          combo={combo}
-          comboMultiplier={activeComboTier.multiplier}
-          comboDecayRatio={comboDecayRatio}
-          activePowerUps={activePowerUps}
-          currentTheme={currentTheme}
-          onEatItem={handleEatItem}
-          onHitHazard={handleHitHazard}
-          onCollectPowerUp={handleCollectPowerUp}
-          onConsumeShield={handleConsumeShield}
-          skinId={bridge.getSkin ? bridge.getSkin('eat-em-all') : 'default'}
-        />
-
-        {/* Start / Mode Selector Overlay if not playing */}
-        {!isPlaying && !showVictoryModal && (
-          <div className="legacy-menu absolute inset-0 bg-black/85 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-4 z-30 text-center animate-in fade-in duration-200">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-orange-500 p-0.5 shadow-2xl mb-3">
-              <div className="w-full h-full bg-[#0c0c14] rounded-2xl flex items-center justify-center text-3xl">
-                😋
-              </div>
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl font-black text-white font-display tracking-wide mb-1">
-              EAT 'EM ALL: ARCADE
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md mb-3 leading-relaxed">
-              Trượt để nuốt chửng quả cầu năng lượng! Đổi hệ Băng ❄ / Lửa 🔥 để ăn đúng vật phẩm, nhặt vật phẩm bổ trợ
-              (Khiên 🛡️, Nam châm 🧲, Tăng tốc ⚡, Làm chậm ❄️) và kích hoạt bão điểm <strong>ELEMENTAL FURY x10</strong>!
-            </p>
-
-            {/* Mode Selectors */}
-            <div className="flex items-center gap-2 mb-3">
-              <button
-                type="button"
-                onClick={() => setGameMode('target')}
-                className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
-                  gameMode === 'target'
-                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/30'
-                    : 'bg-[#151522] border-white/10 text-slate-400 hover:text-white'
-                }`}
-              >
-                <Target className="w-3.5 h-3.5" />
-                <span>Chiến Dịch (12 Màn)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setGameMode('endless')}
-                className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
-                  gameMode === 'endless'
-                    ? 'bg-cyan-600 border-cyan-400 text-white shadow-lg shadow-cyan-600/30'
-                    : 'bg-[#151522] border-white/10 text-slate-400 hover:text-white'
-                }`}
-              >
-                <InfinityIcon className="w-3.5 h-3.5" />
-                <span>Sinh Tồn Vô Tận</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setGameMode('time')}
-                className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
-                  gameMode === 'time'
-                    ? 'bg-amber-600 border-amber-400 text-white shadow-lg shadow-amber-600/30'
-                    : 'bg-[#151522] border-white/10 text-slate-400 hover:text-white'
-                }`}
-              >
-                <Clock className="w-3.5 h-3.5" />
-                <span>Thời Gian 60s</span>
-              </button>
-            </div>
-
-            {/* Difficulty Selectors */}
-            <div className="flex items-center gap-1.5 mb-3">
-              <span className="text-[11px] text-slate-400 mr-1 font-bold">Độ khó:</span>
-              {(['easy', 'normal', 'hard', 'insane'] as Difficulty[]).map((d) => {
-                const conf = DIFFICULTY_PRESETS[d];
-                return (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => setDifficulty(d)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                      difficulty === d ? conf.color : 'bg-white/5 border-white/5 text-slate-400'
-                    }`}
-                  >
-                    {conf.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Stage Selector Button for Target Mode */}
-            {gameMode === 'target' && (
-              <button
-                type="button"
-                onClick={() => setShowStagePicker(true)}
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold underline mb-3 flex items-center gap-1 cursor-pointer"
-              >
-                <span>Chọn màn chơi (Đang ở: {currentStage.title})</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            )}
-
-            {/* Start Button */}
-            <button
-              id="btn-start-eat-em-all"
-              type="button"
-              onClick={() => startNewGame()}
-              className="px-8 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-orange-500 hover:opacity-95 active:scale-95 text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-indigo-500/25 flex items-center gap-2 transition-all cursor-pointer"
-            >
-              <Play className="w-5 h-5 fill-white" />
-              <span>BẮT ĐẦU CHƠI NGAY</span>
-            </button>
-          </div>
-        )}
-
-        {/* Stage Victory Modal */}
-        {showVictoryModal && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-4 z-40 text-center animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center text-3xl shadow-xl shadow-amber-500/20 mb-3">
-              👑
-            </div>
-
-            <h3 className="text-2xl font-black text-white font-display mb-1">HOÀN THÀNH MÀN CHƠI!</h3>
-            <p className="text-xs text-slate-300 mb-3">{currentStage.title}</p>
-
-            <div className="flex items-center gap-1 text-2xl text-amber-400 mb-4">
-              {'⭐'.repeat(stageStars[currentStageId] || 3)}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 max-w-xs w-full bg-[#12121a] border border-white/10 rounded-xl p-3 mb-4 text-xs">
-              <div>
-                <span className="text-slate-400 block text-[10px]">Điểm màn này:</span>
-                <strong className="text-yellow-400 font-mono text-sm">{score.toLocaleString()}</strong>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[10px]">Vật phẩm ăn:</span>
-                <strong className="text-white font-mono text-sm">{targetProgress} quả</strong>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => startNewGame('target', currentStageId)}
-                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Chơi Lại Màn Này</span>
-              </button>
-
-              {currentStageId < 12 ? (
-                <button
-                  type="button"
-                  onClick={() => startNewGame('target', currentStageId + 1)}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-95 active:scale-95 text-white text-xs font-black flex items-center gap-1.5 shadow-lg shadow-emerald-600/30 transition-all cursor-pointer"
-                >
-                  <span>Màn Kế Tiếp</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowStagePicker(true)}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer"
-                >
-                  Chọn màn khác
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Stage Picker Modal */}
-        {showStagePicker && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-md rounded-2xl flex flex-col p-4 z-40 overflow-y-auto animate-in fade-in duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                <Target className="w-4 h-4 text-indigo-400" />
-                <span>CHỌN MÀN CHIẾN DỊCH (1 - 12)</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowStagePicker(false)}
-                className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-white/5 cursor-pointer"
-              >
-                Đóng
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 overflow-y-auto pr-1">
-              {STAGES_CONFIG.map((stage) => {
-                const isUnlocked = stage.id <= unlockedStage;
-                const stars = stageStars[stage.id] || 0;
-
-                return (
-                  <button
-                    key={stage.id}
-                    type="button"
-                    disabled={!isUnlocked}
-                    onClick={() => startNewGame('target', stage.id)}
-                    className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden ${
-                      isUnlocked
-                        ? stage.id === currentStageId
-                          ? 'bg-indigo-950/70 border-indigo-400 ring-1 ring-indigo-400/50 cursor-pointer'
-                          : 'bg-[#12121a] border-white/10 hover:border-white/30 cursor-pointer'
-                        : 'bg-[#0a0a0f] border-white/5 opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-white">Màn {stage.id}</span>
-                      {stars > 0 && <span className="text-[10px] text-amber-400">{'⭐'.repeat(stars)}</span>}
-                    </div>
-                    <p className="text-[11px] text-slate-300 font-medium truncate">
-                      {stage.title.split(': ')[1] || stage.title}
-                    </p>
-                    <span className="text-[10px] text-slate-500 mt-1 block">
-                      Mục tiêu: {stage.targetCount} quả • {THEME_CONFIGS[stage.theme || 'day'].icon}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom Bar: ELEMENTAL FURY Gauge & Switch Mode Button */}
-      <div className="w-full bg-[#0d0d14]/90 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 mt-1 flex flex-col gap-1.5 shadow-xl shrink-0">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-black text-[11px] sm:text-xs tracking-wider uppercase flex items-center gap-1 text-amber-400">
-            <Zap className={`w-3.5 h-3.5 ${furyActive ? 'animate-bounce text-yellow-300' : ''}`} />
-            <span>ELEMENTAL FURY</span>
-            {furyActive && (
-              <span className="ml-1 px-1.5 py-0.5 rounded bg-yellow-400 text-black font-black text-[10px] animate-pulse">
-                FURY x10 ({furyTimer.toFixed(1)}s)
-              </span>
-            )}
-          </span>
-
-          <span className="font-mono text-[11px] font-bold text-slate-400">
-            {furyActive ? 'CUỒNG NỘ BÙNG NỔ!' : `${Math.round(furyEnergy)}% NĂNG LƯỢNG`}
-          </span>
-        </div>
-
-        {/* Elemental Fury Progress Bar */}
-        <div className="w-full h-2 sm:h-2.5 bg-black/60 rounded-full overflow-hidden border border-white/10 relative p-0.5">
-          <div
-            className={`h-full rounded-full transition-all duration-200 ${
-              furyActive
-                ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-500 shadow-[0_0_15px_rgba(245,158,11,0.9)] animate-pulse'
-                : 'bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
-            }`}
-            style={{ width: `${furyActive ? (furyTimer / 8) * 100 : furyEnergy}%` }}
-          />
-        </div>
-
-        {/* Virtual Controls for Mobile / Touch Play */}
-        <div className="flex items-center justify-between gap-2 pt-0.5">
-          <button
-            type="button"
-            onClick={handleSwitchMode}
-            className={`flex-1 py-2 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 border transition-all active:scale-95 cursor-pointer ${
-              playerMode === 'ice'
-                ? 'bg-cyan-900/60 border-cyan-400/80 text-cyan-300 shadow-md shadow-cyan-500/20'
-                : 'bg-orange-900/60 border-orange-500/80 text-orange-300 shadow-md shadow-orange-500/20'
-            }`}
-          >
-            <RefreshCw className="w-4 h-4 animate-spin-slow" />
-            <span>ĐỔI HỆ: {playerMode === 'ice' ? '❄ BĂNG ➔ LỬA 🔥' : '🔥 LỬA ➔ BĂNG ❄'}</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+      <footer className="eat-controls"><button className={`eat-control ${r.element==='fire'?'fire':''}`} disabled={r.status!=='playing'||paused||isPaused} onClick={()=>{switchMode();eatAudio.playSwitch();}}> {r.element==='ice'?'❄ BĂNG → 🔥 LỬA':'🔥 LỬA → ❄ BĂNG'}<small>Đổi hệ · Space</small></button><button className={`eat-control fury ${r.energy>=100?'ready':''}`} disabled={r.energy<100||fury||r.status!=='playing'||paused||isPaused} onClick={activateFury}>⚡ {fury?`FURY ${Math.ceil(r.furyUntil-r.elapsed)}s`:r.energy>=100?'TUNG FURY':`FURY ${Math.floor(r.energy)}%`}<small>{r.energy>=100?'Nuốt mọi thứ trong 5 giây · F':'Ăn đúng hệ để tích năng lượng'}</small></button></footer>
+      {r.status==='brief'&&<div className="eat-overlay"><section className="eat-dialog"><div className="eat-eyebrow">{r.mode==='target'?`CHƯƠNG ${stage.chapter} · MÀN ${stage.id}`:'THỬ THÁCH'}</div><h2>{r.mode==='target'?stage.title:'Bữa tiệc bắt đầu'}</h2><p>{r.mode==='target'?stage.story:'Đổi Băng/Lửa để ăn đúng hệ. Để dành Fury cho thời khắc khó nhất.'}</p><p>{r.mode==='target'?stage.description:''}</p><p>❄ Ăn Băng khi ở hệ Băng · 🔥 Ăn Lửa khi ở hệ Lửa<br/>Kéo ngang để hứng · Né bom và bình độc</p><button className="eat-primary" onClick={()=>{r.status='playing';setPaused(false);force();}}>ĐÃ SẴN SÀNG →</button><button className="eat-secondary" onClick={backToMap}>Về bản đồ</button></section></div>}
+      {paused&&r.status==='playing'&&<div className="eat-overlay"><section className="eat-dialog"><h2>Nghỉ một nhịp</h2><p>{stage.title}</p><button className="eat-primary" onClick={()=>setPaused(false)}>TIẾP TỤC</button><button className="eat-secondary" onClick={backToMap}>Về bản đồ</button></section></div>}
+      {(r.status==='won'||r.status==='lost')&&<div className="eat-overlay"><section className="eat-dialog"><div className="eat-eyebrow">{r.status==='won'?'MỘT NHỊP TIM TRỞ LẠI':'NỐM CẦN BẠN'}</div><h2>{r.status==='won'?(r.mode==='target'?'Vùng đất thức giấc!':'Bữa tiệc trọn vẹn!'):'Thử một lối đi khác'}</h2>{r.status==='won'&&r.mode==='target'&&<div className="eat-stars" style={{fontSize:34}}>{'★'.repeat(1+Number(r.hits<=1)+Number(r.maxCombo>=Math.min(12,Math.ceil(stage.targetCount/2))))}</div>}<p>{r.status==='won'?(r.mode==='target'?stage.resolution:'Một phút đã khép lại. Thử giữ combo lâu hơn để vượt kỷ lục của chính mình!'):r.lives<=0?'Giữ khoảng trống để né. Fury sẵn sàng không tự kích hoạt — hãy dùng khi bị dồn ép.':'Chưa đủ mục tiêu trước khi cổng khép lại. Ưu tiên món còn thiếu trên thanh mục tiêu.'}</p><p>{r.score.toLocaleString()} điểm · Combo tốt nhất {r.maxCombo}<br/>{r.hits} lần trúng đòn · {Math.floor(r.elapsed)} giây</p>{r.mode==='target'&&r.status==='won'&&stage.id<CAMPAIGN_STAGES.length?<button className="eat-primary" onClick={()=>start(stage.id+1,'target')}>CHƯƠNG TIẾP CỦA NỐM →</button>:<button className="eat-primary" onClick={()=>start(r.stageId,r.mode)}>CHƠI LẠI →</button>}<button className="eat-secondary" onClick={backToMap}>🧭 Bản đồ</button> <button className="eat-secondary" onClick={exit}>Kết thúc lượt</button></section></div>}
+    </>}
+  </div>;
 };

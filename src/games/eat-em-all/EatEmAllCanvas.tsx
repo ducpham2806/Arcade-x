@@ -11,6 +11,8 @@ import {
   PowerUpType,
 } from './types';
 import { eatAudio } from './audio';
+import type { CampaignStage } from './campaign';
+import { planDrop } from './encounters';
 import { getComboTier, THEME_CONFIGS } from './config';
 
 interface EatEmAllCanvasProps {
@@ -38,6 +40,8 @@ interface EatEmAllCanvasProps {
   targetItems?: Partial<Record<ItemType, number>>;
   remainingTargets?: Partial<Record<ItemType, number>>;
   skinId?: string;
+  campaignStage?: CampaignStage;
+  stageElapsed?: number;
 }
 
 export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
@@ -62,7 +66,12 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
   onCollectPowerUp,
   onConsumeShield,
   skinId = 'default',
+  campaignStage,
+  stageElapsed = 0,
+  remainingTargets,
 }) => {
+  const liveRef = useRef({playerMode, isPaused, isGameOver, furyActive, speedMultiplier, spawnIntervalMs, bombChance, poisonChance, powerUpChance, combo, comboMultiplier, comboDecayRatio, activePowerUps, currentTheme, onEatItem, onHitHazard, onCollectPowerUp, onConsumeShield, campaignStage, remainingTargets, stageElapsed, skinId});
+  liveRef.current = {playerMode, isPaused, isGameOver, furyActive, speedMultiplier, spawnIntervalMs, bombChance, poisonChance, powerUpChance, combo, comboMultiplier, comboDecayRatio, activePowerUps, currentTheme, onEatItem, onHitHazard, onCollectPowerUp, onConsumeShield, campaignStage, remainingTargets, stageElapsed, skinId};
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -89,6 +98,9 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
   const particlesRef = useRef<Particle[]>([]);
   const floatTextsRef = useRef<FloatingText[]>([]);
   const lastSpawnRef = useRef<number>(0);
+  const sequenceRef = useRef(0);
+  const stageClockRef = useRef(0);
+  const warningRef = useRef<{x:number;until:number} | null>(null);
   const nextItemIdRef = useRef<number>(1);
   const nextTextIdRef = useRef<number>(1);
 
@@ -149,7 +161,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
 
       // Position character significantly higher up (elevated by 125-150px from bottom)
       // This leaves ample room for the player's thumb / finger without blocking the character
-      const bottomClearance = Math.max(125, Math.min(155, Math.round(height * 0.22)));
+      const bottomClearance = Math.max(65, Math.min(100, Math.round(height * 0.20)));
       playerRef.current.y = height - bottomClearance;
 
       if (playerRef.current.x > width || playerRef.current.x === 200) {
@@ -162,7 +174,9 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
   useEffect(() => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    return () => window.removeEventListener('resize', resizeCanvas);
+    const observer = new ResizeObserver(resizeCanvas);
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => { window.removeEventListener('resize', resizeCanvas); observer.disconnect(); };
   }, [resizeCanvas]);
 
   // Touch & Pointer input (Smooth horizontal tracking, finger doesn't block character)
@@ -197,7 +211,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
     const keysDown = new Set<string>();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isPaused || isGameOver) return;
+      if (isPaused || isGameOver || e.repeat) return;
       keysDown.add(e.code);
 
       if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
@@ -239,12 +253,13 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
       window.removeEventListener('keyup', handleKeyUp);
       clearInterval(interval);
     };
-  }, [isPaused, isGameOver, onSwitchMode, activePowerUps.speedTimer]);
+  }, [isPaused, isGameOver, onSwitchMode, activePowerUps.speedTimer > 0]);
 
   // Spawn an item (with Power-up chance)
   const spawnItem = (canvasWidth: number) => {
+    const { campaignStage, remainingTargets, stageElapsed, speedMultiplier, powerUpChance, bombChance, poisonChance } = liveRef.current;
     const margin = 50;
-    const spawnX = margin + Math.random() * (canvasWidth - margin * 2);
+    let spawnX = margin + Math.random() * (canvasWidth - margin * 2);
 
     let chosenType: ItemType = 'ice';
     const rand = Math.random();
@@ -283,13 +298,24 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
       }
     }
 
-    const baseVy = (2.6 + Math.random() * 1.8) * speedMultiplier;
+    let drift = (Math.random() - 0.5) * 0.8;
+    let baseVy = (2.6 + Math.random() * 1.8) * speedMultiplier;
+    if (campaignStage) {
+      const counts = Object.fromEntries(Object.entries(campaignStage.targetItems).map(([k,n]) => [k, (n || 0) - (remainingTargets?.[k as ItemType] || 0)]));
+      const plan = planDrop(campaignStage, sequenceRef.current++, counts, stageElapsed);
+      chosenType = plan.type;
+      spawnX = margin + (canvasWidth - margin * 2) * plan.lane / 4;
+      drift = plan.drift;
+      // Keep flight readable on short mobile boards as well as desktop.
+      baseVy = Math.max(1.1, ((canvasRef.current?.height || 500) - 100) / (3.1 * 60)) * plan.speed;
+    }
+    if (chosenType === 'bomb' || chosenType === 'poison') warningRef.current = { x: spawnX, until: stageClockRef.current + 1.2 };
 
     const newItem: FallingItem = {
       id: nextItemIdRef.current++,
       x: spawnX,
       y: -35,
-      vx: (Math.random() - 0.5) * 0.8,
+      vx: drift,
       vy: baseVy,
       radius:
         chosenType === 'bomb'
@@ -366,6 +392,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
     const loop = (currentTime: number) => {
       animId = requestAnimationFrame(loop);
 
+      const {playerMode, isPaused, isGameOver, furyActive, speedMultiplier, spawnIntervalMs, bombChance, poisonChance, powerUpChance, combo, comboMultiplier, comboDecayRatio, activePowerUps, currentTheme, onEatItem, onHitHazard, onCollectPowerUp, onConsumeShield, campaignStage, remainingTargets, stageElapsed, skinId} = liveRef.current;
       const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
       lastTime = currentTime;
 
@@ -656,11 +683,13 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
           }
         }
 
+        stageClockRef.current += dt;
+        // Active time prevents a burst or timer jump after pausing.
         // Spawning logic
         const adjustedInterval = activePowerUps.slowmoTimer > 0 ? spawnIntervalMs * 1.5 : spawnIntervalMs;
-        if (currentTime - lastSpawnRef.current > adjustedInterval) {
+        if (stageClockRef.current * 1000 - lastSpawnRef.current > adjustedInterval) {
           spawnItem(width);
-          lastSpawnRef.current = currentTime;
+          lastSpawnRef.current = stageClockRef.current * 1000;
         }
 
         // Update items (Fall, wobble, Magnet Vacuum Pull)
@@ -686,7 +715,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             if (isEdible) {
               const dx = px - it.x;
               const dy = py - it.y;
-              const dist = Math.hypot(dx, dy);
+              const dist = Math.max(0.01, Math.hypot(dx, dy));
               if (dist < 260 && it.y < py + 20) {
                 const pullPower = (1 - dist / 260) * 8 + 3.5;
                 it.x += (dx / dist) * pullPower;
@@ -711,16 +740,17 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
             }
           }
 
-          it.y += it.vy * effectiveSpeed;
-          it.wobble += it.wobbleSpeed;
-          it.x += it.vx + Math.sin(it.wobble) * 0.5;
+          const frame = dt * 60;
+          it.y += it.vy * effectiveSpeed * frame;
+          it.wobble += it.wobbleSpeed * frame;
+          it.x = Math.max(35, Math.min(width - 35, it.x + (it.vx + Math.sin(it.wobble) * 0.25) * frame));
           it.rotation += it.rotSpeed;
 
           // Catching collision radius
           const dx = it.x - px;
           const dy = it.y - py;
           const dist = Math.hypot(dx, dy);
-          const catchRadius = player.radius + it.radius + 6;
+          const catchRadius = player.radius * 0.55 + it.radius * 0.65;
 
           if (!it.isEaten && dist < catchRadius && it.y >= py - 30) {
             it.isEaten = true;
@@ -790,7 +820,7 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
 
                 if (furyActive) {
                   splashColor = '#fbbf24';
-                  text = '+200 FURY!';
+                  text = 'FURY ×5!';
                   textColor = '#fbbf24';
                 } else if (it.type === 'fire') {
                   splashColor = '#f97316';
@@ -1588,40 +1618,28 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
         ctx.textAlign = 'center';
         ctx.shadowColor = '#ea580c';
         ctx.shadowBlur = 15;
-        readableCanvasText(ctx, '🔥 FURY x10 ACTIVATED! NUỐT TẤT CẢ! 🔥', width / 2, height - 12);
+        readableCanvasText(ctx, '🔥 FURY ×5 · NUỐT TẤT CẢ! 🔥', width / 2, height - 12);
         ctx.restore();
       }
 
+      if (warningRef.current && warningRef.current.until > stageClockRef.current) {
+        ctx.save();
+        ctx.fillStyle = '#fda4af'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
+        readableCanvasText(ctx, '⚠', warningRef.current.x, 30);
+        ctx.restore();
+      }
       ctx.restore();
     };
 
     animId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animId);
   }, [
-    isPaused,
-    isGameOver,
-    playerMode,
-    furyActive,
-    speedMultiplier,
-    spawnIntervalMs,
-    bombChance,
-    poisonChance,
-    powerUpChance,
-    combo,
-    comboMultiplier,
-    comboDecayRatio,
-    activePowerUps,
-    currentTheme,
-    onEatItem,
-    onHitHazard,
-    onCollectPowerUp,
-    onConsumeShield,
   ]);
 
   return (
     <div
       ref={containerRef}
-      className="arcade-board relative w-full h-full min-h-[460px] max-h-[760px] rounded-2xl overflow-hidden touch-none select-none bg-black flex items-center justify-center border border-white/10 shadow-2xl"
+      className="arcade-board relative w-full h-full min-h-0 rounded-2xl overflow-hidden touch-none select-none bg-black flex items-center justify-center border border-white/10 shadow-2xl"
     >
       <canvas
         ref={canvasRef}
@@ -1635,4 +1653,5 @@ export const EatEmAllCanvas: React.FC<EatEmAllCanvasProps> = ({
     </div>
   );
 };
+
 
