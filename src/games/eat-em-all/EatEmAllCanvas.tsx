@@ -8,7 +8,7 @@ import {AURAS} from './economy';
 import type {AuraId} from './economy';
 
 interface EatEmAllCanvasProps {
-  playerMode:ElementMode; onSwitchMode:()=>void; isPaused:boolean; isGameOver:boolean; isMuted:boolean; lives:number;
+  celebrating?:boolean; celebrationProgress?:number; celebrationPaused?:boolean; playerMode:ElementMode; onSwitchMode:()=>void; isPaused:boolean; isGameOver:boolean; isMuted:boolean; lives:number;
   furyActive:boolean; speedMultiplier:number; spawnIntervalMs:number; bombChance:number; poisonChance:number;
   powerUpChance?:number; combo:number; comboMultiplier:number; comboDecayRatio:number; activePowerUps:ActivePowerUps;
   auraId?:AuraId|null; currentTheme:BackgroundTheme; onEatItem:(item:FallingItem)=>void; onHitHazard:(item:FallingItem)=>void;
@@ -29,7 +29,7 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
   const [assetState,setAssetState]=useState<'loading'|'ready'|'fallback'>('loading');
   const artRef=useRef<Record<string,CanvasImageSource>>({});
   const body=useRef({x:180,target:180,y:360,r:42,chew:0,hurt:0,turn:0,prevElement:props.playerMode});
-  const game=useRef({time:0,lastSpawn:0,sequence:0,nextId:1,items:[] as FallingItem[],motes:[] as Mote[],labels:[] as Label[],keys:new Set<string>(),lastBossHits:0,bossHit:0});
+  const game=useRef({time:0,lastSpawn:0,sequence:0,nextId:1,items:[] as FallingItem[],motes:[] as Mote[],labels:[] as Label[],keys:new Set<string>(),lastBossHits:0,bossHit:0,celebrationTime:0});
 
   useEffect(()=>{eatAudio.setMuted(props.isMuted);},[props.isMuted]);
   useEffect(()=>{
@@ -83,6 +83,10 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       const p=live.current,b=body.current,g=game.current;
       const active=!p.isPaused&&!p.isGameOver&&!document.hidden;
       const reduced=media?.matches||false;
+      if(p.celebrating&&!p.celebrationPaused&&!document.hidden)g.celebrationTime=Math.min(1.5,g.celebrationTime+dt);
+      if(!p.celebrating)g.celebrationTime=0;
+      const victoryProgress=g.celebrationTime/1.5;
+      const victoryHop=p.celebrating&&!reduced?Math.abs(Math.sin(victoryProgress*Math.PI*2))*27*(1-victoryProgress*.3):0;
       if(!active)g.keys.clear();
       if(active){
         g.time+=dt;
@@ -129,13 +133,14 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       // Cosmetic auras sit behind the hero and never cover falling items.
       const aura=AURAS.find(a=>a.id===p.auraId);
       if(aura){ctx.save();ctx.strokeStyle=aura.color+'88';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(b.x,b.y+15,b.r*1.25,b.r*.6,0,0,Math.PI*2);ctx.stroke();for(let i=0;i<2;i++){const angle=i*Math.PI+(reduced?0:g.time*.9);sprite(ctx,aura.icon,b.x+Math.cos(angle)*b.r*1.15,b.y-5+Math.sin(angle)*b.r*.55,19);}ctx.restore();}
-      ctx.save();ctx.translate(b.x,b.y);
+      ctx.save();ctx.translate(b.x,b.y-victoryHop);
+      if(p.celebrating&&!reduced)ctx.rotate(Math.sin(victoryProgress*Math.PI*4)*.1);
       const bob=reduced?0:Math.sin(g.time*3.3)*2;
       if(p.furyActive){ctx.strokeStyle='#f9d27d';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,4,b.r*1.35,b.r*.9,0,0,Math.PI*2);ctx.stroke();}
       if(p.activePowerUps.shield){ctx.strokeStyle='#b6efdbb0';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-5,b.r*1.2,0,Math.PI*2);ctx.stroke();}
-      const pose=b.hurt>0?'hurt':p.isGameOver?'happy':p.furyActive?'fury':b.chew>0?'eat':p.isPaused?'sleep':'idle';
-      if(b.hurt>0&&!reduced)ctx.globalAlpha=.55+.45*Math.abs(Math.sin(g.time*25));
-      const stretch=reduced?0:b.chew>0?Math.sin(b.chew/.25*Math.PI)*.09:b.turn>0?Math.sin(b.turn/.3*Math.PI)*-.08:0;
+      const pose=p.celebrating?'happy':b.hurt>0?'hurt':p.isGameOver?'happy':p.furyActive?'fury':b.chew>0?'eat':p.isPaused?'sleep':'idle';
+      if(b.hurt>0&&!reduced&&!p.celebrating)ctx.globalAlpha=.55+.45*Math.abs(Math.sin(g.time*25));
+      const stretch=reduced?0:p.celebrating?Math.sin(victoryProgress*Math.PI*4)*.07:b.chew>0?Math.sin(b.chew/.25*Math.PI)*.09:b.turn>0?Math.sin(b.turn/.3*Math.PI)*-.08:0;
       ctx.scale(1-stretch,1+stretch);
       if(p.skinId?.includes('neon')){ctx.shadowColor='#a0f3d7';ctx.shadowBlur=12;}
       if(p.skinId?.includes('dragon'))ctx.filter='saturate(1.4) hue-rotate(18deg)';
@@ -143,14 +148,19 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       sprite(ctx,`nom-${p.playerMode}-${pose}`,0,bob,b.r*2.6);ctx.restore();
       // Foreground gameplay items must stay above the hero, including near misses.
       for(const it of g.items){
+        if(p.celebrating&&victoryProgress>.35)continue;
         if(['bomb','poison'].includes(it.type)&&it.y<60){ctx.strokeStyle='#f9bd8c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(it.x-6,15);ctx.lineTo(it.x,5);ctx.lineTo(it.x+6,15);ctx.stroke();}
-        ctx.save();ctx.translate(it.x,it.y);ctx.rotate(it.rotation);
+        ctx.save();if(p.celebrating)ctx.globalAlpha=Math.max(0,1-victoryProgress/.35);ctx.translate(it.x,it.y);ctx.rotate(it.rotation);
         // Ice uses facets; fire uses curved flame. Both are readable at 40px.
         const selected=it.type===p.playerMode||p.furyActive;
         if(selected){ctx.strokeStyle=p.playerMode==='ice'?'#a9f4e688':'#ffcc8b88';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,it.radius+5,0,Math.PI*2);ctx.stroke();}
         sprite(ctx,it.type,0,0,it.radius*2.5);
         if(it.type==='gem'&&p.campaignStage?.objective==='rescue'){ctx.fillStyle='#fff7d5';ctx.beginPath();ctx.ellipse(-5,0,2,3,0,0,Math.PI*2);ctx.ellipse(5,0,2,3,0,0,Math.PI*2);ctx.fill();}
         ctx.restore();
+      }
+      if(p.celebrating){
+        sprite(ctx,'crown',b.x,b.y-b.r*1.8-victoryHop,34);
+        if(!reduced){for(let i=0;i<24;i++){const phase=Math.min(1,(victoryProgress+i*.009)%1);const angle=i/24*Math.PI*2;const distance=22+phase*110;const x=b.x+Math.cos(angle)*distance;const y=b.y-45+Math.sin(angle)*distance+phase*55;ctx.save();ctx.globalAlpha=(1-phase)*.9;ctx.translate(x,y);ctx.rotate(phase*6+i);if(i%4===0)sprite(ctx,'star',0,0,13);else{ctx.fillStyle=['#f6d78c','#b0e6d1','#edb2a2','#afc9f0'][i%4];ctx.fillRect(-2,-4,4,8);}ctx.restore();}}
       }
       for(const m of g.motes){ctx.globalAlpha=Math.max(0,1-m.age/m.ttl);ctx.fillStyle=m.color;ctx.beginPath();ctx.arc(m.x,m.y,m.size,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
       for(const l of g.labels){ctx.save();ctx.globalAlpha=Math.max(0,1-l.age);ctx.font='800 13px system-ui, sans-serif';ctx.textAlign='center';ctx.strokeStyle='#12302f';ctx.lineWidth=4;ctx.strokeText(l.text,Math.max(58,Math.min(width-58,l.x)),l.y);ctx.fillStyle=l.color;ctx.fillText(l.text,Math.max(58,Math.min(width-58,l.x)),l.y);ctx.restore();}

@@ -1,0 +1,9 @@
+# Eat Em All — victory presentation v5
+
+After the last required item/armor hit, the round enters a separate `celebrating` state for 1.5 seconds. Movement, spawning, collision callbacks and match time stop. Nốm switches to the happy pose, performs two small hops with squash/tilt, receives a crown and a bounded 24-piece confetti burst. Remaining items fade out. The result dialog is not mounted until this beat finishes.
+
+The result then reveals one target at a time: 0.15-second lead-in, 0.55-second slots, 0.42-second eased integer count. Boss armor is a separate target row. Each target stops exactly at its quota/count and gets a check when complete. Score and earned rewards count after the target rows. Earned stars pop individually at 0.42-second intervals with glow, eight sparks and a rising tone. Unearned stars stay dim. A two-target, three-star result takes about 3.76 seconds after opening to finish its presentation.
+
+Next remains a one-tap action and can immediately enter the next level. A separate fast-forward icon completes all counters instantly. Animating rewards never grants currency; awards are committed once by the finish handler before presentation. External pause/tab hiding freezes presentation time, opening story pauses result counters, and unmount/retry cancels old timers. Reduced-motion styling disables spring/spark effects; the renderer uses a static happy pose instead of hops/confetti.
+
+Validation: isolated TypeScript and standalone HTML syntax passed. Unit/React DOM tests verify the 1.5-second delay, pause/resume, frozen match callbacks, gradual ordered target counts, separate stars, boss armor tally, fast-forward, reward idempotency and immediate Next. The actual Canvas component was executed under native Canvas2D and its victory frame inspected for happy pose, hop, crown and confetti. Browser CSS/touch QA and target-device performance remain unverified; production has not been deployed.
