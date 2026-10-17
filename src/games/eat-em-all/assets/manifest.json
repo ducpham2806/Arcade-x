@@ -5,6 +5,18 @@
   "background": "world.webp",
   "assets": [
     {
+      "id": "coin",
+      "file": "svg/coin.svg",
+      "width": 128,
+      "height": 128,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "rasterCache": 96,
+      "bytes": 1248
+    },
+    {
       "id": "ice",
       "file": "svg/ice.svg",
       "width": 128,
@@ -714,5 +726,5 @@
     }
   ],
   "worldBytes": 173044,
-  "sourceCount": 59
+  "sourceCount": 60
 }

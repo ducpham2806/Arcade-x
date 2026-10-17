@@ -4,12 +4,14 @@ import type { CampaignStage } from './campaign';
 import { bossPhase, planDrop } from './encounters';
 import { ART_SOURCES, artUrl, worldUrl } from './art';
 import { eatAudio } from './audio';
+import {AURAS} from './economy';
+import type {AuraId} from './economy';
 
 interface EatEmAllCanvasProps {
   playerMode:ElementMode; onSwitchMode:()=>void; isPaused:boolean; isGameOver:boolean; isMuted:boolean; lives:number;
   furyActive:boolean; speedMultiplier:number; spawnIntervalMs:number; bombChance:number; poisonChance:number;
   powerUpChance?:number; combo:number; comboMultiplier:number; comboDecayRatio:number; activePowerUps:ActivePowerUps;
-  currentTheme:BackgroundTheme; onEatItem:(item:FallingItem)=>void; onHitHazard:(item:FallingItem)=>void;
+  auraId?:AuraId|null; currentTheme:BackgroundTheme; onEatItem:(item:FallingItem)=>void; onHitHazard:(item:FallingItem)=>void;
   onCollectPowerUp:(type:PowerUpType)=>void; onConsumeShield:()=>void; targetItems?:Partial<Record<ItemType,number>>;
   remainingTargets?:Partial<Record<ItemType,number>>; skinId?:string; campaignStage?:CampaignStage; stageElapsed?:number;
 }
@@ -124,16 +126,9 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       const ledge=ctx.createLinearGradient(0,b.y+35,0,height);ledge.addColorStop(0,'#273f32');ledge.addColorStop(1,'#0b2526');ctx.fillStyle=ledge;ctx.beginPath();ctx.moveTo(0,b.y+51);ctx.quadraticCurveTo(width*.5,b.y+39,width,b.y+51);ctx.lineTo(width,height);ctx.lineTo(0,height);ctx.closePath();ctx.fill();ctx.strokeStyle='#a4ac6e66';ctx.lineWidth=2;ctx.stroke();
       const boss=p.campaignStage?.objective==='boss';
       if(boss){const phase=bossPhase(p.stageElapsed||0);const size=Math.max(108,Math.min(176,width*.32,height*.32));const y=Math.max(83,height*.22);const breathe=reduced?0:Math.sin(g.time*1.7)*3;const attack=phase.warning;ctx.save();ctx.globalAlpha=.9;ctx.fillStyle=phase.element==='ice'?'#8edddd25':'#f6bc7825';ctx.beginPath();ctx.ellipse(width/2,y,size*.52,size*.45,0,0,Math.PI*2);ctx.fill();const recoil=g.bossHit>0&&!reduced?Math.sin(g.bossHit*50)*4:0;sprite(ctx,`guardian-${chapter}-${g.bossHit>0?'hurt':attack?'attack':'idle'}`,width/2+recoil,y+breathe,size);ctx.restore();if(phase.vulnerable){sprite(ctx,phase.element,width/2,y+size*.25,28);}}
-      for(const it of g.items){
-        if(['bomb','poison'].includes(it.type)&&it.y<60){ctx.strokeStyle='#f9bd8c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(it.x-6,15);ctx.lineTo(it.x,5);ctx.lineTo(it.x+6,15);ctx.stroke();}
-        ctx.save();ctx.translate(it.x,it.y);ctx.rotate(it.rotation);
-        // Ice uses facets; fire uses curved flame. Both are readable at 40px.
-        const selected=it.type===p.playerMode||p.furyActive;
-        if(selected){ctx.strokeStyle=p.playerMode==='ice'?'#a9f4e688':'#ffcc8b88';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,it.radius+5,0,Math.PI*2);ctx.stroke();}
-        sprite(ctx,it.type,0,0,it.radius*2.5);
-        if(it.type==='gem'&&p.campaignStage?.objective==='rescue'){ctx.fillStyle='#fff7d5';ctx.beginPath();ctx.ellipse(-5,0,2,3,0,0,Math.PI*2);ctx.ellipse(5,0,2,3,0,0,Math.PI*2);ctx.fill();}
-        ctx.restore();
-      }
+      // Cosmetic auras sit behind the hero and never cover falling items.
+      const aura=AURAS.find(a=>a.id===p.auraId);
+      if(aura){ctx.save();ctx.strokeStyle=aura.color+'88';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(b.x,b.y+15,b.r*1.25,b.r*.6,0,0,Math.PI*2);ctx.stroke();for(let i=0;i<2;i++){const angle=i*Math.PI+(reduced?0:g.time*.9);sprite(ctx,aura.icon,b.x+Math.cos(angle)*b.r*1.15,b.y-5+Math.sin(angle)*b.r*.55,19);}ctx.restore();}
       ctx.save();ctx.translate(b.x,b.y);
       const bob=reduced?0:Math.sin(g.time*3.3)*2;
       if(p.furyActive){ctx.strokeStyle='#f9d27d';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,4,b.r*1.35,b.r*.9,0,0,Math.PI*2);ctx.stroke();}
@@ -146,6 +141,17 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       if(p.skinId?.includes('dragon'))ctx.filter='saturate(1.4) hue-rotate(18deg)';
       if(p.skinId?.includes('cyber'))ctx.filter='saturate(.65)';
       sprite(ctx,`nom-${p.playerMode}-${pose}`,0,bob,b.r*2.6);ctx.restore();
+      // Foreground gameplay items must stay above the hero, including near misses.
+      for(const it of g.items){
+        if(['bomb','poison'].includes(it.type)&&it.y<60){ctx.strokeStyle='#f9bd8c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(it.x-6,15);ctx.lineTo(it.x,5);ctx.lineTo(it.x+6,15);ctx.stroke();}
+        ctx.save();ctx.translate(it.x,it.y);ctx.rotate(it.rotation);
+        // Ice uses facets; fire uses curved flame. Both are readable at 40px.
+        const selected=it.type===p.playerMode||p.furyActive;
+        if(selected){ctx.strokeStyle=p.playerMode==='ice'?'#a9f4e688':'#ffcc8b88';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,it.radius+5,0,Math.PI*2);ctx.stroke();}
+        sprite(ctx,it.type,0,0,it.radius*2.5);
+        if(it.type==='gem'&&p.campaignStage?.objective==='rescue'){ctx.fillStyle='#fff7d5';ctx.beginPath();ctx.ellipse(-5,0,2,3,0,0,Math.PI*2);ctx.ellipse(5,0,2,3,0,0,Math.PI*2);ctx.fill();}
+        ctx.restore();
+      }
       for(const m of g.motes){ctx.globalAlpha=Math.max(0,1-m.age/m.ttl);ctx.fillStyle=m.color;ctx.beginPath();ctx.arc(m.x,m.y,m.size,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
       for(const l of g.labels){ctx.save();ctx.globalAlpha=Math.max(0,1-l.age);ctx.font='800 13px system-ui, sans-serif';ctx.textAlign='center';ctx.strokeStyle='#12302f';ctx.lineWidth=4;ctx.strokeText(l.text,Math.max(58,Math.min(width-58,l.x)),l.y);ctx.fillStyle=l.color;ctx.fillText(l.text,Math.max(58,Math.min(width-58,l.x)),l.y);ctx.restore();}
       if(p.combo>=5){ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffe6a2';ctx.fillText(`×${p.comboMultiplier} · ${p.combo} CHUỖI`,width/2,height-24);ctx.fillStyle='#eadcb333';ctx.fillRect(width/2-46,height-16,92,3);ctx.fillStyle=accent;ctx.fillRect(width/2-46,height-16,92*p.comboDecayRatio,3);}

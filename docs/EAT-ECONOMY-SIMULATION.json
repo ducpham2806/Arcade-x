@@ -1,0 +1,167 @@
+{
+  "version": 4,
+  "days": 90,
+  "usersPerProfile": 1000,
+  "totalUsers": 4000,
+  "seed": 777,
+  "scope": "Campaign reward grants only; excludes generic launcher score rewards and other games. No IAP; spender profile intentionally matches core.",
+  "hypothesis": "Synthetic play model, not observed player behavior.",
+  "profiles": [
+    {
+      "profile": "casual",
+      "parameters": {
+        "id": "casual",
+        "sessions": 1,
+        "attempts": 3,
+        "win": 0.65,
+        "one": 0.22,
+        "two": 0.58
+      },
+      "firstAuraDayMedian": 2,
+      "campaignClearDayMedian": 13,
+      "day90MeanCoins": 3899.74,
+      "day90MeanXp": 2099.74,
+      "day90MeanAuras": 4.99,
+      "cohorts": [
+        {
+          "day": 7,
+          "meanEarned": 26.4,
+          "meanSpent": 20.89,
+          "walletMedian": 6,
+          "walletP90": 10
+        },
+        {
+          "day": 30,
+          "meanEarned": 58.61,
+          "meanSpent": 45,
+          "walletMedian": 14,
+          "walletP90": 18
+        },
+        {
+          "day": 90,
+          "meanEarned": 71.97,
+          "meanSpent": 71.73,
+          "walletMedian": 0,
+          "walletP90": 0
+        }
+      ]
+    },
+    {
+      "profile": "core",
+      "parameters": {
+        "id": "core",
+        "sessions": 3,
+        "attempts": 4,
+        "win": 0.8,
+        "one": 0.1,
+        "two": 0.45
+      },
+      "firstAuraDayMedian": 1,
+      "campaignClearDayMedian": 3,
+      "day90MeanCoins": 3900,
+      "day90MeanXp": 2100,
+      "day90MeanAuras": 5,
+      "cohorts": [
+        {
+          "day": 7,
+          "meanEarned": 71.85,
+          "meanSpent": 70.49,
+          "walletMedian": 0,
+          "walletP90": 0
+        },
+        {
+          "day": 30,
+          "meanEarned": 72,
+          "meanSpent": 72,
+          "walletMedian": 0,
+          "walletP90": 0
+        },
+        {
+          "day": 90,
+          "meanEarned": 72,
+          "meanSpent": 72,
+          "walletMedian": 0,
+          "walletP90": 0
+        }
+      ]
+    },
+    {
+      "profile": "grinder",
+      "parameters": {
+        "id": "grinder",
+        "sessions": 6,
+        "attempts": 5,
+        "win": 0.9,
+        "one": 0.03,
+        "two": 0.27
+      },
+      "firstAuraDayMedian": 1,
+      "campaignClearDayMedian": 1,
+      "day90MeanCoins": 3900,
+      "day90MeanXp": 2100,
+      "day90MeanAuras": 5,
+      "cohorts": [
+        {
+          "day": 7,
+          "meanEarned": 72,
+          "meanSpent": 72,
+          "walletMedian": 0,
+          "walletP90": 0
+        },
+        {
+          "day": 30,
+          "meanEarned": 72,
+          "meanSpent": 72,
+          "walletMedian": 0,
+          "walletP90": 0
+        },
+        {
+          "day": 90,
+          "meanEarned": 72,
+          "meanSpent": 72,
+          "walletMedian": 0,
+          "walletP90": 0
+        }
+      ]
+    },
+    {
+      "profile": "spender",
+      "parameters": {
+        "id": "spender",
+        "sessions": 3,
+        "attempts": 4,
+        "win": 0.8,
+        "one": 0.1,
+        "two": 0.45
+      },
+      "firstAuraDayMedian": 1,
+      "campaignClearDayMedian": 3,
+      "day90MeanCoins": 3900,
+      "day90MeanXp": 2100,
+      "day90MeanAuras": 5,
+      "cohorts": [
+        {
+          "day": 7,
+          "meanEarned": 71.85,
+          "meanSpent": 70.49,
+          "walletMedian": 0,
+          "walletP90": 0
+        },
+        {
+          "day": 30,
+          "meanEarned": 72,
+          "meanSpent": 72,
+          "walletMedian": 0,
+          "walletP90": 0
+        },
+        {
+          "day": 90,
+          "meanEarned": 72,
+          "meanSpent": 72,
+          "walletMedian": 0,
+          "walletP90": 0
+        }
+      ]
+    }
+  ]
+}

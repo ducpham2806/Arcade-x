@@ -1,5 +1,7 @@
 # Eat Em All: Trái Tim Hai Nguyên Tố — v2
 
+Quy tắc flow/thưởng hiện hành v4: xem `EAT-ECONOMY-V4.md`. Các thông số v2/v3 bên dưới được giữ làm lịch sử thiết kế.
+
 ## Vấn đề và giả thuyết vui
 
 Bản cũ có 12 màn cùng một bộ sinh ngẫu nhiên, tăng tốc và tỷ lệ bom. Điều kiện thắng đếm mọi món thay vì kiểm tra từng quota; người chơi có thể bỏ qua mục tiêu ghi trên màn. Fury tự kích hoạt nên ít quyết định chiến thuật. UI có nhiều thông số và tách người chơi khỏi hành động.
@@ -61,3 +63,5 @@ Art v3 thay toàn bộ phần vẽ bằng asset SVG gốc: Nốm 18 biến thể
 2026-10-17: thay chiến dịch 12 màn bằng 24 màn có truyện, deficit-driven spawns, mục tiêu chính xác, boss theo pha, cứu linh hồn, Fury thủ công, bùa, ba sao, thưởng lần đầu, UI điện thoại và desktop; giữ bản live nguyên trạng chờ duyệt.
 
 2026-10-17, Art v3: hình ảnh fantasy thống nhất, các trạng thái nhân vật/boss, vật phẩm và booster riêng, bản đồ có đường hành trình, Sổ linh thú, giao diện viền đồng/giấy cổ, xuất 59 SVG và manifest. Kiểm tra thêm native Canvas2D trong ba chương, có thực thi hứng vật phẩm. Chưa kiểm tra bố cục CSS trong trình duyệt thật hay đo GPU trên điện thoại.
+
+2026-10-17, Flow/Economy v4: vật phẩm vẽ trước Nốm; lobby dùng icon và một CTA; Chơi/Tiếp/Chơi lại vào màn trực tiếp, truyện tùy chọn. Phân bổ lại cùng ngân sách 3.900 xu/2.100 XP cho lần thắng đầu, sao mới và boss; 72 sao mở năm hào quang trang trí; mô phỏng 90 ngày/4.000 hồ sơ.

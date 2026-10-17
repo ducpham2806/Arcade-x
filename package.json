@@ -30,7 +30,8 @@
     "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
     "test:eat": "node scripts/test-eat-journey.mjs",
     "export:eat-art": "node scripts/export-eat-art.mjs",
-    "preview:eat": "node scripts/export-eat-review.mjs"
+    "preview:eat": "node scripts/export-eat-review.mjs",
+    "simulate:eat-economy": "node scripts/simulate-eat-economy.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
