@@ -109,4 +109,13 @@ Added Settings/storefront entry points for **Đơn thuê của tôi**, with stat
 
 Added the unmounted `server/commerce/http.ts` boundary and public DTOs: owner-only list/detail/create/cancel, strict JSON limits, bearer authentication through the injected service, mandatory host rate-limit hook, sanitized errors and private/no-store responses. The persistence contract now includes owner-filtered keyset order queries. See the server README for paths and adapter requirements.
 
-Next: durable persistence and hosting/session adapters, payment-provider checkout/signature verification, and an audited admin review queue. Supabase work and live checkout remain deferred. No hosted API or browser QA is claimed in this step.
+Next: durable persistence and hosting/session adapters, payment-provider checkout/signature verification, and deployment verification. Supabase work and live checkout remain deferred. No hosted API or browser QA is claimed in this step.
+
+
+## Step 5 — admin payment review
+
+Added the admin list/detail screen with amount comparison, known-order payment references, history, notes, refund-work queue, closing a case and guarded payment approval. Every decision requires a reason and confirmation. Server admin membership, optimistic revision and command idempotency are checked on each operation; the audit captures before/after state. Verified full refunds resolve related cases and cannot leave a refunded active grant through an approval race.
+
+Added three admin HTTP routes behind an independent disabled readiness gate, and `VITE_RENTAL_REVIEW_API=false` for the UI transport. The queue only includes verified abnormal events already associated with a known order. No money is transferred by marking "Chờ hoàn tiền"; only verified provider notifications confirm refunds. Partial refunds, unknown-order reconciliation and initiating a refund need provider integration.
+
+Validation: 53 commerce/core/HTTP/client tests. No Supabase migration, live API, real provider payment or production deployment is enabled by this step. Next: durable repository/admin/session adapters, a chosen payment provider and staging QA. Browser layout/focus and real database race checks remain unverified.

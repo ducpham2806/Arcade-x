@@ -20,16 +20,17 @@ const date = (x: unknown) => typeof x === 'string' && Number.isFinite(Date.parse
 const validId = (x: unknown) => typeof x === 'string' && /^[A-Za-z0-9_-]{1,200}$/.test(x);
 function validOrder(o: any): o is OrderView { return o && validId(o.id) && typeof o.title === 'string' && ['game', 'bundle', 'all'].includes(o.scope) && Array.isArray(o.gameIds) && o.gameIds.every(x => typeof x === 'string') && terms.includes(o.term) && Number.isSafeInteger(o.amount) && o.amount > 0 && o.currency === 'VND' && states.includes(o.state) && date(o.createdAt) && date(o.expiresAt) && (o.paidAt === undefined || date(o.paidAt)) && Array.isArray(o.grants) && o.grants.every(g => g && date(g.startsAt) && date(g.expiresAt) && (g.revokedAt === undefined || date(g.revokedAt))); }
 const validCursor = (c: any) => c === null || c && validId(c.id) && date(c.createdAt);
-export function createOrdersClient(options: {
+export type RentalClientOptions = {
     enabled: boolean;
     readSession: () => Promise<{
         owner: string;
         token: string;
     } | null>;
     fetcher?: typeof fetch;
-}): OrdersClient {
+};
+export function createRentalTransport(options: RentalClientOptions) {
     const fetcher = options.fetcher ?? fetch;
-    async function request(owner: string, path: string, method: string, signal?: AbortSignal) {
+    async function request(owner: string, path: string, method: string, signal?: AbortSignal, payload: unknown = {}) {
         if (!options.enabled)
             throw new OrdersError('orders_unavailable');
         const controller = new AbortController();
@@ -43,8 +44,8 @@ export function createOrdersClient(options: {
             if (!session || session.owner !== owner)
                 throw new OrdersError('account_changed');
             controller.signal.throwIfAborted();
-            const response = await fetcher('/api/rentals/orders' + path, { method, headers: { Authorization: `Bearer ${session.token}`, ...(method === 'POST' ? { 'Content-Type': 'application/json' } : {}) },
-                ...(method === 'POST' ? { body: '{}' } : {}), cache: 'no-store', credentials: 'omit', signal: controller.signal, redirect: 'error' });
+            const response = await fetcher('/api/rentals' + path, { method, headers: { Authorization: `Bearer ${session.token}`, ...(method === 'POST' ? { 'Content-Type': 'application/json' } : {}) },
+                ...(method === 'POST' ? { body: JSON.stringify(payload) } : {}), cache: 'no-store', credentials: 'omit', signal: controller.signal, redirect: 'error' });
             const body = await response.json().catch(() => { throw new OrdersError('invalid_response'); });
             const latest = await options.readSession();
             if (!latest || latest.owner !== owner)
@@ -69,16 +70,32 @@ export function createOrdersClient(options: {
             signal?.removeEventListener('abort', abort);
         }
     }
-    async function detail(owner: string, id: string, method: string, signal?: AbortSignal) { if (!validId(id))
-        throw new OrdersError('invalid_response'); const data = await request(owner, `/${encodeURIComponent(id)}${method === 'POST' ? '/cancel' : ''}`, method, signal); if (!validOrder(data?.order) || !date(data?.serverTime))
-        throw new OrdersError('invalid_response'); return data as {
-        order: OrderView;
-        serverTime: string;
-    }; }
+    return request;
+}
+export function createOrdersClient(options: RentalClientOptions): OrdersClient {
+    const transport = createRentalTransport(options);
+    const request = (owner: string, path: string, method: string, signal?: AbortSignal) => transport(owner, '/orders' + path, method, signal);
+    async function detail(owner: string, id: string, method: string, signal?: AbortSignal) {
+        if (!validId(id))
+            throw new OrdersError('invalid_response');
+        const data = await request(owner, `/${encodeURIComponent(id)}${method === 'POST' ? '/cancel' : ''}`, method, signal);
+        if (!validOrder(data?.order) || !date(data?.serverTime))
+            throw new OrdersError('invalid_response');
+        return data as {
+            order: OrderView;
+            serverTime: string;
+        };
+    }
     return { enabled: options.enabled,
-        async list(owner, cursor, signal) { const params = new URLSearchParams({ limit: '20' }); if (cursor)
-            params.set('cursor', JSON.stringify(cursor)); const data = await request(owner, '?' + params, 'GET', signal); if (!data || !Array.isArray(data.orders) || data.orders.length > 20 || !data.orders.every(validOrder) || !date(data.serverTime) || !validCursor(data.nextCursor))
-            throw new OrdersError('invalid_response'); return data as OrderPage; },
+        async list(owner, cursor, signal) {
+            const params = new URLSearchParams({ limit: '20' });
+            if (cursor)
+                params.set('cursor', JSON.stringify(cursor));
+            const data = await request(owner, '?' + params, 'GET', signal);
+            if (!data || !Array.isArray(data.orders) || data.orders.length > 20 || !data.orders.every(validOrder) || !date(data.serverTime) || !validCursor(data.nextCursor))
+                throw new OrdersError('invalid_response');
+            return data as OrderPage;
+        },
         detail: (owner, id, signal) => detail(owner, id, 'GET', signal), cancel: (owner, id, signal) => detail(owner, id, 'POST', signal) };
 }
 export function orderErrorText(e: unknown): string {

@@ -1,0 +1,27 @@
+import type { OrderCursor } from '../../shared/rental-orders';
+import type { ReviewStatus, ReviewPage, ReviewReply, ReviewView, ReviewDecision } from '../../shared/rental-reviews';
+import { createRentalTransport, OrdersError, orderErrorText, type RentalClientOptions } from './orders-client';
+export interface ReviewClient {
+    enabled: boolean;
+    list(owner: string, status: ReviewStatus | 'all', cursor?: OrderCursor | null, signal?: AbortSignal): Promise<ReviewPage>;
+    detail(owner: string, id: string, signal?: AbortSignal): Promise<ReviewReply>;
+    decide(owner: string, id: string, input: ReviewDecision, signal?: AbortSignal): Promise<ReviewReply>;
+}
+const date = (v: unknown) => typeof v === 'string' && Number.isFinite(Date.parse(v));
+const id = (v: unknown) => typeof v === 'string' && /^[A-Za-z0-9_-]{1,200}$/.test(v);
+function validReview(v: any): v is ReviewView {
+    return v && id(v.id) && id(v.orderId) && typeof v.ownerId === 'string' && typeof v.title === 'string' && ['awaiting_payment', 'paid', 'cancelled', 'expired', 'review', 'refunded'].includes(v.orderState) && Number.isSafeInteger(v.expectedAmount) && v.expectedAmount > 0 && v.expectedCurrency === 'VND' && typeof v.reason === 'string' && ['open', 'awaiting_refund', 'resolved'].includes(v.status) && Number.isSafeInteger(v.revision) && v.revision > 0 && date(v.createdAt) && date(v.updatedAt) && typeof v.canGrant === 'boolean' && (v.grantBlockReason === null || typeof v.grantBlockReason === 'string') && v.event && ['provider', 'eventId', 'paymentId', 'currency'].every(k => typeof v.event[k] === 'string') && ['paid', 'refunded'].includes(v.event.kind) && Number.isSafeInteger(v.event.amount) && v.event.amount > 0 && date(v.event.occurredAt) && Array.isArray(v.history) && v.history.length <= 20 && v.history.every(h => h && ['grant_access', 'queue_refund', 'dismiss', 'note', 'provider_refund'].includes(h.action) && typeof h.actorId === 'string' && typeof h.reason === 'string' && date(h.at));
+}
+export function createReviewClient(options: RentalClientOptions): ReviewClient {
+    const request = createRentalTransport(options), base = '/admin/reviews';
+    async function one(owner: string, caseId: string, signal?: AbortSignal, input?: ReviewDecision) { if (!id(caseId))
+        throw new OrdersError('invalid_response'); const data = await request(owner, `${base}/${caseId}${input ? '/decide' : ''}`, input ? 'POST' : 'GET', signal, input); if (!validReview(data?.review) || !date(data?.serverTime))
+        throw new OrdersError('invalid_response'); return data as ReviewReply; }
+    return { enabled: options.enabled, async list(owner, status, cursor, signal) { const params = new URLSearchParams({ limit: '20', status }); if (cursor)
+            params.set('cursor', JSON.stringify(cursor)); const data = await request(owner, base + '?' + params, 'GET', signal); if (!data || !Array.isArray(data.reviews) || data.reviews.length > 20 || !data.reviews.every(validReview) || !date(data.serverTime) || !(data.nextCursor === null || data.nextCursor && id(data.nextCursor.id) && date(data.nextCursor.createdAt)))
+            throw new OrdersError('invalid_response'); return data as ReviewPage; },
+        detail: (owner, caseId, signal) => one(owner, caseId, signal), decide: (owner, caseId, input, signal) => one(owner, caseId, signal, input) };
+}
+export function reviewErrorText(e: unknown) { const code = e instanceof OrdersError ? e.code : ''; return ({ reviews_unavailable: 'Dịch vụ đối soát chưa được mở. Hãy thử lại sau khi kết nối được hoàn tất.', admin_required: 'Bạn không còn quyền đối soát. Hãy mở lại màn hình bằng tài khoản admin.', review_not_found: 'Hồ sơ không còn tồn tại.', review_stale: 'Hồ sơ vừa thay đổi ở nơi khác. Dữ liệu mới sẽ được tải lại; hãy kiểm tra trước khi thao tác.', review_closed: 'Hồ sơ đã được xử lý. Hãy tải lại để xem kết quả.', review_grant_forbidden: 'Giao dịch không đủ điều kiện cấp quyền. Hãy kiểm tra hồ sơ mới nhất.', invalid_review_decision: 'Cần chọn thao tác hợp lệ và nhập lý do từ 3–500 ký tự.', request_key_reused: 'Yêu cầu này đã được dùng với nội dung khác. Hãy tải lại hồ sơ.' } as Record<string, string>)[code] || orderErrorText(e); }
+export const reviewReasons: Record<string, string> = { amount_mismatch: 'Sai số tiền thanh toán', currency_mismatch: 'Khác loại tiền', partial_or_excess_refund: 'Hoàn tiền một phần hoặc vượt số tiền đơn', outside_payment_window: 'Thanh toán ngoài hạn của đơn', extra_payment: 'Thanh toán thêm cho đơn đã trả tiền', order_not_payable: 'Đơn đã hủy hoặc cần kiểm tra', payment_requires_review: 'Giao dịch đang cần đối soát' };
+export const grantReasons: Record<string, string> = { not_open: 'Hồ sơ không ở trạng thái cần xử lý.', refund_event: 'Đây là thông báo hoàn tiền, không dùng để cấp quyền.', amount_or_currency_mismatch: 'Số tiền hoặc loại tiền chưa khớp với đơn.', payment_not_eligible: 'Giao dịch chưa đủ điều kiện xác nhận thanh toán.', order_already_settled: 'Đơn đã được thanh toán hoặc đã đóng.', account_unavailable: 'Tài khoản không còn đủ điều kiện nhận quyền.', grant_exists: 'Đơn đã có quyền được cấp trước đó.' };

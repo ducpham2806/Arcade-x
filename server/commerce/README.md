@@ -1,6 +1,6 @@
 # Rental order and settlement core
 
-This server-only module implements checkout and settlement rules with injected persistence, authentication and provider verification. It has no HTTP endpoint, production database adapter or payment-provider adapter yet. Nothing in `src/` imports it. Store checkout remains disabled. Do not expose the in-memory ledger or test verifier in a deployed handler.
+This server-only module implements checkout and settlement rules with injected persistence, authentication and provider verification. It has no deployed HTTP endpoint, production database adapter or payment-provider adapter yet. Nothing in `src/` imports it. Store checkout remains disabled. Do not expose the in-memory ledger or test verifier in a deployed handler.
 
 Run `npm run test:commerce` for executable examples. No credentials or external services are required. `npm run lint` also type-checks the server module.
 
@@ -23,7 +23,7 @@ Run `npm run test:commerce` for executable examples. No credentials or external 
 4. `PaymentVerifier`: choose a provider, verify its documented signature against the original raw bytes; check merchant, test/live environment, provider status and freshness; normalize timestamps and refund totals. Include the verified provider namespace and trusted order reference. No default verifier is provided. Failed/cancelled provider statuses do not create a success event.
 5. Provider initiation: persist the pending order first, then create a provider checkout session with the order ID and a provider idempotency key. Retry/reconcile session creation without creating a new order. Store the resulting provider reference through a separate durable transaction. Redirect return is informational; only verified settlement grants access.
 6. HTTP boundary: create/cancel/history require server authentication and owner checks; the webhook uses provider authentication. Apply strict JSON/body limits and response/error mapping. Do not return raw errors, keys, raw webhook bodies or other owners' data. Persist unknown-order or invalid events in an operator-visible quarantine/retry flow before acknowledging to a provider.
-7. Review UI: list mismatched/late/extra payments, partial refunds and cancellation races. An authorized resolution must have a mandatory reason, audit trail, idempotency key and atomic entitlement updates. This core deliberately has no automatic "approve review" path yet.
+7. Review UI: list mismatched/late/extra payments, partial refunds and cancellation races. An authorized resolution must have a mandatory reason, audit trail, idempotency key and atomic entitlement updates. The review service now supports guarded approval of verified matching payments; durable storage and production integration are still required.
 8. Existing account/game blocks and maintenance must still win during access checks after settlement. Receiving money records a paid entitlement; it never removes a block. Starter/admin grants remain separate sources. Do not wire `grantActive` as a replacement for the full access evaluator.
 
 ## Deferred decisions
@@ -55,3 +55,34 @@ Frontend entry points are Settings → Đơn thuê của tôi and the game store
 The client checks the expected account before and after a request, validates returned data, uses abort/timeout and no-store requests, and never persists orders/tokens in a separate local cache. The screen is remounted on account switch, supports local status filtering, paginated loading, inline details, confirmation before cancellation and server-relative deadline labels. The first page polls every 20 seconds only while visible and awaiting payment; pagination pauses polling so it does not discard older loaded pages. Returning to the tab or reconnecting reloads the first page. Paid grant dates distinguish active, future renewal, expired and revoked grants.
 
 Test coverage includes HTTP/client roundtrips with a test-only ledger: owner isolation, same-timestamp pagination, automatic expiry, cancellation/payment races, DTO redaction, field/body limits, disabled gates, account switches in flight and HTML fallback/malformed responses. Browser layout/focus checks and deployment remain pending staging.
+
+
+## Admin review queue (step 5)
+
+Verified abnormal events for a known order now create a private `ReviewCase` in the same transaction as payment/order/receipt/audit updates. Repeated delivery of the same event does not create another case. Unknown-order events and rejected signatures remain outside this queue; the production provider adapter still needs a quarantine/reconciliation path for them.
+
+The admin screen is reached from Access administration → Đối soát giao dịch. It has server status filters, cursor pagination, local search, a list/detail layout, expected-versus-received amounts, order/account/payment references and the latest 20 history entries. Mobile switches between list and detail instead of placing detail after a long queue. Decisions require a reason (3–500 characters) and a separate confirmation step.
+
+| Action | Effect |
+| --- | --- |
+| `note` | Append a note; preserve financial state and access |
+| `queue_refund` | Mark work as awaiting refund; does not call a provider or transfer money |
+| `dismiss` | Close this case; preserve order, payment and access state |
+| `grant_access` | For eligible verified full matching payments only, record paid order and one rental grant using normal renewal rules |
+
+Grant approval is denied for amount/currency mismatch, refund notifications, already-paid/refunded orders, an existing grant, a payment that is not in review, previous refunded value or an unregistered/missing owner. A late/cancelled order with a verified full matching payment may be approved explicitly with a reason. Approval starts the rental now or appends it to same-coverage rental time. Account/game restrictions and maintenance still apply in access evaluation.
+
+Admin membership comes from `Transaction.isAdmin(userId)` inside every transaction, never client flags or JWT user metadata. `expectedRevision` rejects stale decisions; `(admin_id, request_key)` and its payload fingerprint make retries idempotent. Review update, optional grant/order/payment, command receipt and before/after audit must commit or roll back together. Membership revocation must take effect on the next read/write. Other cases referring to a newly-settled order may remain open for explicit closure; their grant eligibility becomes false.
+
+A verified full refund resolves related cases and appends provider history, even after admin approval. When a known payment was underpaid or in a different currency, full-refund matching uses that payment's actual recorded amount/currency rather than the offer price. A refund of a secondary payment still leaves the primary paid entitlement intact. Partial refunds need manual review; this screen cannot initiate refunds, change received amounts, combine underpayments or reassign a payment to another owner/order. Closing a review does not change an order still marked review.
+
+Additional transaction adapter methods: `review`, `reviews`, `reviewsForPayment`, `putReview`, `reviewCommand`, `putReviewCommand`, `isAdmin`. Store cases/history/command receipts in private RLS-protected tables; enforce unique admin command keys and lock the review, order, provider payment and owner coverage during decisions and provider settlement. Stable queue cursor is `(created_at DESC, id DESC)`. Use indexed status/created_at/id and payment-key lookups; never trust a UI-selected ID without the fresh membership check.
+
+Additional unmounted HTTP routes:
+- `GET /api/rentals/admin/reviews?status=open|awaiting_refund|resolved|all&limit=20&cursor=...`
+- `GET /api/rentals/admin/reviews/:id`
+- `POST /api/rentals/admin/reviews/:id/decide` with `{action,expectedRevision,reason,requestKey}` only.
+
+The handler requires `enabled`, a rate-limit callback and independent `reviewEnabled:true`; the frontend requires access preview plus `VITE_RENTAL_REVIEW_API=true`. All default off. These gates do not enable payments. Leave them off until durable admin/queue/command/audit adapters are deployed. No fixture data is shown to admins in the unavailable state.
+
+`npm run test:commerce` now runs 53 tests covering core, history, review service/HTTP/client, fresh role checks, retry/conflict handling, two admins, atomic rollback, approval/refund races, mismatched-payment refunds and independent readiness gates. The concurrency fixture serializes in memory; production database concurrency, browser layout/focus and live provider behavior still need staging verification.

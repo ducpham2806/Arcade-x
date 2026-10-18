@@ -1,3 +1,4 @@
+import type { ReviewStatus, ReviewEntry } from '../../shared/rental-reviews';
 import type { OrderCursor } from '../../shared/rental-orders';
 /** Server-only contracts. Do not import this service into the browser bundle. */
 export type Term = '7d' | '14d' | '30d' | '3m' | '6m' | '1y';
@@ -69,14 +70,41 @@ export interface EventReceipt {
     fingerprint: string;
     result: Settlement;
 }
+export interface ReviewCase {
+    id: string;
+    orderId: string;
+    paymentKey: string;
+    reason: string;
+    event: PaymentEvent;
+    status: ReviewStatus;
+    revision: number;
+    createdAt: string;
+    updatedAt: string;
+    history: ReviewEntry[];
+}
+export interface ReviewCommand {
+    adminId: string;
+    requestKey: string;
+    fingerprint: string;
+    reviewId: string;
+}
 export interface Audit {
     action: string;
     targetId: string;
     actor: string;
     at: string;
     reason: string;
+    before?: unknown;
+    after?: unknown;
 }
 export interface Transaction {
+    isAdmin(userId: string): Promise<boolean>;
+    review(id: string): Promise<ReviewCase | null>;
+    reviews(status: ReviewStatus | 'all', before: OrderCursor | null, limit: number): Promise<ReviewCase[]>;
+    reviewsForPayment(paymentKey: string): Promise<ReviewCase[]>;
+    putReview(review: ReviewCase): Promise<void>;
+    reviewCommand(adminId: string, requestKey: string): Promise<ReviewCommand | null>;
+    putReviewCommand(command: ReviewCommand): Promise<void>;
     checkoutEnabled(): Promise<boolean>;
     account(ownerId: string): Promise<Account | null>;
     offer(id: string): Promise<Offer | null>;

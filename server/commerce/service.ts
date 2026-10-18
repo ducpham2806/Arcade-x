@@ -1,5 +1,6 @@
+import type { ReviewStatus, ReviewPage, ReviewView, ReviewReply, ReviewDecision } from '../../shared/rental-reviews';
 import type { OrderCursor, OrderPage, OrderView } from '../../shared/rental-orders';
-import type { CommerceRepository, IdentityProvider, PaymentVerifier, Offer, Order, PaymentEvent, Settlement, Term, Transaction, RentalGrant } from './types';
+import type { CommerceRepository, IdentityProvider, PaymentVerifier, Offer, Order, PaymentEvent, Settlement, Term, Transaction, RentalGrant, ReviewCase } from './types';
 export class CommerceError extends Error {
     constructor(public code: string) { super(code); this.name = 'CommerceError'; }
 }
@@ -178,12 +179,17 @@ export class CommerceService {
                     order.state = 'review';
                     await tx.putOrder(order);
                 }
+                const at = this.clock().toISOString();
+                await tx.putReview({ id: this.id(), orderId: order.id, paymentKey, reason, event: { provider: e.provider, eventId: e.eventId, paymentId: e.paymentId, orderId: e.orderId, kind: e.kind, amount: e.amount, currency: e.currency, occurredAt: e.occurredAt },
+                    status: 'open', revision: 1, createdAt: at, updatedAt: at, history: [] });
                 return finish({ outcome: 'review', orderId: order.id, reason });
             };
-            if (e.currency !== order.offer.currency)
+            const expectedCurrency = e.kind === 'refunded' && previous && previous.amount > 0 ? previous.currency : order.offer.currency;
+            if (e.currency !== expectedCurrency)
                 return review('currency_mismatch');
             if (e.kind === 'refunded') {
-                if (e.amount !== order.offer.amount)
+                const refundable = previous && previous.amount > 0 ? previous.amount : order.offer.amount;
+                if (e.amount !== refundable)
                     return review('partial_or_excess_refund');
                 if (previous?.state === 'refunded')
                     return finish({ outcome: 'duplicate', orderId: order.id });
@@ -197,6 +203,13 @@ export class CommerceService {
                             grant.revokedAt = this.clock().toISOString();
                             await tx.putGrant(grant);
                         }
+                }
+                for (const c of await tx.reviewsForPayment(paymentKey)) {
+                    c.status = 'resolved';
+                    c.revision++;
+                    c.updatedAt = this.clock().toISOString();
+                    c.history.push({ action: 'provider_refund', actorId: e.provider, reason: 'Verified full refund received', at: c.updatedAt });
+                    await tx.putReview(c);
                 }
                 return finish({ outcome: 'refunded', orderId: order.id });
             }
@@ -214,21 +227,112 @@ export class CommerceService {
                 return review('order_not_payable');
             if (Date.parse(e.occurredAt) < Date.parse(order.createdAt) || Date.parse(e.occurredAt) >= Date.parse(order.expiresAt))
                 return review('outside_payment_window');
-            const now = this.clock().toISOString(), coverage = coverageKey(order.offer);
-            let start = now;
-            for (const grant of await tx.grants(order.ownerId))
-                if (!grant.revokedAt && grant.coverageKey === coverage && Date.parse(grant.expiresAt) > Date.parse(start))
-                    start = grant.expiresAt;
-            const grant: RentalGrant = { id: this.id(), orderId: order.id, ownerId: order.ownerId, coverageKey: coverage,
-                gameIds: [...order.offer.gameIds], allGames: order.offer.scope === 'all', startsAt: start, expiresAt: addTerm(start, order.offer.term) };
-            await tx.putGrant(grant);
-            order.state = 'paid';
-            order.paidAt = now;
-            order.paymentKey = paymentKey;
-            await tx.putOrder(order);
-            await tx.putPayment({ key: paymentKey, orderId: order.id, state: 'paid', amount: e.amount, currency: e.currency, refundedTotal: 0 });
+            await this.grantPayment(tx, order, paymentKey, e.amount, e.currency);
             return finish({ outcome: 'unlocked', orderId: order.id });
         });
+    }
+    async listReviews(session: unknown, options: {
+        status?: ReviewStatus | 'all';
+        limit?: number;
+        cursor?: OrderCursor | null;
+    } = {}): Promise<ReviewPage> {
+        const actor = await this.identity.requireUser(session), status = options.status ?? 'open', limit = options.limit ?? 20, cursor = options.cursor ?? null;
+        return this.repo.transaction(async (tx) => {
+            await this.requireAdmin(tx, actor.id);
+            if (!['open', 'awaiting_refund', 'resolved', 'all'].includes(status) || !Number.isInteger(limit) || limit < 1 || limit > 50 || cursor && (!cursor.id || typeof cursor.id !== 'string' || cursor.id.length > 200 || typeof cursor.createdAt !== 'string' || !Number.isFinite(Date.parse(cursor.createdAt))))
+                fail('invalid_page');
+            const rows = await tx.reviews(status, cursor, limit + 1), reviews: ReviewView[] = [];
+            for (const c of rows.slice(0, limit))
+                reviews.push(await this.reviewView(tx, c));
+            const last = rows[Math.min(rows.length, limit) - 1];
+            return { reviews, nextCursor: rows.length > limit ? { createdAt: last.createdAt, id: last.id } : null, serverTime: this.clock().toISOString() };
+        });
+    }
+    async reviewDetails(session: unknown, id: string): Promise<ReviewReply> {
+        const actor = await this.identity.requireUser(session);
+        return this.repo.transaction(async (tx) => {
+            await this.requireAdmin(tx, actor.id);
+            const c = await tx.review(id);
+            if (!c)
+                fail('review_not_found');
+            return { review: await this.reviewView(tx, c), serverTime: this.clock().toISOString() };
+        });
+    }
+    async decideReview(session: unknown, id: string, input: ReviewDecision): Promise<ReviewReply> {
+        const actor = await this.identity.requireUser(session);
+        return this.repo.transaction(async (tx) => {
+            await this.requireAdmin(tx, actor.id);
+            if (!input || !['grant_access', 'queue_refund', 'dismiss', 'note'].includes(input.action) || !Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 1 || typeof input.reason !== 'string' || input.reason.trim().length < 3 || input.reason.trim().length > 500 || typeof input.requestKey !== 'string' || !/^[A-Za-z0-9_-]{16,100}$/.test(input.requestKey))
+                fail('invalid_review_decision');
+            const reason = input.reason.trim(), fingerprint = JSON.stringify([id, input.action, input.expectedRevision, reason]);
+            const previous = await tx.reviewCommand(actor.id, input.requestKey);
+            if (previous) {
+                if (previous.fingerprint !== fingerprint || previous.reviewId !== id)
+                    fail('request_key_reused');
+                const saved = await tx.review(id);
+                if (!saved)
+                    fail('review_not_found');
+                return { review: await this.reviewView(tx, saved), serverTime: this.clock().toISOString() };
+            }
+            const c = await tx.review(id);
+            if (!c)
+                fail('review_not_found');
+            if (c.revision !== input.expectedRevision)
+                fail('review_stale');
+            if (c.status === 'resolved')
+                fail('review_closed');
+            const before = structuredClone(c), view = await this.reviewView(tx, c);
+            if (input.action === 'grant_access') {
+                if (!view.canGrant)
+                    fail('review_grant_forbidden');
+                const order = await tx.order(c.orderId);
+                await this.grantPayment(tx, order!, c.paymentKey, c.event.amount, c.event.currency);
+                c.status = 'resolved';
+            }
+            else if (input.action === 'queue_refund')
+                c.status = 'awaiting_refund';
+            else if (input.action === 'dismiss')
+                c.status = 'resolved';
+            c.revision++;
+            c.updatedAt = this.clock().toISOString();
+            c.history.push({ action: input.action, actorId: actor.id, reason, at: c.updatedAt });
+            await tx.putReview(c);
+            await tx.audit({ action: 'review_' + input.action, targetId: c.id, actor: actor.id, at: c.updatedAt, reason, before, after: structuredClone(c) });
+            await tx.putReviewCommand({ adminId: actor.id, requestKey: input.requestKey, fingerprint, reviewId: id });
+            return { review: await this.reviewView(tx, c), serverTime: this.clock().toISOString() };
+        });
+    }
+    private async requireAdmin(tx: Transaction, id: string) { if (!await tx.isAdmin(id))
+        fail('admin_required'); }
+    private async reviewView(tx: Transaction, c: ReviewCase): Promise<ReviewView> {
+        const o = await tx.order(c.orderId);
+        if (!o)
+            fail('review_not_found');
+        const p = await tx.payment(c.paymentKey), account = await tx.account(o.ownerId);
+        const grants = await tx.grants(o.ownerId);
+        const blocked = c.status !== 'open' ? 'not_open' : c.event.kind !== 'paid' ? 'refund_event' :
+            c.event.currency !== o.offer.currency || c.event.amount !== o.offer.amount ? 'amount_or_currency_mismatch' :
+                !p || p.state !== 'review' || p.orderId !== o.id || p.amount !== c.event.amount || p.currency !== c.event.currency || p.refundedTotal > 0 ? 'payment_not_eligible' :
+                    o.paymentKey || !['review', 'cancelled', 'expired', 'awaiting_payment'].includes(o.state) ? 'order_already_settled' :
+                        !account?.registered ? 'account_unavailable' : grants.some(g => g.orderId === o.id) ? 'grant_exists' : null;
+        return { id: c.id, orderId: o.id, ownerId: o.ownerId, title: o.offer.title, orderState: o.state, expectedAmount: o.offer.amount, expectedCurrency: o.offer.currency,
+            reason: c.reason, status: c.status, event: { provider: c.event.provider, eventId: c.event.eventId, paymentId: c.event.paymentId, kind: c.event.kind, amount: c.event.amount, currency: c.event.currency, occurredAt: c.event.occurredAt }, revision: c.revision, createdAt: c.createdAt, updatedAt: c.updatedAt,
+            canGrant: blocked === null, grantBlockReason: blocked, history: c.history.slice(-20).map(h => ({ ...h })) };
+    }
+    private async grantPayment(tx: Transaction, order: Order, paymentKey: string, amount: number, currency: string) {
+        const now = this.clock().toISOString(), coverage = coverageKey(order.offer);
+        let start = now;
+        for (const grant of await tx.grants(order.ownerId))
+            if (!grant.revokedAt && grant.coverageKey === coverage && Date.parse(grant.expiresAt) > Date.parse(start))
+                start = grant.expiresAt;
+        const grant: RentalGrant = { id: this.id(), orderId: order.id, ownerId: order.ownerId, coverageKey: coverage,
+            gameIds: [...order.offer.gameIds], allGames: order.offer.scope === 'all', startsAt: start, expiresAt: addTerm(start, order.offer.term) };
+        await tx.putGrant(grant);
+        order.state = 'paid';
+        order.paidAt = now;
+        order.paymentKey = paymentKey;
+        await tx.putOrder(order);
+        await tx.putPayment({ key: paymentKey, orderId: order.id, state: 'paid', amount, currency, refundedTotal: 0 });
     }
     private audit(tx: Transaction, action: string, targetId: string, actor: string, reason: string) { return tx.audit({ action, targetId, actor, reason, at: this.clock().toISOString() }); }
 }

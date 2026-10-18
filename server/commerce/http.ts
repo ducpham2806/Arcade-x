@@ -1,7 +1,9 @@
 import { CommerceError, CommerceService } from './service';
 import type { OrderCursor } from '../../shared/rental-orders';
+import type { ReviewDecision, ReviewStatus } from '../../shared/rental-reviews';
+const reviewBase = '/api/rentals/admin/reviews';
 const base = '/api/rentals/orders';
-const errorStatus: Record<string, number> = { unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
+const errorStatus: Record<string, number> = { admin_required: 403, review_not_found: 404, invalid_review_decision: 400, review_stale: 409, review_closed: 409, review_grant_forbidden: 409, unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
     invalid_page: 400, invalid_request_key: 400, price_changed: 409, request_key_reused: 409, order_cannot_cancel: 409,
     checkout_disabled: 503, offer_unavailable: 409, game_unavailable: 409, invalid_offer: 409 };
 function json(body: unknown, status = 200) {
@@ -77,6 +79,7 @@ function cursor(value: string | null): OrderCursor | null {
  * IdentityProvider independently verifies the bearer token on every service operation. */
 export function createCommerceHandler(service: CommerceService, options: {
     enabled?: boolean;
+    reviewEnabled?: boolean;
     allowRequest?: (request: Request) => Promise<boolean>;
 } = {}) {
     return async (request: Request): Promise<Response> => {
@@ -84,16 +87,40 @@ export function createCommerceHandler(service: CommerceService, options: {
             if (!options.enabled || !options.allowRequest)
                 return json({ error: 'orders_unavailable' }, 503);
             const url = new URL(request.url);
-            if (url.pathname !== base && !url.pathname.startsWith(base + '/'))
+            const isReview = url.pathname === reviewBase || url.pathname.startsWith(reviewBase + '/');
+            if (isReview && !options.reviewEnabled)
+                return json({ error: 'reviews_unavailable' }, 503);
+            if (!isReview && url.pathname !== base && !url.pathname.startsWith(base + '/'))
                 return json({ error: 'not_found' }, 404);
             const auth = request.headers.get('authorization');
             if (!auth || !/^Bearer [^\s]{1,8192}$/.test(auth))
                 return json({ error: 'unauthenticated' }, 401);
             if (!await options.allowRequest(request))
                 return json({ error: 'rate_limited' }, 429);
-            const session = auth.slice(7), parts = url.pathname.slice(base.length).split('/').filter(Boolean);
+            const session = auth.slice(7), parts = url.pathname.slice((isReview ? reviewBase : base).length).split('/').filter(Boolean);
             if (parts.length > 2 || parts.some(p => !/^[A-Za-z0-9_-]{1,200}$/.test(p)))
                 bad('invalid_path');
+            if (isReview) {
+                if (!parts.length && request.method === 'GET') {
+                    if ([...url.searchParams.keys()].some(k => !['limit', 'cursor', 'status'].includes(k)) || ['limit', 'cursor', 'status'].some(k => url.searchParams.getAll(k).length > 1))
+                        bad('invalid_page');
+                    const raw = url.searchParams.get('limit');
+                    if (raw !== null && !/^\d{1,2}$/.test(raw))
+                        bad('invalid_page');
+                    return json(await service.listReviews(session, { limit: raw === null ? 20 : Number(raw), status: (url.searchParams.get('status') ?? 'open') as ReviewStatus | 'all', cursor: cursor(url.searchParams.get('cursor')) }));
+                }
+                if (url.search)
+                    bad('unexpected_query');
+                if (parts.length === 1 && request.method === 'GET')
+                    return json(await service.reviewDetails(session, parts[0]));
+                if (parts.length === 2 && parts[1] === 'decide' && request.method === 'POST') {
+                    const body = await readBody(request);
+                    if (Object.keys(body).some(k => !['action', 'expectedRevision', 'reason', 'requestKey'].includes(k)))
+                        bad('unexpected_field');
+                    return json(await service.decideReview(session, parts[0], body as unknown as ReviewDecision));
+                }
+                return json({ error: 'method_not_allowed' }, 405);
+            }
             if (!parts.length && request.method === 'GET') {
                 if ([...url.searchParams.keys()].some(k => !['limit', 'cursor'].includes(k)) || url.searchParams.getAll('limit').length > 1 || url.searchParams.getAll('cursor').length > 1)
                     bad('invalid_page');

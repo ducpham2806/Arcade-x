@@ -8,12 +8,16 @@ const clone=value=>structuredClone(value);
 export class Ledger {
   data={enabled:true,available:true,accounts:{alice:{registered:true,pilot:true,blocked:false},bob:{registered:true,pilot:true,blocked:false}},
     offers:{one:{id:'one',revision:'r1',title:'2048 7 days',scope:'game',gameIds:['tile-2048'],term:'7d',amount:10000,currency:'VND',active:true}},
-    orders:{},payments:{},events:{},grants:{},audit:[]};
+    orders:{},payments:{},events:{},grants:{},audit:[],admins:['bob'],reviews:{},commands:{}};
   tail=Promise.resolve(); failAudit=false;
   async transaction(work){
     let release;const before=this.tail;this.tail=new Promise(resolve=>{release=resolve});await before;
     const d=clone(this.data);
     const tx={
+      isAdmin:async id=>d.admins.includes(id),review:async id=>clone(d.reviews[id]??null),
+      reviews:async(status,before,limit)=>clone(Object.values(d.reviews).filter(r=>(status==='all'||r.status===status)&&(!before||r.createdAt<before.createdAt||r.createdAt===before.createdAt&&r.id<before.id)).sort((a,b)=>a.createdAt===b.createdAt?(a.id>b.id?-1:a.id<b.id?1:0):(a.createdAt>b.createdAt?-1:1)).slice(0,limit)),
+      reviewsForPayment:async key=>clone(Object.values(d.reviews).filter(r=>r.paymentKey===key)),putReview:async r=>{d.reviews[r.id]=clone(r)},
+      reviewCommand:async(admin,key)=>clone(d.commands[JSON.stringify([admin,key])]??null),putReviewCommand:async c=>{d.commands[JSON.stringify([c.adminId,c.requestKey])]=clone(c)},
       checkoutEnabled:async()=>d.enabled,account:async id=>clone(d.accounts[id]??null),offer:async id=>clone(d.offers[id]??null),
       gamesAvailable:async()=>d.available,order:async id=>clone(d.orders[id]??null),
       orderByRequest:async(owner,key)=>clone(Object.values(d.orders).find(o=>o.ownerId===owner&&o.requestKey===key)??null),
