@@ -30,6 +30,7 @@ docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/launcher.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/supabase/tests/subscription-foundation.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/supabase/tests/starter-gifts.sql"
+docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/supabase/tests/store-trial.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/car-escape.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/word-cross-fixtures.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/word-cross.sql"

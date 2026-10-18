@@ -78,6 +78,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
   onGameOver,
   onRestart,
   initialState,
+  trialMode = false,
 }) => {
   const savedBoard = readSavedBoard(initialState !== undefined ? initialState : bridge.loadGameState());
   const [gameMode, setGameMode] = useState<GameMode>(savedBoard?.gameMode ?? 'classic');
@@ -122,6 +123,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
   const boardRef = useRef<HTMLDivElement | null>(null);
   const initializedModeRef = useRef<GameMode | null>(savedBoard?.gameMode ?? null);
   const rngRef = useRef(savedBoard?.rngState ?? crypto.getRandomValues(new Uint32Array(1))[0]);
+  const trialFinalScore = useRef<number|null>(null);
   const endedRef = useRef(false);
   const inputBusyRef = useRef(false);
   const [assisted, setAssisted] = useState(savedBoard?.assisted ?? (savedBoard ? true : false));
@@ -130,8 +132,9 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
   const finish = useCallback((finalScore: number) => {
     if (endedRef.current) return;
     endedRef.current = true;
+    if(trialMode){trialFinalScore.current=finalScore;return;}
     onGameOver(finalScore, { mode: gameMode === 'classic' ? 0 : gameMode === 'big5x5' ? 1 : 2, assisted: assisted ? 1 : 0 });
-  }, [onGameOver, gameMode, assisted]);
+  }, [onGameOver, gameMode, assisted, trialMode]);
 
 
   function createEmptyGrid(size: number): number[][] {
@@ -205,6 +208,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
       maxTile, rushTime, gemsEarnedThisGame, milestonesReached,
       undoCharges, shuffleCharges, hammerCharges, history };
     bridge.saveGameState(snapshot);
+    if(trialMode&&trialFinalScore.current!==null){const final=trialFinalScore.current;trialFinalScore.current=null;onGameOver(final);}
     bridge.updateSessionState?.({ score, moves: movesCount });
   }, [bridge, gameMode, grid, score, combo, movesCount, maxTile, rushTime,
     gemsEarnedThisGame, milestonesReached, undoCharges, shuffleCharges, hammerCharges, history, assisted]);
@@ -284,7 +288,7 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
         if (newScore > bestScore) {
           setBestScore(newScore);
           try {
-            localStorage.setItem(`arcadex_best_2048_v2_${gameMode}_${assisted ? 'assisted' : 'pure'}`, newScore.toString());
+            if (!trialMode) localStorage.setItem(`arcadex_best_2048_v2_${gameMode}_${assisted ? 'assisted' : 'pure'}`, newScore.toString());
           } catch {
             // ignore
           }
@@ -508,7 +512,8 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
             Cổ Điển
           </button>
           <button
-            onClick={() => { if (gameMode === 'big5x5') return; if (movesCount > 0) setPendingMode('big5x5'); else setGameMode('big5x5'); }}
+            disabled={trialMode}
+            onClick={() => { if (trialMode || gameMode === 'big5x5') return; if (movesCount > 0) setPendingMode('big5x5'); else setGameMode('big5x5'); }}
             className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
               gameMode === 'big5x5' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
             }`}
@@ -516,7 +521,8 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
             5x5 Lớn
           </button>
           <button
-            onClick={() => { if (gameMode === 'rush') return; if (movesCount > 0) setPendingMode('rush'); else setGameMode('rush'); }}
+            disabled={trialMode}
+            onClick={() => { if (trialMode || gameMode === 'rush') return; if (movesCount > 0) setPendingMode('rush'); else setGameMode('rush'); }}
             className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
               gameMode === 'rush' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'
             }`}
@@ -725,4 +731,5 @@ export const Tile2048Game: React.FC<GameComponentProps> = ({
     </div>
   );
 };
+
 

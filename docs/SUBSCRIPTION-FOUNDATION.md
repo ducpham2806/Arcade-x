@@ -68,3 +68,31 @@ Frontend: TypeScript --noEmit thành công; build với VITE_ACCESS_CONTROL_V2=t
 Database: npm run test:subscriptions chạy PostgreSQL PGlite tách biệt, không dùng production; kiểm tra cả nền tảng và quà đăng ký. tests/run-supabase.sh có test SQL để chạy lại với PostgreSQL Docker trong CI (Docker không có ở phiên này).
 
 Giới hạn: chưa browser QA, chưa triển khai Supabase staging, chưa tạo admin thật. Local build chỉ là kiểm tra mã nguồn; không phục hồi toàn bộ media/standalone để tạo gói phát hành. Nhánh GitHub giữ nguyên mọi asset từ main, không commit dist local. Không sử dụng build local này để deploy.
+
+## Step 2 — store and 2048 trial pilot
+
+Migration `20261018052000_subscription_store_trial.sql` adds private, RLS-protected offer configuration, trial quotas and per-account trial saves. Admin membership is checked on every configuration RPC; writes require a reason and append an audit record.
+
+- Store entry points: game library and game detail, gated by `VITE_ACCESS_CONTROL_V2=true`.
+- Offers: one game, bundle or all games; each offer has one of the six supported terms and an integer VND price. No seed prices. Draft offers are hidden; referenced unavailable games hide the offer. Admin can create, edit and hide offers.
+- Checkout is always disabled in this phase. No order, payment event, renewal or paid entitlement is produced by the store.
+- Trial: only premium/locked 2048, registered pilot accounts, classic mode. Admin enables it and sets a lifetime allowance of 1–10 boards per account. Starting a new board consumes a run; retries/resume return the existing board. Starting again checks quota, account/game blocks, maintenance and rollout.
+- Resume deadline: 24 hours after starting a board. Passing it does not interrupt an already-running board. Saving an existing board remains possible during maintenance or after the resume deadline, to preserve progress; opening it again is denied.
+- Saves: private server storage, optimistic revision check, retry of an identical acknowledged write is idempotent. A competing tab cannot silently overwrite newer progress. Save errors pause input. The exit action flushes pending state. Trial does not write the regular save, rewards or leaderboard. Final-board snapshot is emitted before the trial completion callback.
+- Trial UI suppresses the forced-update modal while mounted. No automatic page reload during gameplay.
+- Trial state is untrusted client state. This is a product trial gate, not DRM for downloaded JavaScript. No trial score should be accepted for competitive rewards.
+- Importing a trial board into a regular game is deferred; this phase retains it only as a separate trial save. No implicit overwrite or reward migration.
+
+### Staging status and next execution
+
+No migration from this PR has been applied to production. On 2026-10-18, creating the `subscription-pilot` Supabase branch failed twice with `Invalid or expired requestState`; listing branches returned none. Refresh the Supabase connection/branch confirmation before retrying. No cost confirmation was fabricated or bypassed.
+
+After a staging branch is available:
+1. Apply the existing schema and both subscription migrations in order. Configure the frontend with the staging URL/key and the preview flag; keep production preview flag false.
+2. Create two registered QA accounts and one admin membership on staging only. Enable pilot mode and enroll the QA accounts.
+3. Set staging `tile-2048` to published/premium. Existing live games remain free; the trial deliberately does not appear for games already unlocked. Configure the three starter gifts to exclude 2048 while testing locked trials.
+4. Create test offers through admin, enable the trial, then exercise create/resume, refresh, two tabs, account switching, offline-save recovery, quota exhaustion, maintenance and rollout-off. Verify completed trials and normal games cannot overwrite each other's saves.
+5. Check narrow/mobile and desktop modal layout, keyboard focus, lazy-load errors and PWA update suppression. Browser QA has not been run in this environment.
+6. Review the draft PR before deploying a full repository build. The local restored workspace contains only a subset of public game assets and must not be deployed as a complete asset bundle.
+
+Validation: TypeScript and Vite production build with the preview flag enabled; isolated PostgreSQL fixtures for offer validation, access/admin boundaries, trial retries, stale revisions, cross-account isolation, quota, maintenance, resume expiry, pilot-off, audit and no entitlement creation. Real concurrent PostgreSQL transactions and hosted browser flows remain staging checks.

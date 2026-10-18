@@ -2,6 +2,7 @@ import React,{useEffect,useRef,useState} from 'react';
 import {useAuth} from '../context/AuthContext';
 import {accessPreviewEnabled,accessRpc,adminState,adminCommand,termOptions,type AdminState} from './api';
 import './access-admin.css';
+import {StoreAdmin} from './StoreAdmin';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const date=(value:string|null)=>value?new Date(value).toLocaleString('vi-VN'):'Không hết hạn';
 export function AccessAdminEntry({onOpen}:{onOpen:()=>void}){
@@ -38,6 +39,7 @@ function AdminContent({onBack}:{onBack:()=>void}){
     <label className="access-checkbox"><input type="checkbox" checked={starterEnabled} onChange={e=>setStarterEnabled(e.target.checked)}/>Tự tặng cho tài khoản thử chưa nhận quà</label>
     <button disabled={busy||starter.some(id=>!id)||new Set(starter).size!==3} className="launcher-secondary" onClick={()=>choose('starter_config',{p_game_ids:starter,p_enabled:starterEnabled},'Lưu cấu hình bộ 3 game miễn phí')}>Lưu bộ quà</button>
    </section>
+   <StoreAdmin games={state.games}/>
    <section><h4>Tra cứu người chơi</h4><form onSubmit={e=>{e.preventDefault();if(uuid.test(userInput.trim()))void load(userInput.trim());else setMessage('Nhập UUID tài khoản Supabase hợp lệ.')}}>
     <label>Mã tài khoản (UUID)<input value={userInput} onChange={e=>setUserInput(e.target.value)} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required/></label><button disabled={busy} className="launcher-secondary">Tra cứu</button>
    </form>

@@ -7,10 +7,13 @@ import {normalizeSearch} from '../launcher/catalog';
 import {GameArtwork} from '../visuals/gameArt';
 import {FeaturedCarousel} from '../launcher/FeaturedCarousel';
 import {LazyGameCard} from './common/LazyGameCard';
+import {accessPreviewEnabled} from '../commerce/api';
+import {StoreModal} from '../commerce/StoreModal';
 const categories=[['Tất Cả','Tất cả'],['Yêu Thích','Yêu thích'],['Puzzle','Giải đố'],['Arcade','Arcade'],['Action','Hành động'],['Reflex','Phản xạ'],['Multiplayer','Đối kháng']];
 const initialFilter=()=>{try{return JSON.parse(sessionStorage.getItem('launcher_library_filter')||'{}');}catch{return {};}};
 export const GameCatalog:React.FC=()=>{
  const {launchGame,openGameDetail,favorites,toggleFavorite,recentlyPlayed}=useGame();const {profile}=usePlayer();const {catalog,source,refresh}=useLauncher();
+ const [storeOpen,setStoreOpen]=useState(false);
  const [category,setCategory]=useState(initialFilter().category||'Tất Cả');const [query,setQuery]=useState(initialFilter().query||'');
  useEffect(()=>{try{sessionStorage.setItem('launcher_library_filter',JSON.stringify({category,query}));}catch{}},[category,query]);
  useEffect(()=>{const select=(e:Event)=>{setCategory((e as CustomEvent<string>).detail);setQuery('');};window.addEventListener('arcadex:filter_games',select);return()=>window.removeEventListener('arcadex:filter_games',select);},[]);
@@ -22,6 +25,8 @@ export const GameCatalog:React.FC=()=>{
 
  const reset=()=>{setQuery('');setCategory('Tất Cả');};
  return <div className="launcher-catalog arcade-catalog simple-catalog">
+  {accessPreviewEnabled&&<button className="launcher-secondary" onClick={()=>setStoreOpen(true)}>Gói game & chơi thử</button>}
+  {storeOpen&&<StoreModal onClose={()=>setStoreOpen(false)}/>}
   <FeaturedCarousel games={catalog.games} onPlay={launchGame} onDetail={openGameDetail}/>
   <div className="launcher-benefits"><span><Gamepad2 size={17}/>Chọn game và chơi ngay</span><span><Heart size={17}/>Lưu những trò bạn thích</span><span><CloudOff size={17}/>Game đơn hỗ trợ chơi offline</span></div>
   {recent.length>0&&<section id="recent-games" className="launcher-recents" aria-labelledby="heading-recently-played"><div className="launcher-section-title"><h2 id="heading-recently-played">Chơi gần đây</h2><span>Quay lại trò bạn thích</span></div><div>{recent.map(game=><button key={game!.id} id={`btn-play-recent-${game!.id}`} onClick={()=>launchGame(game!.id)}><div><GameArtwork gameId={game!.id}/></div><span>{game!.title}</span><ArrowUpRight size={19}/></button>)}</div></section>}
@@ -33,4 +38,5 @@ export const GameCatalog:React.FC=()=>{
   </section>
  </div>;
 };
+
 
