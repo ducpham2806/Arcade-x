@@ -96,3 +96,9 @@ After a staging branch is available:
 6. Review the draft PR before deploying a full repository build. The local restored workspace contains only a subset of public game assets and must not be deployed as a complete asset bundle.
 
 Validation: TypeScript and Vite production build with the preview flag enabled; isolated PostgreSQL fixtures for offer validation, access/admin boundaries, trial retries, stale revisions, cross-account isolation, quota, maintenance, resume expiry, pilot-off, audit and no entitlement creation. Real concurrent PostgreSQL transactions and hosted browser flows remain staging checks.
+
+## Step 3 — independent order and settlement core
+
+`server/commerce` now implements server-side rules for snapshotted rental orders, owner access/cancellation, expiry, verified webhook delivery, event/payment deduplication, renewal scheduling and full-refund revocation. `npm run test:commerce` exercises these rules using a test-only transactional ledger and verifier. See `server/commerce/README.md` for integration contracts and unresolved cases.
+
+This is not connected to Supabase, the storefront or a live payment provider. No new migrations or production changes are part of this step. Checkout stays disabled. Next: implement durable adapters, a chosen provider's signature verification and session creation, order history/review UI, then staging verification. Supabase work is intentionally deferred at the user's request; a reminder was scheduled for the morning of 2026-10-19 in Asia/Ho_Chi_Minh.
