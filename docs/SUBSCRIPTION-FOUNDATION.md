@@ -127,3 +127,11 @@ Added storefront quote/review, explicit order creation, preparing a provider ses
 Added a provider-neutral checkout coordinator with a 45-second lease, immutable idempotency key, replay/recovery, exact HTTPS origin allowlist and order/amount/currency/expiry validation. External network calls stay outside database transactions. Quote/create/session endpoints require an explicit server readiness flag plus coordinator and repository checkout permission; `VITE_RENTAL_CHECKOUT_API=false` remains the default. The existing catalog SQL is unchanged.
 
 Validation: 67 commerce/core/HTTP/client scenarios. Durable storage, hosting/session adapters, a real payment provider, reconciliation/cancellation handling, owned/free-coverage pricing policy and staging QA are the remaining integration work. No production deployment, migration or actual payment collection was enabled.
+
+## Security/recovery preparation — 18 October 2026
+
+Added fail-closed server review MFA assurance and explicit read/decide permissions,
+including permission revocation before command replay. Added security/recovery runbook
+at `docs/operations/SECURITY-RECOVERY.md`. Real MFA setup, private permission storage,
+legacy admin RPC hardening and backup/restore execution remain pending with service
+integration; no live configuration changed and commerce flags remain off.

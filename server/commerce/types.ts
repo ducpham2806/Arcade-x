@@ -132,6 +132,8 @@ export interface Transaction {
     checkoutByReference(provider: string, reference: string): Promise<CheckoutRecord | null>;
     putCheckout(record: CheckoutRecord): Promise<void>;
     isAdmin(userId: string): Promise<boolean>;
+    /** Fresh private permission lookup; never infer from client/user metadata. */
+    hasPermission(userId: string, permission: 'reviews.read' | 'reviews.decide'): Promise<boolean>;
     review(id: string): Promise<ReviewCase | null>;
     reviews(status: ReviewStatus | 'all', before: OrderCursor | null, limit: number): Promise<ReviewCase[]>;
     reviewsForPayment(paymentKey: string): Promise<ReviewCase[]>;
@@ -167,6 +169,8 @@ export interface IdentityProvider {
     /** Verify the session server-side, including expiry. Never trust a request userId. */
     requireUser(session: unknown): Promise<{
         id: string;
+        /** Server-verified session assurance; missing assurance cannot access admin reviews. */
+        assurance?: 'aal1' | 'aal2';
     }>;
 }
 export interface PaymentVerifier {

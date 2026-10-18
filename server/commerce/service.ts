@@ -256,7 +256,7 @@ export class CommerceService {
     } = {}): Promise<ReviewPage> {
         const actor = await this.identity.requireUser(session), status = options.status ?? 'open', limit = options.limit ?? 20, cursor = options.cursor ?? null;
         return this.repo.transaction(async (tx) => {
-            await this.requireAdmin(tx, actor.id);
+            await this.requireAdmin(tx, actor, 'reviews.read');
             if (!['open', 'awaiting_refund', 'resolved', 'all'].includes(status) || !Number.isInteger(limit) || limit < 1 || limit > 50 || cursor && (!cursor.id || typeof cursor.id !== 'string' || cursor.id.length > 200 || typeof cursor.createdAt !== 'string' || !Number.isFinite(Date.parse(cursor.createdAt))))
                 fail('invalid_page');
             const rows = await tx.reviews(status, cursor, limit + 1), reviews: ReviewView[] = [];
@@ -269,7 +269,7 @@ export class CommerceService {
     async reviewDetails(session: unknown, id: string): Promise<ReviewReply> {
         const actor = await this.identity.requireUser(session);
         return this.repo.transaction(async (tx) => {
-            await this.requireAdmin(tx, actor.id);
+            await this.requireAdmin(tx, actor, 'reviews.read');
             const c = await tx.review(id);
             if (!c)
                 fail('review_not_found');
@@ -279,7 +279,7 @@ export class CommerceService {
     async decideReview(session: unknown, id: string, input: ReviewDecision): Promise<ReviewReply> {
         const actor = await this.identity.requireUser(session);
         return this.repo.transaction(async (tx) => {
-            await this.requireAdmin(tx, actor.id);
+            await this.requireAdmin(tx, actor, 'reviews.decide');
             if (!input || !['grant_access', 'queue_refund', 'dismiss', 'note'].includes(input.action) || !Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 1 || typeof input.reason !== 'string' || input.reason.trim().length < 3 || input.reason.trim().length > 500 || typeof input.requestKey !== 'string' || !/^[A-Za-z0-9_-]{16,100}$/.test(input.requestKey))
                 fail('invalid_review_decision');
             const reason = input.reason.trim(), fingerprint = JSON.stringify([id, input.action, input.expectedRevision, reason]);
@@ -320,9 +320,13 @@ export class CommerceService {
             return { review: await this.reviewView(tx, c), serverTime: this.clock().toISOString() };
         });
     }
-    private async requireAdmin(tx: Transaction, id: string) {
-        if (!await tx.isAdmin(id))
+    private async requireAdmin(tx: Transaction, actor: { id: string; assurance?: string }, permission: 'reviews.read' | 'reviews.decide') {
+        if (!await tx.isAdmin(actor.id))
             fail('admin_required');
+        if (actor.assurance !== 'aal2')
+            fail('admin_mfa_required');
+        if (!await tx.hasPermission(actor.id, permission))
+            fail('admin_permission_required');
     }
     private async reviewView(tx: Transaction, c: ReviewCase): Promise<ReviewView> {
         const o = await tx.order(c.orderId);

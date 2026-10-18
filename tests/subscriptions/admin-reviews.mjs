@@ -112,3 +112,30 @@ test('refund completed before admin approval invalidates the viewed revision',as
  const f=await reviewed();await f.send({...f.event,kind:'refunded',eventId:'refund-before-approval'});
  await assert.rejects(f.service.decideReview('session:bob',f.c.id,decision(f.c,{action:'grant_access'})),code('review_stale'));assert.equal(f.grants().length,0);
 });
+
+test('admin reviews reject absent or single-factor assurance without leaking records',async()=>{
+ for(const assurance of [null,'aal1']){
+  const f=fixture({assurance}),before=structuredClone(f.ledger.data);
+  await assert.rejects(f.service.listReviews('session:bob'),code('admin_mfa_required'));
+  await assert.rejects(f.service.reviewDetails('session:bob','unknown'),code('admin_mfa_required'));
+  await assert.rejects(f.service.decideReview('session:bob','unknown',decision({revision:1})),code('admin_mfa_required'));
+  assert.deepEqual(f.ledger.data,before);
+  const handler=createCommerceHandler(f.service,{enabled:true,reviewEnabled:true,allowRequest:async()=>true});
+  const response=await handler(new Request('https://example.test/api/rentals/admin/reviews',{headers:{Authorization:'Bearer session:bob'}}));
+  assert.equal(response.status,403);assert.deepEqual(await response.json(),{error:'admin_mfa_required'});
+  // Ordinary customer checkout does not inherit the administrative MFA requirement.
+  await f.create();
+ }
+});
+test('read-only reviewers cannot decide and revoked permissions also block command replay',async()=>{
+ const f=await reviewed();f.ledger.data.permissions.bob=['reviews.read'];
+ await f.service.listReviews('session:bob');await f.service.reviewDetails('session:bob',f.c.id);
+ const before=structuredClone(f.ledger.data),input=decision(f.c);
+ await assert.rejects(f.service.decideReview('session:bob',f.c.id,input),code('admin_permission_required'));
+ assert.deepEqual(f.ledger.data,before);
+ f.ledger.data.permissions.bob.push('reviews.decide');await f.service.decideReview('session:bob',f.c.id,input);
+ f.ledger.data.permissions.bob=[];
+ await assert.rejects(f.service.decideReview('session:bob',f.c.id,input),code('admin_permission_required'));
+ await assert.rejects(f.service.listReviews('session:bob'),code('admin_permission_required'));
+ await assert.rejects(f.service.reviewDetails('session:bob',f.c.id),code('admin_permission_required'));
+});

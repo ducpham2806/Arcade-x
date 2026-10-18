@@ -4,7 +4,7 @@ import type { OrderCursor } from '../../shared/rental-orders';
 import type { ReviewDecision, ReviewStatus } from '../../shared/rental-reviews';
 const reviewBase = '/api/rentals/admin/reviews';
 const base = '/api/rentals/orders';
-const errorStatus: Record<string, number> = { checkout_order_changed: 409, checkout_in_progress: 409, checkout_session_expired: 409, checkout_provider_changed: 409, checkout_invalid_session: 503, checkout_invalid_url: 503, checkout_reference_conflict: 503, checkout_provider_unavailable: 503, admin_required: 403, review_not_found: 404, invalid_review_decision: 400, review_stale: 409, review_closed: 409, review_grant_forbidden: 409, unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
+const errorStatus: Record<string, number> = { checkout_order_changed: 409, checkout_in_progress: 409, checkout_session_expired: 409, checkout_provider_changed: 409, checkout_invalid_session: 503, checkout_invalid_url: 503, checkout_reference_conflict: 503, checkout_provider_unavailable: 503, admin_required: 403, admin_mfa_required: 403, admin_permission_required: 403, review_not_found: 404, invalid_review_decision: 400, review_stale: 409, review_closed: 409, review_grant_forbidden: 409, unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
     invalid_page: 400, invalid_request_key: 400, price_changed: 409, request_key_reused: 409, order_cannot_cancel: 409,
     checkout_disabled: 503, offer_unavailable: 409, game_unavailable: 409, invalid_offer: 409 };
 function json(body: unknown, status = 200) {

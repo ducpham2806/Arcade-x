@@ -112,3 +112,13 @@ Quote, order creation and session preparation require `checkoutEnabled:true` and
 Before enabling production: implement durable records/constraints, authenticated/rate-limited host routing, a chosen provider's official signature/session adapters, provider idempotency and expiry/cancellation verification, retry/reconciliation jobs, and staging browser/race tests. Ensure offer configuration clearly identifies the additional paid access beyond free/starter/permanent rights; quote/game-availability checks do not yet price discounts or suppress fully-owned packages automatically.
 
 `npm run test:commerce` now has 67 tests, including quote changes, full client/HTTP flow, session reuse, duplicate preparation, timeout/lease recovery, stale responses, unique references, cancellation during an external call, malformed provider URLs/money/order/expiry and browser success-parameter rejection. Provider and transaction behavior is simulated; no live provider integration or browser QA is claimed.
+
+### Security hardening: review MFA and least privilege
+
+Review reads now require fresh `isAdmin`, server-verified `IdentityProvider` assurance
+`aal2`, and `Transaction.hasPermission(userId, 'reviews.read')`. Decisions require
+`reviews.decide` instead, including retried commands. Missing assurance or permissions
+fails closed with HTTP 403; customer order endpoints remain unchanged. Production adapters
+must implement the new contract before rollout; no permission is inherited from admin status.
+See `docs/operations/SECURITY-RECOVERY.md` for the pending real MFA integration, legacy RPC
+scope limitation, backup inventory, isolated restore drill and activation gates.
