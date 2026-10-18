@@ -1,3 +1,4 @@
+import type { RentalQuote } from '../../shared/rental-checkout';
 import type { ReviewStatus, ReviewPage, ReviewView, ReviewReply, ReviewDecision } from '../../shared/rental-reviews';
 import type { OrderCursor, OrderPage, OrderView } from '../../shared/rental-orders';
 import type { CommerceRepository, IdentityProvider, PaymentVerifier, Offer, Order, PaymentEvent, Settlement, Term, Transaction, RentalGrant, ReviewCase } from './types';
@@ -42,6 +43,23 @@ function validateEvent(e: PaymentEvent, now: Date) {
 }
 export class CommerceService {
     constructor(private repo: CommerceRepository, private identity: IdentityProvider, private verifier: PaymentVerifier, private clock: () => Date = () => new Date(), private id: () => string = () => crypto.randomUUID()) { }
+    async quote(session: unknown, offerId: string): Promise<RentalQuote> {
+        const actor = await this.identity.requireUser(session);
+        return this.repo.transaction(async (tx) => {
+            const account = await tx.account(actor.id);
+            if (!account?.registered || !account.pilot || account.blocked)
+                fail('account_not_eligible');
+            if (!await tx.checkoutEnabled())
+                fail('checkout_disabled');
+            const offer = await tx.offer(offerId);
+            if (!offer)
+                fail('offer_unavailable');
+            validateOffer(offer);
+            if (!await tx.gamesAvailable(offer.gameIds, offer.scope === 'all'))
+                fail('game_unavailable');
+            return { offerId: offer.id, revision: offer.revision, title: offer.title, scope: offer.scope, gameIds: [...offer.gameIds], term: offer.term, amount: offer.amount, currency: offer.currency, serverTime: this.clock().toISOString() };
+        });
+    }
     async createOrder(session: unknown, input: {
         offerId: string;
         offerRevision: string;
@@ -302,8 +320,10 @@ export class CommerceService {
             return { review: await this.reviewView(tx, c), serverTime: this.clock().toISOString() };
         });
     }
-    private async requireAdmin(tx: Transaction, id: string) { if (!await tx.isAdmin(id))
-        fail('admin_required'); }
+    private async requireAdmin(tx: Transaction, id: string) {
+        if (!await tx.isAdmin(id))
+            fail('admin_required');
+    }
     private async reviewView(tx: Transaction, c: ReviewCase): Promise<ReviewView> {
         const o = await tx.order(c.orderId);
         if (!o)

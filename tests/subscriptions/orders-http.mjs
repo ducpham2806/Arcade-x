@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {fixture,createCommerceHandler} from './commerce-fixture.mjs';
-function setup(){const f=fixture(),handler=createCommerceHandler(f.service,{enabled:true,allowRequest:async()=>true});
+function setup(){const f=fixture(),handler=createCommerceHandler(f.service,{enabled:true,checkoutEnabled:true,checkout:f.checkout,allowRequest:async()=>true});
  const request=(path='',init={})=>handler(new Request('https://example.test/api/rentals/orders'+path,{headers:{Authorization:'Bearer session:alice',...init.headers},...init,...(init.headers?{headers:{Authorization:'Bearer session:alice',...init.headers}}:{})}));
  return {...f,handler,request};}
 const post=(body={})=>({method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});

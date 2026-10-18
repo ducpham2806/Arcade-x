@@ -86,3 +86,29 @@ Additional unmounted HTTP routes:
 The handler requires `enabled`, a rate-limit callback and independent `reviewEnabled:true`; the frontend requires access preview plus `VITE_RENTAL_REVIEW_API=true`. All default off. These gates do not enable payments. Leave them off until durable admin/queue/command/audit adapters are deployed. No fixture data is shown to admins in the unavailable state.
 
 `npm run test:commerce` now runs 53 tests covering core, history, review service/HTTP/client, fresh role checks, retry/conflict handling, two admins, atomic rollback, approval/refund races, mismatched-payment refunds and independent readiness gates. The concurrency fixture serializes in memory; production database concurrency, browser layout/focus and live provider behavior still need staging verification.
+
+## Quote, checkout session and payment handoff (step 6)
+
+The storefront can now open a server-priced quote, explicitly create an order, prepare a provider session and show a user-clicked payment link in a new tab. Existing pending orders can continue through the same flow from history. The order's price is displayed again after creation. A changed offer revision requires rechecking the quote; a failed/ambiguous create retries the same request key while that flow remains open. A successfully-created order is retained when session preparation fails. Closing/reloading the flow can recover pending orders from history; do not automatically create a replacement order after a timeout.
+
+The flow polls the authenticated order detail every 15 seconds while visible and pending, refreshes on return/reconnect and stops polling terminal states. Return URL/query parameters are never treated as payment proof. Payment-provider session creation grants no access. Only verified settlement updates the paid order and entitlements. The new-tab link includes noopener/noreferrer and shows its destination host and deadline.
+
+New server components/contracts:
+- `CommerceService.quote`: account/pilot/block, checkout flag, current offer revision/price and game availability are checked on the server. The quote is informational; order creation independently rechecks the version and snapshots the price.
+- `CheckoutCoordinator.begin`: verify owner/session, current account eligibility, pending order/deadline, checkout flag and game availability. Reserve one immutable provider key per order in a durable transaction, call the injected provider outside the transaction, then recheck before exposing the URL.
+- `CheckoutProvider.create`: must be idempotent for the same key even after ambiguous timeouts. Creating a session must not itself charge money. It must return the trusted order reference, exact snapshot amount/currency, unique provider reference, URL and expiry. This PR has no real provider adapter.
+- `CheckoutRecord`: one row per order, unique provider/reference, immutable namespace/provider/order request key, lease token/deadline, ready URL/reference/expiry. Enforce those keys in durable storage. `checkout`, `checkoutByReference`, `putCheckout` join the transaction adapter contract.
+
+A 45-second creation lease prevents concurrent provider calls. Recovery after lease expiry uses the same provider key. An older response cannot overwrite a newer reservation. Verified ready sessions are reused; expired sessions are not silently replaced with another payment. Provider/network or final persistence failure keeps the same key for reconciliation/retry. Lease/audit updates must be atomic, with whole-transaction retries. External provider creation can outlive a cancelled browser request; a host reconciler must recover using the immutable key and cancel the external session through provider APIs when appropriate. Cancelling an order does not currently cancel an external provider session; a subsequent payment follows the existing review rules.
+
+Payment URLs require HTTPS, no embedded credentials and an exact configured origin allowlist. Provider output must match the order ID, integer VND amount and currency, a nonempty reference and a future expiry no later than the order deadline. Returned link DTOs omit provider references and idempotency/lease tokens. Namespace and provider ID must be stable and isolate merchant/test/live environments; a changed configuration cannot reuse another environment's record.
+
+Additional unmounted HTTP routes:
+- `GET /api/rentals/offers/:id/quote`
+- `POST /api/rentals/orders/:id/checkout` with an empty JSON object.
+
+Quote, order creation and session preparation require `checkoutEnabled:true` and an injected coordinator in the HTTP factory. Repository `checkoutEnabled()` is checked again. Frontend `VITE_RENTAL_CHECKOUT_API=true` additionally requires access preview and order API readiness. All defaults remain false. The old pilot catalog's `checkoutEnabled:false` remains unchanged; the new guarded quote endpoint is authoritative only after an explicit checkout rollout. No database migration or payment-provider credentials were introduced in this step.
+
+Before enabling production: implement durable records/constraints, authenticated/rate-limited host routing, a chosen provider's official signature/session adapters, provider idempotency and expiry/cancellation verification, retry/reconciliation jobs, and staging browser/race tests. Ensure offer configuration clearly identifies the additional paid access beyond free/starter/permanent rights; quote/game-availability checks do not yet price discounts or suppress fully-owned packages automatically.
+
+`npm run test:commerce` now has 67 tests, including quote changes, full client/HTTP flow, session reuse, duplicate preparation, timeout/lease recovery, stale responses, unique references, cancellation during an external call, malformed provider URLs/money/order/expiry and browser success-parameter rejection. Provider and transaction behavior is simulated; no live provider integration or browser QA is claimed.

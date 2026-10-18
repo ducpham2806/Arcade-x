@@ -1,3 +1,5 @@
+import {CheckoutFlow} from './CheckoutFlow';
+import {checkoutApi} from './checkout-api';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import type { OrderCursor, OrderState, OrderView } from '../../shared/rental-orders';
@@ -15,6 +17,7 @@ export function OrderHistory({ owner, onBack, api = ordersApi }: {
     onBack: () => void;
     api?: OrdersClient;
 }) {
+    const [checkoutOrder,setCheckoutOrder]=useState<string|null>(null);
     const [rows, setRows] = useState<OrderView[]>([]), [cursor, setCursor] = useState<OrderCursor | null>(null), [error, setError] = useState(''), [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false), [more, setMore] = useState(false), [cancelling, setCancelling] = useState<string | null>(null), [confirm, setConfirm] = useState<string | null>(null), [expanded, setExpanded] = useState<string | null>(null);
     const [revision, setRevision] = useState(0), [filter, setFilter] = useState('all'), [clock, setClock] = useState(Date.now()), [offset, setOffset] = useState(0), [hasLoaded, setHasLoaded] = useState(false);
@@ -24,13 +27,13 @@ export function OrderHistory({ owner, onBack, api = ordersApi }: {
     const pending = rows.some(o => o.state === 'awaiting_payment');
     useEffect(() => { alive.current = true; return () => { alive.current = false; generation.current++; for (const c of requests.current)
         c.abort(); }; }, []);
-    useEffect(() => { const refresh = () => { if (document.visibilityState === 'visible' && !locked.current && !paging.current)
-        setRevision(v => v + 1); }; document.addEventListener('visibilitychange', refresh); window.addEventListener('online', refresh); return () => { document.removeEventListener('visibilitychange', refresh); window.removeEventListener('online', refresh); }; }, []);
-    useEffect(() => { const timer = setInterval(() => { setClock(Date.now()); if (pending && rows.length <= 20 && document.visibilityState === 'visible' && !locked.current && !paging.current)
-        setRevision(v => v + 1); }, 20000); return () => clearInterval(timer); }, [pending, rows.length]);
+    useEffect(() => { const refresh = () => { if (!checkoutOrder&&document.visibilityState === 'visible' && !locked.current && !paging.current)
+        setRevision(v => v + 1); }; document.addEventListener('visibilitychange', refresh); window.addEventListener('online', refresh); return () => { document.removeEventListener('visibilitychange', refresh); window.removeEventListener('online', refresh); }; }, [checkoutOrder]);
+    useEffect(() => { const timer = setInterval(() => { setClock(Date.now()); if (!checkoutOrder&&pending && rows.length <= 20 && document.visibilityState === 'visible' && !locked.current && !paging.current)
+        setRevision(v => v + 1); }, 20000); return () => clearInterval(timer); }, [pending, rows.length, checkoutOrder]);
     useEffect(() => {
         const seq = ++generation.current;
-        if (!owner || !api.enabled)
+        if (!owner || !api.enabled||checkoutOrder)
             return;
         const controller = new AbortController();
         requests.current.add(controller);
@@ -52,7 +55,7 @@ export function OrderHistory({ owner, onBack, api = ordersApi }: {
             .finally(() => { requests.current.delete(controller); if (alive.current && seq === generation.current)
             setLoading(false); });
         return () => { controller.abort(); };
-    }, [owner, api, revision]);
+    }, [owner, api, revision, checkoutOrder]);
     async function loadMore() {
         if (!owner || !cursor || paging.current || loading)
             return;
@@ -112,6 +115,7 @@ export function OrderHistory({ owner, onBack, api = ordersApi }: {
         }
     }
     const now = clock + offset, visible = rows.filter(o => filter === 'all' || o.state === filter);
+    if(checkoutOrder&&owner)return <CheckoutFlow owner={owner} initialOrderId={checkoutOrder} onBack={()=>{setCheckoutOrder(null);setRevision(v=>v+1)}} onHistory={()=>{setCheckoutOrder(null);setRevision(v=>v+1)}}/>;
     return <div className="access-admin rental-orders"><button className="launcher-secondary" onClick={onBack}>← Quay lại</button><h3 ref={heading} tabIndex={-1}>Đơn thuê của tôi</h3>
  {!owner ? <p>Đăng nhập để xem đơn thuê trong tài khoản.</p> : !api.enabled ? <p className="access-note">Lịch sử đơn thuê chưa được mở. Khi dịch vụ được kết nối, bạn có thể xem trạng thái, thời hạn và hủy đơn chưa thanh toán tại đây.</p> : <>
   <div className="access-actions"><button className="launcher-secondary" disabled={loading || more || !!cancelling} onClick={() => { setMessage(''); setRevision(v => v + 1); }}>Cập nhật danh sách</button><label>Lọc các đơn đã tải<select value={filter} onChange={e => setFilter(e.target.value)}><option value="all">Tất cả</option>{Object.entries(stateNames).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></label></div>
@@ -127,6 +131,7 @@ export function OrderHistory({ owner, onBack, api = ordersApi }: {
    {o.state === 'paid' && <p>Thanh toán đã được ghi nhận. Thời gian chơi áp dụng theo quyền được cấp bên dưới; bảo trì và hạn chế truy cập vẫn được áp dụng.</p>}
    {o.state === 'refunded' && <p>Đơn đã được ghi nhận hoàn tiền. Quyền thuê từ đơn này đã được thu hồi.</p>}
    <div className="access-actions"><button className="launcher-secondary" aria-expanded={expanded === o.id} onClick={() => setExpanded(expanded === o.id ? null : o.id)}>{expanded === o.id ? 'Thu gọn' : 'Chi tiết thời hạn'}</button>
+    {o.state==='awaiting_payment'&&checkoutApi.enabled&&<button className="launcher-secondary" disabled={loading||!!cancelling||timedOut} onClick={()=>setCheckoutOrder(o.id)}>Tiếp tục thanh toán</button>}
     {o.state === 'awaiting_payment' && <button className="launcher-secondary" disabled={loading || !!cancelling || timedOut} onClick={() => setConfirm(o.id)}>Hủy đơn</button>}</div>
    {expanded === o.id && <div className="order-details">{o.paidAt && <p>Ghi nhận thanh toán: {date(o.paidAt)}</p>}{o.scope !== 'all' && <p>Game: {o.gameIds.join(' · ')}</p>}
     {!o.grants.length ? <p>Chưa có quyền thuê được cấp từ đơn này.</p> : o.grants.map((g, i) => <div key={i}><strong>{g.revokedAt ? 'Đã thu hồi' : Date.parse(g.expiresAt) <= now ? 'Đã hết hạn' : Date.parse(g.startsAt) > now ? 'Đang chờ đến lượt gia hạn' : 'Còn hiệu lực'}</strong><p>{date(g.startsAt)} → {date(g.expiresAt)}</p>{g.revokedAt && <p>Thu hồi lúc {date(g.revokedAt)}</p>}</div>)}

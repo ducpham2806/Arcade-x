@@ -97,7 +97,40 @@ export interface Audit {
     before?: unknown;
     after?: unknown;
 }
+export interface CheckoutRecord {
+    orderId: string;
+    provider: string;
+    requestKey: string;
+    leaseToken: string;
+    leaseUntil: string;
+    state: 'creating' | 'ready';
+    reference?: string;
+    url?: string;
+    expiresAt?: string;
+}
+/** Production adapter must implement idempotent creation for the same key, including
+ * retry after an ambiguous timeout. It must never charge merely by creating a session. */
+export interface CheckoutProvider {
+    id: string;
+    create(input: {
+        orderId: string;
+        amount: number;
+        currency: 'VND';
+        expiresAt: string;
+        idempotencyKey: string;
+    }): Promise<{
+        orderId: string;
+        amount: number;
+        currency: string;
+        reference: string;
+        url: string;
+        expiresAt: string;
+    }>;
+}
 export interface Transaction {
+    checkout(orderId: string): Promise<CheckoutRecord | null>;
+    checkoutByReference(provider: string, reference: string): Promise<CheckoutRecord | null>;
+    putCheckout(record: CheckoutRecord): Promise<void>;
     isAdmin(userId: string): Promise<boolean>;
     review(id: string): Promise<ReviewCase | null>;
     reviews(status: ReviewStatus | 'all', before: OrderCursor | null, limit: number): Promise<ReviewCase[]>;

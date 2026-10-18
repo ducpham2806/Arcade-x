@@ -18,7 +18,7 @@ const states = ['awaiting_payment', 'paid', 'cancelled', 'expired', 'review', 'r
 const terms = ['7d', '14d', '30d', '3m', '6m', '1y'];
 const date = (x: unknown) => typeof x === 'string' && Number.isFinite(Date.parse(x));
 const validId = (x: unknown) => typeof x === 'string' && /^[A-Za-z0-9_-]{1,200}$/.test(x);
-function validOrder(o: any): o is OrderView { return o && validId(o.id) && typeof o.title === 'string' && ['game', 'bundle', 'all'].includes(o.scope) && Array.isArray(o.gameIds) && o.gameIds.every(x => typeof x === 'string') && terms.includes(o.term) && Number.isSafeInteger(o.amount) && o.amount > 0 && o.currency === 'VND' && states.includes(o.state) && date(o.createdAt) && date(o.expiresAt) && (o.paidAt === undefined || date(o.paidAt)) && Array.isArray(o.grants) && o.grants.every(g => g && date(g.startsAt) && date(g.expiresAt) && (g.revokedAt === undefined || date(g.revokedAt))); }
+export function validOrder(o: any): o is OrderView { return o && validId(o.id) && typeof o.title === 'string' && ['game', 'bundle', 'all'].includes(o.scope) && Array.isArray(o.gameIds) && o.gameIds.every(x => typeof x === 'string') && terms.includes(o.term) && Number.isSafeInteger(o.amount) && o.amount > 0 && o.currency === 'VND' && states.includes(o.state) && date(o.createdAt) && date(o.expiresAt) && (o.paidAt === undefined || date(o.paidAt)) && Array.isArray(o.grants) && o.grants.every(g => g && date(g.startsAt) && date(g.expiresAt) && (g.revokedAt === undefined || date(g.revokedAt))); }
 const validCursor = (c: any) => c === null || c && validId(c.id) && date(c.createdAt);
 export type RentalClientOptions = {
     enabled: boolean;

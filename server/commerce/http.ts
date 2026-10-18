@@ -1,9 +1,10 @@
+import type { CheckoutCoordinator } from './checkout';
 import { CommerceError, CommerceService } from './service';
 import type { OrderCursor } from '../../shared/rental-orders';
 import type { ReviewDecision, ReviewStatus } from '../../shared/rental-reviews';
 const reviewBase = '/api/rentals/admin/reviews';
 const base = '/api/rentals/orders';
-const errorStatus: Record<string, number> = { admin_required: 403, review_not_found: 404, invalid_review_decision: 400, review_stale: 409, review_closed: 409, review_grant_forbidden: 409, unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
+const errorStatus: Record<string, number> = { checkout_order_changed: 409, checkout_in_progress: 409, checkout_session_expired: 409, checkout_provider_changed: 409, checkout_invalid_session: 503, checkout_invalid_url: 503, checkout_reference_conflict: 503, checkout_provider_unavailable: 503, admin_required: 403, review_not_found: 404, invalid_review_decision: 400, review_stale: 409, review_closed: 409, review_grant_forbidden: 409, unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
     invalid_page: 400, invalid_request_key: 400, price_changed: 409, request_key_reused: 409, order_cannot_cancel: 409,
     checkout_disabled: 503, offer_unavailable: 409, game_unavailable: 409, invalid_offer: 409 };
 function json(body: unknown, status = 200) {
@@ -79,6 +80,8 @@ function cursor(value: string | null): OrderCursor | null {
  * IdentityProvider independently verifies the bearer token on every service operation. */
 export function createCommerceHandler(service: CommerceService, options: {
     enabled?: boolean;
+    checkoutEnabled?: boolean;
+    checkout?: CheckoutCoordinator;
     reviewEnabled?: boolean;
     allowRequest?: (request: Request) => Promise<boolean>;
 } = {}) {
@@ -87,16 +90,24 @@ export function createCommerceHandler(service: CommerceService, options: {
             if (!options.enabled || !options.allowRequest)
                 return json({ error: 'orders_unavailable' }, 503);
             const url = new URL(request.url);
+            const quoteMatch = url.pathname.match(/^\/api\/rentals\/offers\/([A-Za-z0-9_-]{1,200})\/quote$/);
             const isReview = url.pathname === reviewBase || url.pathname.startsWith(reviewBase + '/');
             if (isReview && !options.reviewEnabled)
                 return json({ error: 'reviews_unavailable' }, 503);
-            if (!isReview && url.pathname !== base && !url.pathname.startsWith(base + '/'))
+            if (!quoteMatch && !isReview && url.pathname !== base && !url.pathname.startsWith(base + '/'))
                 return json({ error: 'not_found' }, 404);
             const auth = request.headers.get('authorization');
             if (!auth || !/^Bearer [^\s]{1,8192}$/.test(auth))
                 return json({ error: 'unauthenticated' }, 401);
             if (!await options.allowRequest(request))
                 return json({ error: 'rate_limited' }, 429);
+            if (quoteMatch) {
+                if (!options.checkoutEnabled || !options.checkout)
+                    return json({ error: 'checkout_disabled' }, 503);
+                if (request.method !== 'GET' || url.search)
+                    return json({ error: 'method_not_allowed' }, 405);
+                return json(await service.quote(auth.slice(7), quoteMatch[1]));
+            }
             const session = auth.slice(7), parts = url.pathname.slice((isReview ? reviewBase : base).length).split('/').filter(Boolean);
             if (parts.length > 2 || parts.some(p => !/^[A-Za-z0-9_-]{1,200}$/.test(p)))
                 bad('invalid_path');
@@ -132,6 +143,8 @@ export function createCommerceHandler(service: CommerceService, options: {
             if (url.search)
                 bad('unexpected_query');
             if (!parts.length && request.method === 'POST') {
+                if (!options.checkoutEnabled || !options.checkout)
+                    return json({ error: 'checkout_disabled' }, 503);
                 const body = await readBody(request);
                 if (Object.keys(body).some(k => !['offerId', 'offerRevision', 'requestKey'].includes(k)))
                     bad('unexpected_field');
@@ -143,6 +156,14 @@ export function createCommerceHandler(service: CommerceService, options: {
                     requestKey: string;
                 });
                 return json(await service.orderDetails(session, order.id), 201);
+            }
+            if (parts.length === 2 && parts[1] === 'checkout' && request.method === 'POST') {
+                if (!options.checkoutEnabled || !options.checkout)
+                    return json({ error: 'checkout_disabled' }, 503);
+                const body = await readBody(request);
+                if (Object.keys(body).length)
+                    bad('unexpected_field');
+                return json(await options.checkout.begin(session, parts[0]));
             }
             if (parts.length === 1 && request.method === 'GET')
                 return json(await service.orderDetails(session, parts[0]));

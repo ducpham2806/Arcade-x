@@ -119,3 +119,11 @@ Added the admin list/detail screen with amount comparison, known-order payment r
 Added three admin HTTP routes behind an independent disabled readiness gate, and `VITE_RENTAL_REVIEW_API=false` for the UI transport. The queue only includes verified abnormal events already associated with a known order. No money is transferred by marking "Chờ hoàn tiền"; only verified provider notifications confirm refunds. Partial refunds, unknown-order reconciliation and initiating a refund need provider integration.
 
 Validation: 53 commerce/core/HTTP/client tests. No Supabase migration, live API, real provider payment or production deployment is enabled by this step. Next: durable repository/admin/session adapters, a chosen payment provider and staging QA. Browser layout/focus and real database race checks remain unverified.
+
+## Step 6 — checkout handoff flow
+
+Added storefront quote/review, explicit order creation, preparing a provider session, payment link and server-status tracking. Pending orders can reopen payment preparation from history. A stable request key protects create retries while the flow is open; created orders remain visible when preparation fails. The browser never marks an order paid based on returning from a payment page.
+
+Added a provider-neutral checkout coordinator with a 45-second lease, immutable idempotency key, replay/recovery, exact HTTPS origin allowlist and order/amount/currency/expiry validation. External network calls stay outside database transactions. Quote/create/session endpoints require an explicit server readiness flag plus coordinator and repository checkout permission; `VITE_RENTAL_CHECKOUT_API=false` remains the default. The existing catalog SQL is unchanged.
+
+Validation: 67 commerce/core/HTTP/client scenarios. Durable storage, hosting/session adapters, a real payment provider, reconciliation/cancellation handling, owned/free-coverage pricing policy and staging QA are the remaining integration work. No production deployment, migration or actual payment collection was enabled.
