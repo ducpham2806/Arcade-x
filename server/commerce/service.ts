@@ -1,3 +1,5 @@
+import { inspectOrder } from './reconciliation';
+import type { ReconciliationPage } from '../../shared/rental-reconciliation';
 import type { RentalQuote } from '../../shared/rental-checkout';
 import type { ReviewStatus, ReviewPage, ReviewView, ReviewReply, ReviewDecision } from '../../shared/rental-reviews';
 import type { OrderCursor, OrderPage, OrderView } from '../../shared/rental-orders';
@@ -57,6 +59,7 @@ export class CommerceService {
             validateOffer(offer);
             if (!await tx.gamesAvailable(offer.gameIds, offer.scope === 'all'))
                 fail('game_unavailable');
+            await this.checkOwnership(tx, actor.id, offer);
             return { offerId: offer.id, revision: offer.revision, title: offer.title, scope: offer.scope, gameIds: [...offer.gameIds], term: offer.term, amount: offer.amount, currency: offer.currency, serverTime: this.clock().toISOString() };
         });
     }
@@ -88,6 +91,7 @@ export class CommerceService {
                 fail('price_changed');
             if (!await tx.gamesAvailable(offer.gameIds, offer.scope === 'all'))
                 fail('game_unavailable');
+            await this.checkOwnership(tx, actor.id, offer);
             const now = this.clock();
             const order: Order = { id: this.id(), ownerId: actor.id, requestKey: input.requestKey, offer: structuredClone(offer),
                 createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + 30 * 60000).toISOString(), state: 'awaiting_payment' };
@@ -245,9 +249,32 @@ export class CommerceService {
                 return review('order_not_payable');
             if (Date.parse(e.occurredAt) < Date.parse(order.createdAt) || Date.parse(e.occurredAt) >= Date.parse(order.expiresAt))
                 return review('outside_payment_window');
+            if (order.offer.scope !== 'all') {
+                const permanent = new Set(await tx.permanentGameIds(order.ownerId));
+                if (order.offer.gameIds.every(id => permanent.has(id))) return review('already_owned');
+            }
             await this.grantPayment(tx, order, paymentKey, e.amount, e.currency);
             return finish({ outcome: 'unlocked', orderId: order.id });
         });
+    }
+    async reconcile(session: unknown, cursor: OrderCursor | null = null): Promise<ReconciliationPage> {
+        const actor = await this.identity.requireUser(session);
+        return this.repo.transaction(async tx => {
+            await this.requireAdmin(tx, actor, 'reviews.read');
+            if (cursor && (typeof cursor.id !== 'string' || !/^[A-Za-z0-9_-]{1,200}$/.test(cursor.id) || typeof cursor.createdAt !== 'string' || !Number.isFinite(Date.parse(cursor.createdAt)))) fail('invalid_page');
+            const rows = await tx.reconciliationOrders(cursor, 51);
+            const findings: ReconciliationPage['findings'] = [];
+            for (const order of rows.slice(0, 50)) {
+                findings.push(...inspectOrder(order, order.paymentKey ? await tx.payment(order.paymentKey) : null, await tx.grantsForOrder(order.id)));
+            }
+            const last = rows[Math.min(rows.length, 50) - 1];
+            return { findings, scanned: Math.min(rows.length, 50), nextCursor: rows.length > 50 ? {id: last.id, createdAt: last.createdAt} : null, serverTime: this.clock().toISOString() };
+        });
+    }
+    private async checkOwnership(tx: Transaction, owner: string, offer: Offer) {
+        if (offer.scope === 'all') return;
+        const permanent = new Set(await tx.permanentGameIds(owner));
+        if (offer.gameIds.every(id => permanent.has(id))) fail('already_owned');
     }
     async listReviews(session: unknown, options: {
         status?: ReviewStatus | 'all';
@@ -334,11 +361,13 @@ export class CommerceService {
             fail('review_not_found');
         const p = await tx.payment(c.paymentKey), account = await tx.account(o.ownerId);
         const grants = await tx.grants(o.ownerId);
+        const permanent = new Set(await tx.permanentGameIds(o.ownerId));
+        const alreadyOwned = o.offer.scope !== 'all' && o.offer.gameIds.every(id => permanent.has(id));
         const blocked = c.status !== 'open' ? 'not_open' : c.event.kind !== 'paid' ? 'refund_event' :
             c.event.currency !== o.offer.currency || c.event.amount !== o.offer.amount ? 'amount_or_currency_mismatch' :
                 !p || p.state !== 'review' || p.orderId !== o.id || p.amount !== c.event.amount || p.currency !== c.event.currency || p.refundedTotal > 0 ? 'payment_not_eligible' :
                     o.paymentKey || !['review', 'cancelled', 'expired', 'awaiting_payment'].includes(o.state) ? 'order_already_settled' :
-                        !account?.registered ? 'account_unavailable' : grants.some(g => g.orderId === o.id) ? 'grant_exists' : null;
+                        !account?.registered ? 'account_unavailable' : alreadyOwned ? 'already_owned' : grants.some(g => g.orderId === o.id) ? 'grant_exists' : null;
         return { id: c.id, orderId: o.id, ownerId: o.ownerId, title: o.offer.title, orderState: o.state, expectedAmount: o.offer.amount, expectedCurrency: o.offer.currency,
             reason: c.reason, status: c.status, event: { provider: c.event.provider, eventId: c.event.eventId, paymentId: c.event.paymentId, kind: c.event.kind, amount: c.event.amount, currency: c.event.currency, occurredAt: c.event.occurredAt }, revision: c.revision, createdAt: c.createdAt, updatedAt: c.updatedAt,
             canGrant: blocked === null, grantBlockReason: blocked, history: c.history.slice(-20).map(h => ({ ...h })) };

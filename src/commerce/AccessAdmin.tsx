@@ -2,6 +2,7 @@ import React,{useEffect,useRef,useState} from 'react';
 import {useAuth} from '../context/AuthContext';
 import {accessPreviewEnabled,accessRpc,adminState,adminCommand,termOptions,type AdminState} from './api';
 import './access-admin.css';
+import {ReconciliationAdmin} from './ReconciliationAdmin';
 import {ReviewAdmin} from './ReviewAdmin';
 import {StoreAdmin} from './StoreAdmin';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -15,6 +16,7 @@ export function AccessAdmin({onBack}:{onBack:()=>void}){
  const {currentUser}=useAuth();return <AdminContent key={currentUser?.id||'guest'} onBack={onBack}/>;
 }
 function AdminContent({onBack}:{onBack:()=>void}){
+ const [showReconciliation,setShowReconciliation]=useState(false);
  const [showReviews,setShowReviews]=useState(false);
  const [state,setState]=useState<AdminState|null>(null);const [userInput,setUserInput]=useState('');const [user,setUser]=useState<string|null>(null);
  const [starter,setStarter]=useState<string[]>(['','','']);const [starterEnabled,setStarterEnabled]=useState(false);
@@ -26,6 +28,7 @@ function AdminContent({onBack}:{onBack:()=>void}){
  useEffect(()=>{void load(null)},[]);
  async function apply(){if(!pending||reason.trim().length<3||submitting.current)return;submitting.current=true;setBusy(true);setMessage('');try{if(pending.action==='starter_config')await accessRpc('launcher_admin_set_starter',{...pending.payload,p_reason:reason.trim()});else await adminCommand(pending.action,pending.payload,reason.trim());if(!alive.current)return;setPending(null);setReason('');await load(user);if(alive.current)setMessage('Đã lưu thay đổi và nhật ký.')}catch(e){if(alive.current)setMessage(e instanceof Error?e.message:'Chưa lưu được.')}finally{submitting.current=false;if(alive.current)setBusy(false)}}
  const choose=(action:string,payload:Record<string,unknown>,label:string)=>{setPending({action,payload,label});setReason('');setMessage('')};
+ if(showReconciliation)return <ReconciliationAdmin onBack={()=>setShowReconciliation(false)}/>;
  if(showReviews)return <ReviewAdmin onBack={()=>setShowReviews(false)}/>;
  return <div className="access-admin">
   <button className="launcher-secondary" onClick={onBack}>← Cài đặt</button>
@@ -34,7 +37,7 @@ function AdminContent({onBack}:{onBack:()=>void}){
   <p role="status" aria-live="polite">{busy?'Đang xử lý…':message}</p>
   {!state&&!busy&&<button className="launcher-secondary" onClick={()=>void load(user)}>Tải lại</button>}
   {state&&<>
-   <section><h4>Thanh toán</h4><button className="launcher-secondary" onClick={()=>setShowReviews(true)}>Đối soát giao dịch</button></section>
+   <section><h4>Thanh toán</h4><button className="launcher-secondary" onClick={()=>setShowReviews(true)}>Đối soát giao dịch</button><button className="launcher-secondary" onClick={()=>setShowReconciliation(true)}>Kiểm tra sai lệch đơn & quyền</button></section>
    <section><h4>Phạm vi thử nghiệm</h4><p>{state.mode==='off'?'Đang tắt: dùng quy tắc hiện tại.':'Đang thử: áp dụng chặn mới cho tài khoản trong danh sách thử.'}</p>
     <button disabled={busy} className="launcher-secondary" onClick={()=>choose('mode',{mode:state.mode==='off'?'pilot':'off'},state.mode==='off'?'Bật chế độ thử cho danh sách đã chọn':'Tắt chế độ thử')}>{state.mode==='off'?'Bật chế độ thử':'Tắt chế độ thử'}</button>
    </section>

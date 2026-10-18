@@ -4,7 +4,7 @@ import type { OrderCursor } from '../../shared/rental-orders';
 import type { ReviewDecision, ReviewStatus } from '../../shared/rental-reviews';
 const reviewBase = '/api/rentals/admin/reviews';
 const base = '/api/rentals/orders';
-const errorStatus: Record<string, number> = { checkout_order_changed: 409, checkout_in_progress: 409, checkout_session_expired: 409, checkout_provider_changed: 409, checkout_invalid_session: 503, checkout_invalid_url: 503, checkout_reference_conflict: 503, checkout_provider_unavailable: 503, admin_required: 403, admin_mfa_required: 403, admin_permission_required: 403, review_not_found: 404, invalid_review_decision: 400, review_stale: 409, review_closed: 409, review_grant_forbidden: 409, unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
+const errorStatus: Record<string, number> = { already_owned: 409, checkout_order_changed: 409, checkout_in_progress: 409, checkout_session_expired: 409, checkout_provider_changed: 409, checkout_invalid_session: 503, checkout_invalid_url: 503, checkout_reference_conflict: 503, checkout_provider_unavailable: 503, admin_required: 403, admin_mfa_required: 403, admin_permission_required: 403, review_not_found: 404, invalid_review_decision: 400, review_stale: 409, review_closed: 409, review_grant_forbidden: 409, unauthenticated: 401, account_not_eligible: 403, order_not_found: 404,
     invalid_page: 400, invalid_request_key: 400, price_changed: 409, request_key_reused: 409, order_cannot_cancel: 409,
     checkout_disabled: 503, offer_unavailable: 409, game_unavailable: 409, invalid_offer: 409 };
 function json(body: unknown, status = 200) {
@@ -83,6 +83,7 @@ export function createCommerceHandler(service: CommerceService, options: {
     checkoutEnabled?: boolean;
     checkout?: CheckoutCoordinator;
     reviewEnabled?: boolean;
+    reconciliationEnabled?: boolean;
     allowRequest?: (request: Request) => Promise<boolean>;
 } = {}) {
     return async (request: Request): Promise<Response> => {
@@ -91,16 +92,23 @@ export function createCommerceHandler(service: CommerceService, options: {
                 return json({ error: 'orders_unavailable' }, 503);
             const url = new URL(request.url);
             const quoteMatch = url.pathname.match(/^\/api\/rentals\/offers\/([A-Za-z0-9_-]{1,200})\/quote$/);
+            const isReconciliation = url.pathname === '/api/rentals/admin/reconciliation';
+            if (isReconciliation && !options.reconciliationEnabled) return json({error: 'reconciliation_unavailable'}, 503);
             const isReview = url.pathname === reviewBase || url.pathname.startsWith(reviewBase + '/');
             if (isReview && !options.reviewEnabled)
                 return json({ error: 'reviews_unavailable' }, 503);
-            if (!quoteMatch && !isReview && url.pathname !== base && !url.pathname.startsWith(base + '/'))
+            if (!isReconciliation && !quoteMatch && !isReview && url.pathname !== base && !url.pathname.startsWith(base + '/'))
                 return json({ error: 'not_found' }, 404);
             const auth = request.headers.get('authorization');
             if (!auth || !/^Bearer [^\s]{1,8192}$/.test(auth))
                 return json({ error: 'unauthenticated' }, 401);
             if (!await options.allowRequest(request))
                 return json({ error: 'rate_limited' }, 429);
+            if (isReconciliation) {
+                if (request.method !== 'GET') return json({error: 'method_not_allowed'}, 405);
+                if ([...url.searchParams.keys()].some(k => k !== 'cursor') || url.searchParams.getAll('cursor').length > 1) bad('invalid_page');
+                return json(await service.reconcile(auth.slice(7), cursor(url.searchParams.get('cursor'))));
+            }
             if (quoteMatch) {
                 if (!options.checkoutEnabled || !options.checkout)
                     return json({ error: 'checkout_disabled' }, 503);

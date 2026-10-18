@@ -38,6 +38,10 @@ export class CheckoutCoordinator {
             fail('checkout_order_changed');
         if (!await tx.gamesAvailable(order.offer.gameIds, order.offer.scope === 'all'))
             fail('game_unavailable');
+        if (order.offer.scope !== 'all') {
+            const permanent = new Set(await tx.permanentGameIds(owner));
+            if (order.offer.gameIds.every(id => permanent.has(id))) fail('already_owned');
+        }
         return order;
     }
     async begin(session: unknown, orderId: string): Promise<CheckoutLink> {

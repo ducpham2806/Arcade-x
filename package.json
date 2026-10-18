@@ -29,7 +29,7 @@
     "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
     "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
     "test:subscriptions": "node scripts/test-subscriptions.mjs && node tests/subscriptions/access-client.mjs",
-    "test:commerce": "node --test tests/subscriptions/payment-core.mjs tests/subscriptions/orders-http.mjs tests/subscriptions/orders-client.mjs tests/subscriptions/admin-reviews.mjs tests/subscriptions/checkout-flow.mjs"
+    "test:commerce": "node --test tests/subscriptions/payment-core.mjs tests/subscriptions/orders-http.mjs tests/subscriptions/orders-client.mjs tests/subscriptions/admin-reviews.mjs tests/subscriptions/checkout-flow.mjs tests/subscriptions/reconciliation.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

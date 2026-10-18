@@ -8,12 +8,15 @@ const clone=value=>structuredClone(value);
 export class Ledger {
   data={enabled:true,available:true,accounts:{alice:{registered:true,pilot:true,blocked:false},bob:{registered:true,pilot:true,blocked:false}},
     offers:{one:{id:'one',revision:'r1',title:'2048 7 days',scope:'game',gameIds:['tile-2048'],term:'7d',amount:10000,currency:'VND',active:true}},
-    orders:{},payments:{},events:{},grants:{},audit:[],admins:['bob'],permissions:{alice:['reviews.read','reviews.decide'],bob:['reviews.read','reviews.decide']},reviews:{},commands:{},checkouts:{}};
+    permanent:{},orders:{},payments:{},events:{},grants:{},audit:[],admins:['bob'],permissions:{alice:['reviews.read','reviews.decide'],bob:['reviews.read','reviews.decide']},reviews:{},commands:{},checkouts:{}};
   tail=Promise.resolve(); failAudit=false;
   async transaction(work){
     let release;const before=this.tail;this.tail=new Promise(resolve=>{release=resolve});await before;
     const d=clone(this.data);
     const tx={
+      permanentGameIds:async owner=>clone(d.permanent[owner]??[]),
+      grantsForOrder:async id=>clone(Object.values(d.grants).filter(g=>g.orderId===id)),
+      reconciliationOrders:async(before,limit)=>clone(Object.values(d.orders).filter(o=>!before||o.createdAt<before.createdAt||o.createdAt===before.createdAt&&o.id<before.id).sort((a,b)=>a.createdAt===b.createdAt?(a.id>b.id?-1:a.id<b.id?1:0):(a.createdAt>b.createdAt?-1:1)).slice(0,limit)),
       checkout:async order=>clone(d.checkouts[order]??null),checkoutByReference:async(provider,ref)=>clone(Object.values(d.checkouts).find(c=>c.provider===provider&&c.reference===ref)??null),putCheckout:async c=>{d.checkouts[c.orderId]=clone(c)},
       isAdmin:async id=>d.admins.includes(id),hasPermission:async(id,permission)=>(d.permissions[id]??[]).includes(permission),review:async id=>clone(d.reviews[id]??null),
       reviews:async(status,before,limit)=>clone(Object.values(d.reviews).filter(r=>(status==='all'||r.status===status)&&(!before||r.createdAt<before.createdAt||r.createdAt===before.createdAt&&r.id<before.id)).sort((a,b)=>a.createdAt===b.createdAt?(a.id>b.id?-1:a.id<b.id?1:0):(a.createdAt>b.createdAt?-1:1)).slice(0,limit)),

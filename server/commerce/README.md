@@ -122,3 +122,48 @@ fails closed with HTTP 403; customer order endpoints remain unchanged. Productio
 must implement the new contract before rollout; no permission is inherited from admin status.
 See `docs/operations/SECURITY-RECOVERY.md` for the pending real MFA integration, legacy RPC
 scope limitation, backup inventory, isolated restore drill and activation gates.
+
+### Consistency checks, ownership and pilot policy
+
+`GET /api/rentals/admin/reconciliation?cursor=...` requires the independent
+`reconciliationEnabled` host gate, global enable/rate limit, verified MFA admin and
+`reviews.read`. `reconcile` checks 50 orders per call in one consistent transaction:
+missing/duplicate grants, owner/coverage/date corruption, unrevoked refunded or
+unsettled grants, and paid-order payment mismatch. It never mutates the ledger.
+`Transaction.reconciliationOrders` uses the same exclusive createdAt/id descending
+cursor as order history; `grantsForOrder` must query by order regardless of owner.
+The admin screen is gated by `VITE_RENTAL_RECONCILIATION_API=false` by default.
+Pages are separate snapshots: repeat full scans for records changed during a run.
+
+This is internal consistency detection, not provider settlement reconciliation.
+Orphan provider payments, unknown orders, orphan grants, dropped webhooks and provider
+settlement totals require additional provider/database scans before production.
+No scheduler or notification destination is connected yet. A production job must use
+a separate server-only identity/permission path, durable cursor/run records, overlap
+prevention, deduplicated findings and monitored completion; do not store user MFA
+session tokens in a cron job. Repairs must use verified events or reviewed audited
+commands, not direct updates or replay of already-consumed receipts.
+
+`permanentGameIds(owner)` is mandatory: authoritative free published games plus
+currently effective, nonrevoked permanent entitlements, expanding permanent all-game
+rights over the catalog. Exclude expired, future and timed rental grants. Read/lock
+ownership consistently with order creation and settlement. Quotes, new orders and
+checkout preparation refuse fully-owned finite offers. Partial bundles keep their
+listed price and explicitly disclose that no per-game discount is applied. Pass
+covers a changing catalog and is not compared to a finite owned list. Ownership
+acquired after payment-session creation routes settlement to review; it never silently
+consumes the payment as an unnecessary rental. Grant approval also rejects fully-owned
+finite coverage. Actual provider refunds remain an external integration task.
+
+`maintenanceCreditMs` is a pure review-only proposal helper: union overlapping incidents,
+clip to the rental window, exclude revoked grants, count only full-coverage outages.
+Partial bundle/Pass outages need manual assessment. It is not connected to a persistent
+incident register or credit action and does not extend grants automatically. Future
+application must dedupe incident/grant IDs, audit the decision, and shift queued renewals
+atomically without double crediting. Do not advertise guaranteed automatic credits yet.
+
+Store admin includes three inactive presets (one game 7d, bundle 30d, Pass 30d), with
+no guessed prices or game choices. Existing six durations remain available. My Access
+shows expiry within three days using server time; it is an in-app label, not a push/email
+reminder. Expiration retains progress and starter rights; existing access evaluation
+still enforces maintenance and blocks. No recurring billing is implemented.

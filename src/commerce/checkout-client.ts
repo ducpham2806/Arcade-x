@@ -47,6 +47,7 @@ export function createCheckoutClient(options: RentalClientOptions): CheckoutClie
 export function checkoutErrorText(e: unknown) {
     const code = e instanceof OrdersError ? e.code : '';
     return ({
+        already_owned: 'Bạn đã có quyền chơi vĩnh viễn toàn bộ game trong gói này. Không cần thuê thêm.',
         checkout_disabled: 'Thanh toán chưa được mở. Bạn có thể quay lại xem gói hoặc đơn thuê.', price_changed: 'Giá hoặc nội dung gói đã thay đổi. Hãy tải lại gói rồi kiểm tra trước khi tạo đơn.',
         checkout_order_changed: 'Đơn đã thay đổi hoặc hết hạn. Hãy kiểm tra trạng thái mới nhất.', checkout_in_progress: 'Phiên thanh toán đang được chuẩn bị. Hãy chờ một chút rồi thử lại với đơn này.',
         checkout_session_expired: 'Phiên thanh toán đã hết hạn. Hãy kiểm tra đơn thuê trước khi đặt lại.', checkout_provider_changed: 'Phiên thanh toán cũ chưa thể tiếp tục. Hãy kiểm tra đơn và liên hệ quản trị viên nếu cần.',

@@ -128,6 +128,12 @@ export interface CheckoutProvider {
     }>;
 }
 export interface Transaction {
+    /** All orders, createdAt DESC/id DESC; exclusive cursor, bounded limit. */
+    reconciliationOrders(before: OrderCursor | null, limit: number): Promise<Order[]>;
+    /** Query by order, not owner, so ownership corruption remains detectable. */
+    grantsForOrder(orderId: string): Promise<RentalGrant[]>;
+    /** Published free games plus permanent starter/admin/paid rights; never timed rentals. */
+    permanentGameIds(ownerId: string): Promise<string[]>;
     checkout(orderId: string): Promise<CheckoutRecord | null>;
     checkoutByReference(provider: string, reference: string): Promise<CheckoutRecord | null>;
     putCheckout(record: CheckoutRecord): Promise<void>;

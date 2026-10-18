@@ -135,3 +135,27 @@ including permission revocation before command replay. Added security/recovery r
 at `docs/operations/SECURITY-RECOVERY.md`. Real MFA setup, private permission storage,
 legacy admin RPC hardening and backup/restore execution remain pending with service
 integration; no live configuration changed and commerce flags remain off.
+
+## Reconciliation and pilot policies — 18 October 2026
+
+Implemented internal consistency scanner and protected paginated admin screen;
+permanent-ownership checks at quote/order/session/settlement and manual approval;
+in-app three-day expiry label; inactive 7d single-game, 30d bundle and 30d Pass presets;
+explicit no-auto-charge/partial-bundle-price messaging; tested maintenance-duration
+proposal helper. All new gates stay off.
+
+Remaining integration work: durable repository and permission/ownership queries,
+verified identity and real payment adapters, provider-side settlement reconciliation,
+scheduled scans/alerts, maintenance incident storage plus audited credit application,
+push/email expiry notification delivery, analytics event storage/dashboard, selection
+of gift games and pilot prices, real backup/restore drill and staging/browser QA.
+Supabase is deferred by request; preserve the 19 October reminder. This preparation
+must not be represented as a live payment system or completed automatic maintenance credit.
+
+Pilot metrics implementation specification: record deduplicated server events for gift
+claim, trial start/finish, order creation, verified settlement/refund and renewal.
+Associate pseudonymous account ID, event ID and UTC time; exclude tokens/raw provider
+payloads. Define D7/D30 cohorts from first registered activity, report unique users,
+conversion denominators, settled revenue minus refunds/fees, and suppress incomplete
+cohorts. Financial metrics must come from settlement records, not browser clicks.
+Storage/retention policy and consent requirements need review before enabling collection.
