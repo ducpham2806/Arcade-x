@@ -1,3 +1,4 @@
+import {accessPreviewEnabled,myAccess} from '../commerce/api';
 import {isLocalReviewGame} from './catalog';
 import React,{createContext,useContext,useEffect,useState,useCallback,useRef} from 'react';
 import {useAuth} from '../context/AuthContext';
@@ -33,6 +34,7 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
   void sync();window.addEventListener('online',sync);const timer=setInterval(sync,30000);
   return()=>{alive=false;clearInterval(timer);window.removeEventListener('online',sync);};
  },[owner,loaded]);
+ useEffect(()=>{if(accessPreviewEnabled&&owner)void myAccess(owner).catch(()=>{});},[owner]);
  const toggleFavorite=useCallback((id:string)=>{
   preferenceRevision.current++;
   const previous=StorageService.loadFavorites();const favorite=!previous.includes(id);const next=favorite?[...previous,id]:previous.filter(v=>v!==id);
@@ -44,12 +46,12 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
   if(authorizing.current)return false;const game=catalogRef.current.games.find(game=>game.id===id);
   if(!game){setNotice('Game này hiện không có trong thư viện.');return false;}
   let requestedOwner=ownerRef.current;authorizing.current=true;setBusy(true);
-  try{let access=await checkAccess(game);
+  try{if(accessPreviewEnabled&&requestedOwner){try{await myAccess(requestedOwner);}catch{setNotice('Chưa xác minh được quyền của tài khoản. Hãy kết nối mạng và thử lại.');return false;}}let access=await checkAccess(game);
    // Guest restoration may finish during the click. Recheck under the settled identity
    // instead of silently dropping the user's launch; premium checks remain authoritative.
    if(mounted.current&&ownerRef.current!==requestedOwner){requestedOwner=ownerRef.current;const latest=catalogRef.current.games.find(row=>row.id===id);if(!latest)return false;access=await checkAccess(latest);}
    if(!mounted.current||ownerRef.current!==requestedOwner)return false;
-   if(!access.allowed)setNotice(access.reason==='sign_in'?'Đăng nhập để kiểm tra quyền chơi game này.':access.reason==='locked'?'Game này cần quyền mở khóa. Thanh toán trong ứng dụng chưa được mở.':access.reason==='offline'?'Game này cần kết nối mạng để bắt đầu.':access.reason==='connection'?'Chưa xác minh được quyền chơi. Hãy kết nối mạng và thử lại.':'Game đang bảo trì hoặc đã ngừng cung cấp.');
+   if(!access.allowed)setNotice(['account_blocked','game_blocked'].includes(access.reason)?'Quyền truy cập đang bị tạm khóa. Vui lòng liên hệ quản trị viên.':access.reason==='sign_in'?'Đăng nhập để kiểm tra quyền chơi game này.':access.reason==='locked'?'Game này cần quyền mở khóa. Thanh toán trong ứng dụng chưa được mở.':access.reason==='offline'?'Game này cần kết nối mạng để bắt đầu.':access.reason==='connection'?'Chưa xác minh được quyền chơi. Hãy kết nối mạng và thử lại.':'Game đang bảo trì hoặc đã ngừng cung cấp.');
    return access.allowed;
   }finally{authorizing.current=false;if(mounted.current)setBusy(false);}
  },[]);
@@ -58,3 +60,4 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
  return <Context.Provider value={{catalog,source,favorites,recentlyPlayed,toggleFavorite,authorize,recordPlay,finishPlay,notice,dismissNotice:()=>setNotice(''),refresh,busy}}>{children}</Context.Provider>;
 }
 export function useLauncher(){const value=useContext(Context);if(!value)throw new Error('LauncherProvider required');return value;}
+
