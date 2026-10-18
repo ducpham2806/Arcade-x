@@ -1,42 +1,7 @@
-import {build} from 'esbuild';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-const bundle=await build({entryPoints:['server/commerce/service.ts'],bundle:true,write:false,format:'esm',platform:'node'});
-const {CommerceService,CommerceError,addTerm,grantActive}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].text).toString('base64'));
+import {fixture,CommerceError,addTerm,grantActive} from './commerce-fixture.mjs';
 const clone=value=>structuredClone(value);
-
-// Test-only ledger. Transactions are serialized and rolled back in full on failure.
-// It is deliberately not a production persistence or authentication adapter.
-class Ledger {
-  data={enabled:true,available:true,accounts:{alice:{registered:true,pilot:true,blocked:false},bob:{registered:true,pilot:true,blocked:false}},
-    offers:{one:{id:'one',revision:'r1',title:'2048 7 days',scope:'game',gameIds:['tile-2048'],term:'7d',amount:10000,currency:'VND',active:true}},
-    orders:{},payments:{},events:{},grants:{},audit:[]};
-  tail=Promise.resolve(); failAudit=false;
-  async transaction(work){
-    let release;const before=this.tail;this.tail=new Promise(resolve=>{release=resolve});await before;
-    const d=clone(this.data);
-    const tx={
-      checkoutEnabled:async()=>d.enabled,account:async id=>clone(d.accounts[id]??null),offer:async id=>clone(d.offers[id]??null),
-      gamesAvailable:async()=>d.available,order:async id=>clone(d.orders[id]??null),
-      orderByRequest:async(owner,key)=>clone(Object.values(d.orders).find(o=>o.ownerId===owner&&o.requestKey===key)??null),
-      putOrder:async o=>{d.orders[o.id]=clone(o)},payment:async k=>clone(d.payments[k]??null),putPayment:async p=>{d.payments[p.key]=clone(p)},
-      event:async k=>clone(d.events[k]??null),putEvent:async(k,e)=>{d.events[k]=clone(e)},
-      grants:async owner=>clone(Object.values(d.grants).filter(g=>g.ownerId===owner)),putGrant:async g=>{d.grants[g.id]=clone(g)},
-      audit:async a=>{if(this.failAudit)throw Error('audit unavailable');d.audit.push(clone(a))},
-    };
-    try{const result=await work(tx);this.data=d;return clone(result)}finally{release()}
-  }
-}
-function fixture(){
-  const ledger=new Ledger();let serial=0,now=new Date('2026-10-18T10:00:00.000Z');
-  const identity={async requireUser(session){if(!['session:alice','session:bob'].includes(session))throw new CommerceError('unauthenticated');return {id:session.slice(8)}}};
-  const verifier={async verify(body,headers){if(headers['x-test-signature']!=='valid')throw new CommerceError('invalid_signature');return JSON.parse(new TextDecoder().decode(body))}};
-  const service=new CommerceService(ledger,identity,verifier,()=>new Date(now),()=>`id-${++serial}`);
-  const create=(requestKey='request_key_000001',extra={})=>service.createOrder('session:alice',{offerId:'one',offerRevision:ledger.data.offers.one.revision,requestKey,...extra});
-  const event=(order,extra={})=>({provider:'test-only',eventId:`ev-${++serial}`,paymentId:`pay-${order.id}`,orderId:order.id,kind:'paid',amount:order.offer.amount,currency:'VND',occurredAt:now.toISOString(),...extra});
-  const send=(e,headers={'x-test-signature':'valid'})=>service.handleWebhook(new TextEncoder().encode(JSON.stringify(e)),headers);
-  return {ledger,service,create,event,send,time:v=>{now=new Date(v)},grants:()=>Object.values(ledger.data.grants)};
-}
 const code=expected=>e=>e.code===expected;
 
 test('price is read from server; immutable snapshot survives catalog edit',async()=>{

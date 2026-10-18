@@ -1,3 +1,4 @@
+import type { OrderCursor } from '../../shared/rental-orders';
 /** Server-only contracts. Do not import this service into the browser bundle. */
 export type Term = '7d' | '14d' | '30d' | '3m' | '6m' | '1y';
 export type Scope = 'game' | 'bundle' | 'all';
@@ -82,6 +83,9 @@ export interface Transaction {
     gamesAvailable(ids: string[], allGames: boolean): Promise<boolean>;
     order(id: string): Promise<Order | null>;
     orderByRequest(ownerId: string, key: string): Promise<Order | null>;
+    /** Owner predicate is mandatory. Sort createdAt DESC, id DESC; exclusive keyset cursor.
+     * Return no more than limit rows; caller requests one lookahead row. */
+    orders(ownerId: string, before: OrderCursor | null, limit: number): Promise<Order[]>;
     putOrder(order: Order): Promise<void>;
     payment(key: string): Promise<Payment | null>;
     putPayment(payment: Payment): Promise<void>;

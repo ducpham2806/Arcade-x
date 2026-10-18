@@ -32,3 +32,26 @@ Run `npm run test:commerce` for executable examples. No credentials or external 
 - Full refund does not move later queued renewals forward. If a refunded earlier term creates a gap, handle dates/credit explicitly in the audited review flow. No silent rescheduling or double credit.
 - Partial refunds, chargebacks/disputes, currency conversion, taxes/invoices and moving paid value between packages need explicit business rules and provider integration.
 - Database/staging migration, live provider signature verification and cross-process concurrency have not been tested. The user deferred Supabase work on 2026-10-18.
+
+## Order history and HTTP boundary (step 4)
+
+`createCommerceHandler` in `http.ts` is a host-independent `Request → Response` handler. It has no mounted route or production adapter in this PR. It defaults to disabled and refuses to run without an explicit host rate-limit callback. The host still needs to verify sessions through `IdentityProvider`, persist through the durable repository and supply real rate limiting.
+
+| Method | Path | Operation |
+| --- | --- | --- |
+| GET | `/api/rentals/orders?limit=20&cursor=...` | Owner's newest orders, exclusive keyset pagination |
+| GET | `/api/rentals/orders/:id` | Owner's order and grant dates |
+| POST | `/api/rentals/orders` | Create from `{offerId, offerRevision, requestKey}` only |
+| POST | `/api/rentals/orders/:id/cancel` | Cancel with an empty JSON object |
+
+Every route requires a bearer token, independently verified by the service identity adapter. Owner and payment IDs are never accepted from the client. Responses use public DTOs in `shared/rental-orders.ts` and omit owner/request/provider payment IDs. Responses, including errors, use `Cache-Control: no-store, private` and `Vary: Authorization`. The handler has no CORS or cookie authentication. Use same-origin routing; do not add a wildcard credentialed proxy.
+
+`Transaction.orders` must filter by owner before applying the cursor/limit, ordered by `(created_at DESC, id DESC)`. Cursor is the URL-encoded JSON `{createdAt,id}` from `nextCursor`, not a page offset; limit is 1–50, with one internal lookahead row. Use parameterized SQL and an owner/created_at/id index when implementing persistence. Grant reads must be owner-filtered in the same transaction. List/detail expire pending orders at the server deadline. List filtering is intentionally done in the UI only for rows already loaded, avoiding inconsistent pagination around lazy expiry.
+
+JSON mutations are restricted to 4 KiB and explicit fields. Safe machine error codes map to 400/401/403/404/409/413/415/429/503; unexpected exceptions become a generic 503. Browser redirect results cannot settle an order. The history HTTP module does not expose a payment webhook.
+
+Frontend entry points are Settings → Đơn thuê của tôi and the game storefront. `VITE_RENTAL_ORDERS_API=false` is independent of the access preview flag; leave it false until the host handler, durable repository and verified session adapter are ready. When disabled, history shows an unavailable state and performs no history API/session calls. It does not show demo orders. Store checkout remains disabled even when history is enabled.
+
+The client checks the expected account before and after a request, validates returned data, uses abort/timeout and no-store requests, and never persists orders/tokens in a separate local cache. The screen is remounted on account switch, supports local status filtering, paginated loading, inline details, confirmation before cancellation and server-relative deadline labels. The first page polls every 20 seconds only while visible and awaiting payment; pagination pauses polling so it does not discard older loaded pages. Returning to the tab or reconnecting reloads the first page. Paid grant dates distinguish active, future renewal, expired and revoked grants.
+
+Test coverage includes HTTP/client roundtrips with a test-only ledger: owner isolation, same-timestamp pagination, automatic expiry, cancellation/payment races, DTO redaction, field/body limits, disabled gates, account switches in flight and HTML fallback/malformed responses. Browser layout/focus checks and deployment remain pending staging.

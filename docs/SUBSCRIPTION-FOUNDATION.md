@@ -102,3 +102,11 @@ Validation: TypeScript and Vite production build with the preview flag enabled; 
 `server/commerce` now implements server-side rules for snapshotted rental orders, owner access/cancellation, expiry, verified webhook delivery, event/payment deduplication, renewal scheduling and full-refund revocation. `npm run test:commerce` exercises these rules using a test-only transactional ledger and verifier. See `server/commerce/README.md` for integration contracts and unresolved cases.
 
 This is not connected to Supabase, the storefront or a live payment provider. No new migrations or production changes are part of this step. Checkout stays disabled. Next: implement durable adapters, a chosen provider's signature verification and session creation, order history/review UI, then staging verification. Supabase work is intentionally deferred at the user's request; a reminder was scheduled for the morning of 2026-10-19 in Asia/Ho_Chi_Minh.
+
+## Step 4 — personal order history
+
+Added Settings/storefront entry points for **Đơn thuê của tôi**, with status filters for loaded orders, pagination, inline rental dates and cancellation confirmation. The client refreshes pending first-page orders while visible and checks account identity around every response. An independent `VITE_RENTAL_ORDERS_API=false` flag shows an explicit unavailable state until integration; no fake orders or checkout are enabled.
+
+Added the unmounted `server/commerce/http.ts` boundary and public DTOs: owner-only list/detail/create/cancel, strict JSON limits, bearer authentication through the injected service, mandatory host rate-limit hook, sanitized errors and private/no-store responses. The persistence contract now includes owner-filtered keyset order queries. See the server README for paths and adapter requirements.
+
+Next: durable persistence and hosting/session adapters, payment-provider checkout/signature verification, and an audited admin review queue. Supabase work and live checkout remain deferred. No hosted API or browser QA is claimed in this step.

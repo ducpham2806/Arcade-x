@@ -1,3 +1,4 @@
+import type { OrderCursor, OrderPage, OrderView } from '../../shared/rental-orders';
 import type { CommerceRepository, IdentityProvider, PaymentVerifier, Offer, Order, PaymentEvent, Settlement, Term, Transaction, RentalGrant } from './types';
 export class CommerceError extends Error {
     constructor(public code: string) { super(code); this.name = 'CommerceError'; }
@@ -78,8 +79,52 @@ export class CommerceService {
     }
     async getOrder(session: unknown, orderId: string): Promise<Order> {
         const actor = await this.identity.requireUser(session);
-        return this.repo.transaction(async (tx) => { const order = await tx.order(orderId); if (!order || order.ownerId !== actor.id)
-            fail('order_not_found'); return this.expire(tx, order); });
+        return this.repo.transaction(async (tx) => {
+            const order = await tx.order(orderId);
+            if (!order || order.ownerId !== actor.id)
+                fail('order_not_found');
+            return this.expire(tx, order);
+        });
+    }
+    async listOrders(session: unknown, options: {
+        limit?: number;
+        cursor?: OrderCursor | null;
+    } = {}): Promise<OrderPage> {
+        const actor = await this.identity.requireUser(session);
+        const limit = options.limit ?? 20, cursor = options.cursor ?? null;
+        if (!Number.isInteger(limit) || limit < 1 || limit > 50)
+            fail('invalid_page');
+        if (cursor && (!cursor.id || typeof cursor.id !== 'string' || cursor.id.length > 200 || typeof cursor.createdAt !== 'string' || !Number.isFinite(Date.parse(cursor.createdAt))))
+            fail('invalid_page');
+        return this.repo.transaction(async (tx) => {
+            const rows = await tx.orders(actor.id, cursor, limit + 1);
+            // Defense in depth if a persistence adapter omits its owner predicate.
+            if (rows.some(o => o.ownerId !== actor.id))
+                fail('repository_owner_mismatch');
+            const grants = await tx.grants(actor.id), orders: OrderView[] = [];
+            for (const row of rows.slice(0, limit))
+                orders.push(this.present(await this.expire(tx, row), grants));
+            const last = rows[Math.min(rows.length, limit) - 1];
+            return { orders, nextCursor: rows.length > limit ? { createdAt: last.createdAt, id: last.id } : null, serverTime: this.clock().toISOString() };
+        });
+    }
+    async orderDetails(session: unknown, id: string): Promise<{
+        order: OrderView;
+        serverTime: string;
+    }> {
+        const actor = await this.identity.requireUser(session);
+        return this.repo.transaction(async (tx) => {
+            const order = await tx.order(id);
+            if (!order || order.ownerId !== actor.id)
+                fail('order_not_found');
+            return { order: this.present(await this.expire(tx, order), await tx.grants(actor.id)), serverTime: this.clock().toISOString() };
+        });
+    }
+    private present(order: Order, grants: RentalGrant[]): OrderView {
+        return { id: order.id, title: order.offer.title, scope: order.offer.scope, gameIds: [...order.offer.gameIds], term: order.offer.term,
+            amount: order.offer.amount, currency: order.offer.currency, state: order.state, createdAt: order.createdAt, expiresAt: order.expiresAt,
+            ...(order.paidAt ? { paidAt: order.paidAt } : {}), grants: grants.filter(g => g.orderId === order.id && g.ownerId === order.ownerId)
+                .map(g => ({ startsAt: g.startsAt, expiresAt: g.expiresAt, ...(g.revokedAt ? { revokedAt: g.revokedAt } : {}) })) };
     }
     async cancelOrder(session: unknown, orderId: string): Promise<Order> {
         const actor = await this.identity.requireUser(session);
