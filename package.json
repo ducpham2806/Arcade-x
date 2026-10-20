@@ -27,7 +27,9 @@
     "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs",
     "export:artwork": "node scripts/export-game-art.mjs",
     "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
-    "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs"
+    "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
+    "test:battleship": "node tests/battleship/engine.mjs",
+    "preview:battleship": "node scripts/battleship-preview.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

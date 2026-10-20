@@ -1,0 +1,92 @@
+{
+  "images": {
+    "us-light-cruiser": "/games/battleship/us-light-cruiser.webp",
+    "jp-destroyer": "/games/battleship/jp-destroyer.webp",
+    "jp-battleship": "/games/battleship/jp-battleship.webp",
+    "jp-heavy-cruiser": "/games/battleship/jp-heavy-cruiser.webp",
+    "us-carrier": "/games/battleship/us-carrier.webp",
+    "us-destroyer": "/games/battleship/us-destroyer.webp",
+    "jp-light-cruiser": "/games/battleship/jp-light-cruiser.webp",
+    "jp-carrier": "/games/battleship/jp-carrier.webp",
+    "us-battleship": "/games/battleship/us-battleship.webp",
+    "missile": "/games/battleship/missile.webp",
+    "us-heavy-cruiser": "/games/battleship/us-heavy-cruiser.webp",
+    "ocean": "/games/battleship/ocean.webp"
+  },
+  "fx": {
+    "explosion": {
+      "paths": [
+        "/games/battleship/explosion-0.webp",
+        "/games/battleship/explosion-1.webp",
+        "/games/battleship/explosion-2.webp",
+        "/games/battleship/explosion-3.webp",
+        "/games/battleship/explosion-4.webp",
+        "/games/battleship/explosion-5.webp"
+      ],
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "ms": 100
+    },
+    "splash": {
+      "paths": [
+        "/games/battleship/splash-0.webp",
+        "/games/battleship/splash-1.webp",
+        "/games/battleship/splash-2.webp",
+        "/games/battleship/splash-3.webp",
+        "/games/battleship/splash-4.webp",
+        "/games/battleship/splash-5.webp"
+      ],
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "ms": 100
+    },
+    "fire": {
+      "paths": [
+        "/games/battleship/fire-0.webp",
+        "/games/battleship/fire-1.webp",
+        "/games/battleship/fire-2.webp",
+        "/games/battleship/fire-3.webp",
+        "/games/battleship/fire-4.webp",
+        "/games/battleship/fire-5.webp",
+        "/games/battleship/fire-6.webp"
+      ],
+      "sequence": [
+        2,
+        3,
+        6,
+        1
+      ],
+      "ms": 160
+    },
+    "smoke": {
+      "paths": [
+        "/games/battleship/smoke-0.webp",
+        "/games/battleship/smoke-1.webp",
+        "/games/battleship/smoke-2.webp",
+        "/games/battleship/smoke-3.webp",
+        "/games/battleship/smoke-4.webp",
+        "/games/battleship/smoke-5.webp",
+        "/games/battleship/smoke-6.webp"
+      ],
+      "sequence": [
+        2,
+        3,
+        6,
+        1
+      ],
+      "ms": 160
+    }
+  }
+}

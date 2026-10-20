@@ -8,6 +8,7 @@ import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
 export const GAME_ART: Record<string, { color: string; secondary: string; label: string; world: string }> = {
+  'battleship': {color:'#dfbb7e',secondary:'#6ca7c2',label:'BẢN TẬP',world:'Naval Warfare · Hạm đội vỏ thép'},
   'boom-buddies': {color:'#ffa846',secondary:'#89ce57',label:'GAME MỚI',world:'Khu vườn bom vui nhộn'},
   'brick-breaker': {color:'#67eece',secondary:'#a68dff',label:'GAME MỚI',world:'Chronicles · Sáu miền Aethra'},
   'rainbow-blocks': { color:'#7fe6ff',secondary:'#d88beb',label:'GAME MỚI',world:'Cầu vồng sắc màu' },
@@ -208,6 +209,7 @@ function Backdrop({id,a,b}:{id:string;a:string;b:string}){
 
 export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
  const uid=useId().replace(/[^a-zA-Z0-9_-]/g,'');const id=canonicalArtId(gameId);const {color,secondary}=artFor(id);
+ if(id==='battleship') return <svg className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} viewBox="0 0 420 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="/games/battleship/ocean.webp" width="420" height="420" y="-85"/><rect width="420" height="250" fill="#081725" opacity=".35"/><image href="/games/battleship/us-carrier.webp" x="110" y="12" width="90" height="228"/><image href="/games/battleship/jp-battleship.webp" x="224" y="18" width="88" height="218"/></svg>;
  return <svg className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} viewBox={variant==='icon'?'60 -25 300 300':'0 0 420 250'} preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true" focusable="false">
  <defs><clipPath id={`${uid}-orb`}><rect x="135" y="92" width="105" height="105"/></clipPath><radialGradient id={`${uid}-sky`} cx=".5" cy=".35" r=".9"><stop stopColor={color} stopOpacity=".3"/><stop offset="1" stopColor="#071321"/></radialGradient></defs>
  <rect x="0" y="-30" width="420" height="310" fill={`url(#${uid}-sky)`}/><g transform={variant==='icon'?'translate(0 -25) scale(1 1.2)':undefined}><Backdrop id={id} a={color} b={secondary}/></g>
@@ -225,4 +227,5 @@ export function GameAtmosphere({ gameId }: {gameId: string}) {
     <span className="game-world-coordinate">✦ PLAY / EXPLORE / MASTER</span>
   </div>;
 }
+
 

@@ -1,0 +1,10 @@
+import {build} from 'esbuild';
+import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+import path from 'node:path';
+const target=path.resolve(process.argv[2]||'review/battleship-p1-p2-playtest.html');
+const result=await build({entryPoints:['src/games/battleship/review.tsx'],bundle:true,write:false,format:'iife',platform:'browser',minify:true,jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},outfile:'battleship.js'});
+const js=result.outputFiles.find(f=>f.path.endsWith('.js')).text,css=result.outputFiles.find(f=>f.path.endsWith('.css')).text;
+const manifest=JSON.parse(readFileSync('src/games/battleship/art.json','utf8')),urls=[...Object.values(manifest.images),...Object.values(manifest.fx).flatMap(f=>f.paths)];
+const assets=Object.fromEntries(urls.map(url=>[url,'data:image/webp;base64,'+readFileSync('public'+url).toString('base64')]));
+const html=`<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Battleship · P1–P2 Playtest</title><style>html,body,#root{margin:0;width:100%;height:100%;background:#0c1922}${css}</style></head><body><div id="root"></div><script>globalThis.__BATTLESHIP_EMBEDDED__=${JSON.stringify(assets)};${js.replaceAll('</script','<\\/script')}</script></body></html>`;
+mkdirSync(path.dirname(target),{recursive:true});writeFileSync(target,html);console.log(JSON.stringify({file:target,bytes:Buffer.byteLength(html),images:urls.length,compressedArtBytes:urls.reduce((n,u)=>n+readFileSync('public'+u).length,0)}));

@@ -1,0 +1,132 @@
+{
+  "checks": 24,
+  "results": [
+    "duel and squad have fixed 30 second turn clock",
+    "reject fractional, overflow, identity and owner spoof placement",
+    "horizontal, vertical and touching are valid; overlap is not",
+    "replacing own ship is atomic and immutable",
+    "auto placement preserves already placed ship",
+    "200 seeded fleets stay in-bounds, non-overlapping and reproducible",
+    "squad owners cannot cross 7-row sector boundaries",
+    "cannot ready incomplete fleet or edit after ready",
+    "placement deadline auto fills every missing fleet and starts battle",
+    "shot at deadline rejected, timeout loses a turn without auto fire",
+    "background gaps advance the exact elapsed number of turns",
+    "wrong actor, stale turn, fractional target and duplicate target rejected",
+    "idempotent retry returns same state without extra shot or turn",
+    "hit still transfers turn and leaves adjacent unknown cells untouched",
+    "last cell sinks ship and reveals only its public footprint",
+    "opponent DTO contains zero unrevealed ship coordinates before and after a hit",
+    "squad cycle and all seats remain even after their personal fleet sinks",
+    "final occupied cell wins once; repeat winning action is harmless",
+    "duel surrender is final; squad requires team consent workflow",
+    "bot knowledge has no board or private hull data and chooses unshot cells",
+    "normal bot follows a known unsunk hit",
+    "20 bot duels complete using public observations only",
+    "squad seats remain active after all ships owned by one player are sunk",
+    "4 complete squad bot matches use shared board without duplicate shots"
+  ],
+  "simulation": [
+    {
+      "seed": 1,
+      "winner": 0,
+      "turns": 78
+    },
+    {
+      "seed": 2,
+      "winner": 1,
+      "turns": 68
+    },
+    {
+      "seed": 3,
+      "winner": 1,
+      "turns": 71
+    },
+    {
+      "seed": 4,
+      "winner": 0,
+      "turns": 77
+    },
+    {
+      "seed": 5,
+      "winner": 1,
+      "turns": 79
+    },
+    {
+      "seed": 6,
+      "winner": 1,
+      "turns": 70
+    },
+    {
+      "seed": 7,
+      "winner": 1,
+      "turns": 69
+    },
+    {
+      "seed": 8,
+      "winner": 0,
+      "turns": 79
+    },
+    {
+      "seed": 9,
+      "winner": 1,
+      "turns": 71
+    },
+    {
+      "seed": 10,
+      "winner": 1,
+      "turns": 70
+    },
+    {
+      "seed": 11,
+      "winner": 0,
+      "turns": 78
+    },
+    {
+      "seed": 12,
+      "winner": 0,
+      "turns": 81
+    },
+    {
+      "seed": 13,
+      "winner": 1,
+      "turns": 89
+    },
+    {
+      "seed": 14,
+      "winner": 1,
+      "turns": 80
+    },
+    {
+      "seed": 15,
+      "winner": 1,
+      "turns": 69
+    },
+    {
+      "seed": 16,
+      "winner": 1,
+      "turns": 70
+    },
+    {
+      "seed": 17,
+      "winner": 1,
+      "turns": 71
+    },
+    {
+      "seed": 18,
+      "winner": 1,
+      "turns": 68
+    },
+    {
+      "seed": 19,
+      "winner": 0,
+      "turns": 78
+    },
+    {
+      "seed": 20,
+      "winner": 1,
+      "turns": 70
+    }
+  ],
+  "scope": "rules/bot, not online or browser"
+}

@@ -1,0 +1,200 @@
+{
+  "art_source": "host_image",
+  "route": "built-in image_gen",
+  "source_bundle": "arcadex-battleship-war-assets-v2.zip",
+  "source_status": "user approved art sample in prior turn; footprint refit and final VFX review remain open",
+  "transform": "Uniform source crop/downscale and WebP export; runtime ocean distortion and missile transform. No new raster assets drawn in code.",
+  "historical_accuracy": "Fictionalized US/Japanese-inspired silhouettes, not verified replicas",
+  "runtime": [
+    {
+      "path": "public/games/battleship/explosion-0.webp",
+      "bytes": 13570,
+      "sha256": "adfab506418ef583acc872e85a9f18ddc6a3d2ee5eca0bcd57d3e9a13c301403"
+    },
+    {
+      "path": "public/games/battleship/explosion-1.webp",
+      "bytes": 28358,
+      "sha256": "6d917f27b73385c78dffedd944673443cc79042a4df63ee1781c69889823da4e"
+    },
+    {
+      "path": "public/games/battleship/explosion-2.webp",
+      "bytes": 37612,
+      "sha256": "61acbb63c658163ee4d38d0e8acea314ce457dc384ceff2ddcc62b3f81963d56"
+    },
+    {
+      "path": "public/games/battleship/explosion-3.webp",
+      "bytes": 33094,
+      "sha256": "08154d354a89a63b2c2476a5b450aa716443595b7424723a52cce033aa4f4626"
+    },
+    {
+      "path": "public/games/battleship/explosion-4.webp",
+      "bytes": 24278,
+      "sha256": "e9f028eefb2a87dbebea565079231f2bd0be4ebf526cbeedf59b9360fc96e62a"
+    },
+    {
+      "path": "public/games/battleship/explosion-5.webp",
+      "bytes": 21158,
+      "sha256": "04e05dacb35f1c776a771bf163f7ace1dfc7838860355ea93bebc7403c484a0a"
+    },
+    {
+      "path": "public/games/battleship/fire-0.webp",
+      "bytes": 16780,
+      "sha256": "99e4b43aead8643b988157c42637945c955743b4fbd3ecf1aa350f3756708a56"
+    },
+    {
+      "path": "public/games/battleship/fire-1.webp",
+      "bytes": 27572,
+      "sha256": "812084418c5412fc11e6b29c83ca3237ccc7a4950103ff27ac249a4ec9b7cc56"
+    },
+    {
+      "path": "public/games/battleship/fire-2.webp",
+      "bytes": 31542,
+      "sha256": "c51532c5a2710e5bf137ad68845d547362f24c50be471dd72f0ab94fcedf8c58"
+    },
+    {
+      "path": "public/games/battleship/fire-3.webp",
+      "bytes": 29112,
+      "sha256": "c8d37008ecc3346673865c0378cc67ffddae6c4a7db04ca45317325615a84fed"
+    },
+    {
+      "path": "public/games/battleship/fire-4.webp",
+      "bytes": 25156,
+      "sha256": "ec7a7c407bc69c0beb31ee243cfb1a92f475d25b0362ee615450a85f75ec78a3"
+    },
+    {
+      "path": "public/games/battleship/fire-5.webp",
+      "bytes": 18102,
+      "sha256": "5176df3cebaefaa7ac206743f01d815b61c35c0858d34442155ecfa04a39af51"
+    },
+    {
+      "path": "public/games/battleship/fire-6.webp",
+      "bytes": 26402,
+      "sha256": "0a6f2ff9841ab3e62ddb9d236b02a15c9d0ec5aa04edf316a2f96efefe8dc2cc"
+    },
+    {
+      "path": "public/games/battleship/jp-battleship.webp",
+      "bytes": 30834,
+      "sha256": "03482ffb19870311a1d6d242b51dbe07e9147f9ee34e17e156bb7fc8ff298309"
+    },
+    {
+      "path": "public/games/battleship/jp-carrier.webp",
+      "bytes": 40092,
+      "sha256": "aa8519722a2860aaa793f29d443520fcf5877e1b73186deb4237e3d596dcfe7a"
+    },
+    {
+      "path": "public/games/battleship/jp-destroyer.webp",
+      "bytes": 16016,
+      "sha256": "25e1d930b15da1438114e353f29732c96bc45b44aaef30d5c624a4adc2af9c51"
+    },
+    {
+      "path": "public/games/battleship/jp-heavy-cruiser.webp",
+      "bytes": 24704,
+      "sha256": "475e5cd940f982f3009ee2b6070ed36711245fc31a04977d4d151f4e756d657f"
+    },
+    {
+      "path": "public/games/battleship/jp-light-cruiser.webp",
+      "bytes": 19702,
+      "sha256": "94cf3cd4a793f00bf086135b7a61f78966cd20747700075eccf3debec6ece11d"
+    },
+    {
+      "path": "public/games/battleship/missile.webp",
+      "bytes": 4602,
+      "sha256": "18b3886bb4d9489d6a5c604873809bdc5d07537ee44f3cf12af942eb04b72098"
+    },
+    {
+      "path": "public/games/battleship/ocean.webp",
+      "bytes": 325696,
+      "sha256": "863926900ad5bb08f3ee2ec01a92be3df763b439fd01506f198f62dbb0259fb0"
+    },
+    {
+      "path": "public/games/battleship/smoke-0.webp",
+      "bytes": 5646,
+      "sha256": "3ae00aa19592ccc48307cfa06867574fc358c67a296a2e24986cb187e73065a6"
+    },
+    {
+      "path": "public/games/battleship/smoke-1.webp",
+      "bytes": 14398,
+      "sha256": "cc883448d9f82da9980ccbb3fd83ac5ac925fd4d80de86e0109ce1ae4b3150da"
+    },
+    {
+      "path": "public/games/battleship/smoke-2.webp",
+      "bytes": 19052,
+      "sha256": "10c685db335d9454ebffeef9a34a855817e611125b869d5e1a26211e5fdff6e1"
+    },
+    {
+      "path": "public/games/battleship/smoke-3.webp",
+      "bytes": 19268,
+      "sha256": "5a7dc28ea950b898a74a5bffc64daf5c845a5140ce38add5a32d9c776ad80c3c"
+    },
+    {
+      "path": "public/games/battleship/smoke-4.webp",
+      "bytes": 20182,
+      "sha256": "7e74ea11a2e70810563fb3b991bc53277ed2e185c10fcdd7856697a2747f5808"
+    },
+    {
+      "path": "public/games/battleship/smoke-5.webp",
+      "bytes": 12026,
+      "sha256": "820c9fce50b35a4d4dc02032527062671d411c1521030e2df9a8e7b1875ef3da"
+    },
+    {
+      "path": "public/games/battleship/smoke-6.webp",
+      "bytes": 17564,
+      "sha256": "bfc45263bee321872eca08d49be718a6bb27cd0788e399a7ef077c6a89fe7857"
+    },
+    {
+      "path": "public/games/battleship/splash-0.webp",
+      "bytes": 16040,
+      "sha256": "22df82d27d9d143ddd3edf706f7bb4dbc7a3901b1cf2a551a06bdf7a339540df"
+    },
+    {
+      "path": "public/games/battleship/splash-1.webp",
+      "bytes": 29266,
+      "sha256": "c13aecfa64ab327672f4ec60fbba2821d5a8682bd8458e41274f557e968b5209"
+    },
+    {
+      "path": "public/games/battleship/splash-2.webp",
+      "bytes": 37474,
+      "sha256": "f37def861b8f237f1c2565feef787e962a3e4f97ea435b92bdcd075c07bd8777"
+    },
+    {
+      "path": "public/games/battleship/splash-3.webp",
+      "bytes": 36768,
+      "sha256": "7b7aabf41f6ed35fd1ab1cb2027e97b7160307200ee73ffe852a490859c70dee"
+    },
+    {
+      "path": "public/games/battleship/splash-4.webp",
+      "bytes": 36834,
+      "sha256": "2bc27b18c19f9c18685985d950d10028c7bca739b17d5d1749faf214ec0def44"
+    },
+    {
+      "path": "public/games/battleship/splash-5.webp",
+      "bytes": 32956,
+      "sha256": "b7682ab467422aee5ee0f134f2611719b972c318fa0c85f311952fc1725212d2"
+    },
+    {
+      "path": "public/games/battleship/us-battleship.webp",
+      "bytes": 27876,
+      "sha256": "3159cbe7e67cb825540af45a9d092ec849143eb50e1a52c30f3364bdf2283aec"
+    },
+    {
+      "path": "public/games/battleship/us-carrier.webp",
+      "bytes": 40042,
+      "sha256": "361269874091787caae97eca4228f7374343ac068a14f012fb480b887bec79e2"
+    },
+    {
+      "path": "public/games/battleship/us-destroyer.webp",
+      "bytes": 15012,
+      "sha256": "8af614d6ce2e2a61a95ba46f196839e668046daf424aa69f892143a3c8d275a3"
+    },
+    {
+      "path": "public/games/battleship/us-heavy-cruiser.webp",
+      "bytes": 24754,
+      "sha256": "0694b86683779482afe8a4119841137c4dfa4b129606683aec5118dd35300dba"
+    },
+    {
+      "path": "public/games/battleship/us-light-cruiser.webp",
+      "bytes": 18818,
+      "sha256": "8fb69730281a481da9725e7617cac7c4b090fe148be5f95708c08a77c5ddd20d"
+    }
+  ]
+}

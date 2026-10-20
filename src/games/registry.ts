@@ -1,4 +1,5 @@
 import { packageLazy } from './gamePackages';
+const BattleshipGame = packageLazy('battleship', () => import('./battleship')); 
 import { BLOSSOM_TITLE } from './hex-match/blossom/branding';
 const BrickBreakerGame = packageLazy('brick-breaker', () => import('./brick-breaker'));
 const BoomBuddiesGame = packageLazy('boom-buddies', () => import('./boom-buddies'));
@@ -44,6 +45,13 @@ const WordCrossGame = packageLazy('word-cross', () => import('./word-cross').the
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
+  'battleship': {
+    id:'battleship', title:'Battleship · Naval Warfare', shortDesc:'Đặt hạm đội, khóa tọa độ · Bản tập với bot 1vs1 và 2vs2',
+    description:'Hải chiến vỏ thép lấy cảm hứng Mỹ–Nhật. Đặt 5 tàu, bắn từng ô trong 30 giây và đánh chìm toàn bộ hạm đội đối thủ. Bản review có bot dễ/thường và tập 2vs2 với ba bot; online, matchmaking và mã phòng đang ở giai đoạn tiếp theo.',
+    category:'Multiplayer', difficulty:'Trung Bình', icon:'⚓', bannerGradient:'from-slate-800 via-sky-950 to-slate-950', themeColor:'#dfbb7e', tags:['Bản tập','Hải chiến','Bot','Chiến thuật'],
+    controls:[{key:'Chạm / Mũi tên',action:'Chọn ô đặt tàu hoặc ngắm bắn'},{key:'Nút Xoay',action:'Đổi ngang/dọc khi đặt tàu'},{key:'Nút Bắn',action:'Xác nhận tên lửa tới ô đã chọn'}],
+    achievements:[],dropRates:{baseChestDropChance:0,scoreThresholdForDrop:Number.MAX_SAFE_INTEGER,chestWeights:[]},component:BattleshipGame,
+  },
   'brick-breaker': {
     id:'brick-breaker',title:'Block Breaker · Chronicles',shortDesc:'Phá gạch, đồng hành cùng Orb · 96 màn, 6 vùng đất',
     description:'Chronicles of the Shattered Realms: điều khiển thanh đỡ, giải phóng Orb và khôi phục sáu mảnh Lõi của Aethra. 96 màn chiến dịch, sáu boss và nhiều skin từ gói asset gốc. Tiến trình Chronicles được lưu riêng trên thiết bị.',
@@ -362,3 +370,4 @@ export const FEATURED_SLIDER_GAME_IDS = [
   'mummy-escape', // Turn-based pyramid tactical puzzle
   'tile-2048',    // Jewel-dropping 2048 puzzle
 ];
+
