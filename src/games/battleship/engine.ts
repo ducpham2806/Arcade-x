@@ -18,7 +18,7 @@ export type State = {
   boards: Record<Team, Ship[]>; ready: Seat[]; shots: Shot[]; events: TurnEvent[];
   turn: number; turnIndex: number; deadline: number; winner: Team | null; reason: 'fleet' | 'surrender' | null;
 };
-export class RuleError extends Error {}
+export class RuleError extends Error { constructor(message:string){super(message);this.name='RuleError';} }
 const requireRule = (condition: boolean, message: string) => { if (!condition) throw new RuleError(message); };
 export const teamOf = (seat: Seat): Team => seat.startsWith('A') ? 0 : 1;
 export const enemyOf = (seat: Seat): Team => teamOf(seat) === 0 ? 1 : 0;

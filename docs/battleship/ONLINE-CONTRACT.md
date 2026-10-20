@@ -1,6 +1,6 @@
 # Next milestone: authoritative hidden-state transport
 
-This is an interface plan, not an implemented online service.
+The full protocol below remains a target. A staged 1vs1 foundation now exists in `server.ts`, `supabase/battleship/schema.sql` and `supabase/functions/battleship-room/`; it is not deployed or connected to the browser. See P2-P3-CHECKPOINT.md for tested scope and activation gates.
 
 ## Server state
 

@@ -31,7 +31,7 @@ See test-results.json and QA.md. Tested rules/bot engine with 200 placement seed
 
 ## Remaining plan (not completed)
 
-P2: interactive guided tutorial beyond the help screen; broader human playtest, hull footprint refit and physical mobile profiling. Ocean is animated from a still texture, not fluid simulation. Short sprite loops retain the asset pack's visual-review limits.
+P2: guided tutorial is now implemented and browser-checked (see P2-P3-CHECKPOINT.md); remaining work includes broader human playtest, hull footprint refit and physical mobile profiling. Ocean is animated from a still texture, not fluid simulation. Short sprite loops retain the asset pack's visual-review limits.
 P3: authenticated authoritative 1vs1 room and queue; secret-state storage, filtered snapshots, server timer, reconnect, idempotent results.
 P4: authenticated 2vs2 rooms/party queue, private team pings/chat, seat takeover, unanimous surrender/rematch.
 P5: final damaged/sunk hulls, sound, production atlases, subscription/catalog gating, cache lifecycle and final launcher art.

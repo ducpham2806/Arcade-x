@@ -28,8 +28,9 @@
     "export:artwork": "node scripts/export-game-art.mjs",
     "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
     "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
-    "test:battleship": "node tests/battleship/engine.mjs",
-    "preview:battleship": "node scripts/battleship-preview.mjs"
+    "test:battleship": "node tests/battleship/engine.mjs && node tests/battleship/next-milestone.mjs && node tests/battleship/persistence.mjs && node tests/battleship/edge-handler.mjs",
+    "preview:battleship": "node scripts/battleship-preview.mjs",
+    "prepare:battleship-server": "node scripts/battleship-server-package.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
@@ -47,6 +48,7 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.10",
     "@playwright/test": "^1.64.0",
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.18",
