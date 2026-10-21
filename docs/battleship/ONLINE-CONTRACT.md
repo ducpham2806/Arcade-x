@@ -1,6 +1,6 @@
 # Next milestone: authoritative hidden-state transport
 
-The full protocol below remains a target. A staged 1vs1 foundation now exists in `server.ts`, `supabase/battleship/schema.sql` and `supabase/functions/battleship-room/`; it now has a browser client and room UI behind a disabled activation flag, and its primary API/private persistence are now deployed. The scheduler and real-account QA await explicit approval; see CLOUD-ACTIVATION.md. See P2-P3-CHECKPOINT.md for tested scope and activation gates.
+The full protocol below remains a target. A staged 1vs1 foundation now exists in `server.ts`, `supabase/battleship/schema.sql` and `supabase/functions/battleship-room/`; it now has a browser client and room UI behind a disabled activation flag, and its primary API/private persistence are now deployed. The scheduler is active and real-account QA has passed; online UI activation still awaits the remaining disconnect/retention and release work. See CLOUD-ACTIVATION.md. See P2-P3-CHECKPOINT.md for tested scope and activation gates.
 
 ## Server state
 

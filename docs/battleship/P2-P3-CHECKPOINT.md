@@ -43,3 +43,7 @@ Still required before activation: an isolated development backend, actual deploy
 ## Cloud activation follow-up (2026-10-21)
 
 The primary room API and private persistence schema are now live. See CLOUD-ACTIVATION.md and cloud-deployment-results.json for the current state, cloud permission/HTTP/CAS checks and the two explicit approval blockers. The online frontend flag is still false. Earlier no-deployment descriptions above are historical checkpoints. No account-creation QA route or scheduler has been activated.
+
+## Approved cloud verification completed
+
+The 10-second scheduler is active. Real Auth account/isolation checks and a complete scripted fleet match passed; cloud timeouts progressed an unattended fixture. All temporary accounts were deleted, test rooms closed and the QA administration route removed (old route returns 403; normal worker returns 200). See CLOUD-ACTIVATION.md, cloud-auth-reports.json and cloud-deployment-results.json. Earlier approval-blocked notes are historical and are now resolved. Online frontend activation remains off pending the remaining disconnect/retention and release work.

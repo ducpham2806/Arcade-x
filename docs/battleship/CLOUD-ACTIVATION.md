@@ -1,11 +1,11 @@
 # Battleship: cloud activation checkpoint — 2026-10-21
 
-The Battleship database foundation and primary API are now deployed to the existing Arcade-x Supabase project (`whjatkhhupeqfngakmee`). The frontend online flag remains off. This checkpoint supersedes earlier statements that no backend had been deployed. No launcher or Netlify deployment occurred.
+The Battleship database foundation and primary API are now deployed to the existing Arcade-x Supabase project (`whjatkhhupeqfngakmee`). The frontend online flag remains off pending the remaining disconnect/retention and launcher release work. This checkpoint supersedes earlier statements that no backend had been deployed. No launcher or Netlify deployment occurred.
 
 ## Applied
 
 - Migration `battleship_online_room_backend_v1` created only the Battleship private schema, three RLS-protected tables and seven service-only RPCs. Existing game schemas were not modified.
-- Edge Function `battleship-room`, version 1, is ACTIVE with `verify_jwt=true`. It has no QA/account administration endpoint. Its normal routes verify registered users through Auth and bind their identities to seats.
+- Edge Function `battleship-room`, version 5, is ACTIVE with `verify_jwt=true`. It has no QA/account administration endpoint. Its normal routes verify registered users through Auth and bind their identities to seats.
 - A dedicated 256-bit worker credential was generated inside the database and encrypted in Vault. Only its digest is available to the service-only verification RPC. No server credential was written into a browser artifact or Git.
 
 ## Verified on cloud
@@ -18,16 +18,19 @@ Two concurrently submitted native database CAS requests targeted the same fixtur
 
 The local suite now passes 78 checks, plus TypeScript: 24 engine, 17 tutorial/server, 12 persistence, 12 handler and 13 client/pipeline/bundle isolation. Local pipeline tests still use fixture Auth responses.
 
-## Awaiting explicit approval
+## Approval completed and cloud tests passed
 
-Automatic approval review rejected two actions:
+The user explicitly approved the scheduler and disposable Auth account tests on 2026-10-21. Migration `battleship_online_timeout_worker_v1` installed pg_cron/pg_net and activated `battleship-room-timeouts` every 10 seconds. It invokes the Edge worker only when a room is due.
 
-1. A temporary worker-protected QA deployment that could create and delete three disposable Auth users on the shared project. The reviewer identified insufficiently narrow authorization and the risk of a privileged test endpoint. That deployment did not occur; its temporary source was removed. The primary API was separately deployed without it.
-2. Installing pg_cron/pg_net and scheduling a recurring request every 10 seconds. The reviewer identified insufficient authorization for scheduler activation and its operational effects on the shared project. That migration did not run. A cloud query confirmed neither scheduler extension is installed. No alternative timer mechanism was activated.
+An isolated timer fixture progressed to turn 5 with a last event of `timeout` and zero shots, without any player snapshot requests. Four scheduled HTTP responses returned 200 and each reported one updated room. The fixture was then closed. The job had 68 successful executions at the final checkpoint; the final normal worker HTTP probe returned 200 with `updated=0`.
 
-The prepared scheduler template makes no HTTP request when no room is due. Its public anon JWT passes only the Edge gateway; the separate Vault worker credential is also required. This remains uninstalled pending approval.
+Real registered-account checks passed for create/join, seat binding, hidden enemy fleets, outsider read/write denial, readiness/deadline agreement, shot replay, worker access denial, reconnect and surrender. A complete scripted fleet match then passed in four batches: all five enemy ships sank, the winner was correct and retrying the winning action was harmless. Thirty actual shots were made; normal timeout processing remained active between test batches. Targets were selected from trusted fixture state strictly for protocol/result testing, not to assess bot fairness or game balance.
 
-Next: obtain approval for those concrete operations, activate/observe the scheduler, run real-account hidden-state/reconnect/result tests, remove the temporary QA capability immediately afterward, and only then enable online UI. Disconnect grace, retention cleanup, matchmaking and online 2vs2 remain open work.
+The initial runner hit its environment's request cap after its ten isolation/protocol checks. Splitting the full-match run into bounded batches resolved that test-harness limit. Three disposable accounts were used at a time; across diagnostic attempts nine were created and all nine deleted. A final database count found zero run-tagged Auth users and zero active rooms. No emails were sent. See `cloud-auth-reports.json` for sanitized reports, including the intermediate failures.
+
+The temporary QA route was removed by deploying the normal four-file API as version 5. A request with a valid worker credential to the old QA operation returned 403; normal tick still returned 200. Continuation ciphertext was removed from transient QA responses. The continuation mechanism encrypted credentials with AES-GCM, expired after ten minutes, and never returned them in plaintext. No QA module is imported by the normal API or browser game.
+
+No approval blocker remains for these completed operations. Remaining game work: disconnect grace/forfeit, retention and cron-history management, launcher integration release checks, then online UI activation. Matchmaking and online 2vs2 remain later milestones. The existing review HTML is unchanged and still labels its local room laboratory correctly.
 
 ## Advisor review
 

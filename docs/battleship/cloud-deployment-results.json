@@ -1,11 +1,10 @@
 {
   "date": "2026-10-21",
   "project": "whjatkhhupeqfngakmee",
-  "migration_applied": "battleship_online_room_backend_v1",
   "edge": {
     "name": "battleship-room",
     "id": "7b1246d8-2072-43b9-a7ae-adbb9dc06672",
-    "version": 1,
+    "version": 5,
     "status": "ACTIVE",
     "verify_jwt": true,
     "qa_endpoint_included": false
@@ -50,18 +49,45 @@
   },
   "local_automated_checks": 78,
   "typescript": "pass",
-  "scheduler_installed": false,
-  "scheduler_extensions_installed": 0,
+  "scheduler_installed": true,
+  "scheduler_extensions_installed": 2,
   "online_client_enabled": false,
-  "auth_accounts_created": 0,
-  "pending_approval": [
-    "Recurring scheduler activation on shared project",
-    "Temporary QA deployment capable of creating/deleting disposable Auth accounts"
-  ],
+  "auth_accounts_created": 9,
+  "pending_approval": [],
   "limits": [
-    "No real registered-account gameplay test",
-    "No live scheduler timeout test",
+    "Online frontend flag remains off pending disconnect grace/retention and integration release checks",
     "No frontend/launcher deployment",
-    "No Supabase branch was created"
-  ]
+    "No human-device network/performance playtest",
+    "No matchmaking or online 2vs2"
+  ],
+  "migrations_applied": [
+    "battleship_online_room_backend_v1",
+    "battleship_online_timeout_worker_v1"
+  ],
+  "scheduler_active": true,
+  "scheduler_interval_seconds": 10,
+  "scheduler_live_test": {
+    "timer_fixture_observed_turn": 5,
+    "last_event": "timeout",
+    "shots": 0,
+    "fixture_closed": true,
+    "scheduled_http_200_samples": 4,
+    "final_worker_probe_status": 200,
+    "final_worker_updated": 0
+  },
+  "auth_accounts_deleted": 9,
+  "remaining_test_accounts": 0,
+  "max_concurrent_test_accounts": 3,
+  "real_auth_checks_passed": 11,
+  "full_scripted_match": {
+    "passed": true,
+    "batches": 4,
+    "shots": 30,
+    "five_enemy_ships_sunk": true,
+    "winning_action_replay_safe": true,
+    "target_selection": "trusted QA fixture, not fair-bot balancing"
+  },
+  "qa_route_removed_http_status": 403,
+  "user_approval": "User explicitly approved recurring timeout scheduler and disposable Auth account testing on 2026-10-21.",
+  "diagnostic_retries": "Initial account/isolation checks passed; full-match runner hit its environment request cap. Batched runner completed successfully. Every account from each attempt was deleted."
 }

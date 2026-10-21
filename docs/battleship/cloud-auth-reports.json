@@ -1,0 +1,97 @@
+[
+  {
+    "id": 1,
+    "status_code": 200,
+    "timed_out": false,
+    "report": {
+      "run": "b7294c2e-37ba-481d-9597-915590e09d00",
+      "checks": 10,
+      "detail": null,
+      "passed": [
+        "three disposable registered accounts sign in with real Auth JWTs",
+        "A creates room through deployed HTTP API",
+        "B joins by room code and has its own seat",
+        "unrelated account is denied room reads and writes",
+        "both auto-placement responses hide the opposing fleet",
+        "both ready into one battle deadline and turn",
+        "replayed real HTTP shot consumes exactly one turn",
+        "user cannot invoke timeout worker",
+        "rejoin returns current battle without reset",
+        "leaving battle creates one authoritative surrender result"
+      ],
+      "failure": "scripted full fleet match completes through real authenticated HTTP",
+      "serverNow": 1792555379742,
+      "cleanupComplete": true,
+      "createdAccounts": 3,
+      "deletedAccounts": 3,
+      "closedDuringCleanup": 1
+    }
+  },
+  {
+    "id": 6,
+    "status_code": 200,
+    "timed_out": false,
+    "report": {
+      "run": "3794529a-16a8-4843-b93e-e2eed0aa849c",
+      "checks": 10,
+      "detail": "RateLimitError: Rate limit exceeded for trace 01a15ca2b20f7ab8843edcef79acbe95. Retry after 49066ms.",
+      "passed": [
+        "three disposable registered accounts sign in with real Auth JWTs",
+        "A creates room through deployed HTTP API",
+        "B joins by room code and has its own seat",
+        "unrelated account is denied room reads and writes",
+        "both auto-placement responses hide the opposing fleet",
+        "both ready into one battle deadline and turn",
+        "replayed real HTTP shot consumes exactly one turn",
+        "user cannot invoke timeout worker",
+        "rejoin returns current battle without reset",
+        "leaving battle creates one authoritative surrender result"
+      ],
+      "failure": "scripted full fleet match completes through real authenticated HTTP",
+      "operation": "1:snapshot:",
+      "serverNow": 1792555542299,
+      "cleanupComplete": true,
+      "createdAccounts": 3,
+      "deletedAccounts": 3,
+      "closedDuringCleanup": 1
+    }
+  },
+  {
+    "id": 13,
+    "status_code": 200,
+    "timed_out": false,
+    "report": {
+      "run": "b290bd37-f5d2-4560-bda6-86629bec8f71",
+      "shots": 30,
+      "checks": 1,
+      "passed": [
+        "complete scripted fleet match through real Auth HTTP, five sinks, winning-action replay"
+      ],
+      "status": "passed",
+      "batches": 4,
+      "failure": null,
+      "serverNow": 1792555864540,
+      "cleanupComplete": true,
+      "createdAccounts": 3,
+      "deletedAccounts": 3
+    }
+  },
+  {
+    "id": 14,
+    "status_code": 403,
+    "timed_out": false,
+    "report": {
+      "error": "WORKER_OPERATION_ONLY",
+      "serverNow": 1792555944156
+    }
+  },
+  {
+    "id": 15,
+    "status_code": 200,
+    "timed_out": false,
+    "report": {
+      "updated": 0,
+      "serverNow": 1792555976753
+    }
+  }
+]
