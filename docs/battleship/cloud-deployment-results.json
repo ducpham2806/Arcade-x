@@ -47,7 +47,7 @@
     "rejected_stale": 1,
     "fixture_closed": true
   },
-  "local_automated_checks": 90,
+  "local_automated_checks": 97,
   "typescript": "pass",
   "scheduler_installed": true,
   "scheduler_extensions_installed": 2,
@@ -58,13 +58,14 @@
     "No frontend/launcher deployment",
     "No human-device network/performance playtest",
     "Current v6 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
-    "Retention and cron-history cleanup remain pending",
-    "No matchmaking or online 2vs2"
+    "No matchmaking or online 2vs2",
+    "Archives still consume database storage; permanent purge/export policy remains pending"
   ],
   "migrations_applied": [
     "battleship_online_room_backend_v1",
     "battleship_online_timeout_worker_v1",
-    "battleship_presence_and_reconnect_v1"
+    "battleship_presence_and_reconnect_v1",
+    "battleship_reversible_maintenance_v1"
   ],
   "scheduler_active": true,
   "scheduler_interval_seconds": 10,
@@ -102,5 +103,19 @@
     "browser_execute_on_all_8_rpcs": false,
     "all_presence_fixtures_closed": true,
     "fixture_corrections": "Initial staged join fixture normalized newly added B1 pulse to room creation time. Both-absent fixture was rebuilt directly with a fresh unfinished state; final worker result abandoned, winner null, zero shots."
+  },
+  "maintenance": {
+    "job_active": true,
+    "schedule": "17 * * * *",
+    "closed_room_hot_days": 7,
+    "cron_history_hot_days": 7,
+    "batch_rooms": 500,
+    "batch_cron_runs": 5000,
+    "archive_is_reversible": true,
+    "permanent_purge": false,
+    "live_fixture_archived": true,
+    "repeat_noop": true,
+    "archive_rls": true,
+    "browser_or_service_execute": false
   }
 }
