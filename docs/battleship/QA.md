@@ -32,3 +32,7 @@ Browser checked at 390px in the managed preview: placed a carrier, rotated it af
 ## Room client follow-up
 
 See P2-P3-CHECKPOINT.md and online-integration-tests.json. Aggregate suite is now 74 checks; all pass along with TypeScript. Browser local A/B room flow and pending-shot retry were checked on mobile. The review laboratory is explicitly a same-device simulation, not cloud online. Actual Supabase development branching was unavailable on the current plan; no migration, function or scheduler was deployed. The real online activation flag stays off.
+
+## Cloud backend checkpoint
+
+78 local checks and TypeScript pass after dedicated worker authentication was added. See CLOUD-ACTIVATION.md for actual cloud metadata, HTTP denial and database CAS checks. The primary API is deployed with JWT verification; the scheduler and real-account tests remain blocked by automatic approval review. Online frontend activation remains off. No full online reliability claim is made.

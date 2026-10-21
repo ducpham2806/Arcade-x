@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-21",
+  "project": "whjatkhhupeqfngakmee",
+  "migration_applied": "battleship_online_room_backend_v1",
+  "edge": {
+    "name": "battleship-room",
+    "id": "7b1246d8-2072-43b9-a7ae-adbb9dc06672",
+    "version": 1,
+    "status": "ACTIVE",
+    "verify_jwt": true,
+    "qa_endpoint_included": false
+  },
+  "database": {
+    "private_tables": 3,
+    "rls_enabled_tables": 3,
+    "browser_schema_usage": false,
+    "browser_table_select": false,
+    "room_rpcs": 7,
+    "browser_rpc_execute": 0,
+    "worker_digest_matches_vault": true,
+    "active_qa_rooms_after_cleanup": 0
+  },
+  "live_http_probes": [
+    {
+      "probe": "missing token",
+      "status": 401,
+      "layer": "gateway"
+    },
+    {
+      "probe": "invalid JWT",
+      "status": 401,
+      "layer": "gateway"
+    },
+    {
+      "probe": "anon key is not a user",
+      "status": 401,
+      "layer": "handler"
+    },
+    {
+      "probe": "guessed worker token",
+      "status": 401,
+      "layer": "handler and database"
+    }
+  ],
+  "live_cas_race": {
+    "attempts": 2,
+    "accepted": 1,
+    "rejected_stale": 1,
+    "fixture_closed": true
+  },
+  "local_automated_checks": 78,
+  "typescript": "pass",
+  "scheduler_installed": false,
+  "scheduler_extensions_installed": 0,
+  "online_client_enabled": false,
+  "auth_accounts_created": 0,
+  "pending_approval": [
+    "Recurring scheduler activation on shared project",
+    "Temporary QA deployment capable of creating/deleting disposable Auth accounts"
+  ],
+  "limits": [
+    "No real registered-account gameplay test",
+    "No live scheduler timeout test",
+    "No frontend/launcher deployment",
+    "No Supabase branch was created"
+  ]
+}

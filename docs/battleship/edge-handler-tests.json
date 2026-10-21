@@ -1,5 +1,5 @@
 {
-  "checks": 9,
+  "checks": 12,
   "results": [
     "preflight requires no credential and creates no data",
     "missing bearer token is rejected before persistence",
@@ -9,7 +9,10 @@
     "oversized authenticated payload is rejected",
     "client cannot select arbitrary RPC or call scheduler",
     "only documented commands are routed; registered actor comes from verified identity",
-    "scheduler accepts only exact server credential and returns no room data"
+    "scheduler accepts only exact server credential and returns no room data",
+    "worker header cannot authenticate with a guessed token",
+    "valid worker is restricted to timeout processing, not gameplay or QA accounts",
+    "dedicated worker advances due rooms without Auth user privileges"
   ],
   "scope": "Node handler tests with mocked Auth and persistence, not live tokens or deployed HTTP"
 }

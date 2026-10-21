@@ -1,4 +1,4 @@
-// Staged deployment. Package generated engine.ts/server.ts with this entrypoint.
+// Authoritative Battleship API. Package generated engine.ts/server.ts with this entrypoint.
 import {RoomServer,RoomError,type Command} from './server.ts';
 import {PostgresRoomStore} from './store.ts';
 declare const Deno:{env:{get(name:string):string|undefined};serve(handler:(request:Request)=>Promise<Response>):void};
@@ -10,6 +10,14 @@ Deno.serve(async(req)=>{
  try{
   const url=Deno.env.get('SUPABASE_URL'),key=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');if(!url||!key)return reply({error:'SERVER_CONFIGURATION'},503);
   const auth=req.headers.get('Authorization')||'';if(!/^Bearer \S+$/.test(auth))return reply({error:'UNAUTHORIZED'},401);
+  const worker=req.headers.get('x-battleship-worker');
+  if(worker){
+   const store=new PostgresRoomStore(url,key);
+   if(worker.length!==64||!await store.workerAllowed(worker))return reply({error:'WORKER_UNAUTHORIZED'},401);
+   let body:any;try{body=await req.json();}catch{return reply({error:'INVALID_JSON'},400);}
+   if(body?.type!=='tick')return reply({error:'WORKER_OPERATION_ONLY'},403);
+   return reply(await new RoomServer(store).tick(Date.now()));
+  }
   if(auth===`Bearer ${key}`){let body:any;try{body=await req.json();}catch{return reply({error:'INVALID_JSON'},400);}
    if(body?.type!=='tick')return reply({error:'SERVICE_OPERATION_ONLY'},403);
    return reply(await new RoomServer(new PostgresRoomStore(url,key)).tick(Date.now()));

@@ -1,4 +1,4 @@
--- Staged foundation; NOT applied to the live project in this checkpoint.
+-- Canonical room persistence; applied to Arcade-x by battleship_online_room_backend_v1.
 -- Service-only persistence. The browser has no access to the private Room documents.
 create schema if not exists battleship_private;
 revoke all on schema battleship_private from public, anon, authenticated;

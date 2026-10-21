@@ -39,3 +39,7 @@ Validation: 74 passing checks (24 engine, 17 tutorial/server, 11 PostgreSQL priv
 Managed-browser mobile QA: A created a room; B entered its displayed code; both auto-placed and readied; A fired and B received and returned a shot; a simulated network failure retained a pending A shot and retry produced exactly one additional shot. Both boards stayed visible. B game width and scrollWidth both measured 360px inside the 390px review frame. The real-online entry displayed the intentional pre-release gate. A browser compatibility issue with randomUUID on non-secure preview origins was fixed with a UUID generator using crypto.getRandomValues.
 
 Still required before activation: an isolated development backend, actual deployment, Vault credentials and scheduler monitoring, real registered accounts, disconnect grace/forfeit, retention cleanup and performance checks. Matchmaking and online 2vs2 remain later work. The local practice modes are unchanged.
+
+## Cloud activation follow-up (2026-10-21)
+
+The primary room API and private persistence schema are now live. See CLOUD-ACTIVATION.md and cloud-deployment-results.json for the current state, cloud permission/HTTP/CAS checks and the two explicit approval blockers. The online frontend flag is still false. Earlier no-deployment descriptions above are historical checkpoints. No account-creation QA route or scheduler has been activated.
