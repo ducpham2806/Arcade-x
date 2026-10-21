@@ -20,3 +20,11 @@ Browser follow-up on the final review build: 30s displayed at battle start; afte
 - Self-contained review HTML rebuilt with 38 embedded assets, 1,866,910 bytes.
 - SQL privilege checks use PGlite PostgreSQL locally; Edge tests mock Auth and RPC. They are not live deployment, multi-session PostgreSQL contention or real account tests.
 - No backend migration, Edge deployment or online UI activation occurred. Scheduler entrypoint is tested as a function, but no deployed scheduler invokes it.
+
+## Dual-board mobile interaction update (2026-10-21)
+
+This replaces the old tab-only view and separate fire confirmation in normal practice matches. Both boards are mounted in a vertical stack: a large active board and a small board below. Tapping the small board swaps them and cannot fire. The player's chosen board stays selected across turns; battle entry opens the enemy board. Both boards receive the same filtered DTO, so enemy hulls remain hidden.
+
+A tap on an enemy cell fires immediately when legal; the engine still rejects repeated cells, expired turns and wrong actors. The optional 5x5 aim buttons also fire directly and are disabled while observing the own board or waiting for a turn. Keyboard arrows only move the cursor, Enter/Space activates the selected cell. A 44px rotate icon appears beside the selected ship footprint, both before placement and after placement. Invalid committed rotations preserve the prior ship.
+
+Browser checked at 390px in the managed preview: placed a carrier, rotated it after placement, auto-filled, readied, swapped to the enemy board without taking a shot, then tapped the main canvas once. Human shot count changed from 0 to 1 and the turn changed to B1 without a fire button. Both canvases remained mounted, with clientWidth=375 and scrollWidth=375. Full 59-check suite and source TypeScript were rerun. Physical devices remain untested.
