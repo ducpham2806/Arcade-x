@@ -55,3 +55,9 @@ Migration battleship_reversible_maintenance_v1 is live. The hourly owner-only ma
 ## Casual matchmaking — current Edge v7
 
 Migration battleship_casual_matchmaking_v1 and the normal four-file API are live with JWT verification. No QA route or new Auth account was used. The service-only ninth room RPC atomically pairs public queue rooms while preserving friend-room isolation. A live waiting fixture and two concurrent native SQL requests produced one two-seat match and one remaining waiting room; both rooms were closed. Browser queue-RPC execution is denied. Current total: 111 local checks and TypeScript pass; mobile local laboratory search/cancel/research/pair passed. Real-token HTTP and physical-device pairing checks remain pending. No main merge or launcher deployment occurred. MATCHMAKING.md and P2-P3-CHECKPOINT.md describe current scope.
+
+## Online squad rooms — current Edge v8
+
+Migration battleship_online_squad_rooms_v1 and the normal four-file API are live, JWT verification enabled, QA route absent. Four-seat room creation/join/team switching and team-safe commands are implemented. The service-only persistence now handles squad returning-seat heartbeat and atomic delegated-shot guards and ignores explicitly departed seats in active-identity constraints. The existing nine room RPCs retain browser execute denial.
+
+133 automated checks plus TypeScript pass. Three live synthetic squad fixtures showed recovered-seat stale-takeover rejection, worker victory for a wholly missing team, and cancellation/no winner for both teams missing. All fixtures closed; no new Auth accounts. Mobile local four-player QA created/joined/prepared all fleets and fired A1 and B1 with proper A2 teammate-turn status. ONLINE-SQUAD.md has the full behavior and limits. No current four-real-account/device test, main merge or launcher publication was performed.

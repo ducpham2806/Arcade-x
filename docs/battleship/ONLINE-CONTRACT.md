@@ -1,6 +1,6 @@
 # Next milestone: authoritative hidden-state transport
 
-Current implementation supports registered-account 1vs1 rooms and casual matchmaking. Normal Edge v7, persistence, timeout worker, presence and archive maintenance are live. Source/review UI is updated; the launcher has not been published. Online 2vs2, rematch and team pings below remain targets. See P2-P3-CHECKPOINT.md and MATCHMAKING.md for current scope.
+Current implementation supports registered-account 1vs1 rooms, casual 1vs1 matchmaking and online 2vs2 rooms by code. Normal Edge v8, persistence, timeout worker, presence and archive maintenance are live. Source/review UI is updated; the launcher has not been published. Rematch, squad-party matchmaking and team pings below remain targets. See P2-P3-CHECKPOINT.md and MATCHMAKING.md for current scope.
 
 ## Server state
 
@@ -31,3 +31,5 @@ A server scheduler must progress expired turns even with every client closed. Ke
 See CLOUD-ACTIVATION.md for the current authoritative status. Disconnect/reconnect grace is 90 seconds, independent of the 30-second shot clock. A single absent battle player forfeits; both absent close without a winner; preparation absence cancels. Heartbeats use a service-only RPC, five-second write throttle, no gameplay version increment and an atomic expiry guard. Apply presence.sql after schema.sql/worker.sql. Normal Edge version 6 and presence migration are live. The online flag is enabled in source, but no launcher deployment occurred.
 
 Validation: 90 automated checks plus TypeScript; cloud worker and presence/CAS fixtures; 390px browser room create/join, prepare and fire. Actual v6 Auth-account rerun was blocked by automatic review; v5 account evidence is historical. Remaining work: retention/cron-history management, release checks and physical-device network/performance playtests, then matchmaking and online 2vs2.
+
+Current online squad rules and verified limits are in ONLINE-SQUAD.md, including team consent, absent-seat takeover and actor-safe return.

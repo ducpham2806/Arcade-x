@@ -4,7 +4,7 @@
   "edge": {
     "name": "battleship-room",
     "id": "7b1246d8-2072-43b9-a7ae-adbb9dc06672",
-    "version": 7,
+    "version": 8,
     "status": "ACTIVE",
     "verify_jwt": true,
     "qa_endpoint_included": false
@@ -47,7 +47,7 @@
     "rejected_stale": 1,
     "fixture_closed": true
   },
-  "local_automated_checks": 111,
+  "local_automated_checks": 133,
   "typescript": "pass",
   "scheduler_installed": true,
   "scheduler_extensions_installed": 2,
@@ -57,9 +57,9 @@
   "limits": [
     "No frontend/launcher deployment",
     "No human-device network/performance playtest",
-    "Current v7 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
+    "Current v8 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
     "Archives still consume database storage; permanent purge/export policy remains pending",
-    "No online 2vs2, ranked matching, party queues, rematch or physical-device QA"
+    "No ranked matching, squad party queues, rematch or physical-device QA"
   ],
   "migrations_applied": [
     "battleship_online_room_backend_v1",
@@ -67,7 +67,8 @@
     "battleship_presence_and_reconnect_v1",
     "battleship_reversible_maintenance_v1",
     "battleship_casual_matchmaking_v1",
-    "battleship_matchmaking_duplicate_guard_v1"
+    "battleship_matchmaking_duplicate_guard_v1",
+    "battleship_online_squad_rooms_v1"
   ],
   "scheduler_active": true,
   "scheduler_interval_seconds": 10,
@@ -128,5 +129,19 @@
     "new_auth_accounts": 0,
     "current_real_auth_test": false,
     "mobile_lab": "search/cancel/research/pair; two canvases, width=scrollWidth=360"
+  },
+  "online_squad": {
+    "room_code_4_players": true,
+    "map_size": 14,
+    "ships_per_team": 10,
+    "surrender_votes": 2,
+    "delegation_grace_seconds": 90,
+    "explicit_leave_releases_active_identity": true,
+    "live_worker_single_team_lost_winner": 1,
+    "live_worker_both_teams_abandoned_winner": null,
+    "live_stale_takeover_rejected": true,
+    "active_qa_rooms": 0,
+    "current_real_auth_test": false,
+    "mobile_lab": "four players joined/prepared; A1 and B1 fired; A2 teammate banner; two canvases width=scrollWidth=360"
   }
 }

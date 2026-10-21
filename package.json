@@ -28,7 +28,7 @@
     "export:artwork": "node scripts/export-game-art.mjs",
     "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
     "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
-    "test:battleship": "node tests/battleship/engine.mjs && node tests/battleship/next-milestone.mjs && node tests/battleship/persistence.mjs && node tests/battleship/edge-handler.mjs && node tests/battleship/online-integration.mjs && node tests/battleship/presence.mjs && node tests/battleship/maintenance.mjs && node tests/battleship/matchmaking.mjs",
+    "test:battleship": "node tests/battleship/engine.mjs && node tests/battleship/next-milestone.mjs && node tests/battleship/persistence.mjs && node tests/battleship/edge-handler.mjs && node tests/battleship/online-integration.mjs && node tests/battleship/presence.mjs && node tests/battleship/maintenance.mjs && node tests/battleship/matchmaking.mjs && node tests/battleship/squad-online.mjs",
     "preview:battleship": "node scripts/battleship-preview.mjs",
     "prepare:battleship-server": "node scripts/battleship-server-package.mjs"
   },

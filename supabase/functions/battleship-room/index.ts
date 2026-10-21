@@ -33,11 +33,12 @@ Deno.serve(async(req)=>{
   if(!await store.takeRequest(user.id,body.type==='snapshot'?'read':'write'))return reply({error:'RATE_LIMITED'},429);
   const service=new RoomServer(store),now=Date.now();
   if(body?.type==='create'||body?.type==='match'){
+   if(body.type==='create'&&body.mode!==undefined&&!['duel','squad'].includes(body.mode))return reply({error:'BAD_MODE'},400);
    if(typeof body.requestId!=='string'||!/^[0-9a-f-]{36}$/i.test(body.requestId))return reply({error:'INVALID_REQUEST_ID'},400);
    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const code=Array.from(crypto.getRandomValues(new Uint8Array(6)),n=>chars[n%chars.length]).join('');
-   return reply(body.type==='match'?await service.match(user.id,body.requestId,code,now):await service.create(user.id,body.requestId,code,now));
+   return reply(body.type==='match'?await service.match(user.id,body.requestId,code,now):await service.create(user.id,body.requestId,code,now,body.mode));
   }
-  if(body?.type==='join'&&typeof body.code==='string')return reply(await service.join(user.id,body.code,now));
+  if(body?.type==='join'&&typeof body.code==='string')return reply(await service.join(user.id,body.code,now,body.team));
   if(typeof body?.roomId!=='string'||body.roomId.length>128)return reply({error:'INVALID_ROOM_ID'},400);
   if(body.type==='snapshot')return reply(await service.snapshot(user.id,body.roomId,now));
   if(body.type==='command'&&body.command&&typeof body.command==='object')return reply(await service.command(user.id,body.roomId,body.version,body.actionId,body.command as Command,now));

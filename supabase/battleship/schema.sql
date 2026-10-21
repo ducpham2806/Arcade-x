@@ -32,7 +32,7 @@ begin
   if existing->'members'->>'A1' <> owner_uid then raise exception 'room ID conflict'; end if;
   return existing;
  end if;
- if exists(select 1 from battleship_private.rooms r,jsonb_each_text(r.doc->'members') m where r.active and m.value=owner_uid) then raise exception 'identity already has an active room'; end if;
+ if exists(select 1 from battleship_private.rooms r,jsonb_each_text(r.doc->'members') m where r.active and m.value=owner_uid and not coalesce(r.doc->'departed' ? m.key,false)) then raise exception 'identity already has an active room'; end if;
  insert into battleship_private.rooms(id,code,version,active,doc) values(p_room->>'id',p_room->>'code',0,true,p_room);
  return p_room;
 end;$$;

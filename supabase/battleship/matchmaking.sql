@@ -20,7 +20,7 @@ begin
  -- Retrying an uncertain request returns its original match, even after it closes.
  select doc into own_room from battleship_private.rooms where doc->'matchRequests'->>p_uid=p_id limit 1;
  if own_room is not null then return own_room; end if;
- select doc into own_room from battleship_private.rooms r where active and exists(select 1 from jsonb_each_text(r.doc->'members') m where m.value=p_uid) limit 1;
+ select doc into own_room from battleship_private.rooms r where active and exists(select 1 from jsonb_each_text(r.doc->'members') m where m.value=p_uid and not coalesce(r.doc->'departed' ? m.key,false)) limit 1;
  if own_room is not null then
   -- A different request ID must not be accepted as an unrecorded alias: its late
   -- retry after this match closes could otherwise silently open a new search.
