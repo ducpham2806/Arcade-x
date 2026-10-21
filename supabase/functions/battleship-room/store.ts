@@ -7,6 +7,7 @@ export class PostgresRoomStore implements RoomStore{
   if(!response.ok)throw new Error(`Room persistence failed (${response.status}).`);
   return response.json();
  }
+ takeRequest(uid:string,kind:'read'|'write'){return this.rpc<boolean>('bs_room_rate',{p_uid:uid,p_kind:kind});}
  create(room:Room){return this.rpc<Room>('bs_room_create',{p_room:room});}
  read(id:string){return this.rpc<Room|null>('bs_room_read',{p_id:id});}
  byCode(code:string){return this.rpc<Room|null>('bs_room_by_code',{p_code:code});}

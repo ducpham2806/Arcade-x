@@ -2,11 +2,11 @@ import React, {useEffect,useRef} from 'react';
 import {cellsOf,lengthOf,type Ship,type Shot,type State,viewFor} from './engine';
 import type {Art} from './art';
 type View=ReturnType<typeof viewFor>;
-type Props={view:View;own:boolean;art:Art;faction:'us'|'jp';selected:{row:number;col:number}|null;ghost:Ship|null;ghostValid:boolean;reduced:boolean;paused:boolean;interactive?:boolean;onCursor?:(row:number,col:number)=>void;onCell:(row:number,col:number)=>void};
-export function Board({view,own,art,faction,selected,ghost,ghostValid,reduced,paused,onCell,onCursor,interactive=true}:Props){
- const ref=useRef<HTMLCanvasElement>(null),live=useRef({view,own,art,faction,selected,ghost,ghostValid,reduced,paused,onCell});live.current={view,own,art,faction,selected,ghost,ghostValid,reduced,paused,onCell};
+type Props={view:View;own:boolean;art:Art;faction:'us'|'jp';selected:{row:number;col:number}|null;ghost:Ship|null;ghostValid:boolean;reduced:boolean;paused:boolean;clockOffset?:number;viewerTeam?:0|1;interactive?:boolean;onCursor?:(row:number,col:number)=>void;onCell:(row:number,col:number)=>void};
+export function Board({view,own,art,faction,selected,ghost,ghostValid,reduced,paused,onCell,onCursor,interactive=true,viewerTeam=0,clockOffset=0}:Props){
+ const ref=useRef<HTMLCanvasElement>(null),live=useRef({view,own,art,faction,selected,ghost,ghostValid,reduced,paused,onCell,viewerTeam,clockOffset});live.current={view,own,art,faction,selected,ghost,ghostValid,reduced,paused,onCell,viewerTeam,clockOffset};
  useEffect(()=>{const canvas=ref.current!,ctx=canvas.getContext('2d')!;let raf=0,alive=true,frameTime=0;const size=800,pad=34,extent=732;
-  const render=(t:number)=>{if(!alive)return;raf=requestAnimationFrame(render);if(t-frameTime<32)return;frameTime=t;const p=live.current,n=p.view.size,s=extent/n,now=Date.now();
+  const render=(t:number)=>{if(!alive)return;raf=requestAnimationFrame(render);if(t-frameTime<32)return;frameTime=t;const p=live.current,n=p.view.size,s=extent/n,now=Date.now()+p.clockOffset;
    const cell=(r:number,c:number)=>({x:pad+(c+.5)*s,y:pad+(r+.5)*s});
    ctx.fillStyle='#101a22';ctx.fillRect(0,0,size,size);const sea=p.art.images.ocean;
    for(let y=0;y<extent;y+=12){const shift=p.reduced||p.paused?0:Math.sin(y*.02+t*.0006)*4;ctx.drawImage(sea,40+shift,40+y/extent*920,940,16,pad,pad+y,extent,13);}
@@ -16,7 +16,7 @@ export function Board({view,own,art,faction,selected,ghost,ghostValid,reduced,pa
    const hull=(ship:Ship,alpha=1)=>{const a=cell(ship.row,ship.col),length=lengthOf(ship),im=p.art.images[(p.own?p.faction:p.faction==='us'?'jp':'us')+'-'+ship.type];ctx.save();ctx.globalAlpha=alpha;ctx.translate(a.x+(ship.horizontal?(length-1)*s/2:0),a.y+(!ship.horizontal?(length-1)*s/2:0));if(ship.horizontal)ctx.rotate(Math.PI/2);ctx.fillStyle='#1223309c';ctx.fillRect(-s*.42,-length*s*.48,s*.84,length*s*.96);const scale=Math.min(s*.9/im.width,length*s*.92/im.height);ctx.drawImage(im,-im.width*scale/2,-im.height*scale/2,im.width*scale,im.height*scale);ctx.strokeStyle='#b5c5cb8a';ctx.lineWidth=1;ctx.strokeRect(-s*.42,-length*s*.48,s*.84,length*s*.96);ctx.restore();};
    for(const ship of p.own?p.view.own:p.view.revealedEnemy)hull(ship,p.own?1:.6);
    if(p.ghost&&p.own){hull(p.ghost,.55);for(const c of cellsOf(p.ghost)){if(c.row<0||c.col<0||c.row>=n||c.col>=n)continue;const a=cell(c.row,c.col);ctx.fillStyle=p.ghostValid?'#6fcdb867':'#fa776b77';ctx.fillRect(a.x-s*.47,a.y-s*.47,s*.94,s*.94);}}
-   const target=p.own?0:1,shots=p.view.shots.filter(q=>q.target===target);const drawFX=(name:string,age:number,x:number,y:number,sz:number,loop=false,alpha=1)=>{const f=p.art.fx[name],position=loop?Math.floor(age/f.ms)%f.sequence.length:Math.min(f.sequence.length-1,Math.floor(age/f.ms));ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(f.frames[f.sequence[Math.max(0,position)]],x-sz*141/276,y-sz*135/276,sz,sz);ctx.restore();};
+   const target=p.own?p.viewerTeam:p.viewerTeam===0?1:0,shots=p.view.shots.filter(q=>q.target===target);const drawFX=(name:string,age:number,x:number,y:number,sz:number,loop=false,alpha=1)=>{const f=p.art.fx[name],position=loop?Math.floor(age/f.ms)%f.sequence.length:Math.min(f.sequence.length-1,Math.floor(age/f.ms));ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(f.frames[f.sequence[Math.max(0,position)]],x-sz*141/276,y-sz*135/276,sz,sz);ctx.restore();};
    for(const shot of shots){const a=cell(shot.row,shot.col),age=Math.max(0,now-shot.at),travel=p.reduced?0:720;
     if(age<travel){const u=age/travel,sx=size*.55,sy=790,cx=a.x+80,cy=a.y+130,x=(1-u)**2*sx+2*(1-u)*u*cx+u*u*a.x,y=(1-u)**2*sy+2*(1-u)*u*cy+u*u*a.y,dx=2*(1-u)*(cx-sx)+2*u*(a.x-cx),dy=2*(1-u)*(cy-sy)+2*u*(a.y-cy);ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(dy,dx)+Math.PI/2);ctx.drawImage(p.art.images.missile,-s*.12,-s*.5,s*.24,s);ctx.restore();continue;}
     ctx.fillStyle=shot.hit?'#ffc078':'#e1eef7';ctx.font=`bold ${Math.max(17,s*.44)}px system-ui`;ctx.fillText(shot.hit?'✕':'○',a.x,a.y+s*.15);

@@ -2,7 +2,7 @@ import {build} from 'esbuild';
 import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import path from 'node:path';
 const target=path.resolve(process.argv[2]||'review/battleship-p1-p2-playtest.html');
-const result=await build({entryPoints:['src/games/battleship/review.tsx'],bundle:true,write:false,format:'iife',platform:'browser',minify:true,jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},outfile:'battleship.js'});
+const result=await build({entryPoints:['src/games/battleship/review.tsx'],bundle:true,write:false,format:'iife',platform:'browser',minify:true,jsx:'automatic',define:{'process.env.NODE_ENV':'"production"','import.meta.env':'{}'},outfile:'battleship.js'});
 const js=result.outputFiles.find(f=>f.path.endsWith('.js')).text,css=result.outputFiles.find(f=>f.path.endsWith('.css')).text;
 const manifest=JSON.parse(readFileSync('src/games/battleship/art.json','utf8')),urls=[...Object.values(manifest.images),...Object.values(manifest.fx).flatMap(f=>f.paths)];
 const assets=Object.fromEntries(urls.map(url=>[url,'data:image/webp;base64,'+readFileSync('public'+url).toString('base64')]));

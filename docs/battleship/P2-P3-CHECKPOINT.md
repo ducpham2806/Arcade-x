@@ -23,3 +23,19 @@ Read-only backend preflight found no Battleship schema/functions and no installe
 5. Add matchmaking and 2vs2 online as later work. Current 2vs2 review mode remains local practice against bots.
 
 Remaining P2 work includes broader human playtesting, physical mobile performance, hull footprint art review and sound. No full launcher production build or production deployment is claimed.
+
+## Follow-up: room UI and client integration
+
+Added the create/join-by-code UI, server-derived seat views, readiness, direct tap-to-fire, server-side auto-placement, cancellation and surrender on leave. The HTTP client uses the existing registered Arcade-x session and the same resolved public backend configuration as the launcher. It serializes mutations, keeps uncertain requests for exact action-ID retry, refreshes on version rejection, discards older snapshots, estimates server clock offset and blocks play on stale synchronization. Resume storage contains only room IDs under the verified user ID, including a create request ID before its response is known.
+
+The renderer now accounts for the viewer team, so a B1 client maps incoming and outgoing shots to the correct board. Animations use the estimated server time. The service-only SQL request budget allows 90 reads and 30 writes per minute per identity. The scheduler operation requires the exact server credential; ordinary user JWTs cannot call it. The staged scheduler SQL checks Vault prerequisites, requests a tick every 10 seconds only when due rooms exist, and keeps credentials out of the browser and repository. This script has not been installed or executed on a cloud database.
+
+The review HTML now includes a clearly labeled two-player local room laboratory. It runs the same room core in the browser strictly for review, with two separate client instances, a shared local store and a simulated network toggle. It does not provide actual network play, durable persistence, Auth or a background worker after the page is closed. The production game entrypoint excludes RoomLab and its local authority; a bundle-graph check verifies this.
+
+The Supabase development-branch request returned `Branching is supported only on the Pro plan or above`. No branch was created and no cloud schema, function or scheduler was changed. This is a limitation of branch provisioning, not a claim that Battleship itself requires a Pro subscription. A separate designated development project is another route. The online feature flag remains false until cloud activation and account tests succeed.
+
+Validation: 74 passing checks (24 engine, 17 tutorial/server, 11 PostgreSQL privilege/rate-budget, 9 Edge-handler, 13 client/handler/PostgreSQL pipeline and bundle isolation). Pipeline Auth responses are fixtures and requests are in-process HTTP-shaped requests; they do not replace real-token, real-network, multi-session PostgreSQL or cloud scheduler tests.
+
+Managed-browser mobile QA: A created a room; B entered its displayed code; both auto-placed and readied; A fired and B received and returned a shot; a simulated network failure retained a pending A shot and retry produced exactly one additional shot. Both boards stayed visible. B game width and scrollWidth both measured 360px inside the 390px review frame. The real-online entry displayed the intentional pre-release gate. A browser compatibility issue with randomUUID on non-secure preview origins was fixed with a UUID generator using crypto.getRandomValues.
+
+Still required before activation: an isolated development backend, actual deployment, Vault credentials and scheduler monitoring, real registered accounts, disconnect grace/forfeit, retention cleanup and performance checks. Matchmaking and online 2vs2 remain later work. The local practice modes are unchanged.

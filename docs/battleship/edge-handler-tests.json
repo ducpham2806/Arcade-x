@@ -1,5 +1,5 @@
 {
-  "checks": 8,
+  "checks": 9,
   "results": [
     "preflight requires no credential and creates no data",
     "missing bearer token is rejected before persistence",
@@ -8,7 +8,8 @@
     "malformed JSON never reaches persistence",
     "oversized authenticated payload is rejected",
     "client cannot select arbitrary RPC or call scheduler",
-    "only documented commands are routed; registered actor comes from verified identity"
+    "only documented commands are routed; registered actor comes from verified identity",
+    "scheduler accepts only exact server credential and returns no room data"
   ],
   "scope": "Node handler tests with mocked Auth and persistence, not live tokens or deployed HTTP"
 }

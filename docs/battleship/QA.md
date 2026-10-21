@@ -28,3 +28,7 @@ This replaces the old tab-only view and separate fire confirmation in normal pra
 A tap on an enemy cell fires immediately when legal; the engine still rejects repeated cells, expired turns and wrong actors. The optional 5x5 aim buttons also fire directly and are disabled while observing the own board or waiting for a turn. Keyboard arrows only move the cursor, Enter/Space activates the selected cell. A 44px rotate icon appears beside the selected ship footprint, both before placement and after placement. Invalid committed rotations preserve the prior ship.
 
 Browser checked at 390px in the managed preview: placed a carrier, rotated it after placement, auto-filled, readied, swapped to the enemy board without taking a shot, then tapped the main canvas once. Human shot count changed from 0 to 1 and the turn changed to B1 without a fire button. Both canvases remained mounted, with clientWidth=375 and scrollWidth=375. Full 59-check suite and source TypeScript were rerun. Physical devices remain untested.
+
+## Room client follow-up
+
+See P2-P3-CHECKPOINT.md and online-integration-tests.json. Aggregate suite is now 74 checks; all pass along with TypeScript. Browser local A/B room flow and pending-shot retry were checked on mobile. The review laboratory is explicitly a same-device simulation, not cloud online. Actual Supabase development branching was unavailable on the current plan; no migration, function or scheduler was deployed. The real online activation flag stays off.

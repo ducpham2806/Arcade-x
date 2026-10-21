@@ -1,5 +1,5 @@
 {
-  "checks": 10,
+  "checks": 11,
   "passed": [
     "schema is valid PostgreSQL and enables RLS on private room table",
     "anon cannot read table or invoke private-state public RPC",
@@ -10,7 +10,8 @@
     "one identity cannot join two active rooms",
     "scheduler query returns only due open rooms",
     "closing a room releases its active identity slot",
-    "public persistence functions are invoker and grant no browser execution"
+    "public persistence functions are invoker and grant no browser execution",
+    "request budget atomically blocks excess writes while preserving read budget"
   ],
   "engine": "PGlite PostgreSQL WASM",
   "limits": [

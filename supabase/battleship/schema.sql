@@ -60,3 +60,26 @@ create or replace function public.bs_room_due(p_now bigint) returns setof jsonb 
 $$;
 revoke all on function public.bs_room_read(text),public.bs_room_by_code(text),public.bs_room_create(jsonb),public.bs_room_cas(integer,jsonb),public.bs_room_due(bigint) from public,anon,authenticated;
 grant execute on function public.bs_room_read(text),public.bs_room_by_code(text),public.bs_room_create(jsonb),public.bs_room_cas(integer,jsonb),public.bs_room_due(bigint) to service_role;
+
+-- Atomic per-identity request budget shared by every Edge isolate.
+create table if not exists battleship_private.request_budget(
+ uid text not null,kind text not null,window_start timestamptz not null,hits integer not null,
+ primary key(uid,kind)
+);
+alter table battleship_private.request_budget enable row level security;
+revoke all on battleship_private.request_budget from public,anon,authenticated;
+grant select,insert,update on battleship_private.request_budget to service_role;
+create or replace function public.bs_room_rate(p_uid text,p_kind text) returns boolean
+language plpgsql security invoker set search_path='' as $$
+declare current_window timestamptz := date_trunc('minute',clock_timestamp()); used integer;
+begin
+ if p_uid is null or length(p_uid)>128 or p_kind not in ('read','write') then return false; end if;
+ insert into battleship_private.request_budget(uid,kind,window_start,hits) values(p_uid,p_kind,current_window,1)
+ on conflict(uid,kind) do update set
+ hits=case when request_budget.window_start=excluded.window_start then request_budget.hits+1 else 1 end,
+ window_start=excluded.window_start
+ returning hits into used;
+ return used<=case when p_kind='read' then 90 else 30 end;
+end;$$;
+revoke all on function public.bs_room_rate(text,text) from public,anon,authenticated;
+grant execute on function public.bs_room_rate(text,text) to service_role;

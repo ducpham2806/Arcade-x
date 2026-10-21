@@ -1,0 +1,19 @@
+{
+  "checks": 13,
+  "passed": [
+    "create and join traverse HTTP handler, verified fixture identity and PostgreSQL",
+    "server auto-placement reveals own fleet only for both seats",
+    "unrelated identity cannot fetch a known room ID",
+    "both players ready into the same authoritative turn and deadline",
+    "lost committed shot retains exact request and replay produces one shot only",
+    "stale command is rejected and client refreshes without silently firing again",
+    "scheduler advances expired turns without requesting any player snapshot",
+    "reconnect recovers filtered snapshot then leaving battle surrenders exactly once",
+    "waiting-room cancellation releases identity for another room",
+    "client blocks new shots when last snapshot is too old",
+    "out-of-order older snapshot never rolls a board back",
+    "HTTP transport rejects absent login before any network request",
+    "production game bundle excludes the review room authority and test users"
+  ],
+  "scope": "Real handler + HTTP-shaped requests + frontend client + PostgreSQL/PGlite. Auth endpoint is mocked; no network server, real Supabase account, cloud scheduler or multi-session PostgreSQL test."
+}

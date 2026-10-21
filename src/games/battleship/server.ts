@@ -1,5 +1,5 @@
 /** Authoritative room core. Import on a trusted server only; never send Room to clients. */
-import {createState,advanceTime,placeShip,clearFleet,setReady,fire,surrender,viewFor,shipId,type State,type Seat,type ShipType} from './engine';
+import {createState,advanceTime,autoPlace,seeded,placeShip,clearFleet,setReady,fire,surrender,viewFor,shipId,type State,type Seat,type ShipType} from './engine';
 export type Room={id:string;code:string;version:number;status:'waiting'|'active'|'closed';members:Partial<Record<Seat,string>>;state:State|null;createdAt:number;receipts:{id:string;actor:string;fingerprint:string;version:number}[]};
 export interface RoomStore{
  create(room:Room):Promise<Room>;
@@ -11,7 +11,7 @@ export interface RoomStore{
 }
 export type Command=
  |{type:'place';shipType:ShipType;row:number;col:number;horizontal:boolean}
- |{type:'clear'}|{type:'ready';ready:boolean}
+ |{type:'auto'}|{type:'leave'}|{type:'clear'}|{type:'ready';ready:boolean}
  |{type:'fire';row:number;col:number;turnId:number}|{type:'surrender'};
 export class RoomError extends Error{constructor(public code:string,message:string){super(message);}}
 const deny=(code:string,message:string):never=>{throw new RoomError(code,message);};
@@ -50,11 +50,18 @@ export class RoomServer{
    if(receipt){if(receipt.fingerprint!==fingerprint)deny('ACTION_REUSED','Không được dùng lại mã thao tác cho lệnh khác.');return {...roomView(room,uid),duplicate:true,acceptedVersion:receipt.version};}
    const expired=this.expire(room,now);
    if(expired!==room){const saved=await this.store.cas(room.version,expired);if(!saved)continue;return deny('EXPIRED','Hết giờ. Hãy tải trạng thái mới trước khi thao tác.');}
+   if(command.type==='leave'&&room.status!=='closed'){
+    if(version!==room.version)deny('VERSION_CONFLICT','Phòng đã thay đổi. Hãy đồng bộ rồi thử lại.');
+    const state=room.state?.phase==='battle'?surrender(room.state,seat):room.state;
+    const next:Room={...room,state,status:'closed',version:room.version+1,receipts:[...room.receipts,{id:actionId,actor:uid,fingerprint,version:room.version+1}]};
+    const saved=await this.store.cas(room.version,next);if(saved)return roomView(saved,uid);continue;
+   }
    if(room.status!=='active'||!room.state)deny('NOT_ACTIVE','Phòng chưa bắt đầu hoặc đã kết thúc.');
    if(!Number.isInteger(version)||version!==room.version)deny('VERSION_CONFLICT','Bàn đã thay đổi. Hãy đồng bộ trước khi thử lại.');
    let state=room.state;
    switch(command.type){
     case 'place':state=placeShip(state,{id:shipId(seat,command.shipType),owner:seat,type:command.shipType,row:command.row,col:command.col,horizontal:command.horizontal});break;
+    case 'auto':state=autoPlace(state,seat,seeded(now));break;
     case 'clear':state=clearFleet(state,seat);break;
     case 'ready':if(typeof command.ready!=='boolean')deny('BAD_REQUEST','Trạng thái sẵn sàng không hợp lệ.');state=setReady(state,seat,command.ready,now);break;
     case 'fire':state=fire(state,seat,command.row,command.col,now,command.turnId,actionId);break;
