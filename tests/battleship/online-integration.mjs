@@ -2,9 +2,9 @@ import {PGlite} from '@electric-sql/pglite';
 import {build} from 'esbuild';import {createRequire} from 'node:module';import {mkdtempSync,readFileSync,writeFileSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import assert from 'node:assert/strict';
 const temp=mkdtempSync(join(tmpdir(),'bs-online-')),require=createRequire(import.meta.url);
 for(const [name,entry] of [['handler','supabase/functions/battleship-room/index.ts'],['client','src/games/battleship/online-client.ts']])await build({entryPoints:[entry],bundle:true,platform:'node',format:'cjs',outfile:join(temp,name+'.cjs')});
-const db=new PGlite();await db.waitReady;await db.exec('create role anon;create role authenticated;create role service_role bypassrls;');await db.exec(readFileSync('supabase/battleship/schema.sql','utf8'));await db.exec('set role service_role');
+const db=new PGlite();await db.waitReady;await db.exec('create role anon;create role authenticated;create role service_role bypassrls;');await db.exec(readFileSync('supabase/battleship/schema.sql','utf8'));await db.exec(readFileSync('supabase/battleship/presence.sql','utf8'));await db.exec('set role service_role');
 let handler;const originalFetch=globalThis.fetch;globalThis.Deno={env:{get:k=>({SUPABASE_URL:'https://fixture.invalid',SUPABASE_SERVICE_ROLE_KEY:'fixture-service'})[k]},serve:h=>{handler=h;}};
-const functions={bs_room_create:['p_room'],bs_room_read:['p_id'],bs_room_by_code:['p_code'],bs_room_cas:['p_version','p_room'],bs_room_due:['p_now'],bs_room_rate:['p_uid','p_kind']};
+const functions={bs_room_touch:['p_id','p_uid','p_now'],bs_room_create:['p_room'],bs_room_read:['p_id'],bs_room_by_code:['p_code'],bs_room_cas:['p_version','p_room'],bs_room_due:['p_now'],bs_room_rate:['p_uid','p_kind']};
 globalThis.fetch=async(url,options)=>{
  if(String(url).endsWith('/auth/v1/user')){const token=options.headers.Authorization;return new Response(JSON.stringify({id:token.slice(7),is_anonymous:false}),{status:token.startsWith('Bearer fixture-user-')?200:401});}
  const name=String(url).split('/').at(-1),keys=functions[name];assert(keys,'unexpected RPC '+name);const args=JSON.parse(options.body),values=keys.map(k=>typeof args[k]==='object'?JSON.stringify(args[k]):args[k]);

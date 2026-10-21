@@ -46,10 +46,10 @@ import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } f
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
   'battleship': {
-    id:'battleship', title:'Battleship · Naval Warfare', shortDesc:'Đặt hạm đội, khóa tọa độ · Bản tập với bot 1vs1 và 2vs2',
-    description:'Hải chiến vỏ thép lấy cảm hứng Mỹ–Nhật. Đặt 5 tàu, bắn từng ô trong 30 giây và đánh chìm toàn bộ hạm đội đối thủ. Bản review có bot dễ/thường và tập 2vs2 với ba bot; online, matchmaking và mã phòng đang ở giai đoạn tiếp theo.',
-    category:'Multiplayer', difficulty:'Trung Bình', icon:'⚓', bannerGradient:'from-slate-800 via-sky-950 to-slate-950', themeColor:'#dfbb7e', tags:['Bản tập','Hải chiến','Bot','Chiến thuật'],
-    controls:[{key:'Chạm / Mũi tên',action:'Chọn ô đặt tàu hoặc ngắm bắn'},{key:'Nút Xoay',action:'Đổi ngang/dọc khi đặt tàu'},{key:'Nút Bắn',action:'Xác nhận tên lửa tới ô đã chọn'}],
+    id:'battleship', title:'Battleship · Naval Warfare', shortDesc:'Hải chiến · phòng online 1vs1 và luyện tập với bot',
+    description:'Hải chiến vỏ thép lấy cảm hứng Mỹ–Nhật. Đặt 5 tàu, bắn từng ô trong 30 giây và đánh chìm toàn bộ hạm đội đối thủ. Có phòng online 1vs1 bằng mã, bot dễ/thường và tập 2vs2 với ba bot. Mất kết nối có 90 giây để quay lại; tìm trận và online 2vs2 sẽ mở sau.',
+    category:'Multiplayer', difficulty:'Trung Bình', icon:'⚓', bannerGradient:'from-slate-800 via-sky-950 to-slate-950', themeColor:'#dfbb7e', tags:['Online 1vs1','Hải chiến','Bot','Chiến thuật'],
+    controls:[{key:'Chạm / Mũi tên',action:'Chọn ô đặt tàu hoặc ngắm bắn'},{key:'↻ cạnh tàu',action:'Đổi ngang/dọc khi đặt tàu'},{key:'Chạm ô / Enter',action:'Bắn ngay khi đến lượt'}],
     achievements:[],dropRates:{baseChestDropChance:0,scoreThresholdForDrop:Number.MAX_SAFE_INTEGER,chestWeights:[]},component:BattleshipGame,
   },
   'brick-breaker': {

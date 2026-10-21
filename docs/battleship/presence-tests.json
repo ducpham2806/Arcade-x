@@ -1,0 +1,18 @@
+{
+  "checks": 12,
+  "passed": [
+    "heartbeat is persisted without changing board version or turn deadline",
+    "sub-five-second pulses do not rewrite last-seen and old timestamps never rewind it",
+    "single absent battle player forfeits at exactly ninety seconds",
+    "both absent players cancel with no winner, even after many elapsed turns",
+    "return just before grace expiry preserves match and hidden opponent fleet",
+    "return at grace deadline cannot resurrect an expired match",
+    "placement disconnect cancels preparation without awarding a winner",
+    "waiting host disconnect prevents a late guest opening a dead room",
+    "SQL CAS rejects an expiry based on a heartbeat that has already recovered",
+    "unrelated gameplay CAS preserves newer heartbeat metadata",
+    "scheduler selects disconnected preparation even before its placement deadline",
+    "authenticated clients cannot call presence RPC or mark an outsider alive"
+  ],
+  "scope": "Room core against PostgreSQL/PGlite presence/CAS functions. Boundary and interleaving tests, not a real device network test."
+}

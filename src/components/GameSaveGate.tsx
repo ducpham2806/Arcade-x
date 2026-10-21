@@ -33,7 +33,7 @@ export function GameSaveGate({ gameId, onResolved, children }: {
   </div>;
   let guest = true;
   try { guest = JSON.parse(localStorage.getItem('arcadex_player_profile') || '{}').id?.startsWith('guest_') ?? true; } catch { /* local-only */ }
-  const text = gameId === 'battleship' ? 'Trận tập · chưa hỗ trợ lưu ván' : status === 'error' ? 'Chưa lưu được ván trên thiết bị.' : status === 'conflict' ? 'Ván này đang lưu trên máy; có bản trực tuyến khác để chọn khi mở lại game.' : status === 'synced' && !guest ? 'Đã đồng bộ' : guest || status === 'local' ? 'Đã lưu trên thiết bị' : 'Đã lưu trên thiết bị · chờ đồng bộ';
+  const text = gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : status === 'error' ? 'Chưa lưu được ván trên thiết bị.' : status === 'conflict' ? 'Ván này đang lưu trên máy; có bản trực tuyến khác để chọn khi mở lại game.' : status === 'synced' && !guest ? 'Đã đồng bộ' : guest || status === 'local' ? 'Đã lưu trên thiết bị' : 'Đã lưu trên thiết bị · chờ đồng bộ';
   return <>{statusSlot && createPortal(<span className="text-[9px] truncate max-w-[90px] sm:max-w-[220px]" role="status" title={text}>{text}</span>, statusSlot)}{children}</>;
 }
 

@@ -13,5 +13,6 @@ export class PostgresRoomStore implements RoomStore{
  read(id:string){return this.rpc<Room|null>('bs_room_read',{p_id:id});}
  byCode(code:string){return this.rpc<Room|null>('bs_room_by_code',{p_code:code});}
  cas(version:number,next:Room){return this.rpc<Room|null>('bs_room_cas',{p_version:version,p_room:next});}
+ touch(id:string,uid:string,now:number){return this.rpc<Room|null>('bs_room_touch',{p_id:id,p_uid:uid,p_now:now});}
  due(now:number){return this.rpc<Room[]>('bs_room_due',{p_now:now});}
 }

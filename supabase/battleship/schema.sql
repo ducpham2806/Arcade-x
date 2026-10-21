@@ -83,3 +83,5 @@ begin
 end;$$;
 revoke all on function public.bs_room_rate(text,text) from public,anon,authenticated;
 grant execute on function public.bs_room_rate(text,text) to service_role;
+
+-- Apply presence.sql after this bootstrap for the current heartbeat/CAS behavior.

@@ -4,7 +4,7 @@
   "edge": {
     "name": "battleship-room",
     "id": "7b1246d8-2072-43b9-a7ae-adbb9dc06672",
-    "version": 5,
+    "version": 6,
     "status": "ACTIVE",
     "verify_jwt": true,
     "qa_endpoint_included": false
@@ -14,7 +14,7 @@
     "rls_enabled_tables": 3,
     "browser_schema_usage": false,
     "browser_table_select": false,
-    "room_rpcs": 7,
+    "room_rpcs": 8,
     "browser_rpc_execute": 0,
     "worker_digest_matches_vault": true,
     "active_qa_rooms_after_cleanup": 0
@@ -47,22 +47,24 @@
     "rejected_stale": 1,
     "fixture_closed": true
   },
-  "local_automated_checks": 78,
+  "local_automated_checks": 90,
   "typescript": "pass",
   "scheduler_installed": true,
   "scheduler_extensions_installed": 2,
-  "online_client_enabled": false,
+  "online_client_enabled": true,
   "auth_accounts_created": 9,
   "pending_approval": [],
   "limits": [
-    "Online frontend flag remains off pending disconnect grace/retention and integration release checks",
     "No frontend/launcher deployment",
     "No human-device network/performance playtest",
+    "Current v6 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
+    "Retention and cron-history cleanup remain pending",
     "No matchmaking or online 2vs2"
   ],
   "migrations_applied": [
     "battleship_online_room_backend_v1",
-    "battleship_online_timeout_worker_v1"
+    "battleship_online_timeout_worker_v1",
+    "battleship_presence_and_reconnect_v1"
   ],
   "scheduler_active": true,
   "scheduler_interval_seconds": 10,
@@ -89,5 +91,16 @@
   },
   "qa_route_removed_http_status": 403,
   "user_approval": "User explicitly approved recurring timeout scheduler and disposable Auth account testing on 2026-10-21.",
-  "diagnostic_retries": "Initial account/isolation checks passed; full-match runner hit its environment request cap. Batched runner completed successfully. Every account from each attempt was deleted."
+  "diagnostic_retries": "Initial account/isolation checks passed; full-match runner hit its environment request cap. Batched runner completed successfully. Every account from each attempt was deleted.",
+  "presence": {
+    "grace_seconds": 90,
+    "heartbeat_throttle_seconds": 5,
+    "heartbeat_changes_game_version": false,
+    "live_single_absent_forfeit": true,
+    "live_both_absent_no_winner": true,
+    "live_stale_forfeit_rejected_after_heartbeat": true,
+    "browser_execute_on_all_8_rpcs": false,
+    "all_presence_fixtures_closed": true,
+    "fixture_corrections": "Initial staged join fixture normalized newly added B1 pulse to room creation time. Both-absent fixture was rebuilt directly with a fresh unfinished state; final worker result abandoned, winner null, zero shots."
+  }
 }

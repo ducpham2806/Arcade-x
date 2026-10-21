@@ -750,7 +750,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 {/* Auto-save Status Pill */}
                 <div className="flex items-center justify-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 py-1.5 px-3 rounded-xl font-semibold">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{gameId === 'battleship' ? 'Trận tập · chưa hỗ trợ lưu ván' : 'Tiến trình game được tự động lưu an toàn'}</span>
+                  <span>{gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : 'Tiến trình game được tự động lưu an toàn'}</span>
                 </div>
 
                 {/* Dynamic Viewport Resolution Info */}
@@ -842,8 +842,8 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                     type="button"
                     onClick={handleSaveAndExit}
                     className="w-full py-2.5 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold text-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                    title={gameId === 'battleship' ? 'Kết thúc trận tập và về sảnh' : 'Lưu & Ra Ngoài'}
-                    aria-label={gameId === 'battleship' ? 'Kết thúc trận tập và về sảnh' : 'Lưu & Ra Ngoài'}
+                    title={gameId === 'battleship' ? 'Về sảnh (online vẫn tính thời gian)' : 'Lưu & Ra Ngoài'}
+                    aria-label={gameId === 'battleship' ? 'Về sảnh (online vẫn tính thời gian)' : 'Lưu & Ra Ngoài'}
                   >
                     <Save className="w-4 h-4" />
                   </button>
@@ -873,7 +873,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
               </div>
               <h2 className="text-lg font-bold text-white mb-2 font-display">TẠM DỪNG HOẶC RỜI GAME?</h2>
               <p className="text-xs text-slate-400 mb-5">
-                {gameId === 'battleship' ? 'Trận tập này chưa hỗ trợ lưu ván. Trở về sảnh sẽ kết thúc trận hiện tại.' : 'Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.'}
+                {gameId === 'battleship' ? 'Ván bot sẽ kết thúc. Phòng online vẫn chạy; quay lại trong 90 giây để giữ trận.' : 'Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.'}
               </p>
 
               <div className="space-y-2">
@@ -884,7 +884,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                   className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{gameId === 'battleship' ? 'Kết thúc trận tập & về sảnh' : 'Lưu Tiến Trình & Trở Về Sảnh'}</span>
+                  <span>{gameId === 'battleship' ? 'Về sảnh' : 'Lưu Tiến Trình & Trở Về Sảnh'}</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
