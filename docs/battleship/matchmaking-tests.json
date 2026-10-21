@@ -1,0 +1,20 @@
+{
+  "checks": 14,
+  "passed": [
+    "first search creates a hidden waiting queue, not a private room",
+    "second search atomically claims oldest opponent into one preparation room",
+    "duplicate search from the same identity cannot occupy another seat",
+    "cancel racing an already matched queue cannot close the match",
+    "matched players can prepare and fire through the existing authoritative pipeline",
+    "cancelling a waiting search frees its identity and exact replay stays closed",
+    "lost match response retries exactly once into its original waiting room",
+    "private friend rooms are never consumed by matchmaking",
+    "a private-room owner gets an actionable denial without an uncertain pending request",
+    "room-code join cannot jump the public matchmaking queue",
+    "absent queue hosts are skipped and an outsider cannot read the waiting room",
+    "four simultaneous local pipeline searches form two distinct pairs without repeated identities",
+    "browser roles cannot invoke the queue persistence RPC",
+    "queue consumes the same per-user write budget and rejects spoofed identity"
+  ],
+  "scope": "Client + real handler + PostgreSQL/PGlite queue, fixture Auth. Concurrent promises use one local database session; not cloud multi-session or real-user network QA."
+}

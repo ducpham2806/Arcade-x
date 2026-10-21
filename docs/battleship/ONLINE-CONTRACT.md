@@ -1,6 +1,6 @@
 # Next milestone: authoritative hidden-state transport
 
-The full protocol below remains a target. A staged 1vs1 foundation now exists in `server.ts`, `supabase/battleship/schema.sql` and `supabase/functions/battleship-room/`; it now has a browser client and room UI behind a disabled activation flag, and its primary API/private persistence are now deployed. The scheduler is active and real-account QA has passed; online UI activation still awaits the remaining disconnect/retention and release work. See CLOUD-ACTIVATION.md. See P2-P3-CHECKPOINT.md for tested scope and activation gates.
+Current implementation supports registered-account 1vs1 rooms and casual matchmaking. Normal Edge v7, persistence, timeout worker, presence and archive maintenance are live. Source/review UI is updated; the launcher has not been published. Online 2vs2, rematch and team pings below remain targets. See P2-P3-CHECKPOINT.md and MATCHMAKING.md for current scope.
 
 ## Server state
 

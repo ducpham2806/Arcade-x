@@ -4,7 +4,7 @@
   "edge": {
     "name": "battleship-room",
     "id": "7b1246d8-2072-43b9-a7ae-adbb9dc06672",
-    "version": 6,
+    "version": 7,
     "status": "ACTIVE",
     "verify_jwt": true,
     "qa_endpoint_included": false
@@ -14,7 +14,7 @@
     "rls_enabled_tables": 3,
     "browser_schema_usage": false,
     "browser_table_select": false,
-    "room_rpcs": 8,
+    "room_rpcs": 9,
     "browser_rpc_execute": 0,
     "worker_digest_matches_vault": true,
     "active_qa_rooms_after_cleanup": 0
@@ -47,7 +47,7 @@
     "rejected_stale": 1,
     "fixture_closed": true
   },
-  "local_automated_checks": 97,
+  "local_automated_checks": 111,
   "typescript": "pass",
   "scheduler_installed": true,
   "scheduler_extensions_installed": 2,
@@ -57,15 +57,17 @@
   "limits": [
     "No frontend/launcher deployment",
     "No human-device network/performance playtest",
-    "Current v6 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
-    "No matchmaking or online 2vs2",
-    "Archives still consume database storage; permanent purge/export policy remains pending"
+    "Current v7 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
+    "Archives still consume database storage; permanent purge/export policy remains pending",
+    "No online 2vs2, ranked matching, party queues, rematch or physical-device QA"
   ],
   "migrations_applied": [
     "battleship_online_room_backend_v1",
     "battleship_online_timeout_worker_v1",
     "battleship_presence_and_reconnect_v1",
-    "battleship_reversible_maintenance_v1"
+    "battleship_reversible_maintenance_v1",
+    "battleship_casual_matchmaking_v1",
+    "battleship_matchmaking_duplicate_guard_v1"
   ],
   "scheduler_active": true,
   "scheduler_interval_seconds": 10,
@@ -117,5 +119,14 @@
     "repeat_noop": true,
     "archive_rls": true,
     "browser_or_service_execute": false
+  },
+  "matchmaking": {
+    "casual_1v1": true,
+    "cloud_queue_race": "one contender matched, one remained waiting",
+    "cloud_qa_rooms_closed": true,
+    "browser_rpc_execute": false,
+    "new_auth_accounts": 0,
+    "current_real_auth_test": false,
+    "mobile_lab": "search/cancel/research/pair; two canvases, width=scrollWidth=360"
   }
 }

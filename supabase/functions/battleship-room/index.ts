@@ -28,14 +28,14 @@ Deno.serve(async(req)=>{
   const user=await userResponse.json();if(!user.id||user.is_anonymous)return reply({error:'REGISTERED_ACCOUNT_REQUIRED'},403);
   const text=await req.text();if(text.length>16384)return reply({error:'REQUEST_TOO_LARGE'},413);
   let body:any;try{body=JSON.parse(text);}catch{return reply({error:'INVALID_JSON'},400);}
-  if(!['create','join','snapshot','command'].includes(body?.type))return reply({error:'BAD_REQUEST'},400);
+  if(!['create','match','join','snapshot','command'].includes(body?.type))return reply({error:'BAD_REQUEST'},400);
   const store=new PostgresRoomStore(url,key);
   if(!await store.takeRequest(user.id,body.type==='snapshot'?'read':'write'))return reply({error:'RATE_LIMITED'},429);
   const service=new RoomServer(store),now=Date.now();
-  if(body?.type==='create'){
+  if(body?.type==='create'||body?.type==='match'){
    if(typeof body.requestId!=='string'||!/^[0-9a-f-]{36}$/i.test(body.requestId))return reply({error:'INVALID_REQUEST_ID'},400);
    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const code=Array.from(crypto.getRandomValues(new Uint8Array(6)),n=>chars[n%chars.length]).join('');
-   return reply(await service.create(user.id,body.requestId,code,now));
+   return reply(body.type==='match'?await service.match(user.id,body.requestId,code,now):await service.create(user.id,body.requestId,code,now));
   }
   if(body?.type==='join'&&typeof body.code==='string')return reply(await service.join(user.id,body.code,now));
   if(typeof body?.roomId!=='string'||body.roomId.length>128)return reply({error:'INVALID_ROOM_ID'},400);

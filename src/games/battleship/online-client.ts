@@ -1,6 +1,6 @@
 import type {Command,roomView} from './server';
 export type RoomSnapshot=ReturnType<typeof roomView>&{serverNow?:number};
-export type RoomRequest={type:'create';requestId:string}|{type:'join';code:string}|{type:'snapshot';roomId:string}|{type:'command';roomId:string;version:number;actionId:string;command:Command};
+export type RoomRequest={type:'create';requestId:string}|{type:'match';requestId:string}|{type:'join';code:string}|{type:'snapshot';roomId:string}|{type:'command';roomId:string;version:number;actionId:string;command:Command};
 export interface RoomTransport{request(body:RoomRequest):Promise<RoomSnapshot>}
 export class TransportError extends Error{constructor(public code:string,message:string,public uncertain=false){super(message);}}
 export function httpRoomTransport(url:string,publishableKey:string,token:()=>Promise<string|null>,fetcher:typeof fetch=fetch):RoomTransport{
@@ -25,9 +25,11 @@ export class RoomClient{
  get now(){return this.clock()+this.clockOffset;}
  async submit(body:RoomRequest){if(this.busy||this.pending)return;this.pending=body;await this.retry();}
  async retry(){if(!this.pending||this.busy||this.closed)return;const body=this.pending;this.busy=true;this.emit();const sent=this.clock();try{this.apply(await this.transport.request(body),sent);this.pending=null;this.notice='';}catch(e){this.notice=e instanceof Error?e.message:'Không thể kết nối.';if(e instanceof TransportError&&!e.uncertain){this.pending=null;}}finally{this.busy=false;this.emit();}if(!this.pending&&this.snapshot&&body.type==='command')await this.refresh();}
+ match(){return this.submit({type:'match',requestId:this.uuid()});}
  create(){return this.submit({type:'create',requestId:this.uuid()});}
  join(code:string){return this.submit({type:'join',code:code.trim().toUpperCase()});}
  async command(command:Command){if(!this.snapshot||!this.fresh){this.notice='Đang chờ đồng bộ trạng thái mới.';this.emit();return;}return this.submit({type:'command',roomId:this.snapshot.id,version:this.snapshot.version,actionId:this.uuid(),command});}
  async refresh(roomId=this.snapshot?.id){if(!roomId||this.busy||this.closed)return;this.busy=true;const sent=this.clock();try{this.apply(await this.transport.request({type:'snapshot',roomId}),sent);if(!this.pending)this.notice='';}catch(e){this.notice=e instanceof Error?e.message:'Mất kết nối.';}finally{this.busy=false;this.emit();}}
+ resetClosed(){if(this.busy||this.pending||this.snapshot?.status!=='closed')return;this.snapshot=null;this.lastSync=0;this.notice='';this.emit();}
  close(){this.closed=true;this.listeners.clear();}
 }

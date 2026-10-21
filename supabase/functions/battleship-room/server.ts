@@ -1,9 +1,10 @@
 /** Authoritative room core. Import on a trusted server only; never send Room to clients. */
 import {createState,advanceTime,autoPlace,seeded,placeShip,clearFleet,setReady,fire,surrender,viewFor,shipId,type State,type Seat,type ShipType,teamOf} from './engine.ts';
 export const RECONNECT_MS=90_000;
-export type Room={lastSeen?:Partial<Record<Seat,number>>;closedAt?:number;closeReason?:'disconnect'|'abandoned'|'cancelled'|'expired';expiryGuard?:{cutoff:number;seats:Seat[]};id:string;code:string;version:number;status:'waiting'|'active'|'closed';members:Partial<Record<Seat,string>>;state:State|null;createdAt:number;receipts:{id:string;actor:string;fingerprint:string;version:number}[]};
+export type Room={matchmaking?:boolean;matchRequests?:Record<string,string>;lastSeen?:Partial<Record<Seat,number>>;closedAt?:number;closeReason?:'disconnect'|'abandoned'|'cancelled'|'expired';expiryGuard?:{cutoff:number;seats:Seat[]};id:string;code:string;version:number;status:'waiting'|'active'|'closed';members:Partial<Record<Seat,string>>;state:State|null;createdAt:number;receipts:{id:string;actor:string;fingerprint:string;version:number}[]};
 export interface RoomStore{
  create(room:Room):Promise<Room>;
+ match?(uid:string,id:string,code:string,state:State,now:number):Promise<Room>;
  read(id:string):Promise<Room|null>;
  byCode(code:string):Promise<Room|null>;
  /** Atomic version check and replace. Must enforce one active room per identity across rooms. */
@@ -14,17 +15,23 @@ export interface RoomStore{
 }
 export type Command=
  |{type:'place';shipType:ShipType;row:number;col:number;horizontal:boolean}
- |{type:'auto'}|{type:'leave'}|{type:'clear'}|{type:'ready';ready:boolean}
+ |{type:'cancel-search'}|{type:'auto'}|{type:'leave'}|{type:'clear'}|{type:'ready';ready:boolean}
  |{type:'fire';row:number;col:number;turnId:number}|{type:'surrender'};
 export class RoomError extends Error{constructor(public code:string,message:string){super(message);}}
 const deny=(code:string,message:string):never=>{throw new RoomError(code,message);};
 const seatFor=(room:Room,uid:string):Seat=>{const seat=(Object.entries(room.members) as [Seat,string][]).find(([,member])=>member===uid)?.[0];return seat||deny('NOT_MEMBER','Bạn không có quyền vào phòng này.');};
-export function roomView(room:Room,uid:string){const seat=seatFor(room,uid);return {id:room.id,code:room.code,version:room.version,status:room.status,seat,memberCount:Object.keys(room.members).length,closeReason:room.closeReason,connection:{ownLastSeen:room.lastSeen?.[seat]??room.createdAt,opponentLastSeen:room.lastSeen?.[seat==='A1'?'B1':'A1']??room.createdAt,graceMs:RECONNECT_MS},view:room.state?viewFor(room.state,seat):null};}
+export function roomView(room:Room,uid:string){const seat=seatFor(room,uid);return {matchmaking:!!room.matchmaking,id:room.id,code:room.code,version:room.version,status:room.status,seat,memberCount:Object.keys(room.members).length,closeReason:room.closeReason,connection:{ownLastSeen:room.lastSeen?.[seat]??room.createdAt,opponentLastSeen:room.lastSeen?.[seat==='A1'?'B1':'A1']??room.createdAt,graceMs:RECONNECT_MS},view:room.state?viewFor(room.state,seat):null};}
 export class RoomServer{
  constructor(private store:RoomStore,private chooseFirst:()=>number=()=>crypto.getRandomValues(new Uint8Array(1))[0]%2){}
  async create(uid:string,id:string,code:string,now:number){
   if(!uid||!id||!/^[A-Z2-9]{6}$/.test(code))deny('BAD_REQUEST','Mã phòng không hợp lệ.');
   const room=await this.store.create({id,code,version:0,status:'waiting',members:{A1:uid},lastSeen:{A1:now},state:null,createdAt:now,receipts:[]});return this.snapshot(uid,room.id,now);
+ }
+ async match(uid:string,id:string,code:string,now:number){
+  if(!uid||!id||!/^[A-Z2-9]{6}$/.test(code))deny('BAD_REQUEST','Yêu cầu tìm trận không hợp lệ.');
+  if(!this.store.match)deny('UNAVAILABLE','Tìm trận chưa sẵn sàng.');
+  const room=await this.store.match!(uid,id,code,createState('duel',now,this.chooseFirst()),now);
+  return this.snapshot(uid,room.id,now);
  }
  async join(uid:string,rawCode:string,now:number){
   const code=rawCode.trim().toUpperCase();if(!/^[A-Z2-9]{6}$/.test(code))deny('BAD_CODE','Mã phòng phải gồm 6 ký tự.');
@@ -33,6 +40,7 @@ export class RoomServer{
    if(Object.values(room.members).includes(uid))return this.snapshot(uid,room.id,now);
    const expired=this.expire(room,now);if(expired!==room){if(!await this.store.cas(room.version,expired))continue;deny('ROOM_CLOSED','Phòng đã đóng.');}
    if(room.status==='closed'||now-room.createdAt>=600000&&room.status==='waiting')deny('ROOM_CLOSED','Phòng đã đóng.');
+   if(room.matchmaking)deny('QUEUE_ONLY','Phòng tìm trận chỉ nhận người qua tìm trận tự động.');
    if(room.status!=='waiting'||room.members.B1)deny('ROOM_FULL','Phòng đã đủ người.');
    const next:Room={...room,version:room.version+1,status:'active',members:{...room.members,B1:uid},lastSeen:{...room.lastSeen,B1:now},state:createState('duel',now,this.chooseFirst())};
    const saved=await this.store.cas(room.version,next);if(saved)return roomView(saved,uid);
@@ -55,7 +63,8 @@ export class RoomServer{
    const expired=this.expire(room,now);
    if(expired!==room){if(expired.status!=='closed')expired.lastSeen={...expired.lastSeen,[seat]:now};const saved=await this.store.cas(room.version,expired);if(!saved)continue;return deny('EXPIRED','Hết giờ. Hãy tải trạng thái mới trước khi thao tác.');}
    room=await this.store.touch?.(id,uid,now)||room;
-   if(command.type==='leave'&&room.status!=='closed'){
+   if(command.type==='cancel-search'&&(!room.matchmaking||room.status!=='waiting'))deny('QUEUE_MATCHED','Đã ghép đối thủ. Hãy đồng bộ để vào phần đặt tàu.');
+   if((command.type==='leave'||command.type==='cancel-search')&&room.status!=='closed'){
     if(version!==room.version)deny('VERSION_CONFLICT','Phòng đã thay đổi. Hãy đồng bộ rồi thử lại.');
     const state=room.state?.phase==='battle'?surrender(room.state,seat):room.state;
     const next:Room={...room,state,status:'closed',closedAt:now,...(state?.phase!=='finished'?{closeReason:'cancelled' as const}:{}),version:room.version+1,receipts:[...room.receipts,{id:actionId,actor:uid,fingerprint,version:room.version+1}]};
