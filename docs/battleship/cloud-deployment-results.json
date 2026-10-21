@@ -4,17 +4,18 @@
   "edge": {
     "name": "battleship-room",
     "id": "7b1246d8-2072-43b9-a7ae-adbb9dc06672",
-    "version": 8,
+    "version": 9,
     "status": "ACTIVE",
     "verify_jwt": true,
-    "qa_endpoint_included": false
+    "qa_endpoint_included": false,
+    "ezbr_sha256": "bec3257fbad7b72a5408d0bccbc198531e78bf8760963899aa445b38b70f875c"
   },
   "database": {
     "private_tables": 3,
     "rls_enabled_tables": 3,
     "browser_schema_usage": false,
     "browser_table_select": false,
-    "room_rpcs": 9,
+    "room_rpcs": 10,
     "browser_rpc_execute": 0,
     "worker_digest_matches_vault": true,
     "active_qa_rooms_after_cleanup": 0
@@ -47,7 +48,7 @@
     "rejected_stale": 1,
     "fixture_closed": true
   },
-  "local_automated_checks": 133,
+  "local_automated_checks": 157,
   "typescript": "pass",
   "scheduler_installed": true,
   "scheduler_extensions_installed": 2,
@@ -57,9 +58,9 @@
   "limits": [
     "No frontend/launcher deployment",
     "No human-device network/performance playtest",
-    "Current v8 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
+    "Current v9 Auth-account rerun was blocked by automatic approval review; prior v5 real Auth checks remain historical evidence",
     "Archives still consume database storage; permanent purge/export policy remains pending",
-    "No ranked matching, squad party queues, rematch or physical-device QA"
+    "No ranked matching, squad party queues or physical-device QA"
   ],
   "migrations_applied": [
     "battleship_online_room_backend_v1",
@@ -68,7 +69,8 @@
     "battleship_reversible_maintenance_v1",
     "battleship_casual_matchmaking_v1",
     "battleship_matchmaking_duplicate_guard_v1",
-    "battleship_online_squad_rooms_v1"
+    "battleship_online_squad_rooms_v1",
+    "battleship_rematch_consent_v1"
   ],
   "scheduler_active": true,
   "scheduler_interval_seconds": 10,
@@ -143,5 +145,28 @@
     "active_qa_rooms": 0,
     "current_real_auth_test": false,
     "mobile_lab": "four players joined/prepared; A1 and B1 fired; A2 teammate banner; two canvases width=scrollWidth=360"
+  },
+  "rematch": {
+    "duel_votes": 2,
+    "squad_votes": 4,
+    "invitation_seconds": 120,
+    "live_duplicate_confirmations": 2,
+    "live_children_created": 1,
+    "fresh_child": true,
+    "parent_result_preserved": true,
+    "browser_rpc_execute": false,
+    "active_qa_rooms": 0,
+    "new_auth_accounts": 0,
+    "current_real_auth_test": false,
+    "mobile_lab": "four confirmations; fresh 14x14 fleets 0/5, readiness 0/4, first voter follows child; two canvases width=scrollWidth=360"
+  },
+  "audio": {
+    "adapter": "procedural native WebAudio playtest",
+    "gesture_required": true,
+    "max_voices": 8,
+    "master_gain": 0.12,
+    "automated_checks": 10,
+    "browser_unlock_and_mute": true,
+    "physical_device_listening": false
   }
 }

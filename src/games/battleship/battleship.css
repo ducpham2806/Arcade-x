@@ -10,3 +10,8 @@
 .bs-team-roster{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.bs-seat{padding:10px;border:1px solid #718c9e;border-radius:8px;background:#1b3445}.bs-seat strong,.bs-seat span{display:block;font-size:12px}.bs-team-0{border-color:#77c7bc}.bs-team-1{border-color:#deb687}.bs-room-code-label select{width:100%;margin-top:6px}
 
 .bs-ready-line{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.bs-ready-line span{border:1px solid #688594;border-radius:5px;padding:3px 8px;font-size:12px}
+
+.bs-rematch{padding:12px 0;border-top:1px solid #6b8597}.bs-rematch>button{width:100%}
+
+/* Keep each local lab result inside its simulated client so player tabs remain usable. */
+.bs-lab-players .bs-game{position:relative}.bs-lab-players .bs-modal-backdrop{position:absolute}

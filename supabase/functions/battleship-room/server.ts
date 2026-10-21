@@ -1,9 +1,10 @@
 /** Authoritative room core. Import on a trusted server only; never send Room to clients. */
 import {createState,advanceTime,autoPlace,seeded,placeShip,clearFleet,setReady,fire,surrender,viewFor,shipId,type State,type Seat,type ShipType,type Mode,type Team,teamOf,activeSeat} from './engine.ts';
 export const RECONNECT_MS=90_000;
-export type Room={mode?:Mode;departed?:Seat[];surrenderVotes?:Seat[];takeoverGuard?:{seat:Seat;cutoff:number};matchmaking?:boolean;matchRequests?:Record<string,string>;lastSeen?:Partial<Record<Seat,number>>;closedAt?:number;closeReason?:'disconnect'|'abandoned'|'cancelled'|'expired';expiryGuard?:{cutoff:number;seats:Seat[]};id:string;code:string;version:number;status:'waiting'|'active'|'closed';members:Partial<Record<Seat,string>>;state:State|null;createdAt:number;receipts:{id:string;actor:string;fingerprint:string;version:number}[]};
+export type Room={rematchVotes?:Seat[];rematchRoomId?:string;rematchOf?:string;mode?:Mode;departed?:Seat[];surrenderVotes?:Seat[];takeoverGuard?:{seat:Seat;cutoff:number};matchmaking?:boolean;matchRequests?:Record<string,string>;lastSeen?:Partial<Record<Seat,number>>;closedAt?:number;closeReason?:'disconnect'|'abandoned'|'cancelled'|'expired';expiryGuard?:{cutoff:number;seats:Seat[]};id:string;code:string;version:number;status:'waiting'|'active'|'closed';members:Partial<Record<Seat,string>>;state:State|null;createdAt:number;receipts:{id:string;actor:string;fingerprint:string;version:number}[]};
 export interface RoomStore{
  create(room:Room):Promise<Room>;
+ rematch?(id:string,uid:string,version:number,actionId:string,fingerprint:string,agree:boolean,now:number,nextId:string,code:string,state:State):Promise<Room>;
  match?(uid:string,id:string,code:string,state:State,now:number):Promise<Room>;
  read(id:string):Promise<Room|null>;
  byCode(code:string):Promise<Room|null>;
@@ -15,7 +16,7 @@ export interface RoomStore{
 }
 export type Command=
  |{type:'place';shipType:ShipType;row:number;col:number;horizontal:boolean}
- |{type:'team';team:Team}|{type:'cancel-search'}|{type:'auto'}|{type:'leave'}|{type:'clear'}|{type:'ready';ready:boolean}
+ |{type:'rematch';agree:boolean}|{type:'team';team:Team}|{type:'cancel-search'}|{type:'auto'}|{type:'leave'}|{type:'clear'}|{type:'ready';ready:boolean}
  |{type:'fire';row:number;col:number;turnId:number}|{type:'surrender';agree?:boolean};
 export class RoomError extends Error{constructor(public code:string,message:string){super(message);}}
 const deny=(code:string,message:string):never=>{throw new RoomError(code,message);};
@@ -25,7 +26,7 @@ const inactive=(room:Room,seat:Seat,now:number)=>!!room.departed?.includes(seat)
 const controlFor=(room:Room,seat:Seat,now:number):Seat=>{const actor=room.state?activeSeat(room.state):seat;return room.state?.mode==='squad'&&room.state.phase==='battle'&&teamOf(actor)===teamOf(seat)&&inactive(room,actor,now)&&!room.departed?.includes(seat)?actor:seat;};
 export function roomView(room:Room,uid:string,now=Date.now()){
  const seat=seatFor(room,uid),seats=seatsFor(room),peers=seats.filter(s=>s!==seat&&!!room.members[s]);
- return {mode:room.mode||room.state?.mode||'duel',capacity:seats.length,left:!!room.departed?.includes(seat),controlSeat:controlFor(room,seat,now),
+ return {rematch:{votes:room.rematchVotes||[],until:(room.closedAt||0)+120000,available:room.status==='closed'&&room.state?.phase==='finished'&&!room.closeReason&&!room.departed?.length&&now<(room.closedAt||0)+120000},mode:room.mode||room.state?.mode||'duel',capacity:seats.length,left:!!room.departed?.includes(seat),controlSeat:controlFor(room,seat,now),
   roster:seats.map(s=>({seat:s,occupied:!!room.members[s],ready:!!room.state?.ready.includes(s),left:!!room.departed?.includes(s),lastSeen:room.lastSeen?.[s]??room.createdAt})),
   surrenderVotes:(room.surrenderVotes||[]).filter(s=>teamOf(s)===teamOf(seat)),matchmaking:!!room.matchmaking,id:room.id,code:room.code,version:room.version,status:room.status,seat,memberCount:Object.keys(room.members).length,closeReason:room.closeReason,
   connection:{ownLastSeen:room.lastSeen?.[seat]??room.createdAt,opponentLastSeen:Math.max(room.createdAt,...peers.filter(s=>teamOf(s)!==teamOf(seat)).map(s=>room.lastSeen?.[s]??room.createdAt)),graceMs:RECONNECT_MS},view:room.state?viewFor(room.state,seat):null};
@@ -63,6 +64,7 @@ export class RoomServer{
  async snapshot(uid:string,id:string,now:number){
   for(let i=0;i<8;i++){
    const room=await this.store.read(id);if(!room)deny('NOT_FOUND','Phòng không tồn tại.');seatFor(room,uid);
+   if(room.rematchRoomId){id=room.rematchRoomId;continue;}
    const next=this.expire(room,now);if(next!==room&&next.status!=='closed')next.lastSeen={...next.lastSeen,[seatFor(room,uid)]:now};if(next===room){const touched=await this.store.touch?.(id,uid,now);return roomView(touched||room,uid,now);}
    const saved=await this.store.cas(room.version,next);if(saved)return roomView(saved,uid,now);
   }return deny('CONFLICT','Phòng đang đồng bộ. Hãy thử lại.');
@@ -70,10 +72,19 @@ export class RoomServer{
  async command(uid:string,id:string,version:number,actionId:string,command:Command,now:number){
   if(typeof actionId!=='string'||!actionId||actionId.length>128)deny('BAD_ACTION','Mã thao tác không hợp lệ.');
   const fingerprint=JSON.stringify(command);
+  if(command.type==='rematch'){
+   if(!Number.isInteger(version)||typeof command.agree!=='boolean'||!this.store.rematch)deny('BAD_REQUEST','Không thể đấu lại lúc này.');
+   const room=await this.store.read(id);if(!room)deny('NOT_FOUND','Phòng không tồn tại.');seatFor(room,uid);
+   const bytes=crypto.getRandomValues(new Uint8Array(16));const nextId=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',code=Array.from(crypto.getRandomValues(new Uint8Array(6)),n=>chars[n%32]).join('');
+   const state=createState(room.state?.mode||'duel',now,((room.state?.first||0)+1)%seatsFor(room).length);
+   const result=await this.store.rematch!(id,uid,version,actionId,fingerprint,command.agree,now,nextId,code,state);
+   return this.snapshot(uid,result.id,now);
+  }
   for(let i=0;i<8;i++){
    let room=await this.store.read(id);if(!room)deny('NOT_FOUND','Phòng không tồn tại.');const seat=seatFor(room,uid);
    const receipt=room.receipts.find(r=>r.id===actionId&&r.actor===uid);
-   if(receipt){if(receipt.fingerprint!==fingerprint)deny('ACTION_REUSED','Không được dùng lại mã thao tác cho lệnh khác.');return {...roomView(room,uid,now),duplicate:true,acceptedVersion:receipt.version};}
+   if(receipt){if(receipt.fingerprint!==fingerprint)deny('ACTION_REUSED','Không được dùng lại mã thao tác cho lệnh khác.');return {...(room.rematchRoomId?await this.snapshot(uid,room.rematchRoomId,now):roomView(room,uid,now)),duplicate:true,acceptedVersion:receipt.version};}
    const expired=this.expire(room,now);
    if(expired!==room){if(expired.status!=='closed')expired.lastSeen={...expired.lastSeen,[seat]:now};const saved=await this.store.cas(room.version,expired);if(!saved)continue;return deny('EXPIRED','Hết giờ. Hãy tải trạng thái mới trước khi thao tác.');}
    room=await this.store.touch?.(id,uid,now)||room;
