@@ -1,7 +1,7 @@
 {
-  "name": "react-example",
+  "name": "arcadex",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.12.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
@@ -27,7 +27,23 @@
     "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs",
     "export:artwork": "node scripts/export-game-art.mjs",
     "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
-    "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs"
+    "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
+    "test:boom-art": "node tests/boom-buddies/art-v3.mjs",
+    "preview:boom-art": "node scripts/boom-art-preview.mjs",
+    "test:boom-pip": "node tests/boom-buddies/pip-v4.mjs",
+    "export:boom-pip": "node scripts/export-pip-v4-review.mjs",
+    "test:cosmic-levels": "node --test tests/cosmic/encounters-v4.mjs tests/cosmic/encounters-v5.mjs",
+    "preview:cosmic-levels": "node scripts/export-cosmic-level-review.mjs",
+    "test:eat": "node scripts/test-eat-journey.mjs",
+    "export:eat-art": "node scripts/export-eat-art.mjs",
+    "preview:eat": "node scripts/export-eat-review.mjs",
+    "simulate:eat-economy": "node scripts/simulate-eat-economy.mjs",
+    "test:subscriptions": "node scripts/test-subscriptions.mjs && node tests/subscriptions/access-client.mjs",
+    "test:commerce": "node --test tests/subscriptions/payment-core.mjs tests/subscriptions/orders-http.mjs tests/subscriptions/orders-client.mjs tests/subscriptions/admin-reviews.mjs tests/subscriptions/checkout-flow.mjs tests/subscriptions/reconciliation.mjs",
+    "test:battleship": "node tests/battleship/engine.mjs && node tests/battleship/next-milestone.mjs && node tests/battleship/persistence.mjs && node tests/battleship/edge-handler.mjs && node tests/battleship/online-integration.mjs && node tests/battleship/presence.mjs && node tests/battleship/maintenance.mjs && node tests/battleship/matchmaking.mjs && node tests/battleship/squad-online.mjs && node tests/battleship/rematch.mjs && node tests/battleship/audio.mjs",
+    "preview:battleship": "node scripts/battleship-preview.mjs",
+    "prepare:battleship-server": "node scripts/battleship-server-package.mjs",
+    "test:full-release": "node tests/integration/full-release.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
@@ -54,6 +70,7 @@
     "tailwindcss": "^4.1.14",
     "typescript": "~5.8.2",
     "vite": "^6.2.3",
-    "vite-plugin-pwa": "^1.3.0"
+    "vite-plugin-pwa": "^1.3.0",
+    "@electric-sql/pglite": "0.5.10"
   }
 }

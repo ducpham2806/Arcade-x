@@ -1,0 +1,22 @@
+{
+  "checks": 12,
+  "passed": [
+    "schema is valid PostgreSQL and enables RLS on private room table",
+    "anon cannot read table or invoke private-state public RPC",
+    "authenticated browser cannot read secret table or execute any room RPC",
+    "service credential can create room and replay create idempotently",
+    "duplicate active room and reused room ID for other identity are rejected",
+    "CAS writes one next version; stale version cannot replace it",
+    "one identity cannot join two active rooms",
+    "scheduler query returns only due open rooms",
+    "closing a room releases its active identity slot",
+    "public persistence functions are invoker and grant no browser execution",
+    "request budget atomically blocks excess writes while preserving read budget",
+    "worker digest stays private and accepts only the full matching token"
+  ],
+  "engine": "PGlite PostgreSQL WASM",
+  "limits": [
+    "No live Supabase migration applied",
+    "Single-session PostgreSQL syntax and privilege checks; distributed races are tested separately in room-core tests"
+  ]
+}

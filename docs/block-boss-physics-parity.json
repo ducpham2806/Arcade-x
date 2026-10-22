@@ -1,0 +1,98 @@
+{
+  "cases": 18,
+  "stepsPerCase": 1200,
+  "seed": 222,
+  "result": "Identical simulation snapshots with prior engine; includes laser contact and actual boss attacks.",
+  "report": [
+    {
+      "boss": 1,
+      "phase": 1,
+      "identical": true
+    },
+    {
+      "boss": 1,
+      "phase": 2,
+      "identical": true
+    },
+    {
+      "boss": 1,
+      "phase": 3,
+      "identical": true
+    },
+    {
+      "boss": 2,
+      "phase": 1,
+      "identical": true
+    },
+    {
+      "boss": 2,
+      "phase": 2,
+      "identical": true
+    },
+    {
+      "boss": 2,
+      "phase": 3,
+      "identical": true
+    },
+    {
+      "boss": 3,
+      "phase": 1,
+      "identical": true
+    },
+    {
+      "boss": 3,
+      "phase": 2,
+      "identical": true
+    },
+    {
+      "boss": 3,
+      "phase": 3,
+      "identical": true
+    },
+    {
+      "boss": 4,
+      "phase": 1,
+      "identical": true
+    },
+    {
+      "boss": 4,
+      "phase": 2,
+      "identical": true
+    },
+    {
+      "boss": 4,
+      "phase": 3,
+      "identical": true
+    },
+    {
+      "boss": 5,
+      "phase": 1,
+      "identical": true
+    },
+    {
+      "boss": 5,
+      "phase": 2,
+      "identical": true
+    },
+    {
+      "boss": 5,
+      "phase": 3,
+      "identical": true
+    },
+    {
+      "boss": 6,
+      "phase": 1,
+      "identical": true
+    },
+    {
+      "boss": 6,
+      "phase": 2,
+      "identical": true
+    },
+    {
+      "boss": 6,
+      "phase": 3,
+      "identical": true
+    }
+  ]
+}

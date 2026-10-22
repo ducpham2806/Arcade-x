@@ -1,0 +1,13 @@
+variable,value,unit,status,rationale
+salvage_routes_per_sector,3,routes,PLACEHOLDER,Stages 4/8/12 spaced after learning beats
+salvage_windup,1.25,seconds,PLACEHOLDER,Visible warning before trajectory risk
+salvage_deflector_lifetime,9,seconds,PLACEHOLDER,One short bounded pressure window
+salvage_horizontal_range,18,pixels,PLACEHOLDER,Keep deflection in the optional flank
+salvage_reward_base,12,xu,PLACEHOLDER,Small once-per-stage reward
+salvage_reward_sector_step,2,xu,PLACEHOLDER,Slow growth without farmable repeats
+mastery_reward_base,10,xu,PLACEHOLDER,Optional mastery reward below base clears
+mastery_reward_sector_step,2,xu,PLACEHOLDER,Match sector progression
+support_wide_multiplier,1.15,multiplier,PLACEHOLDER,Helpful without permanent growth
+support_wide_duration,20,seconds,PLACEHOLDER,Opening advantage only
+support_energy,3,energy,PLACEHOLDER,Partial charge rather than instant unlimited skill
+support_shield,1,rescues,PLACEHOLDER,One bottom rescue per awarded attempt

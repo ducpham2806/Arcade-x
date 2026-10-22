@@ -1,3 +1,6 @@
+// @ts-nocheck
+import * as v4 from "./legacy-v4-engine.ts";
+import * as v3 from "./legacy-v3-engine.ts";
 import * as legacy from "./legacy-engine.ts";
 import { BOSS_HP, ITEM_NAMES, levelFor, MUTATORS } from "./content.ts";
 import type {
@@ -12,7 +15,28 @@ import type {
   ReplayEntry,
   Boss,
 } from "./types.ts";
-export const VERSION = 3,
+
+function phaseClock(s) {return s.frame-(s.directorOrigin||0);}
+function directEncounter(s) {
+ const l=levelFor(s.config.level);
+ if(!['campaign','practice'].includes(s.config.mode)||!l.phases.length) return;
+ if(s.directorPhase===undefined) {s.directorPhase=0;s.directorOrigin=0;s.directorState='combat';}
+ if(s.directorDone) return;
+ const p=l.phases[s.directorPhase], next=l.waves[s.waveIndex];
+ if(s.directorState==='rest') {
+   if(s.frame<s.restUntil) return;
+   s.directorPhase++;
+   if(s.directorPhase===l.phases.length){s.directorDone=true;return;}
+   s.directorOrigin=s.frame-l.phases[s.directorPhase].start*60;
+   s.directorState='combat';s.combo=0;s.lastKill=s.frame;
+   message(s,l.phases[s.directorPhase].label+' · '+l.lesson);
+ } else if((!next||next.phase>s.directorPhase)&&s.enemies.length===0&&
+     !s.bullets.some(b=>!b.player)&&s.hazards.length===0) {
+   s.directorState='rest';s.restUntil=s.frame+p.rest*60;
+   s.combo=0;message(s,'AN TOÀN · '+p.rest+' giây đổi vị trí / nhặt vật phẩm');
+ }
+}
+export const VERSION = 5,
   WIDTH = 180,
   HEIGHT = 320,
   FPS = 60,
@@ -25,7 +49,7 @@ export const EMPTY_UPGRADES = {
   thrusters: 0,
   core: 0,
 };
-const STATS: Record<EnemyKind, [number, number, number, number]> = {
+const STATS                                                      = {
   scout: [3, 100, 6, 96],
   gnat: [2, 100, 4, 86],
   drone: [6, 200, 9, 95],
@@ -39,13 +63,13 @@ const STATS: Record<EnemyKind, [number, number, number, number]> = {
   cicada: [12, 400, 9, 45],
   minelayer: [14, 400, 10, 43],
   wraith: [18, 400, 9, 63],
-  commander: [420, 2500, 20, 22],
+  commander: [340, 2500, 20, 22],
   generator: [55, 800, 12, 60],
   meteor: [6, 50, 8, 55],
   prism: [8, 200, 8, 80],
 };
-const ACTIVE: ItemKind[] = ["bomb", "laser", "phase", "overdrive"];
-const ITEMS: ItemKind[] = [
+const ACTIVE             = ["bomb", "laser", "phase", "overdrive"];
+const ITEMS             = [
   "plasma",
   "missile",
   "bomb",
@@ -57,29 +81,29 @@ const ITEMS: ItemKind[] = [
   "overdrive",
   "amp",
 ];
-const q = (v: number) => Math.round(v * 256) / 256;
-export const clamp = (v: number, a: number, b: number) =>
+const q = (v        ) => Math.round(v * 256) / 256;
+export const clamp = (v        , a        , b        ) =>
   Math.max(a, Math.min(b, v));
-function random(s: Simulation, drop = false) {
+function random(s: Simulation, drop = false)  {
   const key = drop ? "dropRng" : "rng";
   s[key] = (Math.imul(s[key], 1664525) + 1013904223) >>> 0;
   return (s[key] >>> 8) / 16777216;
 }
-const has = (s: Simulation, m: string) =>
-  s.config.mutators.includes(m as never);
-const difficulty = (s: Simulation) =>
+const has = (s            , m        ) =>
+  s.config.mutators.includes(m         );
+const difficulty = (s            ) =>
   s.config.mode === "endless"
     ? Math.min(110, 50 + s.frame / 1200)
     : levelFor(
         s.config.mode === "rush" ? (s.bossesKilled + 1) * 10 : s.config.level,
       ).difficulty + (s.config.mode === "ngplus" ? 10 : 0);
-const planet = (s: Simulation) =>
+const planet = (s            ) =>
   s.config.mode === "rush"
     ? Math.min(10, s.bossesKilled + 1)
     : levelFor(s.config.level).planet;
-const speed = (s: Simulation) =>
+const speed = (s            ) =>
   (1 + 0.004 * difficulty(s)) * (has(s, "fast") ? 1.2 : 1);
-const caps = (s: Simulation) => {
+const caps = (s            ) => {
   const band = Math.min(4, Math.floor(difficulty(s) / 20));
   return {
     enemies: [16, 20, 24, 28, 32][band],
@@ -88,11 +112,11 @@ const caps = (s: Simulation) => {
     bulletSpeed: [96, 115, 134, 154, 176][band],
   };
 };
-function message(s: Simulation, text: string) {
+function message(s: Simulation, text: string)  {
   s.message = text;
   s.messageUntil = s.frame + 120;
 }
-export function startingHp(integrity: number, hull: number) {
+export function startingHp(integrity: number, hull: number)  {
   return integrity >= 80
     ? hull >= 5
       ? 5
@@ -103,8 +127,10 @@ export function startingHp(integrity: number, hull: number) {
         ? 3
         : 2;
 }
-export function createSimulation(config: RunConfig): Simulation {
+export function createSimulation(config: RunConfig): Simulation              {
   if (config.version === 2) return legacy.createSimulation(config);
+  if (config.version === 3) return v3.createSimulation(config);
+  if (config.version === 4) return v4.createSimulation(config);
   const standard = ["daily", "weekly", "endless", "rush"].includes(config.mode),
     u = standard
       ? (Object.fromEntries(
@@ -116,7 +142,7 @@ export function createSimulation(config: RunConfig): Simulation {
                 ? 7
                 : 6,
           ]),
-        ) as typeof EMPTY_UPGRADES)
+        )                         )
       : { ...config.upgrades };
   config = {
     ...config,
@@ -129,7 +155,7 @@ export function createSimulation(config: RunConfig): Simulation {
   const hp = hasConfig(config, "glass")
     ? 1
     : startingHp(config.integrity, u.hull);
-  const s: Simulation = {
+  const s             = {
     config,
     frame: 0,
     rng: config.seed >>> 0,
@@ -212,31 +238,33 @@ export function createSimulation(config: RunConfig): Simulation {
   }
   if (config.mode === "practice" && levelFor(config.level).stage === 10) {
     makeBoss(s, planet(s));
-    const b = s.boss!;
+    const b = s.boss ;
     b.phase = clamp(config.practicePhase || 1, 1, b.planet === 10 ? 4 : 3);
     b.hp = b.maxHp * (1 - (b.phase - 1) / (b.planet === 10 ? 4 : 3)) - 0.01;
     b.transition = 0;
   }
   return s;
 }
-function hasConfig(c: RunConfig, k: string) {
-  return c.mutators.includes(k as never);
+function hasConfig(c: RunConfig, k: string)  {
+  return c.mutators.includes(k         );
 }
 function addEffect(
   s: Simulation,
   x: number,
   y: number,
   kind: Simulation["effects"][number]["kind"],
-) {
+)  {
   if (s.effects.length < 80) s.effects.push({ x, y, kind, born: s.frame });
 }
-function score(s: Simulation, base: number) {
+function score(s: Simulation, base: number)  {
   s.score += Math.floor(
     base * Math.min(3, 1 + Math.floor(s.combo / 5) * 0.1) * (s.amp > 0 ? 2 : 1),
   );
 }
-export function pickup(s: Simulation, kind: ItemKind) {
+export function pickup(s: Simulation, kind: ItemKind)  {
   if (s.config.version === 2) return legacy.pickup(s, kind);
+  if (s.config.version === 3) return v3.pickup(s, kind);
+  if (s.config.version === 4) return v4.pickup(s, kind);
   const old = s.itemLevels[kind] || 0,
     mastery =
       s.config.upgrades.core >=
@@ -248,7 +276,7 @@ export function pickup(s: Simulation, kind: ItemKind) {
         ? 2
         : 1;
   s.itemLevels[kind] = Math.min(3, Math.max(mastery, old + 1));
-  const lvl = s.itemLevels[kind]!;
+  const lvl = s.itemLevels[kind] ;
   if (kind === "star") {
     s.collected++;
     score(s, 25);
@@ -282,8 +310,10 @@ export function pickup(s: Simulation, kind: ItemKind) {
   if (kind === "magnet") s.magnet = (lvl === 1 ? 10 : 15) * 60;
   if (kind === "amp") s.amp = (lvl === 1 ? 12 : 18) * 60;
 }
-export function useSlot(s: Simulation, index: number) {
+export function useSlot(s: Simulation, index: number)  {
   if (s.config.version === 2) return legacy.useSlot(s, index);
+  if (s.config.version === 3) return v3.useSlot(s, index);
+  if (s.config.version === 4) return v4.useSlot(s, index);
   const kind = s.slots[index];
   if (
     !kind ||
@@ -312,8 +342,10 @@ export function useSlot(s: Simulation, index: number) {
   if (kind === "overdrive")
     s.overdrive = Math.round((lvl >= 2 ? 8 : 6) * 60 * mult);
 }
-export function revive(s: Simulation) {
+export function revive(s: Simulation)  {
   if (s.config.version === 2) return legacy.revive(s);
+  if (s.config.version === 3) return v3.revive(s);
+  if (s.config.version === 4) return v4.revive(s);
   if (s.status !== "revive" || !s.revive) return;
   s.revive = false;
   s.hp = 2;
@@ -322,13 +354,15 @@ export function revive(s: Simulation) {
   s.status = "playing";
   s.replay.push([s.frame, Math.round(s.x), Math.round(s.y), 16]);
 }
-export function endRun(s: Simulation) {
+export function endRun(s: Simulation)  {
   if (s.config.version === 2) return legacy.endRun(s);
+  if (s.config.version === 3) return v3.endRun(s);
+  if (s.config.version === 4) return v4.endRun(s);
   if (s.status !== "playing" && s.status !== "revive") return;
   s.replay.push([s.frame, Math.round(s.targetX), Math.round(s.targetY), 32]);
   s.status = "lost";
 }
-function damage(s: Simulation, n = 1, boss = false) {
+function damage(s: Simulation, n = 1, boss = false)  {
   if (s.invincible > 0 || s.cloak > 0 || s.status !== "playing") return;
   if (s.shield > 0) {
     s.shield--;
@@ -370,7 +404,7 @@ function spawn(
   path: number,
   drop?: ItemKind,
   at?: { x: number; y: number },
-) {
+)  {
   if (s.enemies.length >= caps(s).enemies) return false;
   const st = STATS[kind],
     p = planet(s),
@@ -411,7 +445,7 @@ function spawn(
   s.spawned++;
   return true;
 }
-function bullet(s: Simulation, b: Bullet) {
+function bullet(s: Simulation, b: Bullet)  {
   if (s.bullets.length >= 300) return;
   if (!b.player) {
     if (
@@ -433,7 +467,7 @@ function aimed(
   kind: Bullet["kind"] = "aimed",
   dmg = 1,
   angle?: number,
-) {
+)  {
   const a = angle ?? Math.atan2(s.y - y, s.x - x);
   for (let i = 0; i < count; i++) {
     const theta = a + (i - (count - 1) / 2) * spread,
@@ -453,21 +487,21 @@ function aimed(
     });
   }
 }
-function ring(s: Simulation, x: number, y: number, count: number, offset = 0) {
+function ring(s: Simulation, x: number, y: number, count: number, offset = 0)  {
   for (let i = 0; i < count; i++)
     aimed(s, x, y, 1, 0, "round", 1, offset + (Math.PI * 2 * i) / count);
 }
-function makeBoss(s: Simulation, p: number) {
-  const maxHp = BOSS_HP[p - 1],
-    parts: Boss["parts"] = [];
+function makeBoss(s: Simulation, p: number)  {
+  const maxHp = Math.round(BOSS_HP[p - 1] * .72),
+    parts                = [];
   if ([5, 6, 8].includes(p)) {
     const n = p === 8 ? 3 : 4;
     for (let i = 0; i < n; i++)
       parts.push({
         x: 30 + (120 / (n - 1)) * i,
         y: p === 8 ? 118 : 90 + (i % 2) * 25,
-        hp: p === 5 ? 400 : p === 6 ? 600 : 500,
-        maxHp: p === 5 ? 400 : p === 6 ? 600 : 500,
+        hp: p === 5 ? 240 : p === 6 ? 360 : 300,
+        maxHp: p === 5 ? 240 : p === 6 ? 360 : 300,
         radius: 12,
         kind: p === 5 ? "tentacle" : p === 6 ? "turret" : "rod",
       });
@@ -498,7 +532,7 @@ function hazard(
   h: number,
   life = 60,
   dmg = 1,
-) {
+)  {
   if (dmg === 2) {
     if (s.frame - s.lastHeavy < 480) return;
     s.lastHeavy = s.frame;
@@ -515,7 +549,7 @@ function hazard(
     damage: dmg,
   });
 }
-function bossUpdate(s: Simulation) {
+function bossUpdate(s: Simulation)  {
   const b = s.boss;
   if (!b) return;
   const p = b.planet,
@@ -540,7 +574,16 @@ function bossUpdate(s: Simulation) {
   if (p === 7) b.x = 36 + (Math.floor((s.frame - b.born) / 360) % 5) * 27;
   b.y = q((p === 10 ? 92 : p === 3 ? 48 : 68) + Math.sin(s.frame / 90) * 3);
   if (p === 10 && b.phase === 4) b.weak = s.frame + 300;
+  if (s.frame === b.fire - caps(s).tele && s.frame >= b.transition)
+    message(s, (b.pattern + 1) % 4 === 0 ? 'BOSS · Sắp lộ lõi, chuẩn bị phản công' : 'BOSS · Chuẩn bị đợt tấn công');
   if (s.frame < b.transition || s.frame < b.fire) return;
+  if ((b.pattern + 1) % 4 === 0) {
+    b.pattern++;
+    b.weak = s.frame + 135;
+    b.fire = s.frame + 165;
+    message(s, 'LỘ LÕI · Tập trung hỏa lực');
+    return;
+  }
   b.fire =
     s.frame + Math.max(45, 150 - b.phase * 15 - Math.floor(difficulty(s) / 3));
   b.pattern++;
@@ -686,7 +729,7 @@ function bossUpdate(s: Simulation) {
   }
   if (b.hp <= 0) bossKilled(s);
 }
-function bossKilled(s: Simulation) {
+function bossKilled(s: Simulation)  {
   if (!s.boss) return;
   const p = s.boss.planet;
   score(
@@ -706,12 +749,12 @@ function bossKilled(s: Simulation) {
     makeBoss(s, s.bossesKilled + 1);
   } else if (s.config.mode === "practice") {
     makeBoss(s, p);
-    const b = s.boss!;
+    const b = s.boss ;
     b.phase = s.config.practicePhase || 1;
     b.hp = b.maxHp * (1 - (b.phase - 1) / (p === 10 ? 4 : 3)) - 0.01;
   } else if (s.config.mode !== "endless") s.status = "won";
 }
-function pathPosition(s: Simulation, e: Enemy) {
+function pathPosition(s: Simulation, e: Enemy)  {
   const age = (s.frame - e.born) / 60,
     v = STATS[e.kind][3] * speed(s) * (e.flightSpeed ?? 1),
     isHover = e.path === 7 || e.kind === "commander" || e.kind === "generator";
@@ -723,6 +766,25 @@ function pathPosition(s: Simulation, e: Enemy) {
     return;
   }
   e.y = q(e.path === 17 ? 345 - age * v : -20 + age * v);
+  const side = e.x0 < 90 ? 1 : -1;
+  if (e.path === 18) e.x = q(clamp(e.x0 + side * Math.sin(Math.min(1, age / 3.8) * Math.PI) * 48, 10, 170));
+  if (e.path === 19) e.x = q(clamp(e.x0 + Math.sin(age * 1.65) * 29, 10, 170));
+  if (e.path === 20) {
+    // A visible swoop turns at y=150 and exits upward, never teleports.
+    const turn = 170 / v;
+    e.y = q(age < turn ? -20 + age * v : 150 - (age - turn) * v * 1.15);
+    e.x = q(clamp(e.x0 + side * Math.sin(Math.min(1, age / (turn * 2)) * Math.PI) * 38, 10, 170));
+  }
+  if (e.path === 21) e.x = q(clamp(e.x0 + side * (1 - Math.cos(age * 1.25)) * 24, 10, 170));
+  if (e.path === 22) {
+    const arrival = 100 / v;
+    e.y = q(age < arrival ? -20 + age * v : age < arrival + 3 ? 80 : 80 + (age - arrival - 3) * v);
+    e.x = q(clamp(e.x0 + Math.sin(age * 1.1) * 10, 10, 170));
+  }
+  if (e.path === 23) {
+    e.x = q(clamp(e.x0 + side * Math.sin(age * .9) * 55, 10, 170));
+    e.y = q(-20 + age * v * .85);
+  }
   if (e.path === 2)
     e.x = q(clamp(e.x0 + (e.x0 < 90 ? 1 : -1) * age * v * 0.4, 8, 172));
   if ([3, 11, 16].includes(e.path))
@@ -764,7 +826,7 @@ function pathPosition(s: Simulation, e: Enemy) {
     }
   }
 }
-function miniUpdate(s: Simulation, e: Enemy) {
+function miniUpdate(s: Simulation, e: Enemy)  {
   if (e.y < 45 || s.frame < e.fire) return;
   if (!e.tele) {
     e.tele = s.frame + 54;
@@ -784,7 +846,7 @@ function miniUpdate(s: Simulation, e: Enemy) {
   e.fire = s.frame + (enraged ? 72 : 112);
 }
 
-function separateEnemies(s: Simulation) {
+function separateEnemies(s: Simulation)  {
   const alive = s.enemies.filter(e => e.hp > 0);
   for (let pass = 0; pass < 6; pass++) for (let i = 0; i < alive.length; i++) for (let j = i + 1; j < alive.length; j++) {
     const a = alive[i], b = alive[j];
@@ -793,7 +855,7 @@ function separateEnemies(s: Simulation) {
     const nx = distance > .001 ? dx / distance : (a.id % 2 ? 1 : -1);
     const ny = distance > .001 ? dy / distance : 0;
     const push = (gap - distance) / 2 + .05;
-    for (const [e, sign] of [[a, -1], [b, 1]] as const) {
+    for (const [e, sign] of [[a, -1], [b, 1]]         ) {
       const x = e.x, y = e.y;
       e.x = q(clamp(x + nx * push * sign, e.radius + 1, WIDTH - e.radius - 1));
       e.y = q(y + ny * push * sign);
@@ -803,7 +865,7 @@ function separateEnemies(s: Simulation) {
   }
 }
 
-function enemyUpdate(s: Simulation, e: Enemy) {
+function enemyUpdate(s: Simulation, e: Enemy)  {
   pathPosition(s, e);
   e.x = q(clamp(e.x + (e.separationX ?? 0), e.radius + 1, WIDTH - e.radius - 1));
   e.y = q(e.y + (e.separationY ?? 0));
@@ -870,7 +932,7 @@ function enemyUpdate(s: Simulation, e: Enemy) {
     e.tele = 0;
   }
 }
-function death(s: Simulation, e: Enemy) {
+function death(s: Simulation, e: Enemy)  {
   if (s.frame - s.lastKill > 120) s.combo = 0;
   s.combo++;
   s.maxCombo = Math.max(s.maxCombo, s.combo);
@@ -905,7 +967,7 @@ function death(s: Simulation, e: Enemy) {
   )
     s.pickups.push({ x: e.x, y: e.y, kind: "star", born: s.frame });
 }
-function updateBullets(s: Simulation) {
+function updateBullets(s: Simulation)  {
   const damageMult =
     (1 + 0.04 * s.config.upgrades.cannon) *
     1.032 ** Object.values(s.config.upgrades).reduce((a, b) => a + b, 0) *
@@ -1031,7 +1093,7 @@ function updateBullets(s: Simulation) {
     (b) => b.ttl > 0 && b.x > -20 && b.x < 200 && b.y > -30 && b.y < 350,
   );
 }
-function spawnWaves(s: Simulation) {
+function spawnWaves(s: Simulation)  {
   const l = levelFor(s.config.level);
   if (s.config.mode === "practice" && s.config.practiceEnemy) {
     if (s.frame % 300 === 1)
@@ -1055,7 +1117,7 @@ function spawnWaves(s: Simulation) {
             "beetle",
             "hornet",
             "wraith",
-          ] as EnemyKind[]
+          ]
         )[Math.floor(random(s) * 7)],
         Math.floor(random(s) * 7) + 2,
         1 + Math.floor(random(s) * 9),
@@ -1084,30 +1146,29 @@ function spawnWaves(s: Simulation) {
   const w = waves[s.waveIndex];
   if (
     !w ||
-    s.frame < w.t * 60 ||
+    (["campaign","practice"].includes(s.config.mode) ? phaseClock(s) : s.frame) < w.t * 60 ||
+    (["campaign","practice"].includes(s.config.mode) && (s.directorDone || s.directorState === "rest" || (w.phase !== undefined && w.phase !== s.directorPhase))) ||
     s.frame < s.nextSpawn ||
     s.enemies.length >= caps(s).enemies
   )
     return;
+  if (s.boss && (s.boss.weak > s.frame || s.boss.transition > s.frame)) return;
   const count = w.count + (has(s, "swarm") ? Math.ceil(w.count * 0.5) : 0);
   const index = s.waveSpawn;
-  let lane =
-    w.formation === 1
-      ? 2 + (index % 7)
+  let lane = w.formation === 1
+    ? 1.5 + index * 7 / Math.max(1, count - 1)
+    : w.formation === 2
+      ? (index % 2 ? 8 : 2) + (Math.floor(index / 2) % 2 ? .6 : 0)
       : w.formation === 3
-        ? clamp(w.lane + (index % 2 ? 1 : -1) * Math.ceil(index / 2), 1, 9)
+        ? clamp(w.lane + (index % 2 ? 1 : -1) * Math.ceil(index / 2) * .8, 1, 9)
         : w.lane;
-  if (
-    ((s.config.seed >>> 4) % 2 === 1 && s.config.mode !== "campaign") ||
-    has(s, "remix")
-  )
-    lane = 10 - lane;
-  if (w.formation === 2) lane = clamp(w.lane + (index % 3 - 1) * 2, 1, 9);
-  if (w.formation === 4) lane = 1 + ((index * 3 + s.waveIndex + s.config.seed % 9) % 9);
-  lane = clamp(lane + (random(s) - .5) * .6, 1, 9);
-  const routes = [1, 2, 3, 4, 5, 6, 8, 9, 11, 12, 15, 16];
-  const path = s.config.mode === "practice" || w.path === 7 ? w.path : routes[(Math.max(0, routes.indexOf(w.path)) + s.config.seed % 5) % routes.length];
-  if (!spawn(s, w.enemy, lane, path, index === count - 1 ? w.drop : undefined)) return;
+  if (((s.config.seed >>> 4) % 2 === 1 && s.config.mode !== "campaign") || has(s, "remix")) lane = 10 - lane;
+  // Authored routes survive retries: variation is in speed, not random route substitution.
+  const activeCap = s.boss ? 8 : s.enemies.some(e => e.kind === 'commander') ? 12 : caps(s).enemies;
+  if (s.enemies.length >= activeCap) return;
+  if (!spawn(s, w.enemy, lane, w.path, index === count - 1 ? w.drop : undefined)) return;
+  s.enemies[s.enemies.length - 1].escortThreat = w.escortThreat;
+  if (index === 0 && w.cue) message(s, w.cue);
   s.nextSpawn = s.frame + Math.round(w.delay * 60);
   s.waveSpawn++;
   if (s.waveSpawn >= count) {
@@ -1115,7 +1176,7 @@ function spawnWaves(s: Simulation) {
     s.waveSpawn = 0;
   }
 }
-function objectiveMet(s: Simulation) {
+function objectiveMet(s: Simulation)  {
   const l = levelFor(s.config.level);
   return l.objective === "kills"
     ? s.kills >= l.target
@@ -1131,8 +1192,10 @@ function objectiveMet(s: Simulation) {
               ? s.escortHp > 0
               : l.objective === "survive";
 }
-export function step(s: Simulation, input: Input, record = true) {
+export function step(s: Simulation, input: Input, record = true)  {
   if (s.config.version === 2) return legacy.step(s, input, record);
+  if (s.config.version === 3) return v3.step(s, input, record);
+  if (s.config.version === 4) return v4.step(s, input, record);
   if (s.status !== "playing") return;
   // Input is quantized/sampled at 20 Hz; both live play and server replay use this exact schedule.
   if (s.frame % 3 === 0) {
@@ -1142,9 +1205,9 @@ export function step(s: Simulation, input: Input, record = true) {
     if (
       record &&
       (s.replay.length === 0 ||
-        s.replay.at(-1)![1] !== s.targetX ||
-        s.replay.at(-1)![2] !== s.targetY ||
-        s.replay.at(-1)![3] !== mask)
+        s.replay.at(-1) [1] !== s.targetX ||
+        s.replay.at(-1) [2] !== s.targetY ||
+        s.replay.at(-1) [3] !== mask)
     )
       s.replay.push([s.frame, s.targetX, s.targetY, mask]);
     for (let i = 0; i < s.slots.length; i++)
@@ -1170,7 +1233,7 @@ export function step(s: Simulation, input: Input, record = true) {
     "overdrive",
     "magnet",
     "amp",
-  ] as const)
+  ]         )
     s[key] = Math.max(0, s[key] - 1);
   if (s.shieldOwned && s.shield === 0 && s.shieldRecharge-- <= 0) s.shield = 1;
   let movement =
@@ -1202,6 +1265,7 @@ export function step(s: Simulation, input: Input, record = true) {
   }
   if (planet(s) === 5 || planet(s) === 8)
     s.x = q(clamp(s.x + Math.sin(s.frame / 120) * 0.2, 6, 174));
+  directEncounter(s);
   spawnWaves(s);
   const l = levelFor(s.config.level);
   if (
@@ -1268,7 +1332,7 @@ export function step(s: Simulation, input: Input, record = true) {
   for (const e of s.enemies) {
     if (e.hp <= 0) continue;
     if (Math.hypot(e.x - s.x, e.y - s.y) < e.radius + 2) damage(s);
-    if (l.objective === "escort" && e.y >= 300) {
+    if (l.objective === "escort" && e.escortThreat && e.y >= 300) {
       s.escortHp--;
       e.y = 360;
     }
@@ -1296,6 +1360,9 @@ export function step(s: Simulation, input: Input, record = true) {
   s.pickups = s.pickups.filter((p) => s.frame - p.born < 480 && p.y < 335);
   if (
     l.stage >= 4 &&
+    !s.boss &&
+    !s.enemies.some(e => e.kind === 'commander') &&
+    s.directorState !== "rest" && !s.directorDone && l.waves.some(w => phaseClock(s) >= w.t * 60 && phaseClock(s) < (w.t + 2) * 60 && (w.phase === undefined || w.phase === s.directorPhase)) &&
     s.config.mode !== "rush" &&
     s.frame - s.lastHazard > 900
   ) {
@@ -1324,13 +1391,16 @@ export function step(s: Simulation, input: Input, record = true) {
       s.status = s.config.mode === "endless" ? "won" : "lost";
     return;
   }
-  if (l.objective !== "boss" && s.frame >= l.duration * 60)
+  if (l.objective !== "boss" && (["campaign","practice"].includes(s.config.mode) ? s.directorDone : s.frame >= l.duration * 60))
     s.status = objectiveMet(s) ? "won" : "lost";
+  if (l.objective !== "boss" && s.frame >= (l.duration + 150) * 60) s.status = "lost";
   if (l.objective === "boss" && s.frame >= l.duration * 60 + 900)
     s.status = "lost";
 }
-export function resultFor(s: Simulation): Result {
+export function resultFor(s: Simulation): Result          {
   if (s.config.version === 2) return legacy.resultFor(s);
+  if (s.config.version === 3) return v3.resultFor(s);
+  if (s.config.version === 4) return v4.resultFor(s);
   const l = levelFor(s.config.level),
     won = s.status === "won",
     secondary = s.hits <= 1 && (l.objective !== "escort" || s.escortHp >= 10),
@@ -1383,8 +1453,10 @@ export function replaySimulation(
   config: RunConfig,
   entries: ReplayEntry[],
   frames: number,
-): Simulation {
+): Simulation              {
   if (config.version === 2) return legacy.replaySimulation(config, entries, frames);
+  if (config.version === 3) return v3.replaySimulation(config, entries, frames);
+  if (config.version === 4) return v4.replaySimulation(config, entries, frames);
   if (
     !Number.isInteger(frames) ||
     frames < 0 ||
@@ -1412,7 +1484,7 @@ export function replaySimulation(
   }
   const s = createSimulation(config);
   let i = 0,
-    input: Input = { x: 90, y: 268, mask: 0 };
+    input        = { x: 90, y: 268, mask: 0 };
   while (
     (s.frame < frames && s.status === "playing") ||
     (s.status === "revive" && i < entries.length)
@@ -1436,7 +1508,7 @@ export function replaySimulation(
   s.replay = entries.map((e) => [...e]);
   return s;
 }
-export function encodeReplay(entries: ReplayEntry[]) {
+export function encodeReplay(entries: ReplayEntry[])  {
   const bytes = new Uint8Array(entries.length * 6);
   const view = new DataView(bytes.buffer);
   entries.forEach(([f, x, y, m], i) => {
@@ -1447,14 +1519,14 @@ export function encodeReplay(entries: ReplayEntry[]) {
   });
   return btoa(Array.from(bytes, (b) => String.fromCharCode(b)).join(""));
 }
-export function decodeReplay(text: string): ReplayEntry[] {
+export function decodeReplay(text: string): ReplayEntry[]                 {
   if (typeof text !== "string" || text.length > 100000)
     throw new Error("Replay quá dài");
   const raw = atob(text);
   if (raw.length % 6) throw new Error("Replay sai định dạng");
   const bytes = Uint8Array.from(raw, (c) => c.charCodeAt(0)),
     view = new DataView(bytes.buffer),
-    entries: ReplayEntry[] = [];
+    entries                = [];
   for (let i = 0; i < bytes.length; i += 6)
     entries.push([
       view.getUint16(i),
@@ -1464,4 +1536,3 @@ export function decodeReplay(text: string): ReplayEntry[] {
     ]);
   return entries;
 }
-

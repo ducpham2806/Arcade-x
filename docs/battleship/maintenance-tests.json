@@ -1,0 +1,13 @@
+{
+  "checks": 7,
+  "passed": [
+    "maintenance moves only old closed rooms and preserves complete recovery data",
+    "archive selection preserves other games, running jobs and recent cron history",
+    "maintenance removes stale rate counters but preserves current budgets",
+    "repeat maintenance is idempotent",
+    "browser and service role cannot invoke owner-only maintenance or read archives",
+    "archived room can be restored with original version and state",
+    "normal deployment bundle excludes QA and temporary bundle expires in ten minutes behind worker verification"
+  ],
+  "scope": "PostgreSQL/PGlite; cron tables are a fixture. Real scheduler activation checked separately."
+}

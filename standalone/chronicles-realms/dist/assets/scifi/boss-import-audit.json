@@ -1,0 +1,745 @@
+{
+  "legacyLoss": [
+    0,
+    42,
+    232,
+    1216,
+    56,
+    0,
+    0,
+    858,
+    0,
+    0,
+    29,
+    39,
+    294,
+    1,
+    0,
+    37,
+    64,
+    0,
+    0,
+    12,
+    14,
+    490,
+    0,
+    0,
+    0,
+    272,
+    0,
+    0,
+    35,
+    90,
+    1479,
+    96,
+    125,
+    0,
+    1400,
+    10,
+    0,
+    0,
+    21,
+    359,
+    0,
+    0,
+    0,
+    45,
+    0,
+    9,
+    122,
+    438,
+    1438,
+    325,
+    10,
+    18,
+    787,
+    46
+  ],
+  "legacyLostFrameCount": 34,
+  "legacyLostSolidPixels": 10509,
+  "method": "alpha-component ownership + bounded antialias growth",
+  "anchors": [
+    [
+      86,
+      104
+    ],
+    [
+      248,
+      104
+    ],
+    [
+      410,
+      104
+    ],
+    [
+      577,
+      104
+    ],
+    [
+      766,
+      104
+    ],
+    [
+      940,
+      104
+    ],
+    [
+      1101,
+      104
+    ],
+    [
+      1276,
+      104
+    ],
+    [
+      1450,
+      104
+    ],
+    [
+      86,
+      260
+    ],
+    [
+      248,
+      260
+    ],
+    [
+      410,
+      260
+    ],
+    [
+      577,
+      260
+    ],
+    [
+      766,
+      260
+    ],
+    [
+      940,
+      260
+    ],
+    [
+      1101,
+      260
+    ],
+    [
+      1276,
+      260
+    ],
+    [
+      1450,
+      260
+    ],
+    [
+      86,
+      408
+    ],
+    [
+      248,
+      408
+    ],
+    [
+      410,
+      408
+    ],
+    [
+      577,
+      408
+    ],
+    [
+      766,
+      408
+    ],
+    [
+      940,
+      408
+    ],
+    [
+      1101,
+      408
+    ],
+    [
+      1276,
+      408
+    ],
+    [
+      1450,
+      408
+    ],
+    [
+      86,
+      556
+    ],
+    [
+      248,
+      556
+    ],
+    [
+      410,
+      556
+    ],
+    [
+      577,
+      556
+    ],
+    [
+      766,
+      556
+    ],
+    [
+      940,
+      556
+    ],
+    [
+      1101,
+      556
+    ],
+    [
+      1276,
+      556
+    ],
+    [
+      1450,
+      556
+    ],
+    [
+      86,
+      709
+    ],
+    [
+      248,
+      709
+    ],
+    [
+      410,
+      709
+    ],
+    [
+      577,
+      709
+    ],
+    [
+      766,
+      709
+    ],
+    [
+      940,
+      709
+    ],
+    [
+      1101,
+      709
+    ],
+    [
+      1276,
+      709
+    ],
+    [
+      1450,
+      709
+    ],
+    [
+      86,
+      882
+    ],
+    [
+      248,
+      882
+    ],
+    [
+      410,
+      882
+    ],
+    [
+      577,
+      882
+    ],
+    [
+      766,
+      882
+    ],
+    [
+      940,
+      882
+    ],
+    [
+      1101,
+      882
+    ],
+    [
+      1276,
+      882
+    ],
+    [
+      1450,
+      882
+    ]
+  ],
+  "bounds": [
+    {
+      "left": 0,
+      "top": 30,
+      "right": 168,
+      "bottom": 177,
+      "pixels": 17957,
+      "solidPixels": 12069
+    },
+    {
+      "left": 161,
+      "top": 30,
+      "right": 329,
+      "bottom": 171,
+      "pixels": 18067,
+      "solidPixels": 11874
+    },
+    {
+      "left": 328,
+      "top": 32,
+      "right": 488,
+      "bottom": 177,
+      "pixels": 16496,
+      "solidPixels": 10509
+    },
+    {
+      "left": 484,
+      "top": 31,
+      "right": 674,
+      "bottom": 182,
+      "pixels": 21279,
+      "solidPixels": 12796
+    },
+    {
+      "left": 670,
+      "top": 29,
+      "right": 860,
+      "bottom": 199,
+      "pixels": 23153,
+      "solidPixels": 14597
+    },
+    {
+      "left": 858,
+      "top": 39,
+      "right": 1032,
+      "bottom": 179,
+      "pixels": 17390,
+      "solidPixels": 10856
+    },
+    {
+      "left": 1018,
+      "top": 32,
+      "right": 1176,
+      "bottom": 172,
+      "pixels": 16131,
+      "solidPixels": 10077
+    },
+    {
+      "left": 1173,
+      "top": 32,
+      "right": 1374,
+      "bottom": 185,
+      "pixels": 22577,
+      "solidPixels": 13877
+    },
+    {
+      "left": 1371,
+      "top": 44,
+      "right": 1535,
+      "bottom": 190,
+      "pixels": 17483,
+      "solidPixels": 10106
+    },
+    {
+      "left": 0,
+      "top": 189,
+      "right": 166,
+      "bottom": 327,
+      "pixels": 12187,
+      "solidPixels": 8061
+    },
+    {
+      "left": 158,
+      "top": 185,
+      "right": 341,
+      "bottom": 326,
+      "pixels": 14150,
+      "solidPixels": 8973
+    },
+    {
+      "left": 321,
+      "top": 189,
+      "right": 491,
+      "bottom": 333,
+      "pixels": 16380,
+      "solidPixels": 8957
+    },
+    {
+      "left": 479,
+      "top": 175,
+      "right": 678,
+      "bottom": 330,
+      "pixels": 20007,
+      "solidPixels": 11134
+    },
+    {
+      "left": 669,
+      "top": 177,
+      "right": 851,
+      "bottom": 332,
+      "pixels": 18840,
+      "solidPixels": 11408
+    },
+    {
+      "left": 849,
+      "top": 186,
+      "right": 1014,
+      "bottom": 327,
+      "pixels": 13897,
+      "solidPixels": 9085
+    },
+    {
+      "left": 1011,
+      "top": 186,
+      "right": 1193,
+      "bottom": 332,
+      "pixels": 17576,
+      "solidPixels": 9567
+    },
+    {
+      "left": 1169,
+      "top": 176,
+      "right": 1371,
+      "bottom": 330,
+      "pixels": 20725,
+      "solidPixels": 11595
+    },
+    {
+      "left": 1357,
+      "top": 189,
+      "right": 1535,
+      "bottom": 335,
+      "pixels": 18819,
+      "solidPixels": 9231
+    },
+    {
+      "left": 0,
+      "top": 334,
+      "right": 165,
+      "bottom": 486,
+      "pixels": 15799,
+      "solidPixels": 9085
+    },
+    {
+      "left": 162,
+      "top": 333,
+      "right": 329,
+      "bottom": 485,
+      "pixels": 18565,
+      "solidPixels": 10200
+    },
+    {
+      "left": 329,
+      "top": 332,
+      "right": 484,
+      "bottom": 482,
+      "pixels": 16551,
+      "solidPixels": 8498
+    },
+    {
+      "left": 474,
+      "top": 322,
+      "right": 686,
+      "bottom": 487,
+      "pixels": 23951,
+      "solidPixels": 13056
+    },
+    {
+      "left": 671,
+      "top": 326,
+      "right": 857,
+      "bottom": 492,
+      "pixels": 21211,
+      "solidPixels": 11142
+    },
+    {
+      "left": 850,
+      "top": 327,
+      "right": 1023,
+      "bottom": 482,
+      "pixels": 17482,
+      "solidPixels": 9817
+    },
+    {
+      "left": 1021,
+      "top": 325,
+      "right": 1187,
+      "bottom": 484,
+      "pixels": 19016,
+      "solidPixels": 9486
+    },
+    {
+      "left": 1167,
+      "top": 321,
+      "right": 1383,
+      "bottom": 487,
+      "pixels": 24701,
+      "solidPixels": 13722
+    },
+    {
+      "left": 1358,
+      "top": 333,
+      "right": 1535,
+      "bottom": 496,
+      "pixels": 20780,
+      "solidPixels": 10557
+    },
+    {
+      "left": 0,
+      "top": 483,
+      "right": 177,
+      "bottom": 627,
+      "pixels": 15963,
+      "solidPixels": 9918
+    },
+    {
+      "left": 166,
+      "top": 481,
+      "right": 336,
+      "bottom": 625,
+      "pixels": 15666,
+      "solidPixels": 9686
+    },
+    {
+      "left": 321,
+      "top": 480,
+      "right": 489,
+      "bottom": 628,
+      "pixels": 15190,
+      "solidPixels": 8720
+    },
+    {
+      "left": 458,
+      "top": 475,
+      "right": 697,
+      "bottom": 631,
+      "pixels": 23686,
+      "solidPixels": 12651
+    },
+    {
+      "left": 672,
+      "top": 476,
+      "right": 862,
+      "bottom": 631,
+      "pixels": 20212,
+      "solidPixels": 11562
+    },
+    {
+      "left": 861,
+      "top": 488,
+      "right": 1040,
+      "bottom": 632,
+      "pixels": 17723,
+      "solidPixels": 10505
+    },
+    {
+      "left": 1032,
+      "top": 470,
+      "right": 1178,
+      "bottom": 619,
+      "pixels": 15350,
+      "solidPixels": 7814
+    },
+    {
+      "left": 1158,
+      "top": 472,
+      "right": 1390,
+      "bottom": 632,
+      "pixels": 24178,
+      "solidPixels": 13854
+    },
+    {
+      "left": 1374,
+      "top": 483,
+      "right": 1535,
+      "bottom": 632,
+      "pixels": 18403,
+      "solidPixels": 8783
+    },
+    {
+      "left": 11,
+      "top": 633,
+      "right": 164,
+      "bottom": 771,
+      "pixels": 16274,
+      "solidPixels": 10015
+    },
+    {
+      "left": 162,
+      "top": 624,
+      "right": 332,
+      "bottom": 774,
+      "pixels": 19224,
+      "solidPixels": 11569
+    },
+    {
+      "left": 322,
+      "top": 619,
+      "right": 496,
+      "bottom": 789,
+      "pixels": 20421,
+      "solidPixels": 11209
+    },
+    {
+      "left": 484,
+      "top": 605,
+      "right": 673,
+      "bottom": 797,
+      "pixels": 23305,
+      "solidPixels": 12946
+    },
+    {
+      "left": 671,
+      "top": 609,
+      "right": 863,
+      "bottom": 802,
+      "pixels": 25498,
+      "solidPixels": 14099
+    },
+    {
+      "left": 857,
+      "top": 629,
+      "right": 1030,
+      "bottom": 782,
+      "pixels": 19307,
+      "solidPixels": 11583
+    },
+    {
+      "left": 1030,
+      "top": 632,
+      "right": 1185,
+      "bottom": 785,
+      "pixels": 17451,
+      "solidPixels": 9456
+    },
+    {
+      "left": 1175,
+      "top": 606,
+      "right": 1371,
+      "bottom": 792,
+      "pixels": 23839,
+      "solidPixels": 13338
+    },
+    {
+      "left": 1359,
+      "top": 631,
+      "right": 1535,
+      "bottom": 796,
+      "pixels": 22309,
+      "solidPixels": 11689
+    },
+    {
+      "left": 0,
+      "top": 795,
+      "right": 165,
+      "bottom": 967,
+      "pixels": 19478,
+      "solidPixels": 14218
+    },
+    {
+      "left": 163,
+      "top": 782,
+      "right": 327,
+      "bottom": 969,
+      "pixels": 21237,
+      "solidPixels": 15370
+    },
+    {
+      "left": 326,
+      "top": 777,
+      "right": 488,
+      "bottom": 973,
+      "pixels": 21648,
+      "solidPixels": 14752
+    },
+    {
+      "left": 487,
+      "top": 779,
+      "right": 671,
+      "bottom": 977,
+      "pixels": 26526,
+      "solidPixels": 18332
+    },
+    {
+      "left": 669,
+      "top": 780,
+      "right": 857,
+      "bottom": 975,
+      "pixels": 26319,
+      "solidPixels": 17672
+    },
+    {
+      "left": 853,
+      "top": 795,
+      "right": 1028,
+      "bottom": 965,
+      "pixels": 22292,
+      "solidPixels": 15525
+    },
+    {
+      "left": 1018,
+      "top": 781,
+      "right": 1188,
+      "bottom": 977,
+      "pixels": 22584,
+      "solidPixels": 13367
+    },
+    {
+      "left": 1177,
+      "top": 780,
+      "right": 1374,
+      "bottom": 977,
+      "pixels": 27691,
+      "solidPixels": 19447
+    },
+    {
+      "left": 1371,
+      "top": 785,
+      "right": 1535,
+      "bottom": 978,
+      "pixels": 22402,
+      "solidPixels": 12819
+    }
+  ],
+  "rows": [
+    {
+      "radius": 107,
+      "sourceScale": 1
+    },
+    {
+      "radius": 111,
+      "sourceScale": 1
+    },
+    {
+      "radius": 113,
+      "sourceScale": 1
+    },
+    {
+      "radius": 124,
+      "sourceScale": 1
+    },
+    {
+      "radius": 108,
+      "sourceScale": 1
+    },
+    {
+      "radius": 109,
+      "sourceScale": 1
+    }
+  ],
+  "sourceSolidPixels": 631234,
+  "copiedSolidPixels": 631234,
+  "lostSolidPixels": 0,
+  "unassignedVisiblePixels": 0,
+  "sourceWidth": 1536,
+  "sourceHeight": 1024
+}

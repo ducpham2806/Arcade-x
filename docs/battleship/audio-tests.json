@@ -1,0 +1,16 @@
+{
+  "checks": 10,
+  "passed": [
+    "no AudioContext or playback is created before a user unlock",
+    "user unlock creates one reusable context and every event schedules finite voices",
+    "voice stealing caps both playing and scheduled sources at eight",
+    "mute or hidden/paused policy stops all current and delayed sounds and suspends output",
+    "becoming visible does not auto-resume or play a backlog; a new gesture may resume",
+    "exit closes the context and unsupported audio fails without breaking gameplay",
+    "first snapshot and rejoining old shots are silent; accepted placement and readiness have named cues",
+    "fresh shot emits one launch and timed impact; replayed polls and stale history are silent",
+    "mute consumes event history so unmuting never replays shots or victory",
+    "own-turn cue fires once per turn and reduced motion removes launch delay"
+  ],
+  "scope": "Finite Web Audio scheduling/lifecycle with a fake context, plus pure event history tests. Not physical-device listening/performance QA."
+}

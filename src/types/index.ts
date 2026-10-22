@@ -531,6 +531,7 @@ export interface GameBridgeAPI {
 }
 
 export interface GameComponentProps {
+  trialMode?: boolean;
   initialState?: unknown;
   bridge: GameBridgeAPI;
   isPaused: boolean;
@@ -629,5 +630,6 @@ export interface MatchHistoryItem {
   result: 'win' | 'loss' | 'draw';
   timestamp: number;
 }
+
 
 

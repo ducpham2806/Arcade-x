@@ -1,0 +1,19 @@
+{
+  "decodedMiB": 17.0625,
+  "report": [
+    {
+      "file": "boss-v7.webp",
+      "frames": 54,
+      "uniqueFrames": 54,
+      "gutter": "4px fully transparent",
+      "alphaPreserved": true
+    },
+    {
+      "file": "boss-vfx-v6.webp",
+      "frames": 24,
+      "uniqueFrames": 24,
+      "gutter": "4px fully transparent",
+      "alphaPreserved": true
+    }
+  ]
+}

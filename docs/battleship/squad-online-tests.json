@@ -1,0 +1,28 @@
+{
+  "checks": 22,
+  "passed": [
+    "squad creator sees a four-seat lobby with no battle before four players",
+    "guest chooses same team and cannot spoof a teammate UID or seat",
+    "a full team denies a further guest while the room still has enemy seats",
+    "guests can switch team only while waiting and the host stays A1",
+    "two final guests atomically fill B1 and B2 then open a 14x14 board",
+    "fifth guest and late team switches cannot alter a full squad",
+    "placement is actor-bound and restricted to its seven-row sector",
+    "all four fleets auto-place, share only with their own teammate and never reveal enemy hulls",
+    "clearing one fleet never clears teammate ships",
+    "three ready players cannot start battle; fourth readiness starts one shared clock",
+    "out-of-turn teammate cannot fire and four real pipeline shots follow all four seats",
+    "a single absent teammate keeps the match open and grants only own-team takeover",
+    "return after ninety seconds can reclaim an open squad seat and revokes delegation",
+    "atomic CAS rejects takeover whose absent-seat heartbeat already recovered",
+    "one surrender vote does not end the team match and can be withdrawn",
+    "two teammates agreeing surrender create one shared opponent victory",
+    "explicitly leaving a squad seat does not abandon the teammate and cannot resume playing",
+    "departed player can open a new room without regaining control of the old match",
+    "both teammates leaving finishes the team loss without a stuck match",
+    "squad prep disconnect cancels with no winner and outsiders remain denied",
+    "worker waits through one absent seat but closes a wholly absent team at grace expiry",
+    "both absent teams cancel without a winner"
+  ],
+  "scope": "Four clients through actual handler and PostgreSQL/PGlite with fixture Auth; not real registered accounts, cloud HTTP or physical devices."
+}

@@ -358,4 +358,3 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
     </div>
   );
 };
-

@@ -1,0 +1,10 @@
+{
+  "sourcePoses": 54,
+  "sourceSolidPixels": 631234,
+  "retainedSolidPixels": 631234,
+  "lostSolidPixels": 0,
+  "previousCutFrames": 34,
+  "previousLostSolidPixels": 10509,
+  "renderCases": 2484,
+  "coverage": "All 54 poses and animation transitions, all three phases, left/center/right motion extrema, normal/reduced, clone overlays; padded viewport checks zero alpha outside visible canvas."
+}

@@ -1,7 +1,9 @@
 import campaign from "./data/campaign.json" with { type: "json" };
 import type { Level, Upgrade, Booster, Mutator, ItemKind } from "./types.ts";
-import { buildEncounter } from "./encounters.ts";
-export const LEVELS = (campaign as Level[]).map(buildEncounter);
+import {LEVELS as LEVELS_V4} from "./legacy-v4-content.ts";
+import { LEVELS_V3 } from "./legacy-v3-content.ts";
+import { buildLearningEncounter } from "./encounters.ts";
+export const LEVELS = (campaign as Level[]).map(buildLearningEncounter);
 export const PLANETS = [
   {
     name: "Asteria",
@@ -256,8 +258,8 @@ export const ITEM_NAMES: Record<ItemKind, string> = {
 export const BOSS_HP = [
   1200, 2000, 3000, 4200, 5600, 7200, 9000, 11000, 13500, 20000,
 ];
-export function levelFor(id: number, version = 3) {
-  return (version === 2 ? campaign as Level[] : LEVELS)[Math.max(0, Math.min(99, Math.trunc(id) - 1))];
+export function levelFor(id: number, version = 5) {
+  return (version === 2 ? campaign as Level[] : version === 3 ? LEVELS_V3 : version === 4 ? LEVELS_V4 : LEVELS)[Math.max(0, Math.min(99, Math.trunc(id) - 1))];
 }
 export function upgradeCost(kind: Upgrade, level: number) {
   return Math.round(500 * 1.45 ** level * UPGRADE_INFO[kind].factor);
@@ -270,4 +272,5 @@ export function weeklySeed(day: string) {
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
   return dailySeed(d.toISOString().slice(0, 10));
 }
+
 

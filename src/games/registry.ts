@@ -1,4 +1,5 @@
 import { packageLazy } from './gamePackages';
+const BattleshipGame = packageLazy('battleship', () => import('./battleship')); 
 import { BLOSSOM_TITLE } from './hex-match/blossom/branding';
 const BrickBreakerGame = packageLazy('brick-breaker', () => import('./brick-breaker'));
 const BoomBuddiesGame = packageLazy('boom-buddies', () => import('./boom-buddies'));
@@ -44,6 +45,13 @@ const WordCrossGame = packageLazy('word-cross', () => import('./word-cross').the
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
+  'battleship': {
+    id:'battleship', title:'Battleship · Naval Warfare', shortDesc:'Hải chiến · online 1vs1, 2vs2 và luyện tập với bot',
+    description:'Hải chiến vỏ thép lấy cảm hứng Mỹ–Nhật. Đặt 5 tàu, bắn từng ô trong 30 giây và đánh chìm toàn bộ hạm đội đối thủ. Tìm trận 1vs1 hoặc tạo phòng bằng mã. Online 2vs2 có bàn 14×14, hai người mỗi phe; bot dễ/thường và tập 2vs2 với ba bot. Vắng 90 giây: 1vs1 có thể bị xử thua, 2vs2 đồng đội có thể bắn thay.',
+    category:'Multiplayer', difficulty:'Trung Bình', icon:'⚓', bannerGradient:'from-slate-800 via-sky-950 to-slate-950', themeColor:'#dfbb7e', tags:['Online 1vs1','Online 2vs2','Hải chiến','Bot','Chiến thuật'],
+    controls:[{key:'Chạm / Mũi tên',action:'Chọn ô đặt tàu hoặc ngắm bắn'},{key:'↻ cạnh tàu',action:'Đổi ngang/dọc khi đặt tàu'},{key:'Chạm ô / Enter',action:'Bắn ngay khi đến lượt'}],
+    achievements:[],dropRates:{baseChestDropChance:0,scoreThresholdForDrop:Number.MAX_SAFE_INTEGER,chestWeights:[]},component:BattleshipGame,
+  },
   'brick-breaker': {
     id:'brick-breaker',title:'Block Breaker · Chronicles',shortDesc:'Phá gạch, đồng hành cùng Orb · 96 màn, 6 vùng đất',
     description:'Chronicles of the Shattered Realms: điều khiển thanh đỡ, giải phóng Orb và khôi phục sáu mảnh Lõi của Aethra. 96 màn chiến dịch, sáu boss và nhiều skin từ gói asset gốc. Tiến trình Chronicles được lưu riêng trên thiết bị.',
@@ -268,15 +276,15 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
   },
   'neon-runner': {
     id: 'neon-runner',
-    title: 'Neon Runner 2099',
-    shortDesc: 'Game chạy vô tận Cyberpunk tốc độ cao né bẫy nhặt ngọc',
-    description: 'Chạy qua đô thị tương lai rực rỡ ánh đèn neon, thực hiện nhảy kép, trượt né chướng ngại vật và kích hoạt khiên chắn lượng tử.',
+    title: 'Neon Run · Luma',
+    shortDesc: '40 màn platformer · 5 thế giới và hành trình khôi phục Luma',
+    description: 'Cùng Néo và Pip khôi phục Luma qua 40 màn ngày càng dài và khó hơn. Mở cổng, giải cứu, vận chuyển vật phẩm, khám phá tuyến đường và đánh bại năm boss.',
     category: 'Arcade',
     difficulty: 'Trung Bình',
     icon: '🏃',
     bannerGradient: 'from-cyan-900/60 via-blue-950/80 to-slate-900',
     themeColor: '#06b6d4',
-    tags: ['Cyberpunk', 'Endless Runner', 'Phản Xạ', 'Nhảy Kép'],
+    tags: ['Platformer', '40 màn', 'Phiêu Lưu', 'Khám Phá'],
     controls: NEON_RUNNER_CONTROLS,
     achievements: NEON_RUNNER_ACHIEVEMENTS,
     dropRates: NEON_RUNNER_DROP_RATES,
@@ -362,3 +370,4 @@ export const FEATURED_SLIDER_GAME_IDS = [
   'mummy-escape', // Turn-based pyramid tactical puzzle
   'tile-2048',    // Jewel-dropping 2048 puzzle
 ];
+

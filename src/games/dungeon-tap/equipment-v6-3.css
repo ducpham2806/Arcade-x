@@ -1,0 +1,32 @@
+/* Sprite spans are not badges: place the raster cell itself in the slot center. */
+.fx-root .fx-modal .fx-item{display:flex;align-items:center;justify-content:center;position:relative;aspect-ratio:1;min-width:0;min-height:70px;padding:0;overflow:hidden}
+.fx-root .fx-modal .fx-item>.dt-gear-art{position:absolute;left:50%;top:45%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:64%;height:auto;aspect-ratio:1;max-width:76px;margin:0;padding:0}
+.fx-root .fx-item>.fx-item-level{position:absolute;right:4px;bottom:19px;left:auto;top:auto;padding:1px 3px;border-radius:3px;background:#102219e6;color:#fff1cb;font:800 10px system-ui;z-index:2}
+.fx-root .fx-item>.fx-item-name{position:absolute;inset:auto 3px 4px;text-align:center;font:700 9px/1.2 system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#eee4c6}
+.fx-root .fx-item>.fx-slot-label{position:absolute;top:4px;left:3px;right:3px;text-align:center;font:700 9px/1.2 system-ui;color:#d5c9a2;z-index:2}
+.fx-equipped-check{position:absolute;left:4px;bottom:19px;font:900 11px system-ui;color:#bff0ad;text-shadow:0 1px 3px #07180b}
+.fx-root .fx-modal .fx-equipped{gap:8px;padding:10px;grid-template-columns:repeat(5,minmax(0,1fr))}
+.fx-root .fx-modal .fx-equipped-ally{grid-template-columns:repeat(3,minmax(0,1fr));max-width:430px;margin-left:auto;margin-right:auto}
+.fx-root .fx-modal .fx-equipped-ally .fx-item{aspect-ratio:1.15}
+.fx-empty-slot{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;border:1px dashed #a4a68288;border-radius:8px;background:#12291f;color:#b9bfa6;min-width:0;min-height:70px}
+.fx-empty-slot>.dt-gear-art{width:50%;height:auto;aspect-ratio:1;opacity:.22}
+.fx-empty-slot>small{position:absolute;top:5px;font-size:9px}.fx-empty-slot>span{position:absolute;bottom:4px;font-size:10px}
+.fx-gear-owner{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-size:12px}
+.fx-root .fx-gear-owner>select{flex:1;min-width:0;padding:9px 10px;color:#fff1cb}
+.fx-equip-result,.fx-equip-preview{padding:12px;border:1px solid #bfcf8b;border-radius:8px;background:#1a3528;margin:0 0 14px;width:100%;font-size:12px;scroll-margin:12px}
+.fx-equip-result>b{display:block;color:#d6f3ad;font:800 12px/1.5 system-ui;margin-bottom:5px}
+.fx-equip-preview{background:#11281f;border-color:#9f9564;margin:0}
+.fx-gear-comparison{display:grid;gap:6px;margin-top:8px;font-variant-numeric:tabular-nums}
+.fx-gear-comparison>div{display:grid;grid-template-columns:minmax(90px,1fr) auto minmax(46px,auto);gap:8px;font:11px/1.5 system-ui;color:#cbd0b8;align-items:baseline}
+.fx-gear-comparison strong{text-align:right;font-weight:850}
+.fx-root .is-gain{color:#b7ef94}.fx-root .is-loss{color:#ffad93}.fx-root .is-neutral{color:#b5bba7}
+.fx-item-traits{width:100%;margin:0;padding:10px 0;border-top:1px solid #a69a6266;display:grid;gap:5px;font:11px/1.6 system-ui}
+.fx-item-traits>div{display:flex;justify-content:space-between;gap:10px}.fx-item-traits dt{color:#c4cbb4}.fx-item-traits dd{margin:0;text-align:right}.fx-item-traits em{font-style:normal;font-size:10px}
+.fx-root .fx-mini-gear>button{width:64px;height:64px;min-height:64px;display:flex;align-items:center;justify-content:center;padding:5px;border-color:var(--rarity,#b8a87888)}
+.fx-root .fx-mini-gear .dt-gear-art{position:static;width:45px;height:45px;margin:auto}
+.fx-root .fx-mini-gear .fx-item-level{position:absolute;right:3px;bottom:1px;font-size:10px;background:#152414}
+.fx-root .fx-item[data-changed=true]{outline:2px solid #c6ed94;outline-offset:1px;box-shadow:inset 0 0 12px #c6ed9433}
+@media(min-width:900px){.fx-root .fx-modal .fx-equipped{max-width:680px;margin-left:auto;margin-right:auto}.fx-root .fx-modal .fx-equipped-ally{max-width:430px}.fx-root .fx-item>.fx-item-name{font-size:10px}}
+@media(max-width:360px){.fx-root .fx-modal .fx-equipped{gap:4px;padding:7px}.fx-root .fx-modal .fx-item,.fx-empty-slot{min-height:58px}.fx-root .fx-item>.fx-slot-label{font-size:8px}.fx-root .fx-item>.fx-item-name{font-size:8px}.fx-root .fx-item>.fx-item-level{font-size:9px;right:2px;bottom:17px}.fx-gear-comparison>div{grid-template-columns:minmax(75px,1fr) auto auto;gap:5px;font-size:10px}}
+
+.fx-equip-result{position:sticky;top:0;z-index:5;box-shadow:0 4px 8px #06180b88}.fx-equip-changes{font-size:11px;margin-top:8px}.fx-equip-changes summary{cursor:pointer;padding:5px 0;color:#e7d299}.fx-equip-changes article{padding-top:8px}.fx-equip-changes article>b{font-size:11px;color:#e0e4c8}.fx-equip-changes .fx-item-traits{margin-top:6px;padding-bottom:0}

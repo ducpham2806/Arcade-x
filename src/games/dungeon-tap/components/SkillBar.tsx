@@ -244,4 +244,3 @@ export const SkillBar: React.FC<SkillBarProps> = ({
     </div>
   );
 };
-

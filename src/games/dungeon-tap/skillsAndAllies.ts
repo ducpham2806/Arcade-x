@@ -520,4 +520,3 @@ export const INITIAL_ALLIES: HeroAlly[] = [
     equippedAccessory: STARTER_ALLY_EQUIPMENT.dragon_knight.accessory,
   },
 ];
-

@@ -237,6 +237,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   // Handle Save Game and Exit to Main Hub safely
   const handleSaveAndExit = useCallback(() => {
     if (!gameMeta) return;
+    if (gameMeta.id === 'battleship') { onExit(); return; }
     const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
     const score = currentScoreRef.current;
     saveAndSuspendGame({
@@ -261,7 +262,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   // Periodic background auto-saving to cloud during active gameplay
   useEffect(() => {
-    if (!gameMeta || gameOverData) return;
+    if (!gameMeta || gameOverData || gameMeta.id === 'battleship') return;
     const interval = setInterval(() => {
       if (document.hidden || isPaused) return;
       const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
@@ -674,7 +675,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       <main
         ref={viewportContainerRef}
         id="game-main-viewport"
-        style={{...cssVariables, ...(['cosmic-defense','blocker','shikaku','hex-match'].includes(gameId)?{touchAction:'pan-y'}:{})} as React.CSSProperties}
+        style={{...cssVariables, ...(['battleship','cosmic-defense','blocker','shikaku','hex-match'].includes(gameId)?{touchAction:'pan-y'}:{})} as React.CSSProperties}
         onTouchStart={handleStageTouchStart}
         onTouchEnd={handleStageTouchEnd}
         className="relative flex-1 w-full h-full bg-[#050505] flex items-center justify-center overflow-hidden p-0 scrollbar-thin select-none touch-none"
@@ -683,7 +684,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
-          style={usesLauncherUi(gameId) ? {width:'100%',height:'100%',overflow:'auto',display:'block'} : ['hex-match','rainbow-blocks','boom-buddies','brick-breaker'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
+          style={usesLauncherUi(gameId) ? {width:'100%',height:'100%',overflow:'auto',display:'block'} : ['battleship','hex-match','rainbow-blocks','boom-buddies','brick-breaker'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
         >
           <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
           <GameLoadBoundary onExit={onExit}>
@@ -749,7 +750,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 {/* Auto-save Status Pill */}
                 <div className="flex items-center justify-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 py-1.5 px-3 rounded-xl font-semibold">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Tiến trình game được tự động lưu an toàn</span>
+                  <span>{gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : 'Tiến trình game được tự động lưu an toàn'}</span>
                 </div>
 
                 {/* Dynamic Viewport Resolution Info */}
@@ -841,8 +842,8 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                     type="button"
                     onClick={handleSaveAndExit}
                     className="w-full py-2.5 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold text-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                    title="Lưu & Ra Ngoài"
-                    aria-label="Lưu & Ra Ngoài"
+                    title={gameId === 'battleship' ? 'Về sảnh (online vẫn tính thời gian)' : 'Lưu & Ra Ngoài'}
+                    aria-label={gameId === 'battleship' ? 'Về sảnh (online vẫn tính thời gian)' : 'Lưu & Ra Ngoài'}
                   >
                     <Save className="w-4 h-4" />
                   </button>
@@ -872,7 +873,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
               </div>
               <h2 className="text-lg font-bold text-white mb-2 font-display">TẠM DỪNG HOẶC RỜI GAME?</h2>
               <p className="text-xs text-slate-400 mb-5">
-                Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.
+                {gameId === 'battleship' ? 'Ván bot sẽ kết thúc. Phòng online vẫn chạy; quay lại trong 90 giây để giữ trận.' : 'Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.'}
               </p>
 
               <div className="space-y-2">
@@ -883,7 +884,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                   className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Lưu Tiến Trình & Trở Về Sảnh</span>
+                  <span>{gameId === 'battleship' ? 'Về sảnh' : 'Lưu Tiến Trình & Trở Về Sảnh'}</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -929,3 +930,4 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     </div>
   );
 };
+

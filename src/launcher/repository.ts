@@ -1,3 +1,4 @@
+import {accessPreviewEnabled} from '../commerce/api';
 import { supabase } from '../services/supabaseClient';
 import { bundledCatalog, parseCatalog, isLocalReviewGame, type Catalog, type CatalogGame } from './catalog';
 const cacheKey='launcher_catalog_v1';
@@ -17,6 +18,11 @@ export async function fetchCatalog(): Promise<Catalog> {
   return result;
 }
 export async function checkAccess(game: CatalogGame): Promise<{allowed:boolean;reason:string}> {
+  if(accessPreviewEnabled){
+    if(!navigator.onLine)return {allowed:false,reason:'offline'};
+    try{const result=await rpc('launcher_check_access_v2',{p_game_id:game.id});if(typeof result?.allowed==='boolean')return result;}catch{}
+    return {allowed:false,reason:'connection'};
+  }
   if(game.availability!=='published')return {allowed:false,reason:'unavailable'};
   if(isLocalReviewGame(game.id)&&game.accessModel==='free'&&game.supportsOffline)return {allowed:true,reason:'local_review'};
   if(!navigator.onLine)return {allowed:game.accessModel==='free' && game.supportsOffline,reason:'offline'};
@@ -54,4 +60,5 @@ export async function flushFavorites(owner:string):Promise<void>{
 }
 export async function startSession(owner:string,gameId:string,id:string){await requireOwner(owner);await rpc('launcher_session_start',{p_game_id:gameId,p_session_id:id,p_expected_owner:owner});}
 export async function finishSession(owner:string,id:string,outcome:'completed'|'left',score?:number){await requireOwner(owner);await rpc('launcher_session_finish',{p_session_id:id,p_outcome:outcome,p_expected_owner:owner,p_score:Number.isFinite(score)?Math.max(0,Math.floor(score!)):null});}
+
 

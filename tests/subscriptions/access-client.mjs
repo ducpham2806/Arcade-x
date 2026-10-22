@@ -1,0 +1,20 @@
+import {build} from 'esbuild';
+import assert from 'node:assert/strict';
+const game={id:'test-free',availability:'published',accessModel:'free',supportsOffline:true};
+Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:true});
+const bundle=await build({entryPoints:['src/launcher/repository.ts'],bundle:true,write:false,format:'esm',platform:'node',define:{'import.meta.env.VITE_ACCESS_CONTROL_V2':'"true"'},plugins:[{name:'fake-cloud',setup(b){
+ b.onResolve({filter:/supabaseClient$/},()=>({path:'cloud',namespace:'test'}));
+ b.onResolve({filter:/\.\/catalog$/},()=>({path:'catalog',namespace:'test'}));
+ b.onLoad({filter:/.*/,namespace:'test'},({path})=>({contents:path==='cloud'?`export const supabase={rpc(name){globalThis.lastRpc=name;return {abortSignal:async()=>{if(globalThis.failRpc)throw Error('network');return {data:globalThis.access,error:null}}}}};`:`export const bundledCatalog={};export const parseCatalog=x=>x;export const isLocalReviewGame=()=>true;`}));
+}}]});
+const {checkAccess}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].text).toString('base64'));
+let checks=0;
+globalThis.failRpc=true;
+assert.equal((await checkAccess(game)).allowed,false);checks++;
+globalThis.failRpc=false;globalThis.access={allowed:false,reason:'account_blocked'};
+assert.deepEqual(await checkAccess(game),globalThis.access);checks++;
+assert.equal(globalThis.lastRpc,'launcher_check_access_v2');checks++;
+globalThis.access={allowed:true,reason:'owned'};assert.equal((await checkAccess(game)).allowed,true);checks++;
+globalThis.access={unexpected:true};assert.equal((await checkAccess(game)).allowed,false);checks++;
+navigator.onLine=false;assert.equal((await checkAccess(game)).allowed,false);checks++;
+console.log(`PASS: ${checks} client checks (no cached-free, local-review or offline bypass in preview)`);

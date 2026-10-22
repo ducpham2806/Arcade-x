@@ -25,8 +25,7 @@ export const DUNGEON_TAP_DROP_RATES: DropRateConfig = {
 };
 
 export const DUNGEON_TAP_CONTROLS: GameControlInfo[] = [
-  { key: 'Chạm Màn Hình (Tap)', action: 'Chạm liên tục vào quái vật để Kiếm Sĩ vung kiếm chém sát thương' },
-  { key: 'Kỹ Năng 1 - 4 (Active Skills)', action: 'Kích hoạt Thiên Kiếm, Cuồng Nộ, Bàn Tay Vàng, Phân Thân' },
+  { key: 'Chạm / giữ Tấn công', action: 'Chạm Titan hoặc giữ nút Tấn công để tự chém 4 đòn/giây, tích combo và hồi năng lượng' },
+  { key: '7 tuyệt kỹ / Đỡ đòn', action: 'Dùng tuyệt kỹ khi Titan lộ lõi. Đỡ khi vòng cảnh báo sáng để tránh mất thời gian và nhận +10 MP' },
   { key: 'Nâng Cấp & Trang Bị', action: 'Tăng cấp Kiếm Sĩ, chiêu mộ Đồng Đội và mặc trang bị rớt từ quái' },
 ];
-

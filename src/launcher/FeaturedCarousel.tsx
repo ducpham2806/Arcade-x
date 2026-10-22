@@ -3,9 +3,11 @@ import {ChevronLeft,ChevronRight,Pause,Play} from 'lucide-react';
 import type {CatalogGame} from './catalog';
 import {GameArtwork} from '../visuals/gameArt';
 export const FEATURED_INTERVAL=15_000;
-export const NEW_GAME_IDS=['boom-buddies','brick-breaker','rainbow-blocks'];
+export const NEW_GAME_IDS=['neon-runner','battleship','boom-buddies','brick-breaker','rainbow-blocks'];
 const priority=[...NEW_GAME_IDS,'hex-match','car-escape','tile-2048','word-cross','blocker'];
 const copy:Record<string,{eyebrow:string;title:string;accent:string;body:string}>={
+ 'neon-runner':{eyebrow:'GAME MỚI · NEON RUN',title:'Bước qua bóng tối.',accent:'Thắp sáng Luma.',body:'40 màn qua năm thế giới. Cùng Néo và Pip mang ánh sáng trở về.'},
+ 'battleship':{eyebrow:'GAME MỚI · BATTLESHIP',title:'Khóa một tọa độ.',accent:'Đánh chìm hạm đội.',body:'Đặt tàu, đọc dấu bắn và thử sức trong 30 giây mỗi lượt. Tìm trận online 1vs1, lập đội 2vs2 hoặc luyện tập với bot.'},
  'boom-buddies':{eyebrow:'GAME MỚI · BOOM BUDDIES',title:'Đặt bom thật khéo.',accent:'Cùng bạn bùng nổ.',body:'Khám phá mê cung, né ngọn lửa và mở lối đi cùng Pip và Bum.'},
  'brick-breaker':{eyebrow:'GAME MỚI · BLOCK BREAKER',title:'Giải phóng Orb.',accent:'Hàn gắn Aethra.',body:'Phá gạch, vượt sáu vùng đất và chinh phục 96 màn trong Chronicles.'},
  'rainbow-blocks':{eyebrow:'GAME MỚI · RAINBOW BLOCKS',title:'Xếp sắc màu.',accent:'Bật cầu vồng.',body:'Khối rơi rực rỡ, combo bùng nổ. Chinh phục kỷ lục theo cách của bạn.'},
@@ -38,3 +40,4 @@ export function FeaturedCarousel({games,onPlay,onDetail}:{games:CatalogGame[];on
   <div className="featured-controls"><div className="featured-dots" aria-label="Chọn slide">{slides.map((game,i)=><button key={game.id} aria-label={`Slide ${i+1}: ${game.title}`} aria-current={active===i?'true':undefined} onClick={()=>go(i)}><span/></button>)}</div><div className="featured-arrows"><button aria-label={paused?'Tiếp tục chuyển banner':'Tạm dừng chuyển banner'} aria-pressed={paused} onClick={()=>setPaused(p=>!p)}>{paused?<Play size={14}/>:<Pause size={14}/>}</button><button aria-label="Banner trước" onClick={()=>go(active===0?count-1:active-1)}><ChevronLeft size={18}/></button><button aria-label="Banner tiếp" onClick={()=>go(index+1)}><ChevronRight size={18}/></button></div></div>
  </section>;
 }
+

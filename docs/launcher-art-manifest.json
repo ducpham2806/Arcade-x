@@ -1,0 +1,178 @@
+[
+  {
+    "id": "battleship",
+    "icon": "/game-art/icons/battleship.webp",
+    "banner": "/game-art/banners/battleship.webp",
+    "iconBytes": 71190,
+    "bannerBytes": 84040,
+    "sha256": "8bc8d092fb7ed71bc461f6013d14dea43aaa2beb7549b3e3070f4b2bd1adc498"
+  },
+  {
+    "id": "boom-buddies",
+    "icon": "/game-art/icons/boom-buddies.webp",
+    "banner": "/game-art/banners/boom-buddies.webp",
+    "iconBytes": 17074,
+    "bannerBytes": 35418,
+    "sha256": "bea5b3e256b2d6650a854649477323415a302f0cef5e3a42c8d4e16324bd0a74"
+  },
+  {
+    "id": "brick-breaker",
+    "icon": "/game-art/icons/brick-breaker.webp",
+    "banner": "/game-art/banners/brick-breaker.webp",
+    "iconBytes": 16558,
+    "bannerBytes": 34218,
+    "sha256": "a42f69bb3b6ba208293db4a034e3c7e850fa32c95317cad55cd88ac271004978"
+  },
+  {
+    "id": "rainbow-blocks",
+    "icon": "/game-art/icons/rainbow-blocks.webp",
+    "banner": "/game-art/banners/rainbow-blocks.webp",
+    "iconBytes": 52536,
+    "bannerBytes": 43064,
+    "sha256": "a80527b9f1626d01b37949a8c41ec1443c976ef772768200253e806f84331ebd"
+  },
+  {
+    "id": "word-cross",
+    "icon": "/game-art/icons/word-cross.webp",
+    "banner": "/game-art/banners/word-cross.webp",
+    "iconBytes": 12324,
+    "bannerBytes": 27556,
+    "sha256": "43b19cc93ece62f9451ec9a8659331869b0cd9cdb0e1a9b1e5ca316d43d2de84"
+  },
+  {
+    "id": "car-escape",
+    "icon": "/game-art/icons/car-escape.webp",
+    "banner": "/game-art/banners/car-escape.webp",
+    "iconBytes": 17200,
+    "bannerBytes": 33064,
+    "sha256": "ad0d7e2e1e10ed5519346d3a25ac8fe7b051da55e19c1f494b503e7bc535b372"
+  },
+  {
+    "id": "dungeon-tap",
+    "icon": "/game-art/icons/dungeon-tap.webp",
+    "banner": "/game-art/banners/dungeon-tap.webp",
+    "iconBytes": 30436,
+    "bannerBytes": 28478,
+    "sha256": "eea0346e35f480b93b252b16db1e71809bda74d31c3cb9a7c0de4ac854da1d77"
+  },
+  {
+    "id": "mummy-escape",
+    "icon": "/game-art/icons/mummy-escape.webp",
+    "banner": "/game-art/banners/mummy-escape.webp",
+    "iconBytes": 9530,
+    "bannerBytes": 26962,
+    "sha256": "17da502ff1b768a78085fca9b48e1658864564109cfc158f472e730eb75f440e"
+  },
+  {
+    "id": "shikaku",
+    "icon": "/game-art/icons/shikaku.webp",
+    "banner": "/game-art/banners/shikaku.webp",
+    "iconBytes": 48300,
+    "bannerBytes": 33034,
+    "sha256": "c448b6063ecc4fddfe5fe31c13e44e903a5661dd20f6b5cbff64601688da5966"
+  },
+  {
+    "id": "eat-em-all",
+    "icon": "/game-art/icons/eat-em-all.webp",
+    "banner": "/game-art/banners/eat-em-all.webp",
+    "iconBytes": 10590,
+    "bannerBytes": 25754,
+    "sha256": "3efc41cbb3ff50215ed25f40bcb65a17937f46697c0a744076d228cac6772706"
+  },
+  {
+    "id": "scoodoku",
+    "icon": "/game-art/icons/scoodoku.webp",
+    "banner": "/game-art/banners/scoodoku.webp",
+    "iconBytes": 22224,
+    "bannerBytes": 37004,
+    "sha256": "617239e0b8e0d1504b5117c8572f1e4965a320b13be7b793d7cb673113be1977"
+  },
+  {
+    "id": "fill-the-space",
+    "icon": "/game-art/icons/fill-the-space.webp",
+    "banner": "/game-art/banners/fill-the-space.webp",
+    "iconBytes": 12472,
+    "bannerBytes": 28912,
+    "sha256": "e22f8b5ef826d7ffdcd33db7f88c43e156ec05c5757185db1f103f7d9e292d6d"
+  },
+  {
+    "id": "draw-a-shape",
+    "icon": "/game-art/icons/draw-a-shape.webp",
+    "banner": "/game-art/banners/draw-a-shape.webp",
+    "iconBytes": 12840,
+    "bannerBytes": 29626,
+    "sha256": "ac1035e2441538be602a81e3e406bdb63e1a84ea762108e0bd0d29fa39b6d9e1"
+  },
+  {
+    "id": "blocker",
+    "icon": "/game-art/icons/blocker.webp",
+    "banner": "/game-art/banners/blocker.webp",
+    "iconBytes": 12168,
+    "bannerBytes": 26762,
+    "sha256": "e833a75ed8043f6adc8868ae87bcf025030bc32012761876d9a861eb356e9a70"
+  },
+  {
+    "id": "chess",
+    "icon": "/game-art/icons/chess.webp",
+    "banner": "/game-art/banners/chess.webp",
+    "iconBytes": 10790,
+    "bannerBytes": 25410,
+    "sha256": "3eb19d0d9c7e55ad8318b27c57af5f73260c527bdb453c9424575cb00921f593"
+  },
+  {
+    "id": "xiangqi",
+    "icon": "/game-art/icons/xiangqi.webp",
+    "banner": "/game-art/banners/xiangqi.webp",
+    "iconBytes": 15376,
+    "bannerBytes": 31016,
+    "sha256": "97e0995d294e8b7677f845ddc6a2c652c6d6db798dbf1e4241ebe35b4a93e946"
+  },
+  {
+    "id": "caro-gomoku",
+    "icon": "/game-art/icons/caro-gomoku.webp",
+    "banner": "/game-art/banners/caro-gomoku.webp",
+    "iconBytes": 14680,
+    "bannerBytes": 30624,
+    "sha256": "a26dd8043313068612f4b8dc30dd8594f98fafa93959d19ff12b06373f0f3a79"
+  },
+  {
+    "id": "neon-runner",
+    "icon": "/game-art/icons/neon-runner.webp",
+    "banner": "/game-art/banners/neon-runner.webp",
+    "iconBytes": 18940,
+    "bannerBytes": 35194,
+    "sha256": "ee89e1dac888d3b08f8b0f43b2db81cc9f2023e51949125fa840866681a58d89"
+  },
+  {
+    "id": "cosmic-defense",
+    "icon": "/game-art/icons/cosmic-defense.webp",
+    "banner": "/game-art/banners/cosmic-defense.webp",
+    "iconBytes": 47840,
+    "bannerBytes": 28602,
+    "sha256": "c8c162dccc4aeef1ab15abba862d916d1b66d417d77653994b08ac02671cdfb5"
+  },
+  {
+    "id": "cyber-slice",
+    "icon": "/game-art/icons/cyber-slice.webp",
+    "banner": "/game-art/banners/cyber-slice.webp",
+    "iconBytes": 16742,
+    "bannerBytes": 33152,
+    "sha256": "2c860f2fadedf050c564199b7dc7c5f1a208edda5aa2d59dbff86dbc04d29d8a"
+  },
+  {
+    "id": "hex-match",
+    "icon": "/game-art/icons/hex-match.webp",
+    "banner": "/game-art/banners/hex-match.webp",
+    "iconBytes": 15772,
+    "bannerBytes": 32434,
+    "sha256": "1b821a6f2d69d7b188210d3b10045879bdc1d3e3db7f5f08c7dcfc78288a2b68"
+  },
+  {
+    "id": "tile-2048",
+    "icon": "/game-art/icons/tile-2048.webp",
+    "banner": "/game-art/banners/tile-2048.webp",
+    "iconBytes": 16688,
+    "bannerBytes": 34006,
+    "sha256": "b1dae609c0a512c85e1e6653e131a8a9699db8194dfe42c7ae5ca5ef60d62f9f"
+  }
+]

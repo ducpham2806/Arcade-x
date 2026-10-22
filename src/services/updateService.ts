@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.11.0';
-export const APP_CODENAME = "Play First";
-export const APP_RELEASE_NOTES = "Sảnh game cờ đồng bộ launcher; mở game trực tiếp; hướng dẫn tùy chọn; vào nhanh chiến dịch và sửa bố cục.";
+export const CURRENT_APP_VERSION = '2.12.0';
+export const APP_CODENAME = "All Worlds";
+export const APP_RELEASE_NOTES = "22 game; Neon Run v0.14, Dungeon Titan v6.3, Cosmic Defend v5, Battleship online; bộ icon và banner riêng từng game.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

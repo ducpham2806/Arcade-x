@@ -14,7 +14,7 @@ vm.runInNewContext(code,{exports:exportsForTest,require(name){if(name==='react')
  failed=true;await assert.rejects(prepareGamePackage('beta',new AbortController().signal,()=>{}));failed=false;
  await prepareGamePackage('beta',new AbortController().signal,()=>{});assert.equal(b,1);
  requested=[];const abort=new AbortController();abort.abort();await prepareGamePackage('alpha',abort.signal,()=>{});assert.equal(requested.length,0);
- const registry=fs.readFileSync('src/games/registry.ts','utf8');assert.ok(!/\blazy\(/.test(registry));assert.equal((registry.match(/packageLazy\(/g)||[]).length,20);
+ const registry=fs.readFileSync('src/games/registry.ts','utf8');assert.ok(!/\blazy\(/.test(registry));assert.equal((registry.match(/packageLazy\(/g)||[]).length,21);
  const app=fs.readFileSync('src/App.tsx','utf8');assert.match(app,/<GamePackageGate[^>]*>[\s\S]*?<GameWrapper/);
- console.log('PASS: registration downloads nothing; selected module/assets only; cached repeat; failure retry; abort; all 21 games registered; gate before game mount.');
+ console.log('PASS: registration downloads nothing; selected module/assets only; cached repeat; failure retry; abort; all 22 games registered; gate before game mount.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

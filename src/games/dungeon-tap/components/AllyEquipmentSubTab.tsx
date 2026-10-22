@@ -622,4 +622,3 @@ export const AllyEquipmentSubTab: React.FC<AllyEquipmentSubTabProps> = ({
     </div>
   );
 };
-

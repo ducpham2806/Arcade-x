@@ -53,6 +53,9 @@ export interface StageConfig {
 }
 
 export interface FallingItem {
+  warningLeft?: number;
+  speedClass?: 'slow'|'normal'|'fast'|'rush';
+  beat?: string;
   id: number;
   x: number;
   y: number;
@@ -106,4 +109,5 @@ export interface GameStats {
   gemsEaten: number;
   heartsCollected: number;
 }
+
 

@@ -1,0 +1,5 @@
+{
+  "passed": 17,
+  "date": "2026-10-17",
+  "checks": "pure engine; not browser/device verification"
+}

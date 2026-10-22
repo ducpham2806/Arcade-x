@@ -126,16 +126,17 @@ const ACCESSORIES_BY_PROFESSION: Record<AllyProfession, string[]> = {
 export function generateAllyLootItem(
   stage: number,
   forcedProfession?: AllyProfession,
-  forcedSlot?: AllyEquipSlot
+  forcedSlot?: AllyEquipSlot,
+  rng: () => number = Math.random
 ): AllyEquipmentItem {
   const professions: AllyProfession[] = ['archer', 'mage', 'golem', 'assassin', 'priestess', 'dragon_knight'];
-  const profession = forcedProfession || professions[Math.floor(Math.random() * professions.length)];
+  const profession = forcedProfession || professions[Math.floor(rng() * professions.length)];
   const profMeta = PROFESSION_METAS[profession];
 
   const slots: AllyEquipSlot[] = ['ally_weapon', 'ally_armor', 'ally_accessory'];
-  const slot = forcedSlot || slots[Math.floor(Math.random() * slots.length)];
+  const slot = forcedSlot || slots[Math.floor(rng() * slots.length)];
 
-  const rarity = getRandomRarity(stage);
+  const rarity = getRandomRarity(stage, rng);
   const rarityInfo = RARITY_CONFIG[rarity];
 
   const nameList =
@@ -144,10 +145,10 @@ export function generateAllyLootItem(
       : slot === 'ally_armor'
       ? ARMORS_BY_PROFESSION[profession]
       : ACCESSORIES_BY_PROFESSION[profession];
-  const baseName = nameList[Math.floor(Math.random() * nameList.length)];
+  const baseName = nameList[Math.floor(rng() * nameList.length)];
   const itemLevel = 1;
 
-  const stageScale = Math.pow(1.08, Math.max(0, stage - 1));
+  const stageScale = 1 + .03 * Math.max(0, stage - 1);
   const statScale = stageScale * rarityInfo.statMultiplier;
 
   let dpsBonusPercent = 0;
@@ -181,7 +182,7 @@ export function generateAllyLootItem(
       : profMeta.accessoryIcon;
 
   return {
-    id: `ally-item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    id: `ally-item-${Math.floor(rng() * 1e12)}-${rng().toString(36).substring(2, 7)}`,
     name: baseName,
     profession,
     professionName: profMeta.name,
@@ -533,4 +534,3 @@ export function calculateAllyItemPower(item: AllyEquipmentItem | null | undefine
     item.level * 3
   );
 }
-

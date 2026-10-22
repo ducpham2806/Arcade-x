@@ -371,4 +371,3 @@ export const HeroesTab: React.FC<HeroesTabProps> = ({
     </div>
   );
 };
-

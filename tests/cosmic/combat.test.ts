@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {createSimulation, step, replaySimulation, useSlot, resultFor, EMPTY_UPGRADES} from '../../src/games/cosmic-defense/engine';
 import * as legacy from '../../src/games/cosmic-defense/legacy-engine';
-import {LEVELS, levelFor} from '../../src/games/cosmic-defense/content';
+import {LEVELS_V3 as LEVELS, levelFor} from '../../src/games/cosmic-defense/legacy-v3-content';
 import {validConfig} from '../../src/games/cosmic-defense/save';
 import type {RunConfig} from '../../src/games/cosmic-defense/types';
 const config = (level = 1, seed = 42): RunConfig => ({version:3, level, seed, mode:'campaign', upgrades:{...EMPTY_UPGRADES}, integrity:100, boosters:[], mutators:[]});
@@ -70,3 +70,4 @@ for(const version of [2,3] as const)test(`v${version} replay remains exact and r
   const r=replaySimulation(c,s.replay,s.frame);expect(r.enemies).toEqual(s.enemies);expect(r.pickups).toEqual(s.pickups);expect(resultFor(r)).toEqual(resultFor(s));
   if(version===2){const old=legacy.replaySimulation(c,s.replay,s.frame);expect(r).toEqual(old);}
 });
+

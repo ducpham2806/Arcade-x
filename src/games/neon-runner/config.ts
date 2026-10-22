@@ -35,8 +35,8 @@ export const NEON_RUNNER_DROP_RATES: DropRateConfig = {
 };
 
 export const NEON_RUNNER_CONTROLS: GameControlInfo[] = [
-  { key: 'Phím Space / W / ↑', action: 'Nhảy (Nhấn 2 lần để Nhảy Kép)' },
-  { key: 'Phím S / ↓', action: 'Trượt / Tránh chướng ngại vật trên cao' },
-  { key: 'Chạm màn hình', action: 'Nút ảo Nhảy / Trượt cho điện thoại' },
+  {key:'← / → hoặc A / D',action:'Di chuyển và chọn tuyến đường'},
+  {key:'Space / W / ↑',action:'Nhảy; kết hợp dash khi kỹ năng đã mở'},
+  {key:'E / Tương tác',action:'Dùng máy, mở cổng và hoàn thành nhiệm vụ'},
+  {key:'Điện thoại',action:'V-pad nhỏ cùng nút Nhảy và Tương tác'},
 ];
-

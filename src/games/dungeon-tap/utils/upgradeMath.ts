@@ -7,9 +7,9 @@ import { EquipmentItem } from '../types';
  */
 
 export const HERO_BASE_COST = 18;
-export const HERO_COST_GROWTH = 1.12;
+export const HERO_COST_GROWTH = 1.18;
 export const HERO_BASE_TAP_DMG = 10;
-export const HERO_DMG_GROWTH = 1.14;
+export const HERO_DMG_GROWTH = 1.15;
 
 /**
  * Calculates exact total cost to upgrade Sword Master by `count` levels
@@ -56,14 +56,7 @@ export function getHeroMilestoneData(level: number): {
   progressPercent: number;
   levelsToNext: number;
 } {
-  let multiplier = 1;
-  for (let m = 5; m <= level; m += 5) {
-    if (m === 10 || m === 15 || m === 20) {
-      multiplier *= 2.0;
-    } else {
-      multiplier *= 1.5;
-    }
-  }
+  const multiplier = Math.pow(1.1, Math.floor(level / 5));
 
   const prevMilestone = Math.floor(level / 5) * 5;
   const nextMilestone = prevMilestone + 5;
@@ -120,7 +113,7 @@ export function getAllyMilestoneData(level: number): {
 } {
   let multiplier = 1;
   for (let m = 5; m <= level; m += 5) {
-    multiplier *= 1.6;
+    multiplier *= 1.08;
   }
   const prevMilestone = Math.floor(level / 5) * 5;
   const nextMilestone = prevMilestone + 5;
@@ -345,17 +338,17 @@ export function getSkillData(skillId: string, level: number): {
 } {
   switch (skillId) {
     case 'heavenly_strike': {
-      const currentMult = 45 + (level - 1) * 15;
-      const nextMult = 45 + level * 15;
+      const currentMult = 8 + (level - 1) * 2;
+      const nextMult = 8 + level * 2;
       return {
         primaryValue: currentMult,
         currentEffect: `Gây x${currentMult} Sát Thương Chém tức thì`,
-        nextEffect: `Gây x${nextMult} Sát Thương Chém (+15x)`,
+        nextEffect: `Gây x${nextMult} Sát Thương Chém (+2x)`,
       };
     }
     case 'berserker_rage': {
-      const currentMult = Math.round((3.0 + (level - 1) * 0.4) * 10) / 10;
-      const nextMult = Math.round((3.0 + level * 0.4) * 10) / 10;
+      const currentMult = Math.round((2.0 + (level - 1) * 0.1) * 10) / 10;
+      const nextMult = Math.round((2.0 + level * 0.1) * 10) / 10;
       const currentDur = 10 + Math.floor((level - 1) / 2);
       const nextDur = 10 + Math.floor(level / 2);
       return {
@@ -366,20 +359,20 @@ export function getSkillData(skillId: string, level: number): {
       };
     }
     case 'hand_of_midas': {
-      const currentMult = Math.round((5.0 + (level - 1) * 1.5) * 10) / 10;
-      const nextMult = Math.round((5.0 + level * 1.5) * 10) / 10;
+      const currentMult = Math.round((Math.min(5, 2.0 + (level - 1) * 0.15)) * 10) / 10;
+      const nextMult = Math.round((Math.min(5, 2.0 + level * 0.15)) * 10) / 10;
       const currentDur = 15 + Math.floor((level - 1) / 2);
       const nextDur = 15 + Math.floor(level / 2);
       return {
         primaryValue: currentMult,
         secondaryValue: currentDur,
-        currentEffect: `Rơi x${currentMult} Vàng mỗi đòn trong ${currentDur}s`,
+        currentEffect: `Nhận x${currentMult} Vàng khi hạ quái trong ${currentDur}s`,
         nextEffect: `Rơi x${nextMult} Vàng trong ${nextDur}s`,
       };
     }
     case 'shadow_clone': {
-      const currentRatio = Math.round((0.8 + (level - 1) * 0.2) * 100);
-      const nextRatio = Math.round((0.8 + level * 0.2) * 100);
+      const currentRatio = Math.round((0.5 + (level - 1) * 0.05) * 100);
+      const nextRatio = Math.round((0.5 + level * 0.05) * 100);
       const currentDur = 15 + Math.floor((level - 1) / 2);
       const nextDur = 15 + Math.floor(level / 2);
       return {
@@ -390,8 +383,8 @@ export function getSkillData(skillId: string, level: number): {
       };
     }
     case 'blade_storm': {
-      const currentMult = Math.round((12.0 + (level - 1) * 4.0) * 10) / 10;
-      const nextMult = Math.round((12.0 + level * 4.0) * 10) / 10;
+      const currentMult = Math.round((1.5 + (level - 1) * 0.25) * 10) / 10;
+      const nextMult = Math.round((1.5 + level * 0.25) * 10) / 10;
       const currentDur = 10 + Math.floor((level - 1) / 3);
       const nextDur = 10 + Math.floor(level / 3);
       return {
@@ -402,8 +395,8 @@ export function getSkillData(skillId: string, level: number): {
       };
     }
     case 'war_cry': {
-      const currentMult = Math.round((2.5 + (level - 1) * 0.5) * 10) / 10;
-      const nextMult = Math.round((2.5 + level * 0.5) * 10) / 10;
+      const currentMult = Math.round((Math.min(3.5, 1.5 + (level - 1) * 0.1)) * 10) / 10;
+      const nextMult = Math.round((Math.min(3.5, 1.5 + level * 0.1)) * 10) / 10;
       const currentManaRestore = 30 + (level - 1) * 5;
       const currentDur = 12 + Math.floor((level - 1) / 2);
       const nextDur = 12 + Math.floor(level / 2);
@@ -415,8 +408,8 @@ export function getSkillData(skillId: string, level: number): {
       };
     }
     case 'radiant_slash': {
-      const currentMult = 85 + (level - 1) * 30;
-      const nextMult = 85 + level * 30;
+      const currentMult = 15 + (level - 1) * 4;
+      const nextMult = 15 + level * 4;
       const currentArmorBreak = Math.min(80, 50 + (level - 1) * 3);
       const nextArmorBreak = Math.min(80, 50 + level * 3);
       return {
@@ -467,5 +460,3 @@ export function getAllySkillEffect(
   }
   return { currentMult, label };
 }
-
-

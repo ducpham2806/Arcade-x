@@ -4,7 +4,7 @@ const {window}=parseHTML('<html><body><div id="root"></div></body></html>');
 Object.assign(global,{window,document:window.document,HTMLElement:window.HTMLElement,IS_REACT_ACT_ENVIRONMENT:true});
 const storage=new Map();global.localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)};
 const React=require('react'),{act}=React,{createRoot}=require('react-dom/client');
-function load(path,mocks={}){const out={};const code=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInNewContext(code,{exports:out,localStorage,window,document,console,setInterval:()=>1,clearInterval:()=>{},require:id=>mocks[id]|| (id.includes('visuals/gameArt')?{GameArtwork:()=>null,artFor:()=>({label:'Game'}),artStyle:()=>({})}:require(id))});return out;}
+function load(path,mocks={}){const out={};const code=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInNewContext(code,{exports:out,localStorage,window,document,console,setInterval:()=>1,clearInterval:()=>{},require:id=>mocks[id]||(id==='../commerce/api'?{accessPreviewEnabled:false}:null)|| (id.includes('visuals/gameArt')?{GameArtwork:()=>null,artFor:()=>({label:'Game'}),artStyle:()=>({})}:require(id))});return out;}
 (async()=>{
  const root=createRoot(document.getElementById('root')), {DuelLobby}=load('src/components/games/DuelLobby.tsx');let launches=[],online=0,local=0;
  const props={gameId:'chess',title:'Cờ vua',username:'Tester',elo:1200,onAi:d=>launches.push(d),onOnline:()=>online++,onLocal:()=>local++};

@@ -15,7 +15,7 @@ create role anon nologin;
 create role authenticated nologin;
 create role service_role nologin;
 create schema auth;
-create table auth.users(id uuid primary key);
+create table auth.users(id uuid primary key, is_anonymous boolean default false);
 create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
 create function auth.jwt() returns jsonb language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb$$;
 grant usage on schema auth to authenticated,anon;
@@ -28,6 +28,9 @@ docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo
 
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/identity.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/launcher.sql"
+docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/supabase/tests/subscription-foundation.sql"
+docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/supabase/tests/starter-gifts.sql"
+docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/supabase/tests/store-trial.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/car-escape.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/word-cross-fixtures.sql"
 docker exec -i "$test_container" psql -U postgres -q -v ON_ERROR_STOP=1 < "$repo_dir/tests/word-cross.sql"
@@ -73,3 +76,4 @@ else
   cat "$race_log_a" "$race_log_b"; exit 1
 fi
 rm -f "$race_log_a" "$race_log_b"
+

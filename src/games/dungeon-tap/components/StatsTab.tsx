@@ -121,4 +121,3 @@ export const StatsTab: React.FC<StatsTabProps> = ({
     </div>
   );
 };
-

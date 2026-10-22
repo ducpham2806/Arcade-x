@@ -23,6 +23,8 @@ function initializeClient(): SupabaseClient | null {
   } }, auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
 }
 export const supabase = initializeClient();
+// Public configuration resolved with the same deployment overrides as the authenticated client.
+export const supabasePublicConfig = {url, key};
 
 let signingIn: Promise<void> | null = null;
 let authPaused = false;
@@ -68,4 +70,5 @@ supabase?.auth.onAuthStateChange((event) => {
     bindings.clear();
   }
 });
+
 

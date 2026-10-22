@@ -89,15 +89,15 @@ export default defineConfig(() => {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/chronicles-realms\//],
+          navigateFallbackDenylist: [/^\/chronicles-realms\//, /^\/standalone\//],
           runtimeCaching: [
-            ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'chronicles-realms/assets'].map(prefix => ({
+            ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
               handler: 'StaleWhileRevalidate' as const,
               options: { cacheName: 'game-pack-' + prefix.replaceAll('/', '-'), expiration: { maxEntries: 1200, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },
             })),
             {
-              urlPattern: /\/chronicles-realms\/(?:index\.html)?$/i,
+              urlPattern: /\/(?:chronicles-realms|standalone\/neon-run)\/(?:index\.html)?$/i,
               handler: 'NetworkFirst',
               options: { cacheName: 'standalone-pages', networkTimeoutSeconds: 3, expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },
             },

@@ -1,0 +1,542 @@
+{
+  "status": "draft, no push/merge/deploy",
+  "base_commit": "c143446375eb7bbfa003e75418dad0403d3ce7f2",
+  "build": "Dungeon Titan equipment UX v6.3",
+  "files": [
+    {
+      "path": "art-source-v5/PROMPT-BRIEFS.md",
+      "sha256": "15ab2a3df32d41634edd3cfb32517480ea598725bf82b73d0177ca8f2a42c3b7",
+      "bytes": 4323
+    },
+    {
+      "path": "art-source-v5/atlas-manifest.json",
+      "sha256": "ae31c75e0d7cf22e9a8e10461e3e3c159eaf05812bea0f5ee74197c6271f9661",
+      "bytes": 21416
+    },
+    {
+      "path": "art-source-v5/generation-sources.json",
+      "sha256": "fd1693ca438d6823eb4c5eee5601fa6cf386135cf0f199ad324c9af2d1f4dbca",
+      "bytes": 2554
+    },
+    {
+      "path": "art-source-v5/prompts.json",
+      "sha256": "2ef1aae68b58de20342306ada9f2efaa333e7fca7c9a59b313e406a732290976",
+      "bytes": 4855
+    },
+    {
+      "path": "art-source-v5/validation.json",
+      "sha256": "b074b524b72b3c1bc5275e1defadecfb1a530a1eb5b7b8ef3acd8cb1b98829b5",
+      "bytes": 204
+    },
+    {
+      "path": "art-source-v6/atlas-manifest.json",
+      "sha256": "c7de3f37cbf80ba677ac246ccc07209d1d8cf78a6e45ab1e6b73b846444c7de2",
+      "bytes": 4660
+    },
+    {
+      "path": "art-source-v6/generation-sources.json",
+      "sha256": "5f306be2d33c283fc9c37f2d30708572733e120428acda8ad2023011dfac3a15",
+      "bytes": 891
+    },
+    {
+      "path": "art-source-v6/prompts.json",
+      "sha256": "e5758d16d6f00cf201eb93122eaea85ffb4de30350122b0af533cbbc86eb73ff",
+      "bytes": 8721
+    },
+    {
+      "path": "art-source-v6/validation.json",
+      "sha256": "d49d5d84034528a7deec4bd460d7a32430333ac11dd6924889813aa2b5bc2a87",
+      "bytes": 172
+    },
+    {
+      "path": "docs/dungeon-titan/ART-v5.md",
+      "sha256": "83f9db8f1e8da7482f0fcd062f80c015a002e31391105256c4ac6133a9434a63",
+      "bytes": 4680
+    },
+    {
+      "path": "docs/dungeon-titan/DESIGN-v3.md",
+      "sha256": "bda320d0496bfcec28659c7973b47738183d306c420c68335cc439e92dc4ea06",
+      "bytes": 17048
+    },
+    {
+      "path": "docs/dungeon-titan/INTEGRATION.md",
+      "sha256": "d1a42223724461ab2991f336778eeaea9a753a2af8ac5df0e82c6c32cf2e2b27",
+      "bytes": 4262
+    },
+    {
+      "path": "docs/dungeon-titan/UX-v4.md",
+      "sha256": "771db4c6d52fdc4f7f0bffd6957a0cc4fc70fa6b631ae9870d13c633957fa9ee",
+      "bytes": 6203
+    },
+    {
+      "path": "docs/dungeon-titan/UX-v6.1.md",
+      "sha256": "efa51f8468a6e251e377fdae9a1f3387a2850df3da485a1b8cc550bc1bb98e43",
+      "bytes": 1586
+    },
+    {
+      "path": "docs/dungeon-titan/UX-v6.2.md",
+      "sha256": "dc3c4b25ff6f3970cee23c675f12c6435f735da8310f6d0a50c941fdebaa8f71",
+      "bytes": 2565
+    },
+    {
+      "path": "docs/dungeon-titan/UX-v6.3.md",
+      "sha256": "0690f5d348ba5ad38d60f42e22e30bf6438237050634b9a82afa8cfb3853c9fa",
+      "bytes": 3174
+    },
+    {
+      "path": "docs/dungeon-titan/UX-v6.md",
+      "sha256": "dfeba778f85dd572ae23dc46a0bfffdd768d23329562d221fa39761f41a6cc49",
+      "bytes": 4940
+    },
+    {
+      "path": "docs/dungeon-titan/boss-roster-v3.png",
+      "sha256": "2fb5eb8d87d09cf86eb0e407436efb1c25259b07e3f8844caaddff5daae0fd84",
+      "bytes": 152607
+    },
+    {
+      "path": "docs/dungeon-titan/boss-roster-v3.svg",
+      "sha256": "84d4dcfdafa3723790cffda997f2d452eea027094ff74d23033016bf393f6bfe",
+      "bytes": 9644
+    },
+    {
+      "path": "docs/dungeon-titan/dungeon-titan-tuning-v3.xlsx",
+      "sha256": "60700e05fe0d187c990743aa310d6aff9c540086611f02c1111a1757771d915a",
+      "bytes": 51320
+    },
+    {
+      "path": "docs/dungeon-titan/economy-90-days.json",
+      "sha256": "8e9ebb995e719a0b6d8fcd8b32054c6264751914e231d99d5afe8eea85c810e3",
+      "bytes": 129066
+    },
+    {
+      "path": "docs/dungeon-titan/economy-before-tuning.json",
+      "sha256": "a7939a428791cd99b2a6538e86da519b96c403c0f1f8e7f3579886133d0295b4",
+      "bytes": 111363
+    },
+    {
+      "path": "docs/dungeon-titan/squads-v6-results.json",
+      "sha256": "dd1a27dbf1d3c0b64fa55cddc7e869d2014bb70115269f6bcf837aae4564ab19",
+      "bytes": 129
+    },
+    {
+      "path": "docs/dungeon-titan/test-results.json",
+      "sha256": "99e18b54d814352f452321570acc8a6a5c61866a67dd67850c62cb59259b687d",
+      "bytes": 102
+    },
+    {
+      "path": "dungeon-titan-equipment-v6-3-playtest.html",
+      "sha256": "d15e48c735cd0babd38535e5391fcbe6ca0a91d8be8c5e1175624613c95086be",
+      "bytes": 5799645
+    },
+    {
+      "path": "preview/dungeon/ArtGallery.tsx",
+      "sha256": "a24c3ac07d960420fcd44d89db58231651d42b1ed034f5987e3cd8ce79d70f7b",
+      "bytes": 4427
+    },
+    {
+      "path": "preview/dungeon/main.tsx",
+      "sha256": "74a95afebbf5bec530d8ad5a7e7fdb904c77dcecdb8da259889cb2cf6853817d",
+      "bytes": 2683
+    },
+    {
+      "path": "scripts/export-dungeon-review.mjs",
+      "sha256": "29d061817b0f7cbac1ecd82133658b095d4597ce9def02c509860789d597ccef",
+      "bytes": 2235
+    },
+    {
+      "path": "scripts/package-dungeon-v6-3.py",
+      "sha256": "3e57cf0cd0440148e43ebe8dacf2aada9f0912d6c1ec29931bf90e92450aeb83",
+      "bytes": 2416
+    },
+    {
+      "path": "scripts/prepare-dungeon-art-v5.py",
+      "sha256": "05d5284b990692d51a6f9cb0fade53a1f47e428c1c927d8c35e150da330bd669",
+      "bytes": 5378
+    },
+    {
+      "path": "scripts/prepare-dungeon-art-v6.py",
+      "sha256": "25719583c408349c5f9fc79cdc09cc6bd4340fc4a32713486fb70e8081aee6e6",
+      "bytes": 2845
+    },
+    {
+      "path": "src/games/dungeon-tap/DungeonTitanCore.tsx",
+      "sha256": "7c357ced0db982692ffc1a5cf1df3151ddb3c097aa703343db7ac18060caf1e5",
+      "bytes": 5493
+    },
+    {
+      "path": "src/games/dungeon-tap/allyEquipmentData.ts",
+      "sha256": "79b1fe1fc0df44e575de952a90b3003bdf1f61a9c8239fac50be68b08635ad59",
+      "bytes": 19165
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/dragon.webp",
+      "sha256": "cc18ca97743bd7589e326364584a85405c6b7429781a7d09b3d53856eeeda6a8",
+      "bytes": 142680
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/enemies-a.webp",
+      "sha256": "ba291fc3794676967a31a202115805ecebfe5e139f758dc2c13830a71c6b6514",
+      "bytes": 155412
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/enemies-b.webp",
+      "sha256": "1ed0071cf619e20b03b39ba553179087c2b072897b435ea5ce39ec669d7667b4",
+      "bytes": 150868
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/enemies-c.webp",
+      "sha256": "fc0e3c3e41e01d0a72ab450689f6840ae0410c582dae26d256d7c496bb454e92",
+      "bytes": 152806
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/enemies-d.webp",
+      "sha256": "38500670d1150ee9e522243dcc9b8e18caf3861af791941f9a18527a899eabb1",
+      "bytes": 175250
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/frost.webp",
+      "sha256": "efec981b589edcd59586e08f61866ad0b4c8a37b3c6a0938488788443f0aa40b",
+      "bytes": 145116
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/fx.webp",
+      "sha256": "9a77f35ed46c51f1787670d285c6195daa9470c0eac19d3438b08107959d89dd",
+      "bytes": 169138
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/gear.webp",
+      "sha256": "582d53a1d247afd8ac6bba3d64fc40b1c01b9d274dfc8339bd54e7ce6d7bfcfd",
+      "bytes": 118160
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/goblin.webp",
+      "sha256": "0e73a59d42da3ab68f5f66929acee8941552437f483922a9af14b3118260a352",
+      "bytes": 126996
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/party-a.webp",
+      "sha256": "06aba52da3b2701c2196a43dd4530d00d3c4554c3d5da3b21dbd46a85abbbfb7",
+      "bytes": 137536
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/party-b.webp",
+      "sha256": "1bfb0bfbaf322cd64082fdfb5551996dd4cdbcdd8dad565140e715c3db31fd21",
+      "bytes": 97428
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/skeleton.webp",
+      "sha256": "7bbf748431e489a7292ebcfddbb08f55af64872683dfb2dfcda4951f4421c1de",
+      "bytes": 142584
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/spells.webp",
+      "sha256": "8dc6f24bc96c6d7c745cb6dee11e0a1232b639f4e646c776a7442ade59546e6c",
+      "bytes": 204602
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/spider.webp",
+      "sha256": "6680be29772a8511f9bc2f8f94cc49b97ca6cfa033686d6f53321c349597fb13",
+      "bytes": 145942
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/thunder.webp",
+      "sha256": "d44e207924f982170dc3514d9d3e9c541196d2193d05a3b4ae280bb061cf898f",
+      "bytes": 143096
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/ui.webp",
+      "sha256": "6193383ee0e82dd1105c936a82917bba768e98a1edab22246496af2963b1f822",
+      "bytes": 193110
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/vampire.webp",
+      "sha256": "1822e7c573f6b5426a16b387500c925ac462b4b6ce70cd508ec659038296d4b6",
+      "bytes": 124258
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/void.webp",
+      "sha256": "eca4730385e825f9499d5807527756dadc39796d9b8ecb007a6da7be46ea3473",
+      "bytes": 159038
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-1.webp",
+      "sha256": "556439a00869f3184f2d8d53e1e43d8029d6a00db38118ecb80879e49061f66b",
+      "bytes": 128324
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-2.webp",
+      "sha256": "40d91af54f1b7b73fc4af26311c92cb134d3fca96fc493669f1da56718d5f542",
+      "bytes": 101766
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-3.webp",
+      "sha256": "b6636e042447f7463e832148d37e646f7a3abe30af9ad6dfd629c201ccb852ce",
+      "bytes": 113868
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-4.webp",
+      "sha256": "4bf5b6447d17d9c001d39b47f1784385bfe6df5f50c08eb05ff8932677ca47dd",
+      "bytes": 91488
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-5.webp",
+      "sha256": "75e133fd78aecfaccc5603e9232f7df9313e4d86b44dee459f18394bd8486b2c",
+      "bytes": 98992
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-6.webp",
+      "sha256": "2250828e0bbcf111bd65e4f70b769e6090c474a1a741b78e33d8604932b4a0f8",
+      "bytes": 116172
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-7.webp",
+      "sha256": "15178530e5189d0235f27e0fa00fda03ca314941ce6a1d683bb9cba713994644",
+      "bytes": 108682
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v5/world-8.webp",
+      "sha256": "25aff72e5498245a90d3d82b9fb265b80f457309618e411cde106f7db4b46da9",
+      "bytes": 100540
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-1.webp",
+      "sha256": "c0241693390aba8a63f8c98f9b6b2af2a8265cda55c6ed2618c3e9eee18e9d67",
+      "bytes": 56664
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-2.webp",
+      "sha256": "5bacf741373f4326b2cb4ab10c253d654966ba32740ec051339d95b5eaae1d6c",
+      "bytes": 65494
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-3.webp",
+      "sha256": "d607da4bfbf8dfd04e12bb77eeec0e87969e45c4d8c7561259417475ccd058a6",
+      "bytes": 69150
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-4.webp",
+      "sha256": "4dd67de3cb6b9144eff8dfc672d7e53ecac37817840621f99f4a4d60680b67ae",
+      "bytes": 64246
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-5.webp",
+      "sha256": "0934b8f92599929e42989e4558ec5928e62e00e673ac8d5b82d768cf698adc68",
+      "bytes": 66542
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-6.webp",
+      "sha256": "be210b9ae786a0c71306090eb696f960d681bc27b6ed2569b6196b27c3aaf614",
+      "bytes": 59794
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-7.webp",
+      "sha256": "67d082d6dfc4d3b55aa9fbcbb580567fa354fac8c47cfeb2014a95b491a80189",
+      "bytes": 64268
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/art-v6/extra-8.webp",
+      "sha256": "6db6392f8956c94ae403f3f30b9b263c21c63f3f935bc133f0b861dc1e89c6ef",
+      "bytes": 56148
+    },
+    {
+      "path": "src/games/dungeon-tap/assets/citadel-v4.webp",
+      "sha256": "fd90aecb405d6842d8efeb7c6f73415fab431c3b2739eefb0eaa7971cbadadbe",
+      "bytes": 303942
+    },
+    {
+      "path": "src/games/dungeon-tap/battlefield-v6.css",
+      "sha256": "1b14e4a7a860b46834cac52f3bc4959b9bafe0924dbff684cc12b26173967d05",
+      "bytes": 23091
+    },
+    {
+      "path": "src/games/dungeon-tap/components/AllyEquipmentSubTab.tsx",
+      "sha256": "a9816d5098528f1e9ba2b01114a395e373296c54edbe9cb4e9d1840020aa1044",
+      "bytes": 28690
+    },
+    {
+      "path": "src/games/dungeon-tap/components/BattlefieldV6.tsx",
+      "sha256": "0e9e6e7975e5b8a758fd3b9305e327afaec5654e267c2bb45f041454ab1d70ed",
+      "bytes": 4529
+    },
+    {
+      "path": "src/games/dungeon-tap/components/CombatArt.tsx",
+      "sha256": "b37a59e3aec3b046d7075f2116b9478654dbd9a883e073ab28206462e76e6b32",
+      "bytes": 2898
+    },
+    {
+      "path": "src/games/dungeon-tap/components/DungeonArenaV3.tsx",
+      "sha256": "8acdf856034af5449e6e290e1d1f7baf19019bb3d0ae5cd9c155c3917f5b0b92",
+      "bytes": 5537
+    },
+    {
+      "path": "src/games/dungeon-tap/components/DungeonLeaderboardModal.tsx",
+      "sha256": "9736bb855d5ec357265549287354e1030374b83cd4f2742a10bf00ebb04fc579",
+      "bytes": 16070
+    },
+    {
+      "path": "src/games/dungeon-tap/components/EquipmentPanel.tsx",
+      "sha256": "889e53f35ecedc16a032112711cb3b9e6b4d10e9c3990b1295e9a5f80a351fcf",
+      "bytes": 12323
+    },
+    {
+      "path": "src/games/dungeon-tap/components/EquipmentTab.tsx",
+      "sha256": "4ddb73c1c9d09b61a8d7415d5e1bbde3e149b0ed894a0781a83bdb3a8e0e0e25",
+      "bytes": 48927
+    },
+    {
+      "path": "src/games/dungeon-tap/components/FantasyHUD.tsx",
+      "sha256": "c0006daf8c3f6daa77f0cc98eceb1376a006798bee50adb97a439914c83bcfdd",
+      "bytes": 23752
+    },
+    {
+      "path": "src/games/dungeon-tap/components/FantasyIcon.tsx",
+      "sha256": "8aa667e89d191d064f87630952fb1ac07ab1b5abbb980ad211f3aba3c27f00ab",
+      "bytes": 1024
+    },
+    {
+      "path": "src/games/dungeon-tap/components/HeroesTab.tsx",
+      "sha256": "4327f8a8c0a7637cd1dedcbb63387475d5a6813072a6c943a779b932550bac86",
+      "bytes": 18848
+    },
+    {
+      "path": "src/games/dungeon-tap/components/RasterSprite.tsx",
+      "sha256": "5a3b2f34f51e2992cf0934012ca53becf175445f2eaedad7b03561423bd6ff28",
+      "bytes": 4381
+    },
+    {
+      "path": "src/games/dungeon-tap/components/SkillBar.tsx",
+      "sha256": "6c6e7bbbe57e75e230c6ce30952d6f68b94f6e830873d82b50ff4f3cecfa2064",
+      "bytes": 9729
+    },
+    {
+      "path": "src/games/dungeon-tap/components/StatsTab.tsx",
+      "sha256": "d257bd824d82e0baa0139eb888b9bd8c9f3347b0e5a91c1003042f8fcdf83cef",
+      "bytes": 5263
+    },
+    {
+      "path": "src/games/dungeon-tap/components/StoryTab.tsx",
+      "sha256": "60584fb3a1e59e98bf08b17952c67ed013797c0363fb32366be04affa7126de6",
+      "bytes": 4706
+    },
+    {
+      "path": "src/games/dungeon-tap/components/SwordMasterTab.tsx",
+      "sha256": "b8534e42f9889b4dd094503139c04e0cea8028d0fc5e65bb83ab40081115ba40",
+      "bytes": 13439
+    },
+    {
+      "path": "src/games/dungeon-tap/components/TitanArena.tsx",
+      "sha256": "006ef9cfd0f816726023301ea3a2f2bc4c8202937f6c032ab686ce489d6b5f06",
+      "bytes": 17979
+    },
+    {
+      "path": "src/games/dungeon-tap/components/TitanArt.tsx",
+      "sha256": "66819437b38ecbcde8b5b3a9fea7dc9ea7fe7190e65cbdf2002228a3643da445",
+      "bytes": 2181
+    },
+    {
+      "path": "src/games/dungeon-tap/config.ts",
+      "sha256": "9d5e89365d2167658b00dabd288126161642bfdc327d772679d94c62b41bae47",
+      "bytes": 1237
+    },
+    {
+      "path": "src/games/dungeon-tap/director.ts",
+      "sha256": "ad71bb01f220ef106cc963e49fc547c5537f97ecf24f3db52bd9da60dc01a448",
+      "bytes": 4167
+    },
+    {
+      "path": "src/games/dungeon-tap/dungeon.css",
+      "sha256": "ff56d46f5188cd0f4125c165990f30809781408aa6c794b57fb7f7c52f262800",
+      "bytes": 20490
+    },
+    {
+      "path": "src/games/dungeon-tap/enemyRoster.ts",
+      "sha256": "d6d072183d497194c14086789ed0b6835cc82d4ef9237b64024c754cede1f704",
+      "bytes": 2492
+    },
+    {
+      "path": "src/games/dungeon-tap/engine.ts",
+      "sha256": "b96dbf065067f25c243ddbf8a7bb21778839a7377d0d3c3e4eaa32f0474e414d",
+      "bytes": 27260
+    },
+    {
+      "path": "src/games/dungeon-tap/equipment-v6-3.css",
+      "sha256": "1a02295be5e805b62f4c07ee2f82dc7b737461fade7273ba762c33b8d85156ef",
+      "bytes": 4570
+    },
+    {
+      "path": "src/games/dungeon-tap/equipmentData.ts",
+      "sha256": "397059c7cebd0b1e28b41cde98924c556e7b884452e87750d8a506839383931d",
+      "bytes": 7156
+    },
+    {
+      "path": "src/games/dungeon-tap/fantasy.css",
+      "sha256": "eb04bc754b153e6711b9b9fef0405fd754ca1e0c66ea02bd15d8bd4549ad15c7",
+      "bytes": 42830
+    },
+    {
+      "path": "src/games/dungeon-tap/index.tsx",
+      "sha256": "8766c9cac272caa94e06be16514b9b48b9933bb55146624d951139118745873b",
+      "bytes": 2411
+    },
+    {
+      "path": "src/games/dungeon-tap/skillsAndAllies.ts",
+      "sha256": "372ce483c040be6917ff9488f66c07f991d028ec84a21f5c05bad3e3ca7787d0",
+      "bytes": 15463
+    },
+    {
+      "path": "src/games/dungeon-tap/storyChapters.ts",
+      "sha256": "e3e946719b05256533ef838f7d1fedeee81ea48d79fe3e82d00c8e81a553656d",
+      "bytes": 9366
+    },
+    {
+      "path": "src/games/dungeon-tap/types.ts",
+      "sha256": "73d2b073573821839a30b74cc2677d9d0c79d544ec59d96a7d32ac82cfb314ac",
+      "bytes": 4106
+    },
+    {
+      "path": "src/games/dungeon-tap/unified-v6-2.css",
+      "sha256": "b32660051ab37391d2ee00dde3b0f8f7110e7b12eea22f08064eb672e102fd65",
+      "bytes": 12384
+    },
+    {
+      "path": "src/games/dungeon-tap/utils/upgradeMath.ts",
+      "sha256": "2a78595c48d1524d1e39f5aafd7592b5612ed7eddef696e78e87616c72011e73",
+      "bytes": 14744
+    },
+    {
+      "path": "tests/dungeon/art-v5.mjs",
+      "sha256": "e3b5fe13572f6525deaad6ae0597920077595ed356a17132e916baa3d444a7a7",
+      "bytes": 1763
+    },
+    {
+      "path": "tests/dungeon/engine.mjs",
+      "sha256": "29c306afa353bf4839ed57dcffdd5f599e43c78e718d4dbf9c61f6c9dd2db7c3",
+      "bytes": 7028
+    },
+    {
+      "path": "tests/dungeon/equipment-v6-3.mjs",
+      "sha256": "40fa30f63376e1dca3597c39bd50493125d271bc2932396cd907b75888846f35",
+      "bytes": 7282
+    },
+    {
+      "path": "tests/dungeon/facing-v6-2.mjs",
+      "sha256": "f0281aa2ecf133c841cdbc1b89cf0bce1ed76c90b861520bb1df53ec0ce0235d",
+      "bytes": 2825
+    },
+    {
+      "path": "tests/dungeon/simulate.mjs",
+      "sha256": "17756d45be7290a80d99c4a508153596a6dc9c8a4331bbf56156002175d9cb37",
+      "bytes": 3814
+    },
+    {
+      "path": "tests/dungeon/squads-v6.mjs",
+      "sha256": "fc64f94beca7e968a60d7e0c75616470e48305556c21a406b9fc5825ff3cfb0b",
+      "bytes": 5249
+    },
+    {
+      "path": "tests/dungeon/ui.mjs",
+      "sha256": "a7617b06e47e9a50d57e2007b5259adf1d11b40200132ca1c764c6e515dec2eb",
+      "bytes": 7874
+    }
+  ]
+}

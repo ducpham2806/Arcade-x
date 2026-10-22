@@ -1,0 +1,22 @@
+process.on("uncaughtException", e=>{console.error(e.message,e.detail||"",e.where||"");process.exit(1)});
+import { PGlite } from '@electric-sql/pglite';
+import {readFileSync} from 'node:fs';
+const root=new URL('../',import.meta.url).pathname;
+const db=new PGlite();
+await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;
+create table auth.users(id uuid primary key,is_anonymous boolean default false);
+create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+create function auth.jwt() returns jsonb language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb$$;
+grant usage on schema auth to authenticated,anon;grant execute on all functions in schema auth to authenticated,anon;`);
+await db.exec(readFileSync(root+'/supabase/migrations/202610110001_launcher.sql','utf8'));
+await db.exec(readFileSync(root+'/supabase/migrations/20261018002725_subscription_foundation.sql','utf8'));
+await db.exec(readFileSync(root+'/supabase/migrations/20261018052000_subscription_store_trial.sql','utf8'));
+console.log('PASS: foundation compiles on isolated PostgreSQL (PGlite)');
+await db.exec(readFileSync(root+'/supabase/tests/subscription-foundation.sql','utf8'));
+console.log('PASS: access, admin, isolation and audit scenarios');
+await db.exec(readFileSync(root+'/supabase/tests/starter-gifts.sql','utf8'));
+console.log('PASS: starter gifts, retries, config changes and account isolation');
+// Execute fixture steps individually: bounded result batches in the embedded engine.
+for(const step of readFileSync(root+'/supabase/tests/store-trial.sql','utf8').split('-- test-step')) await db.exec(step);
+console.log('PASS: store validation, trial quota, save retries, isolation, maintenance and audit');
+await db.close();

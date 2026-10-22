@@ -100,4 +100,3 @@ export const StoryTab: React.FC<StoryTabProps> = ({
     </div>
   );
 };
-

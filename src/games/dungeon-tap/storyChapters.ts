@@ -159,7 +159,7 @@ export function generateMonsterForStage(stage: number): TitanMonster {
   // Health and stats mathematical scaling
   // Base HP scales exponentially with stage
   const baseHealth = 85;
-  const healthGrowth = 1.18; // 18% increase per stage
+  const healthGrowth = 1.16; // 18% increase per stage
   let calculatedHp = Math.round(baseHealth * Math.pow(healthGrowth, stage - 1));
 
   // Boss has 5.5x health multiplier and 30s timer
@@ -173,14 +173,15 @@ export function generateMonsterForStage(stage: number): TitanMonster {
 
   // Gold reward
   const baseGold = 18;
-  let goldReward = Math.round(baseGold * Math.pow(1.17, stage - 1));
+  let goldReward = Math.round(baseGold * Math.pow(1.16, stage - 1));
   if (isBoss) {
     goldReward = Math.round(goldReward * 4.5);
   }
 
   if (isBoss) {
-    const bossIdx = Math.floor((stage / 10 - 1) % BOSS_NAMES.length);
-    const bossTemplate = BOSS_NAMES[bossIdx];
+    const bossIdx = Math.min(7, chapter.id - 1);
+    const minibossNames = ['Goblin Chùy Sắt','Hộ Vệ Xương Cổ','Nhện Dệt Tơ Độc','Hiệp Sĩ Huyết Nguyệt','Ấu Long Dung Nham','Cự Nhân Băng Giáp','Kỵ Sĩ Lôi Vũ','Sứ Giả Hư Vô'];
+    const bossTemplate = {name:stage===chapter.endStage?chapter.bossName:minibossNames[bossIdx],avatar:chapter.bossAvatar,title:stage===chapter.endStage?'Thủ lĩnh chương':'Hộ vệ cổng Titan'};
     return {
       id: `boss-${stage}-${Date.now()}`,
       name: `[CẤP ${stage}] ${bossTemplate.name}`,
@@ -200,8 +201,13 @@ export function generateMonsterForStage(stage: number): TitanMonster {
   }
 
   // Regular Titan
-  const regularIdx = (stage * 7 + 3) % REGULAR_MONSTER_NAMES.length;
-  const regTemplate = REGULAR_MONSTER_NAMES[regularIdx];
+  const pools = [
+    ['Goblin Trinh Sát','Goblin Thiết Giáp','Quỷ Rừng'],['Khung Xương Đao Phủ','Hộ Vệ Lăng Mộ','Pháp Sư Vong Linh'],
+    ['Nhện Hư Không','Ma Cây Độc Dược','Phù Thủy Rừng'],['Dơi Huyết Dạ','Lính Gác Huyết Ma','Bóng Ma Thành Cổ'],
+    ['Tinh Linh Hỏa Ngục','Hộ Vệ Dung Nham','Rồng Con Lửa'],['Băng Linh','Chiến Binh Tuyết','Phù Thủy Băng'],
+    ['Hộ Vệ Lôi Điện','Sứ Giả Sấm Sét','Kỵ Binh Thiên Lôi'],['Kẻ Săn Hư Vô','Ảo Ảnh Titan','Bóng Ma Vực Thẳm'],
+  ];
+  const regTemplate = {name:pools[Math.min(7,chapter.id-1)][(stage*7+3)%3],avatar:chapter.bossAvatar};
   return {
     id: `mob-${stage}-${Date.now()}`,
     name: `${regTemplate.name} (T${stage})`,
@@ -219,4 +225,3 @@ export function generateMonsterForStage(stage: number): TitanMonster {
     theme: chapter.bgGradient,
   };
 }
-

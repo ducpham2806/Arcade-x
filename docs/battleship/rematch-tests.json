@@ -1,0 +1,20 @@
+{
+  "checks": 14,
+  "passed": [
+    "finished duel offers rematch for two minutes without exposing private identifiers",
+    "one confirmation cannot restart a duel and may be withdrawn",
+    "all consent creates a fresh linked room, rotates first seat and preserves old result",
+    "original-room refresh follows the rematch for the first voter",
+    "retry of the old winning action returns the new room without replaying surrender",
+    "withdrawal after everyone already agreed cannot cancel the new match",
+    "lost final-consent response retries into exactly one child",
+    "duplicate final confirmation requests cannot create two children",
+    "expired rematch rejects consent and creates no child",
+    "an identity entering another active room blocks atomic rematch creation",
+    "four-player rematch needs all four confirmations and retains teams/empty fourteen-cell boards",
+    "unfinished waiting rooms cannot be restarted through rematch",
+    "departed participants disable rematch even if the old state finished",
+    "outsider and browser database roles cannot invoke privileged rematch persistence"
+  ],
+  "scope": "Real handler, client and PostgreSQL/PGlite; fixture Auth, one local DB session. Not physical-device or registered-account cloud QA."
+}

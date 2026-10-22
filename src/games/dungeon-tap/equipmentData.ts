@@ -100,10 +100,10 @@ const SLOT_ICONS: Record<EquipmentSlot, string> = {
   ring: '💍',
 };
 
-export function getRandomRarity(stage: number): ItemRarity {
+export function getRandomRarity(stage: number, rng: () => number = Math.random): ItemRarity {
   // Higher stages give better odds for rare/epic/legendary
   const bonusRarity = Math.min(25, Math.floor(stage / 10) * 3);
-  const roll = Math.random() * 100;
+  const roll = rng() * 100;
 
   if (roll < 3 + bonusRarity * 0.3) return 'legendary';
   if (roll < 15 + bonusRarity * 0.6) return 'epic';
@@ -111,10 +111,10 @@ export function getRandomRarity(stage: number): ItemRarity {
   return 'common';
 }
 
-export function generateLootItem(stage: number, forcedSlot?: EquipmentSlot): EquipmentItem {
+export function generateLootItem(stage: number, forcedSlot?: EquipmentSlot, rng: () => number = Math.random): EquipmentItem {
   const slots: EquipmentSlot[] = ['weapon', 'armor', 'helmet', 'cloak', 'ring'];
-  const slot = forcedSlot || slots[Math.floor(Math.random() * slots.length)];
-  const rarity = getRandomRarity(stage);
+  const slot = forcedSlot || slots[Math.floor(rng() * slots.length)];
+  const rarity = getRandomRarity(stage, rng);
   const rarityInfo = RARITY_CONFIG[rarity];
 
   let nameList = WEAPON_NAMES;
@@ -123,12 +123,12 @@ export function generateLootItem(stage: number, forcedSlot?: EquipmentSlot): Equ
   if (slot === 'cloak') nameList = CLOAK_NAMES;
   if (slot === 'ring') nameList = RING_NAMES;
 
-  const baseName = nameList[Math.floor(Math.random() * nameList.length)];
+  const baseName = nameList[Math.floor(rng() * nameList.length)];
   // All equipment dropped in dungeons starts at Level 1
   const itemLevel = 1;
 
   // Base stats at level 1 scale based on the dungeon stage where dropped and rarity multiplier
-  const stageScale = Math.pow(1.08, Math.max(0, stage - 1));
+  const stageScale = 1 + .03 * Math.max(0, stage - 1);
   const statScale = stageScale * rarityInfo.statMultiplier;
 
   let tapDmgBonus = 0;
@@ -156,7 +156,7 @@ export function generateLootItem(stage: number, forcedSlot?: EquipmentSlot): Equ
   const upgradeCost = Math.round(35 * statScale);
 
   return {
-    id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    id: `item-${Math.floor(rng() * 1e12)}-${rng().toString(36).substring(2, 7)}`,
     name: baseName,
     slot,
     rarity,
@@ -285,4 +285,3 @@ export const STARTER_EQUIPMENT: Record<EquipmentSlot, EquipmentItem> = {
     },
   },
 };
-

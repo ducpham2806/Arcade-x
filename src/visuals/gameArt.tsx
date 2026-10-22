@@ -8,6 +8,7 @@ import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
 export const GAME_ART: Record<string, { color: string; secondary: string; label: string; world: string }> = {
+  'battleship': {color:'#dfbb7e',secondary:'#6ca7c2',label:'HẢI CHIẾN',world:'Naval Warfare · Hạm đội vỏ thép'},
   'boom-buddies': {color:'#ffa846',secondary:'#89ce57',label:'GAME MỚI',world:'Khu vườn bom vui nhộn'},
   'brick-breaker': {color:'#67eece',secondary:'#a68dff',label:'GAME MỚI',world:'Chronicles · Sáu miền Aethra'},
   'rainbow-blocks': { color:'#7fe6ff',secondary:'#d88beb',label:'GAME MỚI',world:'Cầu vồng sắc màu' },
@@ -120,9 +121,10 @@ function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string
       <path d="M15 15L169 169" stroke="white" strokeWidth="2" opacity=".7"/>
     </g>;
     case 'neon-runner': return <g>
-      {[0,1,2,3,4,5,6].map(i=><g key={i}><rect x={65+i*43} y={65+(i*37)%80} width="32" height="150" fill="#233055"/><path d={`M${73+i*43} ${80+(i*37)%80}v70`} stroke={i%2?a:b} strokeWidth="3" opacity=".7"/></g>)}
-      <path d="M42 216H370" stroke={a} strokeWidth="4"/><path d="M96 195H178M70 169H159M113 145H173" stroke={b} strokeWidth="4" strokeLinecap="round"/>
-      <g stroke={a} strokeWidth="17" strokeLinecap="round" strokeLinejoin="round" fill="none"><circle cx="229" cy="80" r="14" fill={a} stroke="white" strokeWidth="2"/><path d="M218 111L198 149L240 169L218 206M198 149L171 177L145 177M211 116L250 127L271 104M215 113L184 98L165 115"/></g>
+      <path d="M30 220H390M40 170H110M290 115H370" stroke="#82dbe1" strokeWidth="6"/><path d="M45 208V99L83 63H134V209M294 208V80H344V209" fill="#203f52" stroke="#4a7c88" strokeWidth="3"/>
+      <image href="/game-art/illustrations/neon-hero.png" x="138" y="18" width="155" height="202" preserveAspectRatio="xMidYMid meet" style={{imageRendering:'pixelated'}}/>
+      <circle cx="301" cy="71" r="20" fill="#fff2b2"/><circle cx="301" cy="71" r="30" fill="#ffd984" opacity=".18"/><path d="M293 71h16m-8-8v16" stroke="#946c41" strokeWidth="3"/>
+      <path d="M53 146h51m-70 22h61m231-18h48" stroke="#e5b46b" strokeWidth="5" strokeLinecap="round"/>
     </g>;
     case 'cosmic-defense': return <g>
       <circle cx="307" cy="72" r="46" fill="#343666"/><ellipse cx="307" cy="72" rx="68" ry="16" fill="none" stroke={a} strokeWidth="5" transform="rotate(-25 307 72)"/>
@@ -206,16 +208,18 @@ function Backdrop({id,a,b}:{id:string;a:string;b:string}){
  }
 }
 
-export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
+export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
  const uid=useId().replace(/[^a-zA-Z0-9_-]/g,'');const id=canonicalArtId(gameId);const {color,secondary}=artFor(id);
+ if(id==='battleship') return <svg className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} viewBox="0 0 420 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="/games/battleship/ocean.webp" width="420" height="420" y="-85"/><rect width="420" height="250" fill="#081725" opacity=".35"/><image href="/games/battleship/us-carrier.webp" x="110" y="12" width="90" height="228"/><image href="/games/battleship/jp-battleship.webp" x="224" y="18" width="88" height="218"/></svg>;
  return <svg className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} viewBox={variant==='icon'?'60 -25 300 300':'0 0 420 250'} preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true" focusable="false">
- <defs><clipPath id={`${uid}-orb`}><rect x="135" y="92" width="105" height="105"/></clipPath><radialGradient id={`${uid}-sky`} cx=".5" cy=".35" r=".9"><stop stopColor={color} stopOpacity=".3"/><stop offset="1" stopColor="#071321"/></radialGradient></defs>
+ <defs><clipPath id={`${uid}-orb`}><rect x="135" y="92" width="105" height="105"/></clipPath><radialGradient id={`${uid}-sky`} cx=".35" cy=".2" r="1"><stop stopColor={color} stopOpacity=".72"/><stop offset=".62" stopColor={secondary} stopOpacity=".24"/><stop offset="1" stopColor="#0b172b"/></radialGradient><filter id={`${uid}-depth`} x="-25%" y="-25%" width="150%" height="170%"><feDropShadow dx="0" dy="8" stdDeviation="5" floodColor="#020a16" floodOpacity=".6"/></filter></defs>
  <rect x="0" y="-30" width="420" height="310" fill={`url(#${uid}-sky)`}/><g transform={variant==='icon'?'translate(0 -25) scale(1 1.2)':undefined}><Backdrop id={id} a={color} b={secondary}/></g>
- <g className="game-artwork-scene" transform={variant==='icon'?'translate(18 8) scale(.9)':undefined}>{variant==='icon'&&id==='hex-match'?<image href={blossomAsset(BLOSSOM_ICON)} x="85" y="0" width="250" height="250"/>:<Scene id={id} a={color} b={secondary} uid={uid}/>}</g></svg>;
+ <g className="game-artwork-scene" filter={`url(#${uid}-depth)`} transform={variant==='icon'?'translate(18 8) scale(.9)':undefined}>{variant==='icon'&&id==='hex-match'?<image href={blossomAsset(BLOSSOM_ICON)} x="85" y="0" width="250" height="250"/>:<Scene id={id} a={color} b={secondary} uid={uid}/>}</g>{variant==='icon'&&<><path d="M80 26Q210 -22 340 26" stroke="#fff" strokeOpacity=".18" strokeWidth="3"/><rect x="65" y="-20" width="290" height="290" rx="55" stroke="#fff" strokeOpacity=".16" strokeWidth="2" fill="none"/></>}</svg>;
 }
-export function GameIcon({gameId}:{gameId:string}) {
- return canonicalArtId(gameId)==='hex-match'?<img src={blossomAsset(BLOSSOM_ICON)} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:8}}/>:<GameArtwork gameId={gameId} variant="icon"/>;
+export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
+ const id=canonicalArtId(gameId);return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
 }
+export function GameIcon({gameId}:{gameId:string}) {return <GameArtwork gameId={gameId} variant="icon"/>;}
 
 export function GameAtmosphere({ gameId }: {gameId: string}) {
   const {world}=artFor(gameId);
@@ -225,4 +229,5 @@ export function GameAtmosphere({ gameId }: {gameId: string}) {
     <span className="game-world-coordinate">✦ PLAY / EXPLORE / MASTER</span>
   </div>;
 }
+
 

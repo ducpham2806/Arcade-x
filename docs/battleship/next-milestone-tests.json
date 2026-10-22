@@ -1,0 +1,23 @@
+{
+  "checks": 17,
+  "results": [
+    "all seven tutorial actions finish and demonstrate miss, hit, sunk",
+    "tutorial misclick does not consume or mutate step",
+    "tutorial rotates first hull then rejects overlap without losing ships",
+    "normal rules and hidden fleet remain unchanged outside the lesson",
+    "create/join binds verified identities to seats and filters snapshots",
+    "two simultaneous join requests cannot take the same seat",
+    "same member rejoining is idempotent and does not reset board",
+    "snooped room ID cannot authorize a write",
+    "actor fields in a placement cannot change the bound ship owner",
+    "concurrent ready-state edits resolve by version, never overwrite",
+    "action replay returns receipt while reusing ID for different input is rejected",
+    "late shot persists timeout first, returns expiry and never fires",
+    "two clients racing to shoot a turn get exactly one shot",
+    "scheduler entrypoint expires battle turns without a browser request",
+    "scheduler auto-fills preparation and expires empty waiting rooms",
+    "reconnect snapshot returns current version without private enemy hulls",
+    "finished room rejects new commands but accepts idempotent winning-action receipt"
+  ],
+  "scope": "tutorial + authoritative core with atomic in-memory store; not a deployed Supabase/online test"
+}
