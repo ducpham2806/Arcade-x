@@ -1,3 +1,4 @@
+import rasterIcons from './rasterIcons.json';
 import React, { useId } from 'react';
 import boomPip from '../../public/boom/tiles/png/characters/pip_idle_front.png';
 import boomBum from '../../public/boom/tiles/png/characters/bum_front.png';
@@ -217,7 +218,7 @@ export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId
  <g className="game-artwork-scene" filter={`url(#${uid}-depth)`} transform={variant==='icon'?'translate(18 8) scale(.9)':undefined}>{variant==='icon'&&id==='hex-match'?<image href={blossomAsset(BLOSSOM_ICON)} x="85" y="0" width="250" height="250"/>:<Scene id={id} a={color} b={secondary} uid={uid}/>}</g>{variant==='icon'&&<><path d="M80 26Q210 -22 340 26" stroke="#fff" strokeOpacity=".18" strokeWidth="3"/><rect x="65" y="-20" width="290" height="290" rx="55" stroke="#fff" strokeOpacity=".16" strokeWidth="2" fill="none"/></>}</svg>;
 }
 export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
- const id=canonicalArtId(gameId);return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
+ const id=canonicalArtId(gameId);return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
 }
 export function GameIcon({gameId}:{gameId:string}) {return <GameArtwork gameId={gameId} variant="icon"/>;}
 

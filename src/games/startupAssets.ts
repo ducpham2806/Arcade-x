@@ -8,7 +8,7 @@ const firstScreen: Record<string, RegExp> = {
   'battleship': /\/(?:ocean|us-carrier|jp-battleship)\.webp$/,
 };
 export function startupAssets(id: string, urls: string[]): string[] {
-  const icon = urls.filter(url => url === `/game-art/icons/${id}.webp`);
+  const icon = urls.filter(url => url.startsWith('/game-art/icons/'));
   // These frames already own asset loading; do not download their packs twice.
   if (id === 'neon-runner' || id === 'brick-breaker') return icon;
   const available = urls.filter(url => !url.startsWith('/game-art/') && !/\/(?:prompts|manifest|.*audit)\.json$/.test(url));

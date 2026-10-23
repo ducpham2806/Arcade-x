@@ -1,0 +1,51 @@
+{
+  "cosmic-defense": {
+    "master": "art/launcher/tech-art-20261021/cosmic-defense.png",
+    "sourceFileName": "Cobalt Ascension: Nebula Assault.png",
+    "sourceLibraryFileId": "libfile_3544c4fd73bc81918e72291246eaafc5",
+    "sourceCreatedAt": "2026-10-21T11:09:23.058151+00:00",
+    "sourceSHA256": "c830b57a7083fe0cf411e0a424a448db4e7c8e548e4bf24b84677e1e164cef31"
+  },
+  "dungeon-tap": {
+    "master": "art/launcher/tech-art-20261021/dungeon-tap.png",
+    "sourceFileName": "Knight versus the Stone Titan.png",
+    "sourceLibraryFileId": "libfile_37da7f085e8c81919a25a633a9f8a8d4",
+    "sourceCreatedAt": "2026-10-21T11:09:17.981051+00:00",
+    "sourceSHA256": "7c00eb6b30a26c6b81b091fa824b4c4c2124acfb5c5044add4638dcd3542a51a"
+  },
+  "neon-runner": {
+    "master": "art/launcher/tech-art-20261021/neon-runner.png",
+    "sourceFileName": "Neo’s Luminous Rooftop Leap.png",
+    "sourceLibraryFileId": "libfile_7c0ee11adcb4819182a122e80ce2280e",
+    "sourceCreatedAt": "2026-10-21T11:09:13.097225+00:00",
+    "sourceSHA256": "670a85dab13057f58a3b1bdbcb6817f521d2cc9f30d99a9864dc25fc57e04380"
+  },
+  "rainbow-blocks": {
+    "master": "art/launcher/tech-art-20261021/rainbow-blocks.png",
+    "sourceFileName": "Cyan T-Block Rainbow Burst.png",
+    "sourceLibraryFileId": "libfile_96b8dec8a9548191940246d1f0238bc1",
+    "sourceCreatedAt": "2026-10-21T11:09:08.308407+00:00",
+    "sourceSHA256": "1cdb23455a3b6d8392b4187eafabe0b48dcc41a9386787b68b1e7825107887a4"
+  },
+  "brick-breaker": {
+    "master": "art/launcher/tech-art-20261021/brick-breaker.png",
+    "sourceFileName": "Turquoise Orb Shatters Crystal Bricks.png",
+    "sourceLibraryFileId": "libfile_39e3f12060ec819197ce9ff3d119190a",
+    "sourceCreatedAt": "2026-10-21T11:09:03.469588+00:00",
+    "sourceSHA256": "490ab0e42137a3c9a83a5d0ef729766500b9a8ec0630b217fcb35bd3dac55f5d"
+  },
+  "boom-buddies": {
+    "master": "art/launcher/tech-art-20261021/boom-buddies.png",
+    "sourceFileName": "Pip’s Garden Bomb Escape.png",
+    "sourceLibraryFileId": "libfile_8046dc3bb31c8191a70b55e0eacec013",
+    "sourceCreatedAt": "2026-10-21T11:08:58.975074+00:00",
+    "sourceSHA256": "a439f35cc43b6234ce4a86cfbefa4db0354c8e14f547875a5fef4c5d8d5afb29"
+  },
+  "battleship": {
+    "master": "art/launcher/tech-art-20261021/battleship.png",
+    "sourceFileName": "Steel horizon battleship strike.png",
+    "sourceLibraryFileId": "libfile_4fd23607e6e48191b3caf11199b2e907",
+    "sourceCreatedAt": "2026-10-21T11:08:53.132482+00:00",
+    "sourceSHA256": "a06c00fa672e8fec9bdc6488fb91edfd3774b860dd1761b292090a1c452ba405"
+  }
+}

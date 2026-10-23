@@ -35,7 +35,7 @@ const tick=()=>new Promise(resolve=>setImmediate(resolve));
  persistent.set('/bad/one.png',new Response('<html>fallback</html>',{headers:{'Content-Type':'text/html'}}));
  const bad=harness({bad:['/bad/one.png']});bad.api.packageLazy('bad',async()=>({default:()=>null}));await bad.api.prepareGamePackage('bad',new AbortController().signal,()=>{});assert.equal(bad.requested.length,1,'discard a cached SPA fallback and fetch the image again');
  const plans=harness();let total=0,boot=0;
- for(const [id,urls] of Object.entries(real)){const selected=plans.plan.startupAssets(id,urls);assert.ok(selected.length<=16);assert.ok(selected.every(u=>urls.includes(u)));assert.ok(selected.includes('/game-art/icons/'+id+'.webp'));total+=urls.length;boot+=selected.length;}
+ for(const [id,urls] of Object.entries(real)){const selected=plans.plan.startupAssets(id,urls);assert.ok(selected.length<=16);assert.ok(selected.every(u=>urls.includes(u)));assert.ok(selected.includes(urls.find(url=>url.startsWith('/game-art/icons/'))));total+=urls.length;boot+=selected.length;}
  assert.ok(plans.plan.startupAssets('boom-buddies',real['boom-buddies']).length<20);
  const gate=fs.readFileSync('src/components/GamePackageGate.tsx','utf8'),cards=fs.readFileSync('src/components/common/LazyGameCard.tsx','utf8');
  assert.match(gate,/gameId=\{game.id\} variant="icon"/);assert.match(cards,/gameId=\{game.id\} variant="icon"/);assert.ok(!gate.includes('state.completed}'));assert.ok(!gate.includes('setInterval'));

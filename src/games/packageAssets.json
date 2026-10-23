@@ -51,7 +51,7 @@
     "/games/cosmic-defense/story/story_end_1_nap_loi_sao.png",
     "/games/cosmic-defense/story/story_end_2_to_me_sup_do.png",
     "/games/cosmic-defense/story/story_end_3_cong_sang.png",
-    "/game-art/icons/cosmic-defense.webp",
+    "/game-art/icons/cosmic-defense.techart-52712edf1188.webp",
     "/game-art/banners/cosmic-defense.webp"
   ],
   "rainbow-blocks": [
@@ -160,7 +160,7 @@
     "/rainbow_blocks_assets/ui/slider_track.svg",
     "/rainbow_blocks_assets/ui/toggle_off.svg",
     "/rainbow_blocks_assets/ui/toggle_on.svg",
-    "/game-art/icons/rainbow-blocks.webp",
+    "/game-art/icons/rainbow-blocks.techart-51a3a04a1bae.webp",
     "/game-art/banners/rainbow-blocks.webp"
   ],
   "hex-match": [
@@ -288,7 +288,7 @@
     "/boom/tiles/png/tiles_ch1/gate_open.png",
     "/boom/tiles/png/tiles_ch1/hard_block.png",
     "/boom/tiles/png/tiles_ch1/soft_block.png",
-    "/game-art/icons/boom-buddies.webp",
+    "/game-art/icons/boom-buddies.techart-f907995e7ecd.webp",
     "/game-art/banners/boom-buddies.webp",
     "/boom/art-v3/bosses/gau_ri_set.webp",
     "/boom/art-v3/bosses/hiep_si_bong_dem.webp",
@@ -567,7 +567,7 @@
     "/chronicles-realms/scifi-data.js",
     "/chronicles-realms/scifi.css",
     "/chronicles-realms/style.css",
-    "/game-art/icons/brick-breaker.webp",
+    "/game-art/icons/brick-breaker.techart-f2afdf47f0ed.webp",
     "/game-art/banners/brick-breaker.webp"
   ],
   "battleship": [
@@ -609,7 +609,7 @@
     "/games/battleship/smoke-4.webp",
     "/games/battleship/smoke-5.webp",
     "/games/battleship/smoke-6.webp",
-    "/game-art/icons/battleship.webp",
+    "/game-art/icons/battleship.techart-a177e2e0c762.webp",
     "/game-art/banners/battleship.webp"
   ],
   "neon-runner": [
@@ -786,7 +786,7 @@
     "/standalone/neon-run/game.js",
     "/standalone/neon-run/index.html",
     "/standalone/neon-run/launcher-bridge.js",
-    "/game-art/icons/neon-runner.webp",
+    "/game-art/icons/neon-runner.techart-895a2da736eb.webp",
     "/game-art/banners/neon-runner.webp"
   ],
   "word-cross": [
@@ -833,7 +833,7 @@
     "/games/dungeon-tap/assets/art-v6/extra-7.webp",
     "/games/dungeon-tap/assets/art-v6/extra-8.webp",
     "/games/dungeon-tap/assets/citadel-v4.webp",
-    "/game-art/icons/dungeon-tap.webp",
+    "/game-art/icons/dungeon-tap.techart-2993399fd793.webp",
     "/game-art/banners/dungeon-tap.webp"
   ],
   "mummy-escape": [
