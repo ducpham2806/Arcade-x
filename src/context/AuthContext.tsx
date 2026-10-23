@@ -1,3 +1,4 @@
+import { SYNC } from '../services/syncPolicy';
 import { PasswordRecoveryScreen } from '../components/PasswordRecoveryScreen';
 import { getRecoveryState, clearRecovery } from '../services/authRecovery';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
@@ -60,10 +61,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => { void AuthService.checkpoint().catch(() => {
       setNotice('Tiến trình đã lưu trên thiết bị; đồng bộ tài khoản sẽ thử lại khi có kết nối.');
     }); };
-    const interval = setInterval(save, 5000);
+    const interval = setInterval(() => { if (!document.hidden && navigator.onLine) save(); }, SYNC.checkpoint);
+    const visibility = () => { if (document.hidden) save(); };
+    document.addEventListener('visibilitychange', visibility);
     window.addEventListener('pagehide', save);
     window.addEventListener('online', save);
-    return () => { clearInterval(interval); window.removeEventListener('pagehide', save); window.removeEventListener('online', save); };
+    return () => { document.removeEventListener('visibilitychange', visibility); clearInterval(interval); window.removeEventListener('pagehide', save); window.removeEventListener('online', save); };
   }, [loading, restoreError, currentUser?.id, recovery.status]);
 
   const register = useCallback(async (params: RegisterParams) => { const result = apply(await AuthService.register(params)); if (result.success && !result.needsEmailConfirmation) setEntered(true); return result; }, [apply]);
@@ -90,3 +93,4 @@ export function useAuth(): AuthContextType {
   if (!value) throw new Error('useAuth must be used within an AuthProvider');
   return value;
 }
+

@@ -1,3 +1,5 @@
+import { SYNC } from '../services/syncPolicy';
+import { sessionWriter } from '../services/sessionSync';
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Achievement, DailyQuest,
   FriendQuest, LeaderboardEntry, GameMetadata, ActiveModal, ShareData, DailyChallenge, PausedGameSession, PlayerProfile,
@@ -271,16 +273,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [incomingChallenges, setIncomingChallenges] = useState<FriendChallenge[]>([]);
   const [activeIncomingChallenge, setActiveIncomingChallenge] = useState<FriendChallenge | null>(null);
 
+  const presenceProfile = useRef(profile);
+  presenceProfile.current = profile;
   // Heartbeat Presence Broadcast (Keep user alive in Supabase)
   useEffect(() => {
     if (!profile?.id) return;
     const activity = activeGameId ? `Đang chơi ${activeGameId}` : 'Đang ở Sảnh Arcade';
-    SupabaseService.updatePlayerPresence(profile, activity);
-    const interval = setInterval(() => {
-      SupabaseService.updatePlayerPresence(profile, activity);
-    }, 45000);
+    const heartbeat = () => { if (!document.hidden && navigator.onLine) void SupabaseService.updatePlayerPresence(presenceProfile.current, activity); };
+    heartbeat();
+    const interval = setInterval(heartbeat, SYNC.presence);
     return () => clearInterval(interval);
-  }, [profile, activeGameId]);
+  }, [profile.id, activeGameId]);
 
   // Subscribe to real-time incoming PvP challenges
   useEffect(() => {
@@ -568,13 +571,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [weeklyMilestones, setWeeklyMilestones] = useState<WeeklyMilestoneReward[]>(() => StorageService.loadWeeklyMilestones());
   const [weeklyCountdown, setWeeklyCountdown] = useState<WeeklyResetTimer>(() => StorageService.getWeeklyResetCountdown());
 
-  // Countdown timer updater
+  // Weekly UI is only visible in the launcher; do not repaint every game each second.
   useEffect(() => {
+    if (activeGameId) return;
+    setWeeklyCountdown(StorageService.getWeeklyResetCountdown());
     const timer = setInterval(() => {
-      setWeeklyCountdown(StorageService.getWeeklyResetCountdown());
+      if (!document.hidden) setWeeklyCountdown(StorageService.getWeeklyResetCountdown());
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [activeGameId]);
 
   const weeklyPoints = useMemo(() => {
     return weeklyQuests.reduce((sum, q) => (q.completed ? sum + q.questPoints : sum), 0);
@@ -627,7 +632,32 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, [weeklyMilestones, weeklyPoints, addCoins, addGems, addExp]);
 
+  const autosaveQueue = useMemo(() => sessionWriter<PausedGameSession>({
+    owner: profile.id,
+    activeOwner: () => StorageService.loadProfile().id,
+    readLocal: () => StorageService.loadPausedGame(),
+    upload: session => SupabaseService.syncGameSessionToCloud(profile.id, session, false),
+  }), [profile.id]);
+  useEffect(() => {
+    autosaveQueue.restore();
+    const flush = () => { void autosaveQueue.flush(); };
+    const switching = () => autosaveQueue.cancel();
+    window.addEventListener('pagehide', flush);
+    window.addEventListener('online', flush);
+    window.addEventListener('arcadex:account_switching', switching);
+    const visibility = () => { if (document.hidden) flush(); };
+    document.addEventListener('visibilitychange', visibility);
+    return () => {
+      autosaveQueue.cancel();
+      window.removeEventListener('pagehide', flush);
+      window.removeEventListener('online', flush);
+      window.removeEventListener('arcadex:account_switching', switching);
+      document.removeEventListener('visibilitychange', visibility);
+    };
+  }, [autosaveQueue]);
+
   const saveAndSuspendGame = useCallback((session: PausedGameSession, exitToHub: boolean = true) => {
+    autosaveQueue.cancel();
     StorageService.savePausedGame(session);
     setPausedGameSession(session);
     if (exitToHub) {
@@ -638,16 +668,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       soundEngine.play('click');
     }
     if (profile.id) {
-      SupabaseService.syncGameSessionToCloud(profile.id, session);
+      autosaveQueue.enqueue(session);
+      void autosaveQueue.flush();
     }
-  }, [profile.id, finishPlay]);
+  }, [profile.id, finishPlay, autosaveQueue]);
 
   const autoSaveGameSession = useCallback((session: PausedGameSession) => {
-    saveAndSuspendGame(session, false);
-  }, [saveAndSuspendGame]);
+    StorageService.savePausedGame(session);
+    autosaveQueue.enqueue(session);
+  }, [autosaveQueue]);
 
   const resumePausedGame = useCallback(async () => {
-    const session = pausedGameSession || StorageService.loadPausedGame();
+    const session = StorageService.loadPausedGame() || pausedGameSession;
     if (!session || !await authorize(session.gameId)) return;
     recordPlay(session.gameId);
     hapticService.tap();
@@ -659,19 +691,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [pausedGameSession, authorize, recordPlay]);
 
   const discardPausedGame = useCallback(() => {
+    autosaveQueue.cancel();
     hapticService.tap();
     soundEngine.play('click');
     StorageService.clearPausedGame();
     setPausedGameSession(null);
     if (profile.id) {
-      SupabaseService.syncGameSessionToCloud(profile.id, null);
+      autosaveQueue.enqueue(null);
+      void autosaveQueue.flush();
     }
-  }, [profile.id]);
+  }, [profile.id, autosaveQueue]);
 
   // Subscribe to Cloud Game Session (Cross-device auto-save and resume)
   useEffect(() => {
     if (!profile.id) return;
+    let mounted = true;
     SupabaseService.loadGameSessionFromCloud(profile.id).then((cloudSession) => {
+      if (!mounted || autosaveQueue.busy || StorageService.loadProfile().id !== profile.id) return;
       if (cloudSession) {
         setPausedGameSession((prev) => {
           if (!prev || cloudSession.savedAt > prev.savedAt) {
@@ -684,9 +720,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     const unsubscribe = SupabaseService.subscribeToCloudGameSession(profile.id, (cloudSession) => {
+      // A queued local save or clear takes precedence over an older server echo.
+      if (autosaveQueue.busy) return;
       if (cloudSession) {
         setPausedGameSession((prev) => {
-          if (!prev || cloudSession.savedAt >= prev.savedAt) {
+          const local = StorageService.loadPausedGame();
+          if (local && local.savedAt > cloudSession.savedAt) return local;
+          if (!prev || cloudSession.savedAt > prev.savedAt) {
             StorageService.savePausedGame(cloudSession);
             return cloudSession;
           }
@@ -695,15 +735,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         // If discarded or completed on another device, update local state
         const local = StorageService.loadPausedGame();
-        if (local) {
+        if (local && !autosaveQueue.busy) {
           StorageService.clearPausedGame();
           setPausedGameSession(null);
         }
       }
     });
 
-    return () => unsubscribe();
-  }, [profile.id]);
+    return () => { mounted = false; unsubscribe(); };
+  }, [profile.id, autosaveQueue]);
 
   const dismissUnlockedAchievement = useCallback(() => {
     setUnlockedAchievement(null);
@@ -812,12 +852,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [profile.id, activeGameId]);
 
   const exitGame = useCallback(() => {
+    void autosaveQueue.flush();
     finishPlay();
     soundEngine.play('click');
     setActiveGameId(null);
     setIsDailyChallengeMode(false);
     audioManager.playMusic(musicTheme);
-  }, [musicTheme, finishPlay]);
+  }, [musicTheme, finishPlay, autosaveQueue]);
 
   const toggleSound = useCallback(() => {
     const next = audioManager.toggleSound();
@@ -1225,4 +1266,5 @@ export const useGame = (): GameContextType => {
   }
   return context;
 };
+
 

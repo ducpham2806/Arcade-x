@@ -1,3 +1,4 @@
+import { SYNC } from '../services/syncPolicy';
 import {accessPreviewEnabled} from '../commerce/api';
 import { supabase } from '../services/supabaseClient';
 import { bundledCatalog, parseCatalog, isLocalReviewGame, type Catalog, type CatalogGame } from './catalog';
@@ -11,11 +12,18 @@ async function rpc(name: string, args: Record<string,unknown> = {}) {
   try { const result=await supabase.rpc(name,args).abortSignal(controller.signal);if(result.error)throw result.error;return result.data; }
   finally {clearTimeout(timer);}
 }
+let catalogRequest: Promise<Catalog> | null = null;
+let catalogUntil = 0;
 export async function fetchCatalog(): Promise<Catalog> {
-  const raw=await rpc('launcher_catalog');const result=parseCatalog(raw);
-  if(!result)throw new Error('catalog_unavailable');
-  try {localStorage.setItem(cacheKey,JSON.stringify(raw));}catch {}
-  return result;
+  if (Date.now() < catalogUntil) return cachedCatalog();
+  if (catalogRequest) return catalogRequest;
+  catalogRequest = (async () => {
+    const raw=await rpc('launcher_catalog');const result=parseCatalog(raw);
+    if(!result)throw new Error('catalog_unavailable');
+    try {localStorage.setItem(cacheKey,JSON.stringify(raw));catalogUntil=Date.now()+SYNC.library;}catch {}
+    return result;
+  })().finally(() => { catalogRequest=null; });
+  return catalogRequest;
 }
 export async function checkAccess(game: CatalogGame): Promise<{allowed:boolean;reason:string}> {
   if(accessPreviewEnabled){
@@ -60,5 +68,6 @@ export async function flushFavorites(owner:string):Promise<void>{
 }
 export async function startSession(owner:string,gameId:string,id:string){await requireOwner(owner);await rpc('launcher_session_start',{p_game_id:gameId,p_session_id:id,p_expected_owner:owner});}
 export async function finishSession(owner:string,id:string,outcome:'completed'|'left',score?:number){await requireOwner(owner);await rpc('launcher_session_finish',{p_session_id:id,p_outcome:outcome,p_expected_owner:owner,p_score:Number.isFinite(score)?Math.max(0,Math.floor(score!)):null});}
+
 
 

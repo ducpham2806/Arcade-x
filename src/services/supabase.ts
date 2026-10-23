@@ -30,6 +30,8 @@ export interface CloudInventoryData {
   updatedAt?: number;
 }
 const cloudDb = getCloudDatabase();
+const profileAcknowledged = new Map<string, string>();
+if (typeof window !== 'undefined') window.addEventListener('arcadex_auth_changed', () => profileAcknowledged.clear());
 
 // Initial mock tips and welcoming messages for arcade community
 const DEFAULT_CHAT_MESSAGES: ChatMessage[] = [
@@ -285,7 +287,10 @@ export class SupabaseService {
   }
 
   public static async syncProfileToCloud(profile: PlayerProfile): Promise<boolean> {
+    if (StorageService.loadProfile().id !== profile.id) return false;
     StorageService.saveProfile(profile);
+    const fingerprint = JSON.stringify([profile.exp, profile.username, profile.avatar, profile.currentTitle, profile.level, profile.coins, profile.gems, profile.stats]);
+    if (profileAcknowledged.get(profile.id) === fingerprint) return true;
     if (cloudDb && profile.id) {
       try {
         const userRef = doc(cloudDb, 'players', profile.id);
@@ -301,6 +306,7 @@ export class SupabaseService {
           stats: profile.stats,
           updatedAt: serverTimestamp(),
         }, { merge: true });
+        profileAcknowledged.set(profile.id, fingerprint);
       } catch (e) {
         console.warn('Cloud sync error (fallback to local):', e);
         return false;
@@ -392,9 +398,10 @@ export class SupabaseService {
    */
   public static async syncGameSessionToCloud(
     playerId: string,
-    session: PausedGameSession | null
+    session: PausedGameSession | null,
+    persistLocal = true
   ): Promise<boolean> {
-    StorageService.savePausedGame(session);
+    if (persistLocal) StorageService.savePausedGame(session);
 
     if (typeof window !== 'undefined' && session) {
       window.dispatchEvent(
@@ -1298,4 +1305,5 @@ export class SupabaseService {
     }
   }
 }
+
 

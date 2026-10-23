@@ -1,3 +1,4 @@
+import { SYNC } from './syncPolicy';
 /**
  * Document-shaped storage on Supabase/Postgres. Existing game data keeps its shape;
  * reads, transforms and optimistic transaction commits are executed by SQL RPCs.
@@ -68,8 +69,23 @@ async function read(ref: Reference): Promise<Row[]> {
   if (error) throw error;
   return data || [];
 }
-export async function getDoc(ref: Reference) { return new DocumentSnapshot(ref, (await read(ref))[0] || null); }
-export async function getDocs(ref: Reference) { return new QuerySnapshot(ref, await read(ref)); }
+// Join simultaneous identical reads, without retaining stale responses. Transaction
+// reads deliberately bypass this map so every optimistic version is freshly read.
+const pendingReads = new WeakMap<CloudDatabase, Map<string, Promise<Row[]>>>();
+function sharedRead(ref: Reference): Promise<Row[]> {
+  let entries = pendingReads.get(ref.db);
+  if (!entries) { entries = new Map(); pendingReads.set(ref.db, entries); }
+  let owner = '';
+  try { owner = JSON.parse(localStorage.getItem('arcadex_player_profile') || 'null')?.id || ''; } catch {}
+  const key = JSON.stringify([owner, ref.path, ref.kind, ref.constraints || []]);
+  const existing = entries.get(key);
+  if (existing) return existing;
+  const task = read(ref).finally(() => { if (entries!.get(key) === task) entries!.delete(key); });
+  entries.set(key, task);
+  return task;
+}
+export async function getDoc(ref: Reference) { return new DocumentSnapshot(ref, (await sharedRead(ref))[0] || null); }
+export async function getDocs(ref: Reference) { return new QuerySnapshot(ref, await sharedRead(ref)); }
 
 async function commit(writes: Write[], reads: { path: string; version: number }[] = []) {
   if (!writes.length) return;
@@ -101,7 +117,7 @@ export async function runTransaction<T>(db: CloudDatabase, callback: (tx: {
     const writes: Write[] = [];
     const reads = new Map<string, number>();
     const result = await callback({
-      get: async ref => { const snap = await getDoc(ref); reads.set(ref.path, snap.version); return snap; },
+      get: async ref => { const snap = new DocumentSnapshot(ref, (await read(ref))[0] || null); reads.set(ref.path, snap.version); return snap; },
       set: (ref, data, options) => { writes.push({ path: ref.path, operation: 'set', data, merge: !!options?.merge }); },
       update: (ref, data) => { writes.push({ path: ref.path, operation: 'update', data }); },
       delete: ref => { writes.push({ path: ref.path, operation: 'delete' }); },
@@ -118,7 +134,7 @@ export async function runTransaction<T>(db: CloudDatabase, callback: (tx: {
 }
 
 /** Initial read + realtime invalidation + polling recovery. Cleanup cancels late callbacks. */
-export function onSnapshot(ref: Reference, ...args: any[]): () => void {
+function watchSnapshot(ref: Reference, ...args: any[]): () => void {
   const offset = typeof args[0] === 'function' ? 0 : 1;
   const next = args[offset];
   const onError = args[offset + 1] || (() => {});
@@ -128,22 +144,36 @@ export function onSnapshot(ref: Reference, ...args: any[]): () => void {
   let dirty = false;
   let previous = '';
   let poll: ReturnType<typeof setInterval> | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let healthy = false;
+  let lastRead = 0;
+  let retryAt = 0;
+  let failures = 0;
+  const isOnlineGame = /^(game_rooms|matchmaking_queue|friend_challenges)(\/|$)/.test(ref.path);
+  const schedule = () => {
+    if (stopped || timer) return;
+    const wait = Math.max(isOnlineGame ? 0 : 250, retryAt - Date.now());
+    timer = setTimeout(() => { timer = undefined; void refresh(); }, wait);
+  };
   const refresh = async () => {
     if (stopped || document.hidden || !navigator.onLine) return;
     if (running) { dirty = true; return; }
+    if (Date.now() < retryAt) { schedule(); return; }
     running = true;
+    lastRead = Date.now();
     try {
-      const rows = await read(ref);
+      const rows = await sharedRead(ref);
+      failures = 0; retryAt = 0;
       if (!stopped && !channel) {
         const collectionPath = ref.kind === 'document' ? ref.path.split('/').slice(0, -1).join('/') : ref.path;
         channel = ref.db.channel(`arcadex:${crypto.randomUUID()}`)
           .on('postgres_changes', {
             event: '*', schema: 'public', table: 'arcadex_documents',
             filter: ref.kind === 'document' ? `path=eq.${ref.path}` : `collection_path=eq.${collectionPath}`,
-          }, () => { void refresh(); })
+          }, schedule)
           .subscribe(status => {
-            if(status==='SUBSCRIBED')void refresh();
-            if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){onError(Object.assign(new Error('Kết nối trực tiếp gián đoạn; đang đồng bộ dự phòng.'),{code:'REALTIME_DEGRADED'}));void refresh();}
+            if(status==='SUBSCRIBED'){healthy=true;schedule();}
+            if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){healthy=false;schedule();}
           });
       }
       const serialized = JSON.stringify(rows);
@@ -151,18 +181,58 @@ export function onSnapshot(ref: Reference, ...args: any[]): () => void {
         previous = serialized;
         next(ref.kind === 'document' ? new DocumentSnapshot(ref, rows[0] || null) : new QuerySnapshot(ref, rows));
       }
-    } catch (error) { if (!stopped) onError(error); }
-    finally { running = false; if (dirty && !stopped) { dirty = false; void refresh(); } }
+    } catch (error) {
+      failures++; retryAt = Date.now() + Math.min(120_000, 2000 * 2 ** Math.min(failures - 1, 6));
+      if (!stopped) { onError(error); schedule(); }
+    }
+    finally { running = false; if (dirty && !stopped) { dirty = false; schedule(); } }
   };
-  const isOnlineGame=ref.path.startsWith('game_rooms/')||ref.path.startsWith('matchmaking_queue/');
-  poll = setInterval(() => { void refresh(); }, isOnlineGame?5000:30000);
-  const onReturn=()=>{void refresh();};
+  poll = setInterval(() => {
+    const interval = isOnlineGame ? (healthy ? SYNC.onlineRecovery : SYNC.onlineFallback) : SYNC.recovery;
+    if (Date.now() - lastRead >= interval) void refresh();
+  }, 5000);
+  const onReturn=()=>{schedule();};
   if(typeof window!=='undefined'){window.addEventListener('online',onReturn);window.addEventListener('focus',onReturn);document.addEventListener('visibilitychange',onReturn);}
   void refresh();
   return () => {
     stopped = true;
     if (poll) clearInterval(poll);
+    if (timer) clearTimeout(timer);
     if(typeof window!=='undefined'){window.removeEventListener('online',onReturn);window.removeEventListener('focus',onReturn);document.removeEventListener('visibilitychange',onReturn);}
     if (channel) void ref.db.removeChannel(channel);
+  };
+}
+
+
+// Identical consumers share one read, one channel and one recovery timer. Keys
+// include the active account; snapshots are never reused across account switches.
+const watchers = new WeakMap<CloudDatabase, Map<string, {
+  listeners: Set<{ next: (value: any) => void; error: (error: any) => void }>;
+  latest?: DocumentSnapshot | QuerySnapshot;
+  stop: () => void;
+}>>();
+export function onSnapshot(ref: Reference, ...args: any[]): () => void {
+  const offset = typeof args[0] === 'function' ? 0 : 1;
+  const listener = { next: args[offset], error: args[offset + 1] || (() => {}) };
+  let owner = '';
+  try { owner = JSON.parse(localStorage.getItem('arcadex_player_profile') || 'null')?.id || ''; } catch {}
+  const key = JSON.stringify([owner, ref.path, ref.kind, ref.constraints || []]);
+  let entries = watchers.get(ref.db);
+  if (!entries) { entries = new Map(); watchers.set(ref.db, entries); }
+  let entry = entries.get(key);
+  if (!entry) {
+    entry = { listeners: new Set(), stop: () => {} };
+    entries.set(key, entry);
+    const current = entry;
+    entry.stop = watchSnapshot(ref, (value: DocumentSnapshot | QuerySnapshot) => {
+      current.latest = value;
+      for (const target of current.listeners) { try { target.next(value); } catch (error) { target.error(error); } }
+    }, (error: any) => { for (const target of current.listeners) target.error(error); });
+  }
+  entry.listeners.add(listener);
+  if (entry.latest) listener.next(entry.latest);
+  return () => {
+    entry!.listeners.delete(listener);
+    if (!entry!.listeners.size) { entry!.stop(); entries!.delete(key); }
   };
 }

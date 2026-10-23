@@ -25,7 +25,7 @@ export class RoomClient{
  get fresh(){return this.lastSync>0&&this.clock()-this.lastSync<7000;}
  get now(){return this.clock()+this.clockOffset;}
  async submit(body:RoomRequest){if(this.busy||this.pending)return;this.pending=body;await this.retry();}
- async retry(){if(!this.pending||this.busy||this.closed)return;const body=this.pending;this.busy=true;this.emit();const sent=this.clock();try{this.apply(await this.transport.request(body),sent);this.pending=null;this.notice='';}catch(e){this.notice=e instanceof Error?e.message:'Không thể kết nối.';if(e instanceof TransportError&&!e.uncertain){this.pending=null;}}finally{this.busy=false;this.emit();}if(!this.pending&&this.snapshot&&body.type==='command'){const feedback=this.notice;await this.refresh();if(feedback){this.notice=feedback;this.emit();}}}
+ async retry(){if(!this.pending||this.busy||this.closed)return;const body=this.pending;this.busy=true;this.emit();const sent=this.clock();try{this.apply(await this.transport.request(body),sent);this.pending=null;this.notice='';}catch(e){this.notice=e instanceof Error?e.message:'Không thể kết nối.';if(e instanceof TransportError&&!e.uncertain){this.pending=null;}}finally{this.busy=false;this.emit();}if(!this.pending&&this.snapshot&&body.type==='command'&&this.notice){const feedback=this.notice;await this.refresh();if(feedback){this.notice=feedback;this.emit();}}}
  match(){return this.submit({type:'match',requestId:this.uuid()});}
  create(mode:Mode='duel'){return this.submit({type:'create',requestId:this.uuid(),mode});}
  join(code:string,team?:Team){return this.submit({type:'join',code:code.trim().toUpperCase(),team});}
@@ -34,3 +34,4 @@ export class RoomClient{
  resetClosed(){if(this.busy||this.pending||this.snapshot?.status!=='closed')return;this.snapshot=null;this.lastSync=0;this.notice='';this.emit();}
  close(){this.closed=true;this.listeners.clear();}
 }
+

@@ -43,7 +43,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Sync to storage on profile change
   useEffect(() => {
     StorageService.saveProfile(profile);
-    const timer = setTimeout(() => { void SupabaseService.syncProfileToCloud(profile); }, 1500);
+    const timer = setTimeout(() => { void SupabaseService.syncProfileToCloud(profile); }, 5000);
     return () => clearTimeout(timer);
   }, [profile]);
 
@@ -310,4 +310,5 @@ export const usePlayer = (): PlayerContextType => {
   }
   return context;
 };
+
 
