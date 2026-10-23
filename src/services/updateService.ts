@@ -1,6 +1,6 @@
-export const CURRENT_APP_VERSION = '2.12.0';
+export const CURRENT_APP_VERSION = '2.12.1';
 export const APP_CODENAME = "All Worlds";
-export const APP_RELEASE_NOTES = "22 game; Neon Run v0.14, Dungeon Titan v6.3, Cosmic Defend v5, Battleship online; bộ icon và banner riêng từng game.";
+export const APP_RELEASE_NOTES = "22 game; sửa icon thư viện và màn hình tải; tiến độ 0–100%; mở game trước, tải tài nguyên màn sau ở nền; dùng lại bộ nhớ đệm.";
 
 export interface UpdateInfo {
   hasUpdate: boolean;

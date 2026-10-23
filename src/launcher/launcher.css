@@ -88,3 +88,9 @@
 .featured-brick-breaker.launcher-welcome{background:linear-gradient(120deg,#e1f6ec,#e9e5fb);border-color:#89baaf}
 .featured-boom-buddies .featured-copy h1 span{color:#934510}
 .featured-brick-breaker .featured-copy h1 span{color:#305f7b}
+
+/* Square game icons stay intact on cards and compact launcher surfaces. */
+.launcher-light .cartridge-cover {aspect-ratio:1;background:var(--paper)}
+.launcher-light .cartridge-cover .game-artwork {object-fit:contain;transform:none}
+.launcher-recents button>div,.resume-art {aspect-ratio:1}
+.launcher-dialog .guide-art:has([data-art-variant="icon"]) {width:144px;max-width:45%;aspect-ratio:1}

@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'node:fs';
 import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
+import {GAME_ASSET_CACHE} from './src/games/packageCache';
 
 export default defineConfig(() => {
   const shellFiles = new Set<string>();
@@ -93,8 +94,8 @@ export default defineConfig(() => {
           runtimeCaching: [
             ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
-              handler: 'StaleWhileRevalidate' as const,
-              options: { cacheName: 'game-pack-' + prefix.replaceAll('/', '-'), expiration: { maxEntries: 1200, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },
+              handler: 'CacheFirst' as const,
+              options: { cacheName: GAME_ASSET_CACHE, expiration: { maxEntries: 1200, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },
             })),
             {
               urlPattern: /\/(?:chronicles-realms|standalone\/neon-run)\/(?:index\.html)?$/i,

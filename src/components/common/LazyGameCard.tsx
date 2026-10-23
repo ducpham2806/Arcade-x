@@ -30,7 +30,7 @@ export const LazyGameCard: React.FC<LazyGameCardProps> = ({game, personalHighSco
   },[]);
   return <div ref={ref} id={`game-card-${game.id}`} className="arcade-cartridge" style={artStyle(game.id)}>
     <button type="button" className="cartridge-cover" disabled={game.availability==='maintenance'} onClick={()=>onLaunchGame(game.id)} aria-label={`Mở ${game.title}`}>
-      {visible && <GameArtwork gameId={game.id}/>}
+      {visible && <GameArtwork gameId={game.id} variant="icon"/>}
       <span className="cartridge-category">{artFor(game.id).label}</span>
     </button>
     <button id={`btn-fav-card-${game.id}`} type="button" className={`cartridge-favorite ${isFav?'is-favorite':''}`} onClick={()=>onToggleFavorite(game.id)} aria-pressed={isFav} title={isFav?'Bỏ Yêu Thích':'Thêm Vào Yêu Thích'} aria-label={`${isFav?'Bỏ yêu thích':'Yêu thích'} ${game.title}`}>
