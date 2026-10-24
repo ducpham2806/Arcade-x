@@ -9,6 +9,7 @@ import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
 export const GAME_ART: Record<string, { color: string; secondary: string; label: string; world: string }> = {
+  'snake-legend': {color:'#e8c367',secondary:'#6baa76',label:'BẢN THỬ',world:'Thảo Nguyên Xanh'},
   'battleship': {color:'#dfbb7e',secondary:'#6ca7c2',label:'HẢI CHIẾN',world:'Naval Warfare · Hạm đội vỏ thép'},
   'boom-buddies': {color:'#ffa846',secondary:'#89ce57',label:'GAME MỚI',world:'Khu vườn bom vui nhộn'},
   'brick-breaker': {color:'#67eece',secondary:'#a68dff',label:'GAME MỚI',world:'Chronicles · Sáu miền Aethra'},
@@ -217,10 +218,10 @@ export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId
  <rect x="0" y="-30" width="420" height="310" fill={`url(#${uid}-sky)`}/><g transform={variant==='icon'?'translate(0 -25) scale(1 1.2)':undefined}><Backdrop id={id} a={color} b={secondary}/></g>
  <g className="game-artwork-scene" filter={`url(#${uid}-depth)`} transform={variant==='icon'?'translate(18 8) scale(.9)':undefined}>{variant==='icon'&&id==='hex-match'?<image href={blossomAsset(BLOSSOM_ICON)} x="85" y="0" width="250" height="250"/>:<Scene id={id} a={color} b={secondary} uid={uid}/>}</g>{variant==='icon'&&<><path d="M80 26Q210 -22 340 26" stroke="#fff" strokeOpacity=".18" strokeWidth="3"/><rect x="65" y="-20" width="290" height="290" rx="55" stroke="#fff" strokeOpacity=".16" strokeWidth="2" fill="none"/></>}</svg>;
 }
-export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
- const id=canonicalArtId(gameId);return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
+export function GameArtwork({gameId,className='',variant='banner',src}:{gameId:string;className?:string;variant?:'banner'|'icon';src?:string}) {
+ const id=canonicalArtId(gameId);return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={src||variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
 }
-export function GameIcon({gameId}:{gameId:string}) {return <GameArtwork gameId={gameId} variant="icon"/>;}
+export function GameIcon({gameId,src}:{gameId:string;src?:string}) {return <GameArtwork gameId={gameId} variant="icon" src={src}/>;}
 
 export function GameAtmosphere({ gameId }: {gameId: string}) {
   const {world}=artFor(gameId);
@@ -230,5 +231,3 @@ export function GameAtmosphere({ gameId }: {gameId: string}) {
     <span className="game-world-coordinate">✦ PLAY / EXPLORE / MASTER</span>
   </div>;
 }
-
-

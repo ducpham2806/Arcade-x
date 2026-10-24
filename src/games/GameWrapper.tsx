@@ -55,6 +55,7 @@ interface GameWrapperProps {
 }
 
 function readGameState(gameId: string): unknown {
+  if (gameId === 'snake-legend') return undefined;
   return readGameSave(gameId);
 }
 
@@ -237,7 +238,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   // Handle Save Game and Exit to Main Hub safely
   const handleSaveAndExit = useCallback(() => {
     if (!gameMeta) return;
-    if (gameMeta.id === 'battleship') { onExit(); return; }
+    if (gameMeta.id === 'battleship' || gameMeta.id === 'snake-legend') { onExit(); return; }
     const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
     const score = currentScoreRef.current;
     saveAndSuspendGame({
@@ -262,7 +263,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   // Periodic background auto-saving to cloud during active gameplay
   useEffect(() => {
-    if (!gameMeta || gameOverData || gameMeta.id === 'battleship') return;
+    if (!gameMeta || gameOverData || (gameMeta.id === 'battleship' || gameMeta.id === 'snake-legend')) return;
     const interval = setInterval(() => {
       if (document.hidden || isPaused) return;
       const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
@@ -512,6 +513,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   }, []);
 
   const handleRestart = useCallback(() => {
+    if (gameId === 'snake-legend') { window.dispatchEvent(new Event('snake-legend:restart')); setIsPaused(false); setResumeCountdown(null); return; }
     if (gameId === 'hex-match') { window.dispatchEvent(new Event('blossom:restart')); return; }
     if (gameId === 'boom-buddies') { window.dispatchEvent(new Event('boom:restart')); return; }
     if (gameId === 'rainbow-blocks') { window.dispatchEvent(new Event('rainbow:restart')); return; }
@@ -586,7 +588,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       <header className="h-12 sm:h-14 bg-[#0e0e0e]/95 backdrop-blur-md border-b border-white/5 px-2.5 sm:px-6 flex items-center justify-between z-30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-lg shrink-0">
-            <GameIcon gameId={gameMeta.id}/>
+            <GameIcon gameId={gameMeta.id} src={gameMeta.artwork?.icon}/>
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -684,7 +686,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
         <div
           ref={viewportStageRef}
           id="game-viewport-stage"
-          style={usesLauncherUi(gameId) ? {width:'100%',height:'100%',overflow:'auto',display:'block'} : ['battleship','hex-match','rainbow-blocks','boom-buddies','brick-breaker'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
+          style={usesLauncherUi(gameId) ? {width:'100%',height:'100%',overflow:'auto',display:'block'} : ['battleship','hex-match','rainbow-blocks','boom-buddies','brick-breaker','snake-legend'].includes(gameId) ? { width: '100%', height: '100%', overflow: 'hidden' } : stageStyle}
         >
           <GameSaveGate gameId={gameId} onResolved={() => { initialGameStateRef.current = readGameState(gameId); setGameSessionKey(key => key + 1); }}>
           <GameLoadBoundary onExit={onExit}>
@@ -750,7 +752,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 {/* Auto-save Status Pill */}
                 <div className="flex items-center justify-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 py-1.5 px-3 rounded-xl font-semibold">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : 'Tiến trình game được tự động lưu an toàn'}</span>
+                  <span>{gameId === 'snake-legend' ? 'Game quản lý lưu trên thiết bị · xem thông báo trong game' : gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : 'Tiến trình game được tự động lưu an toàn'}</span>
                 </div>
 
                 {/* Dynamic Viewport Resolution Info */}
@@ -873,7 +875,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
               </div>
               <h2 className="text-lg font-bold text-white mb-2 font-display">TẠM DỪNG HOẶC RỜI GAME?</h2>
               <p className="text-xs text-slate-400 mb-5">
-                {gameId === 'battleship' ? 'Ván bot sẽ kết thúc. Phòng online vẫn chạy; quay lại trong 90 giây để giữ trận.' : 'Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.'}
+                {gameId === 'snake-legend' ? 'Mốc đang chơi được game quản lý trên trình duyệt này. Chưa đồng bộ tài khoản; xem thông báo trong game nếu có lỗi lưu.' : gameId === 'battleship' ? 'Ván bot sẽ kết thúc. Phòng online vẫn chạy; quay lại trong 90 giây để giữ trận.' : 'Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.'}
               </p>
 
               <div className="space-y-2">
@@ -884,7 +886,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                   className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{gameId === 'battleship' ? 'Về sảnh' : 'Lưu Tiến Trình & Trở Về Sảnh'}</span>
+                  <span>{gameId === 'snake-legend' ? 'Giữ mốc trên thiết bị & về sảnh' : gameId === 'battleship' ? 'Về sảnh' : 'Lưu Tiến Trình & Trở Về Sảnh'}</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -930,4 +932,3 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     </div>
   );
 };
-

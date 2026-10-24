@@ -21,7 +21,7 @@ export function GamePackageGate({ game, onExit, children }: { game: GameMetadata
   const progress = Math.round(Math.max(0, Math.min(100, state.progress)));
   const splash = <section id="game-package-splash" data-game-id={game.id} className="fixed inset-0 z-[80] bg-[#080b12] text-slate-200 flex items-center justify-center p-6" aria-busy={!error}>
     <div className="w-full max-w-md text-center space-y-6">
-      <div className={`arcadex-boot-logo ${error ? 'arcadex-boot-paused' : ''} w-28 h-28 mx-auto rounded-3xl`}><GameArtwork gameId={game.id} variant="icon"/><span className="arcadex-boot-orbit" aria-hidden="true"/></div>
+      <div className={`arcadex-boot-logo ${error ? 'arcadex-boot-paused' : ''} w-28 h-28 mx-auto rounded-3xl`}><GameArtwork gameId={game.id} variant="icon" src={game.artwork?.icon}/><span className="arcadex-boot-orbit" aria-hidden="true"/></div>
       <div><p className="text-xs text-slate-400 mb-2">ARCADEX · CHUẨN BỊ GAME</p><h1 className="text-2xl font-bold text-white">{game.title}</h1></div>
       {error ? <div className="space-y-4"><p role="alert">Chưa tải xong game. Kiểm tra kết nối rồi thử lại; tiến trình đã lưu vẫn được giữ.</p><button className="simple-primary-button w-full justify-center" onClick={() => setAttempt(v => v + 1)}>Thử tải lại game</button></div> : <div className="space-y-3">
         <p role="status" aria-live="polite" className="text-sm">{state.message}</p>

@@ -1,0 +1,2 @@
+import {defineConfig} from 'vite';import react from '@vitejs/plugin-react';import tailwindcss from '@tailwindcss/vite';import path from 'node:path';
+export default defineConfig({root:'preview/snake',base:'/preview/snake/',envDir:process.cwd(),publicDir:false,plugins:[react(),tailwindcss()],resolve:{alias:{'@':path.resolve(__dirname,'.')}},build:{manifest:true,outDir:'../../dist/preview/snake',emptyOutDir:true}});

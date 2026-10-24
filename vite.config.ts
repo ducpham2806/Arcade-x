@@ -90,7 +90,7 @@ export default defineConfig(() => {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/chronicles-realms\//, /^\/standalone\//],
+          navigateFallbackDenylist: [/^\/preview\/snake(?:\/|$)/, /^\/chronicles-realms\//, /^\/standalone\//],
           runtimeCaching: [
             ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
@@ -168,6 +168,7 @@ export default defineConfig(() => {
       },
     },
     server: {
+      allowedHosts: ['terminal.local'],
       port: 3000,
       host: '0.0.0.0',
       hmr: process.env.DISABLE_HMR !== 'true',
