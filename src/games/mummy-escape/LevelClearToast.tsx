@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Star, Coins, Zap, Trophy, ArrowRight, RotateCcw, Map, Sparkles, X, CheckCircle2, Flame, Shield } from 'lucide-react';
+import { Star, Coins, Zap, Trophy, ArrowRight, RotateCcw, Map, Sparkles, X, CheckCircle2 } from 'lucide-react';
 import { LevelData, GameMode } from './types';
+import { MummySprite } from '../../visuals/MummySprite';
 
 export interface LevelClearToastProps {
   levelData: LevelData;
@@ -25,7 +26,6 @@ export const LevelClearToast: React.FC<LevelClearToastProps> = ({
   score,
   levelScoreBonus,
   mummiesDestroyed,
-  revertChargesUsed,
   mode,
   floor = 1,
   onNextLevel,
@@ -46,39 +46,38 @@ export const LevelClearToast: React.FC<LevelClearToastProps> = ({
     };
   }, []);
 
-  // Calculate rewards based on performance
   const coinsEarned = Math.max(15, 10 + stars * 15 + mummiesDestroyed * 10);
   const expEarned = Math.max(30, 20 + stars * 25 + (mode === 'endless' ? floor * 15 : 40));
 
   const performanceRating =
     stars === 3
-      ? { title: 'BẬC THẦY GIẢI ĐỐ', desc: 'Hoàn thành số bước tối ưu hoàn hảo!', color: 'text-yellow-400' }
+      ? { title: 'ĐẠI HỌC GIẢ PHARAOH', desc: 'Giải mã lăng mộ với số bước tối ưu!', color: 'text-yellow-300' }
       : stars === 2
-      ? { title: 'XUẤT SẮC', desc: 'Thoát hiểm rất nhanh nhẹn!', color: 'text-amber-300' }
-      : { title: 'THOÁT HIỂM THÀNH CÔNG', desc: 'Sống sót khỏi lăng mộ cổ đại!', color: 'text-emerald-400' };
+      ? { title: 'THợ SĂN CỔ VẬT', desc: 'Thoát hiểm nhanh nhạy khỏi xác ướp!', color: 'text-amber-300' }
+      : { title: 'VƯỢT NGỤC THÀNH CÔNG', desc: 'Sống sót rời khỏi hầm mộ cổ đại!', color: 'text-emerald-300' };
 
   return (
     <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-3 animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
-      <div className="relative w-full bg-gradient-to-b from-[#24170a] via-[#1a1106] to-[#120b04] border-2 border-[#f59e0b] rounded-3xl p-4 sm:p-5 shadow-[0_12px_40px_rgba(245,158,11,0.35)] text-white overflow-hidden">
-        {/* Glow & Backdrop decorative beams */}
-        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-24 bg-amber-500/25 blur-2xl rounded-full pointer-events-none" />
-        <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 rounded-full blur-xl pointer-events-none" />
+      <div className="relative w-full bg-gradient-to-b from-[#33210f] via-[#211408] to-[#140b04] border-2 border-[#e0ab43] rounded-3xl p-4 sm:p-5 shadow-[0_18px_50px_rgba(0,0,0,0.85),0_0_30px_rgba(245,158,11,0.35)] text-white overflow-hidden">
+        {/* Hieroglyphic Header Frieze */}
+        <div className="pointer-events-none absolute top-1 left-1/2 -translate-x-1/2 text-[11px] text-amber-300/15 tracking-[0.4em] font-serif whitespace-nowrap">
+          𓂀 𓋹 𓆣 𓁹 𓊽 𓅃 𓆗
+        </div>
 
-        {/* Close / Dismiss button */}
         <button
           type="button"
           onClick={onDismiss}
-          className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 hover:bg-black/60 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer z-10"
+          className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 border border-amber-500/30 flex items-center justify-center text-amber-200 hover:text-white transition-colors cursor-pointer z-10"
           title="Đóng thông báo"
         >
           <X className="w-4 h-4" />
         </button>
 
-        {/* Header with Trophy / Stars */}
+        {/* Header with Golden Scarab Seal */}
         <div className="flex items-center gap-3 mb-3">
-          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-600 p-0.5 shadow-lg shadow-amber-500/30 shrink-0">
-            <div className="w-full h-full bg-[#1c1207] rounded-2xl flex items-center justify-center text-2xl">
-              👑
+          <div className="relative w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-700 p-0.5 shadow-lg shadow-amber-500/30 shrink-0">
+            <div className="w-full h-full bg-[#1c1107] rounded-2xl flex items-center justify-center p-1">
+              <MummySprite kind="scarab" />
             </div>
             <div className="absolute -top-1 -right-1">
               <Sparkles className="w-4 h-4 text-yellow-300 animate-spin" style={{ animationDuration: '6s' }} />
@@ -87,34 +86,34 @@ export const LevelClearToast: React.FC<LevelClearToastProps> = ({
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className={`text-[11px] font-extrabold uppercase tracking-wider ${performanceRating.color}`}>
+              <span className={`text-[11px] font-serif font-extrabold uppercase tracking-wider ${performanceRating.color}`}>
                 {performanceRating.title}
               </span>
-              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-500/30">
-                {mode === 'endless' ? `Tầng ${floor}` : `Phòng ${levelData.id}`}
+              <span className="px-1.5 py-0.2 rounded bg-amber-500/25 text-yellow-200 text-[10px] font-mono font-bold border border-amber-400/40">
+                {mode === 'endless' ? `Tầng ${floor}` : `Mật Thất ${levelData.id}`}
               </span>
             </div>
-            <h3 className="text-base sm:text-lg font-black text-white font-display truncate">
+            <h3 className="text-base sm:text-lg font-serif font-black text-amber-100 truncate">
               {levelData.name}
             </h3>
           </div>
         </div>
 
-        {/* Star Rating Animation Bar */}
-        <div className="flex items-center justify-center gap-2 py-2 mb-3 bg-[#170e05]/90 border border-amber-500/20 rounded-2xl">
+        {/* Golden Star Rating Cartouche */}
+        <div className="flex items-center justify-center gap-3 py-2 mb-3 bg-[#170e05]/95 border border-amber-500/30 rounded-2xl shadow-inner">
           {[1, 2, 3].map((starIdx) => {
             const isEarned = starIdx <= stars;
             return (
               <div
                 key={`toast-star-${starIdx}`}
                 className={`transition-all duration-300 flex flex-col items-center ${
-                  animStep >= starIdx && isEarned ? 'scale-110' : 'scale-90 opacity-40'
+                  animStep >= starIdx && isEarned ? 'scale-110' : 'scale-90 opacity-35'
                 }`}
               >
                 <Star
                   className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
                     isEarned
-                      ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.9)]'
+                      ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.9)]'
                       : 'text-stone-700'
                   }`}
                 />
@@ -123,43 +122,41 @@ export const LevelClearToast: React.FC<LevelClearToastProps> = ({
           })}
         </div>
 
-        {/* Performance & Rewards Grid */}
+        {/* Performance & Rewards Sandstone Tablets */}
         <div className="grid grid-cols-2 gap-2 mb-3">
-          {/* Performance Box */}
-          <div className="bg-[#120b04]/80 border border-[#6b4718] rounded-xl p-2.5 flex flex-col justify-between text-xs">
-            <div className="text-[10px] text-amber-200/70 font-bold uppercase mb-1 flex items-center gap-1">
+          <div className="bg-[#180f06]/90 border border-[#7d5626] rounded-xl p-2.5 flex flex-col justify-between text-xs">
+            <div className="text-[10px] text-amber-200/80 font-bold uppercase mb-1 flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-              <span>Thành tích:</span>
+              <span>Chiến tích:</span>
             </div>
             <div className="space-y-0.5 text-[11px]">
               <div className="flex justify-between">
-                <span className="text-slate-400">Bước đi:</span>
-                <span className="font-bold text-white font-mono">
-                  {turnsTaken} / {levelData.parTurns} lượt
+                <span className="text-amber-200/70">Bước đi:</span>
+                <span className="font-bold text-yellow-100 font-mono">
+                  {turnsTaken} / {levelData.parTurns}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Xác ướp diệt:</span>
-                <span className="font-bold text-amber-300 font-mono">+{mummiesDestroyed} 💀</span>
+                <span className="text-amber-200/70">Hạ xác ướp:</span>
+                <span className="font-bold text-amber-300 font-mono">+{mummiesDestroyed}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Điểm màn:</span>
+                <span className="text-amber-200/70">Thưởng màn:</span>
                 <span className="font-bold text-yellow-400 font-mono">+{levelScoreBonus}</span>
               </div>
             </div>
           </div>
 
-          {/* Rewards Box */}
-          <div className="bg-[#120b04]/80 border border-[#6b4718] rounded-xl p-2.5 flex flex-col justify-between text-xs">
-            <div className="text-[10px] text-amber-200/70 font-bold uppercase mb-1 flex items-center gap-1">
+          <div className="bg-[#180f06]/90 border border-[#7d5626] rounded-xl p-2.5 flex flex-col justify-between text-xs">
+            <div className="text-[10px] text-amber-200/80 font-bold uppercase mb-1 flex items-center gap-1">
               <Trophy className="w-3 h-3 text-yellow-400" />
-              <span>Phần thưởng:</span>
+              <span>Kho báu Pharaoh:</span>
             </div>
             <div className="space-y-1 text-[11px]">
               <div className="flex items-center justify-between text-amber-300 font-bold">
                 <span className="flex items-center gap-1">
                   <Coins className="w-3.5 h-3.5 text-yellow-400" />
-                  <span>Arcade Xu:</span>
+                  <span>Xu Vàng:</span>
                 </span>
                 <span className="font-mono text-yellow-400">+{coinsEarned}</span>
               </div>
@@ -183,29 +180,27 @@ export const LevelClearToast: React.FC<LevelClearToastProps> = ({
           <button
             type="button"
             onClick={onReplay}
-            className="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-stone-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 border border-white/10 transition-all cursor-pointer"
-            title="Chơi lại màn này"
+            className="px-3 py-2.5 rounded-xl bg-[#26180b] hover:bg-[#362210] active:scale-95 text-amber-200 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 border border-[#8b632d] transition-all cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline">Chơi Lại</span>
+            <span>Chơi Lại</span>
           </button>
 
           <button
             type="button"
             onClick={onOpenMap}
-            className="px-3 py-2.5 rounded-xl bg-[#281b0f] hover:bg-[#382615] active:scale-95 text-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 border border-[#7d5626] transition-all cursor-pointer"
-            title="Xem bản đồ kim tự tháp"
+            className="px-3 py-2.5 rounded-xl bg-[#26180b] hover:bg-[#362210] active:scale-95 text-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 border border-[#8b632d] transition-all cursor-pointer"
           >
             <Map className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline">Bản Đồ</span>
+            <span>Bản Đồ</span>
           </button>
 
           <button
             type="button"
             onClick={onNextLevel}
-            className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 active:scale-95 text-stone-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/30 transition-all cursor-pointer"
+            className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-stone-950 font-serif font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/35 transition-all cursor-pointer"
           >
-            <span>{mode === 'endless' ? `Tầng ${floor + 1}` : 'Màn Kế Tiếp'}</span>
+            <span>{mode === 'endless' ? `Mật Thất ${floor + 1}` : 'Mật Thất Kế Tiếp'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -213,4 +208,3 @@ export const LevelClearToast: React.FC<LevelClearToastProps> = ({
     </div>
   );
 };
-

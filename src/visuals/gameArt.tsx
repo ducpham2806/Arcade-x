@@ -102,9 +102,24 @@ function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string
       <path d="M277 126L326 147L314 196L277 216L241 196L229 147Z" fill={b} stroke={a} strokeWidth="6"/><path d="M277 142V196M253 163H301" stroke={a} strokeWidth="8"/>
     </g>;
     case 'mummy-escape': return <g>
-      <circle cx="298" cy="69" r="37" fill={a} opacity=".85"/><path d="M60 218L183 41L304 218Z" fill="#be8554"/><path d="M183 41L216 218H304Z" fill="#735044"/>
-      {[0,1,2,3,4].map(i=><path key={i} d={`M${165-i*18} ${75+i*29}H${207+i*16}`} stroke="#f8d69c" strokeOpacity=".3" strokeWidth="2"/>)}
-      <g transform="translate(245 95) rotate(8)"><rect width="65" height="94" rx="27" fill="#e5d0a4"/>{[17,34,51,68,85].map(y=><path key={y} d={`M4 ${y}L61 ${y-7}`} stroke="#a48465" strokeWidth="5"/>)}<rect x="9" y="28" width="46" height="19" rx="8" fill="#182f30"/><circle cx="22" cy="37" r="4" fill={b}/><circle cx="43" cy="37" r="4" fill={b}/></g>
+      <path d="M48 214L174 34L302 214Z" fill="#92400e" stroke="#f59e0b" strokeWidth="3" opacity=".75"/><path d="M174 34L224 214H302Z" fill="#451a03" opacity=".82"/>
+      <rect x="148" y="114" width="52" height="100" rx="5" fill="#090502" stroke="#fbbf24" strokeWidth="3"/><circle cx="174" cy="162" r="15" fill={b} opacity=".45"/>
+      <g transform="translate(68 62) scale(0.68)">
+        <path d="M36 44 L20 112 L52 122 L64 198 H136 L148 122 L180 112 L164 44 Q100 18 36 44 Z" fill="#eab308" stroke="#1c1108" strokeWidth="5"/>
+        <path d="M44 54 L32 106 M56 48 L46 108 M156 54 L168 106 M144 48 L154 108" stroke="#1d4ed8" strokeWidth="6" strokeLinecap="round"/>
+        <path d="M62 110 H138 L132 194 H68 Z" fill="#991b1b" stroke="#1c1108" strokeWidth="4.5"/>
+        <rect x="64" y="48" width="72" height="54" rx="18" fill="#fef3c7" stroke="#1c1108" strokeWidth="4.5"/>
+        <rect x="72" y="64" width="56" height="18" rx="7" fill="#090502"/>
+        <circle cx="86" cy="73" r="6" fill="#ef4444"/><circle cx="114" cy="73" r="6" fill="#ef4444"/>
+      </g>
+      <g transform="translate(192 26)">
+        <ellipse cx="20" cy="16" rx="11" ry="14" fill="none" stroke="#fde047" strokeWidth="5"/><path d="M7 31H33M20 30V56" stroke="#fde047" strokeWidth="5" strokeLinecap="round"/><circle cx="20" cy="31" r="4.5" fill={b}/>
+      </g>
+      <g transform="translate(226 68) scale(0.66)">
+        <circle cx="22" cy="48" r="28" fill="#fb923c" opacity=".4"/><path d="M22 12 C8 32 10 52 22 62 C34 52 36 32 22 12 Z" fill="#f97316"/><rect x="18" y="58" width="8" height="42" rx="3" fill="#78350f"/>
+        <path d="M62 110 H138 L144 192 H56 Z" fill="#b45309" stroke="#1c1108" strokeWidth="4.5"/><path d="M84 110 H116 V188 H84 Z" fill="#fef3c7" stroke="#1c1108" strokeWidth="3.5"/>
+        <circle cx="100" cy="82" r="28" fill="#fdba74" stroke="#1c1108" strokeWidth="4.5"/><ellipse cx="100" cy="60" rx="52" ry="14" fill="#78350f" stroke="#1c1108" strokeWidth="4.5"/><path d="M64 58 Q74 24 100 28 Q126 24 136 58 Z" fill="#92400e" stroke="#1c1108" strokeWidth="4.5"/>
+      </g>
     </g>;
     case 'chess': return <g>
       <path d="M55 214L122 132H308L375 214Z" fill="#231c2e" stroke="#d9a74a" strokeWidth="3.5"/>
@@ -207,7 +222,7 @@ function Backdrop({id,a,b}:{id:string;a:string;b:string}){
  case 'tile-2048':return <g><path d="M0 0H420V250H0Z" fill="#8b5126"/><path d="M0 202L109 89L225 214L359 37L420 93V250H0Z" fill="#dfa659" opacity=".35"/>{[0,1,2].map(i=><path key={i} d={`M${10+i*138} 0l55 35-55 35-55-35Z`} fill="#ffdca0" opacity=".17"/>)}</g>;
  case 'car-escape':return <g><path d="M0 0H420V250H0Z" fill="#263947"/><path d="M-40 0L178 250H264L45 0Z" fill="#5d737a"/><path d="M420 0L269 250H326L450 53Z" fill="#e27d60" opacity=".35"/><path d="M0 0L220 250" stroke="#f8e3ae" strokeWidth="3" strokeDasharray="17 19"/></g>;
  case 'dungeon-tap':return <g><path d="M0 250V82Q50 10 100 82V250M310 250V82Q360 10 410 82V250" fill="#35303d" stroke="#8f6142" strokeWidth="10"/><path d="M19 187l14-58 15 58m323 0l14-58 15 58" fill="#ffae47" opacity=".6"/></g>;
- case 'mummy-escape':return <g><path d="M0 0H420V250H0Z" fill="#564632"/><path d="M0 190Q113 139 226 202T420 170V250H0Z" fill="#bd8b55"/><path d="M0 211Q119 176 238 217T420 210" stroke="#eddba1" strokeWidth="8" opacity=".4"/><circle cx="43" cy="46" r="38" fill="#d7b361" opacity=".5"/></g>;
+ case 'mummy-escape':return <g><path d="M0 0H420V250H0Z" fill="#1c1108"/><circle cx="210" cy="112" r="115" fill="#f59e0b" opacity=".18"/><path d="M0 188Q113 144 226 198T420 172V250H0Z" fill="#78350f"/><path d="M0 211Q119 182 238 217T420 206" stroke="#f59e0b" strokeWidth="5" opacity=".42"/><circle cx="56" cy="52" r="32" fill="#fde047" opacity=".32"/></g>;
  case 'shikaku':return <g>{Array.from({length:16},(_,i)=><path key={i} d={`M${i*30} 0V250M0 ${i*25}H420`} stroke="#60b3db" strokeWidth="1" opacity=".2"/>)}<path d="M25 23H86V70H25ZM333 172H393V230H333Z" stroke="#bca2ff" strokeWidth="3"/></g>;
  case 'eat-em-all':return <g><path d="M0 0H420V250H0Z" fill="#214b3b"/>{[[33,60,61],[357,183,93],[33,219,73]].map(([x,y,r],i)=><circle key={i} cx={x} cy={y} r={r} fill={i%2?'#61b888':'#95c455'} opacity=".35"/>)}<path d="M345 24l34 24-34 24-34-24Z" fill="#e4d173" opacity=".7"/></g>;
  case 'scoodoku':return <g><path d="M0 0H420V250H0Z" fill="#886444"/><path d="M0 14L420 63M0 206L420 246" stroke="#ccac74" strokeWidth="18" opacity=".3"/><text x="29" y="121" fill="#f3dfb6" opacity=".2" fontSize="75" fontWeight="900">9</text><text x="339" y="208" fill="#f3dfb6" opacity=".2" fontSize="82" fontWeight="900">3</text></g>;
@@ -235,7 +250,7 @@ export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId
 }
 export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
  const id=canonicalArtId(gameId);
- if (id === 'chess') return <NativeGameArtwork gameId={id} className={className} variant={variant}/>;
+ if (id === 'chess' || id === 'mummy-escape') return <NativeGameArtwork gameId={id} className={className} variant={variant}/>;
  return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
 }
 export function GameIcon({gameId}:{gameId:string}) {return <GameArtwork gameId={gameId} variant="icon"/>;}

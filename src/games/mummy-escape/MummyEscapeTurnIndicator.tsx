@@ -1,6 +1,7 @@
 import React from 'react';
 import { GameMode, TurnPhase } from './types';
-import { Hourglass, Flame, Footprints, ShieldAlert, Sparkles, Undo2 } from 'lucide-react';
+import { MummySprite } from '../../visuals/MummySprite';
+import { Hourglass, Footprints, ShieldAlert } from 'lucide-react';
 
 interface MummyEscapeTurnIndicatorProps {
   turnPhase: TurnPhase;
@@ -28,7 +29,6 @@ export const MummyEscapeTurnIndicator: React.FC<MummyEscapeTurnIndicatorProps> =
   revertCharges,
   maxRevertCharges,
   mummiesAliveCount,
-  nearestMummyDistance,
   isThreatCritical = false,
 }) => {
   const isTimeAttack = mode === 'time_attack';
@@ -36,56 +36,45 @@ export const MummyEscapeTurnIndicator: React.FC<MummyEscapeTurnIndicatorProps> =
   const timePercent = Math.max(0, Math.min(100, (timeLeft / (timeLimitSec || 60)) * 100));
   const isTimeCritical = isTimeAttack && timeLeft <= 10;
 
-  // Star calculation preview
   const currentStarPreview =
     turnsTaken <= parTurns ? 3 : turnsTaken <= parTurns + 4 ? 2 : 1;
 
   return (
     <div
       id="mummy-turn-indicator-component"
-      className="w-full max-w-[480px] mx-auto mb-2 bg-[#1c140c] border-2 border-[#7d5626] rounded-2xl p-2 sm:p-2.5 shadow-xl flex flex-col gap-1.5 relative overflow-hidden"
+      className="w-full max-w-[520px] mx-auto mb-2.5 bg-gradient-to-r from-[#2c1d0e] via-[#3d2814] to-[#2c1d0e] border-2 border-[#d4a349] rounded-2xl p-2 sm:p-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(254,240,138,0.3)] flex flex-col gap-1.5 relative overflow-hidden"
     >
-      {/* Background Ambience Glow */}
-      <div
-        className={`absolute inset-0 opacity-10 pointer-events-none transition-colors duration-500 ${
-          turnPhase === 'player_turn'
-            ? isThreatCritical
-              ? 'bg-rose-600 animate-pulse'
-              : 'bg-amber-400'
-            : turnPhase === 'mummy_moving'
-            ? 'bg-rose-600'
-            : turnPhase === 'victory'
-            ? 'bg-emerald-500'
-            : 'bg-red-800'
-        }`}
-      />
+      {/* Subtle Hieroglyphic Watermark */}
+      <div className="pointer-events-none absolute right-3 top-1 text-lg text-amber-300/10 font-serif select-none">
+        𓂀 𓋹 𓆣
+      </div>
 
-      {/* Primary Turn Status Banner & Dynamic Badge */}
+      {/* Primary Turn Status Banner & Canopic Jar Revert Counter */}
       <div className="flex items-center justify-between gap-2 relative z-10">
-        {/* Left: Whose Turn Indicator */}
-        <div className="flex items-center gap-2">
+        {/* Left: Whose Turn Cartouche */}
+        <div className="flex items-center gap-2.5">
           {turnPhase === 'player_turn' && (
-            <div className="flex items-center gap-2">
-              <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-600 border border-yellow-200 shadow-md shadow-amber-500/40">
-                <span className="text-base">🤠</span>
+            <div className="flex items-center gap-2.5">
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/30 to-amber-950 border-2 border-yellow-400/80 p-0.5 shadow-md">
+                <MummySprite kind="explorer" />
                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border border-black animate-ping" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
-                    LƯỢT CỦA BẠN
+                  <span className="text-xs sm:text-sm font-serif font-black text-yellow-200 uppercase tracking-wider drop-shadow">
+                    LƯỢT THÁM HIỂM
                   </span>
-                  <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-bold border border-emerald-500/40 animate-pulse">
-                    Sẵn Sàng
+                  <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/25 text-emerald-200 text-[9px] font-bold border border-emerald-400/50">
+                    1 Bước
                   </span>
                 </div>
-                <span className="text-[10px] text-stone-400">
+                <span className="text-[10px] text-amber-200/80 block">
                   {isThreatCritical ? (
-                    <span className="text-rose-400 font-bold animate-pulse flex items-center gap-1">
-                      <ShieldAlert className="w-3 h-3 text-rose-400 inline" /> Nguy Hiểm! Xác ướp đang áp sát
+                    <span className="text-rose-300 font-bold animate-pulse flex items-center gap-1">
+                      <ShieldAlert className="w-3 h-3 text-rose-400 inline" /> Nguy hiểm! Xác ướp áp sát!
                     </span>
                   ) : (
-                    'Chọn 1 bước đi hoặc Đứng Yên'
+                    'Chọn ô đá sáng hoặc bấm La Bàn Bọ Hung'
                   )}
                 </span>
               </div>
@@ -93,102 +82,94 @@ export const MummyEscapeTurnIndicator: React.FC<MummyEscapeTurnIndicatorProps> =
           )}
 
           {turnPhase === 'mummy_moving' && (
-            <div className="flex items-center gap-2">
-              <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-rose-700 to-slate-900 border border-rose-400 shadow-md shadow-rose-900/60 animate-pulse">
-                <span className="text-base">🧟‍♂️</span>
+            <div className="flex items-center gap-2.5">
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-rose-800/60 to-slate-950 border-2 border-rose-400 p-0.5 shadow-md animate-pulse">
+                <MummySprite kind="red" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black text-rose-400 uppercase tracking-wider">
-                    XÁC ƯỚP ĐANG ĐI...
+                  <span className="text-xs sm:text-sm font-serif font-black text-rose-300 uppercase tracking-wider">
+                    XÁC ƯỚP TRUY ĐUỔI...
                   </span>
-                  <span className="px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 text-[9px] font-bold border border-rose-500/40 animate-spin">
-                    ✦
+                  <span className="px-1.5 py-0.2 rounded-full bg-rose-500/25 text-rose-200 text-[9px] font-bold border border-rose-400/50">
+                    2 Bước
                   </span>
                 </div>
-                <span className="text-[10px] text-rose-300/80">
-                  {mummiesAliveCount} kẻ thù đang phản ứng
+                <span className="text-[10px] text-rose-200/80 block">
+                  {mummiesAliveCount} hộ vệ lăng mộ đang di chuyển
                 </span>
               </div>
             </div>
           )}
 
           {turnPhase === 'victory' && (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-600 border border-emerald-300 text-base shadow-md">
-                🎉
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border-2 border-emerald-400 p-1 shadow-md">
+                <MummySprite kind="scarab" />
               </div>
               <div>
-                <span className="text-xs font-black text-emerald-300 uppercase tracking-wider">
-                  THOÁT HIỂM THÀNH CÔNG!
+                <span className="text-xs sm:text-sm font-serif font-black text-emerald-300 uppercase tracking-wider">
+                  VƯỢT LĂNG MỘ THÀNH CÔNG!
                 </span>
-                <span className="text-[10px] text-emerald-200/80 block">Đã an toàn tới lối ra</span>
+                <span className="text-[10px] text-emerald-200/80 block">Cầu thang Pharaoh đã mở</span>
               </div>
             </div>
           )}
 
           {turnPhase === 'game_over' && (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-rose-800 border border-rose-400 text-base shadow-md">
-                💀
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-rose-950 border-2 border-rose-500 p-0.5 shadow-md">
+                <MummySprite kind="white" />
               </div>
               <div>
-                <span className="text-xs font-black text-rose-400 uppercase tracking-wider">
-                  BỊ XÁC ƯỚP BẮT GIỮ!
+                <span className="text-xs sm:text-sm font-serif font-black text-rose-400 uppercase tracking-wider">
+                  LỜI NGUYỀN PHARAOH!
                 </span>
-                <span className="text-[10px] text-rose-300/80 block">Hãy dùng Revert Turn để thử lại</span>
+                <span className="text-[10px] text-rose-200/80 block">Dùng Bình Canopic để quay ngược lượt</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right: Step Status & Revert Turn Tokens */}
+        {/* Right: Canopic Jars (Revert Charges) & Step Cartouche */}
         <div className="flex items-center gap-2">
-          {/* Revert Charges Pill */}
+          {/* Canopic Jar Revert Indicator */}
           <div
-            className={`flex items-center gap-1 px-2 py-1 rounded-xl border text-[10px] font-bold ${
-              revertCharges > 0
-                ? 'bg-amber-950/60 border-amber-500/40 text-amber-200'
-                : 'bg-stone-900 border-stone-800 text-stone-500'
-            }`}
-            title={`Còn ${revertCharges}/${maxRevertCharges} lượt Hoàn Tác (Revert Turn) ở màn này`}
+            className="flex items-center gap-1 px-2 py-1 rounded-xl bg-[#1a1007]/90 border border-[#c8963e]/60"
+            title={`Còn ${revertCharges}/${maxRevertCharges} Bình Canopic Hoàn Tác Lượt`}
           >
-            <Undo2 className="w-3 h-3 text-amber-400 shrink-0" />
-            <span className="hidden sm:inline">Revert:</span>
-            <div className="flex gap-0.5 items-center">
+            <div className="flex items-center -space-x-1">
               {Array.from({ length: maxRevertCharges }).map((_, idx) => (
                 <div
-                  key={`charge-dot-${idx}`}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  key={`canopic-${idx}`}
+                  className={`w-5 h-5 transition-all ${
                     idx < revertCharges
-                      ? 'bg-yellow-400 shadow-[0_0_4px_rgba(250,204,21,0.8)]'
-                      : 'bg-stone-700'
+                      ? 'opacity-100 drop-shadow-[0_0_5px_rgba(250,204,21,0.8)]'
+                      : 'opacity-25 grayscale'
                   }`}
-                />
+                >
+                  <MummySprite kind="canopic_jar" />
+                </div>
               ))}
             </div>
-            <span className="font-mono text-[9px] text-amber-300">
+            <span className="font-mono text-[10px] font-black text-yellow-300 ml-1">
               {revertCharges}/{maxRevertCharges}
             </span>
           </div>
 
-          {/* Turns vs Par Star Indicator */}
-          <div className="flex items-center gap-1 bg-black/40 border border-white/10 px-2 py-1 rounded-xl">
-            <Footprints className="w-3 h-3 text-amber-400" />
-            <span className="text-[11px] font-mono font-black text-white">
-              {turnsTaken}
-            </span>
-            <span className="text-[9px] text-stone-400 font-mono">/ {parTurns}p</span>
-            <span className="text-[10px] text-yellow-400 ml-0.5">
-              {'★'.repeat(currentStarPreview)}
-            </span>
+          {/* Steps vs Par Star Cartouche */}
+          <div className="flex items-center gap-1 bg-[#1a1007]/90 border border-[#c8963e]/60 px-2.5 py-1 rounded-xl">
+            <Footprints className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-xs font-mono font-black text-yellow-100">{turnsTaken}</span>
+            <span className="text-[10px] text-amber-300/70 font-mono">/{parTurns}</span>
+            <span className="text-xs text-yellow-400 ml-0.5">{'★'.repeat(currentStarPreview)}</span>
           </div>
         </div>
       </div>
 
-      {/* Bottom Sub-Bar: Countdown Timer (for Time Attack) or Turn Limit Progress */}
+      {/* Countdown Torch Bar for Time Attack */}
       {isTimeAttack && (
-        <div className="w-full bg-[#120b06] border border-cyan-500/30 rounded-xl p-1.5 flex items-center justify-between gap-2 relative overflow-hidden z-10">
+        <div className="w-full bg-[#160d05] border border-cyan-500/40 rounded-xl p-1.5 flex items-center justify-between gap-2 relative z-10">
           <div className="flex items-center gap-1.5">
             <Hourglass
               className={`w-3.5 h-3.5 ${
@@ -196,47 +177,32 @@ export const MummyEscapeTurnIndicator: React.FC<MummyEscapeTurnIndicatorProps> =
               }`}
             />
             <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-200">
-              Ngọn Đuốc Thời Gian:
+              Ngọn Đuốc Sinh Mệnh:
             </span>
           </div>
-
-          {/* Time Progress Bar */}
-          <div className="flex-1 max-w-[160px] h-2 bg-black/60 rounded-full border border-cyan-500/30 overflow-hidden relative">
+          <div className="flex-1 max-w-[180px] h-2 bg-black/70 rounded-full border border-cyan-500/30 overflow-hidden">
             <div
               className={`h-full transition-all duration-300 rounded-full ${
                 isTimeCritical
                   ? 'bg-gradient-to-r from-rose-600 to-amber-500 animate-pulse'
-                  : 'bg-gradient-to-r from-cyan-500 to-teal-400'
+                  : 'bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400'
               }`}
               style={{ width: `${timePercent}%` }}
             />
           </div>
-
-          <div
-            className={`font-mono font-black text-xs px-1.5 py-0.5 rounded ${
-              isTimeCritical
-                ? 'bg-rose-950 text-rose-300 border border-rose-500 animate-bounce'
-                : 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
-            }`}
-          >
+          <div className="font-mono font-black text-xs px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-200 border border-cyan-500/40">
             {timeLeft}s
           </div>
         </div>
       )}
 
       {isTurnLimit && maxTurns && (
-        <div className="w-full bg-[#120b06] border border-amber-500/30 rounded-xl p-1.5 flex items-center justify-between gap-2 relative overflow-hidden z-10 text-[10px]">
+        <div className="w-full bg-[#160d05] border border-amber-500/40 rounded-xl p-1.5 flex items-center justify-between gap-2 relative z-10 text-[10px]">
           <span className="text-amber-200 font-bold flex items-center gap-1">
             <Footprints className="w-3 h-3 text-amber-400" />
-            Giới hạn số bước còn lại:
+            Số bước hành quân còn lại:
           </span>
-          <span
-            className={`font-mono font-black px-1.5 py-0.5 rounded ${
-              maxTurns - turnsTaken <= 3
-                ? 'bg-rose-950 text-rose-300 border border-rose-500 animate-pulse'
-                : 'bg-amber-950 text-amber-300 border border-amber-500/40'
-            }`}
-          >
+          <span className="font-mono font-black px-2 py-0.5 rounded bg-amber-950 text-yellow-300 border border-amber-500/40">
             {Math.max(0, maxTurns - turnsTaken)} / {maxTurns}
           </span>
         </div>
@@ -244,4 +210,3 @@ export const MummyEscapeTurnIndicator: React.FC<MummyEscapeTurnIndicatorProps> =
     </div>
   );
 };
-

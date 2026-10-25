@@ -24,6 +24,7 @@ import { MummyEscapeBoard } from './MummyEscapeBoard';
 import { MummyEscapeTurnIndicator } from './MummyEscapeTurnIndicator';
 import { LevelClearToast } from './LevelClearToast';
 import { SettingsModal } from './SettingsModal';
+import { MummySprite } from '../../visuals/MummySprite';
 import {
   GRID_PALETTES,
   getSavedPalette,
@@ -38,7 +39,6 @@ import {
   computeAdaptiveTuning,
   getAdaptiveProceduralOptions,
   getSkillTierInfo,
-  updateAdaptiveSettings,
   MummyAdaptiveProfile,
 } from './adaptiveDifficulty';
 import confetti from 'canvas-confetti';
@@ -60,7 +60,6 @@ import {
   Settings,
   Compass,
   Sparkles,
-  BarChart3,
   Palette,
   Trophy,
   Footprints,
@@ -79,17 +78,131 @@ interface MummyEscapeGameProps {
 const STORAGE_KEY = 'mummy_escape_save_v1';
 const MAX_REVERT_CHARGES = 3;
 
+/**
+ * Ancient Egyptian Pharaoh's Tomb Splash Loading Screen (PopCap Mummy Maze Deluxe Inspired)
+ */
+const MummyEscapeSplashModal: React.FC<{ onDismiss: () => void }> = ({ onDismiss }) => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const start = Date.now();
+    const duration = 1200;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const pct = Math.min(100, Math.round((elapsed / duration) * 100));
+      setProgress(pct);
+      if (pct >= 100) clearInterval(interval);
+    }, 40);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-[#0d0804]/95 backdrop-blur-xl flex items-center justify-center p-4 select-none animate-fadeIn">
+      <div className="relative w-full max-w-3xl rounded-3xl overflow-hidden border-2 border-[#d4a349] bg-gradient-to-b from-[#33210f] via-[#1c1208] to-[#0f0904] shadow-[0_25px_75px_rgba(0,0,0,0.9)] p-6 sm:p-8 flex flex-col items-center text-center">
+        {/* Hieroglyphic Top Frieze */}
+        <div className="text-xs text-amber-300/25 tracking-[0.5em] font-serif mb-2">
+          𓂀 𓋹 𓆣 𓁹 𓊽 𓅃 𓆗 𓂀 𓋹 𓆣
+        </div>
+
+        <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-serif font-extrabold tracking-widest uppercase bg-amber-500/15 text-yellow-300 border border-amber-400/40 mb-2">
+          <span>𓋹</span> LĂNG MỘ ĐẠI ĐẾ PHARAOH · MUMMY MAZE HD <span>𓆣</span>
+        </span>
+
+        <h2 className="text-2xl sm:text-4xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-300 to-amber-200 drop-shadow-[0_2px_12px_rgba(245,158,11,0.4)]">
+          MUMMY ESCAPE · KIM TỰ THÁP CỔ ĐẠI
+        </h2>
+        <p className="text-xs sm:text-sm text-amber-100/75 max-w-xl mt-1">
+          Bạn đi 1 bước, Xác Ướp Pharaoh đi 2 bước. Lợi dụng tường đá sa thạch, chìa khóa Ankh và bẫy lăng mộ để mở cổng thoát hiểm!
+        </p>
+
+        {/* Egyptian Tomb Confrontation Stage */}
+        <div className="relative w-full max-w-xl h-48 sm:h-56 my-5 rounded-2xl border-2 border-[#c8963e]/60 bg-gradient-to-b from-[#3a2612] via-[#221509] to-[#120b04] overflow-hidden flex items-center justify-around px-4 shadow-inner">
+          {/* Torch Sconces */}
+          <div className="absolute top-3 left-4 w-8 h-8 opacity-90">
+            <MummySprite kind="torch" />
+          </div>
+          <div className="absolute top-3 right-4 w-8 h-8 opacity-90">
+            <MummySprite kind="torch" />
+          </div>
+
+          {/* Left: Explorer & Ankh Key */}
+          <div className="relative z-10 flex items-end -space-x-3">
+            <div className="w-28 h-28 sm:w-36 sm:h-36 drop-shadow-[0_10px_20px_rgba(245,158,11,0.45)]">
+              <MummySprite kind="explorer" />
+            </div>
+            <div className="w-12 h-12 sm:w-14 sm:h-14 mb-4 animate-bounce">
+              <MummySprite kind="key_yellow" />
+            </div>
+          </div>
+
+          {/* Center Golden Scarab Emblem */}
+          <div className="relative z-20 flex flex-col items-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_0_25px_rgba(250,204,21,0.85)] animate-pulse">
+              <MummySprite kind="scarab" />
+            </div>
+          </div>
+
+          {/* Right: Red Pharaoh Mummy, White Mummy & Scorpion */}
+          <div className="relative z-10 flex items-end -space-x-5">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mb-1">
+              <MummySprite kind="scorpion" />
+            </div>
+            <div className="w-28 h-28 sm:w-36 sm:h-36 drop-shadow-[0_10px_20px_rgba(225,29,72,0.45)]">
+              <MummySprite kind="red" />
+            </div>
+            <div className="w-20 h-20 sm:w-24 sm:h-24 opacity-90">
+              <MummySprite kind="white" />
+            </div>
+          </div>
+        </div>
+
+        {/* Loading Bar & Enter Tomb Button */}
+        <div className="w-full max-w-md space-y-3">
+          <div className="w-full h-2.5 rounded-full bg-[#120b04] border border-amber-500/40 overflow-hidden p-0.5">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-600 via-yellow-300 to-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.8)] transition-all duration-75"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between text-[11px] text-amber-200/80 font-medium px-1">
+            <span>
+              {progress < 100
+                ? 'Đang thắp đuốc lăng mộ & khởi động cơ quan đá...'
+                : 'Cửa mật thất Kim Tự Tháp đã mở!'}
+            </span>
+            <span className="font-mono font-bold text-yellow-300">{progress}%</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-stone-950 font-serif font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(245,158,11,0.5)] transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2 border border-yellow-200"
+          >
+            <span>𓋹</span>
+            <span>Bước Vào Lăng Mộ Pharaoh</span>
+            <span>𓆣</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
   bridge,
   isPaused = false,
-  isMuted = false,
-  onGameOver,
-  onRestart,
 }) => {
   // Game Modes
   const [mode, setMode] = useState<GameMode>('campaign');
   const [currentLevelIdx, setCurrentLevelIdx] = useState<number>(0);
   const [endlessFloor, setEndlessFloor] = useState<number>(1);
+  const [showSplash, setShowSplash] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('arcadex_mummy_splash_seen') !== '1';
+    } catch {
+      return false;
+    }
+  });
 
   // Procedural Generator Config State
   const [procSizePreset, setProcSizePreset] = useState<MapSizePreset>('6x6');
@@ -155,7 +268,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
   const [hintCooldown, setHintCooldown] = useState<number>(0);
   const [activeHint, setActiveHint] = useState<HintSuggestion | null>(null);
 
-  // Hint cooldown countdown timer
   useEffect(() => {
     if (hintCooldown <= 0) return;
     const interval = setInterval(() => {
@@ -164,7 +276,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     return () => clearInterval(interval);
   }, [hintCooldown]);
 
-  // Reload adaptive profile on turn changes or level start
   useEffect(() => {
     setAdaptiveProfile(loadAdaptiveProfile());
   }, [turnsTaken, currentLevelIdx, isVictory, isCaught]);
@@ -295,7 +406,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       initLevel(chamber);
       setShowProceduralModal(false);
       mummyAudio.playKeyPickup();
-      setStatusMessage(`Đã tạo phòng hầm mộ ngẫu nhiên (${chamber.gridSize?.cols || 6}x${chamber.gridSize?.rows || 6})!`);
+      setStatusMessage(`Đã kiến tạo mật thất cổ đại (${chamber.gridSize?.cols || 6}×${chamber.gridSize?.rows || 6})!`);
     },
     [endlessFloor, procSizePreset, procArchetype, procMummyCount, procTrapDensity, procSeed, mode, initLevel]
   );
@@ -311,7 +422,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     }
   };
 
-  // On Mount
   useEffect(() => {
     startCampaignLevel(0);
   }, [startCampaignLevel]);
@@ -327,8 +437,8 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
             setTurnPhase('game_over');
             setShakeEffect('caught');
             setShakeNonce((n) => n + 1);
-            setStatusMessage('Hết giờ! Ngọn đuốc đã tắt và xác ướp đã đuổi kịp bạn trong bóng tối.');
-            soundEngine.play('gameOver');
+            setStatusMessage('Ngọn đuốc đã tắt! Xác ướp đã tóm được bạn trong bóng tối.');
+            mummyAudio.playPlayerDeath();
             return 0;
           }
           return prev - 1;
@@ -346,10 +456,8 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     (dir: Direction) => {
       if (isVictory || isCaught || isPaused) return;
 
-      // Clear previous active hint highlight
       setActiveHint(null);
 
-      // Save current state to history for Revert Turn
       const currentStateRecord: MoveStepRecord = {
         playerPos: { ...playerPos },
         playerFacing,
@@ -362,10 +470,8 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
         mummiesTrappedCount: mummiesDestroyedThisLevel,
       };
 
-      // Set animated turn indicator phase to mummy moving
       setTurnPhase('mummy_moving');
 
-      // Simulate turn with dynamic chamber dimensions
       const sim = simulatePlayerAndMummiesTurn(
         playerPos,
         dir,
@@ -379,7 +485,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
         levelData.gridSize
       );
 
-      // Sound & message triggers
       let nextScore = score;
       let newTrapped = totalMummiesTrapped;
       let newTrappedThisLevel = mummiesDestroyedThisLevel;
@@ -389,22 +494,19 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       let hasMummyMovement = false;
 
       sim.events.forEach((ev) => {
-        if (ev.type === 'step') {
-          soundEngine.play('click');
-        } else if (ev.type === 'mummy_step') {
+        if (ev.type === 'mummy_step') {
           hasMummyMovement = true;
         } else if (ev.type === 'key_pickup') {
           mummyAudio.playKeyPickup();
-          setStatusMessage(ev.message || 'Nhặt chìa khóa!');
+          setStatusMessage(ev.message || 'Đã kích hoạt Chìa Khóa Ankh mở cổng đá!');
         } else if (ev.type === 'mummy_crush') {
           mummyAudio.playMummyCrush();
           nextScore += 200;
           newTrapped += 2;
           newTrappedThisLevel += 2;
-          setStatusMessage(ev.message || 'Xác ướp va chạm tan biến!');
+          setStatusMessage(ev.message || 'Hai xác ướp đâm sầm vào nhau và vỡ vụn!');
           bridge.reportProgress('mummy-trapper', 1);
 
-          // Screen-shake trigger for mummy destruction!
           setShakeEffect('crush');
           setShakeNonce((n) => n + 1);
         } else if (ev.type === 'trap_trigger') {
@@ -412,10 +514,9 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
           nextScore += 150;
           newTrapped += 1;
           newTrappedThisLevel += 1;
-          setStatusMessage(ev.message || 'Xác ướp sập bẫy!');
+          setStatusMessage(ev.message || 'Kẻ thù đã sa vào bẫy cổ đại!');
           bridge.reportProgress('mummy-trapper', 1);
 
-          // Screen-shake trigger for trap activation!
           setShakeEffect('trap');
           setShakeNonce((n) => n + 1);
         }
@@ -427,7 +528,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
 
       const nextTurns = turnsTaken + 1;
 
-      // Check Turn Limit mode constraint
       if (mode === 'turn_limit' && levelData.maxTurns && nextTurns >= levelData.maxTurns && !sim.playerEscaped) {
         setIsCaught(true);
         setTurnPhase('game_over');
@@ -461,13 +561,12 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       setTotalMummiesTrapped(newTrapped);
       setMummiesDestroyedThisLevel(newTrappedThisLevel);
 
-      // Handle Caught / Game Over
       if (sim.playerCaught) {
         setIsCaught(true);
         setTurnPhase('game_over');
         setShakeEffect('caught');
         setShakeNonce((n) => n + 1);
-        setStatusMessage('Bạn đã bị xác ướp bắt giữ! Hãy dùng Revert Turn hoặc Chơi lại.');
+        setStatusMessage('Bạn đã bị xác ướp tóm gọn! Hãy dùng Bình Canopic Hoàn Tác hoặc Thử lại.');
         mummyAudio.playPlayerDeath();
         recordMatchResult({
           won: false,
@@ -483,7 +582,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
         return;
       }
 
-      // Handle Victory / Escape
       if (sim.playerEscaped) {
         setIsVictory(true);
         setTurnPhase('victory');
@@ -495,7 +593,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
           colors: ['#f59e0b', '#10b981', '#fbbf24'],
         });
 
-        // Calculate stars
         let stars = 1;
         if (nextTurns <= levelData.parTurns) {
           stars = 3;
@@ -537,7 +634,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
           floor: endlessFloor,
         });
 
-        // Report achievements & score to bridge
         bridge.reportProgress('mummy-first-escape', 1);
         if (stars === 3) {
           bridge.reportProgress('mummy-perfectionist', 1);
@@ -550,7 +646,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
         }
         bridge.submitScore(finalScore);
       } else {
-        // Return turn phase to player after brief moment
         setTurnPhase('player_turn');
       }
     },
@@ -574,22 +669,23 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       starsMap,
       unlockedLevels,
       currentLevelIdx,
+      endlessFloor,
       saveProgress,
       bridge,
     ]
   );
 
-  // Revert Turn Action (Restricted to MAX_REVERT_CHARGES per level)
+  // Revert Turn Action
   const handleRevertTurn = useCallback(() => {
     if (isVictory) return;
     if (revertCharges <= 0) {
       soundEngine.play('hit');
-      setStatusMessage('Đã hết số lượt Hoàn Tác (0/3) cho màn chơi này!');
+      setStatusMessage('Đã cạn cả 3 Bình Canopic Hoàn Tác cho mật thất này!');
       return;
     }
     if (history.length === 0) {
       soundEngine.play('click');
-      setStatusMessage('Bạn đang ở bước khởi đầu, chưa thể hoàn tác.');
+      setStatusMessage('Bạn đang ở vị trí xuất phát, chưa thể hoàn tác.');
       return;
     }
 
@@ -608,7 +704,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     setShakeEffect('none');
     const remaining = revertCharges - 1;
     setRevertCharges(remaining);
-    setStatusMessage(`Đã hoàn tác 1 lượt bước đi. (Còn lại: ${remaining}/${MAX_REVERT_CHARGES} lượt)`);
+    setStatusMessage(`Đã kích hoạt Cát Thời Gian lùi 1 bước. (Còn ${remaining}/${MAX_REVERT_CHARGES} bình)`);
     setHistory((prev) => prev.slice(0, -1));
     setActiveHint(null);
     mummyAudio.playRevertTurn();
@@ -616,7 +712,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
 
   // Reset Chamber
   const handleReset = useCallback(() => {
-    soundEngine.play('click');
+    mummyAudio.playTurnStart();
     setActiveHint(null);
     if (mode === 'endless') {
       startEndlessLevel(endlessFloor);
@@ -644,7 +740,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     setActiveHint(suggestion);
     setHintCooldown(HINT_COOLDOWN_SECONDS);
     mummyAudio.playHint();
-    setStatusMessage(`💡 Gợi ý: ${suggestion.reason}`);
+    setStatusMessage(`𓂀 Cuộn Giấy Papyrus: ${suggestion.reason}`);
   }, [
     isVictory,
     isCaught,
@@ -658,9 +754,8 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     traps,
   ]);
 
-  // Next Level Action
   const handleNextLevel = () => {
-    soundEngine.play('click');
+    mummyAudio.playTurnStart();
     setActiveHint(null);
     if (mode === 'endless') {
       startEndlessLevel(endlessFloor + 1);
@@ -724,108 +819,95 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('arcadex:swipe', handleCustomSwipe);
     };
-  }, [handleMove, handleRevertTurn, handleReset, isPaused, isVictory, isCaught]);
+  }, [handleMove, handleRevertTurn, handleReset, handleRequestHint, isPaused, isVictory, isCaught]);
+
+  const dismissSplash = () => {
+    setShowSplash(false);
+    try {
+      sessionStorage.setItem('arcadex_mummy_splash_seen', '1');
+    } catch {}
+  };
 
   return (
     <div
       id="mummy-escape-root"
-      className="arcade-game-surface flex flex-col items-center justify-start w-full h-full max-w-4xl mx-auto text-white select-none overflow-y-auto overflow-x-hidden p-1 sm:p-3 scrollbar-thin"
+      className="arcade-game-surface flex flex-col items-center justify-start w-full h-full max-w-5xl mx-auto text-white select-none overflow-y-auto overflow-x-hidden p-1.5 sm:p-3 scrollbar-thin bg-[radial-gradient(circle_at_50%_10%,#3d2712_0%,#1c1107_55%,#0c0703_100%)] rounded-2xl"
     >
-      {/* Game Header Bar & Mode Selector */}
-      <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 mb-2 bg-[#1b140e] border border-[#7d5626] rounded-2xl p-2 sm:px-4 shadow-lg">
-        {/* Game Title & Egyptian Logo */}
-        <div className="flex items-center gap-2">
-          <span className="text-2xl sm:text-3xl">🏜️</span>
+      {/* Splash Screen Modal */}
+      {showSplash && <MummyEscapeSplashModal onDismiss={dismissSplash} />}
+
+      {/* Ancient Egyptian Royal Temple Pylon Header */}
+      <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 mb-3 bg-gradient-to-r from-[#28190b] via-[#3c2712] to-[#28190b] border-2 border-[#d4a349] rounded-2xl p-2.5 sm:px-4 shadow-[0_10px_30px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(254,240,138,0.35)] relative overflow-hidden">
+        {/* Left Brand with Golden Scarab Crest */}
+        <div className="flex items-center gap-3 relative z-10">
+          <button
+            type="button"
+            onClick={() => setShowSplash(true)}
+            title="Xem màn hình giới thiệu Lăng Mộ Pharaoh"
+            className="w-11 h-11 rounded-xl bg-[#180f06] border-2 border-yellow-400/80 p-1 shadow-md hover:scale-105 transition-transform cursor-pointer shrink-0"
+          >
+            <MummySprite kind="scarab" />
+          </button>
           <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-sm sm:text-base font-black tracking-wider text-[#f59e0b] uppercase drop-shadow">
-                MUMMY ESCAPE
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm sm:text-lg font-serif font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-200 uppercase drop-shadow">
+                MUMMY ESCAPE · PHARAOH&apos;S TOMB
               </h1>
-              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/40">
-                Tactical Puzzle
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-yellow-200 text-[10px] font-bold border border-amber-400/40">
+                𓋹 Giải Đố Lăng Mộ
               </span>
             </div>
-            <p className="text-[10px] text-[#d4b483]">
+            <p className="text-[11px] text-[#e7cba0]">
               {mode === 'endless'
-                ? `Mê Cung Bất Tận - Tầng ${endlessFloor}`
-                : `${levelData.pyramidName} (${currentLevelIdx + 1}/${CAMPAIGN_LEVELS.length})`}
+                ? `Mê Cung Bất Tận · Tầng ${endlessFloor}`
+                : `${levelData.pyramidName} · Mật Thất ${currentLevelIdx + 1}/${CAMPAIGN_LEVELS.length} (${levelData.name})`}
             </p>
           </div>
         </div>
 
-        {/* Mode Selector Tabs */}
-        <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5 overflow-x-auto max-w-full">
-          <button
-            type="button"
-            onClick={() => handleSelectMode('campaign')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-              mode === 'campaign'
-                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30 ring-1 ring-amber-400'
-                : 'text-stone-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <span>🏛️</span>
-            <span className="hidden xs:inline">Chiến Dịch</span>
-          </button>
+        {/* Mode Cartouche Selector Tabs */}
+        <div className="flex items-center gap-1 bg-[#140c05]/85 p-1 rounded-xl border border-[#8b632d] overflow-x-auto max-w-full relative z-10">
+          {(
+            [
+              ['campaign', '🏛️', 'Chiến Dịch'],
+              ['turn_limit', '🎯', 'Giới Hạn Bước'],
+              ['time_attack', '⏳', 'Ngọn Đuốc'],
+              ['endless', '♾️', 'Vô Tận'],
+            ] as const
+          ).map(([mId, icon, label]) => (
+            <button
+              key={mId}
+              type="button"
+              onClick={() => handleSelectMode(mId)}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-serif font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                mode === mId
+                  ? 'bg-gradient-to-b from-amber-500 to-amber-700 text-stone-950 font-black shadow-md ring-1 ring-yellow-300'
+                  : 'text-amber-200/75 hover:text-yellow-200 hover:bg-white/5'
+              }`}
+            >
+              <span>{icon}</span>
+              <span className="hidden xs:inline">{label}</span>
+            </button>
+          ))}
 
-          <button
-            type="button"
-            onClick={() => handleSelectMode('turn_limit')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-              mode === 'turn_limit'
-                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30 ring-1 ring-amber-400'
-                : 'text-stone-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <span>🎯</span>
-            <span className="hidden xs:inline">Giới Hạn Bước</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectMode('time_attack')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-              mode === 'time_attack'
-                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30 ring-1 ring-amber-400'
-                : 'text-stone-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Hourglass className="w-3 h-3 text-cyan-400" />
-            <span className="hidden xs:inline">Thời Gian</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectMode('endless')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-              mode === 'endless'
-                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30 ring-1 ring-amber-400'
-                : 'text-stone-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <span>♾️</span>
-            <span className="hidden xs:inline">Vô Tận</span>
-          </button>
-
-          {/* Adaptive Difficulty Pill Button */}
+          {/* Adaptive Skill Cartouche */}
           <button
             type="button"
             onClick={() => setShowSettingsModal(true)}
-            className="px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 ml-1"
+            className="px-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-amber-500/15 hover:bg-amber-500/25 text-yellow-200 border border-amber-400/40 ml-1"
             title="Độ Khó Thích Ứng (Adaptive AI Difficulty)"
           >
-            <Sparkles className="w-3 h-3 text-amber-400" />
+            <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
             <span className="hidden sm:inline">{getSkillTierInfo(adaptiveProfile.skillRating).title}</span>
-            <span className="font-mono text-[10px] text-amber-200">({adaptiveProfile.skillRating})</span>
           </button>
 
-          {/* Settings & Display Palette Modal Button */}
+          {/* Settings Button */}
           <button
             id="btn-open-settings"
             type="button"
             onClick={() => setShowSettingsModal(true)}
-            className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 bg-amber-600/20 hover:bg-amber-600/30 text-yellow-300 border border-amber-500/40 ml-1"
-            title="Cài Đặt Trò Chơi & Bảng Màu Lưới (Display & Game Settings)"
+            className="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-[#2b1b0c] hover:bg-[#3d2611] text-yellow-300 border border-amber-400/50 ml-1"
+            title="Cài Đặt Lăng Mộ & Bảng Màu Đá"
           >
             <Settings className="w-3.5 h-3.5 text-yellow-400" />
             <span className="hidden sm:inline">Cài Đặt</span>
@@ -833,22 +915,28 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
         </div>
       </div>
 
-      {/* Main Game Layout: Side Control Panel & Board Grid */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
-        {/* LEFT COLUMN: Tactical Mummy Escape Side Panel (4 cols) */}
-        <div className="md:col-span-4 flex flex-col gap-2.5 bg-[#17110a] border border-[#5d3f1c] rounded-2xl p-3 shadow-xl">
-          {/* Score & Step Counters - Icon-focused */}
-          <div className="grid grid-cols-2 gap-2">
-            {/* Score */}
-            <div className="bg-[#24190e] border border-[#7d5626]/50 rounded-xl p-2 text-center shadow-inner" title="Điểm Số">
-              <Trophy className="w-4 h-4 text-amber-400 mx-auto mb-0.5" />
-              <div className="text-xl font-black text-yellow-300 font-mono tracking-wider">{score}</div>
+      {/* Main Temple Layout: Left Carved Stone Obelisk Panel (4 cols) & Right Tomb Chamber (8 cols) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-3.5 items-start">
+        {/* LEFT COLUMN: Egyptian Stone Stele Control Panel & Jeweled Scarab Compass */}
+        <div className="md:col-span-4 flex flex-col gap-3 bg-gradient-to-b from-[#2c1d0e] via-[#1f1409] to-[#150c05] border-2 border-[#c8963e] rounded-2xl p-3.5 shadow-[0_16px_40px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(254,240,138,0.28)] relative">
+          {/* Score & Step Royal Cartouches */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="bg-[#160e06] border border-[#9a7032] rounded-xl p-2.5 text-center shadow-inner">
+              <div className="text-[10px] font-serif font-bold text-amber-300/80 uppercase flex items-center justify-center gap-1">
+                <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                <span>Kho Báu Điểm</span>
+              </div>
+              <div className="text-xl font-black text-yellow-300 font-mono tracking-wider mt-0.5">
+                {score.toLocaleString()}
+              </div>
             </div>
 
-            {/* Turns Taken / Par */}
-            <div className="bg-[#24190e] border border-[#7d5626]/50 rounded-xl p-2 text-center shadow-inner" title="Số Bước">
-              <Footprints className="w-4 h-4 text-amber-400 mx-auto mb-0.5" />
-              <div className="text-xl font-black text-white font-mono">
+            <div className="bg-[#160e06] border border-[#9a7032] rounded-xl p-2.5 text-center shadow-inner">
+              <div className="text-[10px] font-serif font-bold text-amber-300/80 uppercase flex items-center justify-center gap-1">
+                <Footprints className="w-3.5 h-3.5 text-amber-400" />
+                <span>Bước / Chuẩn</span>
+              </div>
+              <div className="text-xl font-black text-amber-100 font-mono mt-0.5">
                 {mode === 'turn_limit'
                   ? Math.max(0, (levelData.maxTurns || 25) - turnsTaken)
                   : `${turnsTaken} / ${levelData.parTurns}`}
@@ -856,255 +944,262 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
             </div>
           </div>
 
-          {/* Time Limit bar if Time Attack */}
-          {mode === 'time_attack' && (
-            <div className="bg-[#24190e] border border-cyan-500/40 rounded-xl p-2 flex items-center justify-between" title="Thời Gian Còn Lại">
-              <div className="flex items-center gap-1.5 text-cyan-300 text-xs font-bold">
-                <Hourglass className="w-4 h-4 animate-spin" />
-              </div>
-              <span className="text-lg font-black font-mono text-cyan-200">{timeLeft}s</span>
+          {/* JEWELED GOLDEN SCARAB COMPASS D-PAD (Primary Interactive Controller) */}
+          <div className="bg-gradient-to-b from-[#23160a] to-[#130b04] border-2 border-[#a87932] rounded-2xl p-3 flex flex-col items-center shadow-inner relative overflow-hidden">
+            <div className="w-full flex items-center justify-between mb-2">
+              <span className="text-[11px] font-serif font-black text-yellow-300 uppercase tracking-wider flex items-center gap-1">
+                <span>𓆣</span> La Bàn Bọ Hung Vàng
+              </span>
+              <span className="text-[10px] text-amber-300/75 font-mono">WASD / Mũi tên</span>
             </div>
-          )}
 
-          {/* Tactical Action Buttons: REVERT TURN with Limited Charges */}
+            {/* Circular Egyptian Compass Rose */}
+            <div className="relative w-44 h-44 rounded-full bg-gradient-to-br from-[#473016] via-[#27190a] to-[#140c04] border-2 border-[#d4a349] shadow-[0_8px_24px_rgba(0,0,0,0.85),inset_0_0_16px_rgba(245,158,11,0.2)] flex items-center justify-center">
+              {/* Outer Engraved Compass Ring */}
+              <div className="pointer-events-none absolute inset-2 rounded-full border border-dashed border-amber-400/35" />
+
+              {/* UP (North) */}
+              <button
+                id="dpad-up"
+                type="button"
+                onClick={() => handleMove('up')}
+                aria-label="Lên"
+                className="absolute top-1.5 left-1/2 -translate-x-1/2 w-13 h-12 rounded-t-2xl rounded-b-lg bg-gradient-to-b from-[#d4a349] via-[#9e6f21] to-[#63420e] hover:brightness-110 active:scale-92 border border-yellow-200/80 text-stone-950 flex flex-col items-center justify-center shadow-lg cursor-pointer transition-transform"
+              >
+                <ArrowUp className="w-5 h-5 stroke-[2.8]" />
+                <span className="text-[8px] font-black uppercase leading-none">Bắc</span>
+              </button>
+
+              {/* DOWN (South) */}
+              <button
+                id="dpad-down"
+                type="button"
+                onClick={() => handleMove('down')}
+                aria-label="Xuống"
+                className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-13 h-12 rounded-b-2xl rounded-t-lg bg-gradient-to-b from-[#d4a349] via-[#9e6f21] to-[#63420e] hover:brightness-110 active:scale-92 border border-yellow-200/80 text-stone-950 flex flex-col items-center justify-center shadow-lg cursor-pointer transition-transform"
+              >
+                <span className="text-[8px] font-black uppercase leading-none">Nam</span>
+                <ArrowDown className="w-5 h-5 stroke-[2.8]" />
+              </button>
+
+              {/* LEFT (West) */}
+              <button
+                id="dpad-left"
+                type="button"
+                onClick={() => handleMove('left')}
+                aria-label="Trái"
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-12 h-13 rounded-l-2xl rounded-r-lg bg-gradient-to-b from-[#d4a349] via-[#9e6f21] to-[#63420e] hover:brightness-110 active:scale-92 border border-yellow-200/80 text-stone-950 flex items-center justify-center shadow-lg cursor-pointer transition-transform"
+              >
+                <ArrowLeft className="w-5 h-5 stroke-[2.8]" />
+              </button>
+
+              {/* RIGHT (East) */}
+              <button
+                id="dpad-right"
+                type="button"
+                onClick={() => handleMove('right')}
+                aria-label="Phải"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-12 h-13 rounded-r-2xl rounded-l-lg bg-gradient-to-b from-[#d4a349] via-[#9e6f21] to-[#63420e] hover:brightness-110 active:scale-92 border border-yellow-200/80 text-stone-950 flex items-center justify-center shadow-lg cursor-pointer transition-transform"
+              >
+                <ArrowRight className="w-5 h-5 stroke-[2.8]" />
+              </button>
+
+              {/* CENTER SCARAB BUTTON: WAIT / SKIP TURN */}
+              <button
+                id="dpad-wait"
+                type="button"
+                onClick={() => handleMove('wait')}
+                disabled={isVictory || isCaught}
+                aria-label="Đứng yên"
+                title="Đứng Yên 1 Lượt (Space) để dụ xác ướp vào bẫy"
+                className="relative z-10 w-15 h-15 rounded-full bg-gradient-to-b from-amber-600 to-amber-950 hover:brightness-110 active:scale-90 border-2 border-yellow-300 shadow-[0_0_16px_rgba(245,158,11,0.6)] flex flex-col items-center justify-center cursor-pointer transition-transform p-1"
+              >
+                <div className="w-8 h-8">
+                  <MummySprite kind="scarab" />
+                </div>
+                <span className="text-[7px] font-black text-yellow-200 uppercase leading-none -mt-0.5">
+                  Đứng Yên
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Egyptian Relic Action Buttons: Canopic Revert, Papyrus Hint, Reset */}
           <div className="flex flex-col gap-2">
-            {/* Revert Turn Button (Restricted uses per level) */}
+            {/* Canopic Jar Revert Turn Button */}
             <button
               id="btn-mummy-revert-turn"
               type="button"
               onClick={handleRevertTurn}
               disabled={history.length === 0 || isVictory || revertCharges <= 0}
-              title="Hoàn Tác Lượt"
+              title="Hoàn Tác Lượt (Phím Z / U)"
               aria-label="Hoàn Tác Lượt"
-              className={`w-full py-2.5 px-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-between border shadow-lg transition-all cursor-pointer ${
+              className={`w-full py-2.5 px-3 rounded-xl font-serif font-black text-xs uppercase tracking-wider flex items-center justify-between border-2 shadow-lg transition-all cursor-pointer ${
                 history.length > 0 && !isVictory && revertCharges > 0
-                  ? 'bg-gradient-to-b from-[#8f6826] to-[#593d11] hover:from-[#a77a2f] hover:to-[#6d4b17] text-yellow-200 border-[#d4af37] active:scale-[0.98]'
-                  : 'bg-stone-900 text-stone-300 border-stone-800 cursor-not-allowed opacity-60'
+                  ? 'bg-gradient-to-r from-[#5c3d18] via-[#7c5321] to-[#5c3d18] hover:brightness-110 text-yellow-200 border-[#e0ab43] active:scale-[0.98]'
+                  : 'bg-[#17110b] text-stone-500 border-stone-800 cursor-not-allowed opacity-60'
               }`}
             >
-              <div className="flex items-center gap-1.5">
-                <Undo2 className="w-4 h-4 text-yellow-300" />
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 shrink-0">
+                  <MummySprite kind="canopic_jar" />
+                </div>
+                <span>Cát Thời Gian (Lùi Lượt)</span>
               </div>
-              <div className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-lg border border-yellow-500/30">
-                <span className="text-[10px] text-yellow-300 font-mono">
-                  {revertCharges}/{MAX_REVERT_CHARGES}
-                </span>
-              </div>
+              <span className="px-2 py-0.5 rounded-lg bg-black/60 border border-yellow-400/40 text-[11px] font-mono text-yellow-300">
+                {revertCharges}/{MAX_REVERT_CHARGES}
+              </span>
             </button>
 
-            {/* Reset Maze Button */}
-            <button
-              id="btn-mummy-reset"
-              type="button"
-              onClick={handleReset}
-              title="Chơi Lại (Reset)"
-              aria-label="Chơi Lại (Reset)"
-              className="w-full py-2 px-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-[#2d1e0d] hover:bg-[#3d2912] text-[#d4b483] border border-[#7d5626] active:scale-[0.98] transition-all cursor-pointer"
-            >
-              <RotateCcw className="w-4 h-4 text-amber-400" />
-            </button>
-
-            {/* Skip / Wait Turn Button */}
-            <button
-              id="btn-mummy-wait"
-              type="button"
-              onClick={() => handleMove('wait')}
-              disabled={isVictory || isCaught}
-              title="Đứng Yên (Bỏ Lượt / Space)"
-              aria-label="Đứng Yên (Bỏ Lượt / Space)"
-              className="w-full py-2 px-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-[#3b2a14] hover:bg-[#4d371a] text-amber-200 border border-amber-500/40 active:scale-[0.98] transition-all cursor-pointer"
-            >
-              <Flame className="w-4 h-4 text-amber-400" />
-            </button>
-          </div>
-
-          {/* Procedural Generator, Map Modal & Display Settings Triggers */}
-          <div className="grid grid-cols-3 gap-1.5 mt-1">
-            <button
-              id="btn-mummy-procedural-gen"
-              type="button"
-              onClick={() => setShowProceduralModal(true)}
-              title="Tự Sinh"
-              aria-label="Tự Sinh"
-              className="py-2 px-1 rounded-xl bg-gradient-to-r from-amber-700/80 to-yellow-800/80 hover:from-amber-600 hover:to-yellow-700 text-yellow-100 border border-amber-400/50 flex items-center justify-center cursor-pointer transition-all shadow-md"
-            >
-              <Wand2 className="w-4 h-4 text-yellow-300 shrink-0" />
-            </button>
-
-            <button
-              id="btn-mummy-world-map"
-              type="button"
-              onClick={() => setShowLevelSelect(true)}
-              title="Bản Đồ"
-              aria-label="Bản Đồ"
-              className="py-2 px-1 rounded-xl bg-[#1d140b] hover:bg-[#2c1e11] text-amber-300 border border-[#5d3f1c] flex items-center justify-center cursor-pointer transition-all"
-            >
-              <Map className="w-4 h-4 shrink-0" />
-            </button>
-
-            <button
-              id="btn-mummy-open-display-settings"
-              type="button"
-              onClick={() => setShowSettingsModal(true)}
-              className="py-2 px-1 rounded-xl bg-[#1d140b] hover:bg-[#2c1e11] text-yellow-300 border border-[#5d3f1c] flex items-center justify-center cursor-pointer transition-all"
-              title="Đổi Bảng Màu & Cài Đặt Hiển Thị"
-              aria-label="Đổi Bảng Màu & Cài Đặt Hiển Thị"
-            >
-              <Palette className="w-4 h-4 text-amber-400 shrink-0" />
-            </button>
-          </div>
-
-          {/* PATHFINDING HINT BUTTON & STRATEGIC OVERVIEW */}
-          <div className="flex flex-col gap-1.5 mt-1">
+            {/* Eye of Horus Safest Move Hint Button */}
             <button
               id="btn-mummy-hint-safest"
               type="button"
               onClick={handleRequestHint}
               disabled={isVictory || isCaught || isPaused || hintCooldown > 0}
-              className={`w-full py-2.5 px-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-between transition-all cursor-pointer shadow-md border ${
+              className={`w-full py-2.5 px-3 rounded-xl font-serif font-black text-xs uppercase tracking-wider flex items-center justify-between transition-all cursor-pointer shadow-md border-2 ${
                 hintCooldown > 0
-                  ? 'bg-stone-900/90 text-stone-300 border-stone-800 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-stone-950 border-yellow-300 shadow-[0_0_15px_rgba(250,204,21,0.4)] active:scale-[0.98]'
+                  ? 'bg-[#17110b] text-stone-400 border-stone-800 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-stone-950 border-yellow-200 shadow-[0_0_15px_rgba(250,204,21,0.35)] active:scale-[0.98]'
               }`}
             >
               <div className="flex items-center gap-2">
-                <div
-                  className={`p-1 rounded-lg ${
-                    hintCooldown > 0 ? 'bg-stone-800 text-stone-300' : 'bg-black/20 text-stone-950'
-                  }`}
-                >
-                  <Lightbulb className={`w-4 h-4 ${hintCooldown === 0 ? 'animate-bounce' : ''}`} />
-                </div>
-                <div className="flex flex-col text-left">
-                  <span className="leading-none">GỢI Ý NƯỚC ĐI AN TOÀN</span>
-                  <span className="text-[9px] font-bold opacity-80 lowercase font-mono">
-                    {hintCooldown > 0 ? 'tìm đường tự động' : 'phím tắt: H'}
-                  </span>
-                </div>
+                <Lightbulb className={`w-4 h-4 ${hintCooldown === 0 ? 'animate-bounce' : ''}`} />
+                <span>Soi Đường Mắt Horus (H)</span>
               </div>
-
-              <div className="flex items-center">
-                {hintCooldown > 0 ? (
-                  <div className="flex items-center gap-1 bg-stone-950/80 px-2 py-1 rounded-lg border border-stone-800 text-[10px] font-mono font-bold text-amber-400">
-                    <Hourglass className="w-3 h-3 animate-spin text-amber-400" />
-                    <span>{hintCooldown}s</span>
-                  </div>
-                ) : (
-                  <span className="bg-black/30 text-stone-950 text-[10px] font-black px-2 py-0.5 rounded-full border border-black/20 animate-pulse">
-                    SẴN SÀNG
-                  </span>
-                )}
-              </div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-black/25">
+                {hintCooldown > 0 ? `${hintCooldown}s` : 'SẴN SÀNG'}
+              </span>
             </button>
 
-            {/* Active Hint Tactical Recommendation Card */}
-            {activeHint && !isVictory && !isCaught && (
-              <div className="bg-gradient-to-b from-[#2b1c0b] to-[#160d05] border-2 border-yellow-400/80 rounded-2xl p-3 shadow-xl animate-fadeIn relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 rounded-full blur-xl pointer-events-none" />
+            {/* Secondary Action Row: Wait, Reset, Map, Generator, Palette */}
+            <div className="grid grid-cols-5 gap-1.5">
+              <button
+                id="btn-mummy-wait"
+                type="button"
+                onClick={() => handleMove('wait')}
+                disabled={isVictory || isCaught}
+                title="Đứng Yên (Bỏ Lượt / Space)"
+                aria-label="Đứng Yên (Bỏ Lượt / Space)"
+                className="py-2 rounded-xl bg-[#2a1b0d] hover:bg-[#3b2612] text-amber-200 border border-[#8b632d] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all"
+              >
+                <Flame className="w-4 h-4 text-amber-400" />
+                <span className="text-[9px] font-bold">Đứng Yên</span>
+              </button>
 
-                <div className="flex items-center justify-between pb-1.5 border-b border-amber-500/20 mb-2">
-                  <div className="flex items-center gap-1.5 text-yellow-300 text-xs font-black uppercase tracking-wide">
-                    <Compass className="w-3.5 h-3.5 text-yellow-400 animate-spin" />
-                    <span>Chiến Thuật Tối Ưu</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveHint(null)}
-                    className="text-stone-400 hover:text-white text-xs px-1 cursor-pointer"
-                    title="Đóng gợi ý"
-                  >
-                    ✕
-                  </button>
-                </div>
+              <button
+                id="btn-mummy-reset"
+                type="button"
+                onClick={handleReset}
+                title="Chơi Lại Mật Thất (Phím R)"
+                aria-label="Chơi Lại (Reset)"
+                className="py-2 rounded-xl bg-[#2a1b0d] hover:bg-[#3b2612] text-amber-200 border border-[#8b632d] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all"
+              >
+                <RotateCcw className="w-4 h-4 text-amber-400" />
+                <span className="text-[9px] font-bold">Chơi Lại</span>
+              </button>
 
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 border border-yellow-200 flex items-center justify-center text-stone-950 font-black shadow shrink-0">
-                    {activeHint.isWait ? (
-                      <span className="text-sm">🛑</span>
-                    ) : activeHint.bestDir === 'up' ? (
-                      <ArrowUp className="w-5 h-5 font-black" />
-                    ) : activeHint.bestDir === 'down' ? (
-                      <ArrowDown className="w-5 h-5 font-black" />
-                    ) : activeHint.bestDir === 'left' ? (
-                      <ArrowLeft className="w-5 h-5 font-black" />
-                    ) : (
-                      <ArrowRight className="w-5 h-5 font-black" />
-                    )}
-                  </div>
+              <button
+                id="btn-mummy-world-map"
+                type="button"
+                onClick={() => setShowLevelSelect(true)}
+                title="Bản Đồ 15 Mật Thất Kim Tự Tháp"
+                aria-label="Bản Đồ"
+                className="py-2 rounded-xl bg-[#2a1b0d] hover:bg-[#3b2612] text-amber-200 border border-[#8b632d] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all"
+              >
+                <Map className="w-4 h-4 text-yellow-400" />
+                <span className="text-[9px] font-bold">Bản Đồ</span>
+              </button>
 
-                  <div className="flex flex-col">
-                    <span className="text-xs font-black text-yellow-200">
-                      {activeHint.isWinningMove
-                        ? 'LỐI THOÁT TRỰC TIẾP!'
-                        : activeHint.isWait
-                        ? 'BỎ LƯỢT (WAIT)'
-                        : `DI CHUYỂN: ${
-                            activeHint.bestDir === 'up'
-                              ? 'HƯỚNG LÊN'
-                              : activeHint.bestDir === 'down'
-                              ? 'HƯỚNG XUỐNG'
-                              : activeHint.bestDir === 'left'
-                              ? 'SANG TRÁI'
-                              : 'SANG PHẢI'
-                          }`}
-                    </span>
-                    <span className="text-[10px] text-amber-300/80 font-mono">
-                      Tới ô tọa độ ({activeHint.targetPos.x + 1}, {activeHint.targetPos.y + 1})
-                    </span>
-                  </div>
-                </div>
+              <button
+                id="btn-mummy-procedural-gen"
+                type="button"
+                onClick={() => setShowProceduralModal(true)}
+                title="Kiến Tạo Mật Thất Ngẫu Nhiên"
+                aria-label="Tự Sinh"
+                className="py-2 rounded-xl bg-[#2a1b0d] hover:bg-[#3b2612] text-amber-200 border border-[#8b632d] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all"
+              >
+                <Wand2 className="w-4 h-4 text-yellow-300" />
+                <span className="text-[9px] font-bold">Tự Sinh</span>
+              </button>
 
-                <p className="text-[11px] text-amber-100/90 leading-relaxed bg-black/40 p-2 rounded-xl border border-amber-500/20 mb-2">
-                  {activeHint.reason}
-                </p>
-
-                {/* Direct Move Execute Action */}
-                <button
-                  type="button"
-                  onClick={() => handleMove(activeHint.bestDir)}
-                  className="w-full py-1.5 px-2 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 border border-yellow-400/50 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <span>Thực hiện nước đi này ngay</span>
-                  <span>➔</span>
-                </button>
-              </div>
-            )}
+              <button
+                id="btn-mummy-open-display-settings"
+                type="button"
+                onClick={() => setShowSettingsModal(true)}
+                title="Đổi Bảng Màu Đá Lăng Mộ"
+                aria-label="Đổi Bảng Màu & Cài Đặt Hiển Thị"
+                className="py-2 rounded-xl bg-[#2a1b0d] hover:bg-[#3b2612] text-amber-200 border border-[#8b632d] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all"
+              >
+                <Palette className="w-4 h-4 text-amber-400" />
+                <span className="text-[9px] font-bold">Màu Đá</span>
+              </button>
+            </div>
           </div>
 
-          {/* Hint Card */}
-          {showHint && (
-            <div className="bg-[#241708] border border-amber-500/30 rounded-xl p-2.5 text-xs text-amber-200/90 animate-fadeIn">
-              <div className="font-bold text-amber-300 mb-1 flex items-center gap-1">
-                <span>💡 Gợi ý phòng mộ:</span>
+          {/* Active Papyrus Scroll Hint Card */}
+          {activeHint && !isVictory && !isCaught && (
+            <div className="bg-gradient-to-b from-[#3d2812] to-[#211408] border-2 border-yellow-400 rounded-2xl p-3 shadow-xl animate-fadeIn">
+              <div className="flex items-center justify-between pb-1.5 border-b border-amber-400/30 mb-2">
+                <div className="flex items-center gap-1.5 text-yellow-300 text-xs font-serif font-black uppercase">
+                  <Compass className="w-3.5 h-3.5 text-yellow-400 animate-spin" />
+                  <span>Chỉ Dẫn Cuộn Giấy Papyrus</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveHint(null)}
+                  className="text-amber-200 hover:text-white text-xs px-1 cursor-pointer"
+                >
+                  ✕
+                </button>
               </div>
-              <p className="text-[11px] leading-relaxed">{levelData.hintTip || 'Dụ xác ướp vào các góc tường cụt!'}</p>
+              <p className="text-[11px] text-amber-100 leading-relaxed mb-2">{activeHint.reason}</p>
+              <button
+                type="button"
+                onClick={() => handleMove(activeHint.bestDir)}
+                className="w-full py-1.5 px-2 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-stone-950 text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <span>Đi Theo Chỉ Dẫn Này Ngay</span>
+                <span>➔</span>
+              </button>
             </div>
           )}
 
-          {/* Tactical Guide / Rules Reminder */}
-          <div className="bg-[#120e09] border border-white/5 rounded-xl p-2.5 text-[11px] text-stone-400 flex flex-col gap-1">
-            <div className="font-bold text-stone-300 text-[11px] uppercase flex items-center justify-between">
-              <span>Quy Luật Di Chuyển:</span>
-              <span className="text-[9px] text-amber-400 font-mono">Radar ⚠️: Bật</span>
+          {/* Ancient Tomb Bestiary & Law Tablet */}
+          <div className="bg-[#160e06]/90 border border-[#7d5626] rounded-xl p-2.5 text-[11px] text-amber-100/85 space-y-1.5">
+            <div className="font-serif font-bold text-yellow-300 text-xs uppercase flex items-center justify-between border-b border-amber-500/20 pb-1">
+              <span>📜 Luật Cổ Ngữ Pharaoh</span>
+              <span className="text-[10px] text-amber-300 font-mono">1 Bước = 2 Bước Địch</span>
             </div>
-            <div className="flex items-center gap-1.5 text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-slate-200 inline-block shrink-0" />
-              <span>Xác ướp trắng: Đi 2 bước (Ưu tiên NGANG).</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 shrink-0">
+                <MummySprite kind="white" />
+              </div>
+              <span>
+                <strong className="text-cyan-300">Xác Ướp Trắng:</strong> Đi 2 bước, luôn ưu tiên kéo <strong>NGANG</strong> trước.
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 text-rose-300">
-              <span className="w-2 h-2 rounded-full bg-rose-500 inline-block shrink-0" />
-              <span>Xác ướp đỏ: Đi 2 bước (Ưu tiên DỌC).</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 shrink-0">
+                <MummySprite kind="red" />
+              </div>
+              <span>
+                <strong className="text-rose-300">Xác Ướp Pharaoh Đỏ:</strong> Đi 2 bước, luôn ưu tiên kéo <strong>DỌC</strong> trước.
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 text-amber-300">
-              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0" />
-              <span>Bọ cạp: Đi 1 bước mỗi lượt.</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 shrink-0">
+                <MummySprite kind="scorpion" />
+              </div>
+              <span>
+                <strong className="text-amber-300">Bọ Cạp Vàng:</strong> Đi 1 bước mỗi lượt, có thể kích hoạt bẫy.
+              </span>
             </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Turn Indicator + Game Board + Mobile D-Pad (8 cols) */}
-        <div className="mummy-board-panel md:col-span-8 flex flex-col items-center justify-center bg-[#151009] border border-[#5d3f1c] rounded-2xl p-2 sm:p-4 shadow-2xl relative">
-          {/* Visual Turn Indicator UI Component with Countdown Timer */}
+        {/* RIGHT COLUMN: Turn Cartouche + Ancient Tomb Chamber Grid (8 cols) */}
+        <div className="mummy-board-panel md:col-span-8 flex flex-col items-center justify-center bg-gradient-to-b from-[#24170b] via-[#180f06] to-[#110a04] border-2 border-[#c8963e] rounded-2xl p-2.5 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.85)] relative">
           <MummyEscapeTurnIndicator
             turnPhase={turnPhase}
             turnsTaken={turnsTaken}
@@ -1119,21 +1214,20 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
             isThreatCritical={isThreatCritical}
           />
 
-          {/* Status Alert Banner */}
+          {/* Papyrus Status Alert Banner */}
           {statusMessage && (
-            <div className="w-full max-w-[500px] mb-2 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs font-semibold flex items-center justify-between animate-fadeIn">
+            <div className="w-full max-w-[520px] mb-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-900/70 via-amber-800/70 to-amber-900/70 border border-yellow-400/50 text-yellow-100 text-xs font-semibold flex items-center justify-between animate-fadeIn shadow-md">
               <span>{statusMessage}</span>
               <button
                 type="button"
                 onClick={() => setStatusMessage('')}
-                className="text-amber-400 text-xs hover:text-white ml-2"
+                className="text-yellow-300 text-xs hover:text-white ml-2 cursor-pointer"
               >
                 ✕
               </button>
             </div>
           )}
 
-          {/* Mummy Escape Board with Dynamic Grid Sizes, Warning Path Indicators and Screen-Shake */}
           <MummyEscapeBoard
             playerPos={playerPos}
             playerFacing={playerFacing}
@@ -1168,122 +1262,24 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
             }
             onMove={handleMove}
           />
-
-          {/* On-Screen Mobile Compass D-Pad */}
-          <div className="w-full max-w-[340px] mt-3 flex flex-col items-center justify-center gap-1 bg-[#20150a] border border-[#6d4c20]/50 rounded-2xl p-2.5 shadow-inner">
-            <div className="flex items-center justify-between w-full px-2 mb-1 gap-1">
-              <span className="text-[10px] font-bold text-amber-400/70 uppercase tracking-wider truncate">
-                Phím Điều Hướng
-              </span>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  id="dpad-quick-hint"
-                  type="button"
-                  onClick={handleRequestHint}
-                  disabled={hintCooldown > 0 || isVictory || isCaught}
-                  className={`text-[9px] font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border transition-all ${
-                    hintCooldown === 0 && !isVictory && !isCaught
-                      ? 'bg-gradient-to-r from-yellow-600 to-amber-600 text-stone-950 font-black border-yellow-300 shadow cursor-pointer active:scale-95'
-                      : 'bg-stone-900 text-stone-300 border-stone-800 cursor-not-allowed'
-                  }`}
-                >
-                  <Lightbulb className="w-2.5 h-2.5" />
-                  <span>{hintCooldown > 0 ? `Hint (${hintCooldown}s)` : 'Hint (H)'}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRevertTurn}
-                  disabled={history.length === 0 || isVictory || revertCharges <= 0}
-                  className={`text-[9px] font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border ${
-                    revertCharges > 0 && history.length > 0
-                      ? 'bg-amber-950 text-amber-300 border-amber-500/40 cursor-pointer'
-                      : 'bg-stone-900 text-stone-300 border-stone-800 cursor-not-allowed'
-                  }`}
-                >
-                  <Undo2 className="w-2.5 h-2.5" />
-                  <span>Revert ({revertCharges}/{MAX_REVERT_CHARGES})</span>
-                </button>
-              </div>
-            </div>
-
-            {/* UP */}
-            <div className="flex justify-center">
-              <button
-                id="dpad-up"
-                type="button"
-                onClick={() => handleMove('up')}
-                className="w-12 h-11 rounded-xl bg-gradient-to-b from-[#8f6826] to-[#593d11] hover:from-[#a77a2f] hover:to-[#6d4b17] border border-[#d4af37] text-yellow-100 flex items-center justify-center active:scale-90 shadow-md transition-transform cursor-pointer"
-                aria-label="Lên"
-              >
-                <ArrowUp className="w-5 h-5 font-black" />
-              </button>
-            </div>
-
-            {/* LEFT, WAIT, RIGHT */}
-            <div className="flex items-center gap-2">
-              <button
-                id="dpad-left"
-                type="button"
-                onClick={() => handleMove('left')}
-                className="w-12 h-11 rounded-xl bg-gradient-to-b from-[#8f6826] to-[#593d11] hover:from-[#a77a2f] hover:to-[#6d4b17] border border-[#d4af37] text-yellow-100 flex items-center justify-center active:scale-90 shadow-md transition-transform cursor-pointer"
-                aria-label="Trái"
-              >
-                <ArrowLeft className="w-5 h-5 font-black" />
-              </button>
-
-              {/* Center Wait Button */}
-              <button
-                id="dpad-wait"
-                type="button"
-                onClick={() => handleMove('wait')}
-                className="w-14 h-11 rounded-xl bg-gradient-to-b from-amber-700 to-amber-950 hover:from-amber-600 hover:to-amber-900 border-2 border-amber-400 text-amber-100 font-black text-[10px] uppercase flex flex-col items-center justify-center active:scale-90 shadow-md transition-transform cursor-pointer"
-                aria-label="Đứng yên"
-              >
-                <span>BỎ LƯỢT</span>
-                <span className="text-[8px] text-amber-300">Wait</span>
-              </button>
-
-              <button
-                id="dpad-right"
-                type="button"
-                onClick={() => handleMove('right')}
-                className="w-12 h-11 rounded-xl bg-gradient-to-b from-[#8f6826] to-[#593d11] hover:from-[#a77a2f] hover:to-[#6d4b17] border border-[#d4af37] text-yellow-100 flex items-center justify-center active:scale-90 shadow-md transition-transform cursor-pointer"
-                aria-label="Phải"
-              >
-                <ArrowRight className="w-5 h-5 font-black" />
-              </button>
-            </div>
-
-            {/* DOWN */}
-            <div className="flex justify-center">
-              <button
-                id="dpad-down"
-                type="button"
-                onClick={() => handleMove('down')}
-                className="w-12 h-11 rounded-xl bg-gradient-to-b from-[#8f6826] to-[#593d11] hover:from-[#a77a2f] hover:to-[#6d4b17] border border-[#d4af37] text-yellow-100 flex items-center justify-center active:scale-90 shadow-md transition-transform cursor-pointer"
-                aria-label="Xuống"
-              >
-                <ArrowDown className="w-5 h-5 font-black" />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* PROCEDURAL LEVEL GENERATOR MODAL */}
       {showProceduralModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#1a1209] border-2 border-[#d4af37] rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto scrollbar-thin">
-            {/* Modal Header */}
+          <div className="w-full max-w-lg bg-[#1d1309] border-2 border-[#d4af37] rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto scrollbar-thin">
             <div className="flex items-center justify-between pb-3 border-b border-amber-600/30 mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">✨</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9">
+                  <MummySprite kind="scarab" />
+                </div>
                 <div>
-                  <h3 className="text-base font-black text-yellow-300 uppercase tracking-wide">
-                    TẠO MÀN THỦ TỤC NGẪU NHIÊN (PROCEDURAL GENERATOR)
+                  <h3 className="text-base font-serif font-black text-yellow-300 uppercase tracking-wide">
+                    KIẾN TẠO MẬT THẤT NGẪU NHIÊN
                   </h3>
                   <p className="text-[10px] text-amber-200/70">
-                    Sinh mê cung vô tận với bố cục bẫy và kích thước bản đồ tùy biến
+                    Tùy biến kích thước lăng mộ, kiến trúc cột đá và mật độ xác ướp
                   </p>
                 </div>
               </div>
@@ -1296,13 +1292,11 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               </button>
             </div>
 
-            {/* Form Controls */}
             <div className="space-y-4">
-              {/* 1. Map Size Preset */}
               <div>
                 <label className="block text-xs font-bold text-amber-300 uppercase mb-1.5 flex items-center gap-1.5">
                   <Sliders className="w-3.5 h-3.5" />
-                  <span>1. Kích Thước Bản Đồ:</span>
+                  <span>1. Kích Thước Mật Thất:</span>
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {(['5x5', '6x6', '7x7', '8x8'] as MapSizePreset[]).map((size) => (
@@ -1312,7 +1306,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                       onClick={() => setProcSizePreset(size)}
                       className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border ${
                         procSizePreset === size
-                          ? 'bg-amber-600 border-yellow-300 text-white shadow-md shadow-amber-600/40 ring-2 ring-yellow-400'
+                          ? 'bg-amber-600 border-yellow-300 text-white shadow-md ring-2 ring-yellow-400'
                           : 'bg-[#281b0f] border-[#5d3f1c] text-stone-300 hover:bg-[#3b2817]'
                       }`}
                     >
@@ -1322,20 +1316,19 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                 </div>
               </div>
 
-              {/* 2. Chamber Archetype */}
               <div>
                 <label className="block text-xs font-bold text-amber-300 uppercase mb-1.5 flex items-center gap-1.5">
                   <Map className="w-3.5 h-3.5" />
-                  <span>2. Bố Cục Kiến Trúc Phòng Mộ:</span>
+                  <span>2. Kiến Trúc Điện Thờ:</span>
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {[
                     { id: 'random', label: '🎲 Ngẫu Nhiên' },
-                    { id: 'labyrinth', label: '🌀 Mê Cung' },
-                    { id: 'pillars_of_karnak', label: '🏛️ Hàng Thạch Trụ' },
+                    { id: 'labyrinth', label: '🌀 Mê Cung Cổ' },
+                    { id: 'pillars_of_karnak', label: '🏛️ Cột Đá Karnak' },
                     { id: 'gauntlet_of_traps', label: '🗡️ Đại Trận Bẫy' },
-                    { id: 'royal_vault', label: '👑 Kho Báu Cổng Khóa' },
-                    { id: 'scorpion_nest', label: '🦂 Tổ Bọ Cạp' },
+                    { id: 'royal_vault', label: '👑 Kho Báu Cổng Ankh' },
+                    { id: 'scorpion_nest', label: '🦂 Tổ Bọ Cạp Vàng' },
                   ].map((arch) => (
                     <button
                       key={`arch-${arch.id}`}
@@ -1343,7 +1336,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                       onClick={() => setProcArchetype(arch.id as any)}
                       className={`p-2 rounded-xl text-[11px] font-bold text-left transition-all cursor-pointer border ${
                         procArchetype === arch.id
-                          ? 'bg-amber-600 border-yellow-300 text-white shadow-md shadow-amber-600/30'
+                          ? 'bg-amber-600 border-yellow-300 text-white shadow-md'
                           : 'bg-[#281b0f] border-[#5d3f1c] text-stone-300 hover:bg-[#3b2817]'
                       }`}
                     >
@@ -1353,9 +1346,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                 </div>
               </div>
 
-              {/* 3. Mummy Count & Trap Density */}
               <div className="grid grid-cols-2 gap-3">
-                {/* Mummy Count */}
                 <div>
                   <label className="block text-xs font-bold text-amber-300 uppercase mb-1.5">
                     3. Số Xác Ướp ({procMummyCount}):
@@ -1378,7 +1369,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                   </div>
                 </div>
 
-                {/* Trap Density */}
                 <div>
                   <label className="block text-xs font-bold text-amber-300 uppercase mb-1.5">
                     4. Mật Độ Bẫy:
@@ -1402,10 +1392,9 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                 </div>
               </div>
 
-              {/* 4. Seed (Optional) */}
               <div>
                 <label className="block text-xs font-bold text-amber-300 uppercase mb-1.5 flex items-center justify-between">
-                  <span>5. Mã Hạt Giống Hầm Mộ (Seed):</span>
+                  <span>5. Mã Khắc Cổ Ngữ (Seed):</span>
                   <button
                     type="button"
                     onClick={() => setProcSeed(Math.random().toString(36).substring(2, 8).toUpperCase())}
@@ -1419,19 +1408,18 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                   type="text"
                   value={procSeed}
                   onChange={(e) => setProcSeed(e.target.value)}
-                  placeholder="Ví dụ: PHARAOH-99, TUTO-77..."
+                  placeholder="Ví dụ: PHARAOH-99, ANUBIS-77..."
                   className="w-full bg-[#120b06] border border-[#7d5626] rounded-xl px-3 py-2 text-xs text-yellow-200 font-mono focus:outline-none focus:border-yellow-400"
                 />
               </div>
 
-              {/* Generate Button */}
               <button
                 type="button"
                 onClick={() => handleGenerateCustomChamber()}
-                className="w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
+                className="w-full py-3.5 rounded-2xl font-serif font-black text-sm uppercase tracking-wider bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-stone-950 shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
               >
                 <Wand2 className="w-4 h-4 text-stone-950" />
-                <span>SINH PHÒNG MỘ TỰ ĐỘNG (GENERATE CHAMBER)</span>
+                <span>MỞ CỬA MẬT THẤT MỚI</span>
               </button>
             </div>
           </div>
@@ -1461,16 +1449,15 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       {isVictory && !levelVictoryData && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-sm bg-gradient-to-b from-[#2e1d0f] to-[#120b06] border-2 border-[#d4af37] rounded-3xl p-6 shadow-2xl text-center relative overflow-hidden">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-3xl shadow-[0_0_25px_rgba(245,158,11,0.5)]">
-              🪜
+            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-amber-500/20 border border-amber-400 p-2 shadow-[0_0_25px_rgba(245,158,11,0.5)]">
+              <MummySprite kind="scarab" />
             </div>
 
-            <h2 className="text-xl font-black text-yellow-300 tracking-wider uppercase mb-1">
+            <h2 className="text-xl font-serif font-black text-yellow-300 tracking-wider uppercase mb-1">
               THOÁT HIỂM THÀNH CÔNG!
             </h2>
             <p className="text-xs text-amber-200/80 mb-4">{levelData.name}</p>
 
-            {/* Stars Rating */}
             <div className="flex items-center justify-center gap-2 mb-4">
               {[1, 2, 3].map((starNum) => {
                 const isEarned =
@@ -1490,31 +1477,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               })}
             </div>
 
-            {/* Performance Stats */}
-            <div className="bg-black/40 border border-white/5 rounded-2xl p-3 mb-5 text-left text-xs space-y-1.5 font-mono">
-              <div className="flex justify-between text-slate-300">
-                <span>Số bước đã đi:</span>
-                <span className="font-bold text-white">
-                  {turnsTaken} bước (Chuẩn: {levelData.parTurns})
-                </span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Xác ướp tiêu diệt:</span>
-                <span className="font-bold text-amber-300">+{mummiesDestroyedThisLevel}</span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Lượt Revert còn lại:</span>
-                <span className="font-bold text-emerald-400">
-                  {revertCharges}/{MAX_REVERT_CHARGES}
-                </span>
-              </div>
-              <div className="flex justify-between text-yellow-300 pt-1 border-t border-white/10 font-bold">
-                <span>Tổng Điểm:</span>
-                <span className="text-base">{score}</span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -1526,50 +1488,49 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               <button
                 type="button"
                 onClick={handleNextLevel}
-                className="flex-1 py-3 rounded-xl font-black text-xs uppercase bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 shadow-lg shadow-amber-500/40 cursor-pointer"
+                className="flex-1 py-3 rounded-xl font-black text-xs uppercase bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 shadow-lg cursor-pointer"
               >
-                {mode === 'endless' ? `Tầng ${endlessFloor + 1} ➔` : 'Tầng Tiếp Theo ➔'}
+                {mode === 'endless' ? `Tầng ${endlessFloor + 1} ➔` : 'Mật Thất Tiếp ➔'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* GAME OVER DIALOG (With Revert Turn Charge Option) */}
+      {/* GAME OVER DIALOG */}
       {isCaught && !isVictory && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-sm bg-gradient-to-b from-[#2a100d] to-[#120504] border-2 border-rose-600 rounded-3xl p-6 shadow-2xl text-center">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-rose-600/20 border border-rose-500 flex items-center justify-center text-3xl shadow-[0_0_25px_rgba(225,29,72,0.5)]">
-              💀
+            <div className="w-20 h-20 mx-auto mb-3 rounded-2xl bg-rose-950/60 border border-rose-500 p-1.5 shadow-[0_0_25px_rgba(225,29,72,0.5)]">
+              <MummySprite kind="red" />
             </div>
 
-            <h2 className="text-xl font-black text-rose-400 tracking-wider uppercase mb-1">
-              BỊ XÁC ƯỚP BẮT GIỮ!
+            <h2 className="text-xl font-serif font-black text-rose-400 tracking-wider uppercase mb-1">
+              LỜI NGUYỀN XÁC ƯỚP!
             </h2>
-            <p className="text-xs text-rose-200/80 mb-4">{statusMessage || 'Bạn đã rơi vào móng vuốt của Pharaoh.'}</p>
+            <p className="text-xs text-rose-200/80 mb-4">
+              {statusMessage || 'Bạn đã rơi vào móng vuốt của hộ vệ Pharaoh.'}
+            </p>
 
-            {/* Action Buttons: Allows Revert Turn if charges remain */}
             <div className="flex flex-col gap-2">
               {revertCharges > 0 && history.length > 0 && (
                 <button
                   type="button"
                   onClick={handleRevertTurn}
-                  className="w-full py-3 rounded-xl font-black text-xs uppercase bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-lg shadow-amber-600/40 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 rounded-xl font-serif font-black text-xs uppercase bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Undo2 className="w-4 h-4" />
-                  <span>Dùng 1 Hoàn Tác (Còn {revertCharges}/{MAX_REVERT_CHARGES})</span>
+                  <span>Dùng Bình Canopic Lùi Lượt ({revertCharges}/{MAX_REVERT_CHARGES})</span>
                 </button>
               )}
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="flex-1 py-3 rounded-xl font-black text-xs uppercase bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-lg shadow-rose-600/40 cursor-pointer"
-                >
-                  Thử Lại ↻
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="w-full py-3 rounded-xl font-serif font-black text-xs uppercase bg-gradient-to-r from-rose-700 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white shadow-lg cursor-pointer"
+              >
+                Khởi Động Lại Mật Thất ↻
+              </button>
             </div>
           </div>
         </div>
@@ -1578,16 +1539,18 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
       {/* PYRAMID LEVEL SELECTOR MODAL */}
       {showLevelSelect && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#1a1209] border-2 border-[#8b6534] rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🏛️</span>
+          <div className="w-full max-w-lg bg-[#1d1309] border-2 border-[#d4a349] rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between pb-3 border-b border-amber-500/20 mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9">
+                  <MummySprite kind="exit_portal" />
+                </div>
                 <div>
-                  <h3 className="text-base font-black text-yellow-300 uppercase">
-                    BẢN ĐỒ KIM TỰ THÁP (15 PHÒNG MỘ)
+                  <h3 className="text-base font-serif font-black text-yellow-300 uppercase">
+                    BẢN ĐỒ KIM TỰ THÁP (15 MẬT THẤT)
                   </h3>
                   <p className="text-[10px] text-amber-200/70">
-                    Chọn phòng hầm mộ đã mở khóa để bắt đầu thám hiểm
+                    Chọn mật thất đã giải ấn để bắt đầu hành trình
                   </p>
                 </div>
               </div>
@@ -1600,7 +1563,6 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               </button>
             </div>
 
-            {/* Grid of 15 levels */}
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5 overflow-y-auto p-1 scrollbar-thin flex-1">
               {CAMPAIGN_LEVELS.map((lvl, idx) => {
                 const isUnlocked = idx < unlockedLevels;
@@ -1615,31 +1577,28 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                     onClick={() => {
                       setShowLevelSelect(false);
                       startCampaignLevel(idx);
-                      soundEngine.play('click');
+                      mummyAudio.playTurnStart();
                     }}
                     className={`relative p-3 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                       isCurrent
-                        ? 'bg-amber-600/30 border-yellow-400 ring-2 ring-yellow-400 shadow-lg shadow-amber-500/30'
+                        ? 'bg-amber-600/35 border-yellow-400 ring-2 ring-yellow-400 shadow-lg'
                         : isUnlocked
-                        ? 'bg-[#281b0f] hover:bg-[#3b2817] border-[#7d5626] text-white'
-                        : 'bg-black/40 border-white/5 text-stone-300 cursor-not-allowed opacity-50'
+                        ? 'bg-[#281b0f] hover:bg-[#3b2817] border-[#8b632d] text-white'
+                        : 'bg-black/40 border-white/5 text-stone-400 cursor-not-allowed opacity-50'
                     }`}
                   >
-                    <span className="text-sm font-black font-mono">#{idx + 1}</span>
+                    <span className="text-sm font-serif font-black text-yellow-200">#{idx + 1}</span>
                     <span className="text-[9px] text-center line-clamp-1 text-amber-200/80">
-                      {isUnlocked ? lvl.name.split(' ')[0] : 'Khóa'}
+                      {isUnlocked ? lvl.name.split(' ')[0] : 'Phong Ấn'}
                     </span>
 
-                    {/* Stars Earned */}
                     {isUnlocked ? (
                       <div className="flex gap-0.5 mt-0.5">
                         {[1, 2, 3].map((s) => (
                           <Star
                             key={`lvl-star-${idx}-${s}`}
                             className={`w-2.5 h-2.5 ${
-                              s <= starsEarned
-                                ? 'text-yellow-400 fill-yellow-400'
-                                : 'text-stone-300'
+                              s <= starsEarned ? 'text-yellow-400 fill-yellow-400' : 'text-stone-600'
                             }`}
                           />
                         ))}
@@ -1655,7 +1614,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
         </div>
       )}
 
-      {/* SETTINGS MODAL: DISPLAY SETTINGS & ADAPTIVE AI */}
+      {/* SETTINGS MODAL */}
       <SettingsModal
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
@@ -1677,4 +1636,3 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
     </div>
   );
 };
-
