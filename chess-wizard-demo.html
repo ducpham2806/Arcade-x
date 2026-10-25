@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArcadeX · Cờ Vua Phù Thủy (Wizard's Chess HD 2D Full Production)</title>
+  <style>
+    :root {
+      --gold-bright: #f7d784;
+      --gold-brass: #d9a74a;
+      --rune-cyan: #38bdf8;
+      --crimson-magic: #f43f5e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 12%, #281d3a 0%, #110d1b 55%, #07050c 100%);
+      color: #f3ece0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 20px 14px 64px;
+      line-height: 1.5;
+    }
+    .container { max-width: 1220px; margin: 0 auto; }
+
+    /* Splash Modal Overlay */
+    .splash-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(8, 6, 14, 0.94);
+      backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: opacity 0.3s ease;
+    }
+    .splash-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .splash-card {
+      width: 100%;
+      max-width: 780px;
+      border-radius: 26px;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      background: linear-gradient(180deg, #1f172d 0%, #110d1a 60%, #09060e 100%);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.88);
+      padding: 28px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .splash-stage {
+      height: 220px;
+      margin: 18px 0;
+      border-radius: 18px;
+      border: 1px solid rgba(245, 158, 11, 0.32);
+      background: radial-gradient(circle at 50% 40%, rgba(245, 158, 11, 0.18), rgba(14, 10, 22, 0.96));
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 12px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .splash-stage svg {
+      width: 138px;
+      height: 138px;
+      filter: drop-shadow(0 12px 20px rgba(0,0,0,0.75));
+    }
+    .vs-orb {
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #fde047, #f97316, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Georgia, serif;
+      font-weight: 900;
+      color: #0f0a19;
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.85);
+    }
+
+    /* Header */
+    .demo-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 20px 24px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(38, 30, 52, 0.9), rgba(18, 15, 28, 0.96));
+      border: 1px solid rgba(217, 167, 74, 0.38);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .app-icon-preview {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid var(--gold-bright);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.65);
+      flex-shrink: 0;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-bright);
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-family: Georgia, serif;
+      font-size: clamp(22px, 3.2vw, 32px);
+      color: #fff6e0;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 980px) {
+      .grid-layout {
+        grid-template-columns: 1.08fr 0.92fr;
+        align-items: start;
+      }
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(30, 24, 43, 0.94), rgba(15, 12, 23, 0.98));
+      border: 1px solid rgba(217, 167, 74, 0.3);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+    }
+    .panel-title {
+      font-family: Georgia, serif;
+      font-size: 18px;
+      color: var(--gold-bright);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-desc {
+      font-size: 12.5px;
+      color: #b0a696;
+      margin-bottom: 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .btn {
+      cursor: pointer;
+      border: 1px solid rgba(217, 167, 74, 0.4);
+      background: rgba(40, 31, 56, 0.92);
+      color: #f6ecd9;
+      padding: 8px 13px;
+      border-radius: 11px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.16s ease;
+    }
+    .btn:hover {
+      background: rgba(217, 167, 74, 0.24);
+      border-color: var(--gold-bright);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #f59e0b, #b45309);
+      color: #0d0a14;
+      border-color: #fde047;
+    }
+    .btn.danger {
+      background: rgba(159, 18, 57, 0.45);
+      border-color: #fb7185;
+      color: #fecdd3;
+    }
+
+    /* Full 8x8 Enchanted Chamber Board */
+    .chamber-frame {
+      padding: 12px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #2d243b, #171321, #231c30);
+      border: 2px solid rgba(245, 158, 11, 0.5);
+      box-shadow: 0 20px 55px rgba(0,0,0,0.85), inset 0 0 20px rgba(0,0,0,0.85);
+      transition: transform 0.1s ease;
+    }
+    .chamber-frame.shake {
+      animation: boardCameraShake 0.48s ease-in-out;
+    }
+    @keyframes boardCameraShake {
+      0%, 100% { transform: translate(0, 0); }
+      15% { transform: translate(-10px, 5px); }
+      30% { transform: translate(10px, -5px); }
+      45% { transform: translate(-7px, 4px); }
+      60% { transform: translate(7px, -3px); }
+      75% { transform: translate(-3px, 2px); }
+    }
+
+    .board-8x8 {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      aspect-ratio: 1 / 1;
+      border: 2px solid rgba(217, 167, 74, 0.6);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .sq {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .sq.light {
+      background: linear-gradient(135deg, #e7dac1 0%, #d2be99 55%, #b9a077 100%);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.45), inset 0 -2px 4px rgba(68,51,25,0.35);
+    }
+    .sq.dark {
+      background: linear-gradient(135deg, #384459 0%, #232b3b 55%, #151a26 100%);
+      box-shadow: inset 0 1px 1px rgba(148,163,184,0.18), inset 0 -2px 5px rgba(0,0,0,0.65);
+    }
+    .sq.selected {
+      background: rgba(245, 158, 11, 0.85) !important;
+      box-shadow: inset 0 0 18px rgba(254, 240, 138, 0.85);
+    }
+    .sq .piece-holder {
+      width: 88%;
+      height: 88%;
+      transition: transform 0.22s ease;
+    }
+    .sq.selected .piece-holder {
+      transform: translateY(-5px) scale(1.12);
+    }
+
+    /* Epic Slash & Shatter VFX */
+    .vfx-burst {
+      position: absolute;
+      inset: -45%;
+      pointer-events: none;
+      z-index: 30;
+      animation: fadeOutVfx 0.75s ease-out forwards;
+    }
+    @keyframes fadeOutVfx {
+      0% { opacity: 1; transform: scale(0.5); }
+      45% { opacity: 1; transform: scale(1.25); }
+      100% { opacity: 0; transform: scale(1.65); }
+    }
+
+    /* Roster 12 HD Sprites Grid */
+    .roster-12 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .sprite-card {
+      background: rgba(18, 14, 28, 0.92);
+      border: 1px solid rgba(217, 167, 74, 0.24);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+    }
+    .sprite-stage {
+      height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: radial-gradient(circle at 50% 60%, rgba(245, 158, 11, 0.15), rgba(9, 7, 15, 0.92));
+      margin-bottom: 6px;
+    }
+    .sprite-stage svg {
+      width: 82px;
+      height: 82px;
+    }
+    .sprite-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8eedb;
+    }
+    .sprite-sub {
+      font-size: 10.5px;
+      color: #9e9384;
+    }
+  </style>
+</head>
+<body>
+  <!-- Splash Loading Screen Modal -->
+  <div class="splash-overlay" id="splash-modal">
+    <div class="splash-card">
+      <div class="eyebrow">⚡ MÀN HÌNH SPLASH LOADING SCREEN · WIZARD'S CHESS HD</div>
+      <h1>CỜ VUA PHÙ THỦY · HOGWARTS CHAMBER</h1>
+      <p style="font-size: 13px; color: #c7bca8; max-width: 560px; margin: 6px auto 0;">
+        Binh đoàn tượng đá Cẩm Thạch Hoàng Gia (Trắng) đối đầu Hắc Diện Thạch Cổ Ngữ (Đen) trong hầm ngầm Hogwarts.
+      </p>
+      <div class="splash-stage" id="splash-stage"></div>
+      <button class="btn primary" style="padding: 12px 28px; font-size: 14px;" onclick="toggleSplash(false)">
+        ⚔️ Bước Vào Bàn Cờ Hầm Ngầm
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="demo-header">
+      <div class="header-brand">
+        <div class="app-icon-preview" id="app-icon-slot" title="Game Icon 1:1"></div>
+        <div>
+          <span class="eyebrow">NHÁNH FEAT/WIZARD-CHESS-UPGRADE · BẢN HOÀN TẤT 12 SPRITE HD 2D</span>
+          <h1>Cờ Vua Phù Thủy · Wizard's Chess HD</h1>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn primary" onclick="toggleSplash(true)">🎬 Xem Lại Splash Loading Screen</button>
+        <button class="btn danger" onclick="demoEpicCapture()">💥 Test Đòn Chém Vỡ Tượng + Rung Bàn Cờ</button>
+      </div>
+    </header>
+
+    <div class="grid-layout">
+      <!-- Left: Full 8x8 Wizard's Chess Board -->
+      <section class="panel">
+        <div class="panel-title">
+          <span>1. Bàn Cờ Đá 8×8 Hầm Ngầm Hogwarts & Hiệu Ứng Chém Vỡ Tượng</span>
+          <span style="font-size: 12px; color: #38bdf8;">Chạm quân cờ rồi chạm quân bất kỳ để chém vỡ</span>
+        </div>
+        <p class="panel-desc">
+          Mỗi quân cờ hiển thị bằng Sprite HD 2D chi tiết cao. Khi ăn quân, tượng chiến binh lao tới vung kiếm chém chéo, làm rung bàn cờ và bắn tung mảnh đá vỡ của đối phương.
+        </p>
+
+        <div class="toolbar">
+          <button class="btn danger" onclick="demoEpicCapture()">⚔️ Mô Phỏng Ăn Quân Hoành Tráng</button>
+          <button class="btn" onclick="resetFullBoard()">↺ Khôi Phục Đội Hình 32 Tượng Cờ</button>
+        </div>
+
+        <div class="chamber-frame" id="chamber-frame">
+          <div class="board-8x8" id="board-8x8"></div>
+        </div>
+      </section>
+
+      <!-- Right: Full 12 HD 2D Sprites Showcase (6 White + 6 Black) -->
+      <section class="panel">
+        <div class="panel-title">
+          <span>2. Trọn Bộ 12 Sprite HD 2D (6 Trắng Cẩm Thạch + 6 Đen Obsidian)</span>
+        </div>
+        <p class="panel-desc">
+          Toàn bộ 12 quân cờ đã được đồng bộ vào <code>src/visuals/ChessPiece.tsx</code>, <code>src/games/chess/index.tsx</code> và <code>src/visuals/gameArt.tsx</code>.
+        </p>
+        <div class="roster-12" id="roster-12"></div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module">
+    import { buildPieceSvg } from './scripts/build-chess-wizard-art.mjs';
+  </script>
+  <script>
+    function getWizardPalette(color) {
+      if (color === 'w') {
+        return {
+          stoneHi: '#fffdf7', stoneLight: '#f5ebd6', stoneMid: '#d8c39e', stoneDark: '#9e845b', stoneDeep: '#59462b',
+          armorHi: '#fff3b0', armorMid: '#e0a945', armorDark: '#8c5b14', outline: '#2b1e10',
+          glowCore: '#fffbeb', glowMid: '#fbbf24', glowOuter: '#f59e0b',
+          capeLight: '#e6d5b8', capeDark: '#786140', pedestalTop: '#ede0c8', pedestalSide: '#8c734b', pedestalRune: '#ffd966'
+        };
+      }
+      return {
+        stoneHi: '#7c8ba6', stoneLight: '#49566e', stoneMid: '#283142', stoneDark: '#161b26', stoneDeep: '#090c12',
+        armorHi: '#94a3b8', armorMid: '#334155', armorDark: '#0f172a', outline: '#05070b',
+        glowCore: '#fef08a', glowMid: '#f97316', glowOuter: '#e11d48', arcaneMid: '#c084fc',
+        capeLight: '#312e48', capeDark: '#110f1d', pedestalTop: '#333d52', pedestalSide: '#151a24', pedestalRune: '#fb7185'
+      };
+    }
+
+    function buildPieceSvg(type, color, uid = Math.random().toString(36).slice(2, 7)) {
+      const p = getWizardPalette(color);
+      const isW = color === 'w';
+      const eyeColor = isW ? '#fde047' : (type === 'r' || type === 'n' ? '#fb923c' : '#e879f9');
+      const runeColor = isW ? '#fbbf24' : (type === 'r' ? '#f97316' : '#c084fc');
+      const runeGlow = isW ? p.glowMid : (p.arcaneMid || p.glowMid);
+
+      const defs = `
+        <defs>
+          <linearGradient id="sb_${uid}" x1="0.15" y1="0.05" x2="0.85" y2="0.95">
+            <stop offset="0%" stop-color="${p.stoneHi}"/><stop offset="28%" stop-color="${p.stoneLight}"/>
+            <stop offset="68%" stop-color="${p.stoneMid}"/><stop offset="100%" stop-color="${p.stoneDark}"/>
+          </linearGradient>
+          <linearGradient id="ss_${uid}" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${p.stoneMid}"/><stop offset="100%" stop-color="${p.stoneDeep}"/>
+          </linearGradient>
+          <linearGradient id="am_${uid}" x1="0.1" y1="0" x2="0.9" y2="1">
+            <stop offset="0%" stop-color="${p.armorHi}"/><stop offset="45%" stop-color="${p.armorMid}"/><stop offset="100%" stop-color="${p.armorDark}"/>
+          </linearGradient>
+          <linearGradient id="cg_${uid}" x1="0" y1="0" x2="0.8" y2="1">
+            <stop offset="0%" stop-color="${p.capeLight}"/><stop offset="100%" stop-color="${p.capeDark}"/>
+          </linearGradient>
+          <radialGradient id="ao_${uid}" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="${runeGlow}"/><stop offset="100%" stop-color="${p.glowOuter}" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="bg_${uid}" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/><stop offset="45%" stop-color="${p.glowMid}"/><stop offset="100%" stop-color="${p.armorDark}"/>
+          </linearGradient>
+        </defs>
+      `;
+
+      const ped = `
+        <ellipse cx="128" cy="238" rx="88" ry="14" fill="#000" opacity="0.55"/>
+        <path d="M44 214 L212 214 L224 232 L32 232 Z" fill="url(#ss_${uid})" stroke="${p.outline}" stroke-width="4.5" stroke-linejoin="round"/>
+        <ellipse cx="128" cy="214" rx="84" ry="15" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4"/>
+        <path d="M52 198 L204 198 L212 214 L44 214 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="4" stroke-linejoin="round"/>
+        <ellipse cx="128" cy="198" rx="76" ry="13" fill="${p.pedestalTop}" stroke="${p.outline}" stroke-width="3.8"/>
+      `;
+
+      let body = '';
+      if (type === 'k') {
+        body = `
+          <path d="M52 198 L62 86 Q128 64 194 86 L204 198 Z" fill="url(#cg_${uid})" stroke="${p.outline}" stroke-width="4.5"/>
+          <path d="M64 196 L72 94 Q128 76 184 94 L192 196 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.5"/>
+          <path d="M84 96 L128 112 L172 96 L164 166 L128 182 L92 166 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="3.8"/>
+          <path d="M48 114 Q56 76 92 84 L88 128 Q64 132 48 114 Z M208 114 Q200 76 164 84 L168 128 Q192 132 208 114 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="4"/>
+          <path d="M98 44 H158 V84 Q128 106 98 84 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4"/>
+          <path d="M104 72 Q128 66 152 72 L144 98 L128 108 L112 98 Z" fill="url(#ss_${uid})" stroke="${p.outline}" stroke-width="3.2"/>
+          <polygon points="108,59 121,62 110,65" fill="${eyeColor}"/><polygon points="148,59 135,62 146,65" fill="${eyeColor}"/>
+          <path d="M92 46 L96 20 L112 35 L128 12 L144 35 L160 20 L164 46 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="4"/>
+          <path d="M88 130 L128 122 L168 130 L162 140 L128 135 L94 140 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="3.6"/>
+          <path d="M115 136 H141 L137 198 L128 212 L119 198 Z" fill="url(#bg_${uid})" stroke="${p.outline}" stroke-width="3.6"/>
+        `;
+      } else if (type === 'q') {
+        body = `
+          <path d="M58 198 L78 96 L60 66 L96 78 L128 72 L160 78 L196 66 L178 96 L198 198 Z" fill="url(#cg_${uid})" stroke="${p.outline}" stroke-width="4.5"/>
+          <path d="M74 198 L90 100 Q128 86 166 100 L182 198 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.2"/>
+          <path d="M96 98 L128 114 L160 98 L148 196 L128 182 L108 196 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="3.6"/>
+          <path d="M104 48 Q128 40 152 48 L148 84 Q128 96 108 84 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="3.8"/>
+          <ellipse cx="117" cy="64" rx="4.5" ry="2.5" fill="${eyeColor}"/><ellipse cx="139" cy="64" rx="4.5" ry="2.5" fill="${eyeColor}"/>
+          <path d="M96 50 L102 22 L116 38 L128 12 L140 38 L154 22 L160 50 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="3.8"/>
+          <g transform="rotate(-32 128 128)">
+            <rect x="124" y="20" width="8" height="205" rx="4" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="3.2"/>
+            <circle cx="128" cy="14" r="11" fill="${eyeColor}" stroke="${p.outline}" stroke-width="2.5"/>
+          </g>
+        `;
+      } else if (type === 'r') {
+        body = `
+          <rect x="74" y="156" width="38" height="42" rx="8" fill="url(#ss_${uid})" stroke="${p.outline}" stroke-width="4.2"/>
+          <rect x="144" y="156" width="38" height="42" rx="8" fill="url(#ss_${uid})" stroke="${p.outline}" stroke-width="4.2"/>
+          <path d="M36 96 L74 82 L82 162 L42 172 L28 140 Z M220 96 L182 82 L174 162 L214 172 L228 140 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.5"/>
+          <path d="M64 22 H92 V42 H112 V22 H144 V42 H164 V22 H192 V72 L178 168 H78 L64 72 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.5"/>
+          <path d="M78 78 L98 66 L128 76 L158 66 L178 78 L166 146 L128 162 L90 146 Z" fill="url(#ss_${uid})" stroke="${p.outline}" stroke-width="4"/>
+          <polygon points="94,92 118,100 98,106" fill="${eyeColor}"/><polygon points="162,92 138,100 158,106" fill="${eyeColor}"/>
+          <path d="M102 120 H154 L148 146 L128 152 L108 146 Z" fill="${runeColor}"/>
+        `;
+      } else if (type === 'b') {
+        body = `
+          <path d="M56 198 L78 92 Q128 74 178 92 L200 198 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.5"/>
+          <path d="M62 104 Q128 78 194 104 L178 134 Q128 114 78 134 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="4"/>
+          <path d="M92 84 C88 46 106 20 128 12 C150 20 168 46 164 84 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="4.2"/>
+          <path d="M102 88 Q128 52 154 88 L146 104 Q128 112 110 104 Z" fill="#09080f" stroke="${p.outline}" stroke-width="3.6"/>
+          <circle cx="118" cy="84" r="4.2" fill="${eyeColor}"/><circle cx="138" cy="84" r="4.2" fill="${eyeColor}"/>
+          <circle cx="186" cy="112" r="20" fill="url(#ao_${uid})"/><circle cx="186" cy="112" r="10" fill="${eyeColor}"/>
+          <rect x="52" y="42" width="8" height="162" rx="4" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="3.2"/>
+          <path d="M56 18 L78 44 L56 70 L34 44 Z" fill="url(#bg_${uid})" stroke="${p.outline}" stroke-width="3.5"/>
+        `;
+      } else if (type === 'n') {
+        body = `
+          <path d="M84 198 L98 148 L72 156 L58 136 L74 118 L92 128 L88 86 L66 78 L80 42 L106 32 L118 46 C158 58 182 108 172 154 L164 198 H142 L146 158 L116 158 L104 198 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.4"/>
+          <path d="M66 78 L80 42 L106 32 L112 58 L84 82 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="3.6"/>
+          <circle cx="88" cy="56" r="4.5" fill="${eyeColor}"/>
+          <rect x="116" y="54" width="28" height="28" rx="6" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="3.8"/>
+          <path d="M126 84 L170 88 L164 134 L142 150 L122 130 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="4"/>
+          <path d="M26 14 L184 128 L178 136 L20 22 Z" fill="url(#bg_${uid})" stroke="${p.outline}" stroke-width="3.4"/>
+        `;
+      } else {
+        body = `
+          <path d="M80 148 L72 198 H104 L112 156 H134 L142 198 H174 L164 148 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.2"/>
+          <path d="M64 92 Q122 74 180 92 L170 156 H74 Z" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.4"/>
+          <rect x="94" y="42" width="56" height="48" rx="10" fill="url(#sb_${uid})" stroke="${p.outline}" stroke-width="4.2"/>
+          <rect x="102" y="59" width="12" height="5" rx="2" fill="${eyeColor}"/><rect x="130" y="59" width="12" height="5" rx="2" fill="${eyeColor}"/>
+          <path d="M126 88 L198 96 L190 162 L158 188 L124 162 Z" fill="url(#am_${uid})" stroke="${p.outline}" stroke-width="4.4"/>
+          <path d="M46 132 L66 146 L152 192 L138 168 L56 120 Z" fill="url(#bg_${uid})" stroke="${p.outline}" stroke-width="3.6"/>
+        `;
+      }
+
+      return `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">${defs}${ped}${body}</svg>`;
+    }
+
+    // Populate Splash & Icon
+    document.getElementById('splash-stage').innerHTML = `
+      <div style="display:flex;align-items:end;">${buildPieceSvg('n','w','sp1')}${buildPieceSvg('k','w','sp2')}</div>
+      <div class="vs-orb">VS</div>
+      <div style="display:flex;align-items:end;">${buildPieceSvg('r','b','sp3')}${buildPieceSvg('q','b','sp4')}</div>
+    `;
+    document.getElementById('app-icon-slot').innerHTML = buildPieceSvg('k', 'w', 'ico');
+
+    function toggleSplash(show) {
+      document.getElementById('splash-modal').classList.toggle('hidden', !show);
+    }
+    setTimeout(() => toggleSplash(false), 1600);
+
+    // 8x8 Board Setup
+    const INITIAL_ROWS = [
+      ['br','bn','bb','bq','bk','bb','bn','br'],
+      ['bp','bp','bp','bp','bp','bp','bp','bp'],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      ['wp','wp','wp','wp','wp','wp','wp','wp'],
+      ['wr','wn','wb','wq','wk','wb','wn','wr'],
+    ];
+
+    let grid = JSON.parse(JSON.stringify(INITIAL_ROWS));
+    let selected = null;
+    let activeVfx = null;
+
+    function renderBoard() {
+      const el = document.getElementById('board-8x8');
+      el.innerHTML = '';
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const sq = document.createElement('div');
+          const isLight = (r + c) % 2 === 0;
+          const isSel = selected && selected[0] === r && selected[1] === c;
+          sq.className = `sq ${isLight ? 'light' : 'dark'} ${isSel ? 'selected' : ''}`;
+          sq.onclick = () => onSquareClick(r, c);
+
+          const code = grid[r][c];
+          if (code) {
+            const holder = document.createElement('div');
+            holder.className = 'piece-holder';
+            holder.innerHTML = buildPieceSvg(code[1], code[0], `b_${r}_${c}`);
+            sq.appendChild(holder);
+          }
+
+          if (activeVfx && activeVfx.r === r && activeVfx.c === c) {
+            const vfx = document.createElement('div');
+            vfx.className = 'vfx-burst';
+            vfx.innerHTML = `
+              <svg viewBox="0 0 100 100" style="width:100%;height:100%;">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#fbbf24" stroke-width="5"/>
+                <path d="M12 88 Q48 42 90 10 Q58 54 18 92 Z" fill="#fef08a"/>
+                <polygon points="15,20 28,14 24,30" fill="#d8c39e" stroke="#2b1e10" stroke-width="2"/>
+                <polygon points="75,22 88,16 82,34" fill="#334155" stroke="#090c12" stroke-width="2"/>
+                <polygon points="22,78 36,84 20,90" fill="#f97316" stroke="#090c12" stroke-width="2"/>
+                <polygon points="76,75 90,82 74,90" fill="#c084fc" stroke="#090c12" stroke-width="2"/>
+              </svg>
+            `;
+            sq.appendChild(vfx);
+          }
+
+          el.appendChild(sq);
+        }
+      }
+    }
+
+    function onSquareClick(r, c) {
+      if (!selected) {
+        if (!grid[r][c]) return;
+        selected = [r, c];
+        renderBoard();
+        return;
+      }
+      const [sr, sc] = selected;
+      if (sr === r && sc === c) {
+        selected = null;
+        renderBoard();
+        return;
+      }
+      const target = grid[r][c];
+      grid[r][c] = grid[sr][sc];
+      grid[sr][sc] = null;
+      selected = null;
+      if (target) {
+        triggerBoardShake(r, c);
+      } else {
+        renderBoard();
+      }
+    }
+
+    function triggerBoardShake(r, c) {
+      activeVfx = { r, c };
+      const frame = document.getElementById('chamber-frame');
+      frame.classList.remove('shake');
+      void frame.offsetWidth;
+      frame.classList.add('shake');
+      renderBoard();
+      setTimeout(() => {
+        activeVfx = null;
+        renderBoard();
+      }, 720);
+    }
+
+    function demoEpicCapture() {
+      grid[3][3] = 'wq';
+      grid[6][3] = null;
+      triggerBoardShake(3, 3);
+    }
+
+    function resetFullBoard() {
+      grid = JSON.parse(JSON.stringify(INITIAL_ROWS));
+      selected = null;
+      activeVfx = null;
+      renderBoard();
+    }
+
+    // Render 12 Sprites Showcase
+    const ALL_12 = [
+      ['w','k','Vua Trắng','Đế Vương Cẩm Thạch'],
+      ['w','q','Hậu Trắng','Nữ Hoàng Thánh Quang'],
+      ['w','r','Xe Trắng','Tháp Hộ Vệ Hoàng Gia'],
+      ['w','b','Tượng Trắng','Đại Pháp Sư Tháp Cao'],
+      ['w','n','Mã Trắng','Kỵ Sĩ Chiến Mã'],
+      ['w','p','Tốt Trắng','Vệ Binh Cẩm Thạch'],
+      ['b','k','Vua Đen','Lãnh Chúa Obsidian'],
+      ['b','q','Hậu Đen','Nữ Hoàng Hắc Ám'],
+      ['b','r','Xe Đen','Khổng Lồ Gargoyle'],
+      ['b','b','Tượng Đen','Pháp Sư Hắc Ám'],
+      ['b','n','Mã Đen','Kỵ Sĩ Hỏa Ngục'],
+      ['b','p','Tốt Đen','Thiết Giáp Tiên Phong'],
+    ];
+
+    const rosterEl = document.getElementById('roster-12');
+    ALL_12.forEach(([col, type, name, sub], idx) => {
+      const card = document.createElement('div');
+      card.className = 'sprite-card';
+      card.innerHTML = `
+        <div class="sprite-stage">${buildPieceSvg(type, col, `ros_${idx}`)}</div>
+        <div class="sprite-name">${name}</div>
+        <div class="sprite-sub">${sub}</div>
+      `;
+      rosterEl.appendChild(card);
+    });
+
+    renderBoard();
+  </script>
+</body>
+</html>

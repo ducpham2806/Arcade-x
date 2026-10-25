@@ -107,9 +107,25 @@ function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string
       <g transform="translate(245 95) rotate(8)"><rect width="65" height="94" rx="27" fill="#e5d0a4"/>{[17,34,51,68,85].map(y=><path key={y} d={`M4 ${y}L61 ${y-7}`} stroke="#a48465" strokeWidth="5"/>)}<rect x="9" y="28" width="46" height="19" rx="8" fill="#182f30"/><circle cx="22" cy="37" r="4" fill={b}/><circle cx="43" cy="37" r="4" fill={b}/></g>
     </g>;
     case 'chess': return <g>
-      <path d="M63 209L135 125H307L372 209Z" fill="#8c7257"/>{[0,1,2,3,4,5].map(i=><path key={i} d={`M${82+i*48} 209L${144+i*30} 125`} stroke="#efdcb9" strokeWidth="15" opacity=".4"/>)}
-      <path d="M199 197H279L270 178L251 165L244 99L261 80L257 61H238V41H220V61H202L198 80L215 99L207 165L190 178Z" fill="#f5ddb1" stroke="#b18e64" strokeWidth="4"/>
-      <path d="M118 191H183L172 165L159 118L180 102L165 72L139 64L113 99L126 111L139 108L131 165Z" fill="#384b6d" stroke="#87a2bf" strokeWidth="3"/>
+      <path d="M55 214L122 132H308L375 214Z" fill="#231c2e" stroke="#d9a74a" strokeWidth="3.5"/>
+      {[0,1,2,3,4,5].map(i=><path key={i} d={`M${76+i*48} 214L${136+i*30} 132`} stroke="#e8d4b0" strokeWidth="14" opacity=".28"/>)}
+      <circle cx="215" cy="128" r="56" fill="#f59e0b" opacity=".22"/>
+      <g transform="translate(86 38) scale(0.72)">
+        <path d="M36 96 L74 82 L82 162 L42 172 L28 140 Z M220 96 L182 82 L174 162 L214 172 L228 140 Z" fill="#283142" stroke="#090c12" strokeWidth="5"/>
+        <path d="M64 22 H92 V42 H112 V22 H144 V42 H164 V22 H192 V72 L178 168 H78 L64 72 Z" fill="#334155" stroke="#090c12" strokeWidth="5"/>
+        <polygon points="94,92 118,100 98,106" fill="#fb923c"/><polygon points="162,92 138,100 158,106" fill="#fb923c"/>
+        <path d="M102 120 H154 L148 146 L128 152 L108 146 Z" fill="#f97316"/>
+        <ellipse cx="128" cy="182" rx="72" ry="14" fill="#1e293b" stroke="#fb7185" strokeWidth="3"/>
+      </g>
+      <path d="M214 74 L224 114 L256 102 L230 132 L254 162 L214 144 L174 162 L198 132 L172 102 L204 114 Z" fill="#fbbf24" opacity=".88"/>
+      <g transform="translate(178 24) scale(0.78)">
+        <path d="M52 184 L62 86 Q128 64 194 86 L204 184 Z" fill="#d8c39e" stroke="#2b1e10" strokeWidth="5"/>
+        <path d="M84 96 L128 112 L172 96 L164 166 L128 182 L92 166 Z" fill="#e0a945" stroke="#2b1e10" strokeWidth="4"/>
+        <path d="M98 44 H158 V84 Q128 106 98 84 Z" fill="#f5ebd6" stroke="#2b1e10" strokeWidth="4.5"/>
+        <path d="M92 46 L96 20 L112 35 L128 12 L144 35 L160 20 L164 46 Z" fill="#fbbf24" stroke="#2b1e10" strokeWidth="4"/>
+        <polygon points="108,59 121,62 110,65" fill="#fde047"/><polygon points="148,59 135,62 146,65" fill="#fde047"/>
+        <path d="M115 126 H141 L137 192 L128 206 L119 192 Z" fill="#fef08a" stroke="#2b1e10" strokeWidth="4"/>
+      </g>
     </g>;
     case 'xiangqi': return <g>
       <path d="M72 205L113 38H326L365 205Z" fill="#b98657" stroke="#edc28a" strokeWidth="3"/>{[0,1,2,3,4].map(i=><path key={i} d={`M${97+i*52} 195L${124+i*45} 48M100 ${64+i*29}H337`} stroke="#583b32" opacity=".5"/>)}
@@ -197,7 +213,7 @@ function Backdrop({id,a,b}:{id:string;a:string;b:string}){
  case 'scoodoku':return <g><path d="M0 0H420V250H0Z" fill="#886444"/><path d="M0 14L420 63M0 206L420 246" stroke="#ccac74" strokeWidth="18" opacity=".3"/><text x="29" y="121" fill="#f3dfb6" opacity=".2" fontSize="75" fontWeight="900">9</text><text x="339" y="208" fill="#f3dfb6" opacity=".2" fontSize="82" fontWeight="900">3</text></g>;
  case 'fill-the-space':return <g><path d="M0 0H420V250H0Z" fill="#58422d"/>{Array.from({length:6},(_,i)=><path key={i} d={`M0 ${i*49}Q132 ${i*49-20} 269 ${i*49+10}T420 ${i*49}`} stroke="#ab825b" strokeWidth="5" opacity=".25"/>)}<path d="M26 29h40v39H26ZM339 201h55v30h-55Z" fill="#e6c68b" opacity=".2"/></g>;
  case 'blocker':return <g><path d="M0 0H420V250H0Z" fill="#266448"/><path d="M0 0Q100 96 60 250M420 0Q320 96 367 250" fill="#417c42" stroke="#94b25e" strokeWidth="12"/>{[0,1,2].map(i=><path key={i} d={`M${23+i*170} ${20+i%2*170}l24 13-24 13-24-13Z`} fill="#bad18a" opacity=".4"/>)}</g>;
- case 'chess':return <g><path d="M0 0H420V250H0Z" fill="#28364a"/>{Array.from({length:12},(_,i)=><rect key={i} x={i%6*80-25} y={Math.floor(i/6)*180-47} width="80" height="80" fill={i%2===Math.floor(i/6)%2?'#cfb889':'#53627a'} opacity=".22" transform="rotate(-12 210 125)"/>)}</g>;
+ case 'chess':return <g><path d="M0 0H420V250H0Z" fill="#161224"/><circle cx="85" cy="68" r="62" fill="#f59e0b" opacity=".2"/><circle cx="335" cy="68" r="62" fill="#a855f7" opacity=".2"/>{Array.from({length:12},(_,i)=><rect key={i} x={i%6*80-25} y={Math.floor(i/6)*180-47} width="80" height="80" fill={i%2===Math.floor(i/6)%2?'#cfb889':'#334155'} opacity=".24" transform="rotate(-12 210 125)"/>)}</g>;
  case 'xiangqi':return <g><path d="M0 0H420V250H0Z" fill="#753d36"/><path d="M22 24H398V226H22Z" stroke="#d3a55c" strokeWidth="5"/>{[0,1,2,3].map(i=><path key={i} d={`M${31+i%2*342} ${31+Math.floor(i/2)*179}h16v16h-16v-16h-10`} stroke="#e9c183" strokeWidth="3"/>)}<path d="M0 120Q105 89 211 125T420 114" stroke="#301f31" strokeWidth="22" opacity=".35"/></g>;
  case 'caro-gomoku':return <g><path d="M0 0H420V250H0Z" fill="#344375"/><circle cx="37" cy="53" r="35" fill="none" stroke="#fa9bc6" strokeWidth="10" opacity=".45"/><path d="M326 158l64 64m0-64l-64 64" stroke="#a4baff" strokeWidth="12" strokeLinecap="round" opacity=".45"/></g>;
  case 'draw-a-shape':return <g><path d="M0 0H420V250H0Z" fill="#204d70"/>{[0,1,2,3,4].map(i=><path key={i} d={`M0 ${25+i*48}H420M${25+i*95} 0V250`} stroke="#afd2dd" strokeWidth="1" opacity=".16"/>)}<path d="M34 49l29 39-20 43M346 207l38-33-15-30" stroke={b} strokeWidth="4" strokeDasharray="4 7"/></g>;
@@ -218,7 +234,9 @@ export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId
  <g className="game-artwork-scene" filter={`url(#${uid}-depth)`} transform={variant==='icon'?'translate(18 8) scale(.9)':undefined}>{variant==='icon'&&id==='hex-match'?<image href={blossomAsset(BLOSSOM_ICON)} x="85" y="0" width="250" height="250"/>:<Scene id={id} a={color} b={secondary} uid={uid}/>}</g>{variant==='icon'&&<><path d="M80 26Q210 -22 340 26" stroke="#fff" strokeOpacity=".18" strokeWidth="3"/><rect x="65" y="-20" width="290" height="290" rx="55" stroke="#fff" strokeOpacity=".16" strokeWidth="2" fill="none"/></>}</svg>;
 }
 export function GameArtwork({gameId,className='',variant='banner'}:{gameId:string;className?:string;variant?:'banner'|'icon'}) {
- const id=canonicalArtId(gameId);return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
+ const id=canonicalArtId(gameId);
+ if (id === 'chess') return <NativeGameArtwork gameId={id} className={className} variant={variant}/>;
+ return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
 }
 export function GameIcon({gameId}:{gameId:string}) {return <GameArtwork gameId={gameId} variant="icon"/>;}
 
