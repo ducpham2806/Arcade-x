@@ -487,6 +487,8 @@ export interface GameAchievementDef {
 }
 
 export interface GameMetadata {
+  /** Optional imported artwork for a controlled preview; does not register a game. */
+  artwork?: { icon: string; banner: string };
   id: string;
   title: string;
   shortDesc: string;
@@ -630,6 +632,3 @@ export interface MatchHistoryItem {
   result: 'win' | 'loss' | 'draw';
   timestamp: number;
 }
-
-
-

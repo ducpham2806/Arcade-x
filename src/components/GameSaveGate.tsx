@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom';
 import React, { useEffect, useState } from 'react';
 import { gameSaveStatus, resolveGameSave, type SaveStatus } from '../services/gameSaves';
 
-export function GameSaveGate({ gameId, onResolved, children }: {
+function CloudGameSaveGate({ gameId, onResolved, children }: {
   gameId: string; onResolved: () => void; children: React.ReactNode;
 }) {
   const [status, setStatus] = useState<SaveStatus>(() => gameSaveStatus(gameId));
@@ -50,3 +50,7 @@ export class GameLoadBoundary extends React.Component<{ children: React.ReactNod
 }
 
 
+
+
+function LocalCampaignGate({children}:{children:React.ReactNode}){const [slot,setSlot]=useState<HTMLElement|null>(null);useEffect(()=>setSlot(document.getElementById('game-save-status-slot')),[]);return <>{slot&&createPortal(<span role="status" title="Game quản lý lưu cục bộ. Xem thông báo trong game khi có lỗi.">Lưu riêng trên thiết bị</span>,slot)}{children}</>;}
+export function GameSaveGate(props:{gameId:string;onResolved:()=>void;children:React.ReactNode}){return props.gameId==='snake-legend'?<LocalCampaignGate>{props.children}</LocalCampaignGate>:<CloudGameSaveGate {...props}/>;}

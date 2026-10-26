@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "gameId": "snake-legend",
+  "status": "new marketing art; in-game art remains A1 candidate",
+  "assets": {
+    "icon": {
+      "source": "icon-master.png",
+      "sourceSha256": "f8009f87728fea521c68f6fad48581f073beae14ca0c25e6a832338ca5a7783b",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "runtime": "icon.webp",
+      "sha256": "86d5a0919f4a1320be7000c8bdffe9cb743cabe6f73ff93e0866289aba57f6d9",
+      "bytes": 52592,
+      "size": [
+        512,
+        512
+      ],
+      "budgetBytes": 150000,
+      "generator": "built-in imagegen",
+      "text": "none; title is accessible HTML"
+    },
+    "banner": {
+      "source": "banner-master.png",
+      "sourceSha256": "5d4c2f19e0e191e6c91593e904857aade41daed1a35c6ae8a9b75d89ed1c457d",
+      "sourceSize": [
+        2172,
+        724
+      ],
+      "runtime": "banner.webp",
+      "sha256": "e938f6ef3537849873347353f88a3f41f083c18bcf42ab81cfbe5dadab2c8616",
+      "bytes": 190658,
+      "size": [
+        1600,
+        534
+      ],
+      "budgetBytes": 240000,
+      "generator": "built-in imagegen",
+      "text": "none; title is accessible HTML"
+    }
+  }
+}

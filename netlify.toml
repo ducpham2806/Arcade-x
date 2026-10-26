@@ -4,3 +4,7 @@ publish = "dist"
 
 [build.environment]
 NODE_VERSION = "24"
+
+
+[context.deploy-preview]
+command = "npm run lint && npm run build && npm run build:snake-preview"
