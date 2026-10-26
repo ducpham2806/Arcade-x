@@ -4,28 +4,22 @@ import {
   Pause,
   Play,
   MoreHorizontal,
-  RotateCw,
-  Lightbulb,
   Trophy,
   Target,
   Clock,
   Footprints,
   Sparkles,
-  Hammer,
-  Shuffle,
-  Undo2,
+  Flame,
 } from "lucide-react";
 import { chooseSkin, SKIN_NAMES, BOARD_SKINS } from "./skins";
 import { GameComponentProps } from "../../types";
 import { useDialogFocus } from "../../launcher/useDialogFocus";
 import {
-  Board,
   Piece,
   Run,
   LEVELS,
   CHAPTERS,
   OBJECTIVES,
-  RULES,
   Booster,
   BOOSTERS,
   ClearEvent,
@@ -45,7 +39,10 @@ import {
   useBooster,
 } from "./engine";
 import { BlockSave, hydrate, levelOpen, settle, buy, buyFrame } from "./save";
+import { JewelBlockSvg, BoosterRelicSvg } from "../../visuals/BlockerJewelArt";
+import { blockerAudio } from "./audio";
 import "./blocker.css";
+
 function Dialog({
   title,
   onClose,
@@ -81,6 +78,7 @@ function Dialog({
     document.body,
   );
 }
+
 function Tile({
   color,
   gem,
@@ -91,11 +89,13 @@ function Tile({
   ice?: number;
 }) {
   return (
-    <span className={`bp-tile bp-color-${color} ${ice ? "bp-ice" : ""}`}>
+    <span className={`bp-tile bp-color-${color} ${ice ? "bp-ice" : ""} ${gem ? "bp-gem-tile" : ""}`}>
+      <JewelBlockSvg color={color} gem={gem} ice={ice} />
       <span className="bp-glyph">{ice ? "❄" : gem ? "★" : ""}</span>
     </span>
   );
 }
+
 function Shape({ piece, cellSize }: { piece: Piece; cellSize?: number }) {
   return (
     <span
@@ -120,6 +120,75 @@ function Shape({ piece, cellSize }: { piece: Piece; cellSize?: number }) {
     </span>
   );
 }
+
+function getClearCallout(fx: ClearEvent): {
+  badge: string;
+  headline: string;
+  tier: number;
+} {
+  if (fx.perfect) {
+    return {
+      badge: "💎 SIÊU PHẨM HOÀN HẢO · +500 BONUS",
+      headline: "PERFECT CLEAR!",
+      tier: 5,
+    };
+  }
+  if (fx.lines >= 4) {
+    return {
+      badge: `🌌 SIÊU TÂN TINH · XÓA ${fx.lines} HÀNG CÙNG LÚC`,
+      headline: `SUPERNOVA ×${fx.lines}!`,
+      tier: 5,
+    };
+  }
+  if (fx.lines === 3) {
+    return {
+      badge: `⚡ ĐẠI PHÁO LĂNG KÍNH · 3 HÀNG${fx.streak > 1 ? ` · COMBO ×${fx.streak}` : ""}`,
+      headline: "TRIPLE NOVA!",
+      tier: 4,
+    };
+  }
+  if (fx.lines === 2) {
+    return {
+      badge: `🔥 SÓNG XUNG KÍCH KÉP · 2 HÀNG${fx.streak > 1 ? ` · COMBO ×${fx.streak}` : ""}`,
+      headline: "DOUBLE CRUSH!",
+      tier: 3,
+    };
+  }
+  if (fx.streak >= 5) {
+    return {
+      badge: `👑 BẤT KHẢ CHIẾN BẠI · NHÂN ĐIỂM TỐI ĐA`,
+      headline: `GODLIKE COMBO ×${fx.streak}!`,
+      tier: 5,
+    };
+  }
+  if (fx.streak === 4) {
+    return {
+      badge: `🌟 CHUỖI PHA LÊ BÙNG NỔ · FEVER OVERDRIVE`,
+      headline: `UNBELIEVABLE ×4!`,
+      tier: 4,
+    };
+  }
+  if (fx.streak === 3) {
+    return {
+      badge: `🔥 KÍCH HOẠT FEVER MODE · NHÂN ĐIỂM ×1.50`,
+      headline: `AMAZING COMBO ×3!`,
+      tier: 3,
+    };
+  }
+  if (fx.streak === 2) {
+    return {
+      badge: `✨ CHUỖI LIÊN HOÀN · NHÂN ĐIỂM ×1.25`,
+      headline: `COMBO ${fx.streak}!`,
+      tier: 2,
+    };
+  }
+  return {
+    badge: "💎 PHÁ VỠ NGỌC PHA LÊ",
+    headline: "TUYỆT VỜI!",
+    tier: 1,
+  };
+}
+
 export const BlockerGame: React.FC<GameComponentProps> = ({
   bridge,
   onGameOver,
@@ -178,10 +247,12 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
   }, [coach]);
   const [ghost, setGhost] = useState<{ r: number; c: number } | null>(null);
   const [fx, setFx] = useState<ClearEvent | null>(null);
+  const [placedCells, setPlacedCells] = useState<Set<string>>(new Set());
   const [announcement, setAnnouncement] = useState("");
   const [reward, setReward] = useState(0);
   const boardRef = useRef<HTMLDivElement>(null);
   const fxTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dragging = useRef<{
     index: number;
     startX: number;
@@ -197,6 +268,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
   const blocked = !!(isPaused || paused || hidden || modal);
   const blockedRef = useRef(blocked);
   blockedRef.current = blocked;
+
   function persist(next: BlockSave) {
     saved.current = next;
     setSave(next);
@@ -232,6 +304,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     setGhost(null);
     setReward(0);
     setFx(null);
+    setPlacedCells(new Set());
     setAnnouncement("");
   }
   function goMenu() {
@@ -261,6 +334,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
       window.removeEventListener("pagehide", flush);
       flush();
       if (fxTimer.current) clearTimeout(fxTimer.current);
+      if (placeTimer.current) clearTimeout(placeTimer.current);
     };
   }, [bridge]);
   useEffect(() => {
@@ -294,16 +368,33 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
         timeElapsed: Math.floor(run.metrics.elapsed),
       });
   }, [run?.metrics.score, run?.metrics.moves, run?.metrics.elapsed, bridge]);
+
   function commit(index: number, r: number, c: number) {
     if (blockedRef.current) return;
     const next = clone(saved.current);
     if (!next.run) return;
+    const pieceToPlace = next.run.tray[index];
     const event = place(next.run, index, r, c);
     if (!event) {
       sound("error");
+      if (!isMuted) blockerAudio.playInvalid();
       setAnnouncement("Khối chưa vừa. Thử xoay nhé.");
       return;
     }
+
+    // Track newly locked cells for placement pulse animation
+    if (pieceToPlace) {
+      const newlyPlaced = new Set<string>();
+      pieceToPlace.matrix.forEach((row, dy) =>
+        row.forEach((v, dx) => {
+          if (v) newlyPlaced.add(`${r + dy}-${c + dx}`);
+        }),
+      );
+      setPlacedCells(newlyPlaced);
+      if (placeTimer.current) clearTimeout(placeTimer.current);
+      placeTimer.current = setTimeout(() => setPlacedCells(new Set()), 420);
+    }
+
     setGhost(null);
     setSelected(null);
     setFx(event);
@@ -312,6 +403,20 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
         ? `${event.lines} hàng · +${event.points} điểm${event.streak > 1 ? ` · Combo ${event.streak}` : ""}`
         : `+${event.points} điểm`,
     );
+
+    if (!isMuted) {
+      const cellCount = pieceToPlace
+        ? pieceToPlace.matrix.flat().filter(Boolean).length
+        : 3;
+      blockerAudio.playPlace(cellCount);
+      if (event.lines > 0) {
+        blockerAudio.playClear(event.lines, event.streak, event.perfect);
+        if (event.streak >= 3) {
+          blockerAudio.playFeverIgnite(event.streak);
+        }
+      }
+    }
+
     if (!["won", "lost"].includes(next.run.status))
       sound(event.perfect ? "win" : event.lines ? "pop" : "tap");
     bridge.recordMove?.();
@@ -324,10 +429,17 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
         );
     }
     if (fxTimer.current) clearTimeout(fxTimer.current);
-    fxTimer.current = setTimeout(() => setFx(null), 900);
+    const fxDuration =
+      event.perfect || event.lines >= 4
+        ? 1350
+        : event.lines >= 2 || event.streak >= 3
+          ? 1100
+          : 900;
+    fxTimer.current = setTimeout(() => setFx(null), fxDuration);
     if (["won", "lost"].includes(next.run.status)) finish(next);
     else persist(next);
   }
+
   function rotateSelected() {
     if (blockedRef.current || selected === null) return;
     update((s) => {
@@ -336,7 +448,9 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     });
     setGhost(null);
     sound("tap");
+    if (!isMuted) blockerAudio.playRotate();
   }
+
   function showHint() {
     if (blockedRef.current || !saved.current.run) return;
     const h = hint(saved.current.run);
@@ -350,8 +464,10 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     });
     setSelected(h.index);
     setGhost({ r: h.r, c: h.c });
+    if (!isMuted) blockerAudio.playSelect();
     setAnnouncement("Ô sáng là gợi ý. Chạm ô góc trên trái để đặt khối.");
   }
+
   function activate(kind: Booster, r?: number, c?: number) {
     if (isPaused || paused || hidden || (modal && modal !== "tools")) return;
     if (!saved.current.seenBoosters.includes(kind)) {
@@ -386,8 +502,10 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     setGhost(null);
     setFx(null);
     sound("pop");
+    if (!isMuted) blockerAudio.playBooster(kind);
     setAnnouncement(`${BOOSTERS[kind].name} đã dùng`);
   }
+
   function cellClick(r: number, c: number) {
     if (blockedRef.current) return;
     if (hammer) {
@@ -396,6 +514,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     } else if (selected !== null) commit(selected, r, c);
     else setAnnouncement("Chọn khối bên dưới, rồi chạm ô để đặt.");
   }
+
   function pointerDown(e: React.PointerEvent, index: number) {
     if (blockedRef.current || !run?.tray[index] || run.status !== "playing")
       return;
@@ -424,7 +543,9 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     setSelected(index);
     setHammer(false);
     setGhost(null);
+    if (!isMuted) blockerAudio.playSelect();
   }
+
   function pointerMove(e: React.PointerEvent) {
     const d = dragging.current;
     if (!d || blockedRef.current) return;
@@ -455,6 +576,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     d.spot = { r, c };
     setGhost({ r, c });
   }
+
   function pointerUp(e: React.PointerEvent) {
     const d = dragging.current;
     dragging.current = null;
@@ -466,6 +588,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
       setGhost(null);
     }
   }
+
   const projected =
     selected !== null && ghost && run?.tray[selected]
       ? run.tray[selected]
@@ -479,18 +602,53 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
   const isGhost = (r: number, c: number) =>
     !!(projected && ghost && projected.matrix[r - ghost.r]?.[c - ghost.c]);
   const done = run && ["won", "lost", "ended"].includes(run.status);
+
+  const activeStreak = run?.metrics.streak || 0;
+  const feverTier =
+    activeStreak >= 5
+      ? "max"
+      : activeStreak >= 3
+        ? "high"
+        : activeStreak === 2
+          ? "warm"
+          : "none";
+  const clearIntensity = fx
+    ? fx.perfect || fx.lines >= 4
+      ? 4
+      : fx.lines === 3 || fx.streak >= 4
+        ? 3
+        : fx.lines === 2 || fx.streak >= 2
+          ? 2
+          : fx.lines === 1
+            ? 1
+            : 0
+    : 0;
+
+  const clearedRows = fx
+    ? Array.from({ length: 8 }, (_, r) => r).filter(
+        (r) => fx.cells.filter((cell) => cell.r === r).length === 8,
+      )
+    : [];
+  const clearedCols = fx
+    ? Array.from({ length: 8 }, (_, c) => c).filter(
+        (c) => fx.cells.filter((cell) => cell.c === c).length === 8,
+      )
+    : [];
+  const callout = fx && fx.lines > 0 ? getClearCallout(fx) : null;
+
   return (
     <div
       className={`bp-root ${screen === "game" ? "bp-playing" : ""} ${save.reducedMotion ? "bp-reduced" : ""}`}
       data-frame={save.frame || "plain"}
       data-board-skin={screen === "game" ? run?.boardSkin || "mint" : undefined}
+      data-fever={screen === "game" ? feverTier : "none"}
       data-no-swipe="true"
     >
       <div className="bp-shell">
         {screen !== "game" && (
           <header className="bp-top">
             <div>
-              <span className="bp-eyebrow">COLOR POP</span>
+              <span className="bp-eyebrow">💎 CRYSTAL JEWEL ARCADE</span>
               <h1>Xếp Gạch</h1>
             </div>
             <div className="bp-top-actions">
@@ -512,27 +670,34 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
         {screen === "menu" && (
           <main className="bp-menu">
             <div className="bp-hero" aria-hidden="true">
+              <div className="bp-hero-aura" />
               <span className="bp-hero-piece">
-                <Tile color={1} />
+                <Tile color={1} gem />
                 <Tile color={2} />
-                <Tile color={3} />
+                <Tile color={3} gem />
                 <Tile color={4} />
-                <Tile color={5} />
+                <Tile color={5} gem />
                 <Tile color={6} />
               </span>
               <i>★</i>
+            </div>
+            <div className="bp-menu-badge">
+              ✨ NGỌC PHA LÊ 3D · COMBO FEVER OVERDRIVE ✨
             </div>
             <h2>
               Một khối nhỏ.
               <br />
               Một niềm vui lớn.
             </h2>
-            <p>Xếp thật thoải mái. Xóa hàng rực rỡ.</p>
+            <p>
+              Ghép khối Ngọc Pha Lê lấp lánh, kích hoạt đại pháo Lăng Kính 1–4+
+              hàng và bùng nổ chuỗi Combo Fever rực lửa!
+            </p>
             <button className="bp-mode bp-free" onClick={() => start("free")}>
-              <span>☀</span>
+              <span>💎</span>
               <div>
                 <strong>Chơi tự do</strong>
-                <small>Không đồng hồ · chơi đến khi bạn muốn dừng</small>
+                <small>Không đồng hồ · săn chuỗi Combo & Fever vô tận</small>
               </div>
               <b>→</b>
             </button>
@@ -543,7 +708,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
               <span>🌈</span>
               <div>
                 <strong>Hành trình 100 màn</strong>
-                <small>10 vùng đất · mục tiêu mới mỗi màn</small>
+                <small>10 vùng đất pha lê · thu sao & phá băng vĩnh cửu</small>
               </div>
               <b>→</b>
             </button>
@@ -558,7 +723,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
               </span>
             </div>
             <p className="bp-tip">
-              Xoay & gợi ý miễn phí. Không mạng vẫn chơi được.
+              Xoay & gợi ý miễn phí. Duy trì Combo từ ×3 để bật Fever Overdrive!
             </p>
           </main>
         )}
@@ -659,7 +824,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                   </div>
                 )}
                 <div
-                  className="bp-budget"
+                  className={`bp-budget ${activeStreak >= 3 ? "bp-budget-fever" : activeStreak === 2 ? "bp-budget-warm" : ""}`}
                   aria-label={
                     level?.rule === "moves"
                       ? "Lượt còn"
@@ -672,6 +837,8 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                     <Footprints size={14} />
                   ) : level?.rule === "time" ? (
                     <Clock size={14} />
+                  ) : activeStreak >= 3 ? (
+                    <Flame size={15} />
                   ) : (
                     <Sparkles size={14} />
                   )}
@@ -691,6 +858,39 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                   <MoreHorizontal size={21} />
                 </button>
               </div>
+
+              {/* Live Combo & Fever Overdrive Meter Bar */}
+              <div
+                className={`bp-fever-strip bp-fever-${feverTier}`}
+                aria-hidden="true"
+              >
+                <div className="bp-fever-label">
+                  <span>
+                    {activeStreak >= 5
+                      ? `👑 HYPER PRISM FEVER ×${activeStreak}`
+                      : activeStreak >= 3
+                        ? `🔥 FEVER OVERDRIVE · COMBO ×${activeStreak}`
+                        : activeStreak === 2
+                          ? `✨ CHUỖI COMBO ×2 · SẮP BẬT FEVER!`
+                          : `💎 CHUỖI PHA LÊ · XÓA LIÊN TIẾP ĐỂ TÍCH NĂNG LƯỢNG`}
+                  </span>
+                  <b>
+                    ×
+                    {(
+                      1 +
+                      Math.min(4, Math.max(0, activeStreak - 1)) * 0.25
+                    ).toFixed(2)}
+                  </b>
+                </div>
+                <div className="bp-fever-track">
+                  <i
+                    style={{
+                      width: `${Math.min(100, (activeStreak / 5) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
               {level && (
                 <div
                   className="bp-progress"
@@ -708,7 +908,31 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                 </div>
               )}
             </div>
-            <div className="bp-board-wrap">
+
+            <div
+              className={`bp-board-wrap ${clearIntensity > 0 ? `bp-shake-tier-${clearIntensity}` : ""}`}
+              data-fever-tier={feverTier}
+              data-clear-tier={clearIntensity}
+            >
+              {/* Ambient Fever Embers when streak >= 3 */}
+              {activeStreak >= 3 && !save.reducedMotion && (
+                <div className="bp-fever-embers" aria-hidden="true">
+                  {Array.from({ length: activeStreak >= 5 ? 14 : 8 }, (_, i) => (
+                    <span
+                      key={i}
+                      className="bp-fever-ember"
+                      style={
+                        {
+                          left: `${(i * 17 + 7) % 96}%`,
+                          animationDelay: `${(i * 190) % 1400}ms`,
+                          animationDuration: `${1400 + (i % 4) * 320}ms`,
+                        } as React.CSSProperties
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+
               <div
                 className={`bp-board ${hammer ? "bp-hammer" : ""}`}
                 ref={boardRef}
@@ -721,7 +945,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                       role="gridcell"
                       aria-label={`Hàng ${r + 1}, cột ${c + 1}, ${cell ? (cell.ice ? "băng" : cell.gem ? "gạch có sao" : "có gạch") : "trống"}`}
                       key={`${r}-${c}`}
-                      className={`bp-cell ${hammer && (hammerTarget || hammerHover) && Math.abs(r - (hammerTarget || hammerHover)!.r) <= 1 && Math.abs(c - (hammerTarget || hammerHover)!.c) <= 1 ? "bp-hammer-preview" : ""} ${isGhost(r, c) ? (validGhost ? "bp-ghost-valid" : "bp-ghost-invalid") : ""}`}
+                      className={`bp-cell ${placedCells.has(`${r}-${c}`) ? "bp-cell-just-placed" : ""} ${hammer && (hammerTarget || hammerHover) && Math.abs(r - (hammerTarget || hammerHover)!.r) <= 1 && Math.abs(c - (hammerTarget || hammerHover)!.c) <= 1 ? "bp-hammer-preview" : ""} ${isGhost(r, c) ? (validGhost ? "bp-ghost-valid" : "bp-ghost-invalid") : ""}`}
                       onClick={() => cellClick(r, c)}
                       onPointerEnter={() => {
                         if (hammer) setHammerHover({ r, c });
@@ -745,84 +969,192 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                   )),
                 )}
               </div>
+
               {fx && (
-                <div className="bp-effects" aria-hidden="true">
-                  {Array.from({ length: 8 }, (_, line) => line)
-                    .filter(
-                      (r) => fx.cells.filter((c) => c.r === r).length === 8,
-                    )
-                    .map((r) => (
+                <div
+                  className={`bp-effects bp-effects-tier-${clearIntensity}`}
+                  aria-hidden="true"
+                >
+                  {/* Full-Board Impact Flash on 2+ lines, Fever Combo, or Perfect Clear */}
+                  {(fx.lines >= 2 || fx.streak >= 3 || fx.perfect) && (
+                    <span
+                      className={`bp-screen-flash bp-flash-tier-${clearIntensity}`}
+                    />
+                  )}
+
+                  {/* Horizontal Laser Beams */}
+                  {clearedRows.map((r) => (
+                    <span
+                      key={`row-${r}`}
+                      className={`bp-clear-beam bp-beam-tier-${Math.min(4, Math.max(1, fx.lines))}`}
+                      style={{
+                        top: `${(r / 8) * 100}%`,
+                        left: 0,
+                        width: "100%",
+                        height: "12.5%",
+                      }}
+                    />
+                  ))}
+
+                  {/* Vertical Laser Beams */}
+                  {clearedCols.map((c) => (
+                    <span
+                      key={`col-${c}`}
+                      className={`bp-clear-beam bp-beam-vertical bp-beam-tier-${Math.min(4, Math.max(1, fx.lines))}`}
+                      style={{
+                        left: `${(c / 8) * 100}%`,
+                        top: 0,
+                        height: "100%",
+                        width: "12.5%",
+                      }}
+                    />
+                  ))}
+
+                  {/* Cross-Intersection Star Flares when both row & column clear together */}
+                  {clearedRows.flatMap((r) =>
+                    clearedCols.map((c) => (
                       <span
-                        key={`row-${r}`}
-                        className="bp-clear-beam"
+                        key={`cross-${r}-${c}`}
+                        className="bp-cross-flare"
                         style={{
-                          top: `${(r / 8) * 100}%`,
-                          left: 0,
-                          width: "100%",
-                          height: "12.5%",
+                          left: `${((c + 0.5) / 8) * 100}%`,
+                          top: `${((r + 0.5) / 8) * 100}%`,
                         }}
                       />
-                    ))}
-                  {Array.from({ length: 8 }, (_, line) => line)
-                    .filter(
-                      (c) =>
-                        fx.cells.filter((cell) => cell.c === c).length === 8,
-                    )
-                    .map((c) => (
-                      <span
-                        key={`col-${c}`}
-                        className="bp-clear-beam bp-beam-vertical"
-                        style={{
-                          left: `${(c / 8) * 100}%`,
-                          top: 0,
-                          height: "100%",
-                          width: "12.5%",
-                        }}
+                    )),
+                  )}
+
+                  {/* Concentric Shockwave Rings for Multi-Line & Combo Clears */}
+                  {(fx.lines >= 2 || fx.streak >= 2 || fx.perfect) && (
+                    <span className="bp-shockwave-ring bp-ring-1" />
+                  )}
+                  {(fx.lines >= 3 || fx.streak >= 3 || fx.perfect) && (
+                    <span className="bp-shockwave-ring bp-ring-2" />
+                  )}
+                  {(fx.lines >= 4 || fx.streak >= 4 || fx.perfect) && (
+                    <>
+                      <span className="bp-shockwave-ring bp-ring-3" />
+                      <span className="bp-supernova-core" />
+                    </>
+                  )}
+
+                  {/* Arcane Lightning Bolts across board for 3+ lines or Fever Streak >= 3 */}
+                  {(fx.lines >= 3 || fx.streak >= 3 || fx.perfect) && (
+                    <svg
+                      className="bp-lightning-svg"
+                      viewBox="0 0 200 200"
+                      preserveAspectRatio="none"
+                    >
+                      <polyline
+                        points="8,24 52,68 38,84 98,118 82,134 148,162 192,186"
+                        fill="none"
+                        stroke="#fde047"
+                        strokeWidth="3.5"
                       />
-                    ))}
-                  {fx.cells.map((cell, i) => (
-                    <React.Fragment key={`${cell.r}-${cell.c}`}>
-                      <i
-                        className={`bp-burst bp-color-${cell.color}`}
-                        style={{
-                          left: `${((cell.c + 0.5) / 8) * 100}%`,
-                          top: `${((cell.r + 0.5) / 8) * 100}%`,
-                          animationDelay: `${(i % 8) * 10}ms`,
-                        }}
+                      <polyline
+                        points="190,18 142,62 158,76 102,114 118,132 54,172 12,190"
+                        fill="none"
+                        stroke="#38bdf8"
+                        strokeWidth="3"
                       />
-                      {[0, 1].map((j) => (
+                    </svg>
+                  )}
+
+                  {/* Per-Cell Crystal Bursts, Multi-Shards & Floating Score Popups */}
+                  {fx.cells.map((cell, i) => {
+                    const shardCount =
+                      fx.perfect || fx.lines >= 4
+                        ? 5
+                        : fx.lines === 3
+                          ? 4
+                          : fx.lines === 2
+                            ? 3
+                            : 2;
+                    return (
+                      <React.Fragment key={`${cell.r}-${cell.c}`}>
                         <i
-                          key={j}
-                          className={`bp-shard bp-color-${cell.color}`}
-                          style={
-                            {
+                          className={`bp-burst bp-color-${cell.color}`}
+                          style={{
+                            left: `${((cell.c + 0.5) / 8) * 100}%`,
+                            top: `${((cell.r + 0.5) / 8) * 100}%`,
+                            animationDelay: `${(i % 8) * 12}ms`,
+                          }}
+                        />
+                        {i % 2 === 0 && (
+                          <em
+                            className="bp-cell-score"
+                            style={{
                               left: `${((cell.c + 0.5) / 8) * 100}%`,
                               top: `${((cell.r + 0.5) / 8) * 100}%`,
-                              "--dx": `${(j ? 1 : -1) * (18 + (i % 5) * 9)}px`,
-                              "--dy": `${-22 - (i % 7) * 9}px`,
-                              "--spin": `${(j ? 1 : -1) * 160}deg`,
-                            } as React.CSSProperties
-                          }
-                        />
-                      ))}
-                    </React.Fragment>
-                  ))}
-                  {fx.lines > 0 && (
-                    <div className="bp-combo">
-                      {fx.perfect
-                        ? "PERFECT CLEAR!"
-                        : fx.lines >= 3
-                          ? "RỰC RỠ!"
-                          : fx.lines === 2
-                            ? "DOUBLE!"
-                            : fx.streak > 1
-                              ? `COMBO ${fx.streak}!`
-                              : "TUYỆT VỜI!"}
-                      <small>+{fx.points}</small>
+                              animationDelay: `${(i % 6) * 22}ms`,
+                            }}
+                          >
+                            +{Math.max(15, Math.round(fx.points / Math.max(1, fx.cells.length)))}
+                          </em>
+                        )}
+                        {Array.from({ length: shardCount }, (_, j) => {
+                          const angle =
+                            ((j / shardCount) * Math.PI * 2) + (i % 5) * 0.35;
+                          const dist =
+                            28 +
+                            (i % 4) * 14 +
+                            j * 12 +
+                            Math.min(4, fx.lines) * 12;
+                          const dx = Math.round(Math.cos(angle) * dist);
+                          const dy = Math.round(Math.sin(angle) * dist - 18);
+                          return (
+                            <i
+                              key={j}
+                              className={`bp-shard bp-color-${cell.color}`}
+                              style={
+                                {
+                                  left: `${((cell.c + 0.5) / 8) * 100}%`,
+                                  top: `${((cell.r + 0.5) / 8) * 100}%`,
+                                  "--dx": `${dx}px`,
+                                  "--dy": `${dy}px`,
+                                  "--spin": `${(j % 2 ? 1 : -1) * (180 + j * 65)}deg`,
+                                } as React.CSSProperties
+                              }
+                            />
+                          );
+                        })}
+                      </React.Fragment>
+                    );
+                  })}
+
+                  {/* Diamond & Star Meteor Shower on 3+ lines, Perfect, or Fever Streak >= 3 */}
+                  {(fx.lines >= 3 || fx.streak >= 3 || fx.perfect) &&
+                    Array.from({ length: 16 }, (_, k) => (
+                      <span
+                        key={`gem-rain-${k}`}
+                        className={`bp-diamond-rain bp-color-${(k % 6) + 1}`}
+                        style={
+                          {
+                            left: `${6 + ((k * 19) % 88)}%`,
+                            top: `${10 + ((k * 23) % 75)}%`,
+                            "--rx": `${(k % 2 ? 1 : -1) * (24 + (k % 5) * 14)}px`,
+                            "--ry": `${-45 - (k % 6) * 16}px`,
+                            animationDelay: `${(k % 7) * 35}ms`,
+                          } as React.CSSProperties
+                        }
+                      />
+                    ))}
+
+                  {/* Escalating Combo & Multi-Line Callout Banner */}
+                  {fx.lines > 0 && callout && (
+                    <div
+                      className={`bp-combo bp-combo-tier-${callout.tier}`}
+                    >
+                      <span className="bp-combo-badge">{callout.badge}</span>
+                      <div className="bp-combo-headline">
+                        {callout.headline}
+                      </div>
+                      <small>+{fx.points.toLocaleString("vi-VN")} ĐIỂM</small>
                     </div>
                   )}
                 </div>
               )}
+
               {(paused || hidden || isPaused) && !done && (
                 <div className="bp-board-cover">
                   <h2>Tạm nghỉ nhé ☁</h2>
@@ -836,6 +1168,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                 </div>
               )}
             </div>
+
             <div className="bp-bottom-controls">
               <div className="bp-tray" aria-label="Khay khối gạch">
                 {run.tray.map((p, index) => (
@@ -877,7 +1210,11 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                     !!done
                   }
                 >
-                  {hammer ? <span>✓</span> : <RotateCw size={21} />}
+                  {hammer ? (
+                    <span>✓</span>
+                  ) : (
+                    <BoosterRelicSvg kind="rotate" size={24} />
+                  )}
                 </button>
                 <button
                   aria-label={hammer ? "Hủy búa" : "Gợi ý"}
@@ -885,7 +1222,11 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                   onClick={() => (hammer ? setHammer(false) : showHint())}
                   disabled={blocked || !!done}
                 >
-                  {hammer ? <span>✕</span> : <Lightbulb size={21} />}
+                  {hammer ? (
+                    <span>✕</span>
+                  ) : (
+                    <BoosterRelicSvg kind="hint" size={24} />
+                  )}
                 </button>
                 {(Object.keys(BOOSTERS) as Booster[]).map((kind) => (
                   <button
@@ -903,13 +1244,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                     onClick={() => activate(kind)}
                   >
                     <span aria-hidden="true">
-                      {kind === "hammer" ? (
-                        <Hammer size={21} />
-                      ) : kind === "shuffle" ? (
-                        <Shuffle size={21} />
-                      ) : (
-                        <Undo2 size={21} />
-                      )}
+                      <BoosterRelicSvg kind={kind} size={24} />
                     </span>
                     <small>{save.inventory[kind]}</small>
                   </button>
@@ -932,6 +1267,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                     onClick={() => {
                       const next = clone(saved.current);
                       rescue(next.run!);
+                      if (!isMuted) blockerAudio.playBooster("hammer");
                       if (next.run!.status === "won") finish(next);
                       else persist(next);
                       setAnnouncement("Đã dọn một vùng. Tiếp tục nhé!");
@@ -1091,7 +1427,9 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
           </div>
           {(Object.keys(BOOSTERS) as Booster[]).map((kind) => (
             <div className="bp-shop-card" key={kind}>
-              <span>{BOOSTERS[kind].icon}</span>
+              <span>
+                <BoosterRelicSvg kind={kind} size={36} />
+              </span>
               <div>
                 <h3>{BOOSTERS[kind].name}</h3>
                 <p>{BOOSTERS[kind].description}</p>
@@ -1105,6 +1443,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                 onClick={() => {
                   update((s) => buy(s, kind));
                   sound("tap");
+                  if (!isMuted) blockerAudio.playSelect();
                 }}
               >
                 {BOOSTERS[kind].price} 🪙
@@ -1262,4 +1601,3 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
     </div>
   );
 };
-

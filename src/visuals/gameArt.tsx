@@ -23,7 +23,7 @@ export const GAME_ART: Record<string, { color: string; secondary: string; label:
   'scoodoku': { color: '#ffd082', secondary: '#be9479', label: 'TRÍ TUỆ', world: 'Mật mã cổ đại' },
   'fill-the-space': { color: '#e5b48a', secondary: '#80c9b1', label: 'XẾP HÌNH', world: 'Xưởng ghép kỳ diệu' },
   'draw-a-shape': { color: '#8ad7ff', secondary: '#f285e1', label: 'KẾT NỐI', world: 'Chòm sao sắc màu' },
-  'blocker': { color: '#77e5ad', secondary: '#ffe072', label: 'XẾP KHỐI', world: 'Khu vườn khối ngọc' },
+  'blocker': { color: '#38bdf8', secondary: '#fde047', label: 'XẾP KHỐI', world: 'Đền pha lê lấp lánh' },
   'chess': { color: '#e5cf9f', secondary: '#93b6e5', label: 'ĐẤU TRÍ', world: 'Đấu trường hoàng gia' },
   'xiangqi': { color: '#ffb77f', secondary: '#ef7373', label: 'ĐỐI KHÁNG', world: 'Long thành kỳ trận' },
   'caro-gomoku': { color: '#9bafff', secondary: '#ff92b8', label: 'ĐỐI KHÁNG', world: 'Đấu trường vô cực' },
@@ -198,11 +198,14 @@ function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string
       {[{x:0,y:0,w:122,h:57,c:a,t:6},{x:128,y:0,w:57,h:121,c:b,t:8},{x:0,y:63,w:57,h:122,c:'#f1b46e',t:4},{x:63,y:63,w:59,h:122,c:'#7adbc4',t:6},{x:128,y:127,w:57,h:58,c:'#f390bf',t:2}].map(p=><g key={p.t+'-'+p.x}><rect x={p.x} y={p.y} width={p.w} height={p.h} rx="9" fill={p.c} stroke="white" strokeOpacity=".4"/><text x={p.x+p.w/2} y={p.y+p.h/2+9} textAnchor="middle" fill="#17314b" fontSize="26" fontWeight="900">{p.t}</text></g>)}
     </g>;
     case 'blocker': return <g>
-      <rect x="99" y="20" width="215" height="201" rx="18" fill="#113d34" stroke="#a1e9ba" strokeWidth="3"/>
-      {Array.from({length:36},(_,i)=><rect key={i} x={111+i%6*32} y={32+Math.floor(i/6)*29} width="27" height="24" rx="4" fill="#23564a"/>)}
-      {[[0,0],[1,0],[0,1],[0,2],[2,3],[3,3],[4,3],[4,4]].map(([x,y],i)=><rect key={i} x={111+x*32} y={32+y*29} width="27" height="24" rx="5" fill={i<4?'#6be5a4':'#ffd766'} stroke="#ecffc9" strokeWidth="1"/>)}
-      <path d="M112 188H299" stroke="#ceffba" strokeWidth="7" strokeLinecap="round"/>
-      <g transform="translate(275 108) rotate(10)">{[[0,0],[0,1],[1,1]].map(([x,y],i)=><Tile key={i} x={x*35} y={y*35} size={32} color="#77e5ad"/>)}</g>
+      <rect x="96" y="18" width="220" height="206" rx="20" fill="#0f172a" stroke="#fde047" strokeWidth="3.5"/>
+      {Array.from({length:36},(_,i)=><rect key={i} x={110+i%6*32} y={31+Math.floor(i/6)*29} width="27" height="25" rx="5" fill="#1e293b" stroke="#334155" strokeWidth="1"/>)}
+      {[[0,0,'#f43f5e'],[1,0,'#f43f5e'],[0,1,'#f43f5e'],[0,2,'#f43f5e'],[2,3,'#38bdf8'],[3,3,'#10b981'],[4,3,'#fde047'],[5,3,'#c084fc'],[4,4,'#fde047'],[2,2,'#3b82f6']].map(([x,y,c],i)=><g key={i}><rect x={110+Number(x)*32} y={31+Number(y)*29} width="27" height="25" rx="5" fill={String(c)} stroke="#fff" strokeWidth="1.5"/><polygon points={`${114+Number(x)*32},${34+Number(y)*29} ${133+Number(x)*32},${34+Number(y)*29} ${128+Number(x)*32},${40+Number(y)*29} ${119+Number(x)*32},${40+Number(y)*29}`} fill="#fff" opacity=".45"/></g>)}
+      <path d="M86 131H334" stroke="#f43f5e" strokeWidth="18" strokeLinecap="round" opacity=".4"/>
+      <path d="M86 131H334" stroke="#fde047" strokeWidth="9" strokeLinecap="round" opacity=".85"/>
+      <path d="M86 131H334" stroke="#fff" strokeWidth="3.5" strokeLinecap="round"/>
+      <circle cx="210" cy="131" r="42" stroke="#38bdf8" strokeWidth="3" opacity=".8"/>
+      <g transform="translate(278 96) rotate(12)">{[[0,0,'#f59e0b'],[0,1,'#ec4899'],[1,1,'#38bdf8']].map(([x,y,c],i)=><Tile key={i} x={Number(x)*35} y={Number(y)*35} size={32} color={String(c)}/>)}</g>
     </g>;
     case 'fill-the-space': return <g>
       <path d="M82 196L126 39H310L357 196Z" fill="#a77548" stroke="#f1ca91" strokeWidth="5"/>
@@ -228,7 +231,7 @@ function Backdrop({id,a,b}:{id:string;a:string;b:string}){
  case 'eat-em-all':return <g><path d="M0 0H420V250H0Z" fill="#214b3b"/>{[[33,60,61],[357,183,93],[33,219,73]].map(([x,y,r],i)=><circle key={i} cx={x} cy={y} r={r} fill={i%2?'#61b888':'#95c455'} opacity=".35"/>)}<path d="M345 24l34 24-34 24-34-24Z" fill="#e4d173" opacity=".7"/></g>;
  case 'scoodoku':return <g><path d="M0 0H420V250H0Z" fill="#886444"/><path d="M0 14L420 63M0 206L420 246" stroke="#ccac74" strokeWidth="18" opacity=".3"/><text x="29" y="121" fill="#f3dfb6" opacity=".2" fontSize="75" fontWeight="900">9</text><text x="339" y="208" fill="#f3dfb6" opacity=".2" fontSize="82" fontWeight="900">3</text></g>;
  case 'fill-the-space':return <g><path d="M0 0H420V250H0Z" fill="#58422d"/>{Array.from({length:6},(_,i)=><path key={i} d={`M0 ${i*49}Q132 ${i*49-20} 269 ${i*49+10}T420 ${i*49}`} stroke="#ab825b" strokeWidth="5" opacity=".25"/>)}<path d="M26 29h40v39H26ZM339 201h55v30h-55Z" fill="#e6c68b" opacity=".2"/></g>;
- case 'blocker':return <g><path d="M0 0H420V250H0Z" fill="#266448"/><path d="M0 0Q100 96 60 250M420 0Q320 96 367 250" fill="#417c42" stroke="#94b25e" strokeWidth="12"/>{[0,1,2].map(i=><path key={i} d={`M${23+i*170} ${20+i%2*170}l24 13-24 13-24-13Z`} fill="#bad18a" opacity=".4"/>)}</g>;
+ case 'blocker':return <g><path d="M0 0H420V250H0Z" fill="#090d1e"/><circle cx="210" cy="125" r="125" fill="#ec4899" opacity=".22"/><path d="M0 0Q100 96 60 250M420 0Q320 96 367 250" fill="#1e1b4b" stroke="#38bdf8" strokeWidth="8" opacity=".55"/>{[0,1,2].map(i=><path key={i} d={`M${23+i*170} ${20+i%2*170}l24 13-24 13-24-13Z`} fill="#fde047" opacity=".45"/>)}</g>;
  case 'chess':return <g><path d="M0 0H420V250H0Z" fill="#161224"/><circle cx="85" cy="68" r="62" fill="#f59e0b" opacity=".2"/><circle cx="335" cy="68" r="62" fill="#a855f7" opacity=".2"/>{Array.from({length:12},(_,i)=><rect key={i} x={i%6*80-25} y={Math.floor(i/6)*180-47} width="80" height="80" fill={i%2===Math.floor(i/6)%2?'#cfb889':'#334155'} opacity=".24" transform="rotate(-12 210 125)"/>)}</g>;
  case 'xiangqi':return <g><path d="M0 0H420V250H0Z" fill="#753d36"/><path d="M22 24H398V226H22Z" stroke="#d3a55c" strokeWidth="5"/>{[0,1,2,3].map(i=><path key={i} d={`M${31+i%2*342} ${31+Math.floor(i/2)*179}h16v16h-16v-16h-10`} stroke="#e9c183" strokeWidth="3"/>)}<path d="M0 120Q105 89 211 125T420 114" stroke="#301f31" strokeWidth="22" opacity=".35"/></g>;
  case 'caro-gomoku':return <g><path d="M0 0H420V250H0Z" fill="#344375"/><circle cx="37" cy="53" r="35" fill="none" stroke="#fa9bc6" strokeWidth="10" opacity=".45"/><path d="M326 158l64 64m0-64l-64 64" stroke="#a4baff" strokeWidth="12" strokeLinecap="round" opacity=".45"/></g>;
@@ -251,7 +254,7 @@ export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId
 }
 export function GameArtwork({gameId,className='',variant='banner',src}:{gameId:string;className?:string;variant?:'banner'|'icon';src?:string}) {
  const id=canonicalArtId(gameId);
- if (!src && (id === 'chess' || id === 'mummy-escape')) return <NativeGameArtwork gameId={id} className={className} variant={variant}/>;
+ if (!src && (id === 'chess' || id === 'mummy-escape' || id === 'blocker')) return <NativeGameArtwork gameId={id} className={className} variant={variant}/>;
  return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={src||variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
 }
 export function GameIcon({gameId,src}:{gameId:string;src?:string}) {return <GameArtwork gameId={gameId} variant="icon" src={src}/>;}

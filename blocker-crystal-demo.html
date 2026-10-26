@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xếp Gạch: Crystal Jewel Blast & Fever Overdrive — Interactive Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at 20% 10%, rgba(99,102,241,0.28), transparent 45%),
+                  radial-gradient(circle at 80% 15%, rgba(236,72,153,0.25), transparent 45%),
+                  linear-gradient(160deg, #070b19 0%, #111833 55%, #060914 100%);
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+    @keyframes shake1 { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-4px,2px)} 75%{transform:translate(4px,-2px)} }
+    @keyframes shake2 { 0%,100%{transform:translate(0,0)} 20%{transform:translate(-8px,5px)} 60%{transform:translate(8px,-5px)} }
+    @keyframes shake3 { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(-12px,8px) scale(1.03)} 75%{transform:translate(12px,-8px) scale(1.02)} }
+    @keyframes shake4 { 0%,100%{transform:translate(0,0) scale(1)} 15%{transform:translate(-16px,10px) scale(1.05)} 45%{transform:translate(16px,-10px) scale(1.04)} 75%{transform:translate(-10px,6px) scale(1.02)} }
+    @keyframes shockwave { 0%{width:20px;height:20px;opacity:1} 100%{width:125%;height:125%;opacity:0} }
+    @keyframes beamSweep { 0%{opacity:0;transform:scale(0.9)} 20%{opacity:1;transform:scale(1.04)} 100%{opacity:0;transform:scale(1.1)} }
+    @keyframes shardFly { 0%{opacity:1;transform:translate(-50%,-50%) scale(0.5)} 100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--rot)) scale(0.2)} }
+    @keyframes calloutPop { 0%{opacity:0;transform:translate(-50%,-35%) scale(0.4)} 22%{opacity:1;transform:translate(-50%,-50%) scale(1.14)} 80%{opacity:1;transform:translate(-50%,-52%) scale(1)} 100%{opacity:0;transform:translate(-50%,-80%) scale(0.9)} }
+    @keyframes feverPulse { 0%{box-shadow:0 0 25px rgba(245,158,11,0.6), inset 0 0 25px rgba(244,63,94,0.35)} 100%{box-shadow:0 0 55px rgba(236,72,153,0.95), 0 0 90px rgba(56,189,248,0.75), inset 0 0 40px rgba(250,204,21,0.5)} }
+    .fever-board { animation: feverPulse 0.7s infinite alternate ease-in-out; border-color: #fde047 !important; }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+  <div class="max-w-6xl mx-auto space-y-8">
+    <!-- Top Header -->
+    <header class="rounded-3xl border-2 border-amber-400/50 bg-slate-900/90 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.85)] flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <img src="./public/game-art/icons/blocker.svg" alt="Crystal Blocker Icon" class="w-20 h-20 rounded-2xl border-2 border-amber-300 shadow-lg" />
+        <div>
+          <span class="px-3 py-0.5 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-xs font-black tracking-widest uppercase">
+            💎 CRYSTAL JEWEL ARCADE · FEVER OVERDRIVE
+          </span>
+          <h1 class="text-2xl md:text-4xl font-black tracking-tight bg-gradient-to-b from-white via-amber-200 to-amber-500 bg-clip-text text-transparent mt-1">
+            XẾP GẠCH: NGỌC PHA LÊ LẤP LÁNH
+          </h1>
+          <p class="text-sm text-slate-300">
+            Trình diễn trực quan 6 Khối Ngọc Pha Lê 3D · Đại Pháo Xóa 1–4+ Hàng · Chuỗi Combo & Trạng Thái Fever Rực Lửa
+          </p>
+        </div>
+      </div>
+      <button onclick="resetBoard()" class="px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/60 text-amber-200 font-bold text-sm transition">
+        ↺ Làm Mới Bàn Pha Lê
+      </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- Left Column: VFX & Combo Escalation Showcase Controls -->
+      <div class="lg:col-span-5 rounded-3xl border border-slate-700/80 bg-slate-900/85 p-5 shadow-2xl space-y-5">
+        <div>
+          <div class="text-xs font-black uppercase tracking-widest text-sky-400">⚡ Bảng Kích Hoạt Thử Nghiệm VFX Tăng Tiến</div>
+          <p class="text-xs text-slate-400 mt-1">Bấm các nút bên dưới để xem ngay sự khác biệt về độ hoành tráng khi ăn 1, 2, 3, 4+ hàng và chuỗi Combo Fever:</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-2.5">
+          <button onclick="triggerDemoClear(1, 1, false)" class="p-3.5 rounded-2xl border border-sky-400/40 bg-sky-950/50 hover:bg-sky-900/60 text-left flex items-center justify-between transition">
+            <div>
+              <div class="font-black text-sky-300 text-sm">1. Ăn 1 Hàng (Single Crystal Blast)</div>
+              <div class="text-xs text-slate-300">Tia laser đơn + mảnh vỡ pha lê 2 hướng + âm chuông ngọc</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-200 font-black text-xs">+150</span>
+          </button>
+
+          <button onclick="triggerDemoClear(2, 2, false)" class="p-3.5 rounded-2xl border border-amber-400/50 bg-amber-950/50 hover:bg-amber-900/60 text-left flex items-center justify-between transition">
+            <div>
+              <div class="font-black text-amber-300 text-sm">2. Ăn 2 Hàng + Combo ×2 (Double Crush!)</div>
+              <div class="text-xs text-slate-300">Giao thoa laser kép + vòng sóng xung kích + rung bàn nhẹ</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-200 font-black text-xs">+420</span>
+          </button>
+
+          <button onclick="triggerDemoClear(3, 3, false)" class="p-3.5 rounded-2xl border border-pink-400/60 bg-pink-950/50 hover:bg-pink-900/60 text-left flex items-center justify-between transition">
+            <div>
+              <div class="font-black text-pink-300 text-sm">3. Ăn 3 Hàng + Fever ×3 (Triple Nova!)</div>
+              <div class="text-xs text-slate-300">Đại pháo 3 hàng + tia sét chéo + mưa kim cương + cháy viền Fever!</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-pink-500/20 text-pink-200 font-black text-xs">+960</span>
+          </button>
+
+          <button onclick="triggerDemoClear(4, 5, true)" class="p-3.5 rounded-2xl border-2 border-yellow-300 bg-gradient-to-r from-purple-950/80 via-rose-950/80 to-amber-950/80 hover:brightness-110 text-left flex items-center justify-between transition shadow-[0_0_25px_rgba(250,204,21,0.3)]">
+            <div>
+              <div class="font-black text-yellow-200 text-sm">4. Ăn 4+ Hàng / Perfect Clear + Godlike ×5!</div>
+              <div class="text-xs text-amber-100/90">Siêu Tân Tinh Cầu Vồng + 3 vòng sóng + sấm sét + mưa sao + Hyper Fever!</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-yellow-400 text-slate-950 font-black text-xs">+2.400</span>
+          </button>
+        </div>
+
+        <!-- Gem Gallery -->
+        <div class="pt-2 border-t border-slate-800">
+          <div class="text-xs font-black uppercase tracking-widest text-amber-300 mb-3">💎 Bộ 6 Viên Ngọc Pha Lê 3D & Vật Phẩm</div>
+          <div id="gem-showcase" class="grid grid-cols-4 gap-2.5 text-center text-[11px] font-bold text-slate-300"></div>
+        </div>
+      </div>
+
+      <!-- Right Column: Live 8x8 Crystal Jewel Board & VFX Stage -->
+      <div class="lg:col-span-7 rounded-3xl border-2 border-sky-400/40 bg-slate-950/90 p-5 md:p-7 shadow-2xl space-y-4">
+        <!-- HUD & Fever Meter -->
+        <div class="flex items-center justify-between gap-4 bg-slate-900/90 border border-slate-700/70 rounded-2xl p-3.5">
+          <div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">ĐIỂM SỐ PHA LÊ</div>
+            <div id="score-val" class="text-3xl font-black text-white drop-shadow-[0_2px_10px_rgba(56,189,248,0.5)]">0</div>
+          </div>
+          <div class="flex-1 max-w-xs">
+            <div class="flex justify-between text-[11px] font-black mb-1">
+              <span id="fever-text" class="text-sky-300">💎 CHUỖI COMBO ×1</span>
+              <span id="mult-text" class="text-amber-300">×1.00</span>
+            </div>
+            <div class="h-2.5 rounded-full bg-slate-950 overflow-hidden border border-slate-700">
+              <div id="fever-bar" class="h-full w-1/5 bg-gradient-to-r from-sky-400 via-amber-300 to-rose-500 transition-all duration-300"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8x8 Board Container -->
+        <div id="board-wrap" class="relative aspect-square max-w-[470px] mx-auto">
+          <div id="board-grid" class="w-full h-full grid grid-cols-8 grid-rows-8 gap-1.5 p-2.5 rounded-2xl bg-[#0d1326] border-4 border-sky-400/80 shadow-[0_0_35px_rgba(56,189,248,0.35),inset_0_0_30px_rgba(0,0,0,0.9)] transition-all duration-300"></div>
+          <div id="vfx-layer" class="pointer-events-none absolute inset-0 overflow-visible z-20"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PALETTES = {
+      1: { name: 'Ruby Lửa', top: '#ff6b8b', bot: '#9f1239', mid: '#f43f5e' },
+      2: { name: 'Topaz Vàng', top: '#fde047', bot: '#b45309', mid: '#f59e0b' },
+      3: { name: 'Ngọc Lục Bảo', top: '#6ee7b7', bot: '#065f46', mid: '#10b981' },
+      4: { name: 'Lam Ngọc', top: '#60a5fa', bot: '#1e3a8a', mid: '#3b82f6' },
+      5: { name: 'Tử Thạch', top: '#c084fc', bot: '#581c87', mid: '#9333ea' },
+      6: { name: 'Kim Cương Hồng', top: '#f472b6', bot: '#831843', mid: '#ec4899' }
+    };
+
+    function jewelSvg(color, star = false, ice = false) {
+      const p = PALETTES[color] || PALETTES[1];
+      return `<svg viewBox="0 0 100 100" class="w-full h-full">
+        <rect x="3" y="3" width="94" height="94" rx="16" fill="${ice ? '#38bdf8' : p.mid}" stroke="${star ? '#fde047' : '#ffffff90'}" stroke-width="3"/>
+        <polygon points="10,8 90,8 76,24 24,24" fill="#ffffff" fill-opacity="0.45"/>
+        <polygon points="8,10 24,24 24,76 8,90" fill="#ffffff" fill-opacity="0.22"/>
+        <polygon points="92,10 92,90 76,76 76,24" fill="#000000" fill-opacity="0.28"/>
+        <polygon points="24,76 76,76 90,92 10,92" fill="#000000" fill-opacity="0.42"/>
+        <rect x="22" y="22" width="56" height="56" rx="8" fill="${ice ? '#bae6fd' : p.top}" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.8"/>
+        <polygon points="50,24 76,50 50,76 24,50" fill="${p.bot}" fill-opacity="0.45" stroke="#ffffff80" stroke-width="1.2"/>
+        <ellipse cx="31" cy="29" rx="12" ry="5" transform="rotate(-28 31 29)" fill="#ffffff" fill-opacity="0.8"/>
+        ${star ? '<polygon points="50,16 57,41 82,50 57,59 50,84 43,59 18,50 43,41" fill="#fde047" stroke="#fff" stroke-width="2"/>' : ''}
+        ${ice ? '<path d="M8,6 H92 L86,26 L74,14 L60,28 L46,12 L30,26 L14,16 Z" fill="#fff" fill-opacity="0.9"/>' : ''}
+      </svg>`;
+    }
+
+    // Render Gem Showcase
+    const showcase = document.getElementById('gem-showcase');
+    [1,2,3,4,5,6].forEach(c => {
+      showcase.innerHTML += `<div class="p-2 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col items-center gap-1">
+        <div class="w-11 h-11">${jewelSvg(c, c===2)}</div>
+        <span>${PALETTES[c].name}</span>
+      </div>`;
+    });
+    showcase.innerHTML += `<div class="p-2 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col items-center gap-1">
+      <div class="w-11 h-11">${jewelSvg(1, true, false)}</div><span>Ngọc Sao ★</span>
+    </div>`;
+    showcase.innerHTML += `<div class="p-2 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col items-center gap-1">
+      <div class="w-11 h-11">${jewelSvg(4, false, true)}</div><span>Băng Vĩnh Cửu ❄</span>
+    </div>`;
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function playTone(freq, dur, delay, type='sine', gain=0.16, slide=null) {
+      const ctx = getAudio(), now = ctx.currentTime + delay;
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, now);
+      if (slide) osc.frequency.exponentialRampToValueAtTime(slide, now + dur);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(gain, now + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(now); osc.stop(now + dur + 0.02);
+    }
+
+    let score = 0;
+    let board = [];
+    function resetBoard() {
+      score = 0;
+      document.getElementById('score-val').textContent = '0';
+      board = Array.from({length: 8}, (_, r) =>
+        Array.from({length: 8}, (_, c) => ((r + c) % 3 === 0 ? ((r * 3 + c) % 6) + 1 : 0))
+      );
+      renderBoard();
+    }
+
+    function renderBoard() {
+      const grid = document.getElementById('board-grid');
+      grid.innerHTML = '';
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const val = board[r][c];
+          const cell = document.createElement('button');
+          cell.className = ' rounded-lg bg-[#192340] border border-white/10 shadow-inner flex items-center justify-center p-0.5 hover:border-sky-400/60 transition';
+          cell.innerHTML = val ? jewelSvg(val, (r+c)%5===0, false) : '<span class="w-1.5 h-1.5 rounded-full bg-slate-600/40"></span>';
+          cell.onclick = () => {
+            board[r][c] = board[r][c] ? 0 : ((r + c) % 6) + 1;
+            playTone(880, 0.09, 0, 'sine', 0.14, 1320);
+            renderBoard();
+          };
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    function triggerDemoClear(lines, streak, perfect) {
+      const pts = lines === 1 ? 150 : lines === 2 ? 420 : lines === 3 ? 960 : 2400;
+      score += pts;
+      document.getElementById('score-val').textContent = score.toLocaleString('vi-VN');
+
+      // Update Fever UI
+      const mult = (1 + Math.min(4, Math.max(0, streak - 1)) * 0.25).toFixed(2);
+      document.getElementById('mult-text').textContent = `×${mult}`;
+      document.getElementById('fever-bar').style.width = `${Math.min(100, (streak / 5) * 100)}%`;
+      const boardGrid = document.getElementById('board-grid');
+      if (streak >= 3) {
+        boardGrid.classList.add('fever-board');
+        document.getElementById('fever-text').textContent = streak >= 5 ? `👑 HYPER PRISM FEVER ×${streak}` : `🔥 FEVER OVERDRIVE ×${streak}`;
+      } else {
+        boardGrid.classList.remove('fever-board');
+        document.getElementById('fever-text').textContent = `✨ CHUỖI COMBO ×${streak}`;
+      }
+
+      // Play Escalating Audio
+      const pitch = Math.pow(2, (streak - 1) / 12);
+      playTone(130, 0.18 + lines * 0.08, 0, 'sawtooth', 0.24, 38);
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98, 2093.0, 2637.02].slice(0, 3 + lines);
+      notes.forEach((n, i) => {
+        playTone(n * pitch, 0.3, i * 0.045, 'triangle', 0.18);
+        if (lines >= 2) playTone(n * pitch * 1.5, 0.24, i * 0.045 + 0.015, 'sine', 0.1);
+      });
+
+      // Shake Board
+      const wrap = document.getElementById('board-wrap');
+      wrap.style.animation = 'none';
+      void wrap.offsetWidth;
+      wrap.style.animation = `shake${Math.min(4, lines)} ${0.28 + lines * 0.12}s ease-out`;
+
+      // Render VFX Layer
+      const vfx = document.getElementById('vfx-layer');
+      vfx.innerHTML = '';
+
+      // Laser Beams
+      for (let i = 0; i < Math.min(4, lines); i++) {
+        const rowIdx = i + 2;
+        vfx.innerHTML += `<div style="position:absolute;left:0;top:${(rowIdx/8)*100}%;width:100%;height:12.5%;border-radius:10px;background:linear-gradient(90deg,#f43f5e,#fde047,#ffffff,#38bdf8);box-shadow:0 0 35px #fde047,0 0 65px #ec4899;animation:beamSweep 0.8s ease-out both"></div>`;
+      }
+      if (lines >= 2) {
+        vfx.innerHTML += `<div style="position:absolute;top:0;left:50%;width:12.5%;height:100%;border-radius:10px;background:linear-gradient(180deg,#38bdf8,#ffffff,#fde047,#ec4899);box-shadow:0 0 35px #38bdf8;animation:beamSweep 0.8s ease-out both"></div>`;
+      }
+
+      // Shockwave Rings
+      if (lines >= 2) {
+        for (let r = 0; r < Math.min(3, lines - 1); r++) {
+          vfx.innerHTML += `<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:${4+r}px solid ${r%2?'#fde047':'#38bdf8'};box-shadow:0 0 30px #fde047;animation:shockwave ${0.75+r*0.15}s ${r*0.09}s ease-out both"></div>`;
+        }
+      }
+
+      // Flying Shards
+      const shardTotal = lines * 14;
+      for (let s = 0; s < shardTotal; s++) {
+        const angle = (s / shardTotal) * Math.PI * 2;
+        const dist = 60 + (s % 5) * 35 + lines * 20;
+        const dx = Math.round(Math.cos(angle) * dist);
+        const dy = Math.round(Math.sin(angle) * dist);
+        const colors = ['#f43f5e', '#fde047', '#10b981', '#38bdf8', '#c084fc', '#ec4899'];
+        vfx.innerHTML += `<div style="position:absolute;left:${20+(s*13)%60}%;top:${25+(s*17)%50}%;width:15px;height:15px;background:${colors[s%6]};border:1.5px solid #fff;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);--dx:${dx}px;--dy:${dy}px;--rot:${(s%2?1:-1)*240}deg;animation:shardFly 0.9s ease-out both"></div>`;
+      }
+
+      // Callout Banner
+      const headline = perfect ? 'PERFECT CLEAR!' : lines >= 4 ? 'SUPERNOVA ×4!' : lines === 3 ? 'TRIPLE NOVA!' : lines === 2 ? 'DOUBLE CRUSH!' : 'CRYSTAL BLAST!';
+      const badge = perfect ? '💎 SIÊU PHẨM HOÀN HẢO · GODLIKE ×5' : lines === 3 ? '⚡ ĐẠI PHÁO 3 HÀNG · FEVER OVERDRIVE' : lines === 2 ? '🔥 SÓNG XUNG KÍCH KÉP · COMBO ×2' : '✨ PHÁ VỠ NGỌC PHA LÊ';
+      vfx.innerHTML += `<div style="position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);padding:12px 26px;border-radius:22px;background:rgba(9,13,30,0.95);border:3px solid #fde047;box-shadow:0 0 45px #fde047,0 0 80px #ec4899;text-align:center;white-space:nowrap;animation:calloutPop 1.05s cubic-bezier(0.22,1,0.36,1) both">
+        <div style="font-size:10px;font-weight:900;letter-spacing:2px;color:#7dd3fc">${badge}</div>
+        <div style="font-size:34px;font-weight:950;background:linear-gradient(180deg,#fff,#fde047,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${headline}</div>
+        <div style="font-size:18px;font-weight:900;color:#34d399">+${pts.toLocaleString('vi-VN')} ĐIỂM</div>
+      </div>`;
+    }
+
+    resetBoard();
+  </script>
+</body>
+</html>
