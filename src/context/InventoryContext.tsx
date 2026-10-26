@@ -151,6 +151,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const syncInventory = useCallback(async (): Promise<boolean> => {
     if (!profile.id) return false;
+    if (!revisionRef.current!.dirty) return true;
     const revision = revisionRef.current!.updatedAt;
     setCloudSyncStatus('syncing');
     const ok = await SupabaseService.syncInventoryToCloud(profile.id, items, chestCounts,
@@ -164,9 +165,16 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [profile.id, items, chestCounts, forgeMastery, discoveredBlueprintIds]);
 
   useEffect(() => {
-    if (!cloudReady) return;
-    const timer = setTimeout(() => { void syncInventory(); }, 1200);
+    if (!cloudReady || !revisionRef.current!.dirty) return;
+    const timer = setTimeout(() => { void syncInventory(); }, 5000);
     return () => clearTimeout(timer);
+  }, [cloudReady, syncInventory]);
+
+  useEffect(() => {
+    const retry = () => { if (cloudReady && !document.hidden && navigator.onLine && revisionRef.current!.dirty) void syncInventory(); };
+    window.addEventListener('online', retry);
+    document.addEventListener('visibilitychange', retry);
+    return () => { window.removeEventListener('online', retry); document.removeEventListener('visibilitychange', retry); };
   }, [cloudReady, syncInventory]);
 
   const manualSyncInventory = useCallback(async () => {
@@ -925,4 +933,5 @@ export const useInventory = (): InventoryContextType => {
   }
   return context;
 };
+
 

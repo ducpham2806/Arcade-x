@@ -72,7 +72,7 @@ export function hydrateGameSaves(values: Record<string, string>, rows: any[]): R
   return next;
 }
 
-export async function syncGameSaves(ownerId: string): Promise<void> {
+async function uploadGameSaves(ownerId: string): Promise<void> {
   if (!supabase || !navigator.onLine) return;
   const ownerStillActive = () => parse(localStorage.getItem('arcadex_player_profile'))?.id === ownerId;
   for (const key of Object.keys(localStorage).filter(key => key.startsWith(prefix))) {
@@ -128,4 +128,16 @@ export function resolveGameSave(id: string, choice: 'local' | 'remote'): void {
   localStorage.setItem(prefix + id, JSON.stringify(next));
   localStorage.setItem(legacy(id), JSON.stringify(next.payload));
   announce(id, next.dirty ? 'pending' : 'synced');
+}
+
+
+// Auth checkpoints and reconnect handlers may overlap; a save revision has one
+// uploader per owner. Edits during upload remain dirty for the next checkpoint.
+const uploads = new Map<string, Promise<void>>();
+export function syncGameSaves(ownerId: string): Promise<void> {
+  const active = uploads.get(ownerId);
+  if (active) return active;
+  const task = uploadGameSaves(ownerId).finally(() => { if (uploads.get(ownerId) === task) uploads.delete(ownerId); });
+  uploads.set(ownerId, task);
+  return task;
 }

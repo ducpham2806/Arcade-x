@@ -1,3 +1,4 @@
+import { SYNC } from '../services/syncPolicy';
 import {accessPreviewEnabled,myAccess} from '../commerce/api';
 import {isLocalReviewGame} from './catalog';
 import React,{createContext,useContext,useEffect,useState,useCallback,useRef} from 'react';
@@ -21,17 +22,17 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
  useEffect(()=>{void refresh();const online=()=>void refresh();const visible=()=>{if(document.visibilityState==='visible')void refresh();};window.addEventListener('online',online);document.addEventListener('visibilitychange',visible);return()=>{window.removeEventListener('online',online);document.removeEventListener('visibilitychange',visible);};},[refresh]);
  useEffect(()=>{
   if(!owner || !loaded)return;let alive=true;let syncing=false;
-  const sync=async()=>{if(syncing)return;syncing=true;const revision=preferenceRevision.current;try{
+  const sync=async()=>{if(syncing||document.hidden||!navigator.onLine)return;syncing=true;const revision=preferenceRevision.current;try{
    // Read canonical rows first; migrate only local favorites with no server row.
    const rows=await readLibrary(owner);if(!alive || ownerRef.current!==owner)return;
    for(const id of StorageService.loadFavorites())if(!isLocalReviewGame(id)&&!rows.some(row=>row.game_id===id)&&!pendingFavorites(owner).some(row=>row.gameId===id)&&catalogRef.current.games.some(game=>game.id===id))enqueueFavorite(owner,id,true);
-   await flushFavorites(owner);const latest=await readLibrary(owner);if(!alive||ownerRef.current!==owner||revision!==preferenceRevision.current)return;
+   const hasWrites=pendingFavorites(owner).length>0;await flushFavorites(owner);const latest=hasWrites?await readLibrary(owner):rows;if(!alive||ownerRef.current!==owner||revision!==preferenceRevision.current)return;
    const desired=new Set([...latest.filter(row=>row.favorite).map(row=>row.game_id),...StorageService.loadFavorites().filter(isLocalReviewGame)]);for(const row of pendingFavorites(owner)){if(row.favorite)desired.add(row.gameId);else desired.delete(row.gameId);}
    const favoriteIds=[...desired];setFavorites(favoriteIds);StorageService.saveFavorites(favoriteIds);
    const remoteRecent=latest.filter(row=>row.last_played_at).sort((a,b)=>Date.parse(b.last_played_at!)-Date.parse(a.last_played_at!)).map(row=>row.game_id);
    const merged=[...new Set([...StorageService.loadRecentlyPlayed(),...remoteRecent])].slice(0,12);setRecents(merged);StorageService.saveRecentlyPlayed(merged);
   }catch{/* Local preferences remain available; queued favorites retry on reconnect. */}finally{syncing=false;}};
-  void sync();window.addEventListener('online',sync);const timer=setInterval(sync,30000);
+  void sync();window.addEventListener('online',sync);const timer=setInterval(sync,SYNC.library);
   return()=>{alive=false;clearInterval(timer);window.removeEventListener('online',sync);};
  },[owner,loaded]);
  useEffect(()=>{if(accessPreviewEnabled&&owner)void myAccess(owner).catch(()=>{});},[owner]);
@@ -60,4 +61,5 @@ export function LauncherProvider({children}:{children:React.ReactNode}){
  return <Context.Provider value={{catalog,source,favorites,recentlyPlayed,toggleFavorite,authorize,recordPlay,finishPlay,notice,dismissNotice:()=>setNotice(''),refresh,busy}}>{children}</Context.Provider>;
 }
 export function useLauncher(){const value=useContext(Context);if(!value)throw new Error('LauncherProvider required');return value;}
+
 

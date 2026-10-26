@@ -1,3 +1,4 @@
+import { accountUploadValues } from './syncPolicy';
 import { getRecoveryState, initializeRecovery, clearRecovery, authRedirect, takeAuthCallbackMessage } from './authRecovery';
 import { hydrateGameSaves, syncGameSaves } from './gameSaves';
 import type { User, Session } from '@supabase/supabase-js';
@@ -301,7 +302,8 @@ export class AuthService {
     saveAccountSlot(id, snapshot);
     if (!user || user.id !== id || !supabase || !navigator.onLine) return;
     if (saving) { await saving; return this.checkpoint(); }
-    const signature = JSON.stringify(snapshot.values);
+    const values = accountUploadValues(snapshot.values);
+    const signature = id + ':' + JSON.stringify(values);
     saving = (async () => {
       const { data, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || data.session?.user.id !== id || data.session.user.is_anonymous) return;
@@ -310,7 +312,7 @@ export class AuthService {
       if (signature === lastCloudSnapshot) return;
       const { error } = await supabase.rpc('arcadex_commit', { p_writes: [{
         path: `players/${id}/inventory_data/main`, operation: 'set', merge: true,
-        data: { accountState: { ...snapshot, values: Object.fromEntries(Object.entries(snapshot.values).filter(([key]) => !key.startsWith('arcadex_save_v1_') && !key.startsWith('arcadex_save_backup_'))) } },
+        data: { accountState: { ...snapshot, values } },
       }] });
       if (error) throw error;
       lastCloudSnapshot = signature;
@@ -318,3 +320,4 @@ export class AuthService {
     return saving;
   }
 }
+

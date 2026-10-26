@@ -43,7 +43,8 @@
     "test:battleship": "node tests/battleship/engine.mjs && node tests/battleship/next-milestone.mjs && node tests/battleship/persistence.mjs && node tests/battleship/edge-handler.mjs && node tests/battleship/online-integration.mjs && node tests/battleship/presence.mjs && node tests/battleship/maintenance.mjs && node tests/battleship/matchmaking.mjs && node tests/battleship/squad-online.mjs && node tests/battleship/rematch.mjs && node tests/battleship/audio.mjs",
     "preview:battleship": "node scripts/battleship-preview.mjs",
     "prepare:battleship-server": "node scripts/battleship-server-package.mjs",
-    "test:full-release": "node tests/integration/full-release.mjs"
+    "test:full-release": "node tests/integration/full-release.mjs",
+    "test:sync": "node --test tests/sync/efficiency.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
