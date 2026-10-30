@@ -3,7 +3,7 @@ import { sessionWriter } from '../services/sessionSync';
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Achievement, DailyQuest,
   FriendQuest, LeaderboardEntry, GameMetadata, ActiveModal, ShareData, DailyChallenge, PausedGameSession, PlayerProfile,
-  Friend, FriendChallenge, WeeklyQuest, WeeklyMilestoneReward, WeeklyResetTimer } from '../types';
+  Friend, FriendChallenge, WeeklyQuest, WeeklyMilestoneReward } from '../types';
 import { StorageService } from '../services/storage';
 import { SupabaseService } from '../services/supabase';
 import { MatchmakingService } from '../services/matchmakingService';
@@ -38,7 +38,6 @@ interface GameContextType {
   claimWeeklyQuest: (questId: string) => void;
   claimWeeklyMilestoneReward: (tier: number) => void;
   reportWeeklyQuestProgress: (typeOrCategory: string, progressDelta: number) => void;
-  weeklyCountdown: WeeklyResetTimer;
   // Friends System & Direct Challenges
   friends: Friend[];
   addFriend: (friend: Friend) => void;
@@ -114,6 +113,9 @@ interface GameContextType {
 }
 
 const GameContext = createContext<GameContextType | null>(null);
+
+const sameChallenges = (a: FriendChallenge[], b: FriendChallenge[]) =>
+  a.length === b.length && a.every((c, i) => c.id === b[i].id && c.status === b[i].status && c.expiresAt === b[i].expiresAt);
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { profile, addCoins, addGems, addExp } = usePlayer();
@@ -290,7 +292,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!profile?.id) return;
     const notified = new Set<string>();
     const unsub = SupabaseService.subscribeToIncomingChallenges(profile.id, (challenges) => {
-      setIncomingChallenges(challenges);
+      // Polls and errors deliver fresh (often empty) arrays; keep the old reference when nothing
+      // changed so the whole launcher does not re-render.
+      setIncomingChallenges(prev => sameChallenges(prev, challenges) ? prev : challenges);
       if (challenges.length > 0) {
         const newest = challenges[0];
         if (notified.has(newest.id)) return;
@@ -569,17 +573,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ==========================================
   const [weeklyQuests, setWeeklyQuests] = useState<WeeklyQuest[]>(() => StorageService.loadWeeklyQuests());
   const [weeklyMilestones, setWeeklyMilestones] = useState<WeeklyMilestoneReward[]>(() => StorageService.loadWeeklyMilestones());
-  const [weeklyCountdown, setWeeklyCountdown] = useState<WeeklyResetTimer>(() => StorageService.getWeeklyResetCountdown());
-
-  // Weekly UI is only visible in the launcher; do not repaint every game each second.
-  useEffect(() => {
-    if (activeGameId) return;
-    setWeeklyCountdown(StorageService.getWeeklyResetCountdown());
-    const timer = setInterval(() => {
-      if (!document.hidden) setWeeklyCountdown(StorageService.getWeeklyResetCountdown());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [activeGameId]);
+  // The live weekly reset countdown lives in useWeeklyCountdown so its tick does not
+  // re-render every GameContext consumer.
 
   const weeklyPoints = useMemo(() => {
     return weeklyQuests.reduce((sum, q) => (q.completed ? sum + q.questPoints : sum), 0);
@@ -1088,7 +1083,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       claimWeeklyQuest,
       claimWeeklyMilestoneReward,
       reportWeeklyQuestProgress,
-      weeklyCountdown,
       // Friends & Challenges
       friends,
       addFriend,
@@ -1178,7 +1172,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       claimWeeklyQuest,
       claimWeeklyMilestoneReward,
       reportWeeklyQuestProgress,
-      weeklyCountdown,
       friends,
       addFriend,
       addFriendByUsername,
