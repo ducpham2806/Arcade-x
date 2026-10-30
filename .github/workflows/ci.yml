@@ -36,5 +36,7 @@ jobs:
         run: npm run test:smoke
       - name: Offline launcher shell
         run: npm run test:offline
+      - name: Modal frame (AGENTS.md sizing)
+        run: npm run test:modals
       - name: Generated files are not left behind
         run: git diff --exit-code && test -z "$(git status --porcelain)"

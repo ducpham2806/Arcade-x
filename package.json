@@ -50,6 +50,7 @@
     "test:perf": "node tests/perf/launcher-idle-renders.cjs --window=12 --max-renders-per-sec=20",
     "test:smoke": "node tests/smoke/launcher-flows.cjs",
     "test:offline": "node tests/smoke/offline-shell.cjs",
+    "test:modals": "node tests/ux/modal-frame.cjs",
     "analyze:bundle": "node scripts/analyze-bundle.mjs",
     "test:bundle": "node scripts/analyze-bundle.mjs --budget",
     "perf:first-load": "node tests/perf/first-load-bytes.cjs",
