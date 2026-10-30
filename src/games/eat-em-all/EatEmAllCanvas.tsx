@@ -183,7 +183,7 @@ export const EatEmAllCanvas:React.FC<EatEmAllCanvasProps>=(props)=>{
       }
       for(const m of g.motes){ctx.globalAlpha=Math.max(0,1-m.age/m.ttl);ctx.fillStyle=m.color;ctx.beginPath();ctx.arc(m.x,m.y,m.size,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
       for(const l of g.labels){ctx.save();ctx.globalAlpha=Math.max(0,1-l.age);ctx.font='800 13px system-ui, sans-serif';ctx.textAlign='center';ctx.strokeStyle='#12302f';ctx.lineWidth=4;ctx.strokeText(l.text,Math.max(58,Math.min(width-58,l.x)),l.y);ctx.fillStyle=l.color;ctx.fillText(l.text,Math.max(58,Math.min(width-58,l.x)),l.y);ctx.restore();}
-      if(p.combo>=5){ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffe6a2';ctx.fillText(`×${p.comboMultiplier} · ${p.combo} CHUỖI`,width/2,height-24);ctx.fillStyle='#eadcb333';ctx.fillRect(width/2-46,height-16,92,3);ctx.fillStyle=accent;ctx.fillRect(width/2-46,height-16,92*p.comboDecayRatio,3);}
+      if(p.combo>=5){ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffe6a2';ctx.fillText(`×${p.comboMultiplier} · ${p.combo} CHUỖI`,width/2,height-24);ctx.fillStyle='#eadcb333';ctx.fillRect(width/2-46,height-16,92,3);ctx.fillStyle=accent;ctx.fillRect(width/2-46,height-16,92*p.comboDecayRatio,3);} // readable-canvas: combo line sits on the dimmed chapter backdrop (11.5:1)
       if(p.furyActive){ctx.strokeStyle='#f6cf79';ctx.lineWidth=5;ctx.strokeRect(2.5,2.5,width-5,height-5);}
     };
     raf=requestAnimationFrame(draw);return()=>cancelAnimationFrame(raf);
