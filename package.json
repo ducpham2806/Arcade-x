@@ -12,7 +12,7 @@
     "test:supabase": "bash tests/run-supabase.sh",
     "test:auth": "playwright test tests/auth",
     "test:qc": "playwright test",
-    "test:fast": "npm run -s test:readability && npm run -s test:sync && npm run -s test:commerce && npm run -s test:subscriptions && npm run -s test:battleship && npm run -s test:duel && npm run -s test:social && npm run -s test:artwork && npm run -s test:cosmic-levels && npm run -s test:startup && npm run -s test:boom-art && npm run -s test:boom-pip && npm run -s test:eat && npm run -s test:full-release",
+    "test:fast": "npm run -s test:readability && npm run -s test:storage && npm run -s test:sync && npm run -s test:commerce && npm run -s test:subscriptions && npm run -s test:battleship && npm run -s test:duel && npm run -s test:social && npm run -s test:artwork && npm run -s test:cosmic-levels && npm run -s test:startup && npm run -s test:boom-art && npm run -s test:boom-pip && npm run -s test:eat && npm run -s test:full-release",
     "test:pwa": "node tests/qc/manual/pwa.cjs",
     "test:shikaku": "node tests/qc/manual/shikaku-repro.cjs",
     "test:update": "node tests/qc/manual/update.cjs",
@@ -46,6 +46,7 @@
     "prepare:battleship-server": "node scripts/battleship-server-package.mjs",
     "test:full-release": "node tests/integration/full-release.mjs",
     "test:sync": "node --test tests/sync/efficiency.mjs",
+    "test:storage": "node tests/storage/compat.mjs",
     "build:snake-preview": "vite build --config vite.snake-preview.config.ts",
     "test:snake-preview": "node tests/snake/preview-package.mjs"
   },

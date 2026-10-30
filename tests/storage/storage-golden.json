@@ -1,0 +1,655 @@
+{
+ "methods": [
+  "addDiscoveryLogEntry",
+  "addFriend",
+  "addMatchHistory",
+  "claimDailyChallengeReward",
+  "clearAll",
+  "clearDiscoveryLog",
+  "clearPausedGame",
+  "exportData",
+  "exportDataBackup",
+  "generateDailySeedEntries",
+  "getDailyPersonalBest",
+  "getDailyResetCountdown",
+  "getTodayDateString",
+  "getWeeklyQuestWeekKey",
+  "getWeeklyResetCountdown",
+  "getYesterdayDateString",
+  "importData",
+  "importDataBackup",
+  "isOnboardingCompleted",
+  "loadAchievements",
+  "loadAllDailyChallenges",
+  "loadAllDailyLeaderboards",
+  "loadDailyChallenge",
+  "loadDailyLeaderboard",
+  "loadDailyQuests",
+  "loadDiscoveredBlueprintIds",
+  "loadDiscoveryLog",
+  "loadFavorites",
+  "loadForgeMastery",
+  "loadFriends",
+  "loadGeneric",
+  "loadInventory",
+  "loadLeaderboards",
+  "loadMatchHistory",
+  "loadPausedGame",
+  "loadProfile",
+  "loadRecentlyPlayed",
+  "loadWeeklyMilestones",
+  "loadWeeklyQuests",
+  "recordDailyChallengeAttempt",
+  "recordRecentlyPlayed",
+  "removeFriend",
+  "saveAchievements",
+  "saveAllDailyChallenges",
+  "saveAllDailyLeaderboards",
+  "saveDailyChallenge",
+  "saveDailyLeaderboard",
+  "saveDailyQuests",
+  "saveDiscoveredBlueprintIds",
+  "saveDiscoveryLog",
+  "saveFavorites",
+  "saveForgeMastery",
+  "saveFriends",
+  "saveGeneric",
+  "saveInventory",
+  "saveLeaderboards",
+  "saveMatchHistory",
+  "savePausedGame",
+  "saveProfile",
+  "saveRecentlyPlayed",
+  "saveWeeklyMilestones",
+  "saveWeeklyQuests",
+  "setOnboardingCompleted",
+  "submitDailyScore",
+  "toggleFavorite",
+  "unlockBlueprint"
+ ],
+ "catalog": {
+  "ALL_DEFAULT_ITEMS": "e7dd12e6626fc49b",
+  "CHEST_TYPES": "e505c278cb55d155",
+  "DAILY_LOGIN_REWARDS_LIST": "b037a811285d2ded",
+  "DEFAULT_ACHIEVEMENTS": "4944b4b41a130afb",
+  "DEFAULT_DAILY_CHALLENGERS": "fa14b42ac63a8231",
+  "DEFAULT_DAILY_QUESTS": "8eb16ef9e74ddedf",
+  "DEFAULT_FORGE_MASTERY": "67099609d64593e8",
+  "DEFAULT_LEGENDARY_BLUEPRINTS": "05acf1515653dd96",
+  "DEFAULT_SEED_FRIENDS": "b7df222f7520942e",
+  "DEFAULT_WEEKLY_MILESTONES": "72076287d40524bf",
+  "DEFAULT_WEEKLY_QUESTS": "ceccc9f1052e6615",
+  "FORGE_MASTERY_LEVELS": "2ed2e7d215d629b8",
+  "INITIAL_LEADERBOARD": "e13a7fcfaa5115a3",
+  "INITIAL_PLAYER_PROFILE": "280390eaae37e59a"
+ },
+ "helpers": {
+  "getStreakMultiplier": "620143b013e25c87",
+  "getExpNeededForLevel": "0003a662f175b4bd",
+  "getRecent7DaysScoreHistory": "60a2cca3ea6d6760"
+ },
+ "empty": [
+  {
+   "name": "getDailyResetCountdown",
+   "value": "3c252e253528e8f3",
+   "storage": "44136fa355b3678a"
+  },
+  {
+   "name": "getTodayDateString",
+   "value": "24d70b9666ddc553",
+   "storage": "44136fa355b3678a"
+  },
+  {
+   "name": "getWeeklyQuestWeekKey",
+   "value": "c20e67d9e4816bd2",
+   "storage": "44136fa355b3678a"
+  },
+  {
+   "name": "getWeeklyResetCountdown",
+   "value": "606aaeb5b6231538",
+   "storage": "44136fa355b3678a"
+  },
+  {
+   "name": "getYesterdayDateString",
+   "value": "e1367037a0810c42",
+   "storage": "44136fa355b3678a"
+  },
+  {
+   "name": "isOnboardingCompleted",
+   "value": "fcbcf165908dd18a",
+   "storage": "44136fa355b3678a"
+  },
+  {
+   "name": "loadAchievements",
+   "value": "4944b4b41a130afb",
+   "storage": "44136fa355b3678a"
+  },
+  {
+   "name": "loadAllDailyChallenges",
+   "value": "50a94bdaeb3ca876",
+   "storage": "afae04b86d2d0995"
+  },
+  {
+   "name": "loadAllDailyLeaderboards",
+   "value": "44136fa355b3678a",
+   "storage": "afae04b86d2d0995"
+  },
+  {
+   "name": "loadDailyChallenge",
+   "value": "40ecedaa59c67677",
+   "storage": "afae04b86d2d0995"
+  },
+  {
+   "name": "loadDailyQuests",
+   "value": "339209e0a324146f",
+   "storage": "cc91230437266f2b"
+  },
+  {
+   "name": "loadDiscoveredBlueprintIds",
+   "value": "4a59144a826b36c8",
+   "storage": "cc91230437266f2b"
+  },
+  {
+   "name": "loadDiscoveryLog",
+   "value": "51cba00cb1705f8f",
+   "storage": "cc91230437266f2b"
+  },
+  {
+   "name": "loadFavorites",
+   "value": "4f53cda18c2baa0c",
+   "storage": "cc91230437266f2b"
+  },
+  {
+   "name": "loadForgeMastery",
+   "value": "67099609d64593e8",
+   "storage": "cc91230437266f2b"
+  },
+  {
+   "name": "loadFriends",
+   "value": "b7df222f7520942e",
+   "storage": "d9b8810fbe42c424"
+  },
+  {
+   "name": "loadInventory",
+   "value": "e7dd12e6626fc49b",
+   "storage": "d9b8810fbe42c424"
+  },
+  {
+   "name": "loadLeaderboards",
+   "value": "e13a7fcfaa5115a3",
+   "storage": "d9b8810fbe42c424"
+  },
+  {
+   "name": "loadMatchHistory",
+   "value": "4f53cda18c2baa0c",
+   "storage": "d9b8810fbe42c424"
+  },
+  {
+   "name": "loadPausedGame",
+   "value": "74234e98afe7498f",
+   "storage": "d9b8810fbe42c424"
+  },
+  {
+   "name": "loadProfile",
+   "value": "280390eaae37e59a",
+   "storage": "d9b8810fbe42c424"
+  },
+  {
+   "name": "loadRecentlyPlayed",
+   "value": "4f53cda18c2baa0c",
+   "storage": "d9b8810fbe42c424"
+  },
+  {
+   "name": "loadWeeklyMilestones",
+   "value": "72076287d40524bf",
+   "storage": "45586d78939c6c2f"
+  },
+  {
+   "name": "loadWeeklyQuests",
+   "value": "ceccc9f1052e6615",
+   "storage": "c97852fabc9e1e2e"
+  },
+  {
+   "name": "loadDailyLeaderboard(chess, 2026-10-29)",
+   "value": "9877236640eb8256",
+   "storage": "498f31751520af63"
+  },
+  {
+   "name": "submitDailyScore",
+   "value": "1dcd170150895852",
+   "storage": "d8bb95dc0de8c9ea"
+  },
+  {
+   "name": "submitDailyScore lower",
+   "value": "edf8e680ba106c07",
+   "storage": "d8bb95dc0de8c9ea"
+  },
+  {
+   "name": "getDailyPersonalBest",
+   "value": "be5220c4102d6586",
+   "storage": "d8bb95dc0de8c9ea"
+  },
+  {
+   "name": "loadDailyChallenge(chess)",
+   "value": "817a5b847f804bff",
+   "storage": "d8bb95dc0de8c9ea"
+  },
+  {
+   "name": "recordDailyChallengeAttempt(game)",
+   "value": "b1f480db3dde27a9",
+   "storage": "a1c6990217effcad"
+  },
+  {
+   "name": "recordDailyChallengeAttempt(legacy args)",
+   "value": "f56fd3d5f612a25d",
+   "storage": "3e8653353d212df8"
+  },
+  {
+   "name": "claimDailyChallengeReward",
+   "value": "e22e8c7dba5757e8",
+   "storage": "365f8c146e585600"
+  },
+  {
+   "name": "claimDailyChallengeReward again",
+   "value": "006a69d2564d02d3",
+   "storage": "365f8c146e585600"
+  },
+  {
+   "name": "toggleFavorite add",
+   "value": "8b53c16362e992fb",
+   "storage": "64494ad7a5e565dc"
+  },
+  {
+   "name": "toggleFavorite remove",
+   "value": "0ccd6d77195e1320",
+   "storage": "f117259cc7324345"
+  },
+  {
+   "name": "recordRecentlyPlayed",
+   "value": "7faf7038934605cc",
+   "storage": "25761227f0dc9ea3"
+  },
+  {
+   "name": "unlockBlueprint",
+   "value": "b5bea41b6c623f7c",
+   "storage": "6918c330f45112c2"
+  },
+  {
+   "name": "unlockBlueprint again",
+   "value": "fcbcf165908dd18a",
+   "storage": "6918c330f45112c2"
+  },
+  {
+   "name": "addDiscoveryLogEntry",
+   "value": "ed53bb52a28512c5",
+   "storage": "306256358e8bd792"
+  },
+  {
+   "name": "addFriend",
+   "value": "7f5ec01fd5e8bbba",
+   "storage": "85b7bf47809eb365"
+  },
+  {
+   "name": "addFriend same username",
+   "value": "c3afb6c505c3421e",
+   "storage": "e1ff368e2a9772ce"
+  },
+  {
+   "name": "removeFriend",
+   "value": "c3afb6c505c3421e",
+   "storage": "e1ff368e2a9772ce"
+  },
+  {
+   "name": "addMatchHistory",
+   "value": "e35eab6a9f477b66",
+   "storage": "f0de3af7a0e5ec91"
+  },
+  {
+   "name": "saveDailyChallenge",
+   "value": "74234e98afe7498f",
+   "storage": "b949f4cfa5f602e9"
+  },
+  {
+   "name": "savePausedGame null",
+   "value": "74234e98afe7498f",
+   "storage": "b949f4cfa5f602e9"
+  },
+  {
+   "name": "setOnboardingCompleted false",
+   "value": "74234e98afe7498f",
+   "storage": "e1497e3e796229cd"
+  },
+  {
+   "name": "saveGeneric/loadGeneric",
+   "value": "015abd7f5cc57a2d",
+   "storage": "9b0ec24ea829f273"
+  },
+  {
+   "name": "exportData",
+   "value": "99bf3bbd07ce113c",
+   "storage": "9b0ec24ea829f273"
+  },
+  {
+   "name": "importData valid",
+   "value": "b5bea41b6c623f7c",
+   "storage": "660f686d38e6c2c2"
+  },
+  {
+   "name": "importData invalid",
+   "value": "fcbcf165908dd18a",
+   "storage": "660f686d38e6c2c2"
+  },
+  {
+   "name": "clearDiscoveryLog",
+   "value": "74234e98afe7498f",
+   "storage": "93a2eba233cd02d3"
+  },
+  {
+   "name": "clearPausedGame",
+   "value": "74234e98afe7498f",
+   "storage": "93a2eba233cd02d3"
+  },
+  {
+   "name": "next week: loadWeeklyQuests",
+   "value": "ceccc9f1052e6615",
+   "storage": "d2671de2003c7927"
+  },
+  {
+   "name": "next week: loadDailyQuests",
+   "value": "9950d34f9dcf2e1e",
+   "storage": "bb7093fd070ccbfb"
+  },
+  {
+   "name": "next week: loadAllDailyChallenges",
+   "value": "b852e1e3fbca4b41",
+   "storage": "085596eb7c6335d1"
+  },
+  {
+   "name": "clearAll",
+   "value": "74234e98afe7498f",
+   "storage": "44136fa355b3678a"
+  }
+ ],
+ "legacy": [
+  {
+   "name": "getDailyResetCountdown",
+   "value": "3c252e253528e8f3",
+   "storage": "450c8d9f5de0144f"
+  },
+  {
+   "name": "getTodayDateString",
+   "value": "24d70b9666ddc553",
+   "storage": "450c8d9f5de0144f"
+  },
+  {
+   "name": "getWeeklyQuestWeekKey",
+   "value": "c20e67d9e4816bd2",
+   "storage": "450c8d9f5de0144f"
+  },
+  {
+   "name": "getWeeklyResetCountdown",
+   "value": "606aaeb5b6231538",
+   "storage": "450c8d9f5de0144f"
+  },
+  {
+   "name": "getYesterdayDateString",
+   "value": "e1367037a0810c42",
+   "storage": "450c8d9f5de0144f"
+  },
+  {
+   "name": "isOnboardingCompleted",
+   "value": "b5bea41b6c623f7c",
+   "storage": "450c8d9f5de0144f"
+  },
+  {
+   "name": "loadAchievements",
+   "value": "9e778c07dd8afedf",
+   "storage": "450c8d9f5de0144f"
+  },
+  {
+   "name": "loadAllDailyChallenges",
+   "value": "50a94bdaeb3ca876",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadAllDailyLeaderboards",
+   "value": "ebb2d1db8f234b6b",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadDailyChallenge",
+   "value": "40ecedaa59c67677",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadDailyQuests",
+   "value": "ef8fa922ee840cad",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadDiscoveredBlueprintIds",
+   "value": "82ba9f18d98c57da",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadDiscoveryLog",
+   "value": "deafddf829aa68b6",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadFavorites",
+   "value": "caac368bc3b559db",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadForgeMastery",
+   "value": "04e06ac66c6ba235",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadFriends",
+   "value": "3cfd403c3e233136",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadInventory",
+   "value": "32a44bc9c2be5f01",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadLeaderboards",
+   "value": "70ac2e6ddab741f4",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadMatchHistory",
+   "value": "4f7817c183d5b8f5",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadPausedGame",
+   "value": "22fec3e22f55a213",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadProfile",
+   "value": "eec704444601d166",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadRecentlyPlayed",
+   "value": "d4fc30268620ed02",
+   "storage": "622fd43e1d95fec2"
+  },
+  {
+   "name": "loadWeeklyMilestones",
+   "value": "72076287d40524bf",
+   "storage": "e823d92f853d3563"
+  },
+  {
+   "name": "loadWeeklyQuests",
+   "value": "ceccc9f1052e6615",
+   "storage": "a4576c1bb747120c"
+  },
+  {
+   "name": "loadDailyLeaderboard(chess, 2026-10-29)",
+   "value": "9877236640eb8256",
+   "storage": "e6af55103b69cc1c"
+  },
+  {
+   "name": "submitDailyScore",
+   "value": "17e7e0694b506fa9",
+   "storage": "69328896b2f7d4bc"
+  },
+  {
+   "name": "submitDailyScore lower",
+   "value": "10a0dcdf18439ffc",
+   "storage": "69328896b2f7d4bc"
+  },
+  {
+   "name": "getDailyPersonalBest",
+   "value": "be5220c4102d6586",
+   "storage": "69328896b2f7d4bc"
+  },
+  {
+   "name": "loadDailyChallenge(chess)",
+   "value": "817a5b847f804bff",
+   "storage": "69328896b2f7d4bc"
+  },
+  {
+   "name": "recordDailyChallengeAttempt(game)",
+   "value": "b1f480db3dde27a9",
+   "storage": "fa75f088b9bd1c14"
+  },
+  {
+   "name": "recordDailyChallengeAttempt(legacy args)",
+   "value": "f56fd3d5f612a25d",
+   "storage": "eca716b7c607041e"
+  },
+  {
+   "name": "claimDailyChallengeReward",
+   "value": "e22e8c7dba5757e8",
+   "storage": "28335afdad5d9e42"
+  },
+  {
+   "name": "claimDailyChallengeReward again",
+   "value": "006a69d2564d02d3",
+   "storage": "28335afdad5d9e42"
+  },
+  {
+   "name": "toggleFavorite add",
+   "value": "4e5766717e881ce6",
+   "storage": "82881cf068b93410"
+  },
+  {
+   "name": "toggleFavorite remove",
+   "value": "f6f242621a3c4fff",
+   "storage": "a4073bd7a2d73d64"
+  },
+  {
+   "name": "recordRecentlyPlayed",
+   "value": "51853f208babe5e2",
+   "storage": "939159e0d02950b1"
+  },
+  {
+   "name": "unlockBlueprint",
+   "value": "b5bea41b6c623f7c",
+   "storage": "ea1d10d0ff4089e2"
+  },
+  {
+   "name": "unlockBlueprint again",
+   "value": "fcbcf165908dd18a",
+   "storage": "ea1d10d0ff4089e2"
+  },
+  {
+   "name": "addDiscoveryLogEntry",
+   "value": "439358829e743e41",
+   "storage": "561832e33d42562a"
+  },
+  {
+   "name": "addFriend",
+   "value": "2d1426f4eae5941c",
+   "storage": "5a966c5b45341cc9"
+  },
+  {
+   "name": "addFriend same username",
+   "value": "4eb2eabe1c06ec22",
+   "storage": "c5cdc3e59036bf44"
+  },
+  {
+   "name": "removeFriend",
+   "value": "4eb2eabe1c06ec22",
+   "storage": "c5cdc3e59036bf44"
+  },
+  {
+   "name": "addMatchHistory",
+   "value": "7903dd5738eafac4",
+   "storage": "d6e6ca8c74e2b42e"
+  },
+  {
+   "name": "saveDailyChallenge",
+   "value": "74234e98afe7498f",
+   "storage": "6d5c12ce24409bb4"
+  },
+  {
+   "name": "savePausedGame null",
+   "value": "74234e98afe7498f",
+   "storage": "e6d1974b06b223aa"
+  },
+  {
+   "name": "setOnboardingCompleted false",
+   "value": "74234e98afe7498f",
+   "storage": "d4af040bdb1671b8"
+  },
+  {
+   "name": "saveGeneric/loadGeneric",
+   "value": "015abd7f5cc57a2d",
+   "storage": "f1cb582d0c69262c"
+  },
+  {
+   "name": "exportData",
+   "value": "443c838a47e153f1",
+   "storage": "f1cb582d0c69262c"
+  },
+  {
+   "name": "importData valid",
+   "value": "b5bea41b6c623f7c",
+   "storage": "5ac34523a772cd64"
+  },
+  {
+   "name": "importData invalid",
+   "value": "fcbcf165908dd18a",
+   "storage": "5ac34523a772cd64"
+  },
+  {
+   "name": "clearDiscoveryLog",
+   "value": "74234e98afe7498f",
+   "storage": "200b2b14aaa04916"
+  },
+  {
+   "name": "clearPausedGame",
+   "value": "74234e98afe7498f",
+   "storage": "200b2b14aaa04916"
+  },
+  {
+   "name": "next week: loadWeeklyQuests",
+   "value": "ceccc9f1052e6615",
+   "storage": "d70720f692215641"
+  },
+  {
+   "name": "next week: loadDailyQuests",
+   "value": "9ecd8977074f2529",
+   "storage": "139f8c59db13c3b7"
+  },
+  {
+   "name": "next week: loadAllDailyChallenges",
+   "value": "b852e1e3fbca4b41",
+   "storage": "077767612a073686"
+  },
+  {
+   "name": "clearAll",
+   "value": "74234e98afe7498f",
+   "storage": "44136fa355b3678a"
+  }
+ ]
+}
