@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { AppModal } from '../../components/common/AppModal';
 import { GameBridgeAPI } from '../../types';
 import {
   Direction,
@@ -1267,9 +1268,14 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
 
       {/* PROCEDURAL LEVEL GENERATOR MODAL */}
       {showProceduralModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#1d1309] border-2 border-[#d4af37] rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto scrollbar-thin">
-            <div className="flex items-center justify-between pb-3 border-b border-amber-600/30 mb-4">
+        <AppModal
+          bare
+          onClose={() => setShowProceduralModal(false)}
+          label="Tạo mật thất ngẫu nhiên"
+          closeOnBackdrop={false}
+          className="bg-[#1d1309] border-2 border-[#d4af37] p-5 shadow-2xl"
+        >
+            <div className="flex items-center justify-between pb-3 border-b border-amber-600/30 mb-4 shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9">
                   <MummySprite kind="scarab" />
@@ -1292,7 +1298,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar space-y-4 pr-1">
               <div>
                 <label className="block text-xs font-bold text-amber-300 uppercase mb-1.5 flex items-center gap-1.5">
                   <Sliders className="w-3.5 h-3.5" />
@@ -1422,8 +1428,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                 <span>MỞ CỬA MẬT THẤT MỚI</span>
               </button>
             </div>
-          </div>
-        </div>
+        </AppModal>
       )}
 
       {/* LEVEL CLEAR ANIMATED TOAST NOTIFICATION */}
@@ -1538,9 +1543,14 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
 
       {/* PYRAMID LEVEL SELECTOR MODAL */}
       {showLevelSelect && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#1d1309] border-2 border-[#d4a349] rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
-            <div className="flex items-center justify-between pb-3 border-b border-amber-500/20 mb-3">
+        <AppModal
+          bare
+          onClose={() => setShowLevelSelect(false)}
+          label="Bản đồ kim tự tháp"
+          closeOnBackdrop={false}
+          className="bg-[#1d1309] border-2 border-[#d4a349] p-5 shadow-2xl"
+        >
+            <div className="flex items-center justify-between pb-3 border-b border-amber-500/20 mb-3 shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9">
                   <MummySprite kind="exit_portal" />
@@ -1563,7 +1573,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5 overflow-y-auto p-1 scrollbar-thin flex-1">
+            <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 gap-2.5 content-start overflow-y-auto min-h-0 custom-scrollbar p-1 flex-1">
               {CAMPAIGN_LEVELS.map((lvl, idx) => {
                 const isUnlocked = idx < unlockedLevels;
                 const isCurrent = idx === currentLevelIdx;
@@ -1610,8 +1620,7 @@ export const MummyEscapeGame: React.FC<MummyEscapeGameProps> = ({
                 );
               })}
             </div>
-          </div>
-        </div>
+        </AppModal>
       )}
 
       {/* SETTINGS MODAL */}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AppModal } from '../../components/common/AppModal';
 import { CYBER_SLICE_STAGES, getUnlockedStage, getStageStars } from './stages';
 import { StageConfig } from './types';
 import { Star, Lock, X, Play, Target, Trophy, ChevronRight } from 'lucide-react';
@@ -16,10 +17,16 @@ export const StageSelectModal: React.FC<StageSelectModalProps> = ({ onSelectStag
   const totalStars = Object.values(stageStars).reduce((sum, s) => sum + s, 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in select-none">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col max-h-[92vh]">
+    <AppModal
+      bare
+      onClose={onClose}
+      label="Chọn màn Cyber Slice"
+      closeOnBackdrop={false}
+      overlayClassName="select-none"
+      className="bg-slate-900 border border-slate-700 p-4 sm:p-5 shadow-2xl"
+    >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40">
               <Trophy className="w-5 h-5" />
@@ -47,7 +54,7 @@ export const StageSelectModal: React.FC<StageSelectModalProps> = ({ onSelectStag
         </div>
 
         {/* Grid of Stages */}
-        <div className="flex-1 overflow-y-auto py-3 grid grid-cols-2 sm:grid-cols-3 gap-2.5 pr-1">
+        <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar py-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 content-start pr-1">
           {CYBER_SLICE_STAGES.map((stage) => {
             const isUnlocked = stage.id <= unlockedStage;
             const stars = stageStars[stage.id] || 0;
@@ -189,8 +196,7 @@ export const StageSelectModal: React.FC<StageSelectModalProps> = ({ onSelectStag
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </AppModal>
   );
 };
 

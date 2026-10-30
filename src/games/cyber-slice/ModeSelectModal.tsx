@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppModal } from '../../components/common/AppModal';
 import { GameMode } from './types';
 import { Trophy, Flame, Wind, Clock, X, Sliders, CheckCircle2, ChevronRight, ShieldAlert, Swords } from 'lucide-react';
 
@@ -94,10 +95,16 @@ export const ModeSelectModal: React.FC<ModeSelectModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in select-none">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col max-h-[92vh]">
+    <AppModal
+      bare
+      onClose={onClose}
+      label="Chọn chế độ Cyber Slice"
+      closeOnBackdrop={false}
+      overlayClassName="select-none"
+      className="bg-slate-900 border border-slate-700 p-4 sm:p-6 shadow-2xl"
+    >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
           <div>
             <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
               <span>Chế Độ Chơi Cyber Blade</span>
@@ -115,7 +122,7 @@ export const ModeSelectModal: React.FC<ModeSelectModalProps> = ({
         </div>
 
         {/* Speed Adjustment Control */}
-        <div className="my-3 p-3 rounded-2xl bg-slate-950/70 border border-slate-800">
+        <div className="my-3 p-3 rounded-2xl bg-slate-950/70 border border-slate-800 shrink-0">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 text-xs font-black text-slate-200">
               <Sliders className="w-4 h-4 text-cyan-400" />
@@ -153,7 +160,7 @@ export const ModeSelectModal: React.FC<ModeSelectModalProps> = ({
         </div>
 
         {/* Modes List */}
-        <div className="flex-1 overflow-y-auto space-y-2.5 pr-1">
+        <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar space-y-2.5 pr-1">
           {modes.map((m) => {
             const isSelected = currentMode === m.id;
             return (
@@ -214,8 +221,7 @@ export const ModeSelectModal: React.FC<ModeSelectModalProps> = ({
             Đóng
           </button>
         </div>
-      </div>
-    </div>
+    </AppModal>
   );
 };
 

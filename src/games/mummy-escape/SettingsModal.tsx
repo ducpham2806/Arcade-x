@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AppModal } from '../../components/common/AppModal';
 import {
   Settings,
   Palette,
@@ -58,19 +59,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const tuning = computeAdaptiveTuning(adaptiveProfile, currentLevelId);
 
   return (
-    <div
+    <AppModal
+      bare
+      onClose={onClose}
+      label="Cài đặt Mummy Escape"
       id="mummy-settings-modal-backdrop"
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 animate-fadeIn"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      panelId="mummy-settings-modal"
+      className="bg-gradient-to-b from-[#1c130a] to-[#120a04] border-2 border-[#8b6534] p-5 shadow-2xl text-stone-200"
     >
-      <div
-        id="mummy-settings-modal"
-        className="w-full max-w-xl bg-gradient-to-b from-[#1c130a] to-[#120a04] border-2 border-[#8b6534] rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-stone-200"
-      >
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-amber-600/30 mb-3">
+        <div className="flex items-center justify-between pb-3 border-b border-amber-600/30 mb-3 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 border border-yellow-300/60 flex items-center justify-center text-stone-950 font-black shadow">
               <Settings className="w-5 h-5 animate-spin-slow" />
@@ -95,7 +93,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 p-1 bg-black/40 rounded-xl border border-amber-900/40 mb-4">
+        <div className="flex items-center gap-1.5 p-1 bg-black/40 rounded-xl border border-amber-900/40 mb-4 shrink-0">
           <button
             id="tab-settings-display"
             type="button"
@@ -126,7 +124,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Tab Content: Scrollable Area */}
-        <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar pr-1 space-y-4">
           {activeTab === 'display' && (
             <div className="space-y-4">
               {/* DISPLAY SETTINGS SECTION */}
@@ -475,8 +473,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             ĐÓNG (DONE)
           </button>
         </div>
-      </div>
-    </div>
+    </AppModal>
   );
 };
 

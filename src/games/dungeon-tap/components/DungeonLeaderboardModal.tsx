@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AppModal } from '../../../components/common/AppModal';
 import { Trophy, Flame, Crown, RefreshCw, X, Shield, Calendar, Sparkles } from 'lucide-react';
 import { LeaderboardEntry } from '../../../types';
 import { SupabaseService } from '../../../services/supabase';
@@ -104,11 +105,13 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div
-        className="relative w-full max-w-lg max-h-[90vh] bg-slate-950 border border-amber-500/40 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <AppModal
+      bare
+      onClose={onClose}
+      label="Bảng xếp hạng Dungeon"
+      closeOnBackdrop={false}
+      className="bg-slate-950 border border-amber-500/40 shadow-2xl text-slate-100"
+    >
         {/* Modal Header */}
         <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-white/10 bg-gradient-to-r from-amber-950/60 via-slate-900/90 to-purple-950/60">
           <div className="flex items-center gap-2.5">
@@ -235,7 +238,7 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
         )}
 
         {/* Real-time Rankings List */}
-        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2 min-h-[220px]">
+        <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar p-3 flex flex-col gap-2">
           {isLoading ? (
             <div className="py-16 text-center flex flex-col items-center justify-center gap-2 text-slate-500 text-xs">
               <RefreshCw className="w-6 h-6 animate-spin text-amber-400" />
@@ -354,7 +357,6 @@ export const DungeonLeaderboardModal: React.FC<DungeonLeaderboardModalProps> = (
             Đóng
           </button>
         </div>
-      </div>
-    </div>
+    </AppModal>
   );
 };

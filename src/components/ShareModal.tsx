@@ -5,6 +5,7 @@ import { usePlayer } from '../context/PlayerContext';
 import { soundEngine } from '../services/audio';
 import confetti from '../utils/confetti';
 import { CloseButton } from './common/CloseButton';
+import { AppModal } from './common/AppModal';
 import {
   X,
   Share2,
@@ -205,14 +206,13 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
   }, [onClose]);
 
   return (
-    <div
-      onClick={onClose}
-      className="platform-ui fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
+    <AppModal
+      bare
+      onClose={onClose}
+      labelledBy="share-modal-title"
+      overlayClassName="platform-ui select-none"
+      className="bg-[#0e0e12] border border-indigo-500/30 p-5 sm:p-6 shadow-2xl shadow-indigo-950/50 text-slate-200"
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="max-w-lg w-full h-[90vh] sm:h-[650px] max-h-[700px] bg-[#0e0e12] border border-indigo-500/30 rounded-3xl p-5 sm:p-6 shadow-2xl shadow-indigo-950/50 relative my-auto flex flex-col overflow-hidden text-slate-200"
-      >
         {/* Header */}
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/5 shrink-0">
           <div className="flex items-center gap-3">
@@ -220,7 +220,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
               {data.type === 'recap' ? <Camera className="w-5 h-5 text-cyan-400" /> : <Share2 className="w-5 h-5" />}
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-white font-display uppercase tracking-wide">
+              <h2 id="share-modal-title" className="text-base sm:text-lg font-bold text-white font-display uppercase tracking-wide">
                 {data.type === 'recap' ? 'Game Recap • Thẻ Ảnh Tổng Kết' : data.type === 'achievement' ? 'Khoe Thành Tựu' : data.type === 'score' ? 'Khoe Kỷ Lục Điểm' : 'Chia Sẻ Hồ Sơ'}
               </h2>
               <p className="text-[11px] sm:text-xs text-slate-400 truncate max-w-[240px] sm:max-w-xs">
@@ -423,8 +423,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ data, onClose, onOpenCha
             <span>{copiedText ? 'Đã Copy Caption!' : 'Sao Chép Lời Khoe'}</span>
           </button>
         </div>
-      </div>
-    </div>
+    </AppModal>
   );
 };
 
