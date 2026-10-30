@@ -62,7 +62,7 @@ select public.arcadex_commit('[{"path":"game_rooms/test_room","operation":"updat
 do $$ begin
   begin
     perform public.arcadex_commit('[{"path":"game_rooms/test_room","operation":"update","data":{"status":"ended","winner":"test_player_a"}}]', '[{"path":"game_rooms/test_room","version":0}]');
-  exception when serialization_failure then raise notice 'PASS: stale transaction rejected'; return; end;
+  exception when sqlstate 'PT409' then raise notice 'PASS: stale transaction rejected (HTTP 409)'; return; end;
   raise exception 'FAIL: stale transaction allowed';
 end $$;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
