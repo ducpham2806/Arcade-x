@@ -12,7 +12,7 @@
     "test:supabase": "bash tests/run-supabase.sh",
     "test:auth": "playwright test tests/auth",
     "test:qc": "playwright test",
-    "test:fast": "npm run -s test:readability && npm run -s test:storage && npm run -s test:sync && npm run -s test:commerce && npm run -s test:subscriptions && npm run -s test:battleship && npm run -s test:duel && npm run -s test:social && npm run -s test:artwork && npm run -s test:cosmic-levels && npm run -s test:startup && npm run -s test:boom-art && npm run -s test:boom-pip && npm run -s test:eat && npm run -s test:full-release",
+    "test:fast": "npm run -s test:readability && npm run -s test:storage && npm run -s test:sync && npm run -s test:commerce && npm run -s test:subscriptions && npm run -s test:battleship && npm run -s test:duel && npm run -s test:social && npm run -s test:artwork && npm run -s test:cosmic-levels && npm run -s test:startup && npm run -s test:boom-art && npm run -s test:boom-pip && npm run -s test:eat && npm run -s test:full-release && npm run -s test:dungeon",
     "test:pwa": "node tests/qc/manual/pwa.cjs",
     "test:shikaku": "node tests/qc/manual/shikaku-repro.cjs",
     "test:update": "node tests/qc/manual/update.cjs",
@@ -54,7 +54,9 @@
     "test:bundle": "node scripts/analyze-bundle.mjs --budget",
     "perf:first-load": "node tests/perf/first-load-bytes.cjs",
     "build:snake-preview": "vite build --config vite.snake-preview.config.ts",
-    "test:snake-preview": "node tests/snake/preview-package.mjs"
+    "test:snake-preview": "node tests/snake/preview-package.mjs",
+    "export:dungeon-review": "node scripts/export-dungeon-review.mjs",
+    "test:dungeon": "node scripts/export-dungeon-review.mjs && node tests/dungeon/engine.mjs && node tests/dungeon/art-v5.mjs && node tests/dungeon/facing-v6-2.mjs && node tests/dungeon/squads-v6.mjs && node tests/dungeon/equipment-v6-3.mjs && node tests/dungeon/ui.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

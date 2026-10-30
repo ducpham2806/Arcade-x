@@ -1,6 +1,6 @@
 # Dungeon Titan — Equipment UX v6.3
 
-Mở `dungeon-titan-equipment-v6-3-playtest.html`. Menu → Chế độ thử → Xem art mở thư viện có đủ boss, anh hùng, quái, trang bị, kỹ năng, vùng đất, biểu tượng và hiệu ứng. Tab Titan có nút Đấu thử từng boss. Có thể tạm dừng hoặc chọn từng tư thế.
+Chạy `npm run export:dungeon-review` để sinh file (không còn lưu trong git), rồi mở `dungeon-titan-equipment-v6-3-playtest.html`. Menu → Chế độ thử → Xem art mở thư viện có đủ boss, anh hùng, quái, trang bị, kỹ năng, vùng đất, biểu tượng và hiệu ứng. Tab Titan có nút Đấu thử từng boss. Có thể tạm dừng hoặc chọn từng tư thế.
 
 Patch dựa trên `ducpham2806/Arcade-x` main tại `c143446375eb7bbfa003e75418dad0403d3ce7f2`, cộng gameplay v3 và UX v4 đã gửi trước đó. Đây là source patch Dungeon, không phải full launcher checkout. Áp dụng trên nhánh công việc riêng; đối chiếu diff nếu Dungeon đã thay đổi sau mốc trên. Chưa push, merge hoặc deploy.
 
