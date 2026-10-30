@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BookOpen, Calendar, Play, Star, Trophy, Lock } from "lucide-react";
-import { LEVEL_COUNT, LEXICON_SIZE, MODE_LABELS, specFor } from "./engine";
+import { LEVEL_COUNT, lexiconSize, MODE_LABELS, specFor } from "./engine";
 import type { WordSave } from "./types";
 export function unlockedLevel(save: WordSave) {
   let level = 1;
@@ -36,7 +36,7 @@ export function LevelMap({
           <small>WORD CROSS · THƯ VIỆN CHỮ</small>
           <h1>Tìm chữ. Mở thế giới.</h1>
           <p>
-            {LEXICON_SIZE.toLocaleString("vi-VN")} từ tiếng Anh offline · 200
+            {lexiconSize().toLocaleString("vi-VN")} từ tiếng Anh offline · 200
             màn · 5 chế độ
           </p>
         </div>

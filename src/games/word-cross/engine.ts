@@ -1,4 +1,24 @@
-import lexicon from "./data/lexicon.json" with { type: "json" };
+type Lexicon = { version: number; common: string[]; extended: string[] };
+/** Served as a versioned static file so the ~1.2 MB word list stays out of the JS bundle; the
+ *  game package downloader caches it for offline play (see packageAssets.json). */
+export const LEXICON_URL = "/games/word-cross/lexicon.v1.json";
+let lexicon: Lexicon = { version: 0, common: [], extended: [] };
+let lexiconTask: Promise<void> | undefined;
+/** Must resolve before generatePuzzle runs; the package loader awaits it before rendering. */
+export function loadLexicon(): Promise<void> {
+  return (lexiconTask ??= fetch(LEXICON_URL)
+    .then((response) => {
+      if (!response.ok) throw new Error("Không tải được kho từ Word Cross.");
+      return response.json() as Promise<Lexicon>;
+    })
+    .then((data) => {
+      lexicon = data;
+    })
+    .catch((error) => {
+      lexiconTask = undefined;
+      throw error;
+    }));
+}
 import type {
   Cell,
   Mode,
@@ -30,7 +50,7 @@ export const MODE_HELP: Record<Mode, string> = {
   mystery: "Nhìn chữ đầu, chữ cuối và độ dài để tìm từ bị ẩn.",
   sequence: "Tìm từ được đánh dấu trước, lần lượt theo danh sách.",
 };
-export const LEXICON_SIZE = lexicon.common.length + lexicon.extended.length;
+export const lexiconSize = () => lexicon.common.length + lexicon.extended.length;
 export const DIRS = [
   [0, 1],
   [1, 0],

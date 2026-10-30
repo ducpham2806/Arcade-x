@@ -18,6 +18,7 @@ import {
   resultFor,
   selectWord,
 } from "./engine";
+export { loadLexicon } from "./engine";
 import { complete, hydrateWordSave, makeRun, validPuzzle } from "./save";
 import { LevelMap } from "./LevelMap";
 import { WordBoard } from "./WordBoard";

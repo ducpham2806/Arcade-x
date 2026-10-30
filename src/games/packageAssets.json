@@ -791,7 +791,8 @@
   ],
   "word-cross": [
     "/game-art/icons/word-cross.webp",
-    "/game-art/banners/word-cross.webp"
+    "/game-art/banners/word-cross.webp",
+    "/games/word-cross/lexicon.v1.json"
   ],
   "car-escape": [
     "/game-art/icons/car-escape.webp",

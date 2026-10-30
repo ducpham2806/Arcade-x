@@ -1,6 +1,6 @@
 // Browser smoke test for the launcher flows wired through GameContext: favorites, game
-// detail, settings audio toggles, community chat, launching/exiting a game and the
-// recently played row. Runs against a production build served by `vite preview`.
+// detail, settings audio toggles, community chat, launching/exiting a game, Word Cross
+// loading its lexicon file and the recently played row. Runs against a production build served by `vite preview`.
 // Usage: npm run build && node tests/smoke/launcher-flows.cjs [--outDir=DIR]
 const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
@@ -74,6 +74,18 @@ const outDir = process.argv.find(a => a.startsWith('--outDir='))?.split('=')[1];
       await page.locator('#btn-play-tile-2048').click();
       await page.locator('#btn-game-exit').waitFor({ timeout: 20000 });
       assert.equal(await page.locator('#game-library').count(), 0, 'library hidden while playing');
+      await page.locator('#btn-game-exit').click();
+      const confirm = page.locator('#btn-exit-confirm');
+      if (await confirm.isVisible().catch(() => false)) await confirm.click();
+      await page.locator('#game-library').waitFor({ timeout: 15000 });
+    });
+
+    await check('Word Cross loads its lexicon file before showing the level map', async () => {
+      await page.locator('#btn-play-word-cross').click();
+      const count = page.getByText(/từ tiếng Anh offline/).first();
+      await count.waitFor({ timeout: 20000 });
+      const words = Number((await count.innerText()).match(/([\d.,]+)\s*từ tiếng Anh/)[1].replace(/[.,]/g, ''));
+      assert.ok(words > 10000, `lexicon loaded (${words} words)`);
       await page.locator('#btn-game-exit').click();
       const confirm = page.locator('#btn-exit-confirm');
       if (await confirm.isVisible().catch(() => false)) await confirm.click();

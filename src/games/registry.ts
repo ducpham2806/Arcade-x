@@ -41,7 +41,7 @@ import { CHESS_ACHIEVEMENTS, CHESS_DROP_RATES, CHESS_CONTROLS } from './chess/co
 const CarEscapeGame = packageLazy('car-escape', () => import('./car-escape').then(module => ({ default: module.CarEscapeGame })));
 import { CAR_ESCAPE_ACHIEVEMENTS, CAR_ESCAPE_DROP_RATES, CAR_ESCAPE_CONTROLS } from './car-escape/config';
 
-const WordCrossGame = packageLazy('word-cross', () => import('./word-cross').then(module => ({ default: module.WordCrossGame })));
+const WordCrossGame = packageLazy('word-cross', () => import('./word-cross').then(async module => { await module.loadLexicon(); return { default: module.WordCrossGame }; }));
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
