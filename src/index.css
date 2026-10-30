@@ -1,4 +1,9 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+/* Scan only shipped launcher sources; demo HTML, docs and standalone builds at the repo root
+   otherwise add hundreds of kB of unused utilities. */
+@source "../src";
+@source "../index.html";
+@source "../preview";
 @import "./visuals/arcade.css";
 
 :root {
