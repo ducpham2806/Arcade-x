@@ -34,6 +34,7 @@ export interface QuickMessage {
   timestamp: number;
 }
 
+/** @deprecated Legacy client-written Caro rooms; see games/duel/server.ts for the authoritative room. */
 export interface GameRoomData {
   roomId: string;
   roomCode: string;

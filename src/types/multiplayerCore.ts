@@ -19,6 +19,7 @@ export interface RoomPlayerData {
   lastHeartbeat?: number;
 }
 
+/** @deprecated Legacy client-written rooms; the authoritative protocol uses DuelMoveRecord (games/duel/rules.ts). */
 export interface MoveRecord {
   from?: [number, number] | string;
   to: [number, number] | string;
