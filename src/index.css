@@ -230,7 +230,7 @@
 .arcadex-modal-container-xl {
   position: relative;
   width: 100%;
-  max-width: 64rem;
+  max-width: 56rem;
   height: 92vh;
   max-height: 900px;
   display: flex;
@@ -238,6 +238,13 @@
   overflow: hidden;
   border-radius: 1.5rem;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+}
+
+@media (min-width: 1024px) {
+  .arcadex-modal-container,
+  .arcadex-modal-container-xl {
+    max-width: 64rem;
+  }
 }
 
 @media (max-width: 639px) {
@@ -287,6 +294,49 @@
   .arcadex-modal-container-sm {
     height: 660px;
   }
+}
+
+/* AppModal (src/components/common/AppModal.tsx): content-modal frame from AGENTS.md. Full screen
+   on phones; fixed 92vh (max 900px) at 4xl width from sm and 5xl from lg, identical for every tab.
+   Sizing is unlayered so callers' Tailwind skin classes cannot shrink it; the overlay look lives in
+   @layer components so callers may restyle it. */
+.app-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.app-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+}
+@media (min-width: 640px) {
+  .app-modal-overlay { padding: 1rem; }
+  .app-modal { height: 92vh; max-height: 900px; max-width: 56rem; border-radius: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .app-modal-overlay { padding: 1.5rem; }
+  .app-modal { max-width: 64rem; }
+}
+/* Inside a running game the frame starts below the game header (h-12 / sm:h-14), so the game's
+   exit and audio controls stay visible, and shrinks to the space that remains. */
+#game-wrapper-viewport .app-modal-overlay { top: 3rem; }
+#game-wrapper-viewport .app-modal { max-height: 100%; }
+@media (min-width: 640px) {
+  #game-wrapper-viewport .app-modal-overlay { top: 3.5rem; }
+  #game-wrapper-viewport .app-modal { max-height: min(100%, 900px); }
+}
+@layer components {
+  .app-modal-overlay { background-color: rgba(3, 6, 15, 0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 }
 
 /* Independent Scrollable Body Area (Ensures zero jumping on tab change) */

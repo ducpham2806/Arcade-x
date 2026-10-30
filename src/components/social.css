@@ -4,7 +4,7 @@
 
 /* Arcade cabinet palette, stable frame and independently scrolling conversation. */
 .arcade-app .arcadex-modal-overlay.social-overlay{z-index:150;background:#060917c4;backdrop-filter:blur(10px)}
-.arcade-app .arcadex-modal-container.social-panel{width:min(760px,100%);height:92dvh;max-height:900px;background:radial-gradient(ellipse at top left,#28345d 0,transparent 45%),#0c1226;color:#edf3ff;border:1px solid #6e7de3;border-radius:24px;box-shadow:0 0 0 4px #111a35,0 24px 80px #0009;padding:22px;gap:16px;user-select:text}
+.arcade-app .arcadex-modal-container.social-panel{width:100%;height:92vh;max-height:900px;background:radial-gradient(ellipse at top left,#28345d 0,transparent 45%),#0c1226;color:#edf3ff;border:1px solid #6e7de3;border-radius:24px;box-shadow:0 0 0 4px #111a35,0 24px 80px #0009;padding:22px;gap:16px;user-select:text}
 .social-kicker{font-size:10px;color:#b6f56b;letter-spacing:.18em;font-weight:900}.social-panel h2{font-size:24px;font-weight:900;letter-spacing:-.5px}.social-panel header{padding-bottom:14px;border-bottom:1px solid #849bff2b}.social-panel header>button{width:44px;flex-shrink:0}.social-fab-muted{color:#b0bdd9;font-size:12px;margin-top:4px}
 .arcade-app .arcadex-modal-container.social-panel button{background:#1b2645;border:1px solid #44577f;color:#eef4ff;box-shadow:0 2px 0 #050916;transition:background .15s,border-color .15s}
 .arcade-app .arcadex-modal-container.social-panel button:hover{background:#2c3b65;border-color:#9aaaf0}.social-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.social-tabs button{font-size:13px;font-weight:750;white-space:nowrap;padding:10px 4px!important}

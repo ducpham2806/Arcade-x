@@ -31,7 +31,7 @@
 [data-game-ui=launcher] .game-learning-tools button{font-size:11px;min-height:36px}
 [data-game-ui=launcher] .game-ui-modal{z-index:120;padding:16px;background:#293b5677;backdrop-filter:blur(8px)}
 [data-game-ui=launcher] .game-ui-modal>div{height:92dvh;max-height:900px;width:min(900px,100%);max-width:900px;background:#fff;background-image:none;border:1px solid #dbe3ee;border-radius:24px;color:#293b56;box-shadow:0 24px 70px #25344826}
-[data-game-ui=launcher] :is(.game-ui-modal,[role=dialog]) :is(h1,h2,h3,h4,p,label,.text-slate-100,.text-white,.text-indigo-300,.text-slate-400,.text-slate-300){color:#344b6d}
+[data-game-ui=launcher] :is(.game-ui-modal,[role=dialog]:not([data-modal-skin=authored])) :is(h1,h2,h3,h4,p,label,.text-slate-100,.text-white,.text-indigo-300,.text-slate-400,.text-slate-300){color:#344b6d}
 [data-game-ui=launcher] .game-ui-modal :is(input,select){background:#f3f6fb;color:#34445c;border-color:#c6d3e6}
 [data-game-ui=launcher] .game-ui-modal button{background:#eef2fc;background-image:none;border-color:#cbd6ec;color:#3e55b7;box-shadow:none}
 [data-game-ui=launcher] .game-ui-modal button :is(span,h3,small){color:inherit}
