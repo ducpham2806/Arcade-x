@@ -1,5 +1,5 @@
 /* Mechanical atlas packing only: shared row framing, alpha preserved, fixed pivot. */
-const fs=require('fs'),path=require('path'),sharp=require('sharp'),vm=require('vm');const root=path.resolve(__dirname,'../standalone/chronicles-realms/dist'),out=root+'/assets/scifi',sources=path.resolve(__dirname,'../source-art/boss-v6');
+const fs=require('fs'),path=require('path'),sharp=require('sharp'),vm=require('vm');const root=path.resolve(__dirname,'../standalone/chronicles-realms/dist'),out=root+'/assets/scifi',sources=path.resolve(__dirname,'../art/block-breaker/boss-v6');
 const {importBossFrames}=require('./boss-frame-import.cjs');
 const ids=['treant','pharaoh','ice_queen','magma_dragon','ai_overseer','lord_fracture'],poses=['idle_a','idle_b','charge_a','charge_b','fire','recoil','hurt','weak','defeat'];
 async function pack(input,name,cols,rows,size,rowBands){const {data,info}=await sharp(input).ensureAlpha().raw().toBuffer({resolveWithObject:true});const bands=[0];for(let r=1;r<rows;r++){let best=Infinity,at=0;for(let y=Math.floor(info.height*(r/rows-.05));y<=Math.floor(info.height*(r/rows+.05));y++){let sum=0;for(let x=0;x<info.width;x++)sum+=Math.max(0,data[(y*info.width+x)*4+3]-40);if(sum<best){best=sum;at=y;}}bands.push(at);}bands.push(info.height);if(rowBands)bands.splice(0,bands.length,...rowBands.map(v=>Math.round(v*info.height)));

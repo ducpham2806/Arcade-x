@@ -4,47 +4,47 @@
   "build": "Dungeon Titan equipment UX v6.3",
   "files": [
     {
-      "path": "art-source-v5/PROMPT-BRIEFS.md",
+      "path": "art/dungeon-titan/source-v5/PROMPT-BRIEFS.md",
       "sha256": "15ab2a3df32d41634edd3cfb32517480ea598725bf82b73d0177ca8f2a42c3b7",
       "bytes": 4323
     },
     {
-      "path": "art-source-v5/atlas-manifest.json",
+      "path": "art/dungeon-titan/source-v5/atlas-manifest.json",
       "sha256": "ae31c75e0d7cf22e9a8e10461e3e3c159eaf05812bea0f5ee74197c6271f9661",
       "bytes": 21416
     },
     {
-      "path": "art-source-v5/generation-sources.json",
+      "path": "art/dungeon-titan/source-v5/generation-sources.json",
       "sha256": "fd1693ca438d6823eb4c5eee5601fa6cf386135cf0f199ad324c9af2d1f4dbca",
       "bytes": 2554
     },
     {
-      "path": "art-source-v5/prompts.json",
+      "path": "art/dungeon-titan/source-v5/prompts.json",
       "sha256": "2ef1aae68b58de20342306ada9f2efaa333e7fca7c9a59b313e406a732290976",
       "bytes": 4855
     },
     {
-      "path": "art-source-v5/validation.json",
+      "path": "art/dungeon-titan/source-v5/validation.json",
       "sha256": "b074b524b72b3c1bc5275e1defadecfb1a530a1eb5b7b8ef3acd8cb1b98829b5",
       "bytes": 204
     },
     {
-      "path": "art-source-v6/atlas-manifest.json",
+      "path": "art/dungeon-titan/source-v6/atlas-manifest.json",
       "sha256": "c7de3f37cbf80ba677ac246ccc07209d1d8cf78a6e45ab1e6b73b846444c7de2",
       "bytes": 4660
     },
     {
-      "path": "art-source-v6/generation-sources.json",
+      "path": "art/dungeon-titan/source-v6/generation-sources.json",
       "sha256": "5f306be2d33c283fc9c37f2d30708572733e120428acda8ad2023011dfac3a15",
       "bytes": 891
     },
     {
-      "path": "art-source-v6/prompts.json",
+      "path": "art/dungeon-titan/source-v6/prompts.json",
       "sha256": "e5758d16d6f00cf201eb93122eaea85ffb4de30350122b0af533cbbc86eb73ff",
       "bytes": 8721
     },
     {
-      "path": "art-source-v6/validation.json",
+      "path": "art/dungeon-titan/source-v6/validation.json",
       "sha256": "d49d5d84034528a7deec4bd460d7a32430333ac11dd6924889813aa2b5bc2a87",
       "bytes": 172
     },

@@ -27,7 +27,7 @@ Use existing generated boss source as identity reference. Built-in image generat
 
 ## Rebuild and handoff
 
-Run `node scripts/build-block-scifi.cjs <initial-generated-source-dir>` for the base atlas when needed, then `node scripts/build-block-boss-art.cjs` to apply v6. The latter reads full-resolution `source-art/boss-v6/*-source.webp` masters committed with the code. Original generated PNGs and exact built-in generation prompts are additionally included in the downloadable asset/source bundles (`prompts.json`). No CLI/API generation fallback was used.
+Run `node scripts/build-block-scifi.cjs <initial-generated-source-dir>` for the base atlas when needed, then `node scripts/build-block-boss-art.cjs` to apply v6. The latter reads full-resolution `art/block-breaker/boss-v6/*-source.webp` masters committed with the code. Original generated PNGs and exact built-in generation prompts are additionally included in the downloadable asset/source bundles (`prompts.json`). No CLI/API generation fallback was used.
 
 `boss-motion.json` provides row IDs, nine pose names, fixed pivot, source row bands and frame rectangles. The downloadable asset pack contains transparent PNG spritesheets, optimized runtime WebP atlases, metadata, original PNGs and prompts. The full source bundle includes the renderer and exporters.
 

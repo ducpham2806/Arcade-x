@@ -8,5 +8,5 @@ for(let i=0;i<stages.length;i++){
  s.encounterTime=strikes[i]-.2;s.parriedCycle=0;s.exposed=1;assert.equal(bossArtPose(s),'exposed','Parry must expose before attack');
 }
 assert.equal(actorFrame('defeat',0,true,false),7);assert.equal(actorFrame('attack',0,false,true),2);assert.equal(actorFrame('attack',0,false,false),1);
-const manifest=JSON.parse(fs.readFileSync('art-source-v5/atlas-manifest.json'));assert.equal(manifest.length,26);assert.equal(manifest.reduce((n,a)=>n+a.cols*a.rows,0),245);assert.ok(manifest.reduce((n,a)=>n+a.bytes,0)<8*1024*1024);
+const manifest=JSON.parse(fs.readFileSync('art/dungeon-titan/source-v5/atlas-manifest.json'));assert.equal(manifest.length,26);assert.equal(manifest.reduce((n,a)=>n+a.cols*a.rows,0),245);assert.ok(manifest.reduce((n,a)=>n+a.bytes,0)<8*1024*1024);
 console.log('PASS eight chapter boss windup/strike/recovery/exposed timing, parry override, distinct authored frames, complete 245-cell roster and <8MiB budget.');

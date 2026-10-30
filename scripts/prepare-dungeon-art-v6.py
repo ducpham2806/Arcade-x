@@ -3,7 +3,7 @@ import pathlib,json,subprocess,shutil
 import numpy as np
 from PIL import Image
 from scipy import ndimage
-R=pathlib.Path(__file__).resolve().parents[1];S=R/'art-source-v6';O=R/'src/games/dungeon-tap/assets/art-v6';T=R/'.art-v6-build'
+R=pathlib.Path(__file__).resolve().parents[1];S=R/'art/dungeon-titan/source-v6';O=R/'src/games/dungeon-tap/assets/art-v6';T=R/'.art-v6-build'
 O.mkdir(parents=True,exist_ok=True);T.mkdir(exist_ok=True)
 def run(*a):subprocess.run(list(map(str,a)),check=True,stdout=subprocess.DEVNULL)
 manifest=[]

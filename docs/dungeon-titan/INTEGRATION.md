@@ -20,7 +20,7 @@ Targeted TypeScript check dùng `--types vite/client` cho khai báo WebP. Vite p
 
 Bộ asset riêng chứa PNG nguồn, WebP tối ưu, atlas manifest, prompt briefs và script đóng atlas. Để đóng lại ảnh cần Python/Pillow/NumPy/SciPy và ImageMagick. Script chỉ phân tích alpha, cắt/đóng ô và đổi định dạng; không vẽ thay cho nguồn raster tạo bằng Imagegen.
 
-`UX-v6.md` mô tả bố cục theo ảnh và cơ chế đội lính. `ART-v5.md` mô tả nền art kế thừa; art-source-v6 chứa thêm24 loài mới. `UX-v4.md` mô tả luồng quản lý. `DESIGN-v3.md`, bảng tuning và mô phỏng là tài liệu gameplay lịch sử.
+`UX-v6.md` mô tả bố cục theo ảnh và cơ chế đội lính. `ART-v5.md` mô tả nền art kế thừa; art/dungeon-titan/source-v6 chứa thêm24 loài mới. `UX-v4.md` mô tả luồng quản lý. `DESIGN-v3.md`, bảng tuning và mô phỏng là tài liệu gameplay lịch sử.
 
 Đã kiểm tra logic/DOM, TypeScript và tệp ảnh. Chưa xác nhận layout trên browser/điện thoại thật, FPS/GPU, full launcher build và GameBridge/BXH online. Cần các bước này trước production sign-off.
 

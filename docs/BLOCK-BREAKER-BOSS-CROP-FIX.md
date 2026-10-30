@@ -20,4 +20,4 @@ Boss Lab now includes a direct selector for each of the nine original poses as w
 
 ## Rebuild
 
-Run `node scripts/build-block-boss-art.cjs`, `node scripts/check-block-boss-crops.cjs` and `node scripts/audit-block-boss-art.cjs`. The importer reads the existing full-resolution source masters under `source-art/boss-v6`. Keep `scripts/boss-frame-import.cjs` and `boss-import-audit.json` with the handoff. Rebuilds must reject missing bodies, unexpected ownership spread, source-bound truncation or loss of source high-alpha pixels.
+Run `node scripts/build-block-boss-art.cjs`, `node scripts/check-block-boss-crops.cjs` and `node scripts/audit-block-boss-art.cjs`. The importer reads the existing full-resolution source masters under `art/block-breaker/boss-v6`. Keep `scripts/boss-frame-import.cjs` and `boss-import-audit.json` with the handoff. Rebuilds must reject missing bodies, unexpected ownership spread, source-bound truncation or loss of source high-alpha pixels.

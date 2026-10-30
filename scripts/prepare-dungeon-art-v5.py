@@ -3,7 +3,7 @@ import json,pathlib,subprocess,shutil
 import numpy as np
 from PIL import Image
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-SRC=ROOT/'art-source-v5';OUT=ROOT/'src/games/dungeon-tap/assets/art-v5';TMP=ROOT/'.art-v5-build'
+SRC=ROOT/'art/dungeon-titan/source-v5';OUT=ROOT/'src/games/dungeon-tap/assets/art-v5';TMP=ROOT/'.art-v5-build'
 OUT.mkdir(parents=True,exist_ok=True);TMP.mkdir(exist_ok=True)
 sources=json.loads((SRC/'generation-sources.json').read_text())
 BOSSES=['goblin','skeleton','spider','vampire','dragon','frost','thunder','void']
