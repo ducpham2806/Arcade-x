@@ -4,7 +4,7 @@ import '../../components/social.css';
 import { LearningHub } from '../duel/LearningHub';
 import { ConnectionNotice } from '../duel/ConnectionNotice';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 import {
   Users,
   Bot,

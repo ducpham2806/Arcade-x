@@ -3,7 +3,7 @@ import { ShareData } from '../types';
 import { SupabaseService } from '../services/supabase';
 import { usePlayer } from '../context/PlayerContext';
 import { soundEngine } from '../services/audio';
-import confetti from 'canvas-confetti';
+import confetti from '../utils/confetti';
 import { CloseButton } from './common/CloseButton';
 import {
   X,

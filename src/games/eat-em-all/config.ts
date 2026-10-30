@@ -140,7 +140,6 @@ export const DIFFICULTY_PRESETS: Record<
   },
 };
 
-export { CAMPAIGN_STAGES as STAGES_CONFIG } from './campaign';
 
 export const COMBO_TIERS: ComboTierInfo[] = [
   { minCombo: 30, multiplier: 6, name: 'GODLIKE! 👑', color: '#f43f5e', badgeBg: 'bg-rose-500/20 border-rose-500/60 text-rose-300', icon: '👑' },

@@ -22,7 +22,7 @@ import {
   Share2,
   Check,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 
 type GameMode = 'classic' | 'big5x5' | 'rush';
 

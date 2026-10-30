@@ -30,7 +30,7 @@ import {
   X,
   Wand2,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 import { GameComponentProps } from '../../types';
 import { usePlayer } from '../../context/PlayerContext';
 import { useMultiplayerBridge } from '../../hooks/useMultiplayerBridge';

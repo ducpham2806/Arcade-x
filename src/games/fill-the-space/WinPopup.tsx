@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Trophy, Star, ArrowRight, RotateCcw, Home, Sparkles, Coins, Zap, Gift, Layers, Flame, RefreshCw } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 import { useScrollLock } from '../../hooks/useScrollLock';
 
 interface WinPopupProps {

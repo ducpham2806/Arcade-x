@@ -1,6 +1,5 @@
 import { lazy, type ComponentType } from 'react';
 import type { GameComponentProps } from '../types';
-import manifests from './packageAssets.json';
 import { startupAssets } from './startupAssets';
 import { GAME_ASSET_CACHE } from './packageCache';
 
@@ -91,7 +90,10 @@ function warmRemaining(urls: string[], parent: AbortSignal) {
 export async function prepareGamePackage(id: string, signal: AbortSignal, report: (value: PackageProgress) => void) {
   if (signal.aborted) return;
   cancelWarmup();
-  const urls = (manifests as Record<string, string[]>)[id] || [];
+  // The per-game asset lists are only needed once a game is chosen.
+  const manifests = (await import('./packageAssets.json')).default as Record<string, string[]>;
+  check(signal);
+  const urls = manifests[id] || [];
   const startup = startupAssets(id, urls);
   let completed = 0, moduleReady = false, wrapperReady = false, lastProgress = 0;
   const emit = () => {

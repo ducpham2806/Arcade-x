@@ -9,7 +9,7 @@ import { GameArtwork } from '../visuals/gameArt';
 import { CloseButton } from './common/CloseButton';
 
 import {accessPreviewEnabled} from '../commerce/api';
-import {StoreModal} from '../commerce/StoreModal';
+import {StoreModal} from '../commerce/LazyStoreModal';
 export const GameDetailModal: React.FC = () => {
   const { selectedGameForDetail, closeGameDetail } = useLauncherUi(); const { favorites, toggleFavorite } = useLibrary(); const { launchGame } = useGameSession();
   const { profile } = usePlayer();

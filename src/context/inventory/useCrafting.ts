@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 import type { InventoryItem, Rarity, CraftResult, ForgeMasteryState, LegendaryBlueprint, RecipeDiscoveryLogEntry } from '../../types';
 import { StorageService, ALL_DEFAULT_ITEMS, FORGE_MASTERY_LEVELS, DEFAULT_LEGENDARY_BLUEPRINTS } from '../../services/storage';
 import { soundEngine } from '../../services/audio';

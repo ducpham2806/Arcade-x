@@ -24,6 +24,8 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+      - name: Bundle budget (no chunk > 500 kB, first-load JS <= 400 kB gzip)
+        run: npm run test:bundle
       - name: Fast test suites (no browser, no Docker)
         run: npm run test:fast
       - name: Install Chromium for browser checks
@@ -32,5 +34,7 @@ jobs:
         run: npm run test:perf
       - name: Launcher smoke flows
         run: npm run test:smoke
+      - name: Offline launcher shell
+        run: npm run test:offline
       - name: Generated files are not left behind
         run: git diff --exit-code && test -z "$(git status --porcelain)"

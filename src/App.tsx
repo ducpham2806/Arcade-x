@@ -1,7 +1,7 @@
 import { GamePackageGate } from './components/GamePackageGate';
 import { installReadability } from './accessibility/readability.js';
 import './accessibility/readability.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { LauncherProvider, useLauncher } from './launcher/LauncherContext';
 import { ResumeCard } from './launcher/ResumeCard';
 import { SupportPanel } from './launcher/SupportPanel';
@@ -12,23 +12,35 @@ import { InventoryProvider } from './context/InventoryContext';
 import { GameProvider, useGameSession, useLauncherUi } from './context/GameContext';
 import { Header } from './components/Header';
 import { GameCatalog } from './components/GameCatalog';
-import { LeaderboardModal } from './components/LeaderboardModal';
 import { NonIntrusiveToastManager } from './components/common/NonIntrusiveToastManager';
-import { ProfileModal } from './components/ProfileModal';
-import { ShareModal } from './components/ShareModal';
-import { GlobalChat } from './components/GlobalChat';
-import { GameDetailModal } from './components/GameDetailModal';
-import { SettingsModal } from './components/SettingsModal';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { SplashScreen } from './components/SplashScreen';
 import { MobileNav } from './components/MobileNav';
 import { GameErrorBoundary } from './components/common/GameErrorBoundary';
 const GameWrapper = React.lazy(() => import('./games/GameWrapper').then(module => ({ default: module.GameWrapper }))); 
+// Modals and the community panel load on demand (and are prefetched once the launcher is idle),
+// keeping them out of the first-load bundle.
+const launcherPanels = {
+  ProfileModal: () => import('./components/ProfileModal').then(m => ({ default: m.ProfileModal })),
+  SettingsModal: () => import('./components/SettingsModal').then(m => ({ default: m.SettingsModal })),
+  LeaderboardModal: () => import('./components/LeaderboardModal').then(m => ({ default: m.LeaderboardModal })),
+  GameDetailModal: () => import('./components/GameDetailModal').then(m => ({ default: m.GameDetailModal })),
+  PvpMatchHistoryModal: () => import('./components/PvpMatchHistoryModal').then(m => ({ default: m.PvpMatchHistoryModal })),
+  ShareModal: () => import('./components/ShareModal').then(m => ({ default: m.ShareModal })),
+  GlobalChat: () => import('./components/GlobalChat').then(m => ({ default: m.GlobalChat })),
+};
+const ProfileModal = React.lazy(launcherPanels.ProfileModal);
+const SettingsModal = React.lazy(launcherPanels.SettingsModal);
+const LeaderboardModal = React.lazy(launcherPanels.LeaderboardModal);
+const GameDetailModal = React.lazy(launcherPanels.GameDetailModal);
+const PvpMatchHistoryModal = React.lazy(launcherPanels.PvpMatchHistoryModal);
+const ShareModal = React.lazy(launcherPanels.ShareModal);
+const GlobalChat = React.lazy(launcherPanels.GlobalChat);
 import { GAME_REGISTRY } from './games/registry';
 import { useRippleEffect } from './hooks/useRippleEffect';
+import { whenIdle } from './utils/whenIdle';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
-import { PvpMatchHistoryModal } from './components/PvpMatchHistoryModal';
 import { DiscardSessionConfirmModal } from './components/common/DiscardSessionConfirmModal';
 import { CloudSyncStatusIndicator } from './components/common/CloudSyncStatusIndicator';
 import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy, Pause, Save, Bot, Trash2 } from 'lucide-react';
@@ -57,6 +69,12 @@ const AppContent: React.FC = () => {
     toggleChat,
     openChat,
   } = useLauncherUi();
+
+  const [chatMounted, setChatMounted] = useState(false);
+  useEffect(() => { if (isChatOpen) setChatMounted(true); }, [isChatOpen]);
+
+  // Warm the lazy panels once the launcher is idle so the first open is instant.
+  useEffect(() => whenIdle(() => Object.values(launcherPanels).forEach(load => { void load().catch(() => {}); })), []);
 
   useEffect(() => { if (activeModal === 'auth') { setActiveModal('none'); openEntry(authModalMode); } }, [activeModal, authModalMode, openEntry, setActiveModal]);
 
@@ -150,14 +168,16 @@ const AppContent: React.FC = () => {
 
       <div className="platform-ui">
       {/* Global Modals & Overlays (Available from anywhere) */}
-      {activeModal === 'profile' && <ProfileModal />}
-      {activeModal === 'settings' && <SettingsModal />}
-      {activeModal === 'leaderboard' && <LeaderboardModal initialGameId={activeGameId || undefined} />}
-      {activeModal === 'gameDetail' && <GameDetailModal />}
-      {activeModal === 'pvpHistory' && <PvpMatchHistoryModal />}
-      {activeModal === 'share' && shareData && (
-        <ShareModal data={shareData} onClose={closeShareModal} onOpenChat={openChat} />
-      )}
+      <Suspense fallback={null}>
+        {activeModal === 'profile' && <ProfileModal />}
+        {activeModal === 'settings' && <SettingsModal />}
+        {activeModal === 'leaderboard' && <LeaderboardModal initialGameId={activeGameId || undefined} />}
+        {activeModal === 'gameDetail' && <GameDetailModal />}
+        {activeModal === 'pvpHistory' && <PvpMatchHistoryModal />}
+        {activeModal === 'share' && shareData && (
+          <ShareModal data={shareData} onClose={closeShareModal} onOpenChat={openChat} />
+        )}
+      </Suspense>
 
       {/* Discard Paused Game Session Confirmation Modal */}
       <DiscardSessionConfirmModal
@@ -193,7 +213,8 @@ const AppContent: React.FC = () => {
 
 
       {/* Real-time Global Chat Floating Window - Rendered last so it sits on top of all views */}
-      <div className="platform-ui"><GlobalChat isOpen={isChatOpen} onToggle={toggleChat} onOpenShare={() => setActiveModal('share')} /></div>
+      {/* Mounted from the first open on, so tabs and drafts survive closing the panel. */}
+      {chatMounted && <div className="platform-ui"><Suspense fallback={null}><GlobalChat isOpen={isChatOpen} onToggle={toggleChat} onOpenShare={() => setActiveModal('share')} /></Suspense></div>}
     </div>
   );
 };

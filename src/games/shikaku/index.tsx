@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import type { GameComponentProps } from "../../types";
 import { soundEngine } from "../../services/audio";
-import confetti from "canvas-confetti";
+import confetti from "../../utils/confetti";
 import { generateShikaku, type ShikakuPuzzle, type Rect } from "./generator";
 import { validRegions, validShikakuPuzzle } from "./save";
 import {

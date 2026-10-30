@@ -40,7 +40,7 @@ import { MatchmakingModal } from '../../components/multiplayer/MatchmakingModal'
 import { VersusScreen } from '../../components/multiplayer/VersusScreen';
 import { GameActionConfirmModal } from '../../components/multiplayer/GameActionConfirmModal';
 import { MatchEndModal, MatchEndReviewBar, MatchEndPlayerInfo } from '../../components/multiplayer/MatchEndModal';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 import {
   BoardMatrix,
   INITIAL_XIANGQI_BOARD,

@@ -17,13 +17,14 @@ import {
 import { usePlayer } from './PlayerContext';
 import { soundEngine } from '../services/audio';
 import { getItemSlot } from '../utils/rarity';
-import confetti from 'canvas-confetti';
-import { SHOP_THEMES, ShopTheme, convertThemeToInventoryItem } from '../data/shopThemes';
+import confetti from '../utils/confetti';
+import type { ShopTheme } from '../data/shopThemes';
 import { SupabaseService, type CloudInventoryData } from '../services/supabase';
 import { hapticService } from '../services/haptics';
 import { ELO_TITLE_MILESTONES } from '../utils/eloRankSystem';
 import { useCrafting } from './inventory/useCrafting';
 import { useShallowStable } from './useShallowStable';
+import { whenIdle } from '../utils/whenIdle';
 
 export interface ChestOpenResult {
   chestType: 'common' | 'rare' | 'epic' | 'legendary';
@@ -96,6 +97,14 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [lastCloudSyncTime, setLastCloudSyncTime] = useState<number | null>(null);
 
   const [cloudReady, setCloudReady] = useState(false);
+  // The theme catalog (~90 kB of data) is only needed when equipping or buying a shop theme;
+  // load it once the launcher is idle instead of shipping it in the first-load bundle.
+  const shopThemes = useRef<typeof import('../data/shopThemes') | null>(null);
+  useEffect(() => {
+    let live = true;
+    const cancel = whenIdle(() => { void import('../data/shopThemes').then(module => { if (live) shopThemes.current = module; }).catch(() => {}); });
+    return () => { live = false; cancel(); };
+  }, []);
   const currentInventory = { items, chestCounts, forgeMastery, discoveredBlueprintIds };
   const revisionRef = useRef<{ updatedAt: number; dirty: boolean; fingerprint: string }>(null);
   if (!revisionRef.current) {
@@ -353,10 +362,11 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       targetItem = { ...found };
     } else {
       // Check SHOP_THEMES
-      const theme = SHOP_THEMES.find(t => t.id === itemId);
-      if (theme) {
+      const shop = shopThemes.current;
+      const theme = shop?.SHOP_THEMES.find(t => t.id === itemId);
+      if (shop && theme) {
         targetItem = {
-          ...convertThemeToInventoryItem(theme),
+          ...shop.convertThemeToInventoryItem(theme),
           equipped: true,
           count: 1,
           unlockedAt: Date.now(),
@@ -455,7 +465,11 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [items]);
 
   const purchaseShopTheme = useCallback((themeId: string): { success: boolean; message: string; theme?: ShopTheme } => {
-    const theme = SHOP_THEMES.find(t => t.id === themeId);
+    const shop = shopThemes.current;
+    if (!shop) {
+      return { success: false, message: 'Arcade Shop đang tải, vui lòng thử lại sau giây lát.' };
+    }
+    const theme = shop.SHOP_THEMES.find(t => t.id === themeId);
     if (!theme) {
       return { success: false, message: 'Giao diện không tồn tại trong Arcade Shop!' };
     }
@@ -511,7 +525,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         };
         return updated;
       } else {
-        const newItem = convertThemeToInventoryItem(theme);
+        const newItem = shop.convertThemeToInventoryItem(theme);
         newItem.equipped = true;
         newItem.count = 1;
         newItem.unlockedAt = Date.now();

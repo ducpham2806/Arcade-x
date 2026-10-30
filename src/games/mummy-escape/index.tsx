@@ -41,7 +41,7 @@ import {
   getSkillTierInfo,
   MummyAdaptiveProfile,
 } from './adaptiveDifficulty';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 import {
   RotateCcw,
   Undo2,

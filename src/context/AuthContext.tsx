@@ -1,8 +1,9 @@
 import { SYNC } from '../services/syncPolicy';
 import { PasswordRecoveryScreen } from '../components/PasswordRecoveryScreen';
 import { getRecoveryState, clearRecovery } from '../services/authRecovery';
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { EntryScreen } from '../components/EntryScreen';
+import React, { createContext, useContext, useState, useEffect, useCallback, Suspense } from 'react';
+// Rarely shown (the launcher opens directly); loaded on demand and precached for offline use.
+const EntryScreen = React.lazy(() => import('../components/EntryScreen').then(m => ({ default: m.EntryScreen })));
 import { SplashScreen } from '../components/SplashScreen';
 import type { UserAccount } from '../types';
 import { AuthService, type RegisterParams, type AuthResult } from '../services/auth';
@@ -85,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {restoreError && <button type="button" onClick={retry} className="w-full rounded-xl bg-indigo-600 p-3 font-semibold">Thử lại kết nối</button>}
         <button id="btn-auth-loading-guest" type="button" onClick={async () => { const result = await continueAsGuest(); if (result.success) {setBooted(true);setEntered(true);} }} className="w-full rounded-xl border border-white/15 p-3 font-semibold">Chơi như khách</button>
       </div>
-    </div> : !entered ? <EntryScreen onEnter={() => setEntered(true)}/> : <React.Fragment key={revision}>{children}</React.Fragment>}
+    </div> : !entered ? <Suspense fallback={null}><EntryScreen onEnter={() => setEntered(true)}/></Suspense> : <React.Fragment key={revision}>{children}</React.Fragment>}
   </AuthContext.Provider>;
 };
 export function useAuth(): AuthContextType {

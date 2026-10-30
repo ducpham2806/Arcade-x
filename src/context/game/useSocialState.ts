@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 import type { Friend, FriendChallenge, PlayerProfile } from '../../types';
 import { StorageService } from '../../services/storage';
 import { SupabaseService } from '../../services/supabase';

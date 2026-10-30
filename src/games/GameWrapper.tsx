@@ -45,7 +45,7 @@ import {
   Maximize2,
   Minimize2,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import confetti from '../utils/confetti';
 import { soundEngine } from '../services/audio';
 
 interface GameWrapperProps {

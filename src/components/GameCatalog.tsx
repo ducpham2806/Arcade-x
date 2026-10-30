@@ -8,7 +8,7 @@ import {GameArtwork} from '../visuals/gameArt';
 import {FeaturedCarousel} from '../launcher/FeaturedCarousel';
 import {LazyGameCard} from './common/LazyGameCard';
 import {accessPreviewEnabled} from '../commerce/api';
-import {StoreModal} from '../commerce/StoreModal';
+import {StoreModal} from '../commerce/LazyStoreModal';
 const categories=[['Tất Cả','Tất cả'],['Yêu Thích','Yêu thích'],['Puzzle','Giải đố'],['Arcade','Arcade'],['Action','Hành động'],['Reflex','Phản xạ'],['Multiplayer','Đối kháng']];
 const initialFilter=()=>{try{return JSON.parse(sessionStorage.getItem('launcher_library_filter')||'{}');}catch{return {};}};
 const GameCatalogView:React.FC=()=>{

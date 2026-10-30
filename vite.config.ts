@@ -13,7 +13,9 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       { name: 'launcher-shell-only', generateBundle(_options, bundle) {
-        // Follow static imports only. Dynamic game chunks are independent download packages.
+        // Follow static imports, plus lazily loaded launcher UI (modals, chat, store, confetti, game
+        // asset lists) so it still works offline. Dynamic game chunks are independent download packages.
+        const launcherUi = /[\\/]src[\\/](components|commerce|launcher|data)[\\/]|[\\/]src[\\/]games[\\/]packageAssets\.json$|[\\/]node_modules[\\/]canvas-confetti[\\/]/;
         const visit = (name: string) => {
           if (shellFiles.has(name)) return;
           const chunk = bundle[name]; if (!chunk || chunk.type !== 'chunk') return;
@@ -22,6 +24,10 @@ export default defineConfig(() => {
           metadata?.importedCss.forEach(css => shellFiles.add(css));
           metadata?.importedAssets.forEach(asset => shellFiles.add(asset));
           chunk.imports.forEach(visit);
+          chunk.dynamicImports.forEach(dynamic => {
+            const target = bundle[dynamic];
+            if (target?.type === 'chunk' && target.facadeModuleId && launcherUi.test(target.facadeModuleId)) visit(dynamic);
+          });
         };
         Object.values(bundle).forEach(chunk => { if (chunk.type === 'chunk' && chunk.isEntry) visit(chunk.fileName); });
       } },
@@ -92,7 +98,7 @@ export default defineConfig(() => {
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/preview\/snake(?:\/|$)/, /^\/chronicles-realms\//, /^\/standalone\//],
           runtimeCaching: [
-            ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
+            ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'games/word-cross', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
               handler: 'CacheFirst' as const,
               options: { cacheName: GAME_ASSET_CACHE, expiration: { maxEntries: 1200, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },
@@ -162,6 +168,20 @@ export default defineConfig(() => {
         },
       }),
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          // Long-lived vendor chunks: a release that only changes app code keeps these cached.
+          manualChunks(id: string) {
+            if (!id.includes('/node_modules/')) return undefined;
+            if (/\/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor-react';
+            if (/\/node_modules\/(@supabase|iceberg-js)\//.test(id)) return 'vendor-supabase';
+            if (/\/node_modules\/(motion|framer-motion|motion-dom|motion-utils)\//.test(id)) return 'vendor-motion';
+            return undefined;
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

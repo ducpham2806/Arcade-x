@@ -20,7 +20,7 @@ import {
   Shuffle,
   CheckCircle2,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 
 export const FillTheSpaceGame: React.FC<GameComponentProps> = ({
   bridge,

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { GameComponentProps } from '../../types';
 import { usePlayer } from '../../context/PlayerContext';
 import { Trophy, ArrowRight, RefreshCw, Star, Clock, Target, Edit3, Grid, Play, Home, Settings, Lightbulb } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import confetti from '../../utils/confetti';
 
 interface Point { r: number; c: number }
 interface Seed { id: number; r: number; c: number; size: number; color: string }

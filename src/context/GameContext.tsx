@@ -11,7 +11,7 @@ import { NotificationService } from '../services/notificationService';
 import { soundEngine, audioManager, MusicTheme } from '../services/audio';
 import { hapticService } from '../services/haptics';
 import { usePlayer } from './PlayerContext';
-import confetti from 'canvas-confetti';
+import confetti from '../utils/confetti';
 import { useLauncher } from '../launcher/LauncherContext';
 import { useAudioSettingsState } from './game/useAudioSettingsState';
 import { useSocialState } from './game/useSocialState';

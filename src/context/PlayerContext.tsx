@@ -4,7 +4,7 @@ import { StorageService, getExpNeededForLevel, getStreakMultiplier } from '../se
 import { SupabaseService } from '../services/supabase';
 import { soundEngine } from '../services/audio';
 import { hapticService } from '../services/haptics';
-import confetti from 'canvas-confetti';
+import confetti from '../utils/confetti';
 
 interface LevelUpInfo {
   newLevel: number;
