@@ -15,6 +15,7 @@ import confetti from 'canvas-confetti';
 import { useLauncher } from '../launcher/LauncherContext';
 import { useAudioSettingsState } from './game/useAudioSettingsState';
 import { useSocialState } from './game/useSocialState';
+import { useShallowStable } from './useShallowStable';
 
 export type { ActiveModal };
 
@@ -128,15 +129,6 @@ const AudioSettingsContext = createContext<AudioSettingsSlice | null>(null);
 const ProgressionContext = createContext<ProgressionSlice | null>(null);
 const SocialContext = createContext<SocialSlice | null>(null);
 
-/** Returns the previous object while every field is still identical (Object.is). */
-function useShallowStable<T extends object>(value: T): T {
-  const ref = useRef(value);
-  const prev = ref.current as Record<string, unknown>;
-  const next = value as Record<string, unknown>;
-  const keys = Object.keys(next);
-  if (keys.length !== Object.keys(prev).length || keys.some(k => !Object.is(prev[k], next[k]))) ref.current = value;
-  return ref.current;
-}
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { profile, addCoins, addGems, addExp } = usePlayer();
