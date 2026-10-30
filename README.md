@@ -1,50 +1,66 @@
-# Arcade-x · Source mới nhất · 13/10/2026
+# ArcadeX · 2.12.x
 
-Gói source hợp nhất các game hiện có, Blossom Blast v0.8 và UI/UX launcher mới nhất. Đã bổ sung Rainbow Blocks (5 chế độ offline) và carousel 6 slide, chuyển mỗi 15 giây. Bản source hợp nhất; phát hành Netlify được thực hiện riêng.
+Launcher mini-game dạng PWA (React 19 + Vite + Supabase) với 22 game, chơi được offline và đồng bộ tài khoản. Quy tắc giao diện và trải nghiệm trong game nằm ở `AGENTS.md`.
 
 ## Chạy và build
 
-Dùng Node.js 24. Giải nén, mở terminal trong thư mục `Arcade-x`:
+Dùng Node.js 24 (`.nvmrc`).
 
 ```bash
 npm ci
-npm run lint
-npm run build
-npm run dev
+npm run dev        # http://localhost:3000
+npm run lint       # tsc --noEmit
+npm run build      # dist/
 ```
 
-Website build nằm trong `dist` sau khi chạy build. Gói ZIP chỉ chứa source; không chứa `node_modules` hoặc bản build cũ.
+Muốn kết nối backend riêng: sao chép `.env.example` thành `.env.local`, điền URL và publishable key của project Supabase. Không dùng mật khẩu database hoặc service-role key trong frontend. Các flag `VITE_*` của commerce mặc định tắt. SQL migrations và Edge Functions trong `supabase/` là backend đã triển khai, giữ để tham khảo hoặc cài mới; không chạy lại migrations lên project đang dùng.
 
-Nếu cần kết nối backend, sao chép `.env.example` thành `.env.local`, điền URL và publishable key của project Supabase hiện có. Không dùng mật khẩu database hoặc service-role key trong frontend. SQL migrations/Edge Function trong `supabase/` là backend đã có, được giữ để tham khảo/cài mới; không chạy lại migrations lên project đang dùng.
+Netlify build bằng `npm run build`; deploy preview chạy thêm `lint` và `build:snake-preview`. Cấu hình Vercel nằm ở `vercel.json`.
 
-## Bản duyệt và kiểm thử
+## Cấu trúc
 
-```bash
-npm run preview:blossom
-npm run preview:launcher
-npm run preview:rainbow
-npx playwright install chromium
-npm run test:blossom
-npm run test:rainbow
-npx playwright test tests/launcher
-```
+| Thư mục | Nội dung |
+|---|---|
+| `src/App.tsx`, `src/launcher/` | Khung launcher, thư viện game, carousel |
+| `src/context/` | `GameContext` (chia slice: `useGameSession`, `useLauncherUi`, `useLibrary`, `useAudioSettings`, `useProgression`, `useSocial`), `PlayerContext`, `InventoryContext`, `AuthContext` |
+| `src/services/storage/` | `StorageService` (localStorage) chia theo domain, dữ liệu mặc định trong `catalog/` |
+| `src/services/supabase/` | `SupabaseService`: chat, đồng bộ cloud, bảng xếp hạng, bạn bè |
+| `src/games/` | Mỗi game một thư mục; `registry.ts` đăng ký, `gamePackages.tsx` tải gói theo nhu cầu, `packageAssets.json` liệt kê asset từng gói |
+| `src/commerce/`, `server/commerce/`, `shared/` | Thuê game, thanh toán, duyệt admin (đang tắt bằng flag) |
+| `supabase/` | Migrations, Edge Functions (`battleship-room`, `cosmic-verify`), SQL Battleship và mạng xã hội |
+| `public/` | Asset tĩnh: art launcher, asset game, từ điển Word Cross (`games/word-cross/lexicon.v1.json`) |
+| `standalone/` | Game build sẵn nhúng vào launcher (Chronicles Realms) |
+| `preview/` | Bản preview riêng (Snake Legend, gallery Dungeon) |
+| `art/` | Art nguồn: `launcher/`, `dungeon-titan/source-v5\|v6`, `block-breaker/boss-v6` |
+| `review/` | Trang duyệt tĩnh: gallery art toàn bộ game, `demos/` (blocker, chess, mummy-escape) |
+| `scripts/`, `tests/`, `docs/` | Công cụ build/export, kiểm thử, tài liệu thiết kế từng game |
 
-Các file HTML duyệt được sinh ở thư mục cha của source. Bản launcher HTML phục vụ duyệt giao diện, banner và Rainbow Blocks; các game có worker/asset ngoài cần chạy bằng dev server. Có thể đặt `CHROMIUM_EXECUTABLE` nếu dùng Chromium đã cài trên máy. Các kiểm tra SQL yêu cầu Docker và chạy trong database test riêng; không kết nối production.
+Cosmic Defend giữ các engine `legacy-*` có chủ đích: engine hiện tại xây trên chúng và `cosmic-verify` vẫn replay vé phiên bản cũ.
 
-## Đã dọn
+## Kiểm thử
 
-59 file source không được runtime hoặc kiểm tra liên quan sử dụng; 321 bản SVG trùng/sprite animation chưa được renderer sử dụng; 3 dependency trực tiếp không dùng (d3, @types/d3, clsx). Các game và dữ liệu màn chơi đang được launcher đăng ký đều được giữ. Các asset PNG động theo chương, style, mùa và cốt truyện được giữ để tránh thiếu tài nguyên.
+CI (`.github/workflows/ci.yml`) chạy trên mọi PR: `lint` → `build` → `test:bundle` → `test:fast` → `test:perf` → `test:smoke` → `test:offline`, rồi kiểm tra không còn file sinh ra bị bỏ lại.
 
-Đã khôi phục 61 tài nguyên gốc Cosmic Defend/PWA, cấu hình Netlify/Vercel và backend từ repository hiện có. Không kèm script patch cũ, dump thử nghiệm, lịch sử Git, screenshot, báo cáo Playwright hoặc file môi trường có giá trị thật. Xem `docs/CLEANUP.json` để biết các đường dẫn đã dọn.
+| Lệnh | Phạm vi |
+|---|---|
+| `npm run test:fast` | Các bộ không cần trình duyệt hay Docker: readability, tương thích save (`test:storage`), sync, commerce, subscriptions, battleship, duel, social, artwork, cosmic, startup/PWA, boom, eat, dungeon, full-release |
+| `npm run test:smoke` | Luồng launcher trên bản build: yêu thích, chi tiết game, âm thanh, chat, vào/thoát game, Word Cross |
+| `npm run test:offline` | Tắt mạng sau khi service worker precache: tải lại, mở modal, chơi game đã cache |
+| `npm run test:perf` | Launcher đứng yên không vượt 20 lượt render/giây |
+| `npm run test:bundle` | Không chunk nào > 500 kB, JS tải đầu ≤ 400 kB gzip |
+| `npm run analyze:bundle`, `npm run perf:first-load` | Báo cáo bundle và dung lượng lần tải đầu |
+| `npm run test:supabase` | SQL fixtures; cần Docker, chạy trên database test riêng, không kết nối production |
 
-## Kiểm chứng gói
+`test:perf`, `test:smoke`, `test:offline` cần `npm run build` trước và Chromium (`npx playwright install chromium`, hoặc đặt `CHROMIUM_EXECUTABLE`). Một số bộ Playwright cũ (`tests/launcher`, `tests/auth/entry`, `tests/blossom/launcher`) đang lệch so với giao diện hiện tại và fail cả trên bản gốc 2.12.2.
 
-TypeScript và production build thành công trực tiếp từ thư mục source đã dọn. 75 kiểm tra Blossom Blast/launcher đạt (1.8 phút), gồm mobile/desktop, 100 popup chuẩn bị, VFX, lưu tiến trình, garden và các bản HTML offline. Các game khác được giữ trong dependency graph và build thành công; chưa chạy lại toàn bộ kiểm thử gameplay của các game khác hay kiểm thử backend trong lượt đóng gói này.
+`tests/storage/*-golden.json` ghi lại hành vi của `StorageService` và `SupabaseService`; chỉ cập nhật bằng `--update` khi cố ý đổi hành vi lưu trữ.
 
-Lượt bổ sung Rainbow Blocks: typecheck và build đạt, 29 kiểm thử Rainbow/launcher theme/Blossom UI đạt (2 phút).
+## Bản duyệt và file sinh ra
 
-Xem `docs/RAINBOW-BLOCKS.md` để biết phạm vi Rainbow Blocks, bản kỷ lục trên thiết bị và những hạng mục online chờ triển khai.
+- `npm run preview:blossom`, `preview:rainbow`, `preview:launcher`, `preview:eat`, `preview:battleship`: bản duyệt từng phần.
+- `npm run export:dungeon-review`: sinh `dungeon-titan-equipment-v6-3-playtest.html` một file, chạy offline (không lưu trong git).
+- `blossom-review.html`, `eat-review.html` ở thư mục gốc là trang entry cho dev server (`/blossom-review.html`).
 
-`SOURCE-MANIFEST.json` ghi SHA-256 các file source để kiểm tra tính toàn vẹn.
+## Lịch sử
 
-Cập nhật popup chuẩn bị Rainbow Blocks: khung cố định giữa các mode, công tắc dự đoán vị trí rơi có lưu lựa chọn; hồ sơ mới mặc định tắt. 26 kiểm thử Rainbow đạt trên bản cập nhật.
+Ghi chú phát hành 2.12.0 ở `docs/RELEASE-2.12.0.md`, kèm mã SHA-256 các file nguồn lúc đó trong `docs/RELEASE-2.12.0-SOURCE-MANIFEST.json`. Các đường dẫn đã dọn trong lần đóng gói trước nằm ở `docs/CLEANUP.json`.
