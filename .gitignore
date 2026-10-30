@@ -11,3 +11,6 @@ playwright-report/
 # This standalone game keeps authored source in dist/.
 !standalone/chronicles-realms/dist/
 !standalone/chronicles-realms/dist/**
+
+# Temporary bundles written by scripts/test-eat-journey.mjs
+.eat-test-tmp/

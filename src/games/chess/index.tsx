@@ -524,12 +524,15 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
           calculateCapturedPieces(chessInstanceRef.current);
 
           if (roomState.lastMove && roomState.lastMove.by !== profile.id) {
-            setLastMovedSquare({ from: roomState.lastMove.from, to: roomState.lastMove.to });
-            if (roomState.lastMove.captured) {
+            // Chess rooms record moves as algebraic squares; skip highlight/VFX for any other shape.
+            const { from, to } = roomState.lastMove;
+            const hasSquares = typeof from === 'string' && typeof to === 'string';
+            if (hasSquares) setLastMovedSquare({ from: from as Square, to: to as Square });
+            if (hasSquares && roomState.lastMove.captured) {
               const oppColor: Color = myColor === 'w' ? 'b' : 'w';
               triggerEpicCaptureEffect(
-                roomState.lastMove.from,
-                roomState.lastMove.to,
+                from as Square,
+                to as Square,
                 (roomState.lastMove.piece as PieceSymbol) || 'q',
                 oppColor,
                 (roomState.lastMove.captured as PieceSymbol) || 'p',
