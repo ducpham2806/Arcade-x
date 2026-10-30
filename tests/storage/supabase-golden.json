@@ -1,11 +1,9 @@
 {
  "methods": [
   "getDb",
-  "getLocalChatMessages",
   "loadGameSessionFromCloud",
   "loadInventoryFromCloud",
   "respondToFriendChallenge",
-  "saveLocalChatMessage",
   "searchPlayers",
   "sendChatMessage",
   "sendFriendChallenge",

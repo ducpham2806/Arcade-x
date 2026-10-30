@@ -11,7 +11,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 
 const GOLDEN = path.resolve('tests/storage/supabase-golden.json');
-const ENTRY = process.argv.find(a => a.startsWith('--entry='))?.slice(8) || 'src/services/supabase.ts';
+const ENTRY = process.argv.find(a => a.startsWith('--entry='))?.slice(8) || 'src/services/supabase/index.ts';
 const update = process.argv.includes('--update');
 
 const store = new Map();
