@@ -34,6 +34,8 @@ jobs:
         run: npm run test:perf
       - name: Launcher smoke flows
         run: npm run test:smoke
+      - name: Every game launches, takes input and exits
+        run: npm run test:games
       - name: Offline launcher shell
         run: npm run test:offline
       - name: Modal frame (AGENTS.md sizing)
