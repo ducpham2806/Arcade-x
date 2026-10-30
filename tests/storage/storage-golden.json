@@ -9,7 +9,6 @@
   "clearPausedGame",
   "exportData",
   "exportDataBackup",
-  "generateDailySeedEntries",
   "getDailyPersonalBest",
   "getDailyResetCountdown",
   "getTodayDateString",

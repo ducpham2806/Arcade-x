@@ -40,7 +40,7 @@ const dir = await mkdtemp(path.join(tmpdir(), 'arcadex-storage-'));
 let mod;
 try {
   const outfile = path.join(dir, 'storage.mjs');
-  await build({entryPoints: ['src/services/storage.ts'], bundle: true, platform: 'node', format: 'esm', outfile, logLevel: 'silent'});
+  await build({entryPoints: ['src/services/storage/index.ts'], bundle: true, platform: 'node', format: 'esm', outfile, logLevel: 'silent'});
   mod = await import(pathToFileURL(outfile).href);
 } finally {
   await rm(dir, {recursive: true, force: true});
