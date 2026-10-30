@@ -48,6 +48,7 @@
     "test:sync": "node --test tests/sync/efficiency.mjs",
     "test:storage": "node tests/storage/compat.mjs && node tests/storage/supabase-compat.mjs",
     "test:perf": "node tests/perf/launcher-idle-renders.cjs --window=12 --max-renders-per-sec=20",
+    "test:smoke": "node tests/smoke/launcher-flows.cjs",
     "build:snake-preview": "vite build --config vite.snake-preview.config.ts",
     "test:snake-preview": "node tests/snake/preview-package.mjs"
   },

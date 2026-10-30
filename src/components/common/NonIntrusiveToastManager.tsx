@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Swords, Check, X, Trophy, Coins, Gem, Sparkles, CheckCircle2 } from 'lucide-react';
-import { useGame } from '../../context/GameContext';
+import { useSocial } from '../../context/GameContext';
 import { soundEngine } from '../../services/audio';
 import { hapticService } from '../../services/haptics';
 import { FriendChallenge } from '../../types';
@@ -32,7 +32,7 @@ interface ToastItem {
 }
 
 export const NonIntrusiveToastManager: React.FC = () => {
-  const { activeIncomingChallenge, respondToIncomingChallenge, dismissIncomingChallenge } = useGame();
+  const { activeIncomingChallenge, respondToIncomingChallenge, dismissIncomingChallenge } = useSocial();
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const processedPvPIdsRef = useRef<Set<string>>(new Set());
 

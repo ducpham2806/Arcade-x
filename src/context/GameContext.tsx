@@ -114,6 +114,30 @@ interface GameContextType {
 
 const GameContext = createContext<GameContextType | null>(null);
 
+export type GameSessionSlice = Pick<GameContextType, 'activeGameId' | 'launchGame' | 'isPracticeMode' | 'isDailyChallengeMode' | 'setIsDailyChallengeMode' | 'exitGame' | 'pausedGameSession' | 'saveAndSuspendGame' | 'autoSaveGameSession' | 'resumePausedGame' | 'discardPausedGame' | 'submitGameScore' | 'comboMultiplier' | 'triggerComboBoost' | 'triggerConfetti'>;
+export type LauncherUiSlice = Pick<GameContextType, 'activeModal' | 'setActiveModal' | 'shareData' | 'openShareModal' | 'closeShareModal' | 'isChatOpen' | 'toggleChat' | 'openChat' | 'targetAchievementCategory' | 'setTargetAchievementCategory' | 'selectedGameForDetail' | 'closeGameDetail' | 'viewingProfileData' | 'openPublicProfile' | 'closePublicProfile' | 'isOnboardingActive' | 'startOnboarding' | 'finishOnboarding'>;
+export type LibrarySlice = Pick<GameContextType, 'favorites' | 'toggleFavorite' | 'recentlyPlayed' | 'openGameDetail'>;
+export type AudioSettingsSlice = Pick<GameContextType, 'isSoundMuted' | 'toggleSound' | 'soundVolume' | 'setSoundVolume' | 'isMusicMuted' | 'toggleMusic' | 'musicVolume' | 'setMusicVolume' | 'musicTheme' | 'setMusicTheme' | 'playBGM' | 'stopBGM' | 'playTestTone'>;
+export type ProgressionSlice = Pick<GameContextType, 'achievements' | 'dailyQuests' | 'friendQuests' | 'claimFriendQuest' | 'weeklyQuests' | 'weeklyMilestones' | 'weeklyPoints' | 'claimWeeklyQuest' | 'claimWeeklyMilestoneReward' | 'reportWeeklyQuestProgress' | 'leaderboards' | 'reportAchievementProgress' | 'claimAchievement' | 'reportQuestProgress' | 'claimDailyQuest' | 'generateNewDailyQuests' | 'dailyChallenge' | 'dailyChallenges' | 'launchDailyChallenge' | 'claimDailyChallenge' | 'recordDailyChallengeAttempt' | 'unlockedAchievement' | 'dismissUnlockedAchievement' | 'activeQuestToast' | 'dismissQuestToast'>;
+export type SocialSlice = Pick<GameContextType, 'friends' | 'addFriend' | 'addFriendByUsername' | 'removeFriend' | 'sendGiftToFriend' | 'sendFriendChallenge' | 'incomingChallenges' | 'activeIncomingChallenge' | 'dismissIncomingChallenge' | 'respondToIncomingChallenge' | 'triggerTestPvPChallenge'>;
+
+const GameSessionContext = createContext<GameSessionSlice | null>(null);
+const LauncherUiContext = createContext<LauncherUiSlice | null>(null);
+const LibraryContext = createContext<LibrarySlice | null>(null);
+const AudioSettingsContext = createContext<AudioSettingsSlice | null>(null);
+const ProgressionContext = createContext<ProgressionSlice | null>(null);
+const SocialContext = createContext<SocialSlice | null>(null);
+
+/** Returns the previous object while every field is still identical (Object.is). */
+function useShallowStable<T extends object>(value: T): T {
+  const ref = useRef(value);
+  const prev = ref.current as Record<string, unknown>;
+  const next = value as Record<string, unknown>;
+  const keys = Object.keys(next);
+  if (keys.length !== Object.keys(prev).length || keys.some(k => !Object.is(prev[k], next[k]))) ref.current = value;
+  return ref.current;
+}
+
 const sameChallenges = (a: FriendChallenge[], b: FriendChallenge[]) =>
   a.length === b.length && a.every((c, i) => c.id === b[i].id && c.status === b[i].status && c.expiresAt === b[i].expiresAt);
 
@@ -275,13 +299,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [incomingChallenges, setIncomingChallenges] = useState<FriendChallenge[]>([]);
   const [activeIncomingChallenge, setActiveIncomingChallenge] = useState<FriendChallenge | null>(null);
 
-  const presenceProfile = useRef(profile);
-  presenceProfile.current = profile;
+  const latestProfile = useRef(profile);
+  latestProfile.current = profile;
   // Heartbeat Presence Broadcast (Keep user alive in Supabase)
   useEffect(() => {
     if (!profile?.id) return;
     const activity = activeGameId ? `Đang chơi ${activeGameId}` : 'Đang ở Sảnh Arcade';
-    const heartbeat = () => { if (!document.hidden && navigator.onLine) void SupabaseService.updatePlayerPresence(presenceProfile.current, activity); };
+    const heartbeat = () => { if (!document.hidden && navigator.onLine) void SupabaseService.updatePlayerPresence(latestProfile.current, activity); };
     heartbeat();
     const interval = setInterval(heartbeat, SYNC.presence);
     return () => clearInterval(interval);
@@ -1037,10 +1061,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setViewingProfileData(null);
   }, []);
 
+  // Reads the latest profile through a ref so coin/exp changes do not replace the callback
+  // (and with it the GameSession slice) mid-game.
   const submitGameScore = useCallback(async (gameId: string, score: number, extraStats?: Record<string, any>) => {
-    await SupabaseService.submitLeaderboardScore(gameId, profile.username, score, profile.avatar, profile.currentTitle, extraStats);
+    const current = latestProfile.current;
+    await SupabaseService.submitLeaderboardScore(gameId, current.username, score, current.avatar, current.currentTitle, extraStats);
     setLeaderboards(StorageService.loadLeaderboards());
-  }, [profile]);
+  }, []);
 
   const openShareModal = useCallback((data: ShareData) => {
     soundEngine.play('click');
@@ -1065,189 +1092,57 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsChatOpen(true);
   }, []);
 
+  // Each slice keeps its identity until one of its own fields changes, so consumers of a
+  // narrow hook (useGameSession, useLauncherUi, ...) skip unrelated updates.
+  const session = useShallowStable<GameSessionSlice>({
+    activeGameId, launchGame, isPracticeMode, isDailyChallengeMode, setIsDailyChallengeMode, exitGame,
+    pausedGameSession, saveAndSuspendGame, autoSaveGameSession, resumePausedGame, discardPausedGame, submitGameScore,
+    comboMultiplier, triggerComboBoost, triggerConfetti,
+  });
+  const launcherUi = useShallowStable<LauncherUiSlice>({
+    activeModal, setActiveModal, shareData, openShareModal, closeShareModal, isChatOpen,
+    toggleChat, openChat, targetAchievementCategory, setTargetAchievementCategory, selectedGameForDetail, closeGameDetail,
+    viewingProfileData, openPublicProfile, closePublicProfile, isOnboardingActive, startOnboarding, finishOnboarding,
+  });
+  const library = useShallowStable<LibrarySlice>({
+    favorites, toggleFavorite, recentlyPlayed, openGameDetail,
+  });
+  const audio = useShallowStable<AudioSettingsSlice>({
+    isSoundMuted, toggleSound, soundVolume, setSoundVolume, isMusicMuted, toggleMusic,
+    musicVolume, setMusicVolume, musicTheme, setMusicTheme, playBGM, stopBGM,
+    playTestTone,
+  });
+  const progression = useShallowStable<ProgressionSlice>({
+    achievements, dailyQuests, friendQuests, claimFriendQuest, weeklyQuests, weeklyMilestones,
+    weeklyPoints, claimWeeklyQuest, claimWeeklyMilestoneReward, reportWeeklyQuestProgress, leaderboards, reportAchievementProgress,
+    claimAchievement, reportQuestProgress, claimDailyQuest, generateNewDailyQuests, dailyChallenge, dailyChallenges,
+    launchDailyChallenge, claimDailyChallenge, recordDailyChallengeAttempt, unlockedAchievement, dismissUnlockedAchievement, activeQuestToast,
+    dismissQuestToast,
+  });
+  const social = useShallowStable<SocialSlice>({
+    friends, addFriend, addFriendByUsername, removeFriend, sendGiftToFriend, sendFriendChallenge,
+    incomingChallenges, activeIncomingChallenge, dismissIncomingChallenge, respondToIncomingChallenge, triggerTestPvPChallenge,
+  });
   const contextValue = useMemo<GameContextType>(
-    () => ({
-      activeGameId,
-      activeModal,
-      setActiveModal,
-      launchGame,
-      isPracticeMode,
-      exitGame,
-      achievements,
-      dailyQuests,
-      generateNewDailyQuests,
-      // Weekly Quests & Milestones
-      weeklyQuests,
-      weeklyMilestones,
-      weeklyPoints,
-      claimWeeklyQuest,
-      claimWeeklyMilestoneReward,
-      reportWeeklyQuestProgress,
-      // Friends & Challenges
-      friends,
-      addFriend,
-      addFriendByUsername,
-      removeFriend,
-      sendGiftToFriend,
-      sendFriendChallenge,
-      incomingChallenges,
-      activeIncomingChallenge,
-      dismissIncomingChallenge,
-      respondToIncomingChallenge,
-      triggerTestPvPChallenge,
-      viewingProfileData,
-      openPublicProfile,
-      closePublicProfile,
-      leaderboards,
-      reportAchievementProgress,
-      claimAchievement,
-      reportQuestProgress,
-      claimDailyQuest,
-      friendQuests,
-      claimFriendQuest,
-      isSoundMuted,
-      toggleSound,
-      soundVolume,
-      setSoundVolume,
-      isMusicMuted,
-      toggleMusic,
-      musicVolume,
-      setMusicVolume,
-      musicTheme,
-      setMusicTheme,
-      playBGM,
-      stopBGM,
-      playTestTone,
-      triggerConfetti,
-      submitGameScore,
-      shareData,
-      openShareModal,
-      closeShareModal,
-      isChatOpen,
-      toggleChat,
-      openChat,
-      targetAchievementCategory,
-      setTargetAchievementCategory,
-      favorites,
-      toggleFavorite,
-      recentlyPlayed,
-      selectedGameForDetail,
-      openGameDetail,
-      closeGameDetail,
-      isDailyChallengeMode,
-      setIsDailyChallengeMode,
-      dailyChallenge,
-      dailyChallenges,
-      launchDailyChallenge,
-      claimDailyChallenge,
-      recordDailyChallengeAttempt,
-      pausedGameSession,
-      saveAndSuspendGame,
-      autoSaveGameSession,
-      resumePausedGame,
-      discardPausedGame,
-      unlockedAchievement,
-      dismissUnlockedAchievement,
-      isOnboardingActive,
-      startOnboarding,
-      finishOnboarding,
-      comboMultiplier,
-      triggerComboBoost,
-      activeQuestToast,
-      dismissQuestToast,
-    }),
-    [
-      activeGameId,
-      activeModal,
-      setActiveModal,
-      launchGame,
-      isPracticeMode,
-      exitGame,
-      achievements,
-      dailyQuests,
-      generateNewDailyQuests,
-      weeklyQuests,
-      weeklyMilestones,
-      weeklyPoints,
-      claimWeeklyQuest,
-      claimWeeklyMilestoneReward,
-      reportWeeklyQuestProgress,
-      friends,
-      addFriend,
-      addFriendByUsername,
-      removeFriend,
-      sendFriendChallenge,
-      incomingChallenges,
-      activeIncomingChallenge,
-      dismissIncomingChallenge,
-      respondToIncomingChallenge,
-      triggerTestPvPChallenge,
-      viewingProfileData,
-      openPublicProfile,
-      closePublicProfile,
-      leaderboards,
-      reportAchievementProgress,
-      claimAchievement,
-      reportQuestProgress,
-      claimDailyQuest,
-      friendQuests,
-      claimFriendQuest,
-      isSoundMuted,
-      toggleSound,
-      soundVolume,
-      setSoundVolume,
-      isMusicMuted,
-      toggleMusic,
-      musicVolume,
-      setMusicVolume,
-      musicTheme,
-      setMusicTheme,
-      playBGM,
-      stopBGM,
-      playTestTone,
-      triggerConfetti,
-      submitGameScore,
-      shareData,
-      openShareModal,
-      closeShareModal,
-      isChatOpen,
-      toggleChat,
-      openChat,
-      targetAchievementCategory,
-      setTargetAchievementCategory,
-      favorites,
-      toggleFavorite,
-      recentlyPlayed,
-      selectedGameForDetail,
-      openGameDetail,
-      closeGameDetail,
-      isDailyChallengeMode,
-      setIsDailyChallengeMode,
-      dailyChallenge,
-      dailyChallenges,
-      launchDailyChallenge,
-      claimDailyChallenge,
-      recordDailyChallengeAttempt,
-      pausedGameSession,
-      saveAndSuspendGame,
-      autoSaveGameSession,
-      resumePausedGame,
-      discardPausedGame,
-      unlockedAchievement,
-      dismissUnlockedAchievement,
-      isOnboardingActive,
-      startOnboarding,
-      finishOnboarding,
-      comboMultiplier,
-      triggerComboBoost,
-      activeQuestToast,
-      dismissQuestToast,
-    ]
+    () => ({ ...session, ...launcherUi, ...library, ...audio, ...progression, ...social }),
+    [session, launcherUi, library, audio, progression, social]
   );
 
   return (
     <GameContext.Provider value={contextValue}>
-      {children}
+      <GameSessionContext.Provider value={session}>
+        <LauncherUiContext.Provider value={launcherUi}>
+          <LibraryContext.Provider value={library}>
+            <AudioSettingsContext.Provider value={audio}>
+              <ProgressionContext.Provider value={progression}>
+                <SocialContext.Provider value={social}>
+                  {children}
+                </SocialContext.Provider>
+              </ProgressionContext.Provider>
+            </AudioSettingsContext.Provider>
+          </LibraryContext.Provider>
+        </LauncherUiContext.Provider>
+      </GameSessionContext.Provider>
     </GameContext.Provider>
   );
 };
@@ -1260,4 +1155,38 @@ export const useGame = (): GameContextType => {
   return context;
 };
 
+export const useGameSession = (): GameSessionSlice => {
+  const context = useContext(GameSessionContext);
+  if (!context) throw new Error('useGameSession must be used within GameProvider');
+  return context;
+};
 
+export const useLauncherUi = (): LauncherUiSlice => {
+  const context = useContext(LauncherUiContext);
+  if (!context) throw new Error('useLauncherUi must be used within GameProvider');
+  return context;
+};
+
+export const useAudioSettings = (): AudioSettingsSlice => {
+  const context = useContext(AudioSettingsContext);
+  if (!context) throw new Error('useAudioSettings must be used within GameProvider');
+  return context;
+};
+
+export const useProgression = (): ProgressionSlice => {
+  const context = useContext(ProgressionContext);
+  if (!context) throw new Error('useProgression must be used within GameProvider');
+  return context;
+};
+
+export const useSocial = (): SocialSlice => {
+  const context = useContext(SocialContext);
+  if (!context) throw new Error('useSocial must be used within GameProvider');
+  return context;
+};
+
+export const useLibrary = (): LibrarySlice => {
+  const context = useContext(LibraryContext);
+  if (!context) throw new Error('useLibrary must be used within GameProvider');
+  return context;
+};

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Trophy } from "lucide-react";
-import { useGame } from "../context/GameContext";
+import { useLauncherUi } from "../context/GameContext";
 import { usePlayer } from "../context/PlayerContext";
 import { ALL_GAMES_LIST, GAME_REGISTRY } from "../games/registry";
 import { SupabaseService } from "../services/supabase";
@@ -15,7 +15,7 @@ import { CloseButton } from "./common/CloseButton";
 export const LeaderboardModal: React.FC<{ initialGameId?: string }> = ({
   initialGameId,
 }) => {
-  const { setActiveModal } = useGame();
+  const { setActiveModal } = useLauncherUi();
   const { profile } = usePlayer();
   const [gameId, setGameId] = useState(
     initialGameId && GAME_REGISTRY[initialGameId]

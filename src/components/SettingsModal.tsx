@@ -5,13 +5,13 @@ import {AccessAdmin,AccessAdminEntry} from '../commerce/AccessAdmin';
 import {audioManager} from '../services/audio';
 import React,{useState} from 'react';
 import {X,Download,RefreshCw} from 'lucide-react';
-import {useGame} from '../context/GameContext';
+import { useAudioSettings, useLauncherUi } from '../context/GameContext';
 import {hapticService} from '../services/haptics';
 import {CURRENT_APP_VERSION,isAutoUpdateEnabled,setAutoUpdateEnabled} from '../services/updateService';
 import {checkForUpdate} from '../services/pwaLifecycle';
 import {useDialogFocus} from '../launcher/useDialogFocus';
 export const SettingsModal:React.FC=()=>{
- const {setActiveModal,isSoundMuted,toggleSound,soundVolume,setSoundVolume,isMusicMuted,toggleMusic,musicVolume,setMusicVolume}=useGame();
+ const {setActiveModal} = useLauncherUi(); const {isSoundMuted,toggleSound,soundVolume,setSoundVolume,isMusicMuted,toggleMusic,musicVolume,setMusicVolume} = useAudioSettings();
  const [automatic,setAutomatic]=useState(isAutoUpdateEnabled);const [vibration,setVibration]=useState(()=>hapticService.isEnabled());const [message,setMessage]=useState('');const [checking,setChecking]=useState(false);
  const [showOrders,setShowOrders]=useState(false);
  const [showAdmin,setShowAdmin]=useState(false);const [showAccess,setShowAccess]=useState(false);

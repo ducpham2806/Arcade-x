@@ -1,6 +1,6 @@
 import React,{useEffect,useMemo,useState} from 'react';
 import {Search,Play,ArrowUpRight,Heart,Grid2X2,X,Gamepad2,CloudOff} from 'lucide-react';
-import {useGame} from '../context/GameContext';
+import { useGameSession, useLibrary } from '../context/GameContext';
 import {usePlayer} from '../context/PlayerContext';
 import {useLauncher} from '../launcher/LauncherContext';
 import {normalizeSearch} from '../launcher/catalog';
@@ -11,8 +11,8 @@ import {accessPreviewEnabled} from '../commerce/api';
 import {StoreModal} from '../commerce/StoreModal';
 const categories=[['Tất Cả','Tất cả'],['Yêu Thích','Yêu thích'],['Puzzle','Giải đố'],['Arcade','Arcade'],['Action','Hành động'],['Reflex','Phản xạ'],['Multiplayer','Đối kháng']];
 const initialFilter=()=>{try{return JSON.parse(sessionStorage.getItem('launcher_library_filter')||'{}');}catch{return {};}};
-export const GameCatalog:React.FC=()=>{
- const {launchGame,openGameDetail,favorites,toggleFavorite,recentlyPlayed}=useGame();const {profile}=usePlayer();const {catalog,source,refresh}=useLauncher();
+const GameCatalogView:React.FC=()=>{
+ const {launchGame} = useGameSession(); const {openGameDetail,favorites,toggleFavorite,recentlyPlayed} = useLibrary();const {profile}=usePlayer();const {catalog,source,refresh}=useLauncher();
  const [storeOpen,setStoreOpen]=useState(false);
  const [category,setCategory]=useState(initialFilter().category||'Tất Cả');const [query,setQuery]=useState(initialFilter().query||'');
  useEffect(()=>{try{sessionStorage.setItem('launcher_library_filter',JSON.stringify({category,query}));}catch{}},[category,query]);
@@ -40,3 +40,6 @@ export const GameCatalog:React.FC=()=>{
 };
 
 
+
+// No props: only its own context subscriptions (library, session, player, launcher) re-render it.
+export const GameCatalog = React.memo(GameCatalogView);

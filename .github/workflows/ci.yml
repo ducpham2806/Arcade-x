@@ -26,7 +26,11 @@ jobs:
         run: npm run build
       - name: Fast test suites (no browser, no Docker)
         run: npm run test:fast
+      - name: Install Chromium for browser checks
+        run: npx playwright install --with-deps chromium
       - name: Launcher idle render budget
-        run: npx playwright install --with-deps chromium && npm run test:perf
+        run: npm run test:perf
+      - name: Launcher smoke flows
+        run: npm run test:smoke
       - name: Generated files are not left behind
         run: git diff --exit-code && test -z "$(git status --porcelain)"

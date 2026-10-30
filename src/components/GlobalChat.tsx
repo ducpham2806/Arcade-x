@@ -1,6 +1,6 @@
 import React,{useEffect,useRef,useState} from 'react';
 import {usePlayer} from '../context/PlayerContext';
-import {useGame} from '../context/GameContext';
+import { useGameSession } from '../context/GameContext';
 import {GAME_REGISTRY} from '../games/registry';
 import {SocialChatThread} from './SocialChatThread';
 import {socialAction,watchSocial,SocialProfile,SocialRelation,InboxEntry} from '../services/social';
@@ -9,7 +9,7 @@ import './social.css';
 interface GlobalChatProps{isOpen:boolean;onToggle:()=>void;onOpenShare?:()=>void}
 type Tab='global'|'game'|'inbox'|'friends';
 export const GlobalChat:React.FC<GlobalChatProps>=({isOpen,onToggle})=>{
- const {profile}=usePlayer();const {activeGameId}=useGame();const [tab,setTab]=useState<Tab>('global');const [game,setGame]=useState('caro-gomoku');const [peer,setPeer]=useState<SocialProfile|null>(null);const [view,setView]=useState<SocialProfile|null>(null);const [relations,setRelations]=useState<SocialRelation[]>([]);const [inbox,setInbox]=useState<InboxEntry[]>([]);const [query,setQuery]=useState('');const [found,setFound]=useState<SocialProfile[]>([]);const [error,setError]=useState('');const [busy,setBusy]=useState(false);const generation=useRef(0);const dialog=useDialogFocus(onToggle,isOpen);
+ const {profile}=usePlayer();const {activeGameId} = useGameSession();const [tab,setTab]=useState<Tab>('global');const [game,setGame]=useState('caro-gomoku');const [peer,setPeer]=useState<SocialProfile|null>(null);const [view,setView]=useState<SocialProfile|null>(null);const [relations,setRelations]=useState<SocialRelation[]>([]);const [inbox,setInbox]=useState<InboxEntry[]>([]);const [query,setQuery]=useState('');const [found,setFound]=useState<SocialProfile[]>([]);const [error,setError]=useState('');const [busy,setBusy]=useState(false);const generation=useRef(0);const dialog=useDialogFocus(onToggle,isOpen);
  useEffect(()=>{generation.current++;setPeer(null);setView(null);setRelations([]);setInbox([]);setFound([]);setError('');setBusy(false);},[profile.id]);
  useEffect(()=>{if(!isOpen)return;const heartbeat=()=>{if(!document.hidden&&navigator.onLine)void socialAction(profile.id,'heartbeat').catch(()=>{});};heartbeat();const timer=setInterval(heartbeat,60000);return()=>clearInterval(timer);},[profile.id,isOpen]);
  useEffect(()=>{if(!isOpen)return;return watchSocial(async()=>Promise.all([socialAction<SocialRelation[]>(profile.id,'relations'),socialAction<InboxEntry[]>(profile.id,'inbox')]),([r,i])=>{setRelations(r);setInbox(i);setError('');},e=>setError(e.message),15000);},[profile.id,isOpen]);

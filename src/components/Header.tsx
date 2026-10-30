@@ -2,11 +2,11 @@ import React from 'react';
 import { Gamepad2, Settings, Download, MessageCircle } from 'lucide-react';
 import { AccountAvatar } from './AccountAvatar';
 import { usePlayer } from '../context/PlayerContext';
-import { useGame } from '../context/GameContext';
+import { useLauncherUi } from '../context/GameContext';
 
 export const Header: React.FC = () => {
   const { profile } = usePlayer();
-  const { setActiveModal, toggleChat, isChatOpen } = useGame();
+  const { setActiveModal, toggleChat, isChatOpen } = useLauncherUi();
   return <header className="arcade-platform-header simple-launcher-header sticky top-0 z-50 border-b border-white/10 backdrop-blur-xl">
     <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-3">
       <button id="btn-header-home" type="button" aria-label="ArcadeX — thư viện game" className="flex items-center gap-2.5 text-white font-black tracking-wider" onClick={() => { setActiveModal('none'); window.dispatchEvent(new CustomEvent('arcadex:filter_games', { detail: 'Tất Cả' })); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>

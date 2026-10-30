@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {useDialogFocus} from '../launcher/useDialogFocus';
 import { Play, Bot, Heart, Trophy } from 'lucide-react';
-import { useGame } from '../context/GameContext';
+import { useGameSession, useLauncherUi, useLibrary } from '../context/GameContext';
 import { usePlayer } from '../context/PlayerContext';
 import { useLauncher } from '../launcher/LauncherContext';
 import { GAME_ONBOARDING_DATA } from '../data/gameOnboardingData';
@@ -11,7 +11,7 @@ import { CloseButton } from './common/CloseButton';
 import {accessPreviewEnabled} from '../commerce/api';
 import {StoreModal} from '../commerce/StoreModal';
 export const GameDetailModal: React.FC = () => {
-  const { selectedGameForDetail, closeGameDetail, launchGame, favorites, toggleFavorite } = useGame();
+  const { selectedGameForDetail, closeGameDetail } = useLauncherUi(); const { favorites, toggleFavorite } = useLibrary(); const { launchGame } = useGameSession();
   const { profile } = usePlayer();
   const [storeOpen,setStoreOpen]=useState(false);
   const dialogRef=useDialogFocus(closeGameDetail,!storeOpen);

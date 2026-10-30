@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useGame } from '../context/GameContext';
+import { useGameSession } from '../context/GameContext';
 import { checkForUpdate, installUpdate } from '../services/pwaLifecycle';
 export const ForceUpdateModal: React.FC = () => {
-  const { activeGameId } = useGame();
+  const { activeGameId } = useGameSession();
   const [pending, setPending] = useState(!!window.__arcadex_sw_update_pending);
   const [trialActive,setTrialActive]=useState(false);
   useEffect(()=>{const update=(e:Event)=>setTrialActive((e as CustomEvent<boolean>).detail);window.addEventListener('arcadex:trial-active',update);return()=>window.removeEventListener('arcadex:trial-active',update)},[]);

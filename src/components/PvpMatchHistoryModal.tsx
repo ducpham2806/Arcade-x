@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { History, X, Trophy, Swords, Trash2, Sparkles } from 'lucide-react';
-import { useGame } from '../context/GameContext';
+import { useLauncherUi } from '../context/GameContext';
 import { StorageService } from '../services/storage';
 import { MatchHistoryItem } from '../types';
 import { CloseButton } from './common/CloseButton';
@@ -9,7 +9,7 @@ import { soundEngine } from '../services/audio';
 import { hapticService } from '../services/haptics';
 
 export const PvpMatchHistoryModal: React.FC = () => {
-  const { activeModal, setActiveModal } = useGame();
+  const { activeModal, setActiveModal } = useLauncherUi();
   const [matchHistory, setMatchHistory] = useState<MatchHistoryItem[]>([]);
 
   useEffect(() => {

@@ -1,12 +1,12 @@
 import React,{useEffect,useRef,useState} from 'react';
 import {MessageCircle,Pin} from 'lucide-react';
-import {useGame} from '../context/GameContext';
+import { useLauncherUi } from '../context/GameContext';
 import './social.css';
 type Point={x:number;y:number};
 const clamp=(p:Point):Point=>({x:Math.max(6,Math.min(innerWidth-50,p.x)),y:Math.max(6,Math.min(innerHeight-50,p.y))});
 /** Starts in the reserved toolbar slot, away from the board and touch controls. */
 export function GameChatBubble(){
- const {openChat,isChatOpen}=useGame();
+ const {openChat,isChatOpen} = useLauncherUi();
  const [position,setPosition]=useState<Point|null>(null);
  const drag=useRef<{x:number;y:number;origin:Point}|null>(null),moved=useRef(false);
  useEffect(()=>{const resize=()=>setPosition(p=>p?clamp(p):null);window.addEventListener('resize',resize);return()=>window.removeEventListener('resize',resize);},[]);

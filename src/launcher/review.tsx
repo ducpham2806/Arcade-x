@@ -1,10 +1,10 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import App from '../App';
-import {useGame} from '../context/GameContext';
+import { useLauncherUi, useLibrary } from '../context/GameContext';
 import {useAuth} from '../context/AuthContext';
 function ReviewControls(){
- const {setActiveModal,openChat,openGameDetail,openShareModal}=useGame();const {openEntry}=useAuth();
+ const {setActiveModal,openChat,openShareModal} = useLauncherUi(); const {openGameDetail} = useLibrary();const {openEntry}=useAuth();
  return <aside className="launcher-review-tools"><span>BẢN KIỂM THỬ · Online khi có mạng</span><select aria-label="Xem màn hình launcher" defaultValue="" onChange={e=>{
   const v=e.target.value;e.target.value='';
   if(v==='chat')openChat();else if(v==='detail')openGameDetail('tile-2048');else if(v==='share')openShareModal({type:'score',gameId:'tile-2048',score:2048,title:'Kỷ lục 2048',description:'Kết quả mẫu để duyệt giao diện'});else if(v==='login')openEntry('login');else if(v)setActiveModal(v as any);

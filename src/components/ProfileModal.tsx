@@ -4,7 +4,7 @@ import {useDialogFocus} from '../launcher/useDialogFocus';
 import { LogIn, UserPlus, LogOut, Check, Settings } from 'lucide-react';
 import { usePlayer } from '../context/PlayerContext';
 import { useAuth } from '../context/AuthContext';
-import { useGame } from '../context/GameContext';
+import { useLauncherUi } from '../context/GameContext';
 import { AccountAvatar } from './AccountAvatar';
 import { CloseButton } from './common/CloseButton';
 
@@ -12,7 +12,7 @@ const AVATARS = ['🎮', '🐱', '🦊', '🤖', '🚀', '⚡'];
 export const ProfileModal: React.FC = () => {
   const { profile, updateUsername, updateAvatar } = usePlayer();
   const { currentUser, isLoggedIn, logout, setAuthModalMode, saveIdentity, requestPasswordReset } = useAuth();
-  const { setActiveModal } = useGame();
+  const { setActiveModal } = useLauncherUi();
   const [name, setName] = useState(profile.username);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);

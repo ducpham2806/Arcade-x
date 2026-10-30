@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PlayerProvider } from './context/PlayerContext';
 import { InventoryProvider } from './context/InventoryContext';
-import { GameProvider, useGame } from './context/GameContext';
+import { GameProvider, useGameSession, useLauncherUi } from './context/GameContext';
 import { Header } from './components/Header';
 import { GameCatalog } from './components/GameCatalog';
 import { LeaderboardModal } from './components/LeaderboardModal';
@@ -43,18 +43,20 @@ const AppContent: React.FC = () => {
 
   const {
     activeGameId,
-    activeModal,
     exitGame,
+    pausedGameSession,
+    resumePausedGame,
+    discardPausedGame,
+  } = useGameSession();
+  const {
+    activeModal,
     setActiveModal,
     shareData,
     closeShareModal,
     isChatOpen,
     toggleChat,
     openChat,
-    pausedGameSession,
-    resumePausedGame,
-    discardPausedGame,
-  } = useGame();
+  } = useLauncherUi();
 
   useEffect(() => { if (activeModal === 'auth') { setActiveModal('none'); openEntry(authModalMode); } }, [activeModal, authModalMode, openEntry, setActiveModal]);
 

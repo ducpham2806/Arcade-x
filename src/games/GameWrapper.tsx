@@ -11,7 +11,7 @@ import { GameMetadata } from '../types';
 import { createGameBridge, type CreateBridgeOptions } from './GameBridge';
 import { usePlayer } from '../context/PlayerContext';
 import { useInventory } from '../context/InventoryContext';
-import { useGame } from '../context/GameContext';
+import { useAudioSettings, useGameSession, useLauncherUi, useProgression } from '../context/GameContext';
 import { CHEST_TYPES, StorageService } from '../services/storage';
 import { calculateAchievedRank, generateGameRecapCardImage } from '../utils/recapGenerator';
 import { PreGameLoadingScreen } from '../components/PreGameLoadingScreen';
@@ -68,23 +68,29 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const {
     reportAchievementProgress,
     reportQuestProgress,
+  } = useProgression();
+  const {
     submitGameScore,
-    isSoundMuted,
-    toggleSound,
-    isMusicMuted,
-    toggleMusic,
-    setActiveModal,
-    openChat,
-    openShareModal,
     isPracticeMode,
     isDailyChallengeMode,
-    activeModal,
-    isChatOpen,
     saveAndSuspendGame,
     autoSaveGameSession,
     pausedGameSession,
     discardPausedGame,
-  } = useGame();
+  } = useGameSession();
+  const {
+    isSoundMuted,
+    toggleSound,
+    isMusicMuted,
+    toggleMusic,
+  } = useAudioSettings();
+  const {
+    setActiveModal,
+    openChat,
+    openShareModal,
+    activeModal,
+    isChatOpen,
+  } = useLauncherUi();
 
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);

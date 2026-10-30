@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import type { GameComponentProps } from '../../types';
-import { useGame } from '../../context/GameContext';
+import { useLauncherUi } from '../../context/GameContext';
 import { usePlayer } from '../../context/PlayerContext';
 import { SupabaseService } from '../../services/supabase';
 import { DungeonLeaderboardModal } from './components/DungeonLeaderboardModal';
@@ -9,7 +9,7 @@ import { DungeonTitanCore, DungeonProgress } from './DungeonTitanCore';
 /** Preserve the launcher's existing profile and real-time leaderboard adapters. */
 export const DungeonTapGame:React.FC<GameComponentProps>=(props)=>{
  const {profile}=usePlayer();
- const {activeModal,setActiveModal}=useGame();
+ const {activeModal,setActiveModal} = useLauncherUi();
  const [open,setOpen]=useState(false);
  const [progress,setProgress]=useState<DungeonProgress>({stage:1,maxStageReached:1,heroLevel:1,bossesSlain:0,monstersSlain:0});
  const lastStage=useRef(0);

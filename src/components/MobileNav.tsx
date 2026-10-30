@@ -1,9 +1,9 @@
 import React,{useEffect,useState} from 'react';
 import { Gamepad2, Heart, UserRound, MessageCircle } from 'lucide-react';
-import { useGame } from '../context/GameContext';
+import { useGameSession, useLauncherUi } from '../context/GameContext';
 
 export const MobileNav: React.FC = () => {
-  const { activeGameId, activeModal, setActiveModal, toggleChat, isChatOpen } = useGame();
+  const { activeGameId } = useGameSession(); const { activeModal, setActiveModal, toggleChat, isChatOpen } = useLauncherUi();
   const [category,setCategory]=useState('Tất Cả');
   useEffect(()=>{const handler=(event:Event)=>setCategory((event as CustomEvent<string>).detail);window.addEventListener('arcadex:filter_games',handler);return()=>window.removeEventListener('arcadex:filter_games',handler);},[]);
   if (activeGameId || activeModal !== 'none') return null;
