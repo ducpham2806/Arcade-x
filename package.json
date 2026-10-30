@@ -46,7 +46,7 @@
     "prepare:battleship-server": "node scripts/battleship-server-package.mjs",
     "test:full-release": "node tests/integration/full-release.mjs",
     "test:sync": "node --test tests/sync/efficiency.mjs",
-    "test:storage": "node tests/storage/compat.mjs",
+    "test:storage": "node tests/storage/compat.mjs && node tests/storage/supabase-compat.mjs",
     "build:snake-preview": "vite build --config vite.snake-preview.config.ts",
     "test:snake-preview": "node tests/snake/preview-package.mjs"
   },

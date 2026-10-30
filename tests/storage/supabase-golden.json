@@ -1,0 +1,513 @@
+{
+ "methods": [
+  "getDb",
+  "getLocalChatMessages",
+  "loadGameSessionFromCloud",
+  "loadInventoryFromCloud",
+  "respondToFriendChallenge",
+  "saveLocalChatMessage",
+  "searchPlayers",
+  "sendChatMessage",
+  "sendFriendChallenge",
+  "submitLeaderboardScore",
+  "subscribeToChat",
+  "subscribeToCloudGameSession",
+  "subscribeToCloudInventory",
+  "subscribeToDailyLeaderboard",
+  "subscribeToGameLeaderboard",
+  "subscribeToGlobalExpLeaderboard",
+  "subscribeToIncomingChallenges",
+  "subscribeToWeeklyTopPlayers",
+  "syncAchievementsToCloud",
+  "syncDailyChallenge",
+  "syncGameSessionToCloud",
+  "syncInventoryToCloud",
+  "syncProfileToCloud",
+  "toggleLikeChatMessage",
+  "updatePlayerPresence"
+ ],
+ "offline": [
+  {
+   "name": "getDb",
+   "value": "f072cbec3bf88418",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "f1abda314d1f8690",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToChat",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "7988356ceac0aa7a",
+   "log": "fcef04d832208586",
+   "storage": "f1abda314d1f8690",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "sendChatMessage",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "cd939f7af3eddc8b",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "toggleLikeChatMessage",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "cd939f7af3eddc8b",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "toggleLikeChatMessage welcome",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncProfileToCloud",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncProfileToCloud other account",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncProfileToCloud unchanged",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncInventoryToCloud",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "loadInventoryFromCloud",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToCloudInventory",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncGameSessionToCloud",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "3126b1a00e5461e5",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncGameSessionToCloud null",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "loadGameSessionFromCloud",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToCloudGameSession",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncAchievementsToCloud",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "333f38bdf7e277d2",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "submitLeaderboardScore",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToWeeklyTopPlayers",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "4c046098cf7b44f7",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToGlobalExpLeaderboard",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "7d4f46015145e1da",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToGameLeaderboard",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "cd6e033ccc9020bf",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToGameLeaderboard dated",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "5971b4ecfe8ce90a",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToDailyLeaderboard",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "d2a93ee79a8ac20a",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncDailyChallenge",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "updatePlayerPresence",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "searchPlayers",
+   "value": "4f53cda18c2baa0c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "372df56220043ef6",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "searchPlayers empty",
+   "value": "4f53cda18c2baa0c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "372df56220043ef6",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "sendFriendChallenge",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "372df56220043ef6",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToIncomingChallenges",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "4aff50dc3a9f5f84",
+   "log": "4f53cda18c2baa0c",
+   "storage": "372df56220043ef6",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "respondToFriendChallenge",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "372df56220043ef6",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "syncProfileToCloud after auth change",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "372df56220043ef6",
+   "cloud": "ea806ba3f1eea4cf"
+  }
+ ],
+ "online": [
+  {
+   "name": "getDb",
+   "value": "41a21b0d157a935f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "f1abda314d1f8690",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "subscribeToChat",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "ddd9f5072cf08674",
+   "log": "7dc844f78f85ca17",
+   "storage": "f1abda314d1f8690",
+   "cloud": "ea806ba3f1eea4cf"
+  },
+  {
+   "name": "sendChatMessage",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "f25d23bf0e268a37",
+   "storage": "cd939f7af3eddc8b",
+   "cloud": "76bed03b19e87a77"
+  },
+  {
+   "name": "toggleLikeChatMessage",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "98e0c7c53db72cd9",
+   "storage": "cd939f7af3eddc8b",
+   "cloud": "ddd190de00c41f3b"
+  },
+  {
+   "name": "toggleLikeChatMessage welcome",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "ddd190de00c41f3b"
+  },
+  {
+   "name": "syncProfileToCloud",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "64f5c010fbfeac8f",
+   "storage": "1455e4348530e53e",
+   "cloud": "fbd5e26ddeeaa972"
+  },
+  {
+   "name": "syncProfileToCloud other account",
+   "value": "fcbcf165908dd18a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "fbd5e26ddeeaa972"
+  },
+  {
+   "name": "syncProfileToCloud unchanged",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "1455e4348530e53e",
+   "cloud": "fbd5e26ddeeaa972"
+  },
+  {
+   "name": "syncInventoryToCloud",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "161230a6ee8b9e4f",
+   "storage": "1455e4348530e53e",
+   "cloud": "4938a8eab65f1065"
+  },
+  {
+   "name": "loadInventoryFromCloud",
+   "value": "2b1b1e270c2ce5bb",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "75a63637374373fd",
+   "storage": "1455e4348530e53e",
+   "cloud": "4938a8eab65f1065"
+  },
+  {
+   "name": "subscribeToCloudInventory",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "91852b897b3ac7ce",
+   "log": "2244910220ff9c8a",
+   "storage": "1455e4348530e53e",
+   "cloud": "4938a8eab65f1065"
+  },
+  {
+   "name": "syncGameSessionToCloud",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "b2f2ab891b591a8c",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "7483e7207e1fa531"
+  },
+  {
+   "name": "syncGameSessionToCloud null",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4c40b2f71547fb85",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "8bc10228b22304f0"
+  },
+  {
+   "name": "loadGameSessionFromCloud",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "d3a995d8dd23a3d4",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "8bc10228b22304f0"
+  },
+  {
+   "name": "subscribeToCloudGameSession",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "4f32774941378a43",
+   "log": "1e45e4a8876e1897",
+   "storage": "6c74c7b1a694128a",
+   "cloud": "8bc10228b22304f0"
+  },
+  {
+   "name": "syncAchievementsToCloud",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "333f38bdf7e277d2",
+   "cloud": "8bc10228b22304f0"
+  },
+  {
+   "name": "submitLeaderboardScore",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "227f3b795ec14028",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "919e573c56e1f5a9"
+  },
+  {
+   "name": "subscribeToWeeklyTopPlayers",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "9bec29007df3f9ed",
+   "log": "22c949caf6fd075c",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "919e573c56e1f5a9"
+  },
+  {
+   "name": "subscribeToGlobalExpLeaderboard",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "155a1d704453f116",
+   "log": "b7502b4c4049e221",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "919e573c56e1f5a9"
+  },
+  {
+   "name": "subscribeToGameLeaderboard",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "7cfbb6efa17487d1",
+   "log": "6dbd1b868f173557",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "919e573c56e1f5a9"
+  },
+  {
+   "name": "subscribeToGameLeaderboard dated",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "5971b4ecfe8ce90a",
+   "log": "ba3b6c0ded173dd6",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "919e573c56e1f5a9"
+  },
+  {
+   "name": "subscribeToDailyLeaderboard",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "c5ba6eaaf0c5223d",
+   "log": "a2be11a73a3bc4aa",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "919e573c56e1f5a9"
+  },
+  {
+   "name": "syncDailyChallenge",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "241d31ff17b3d4f9",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "41ea519ff8779939"
+  },
+  {
+   "name": "updatePlayerPresence",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "d35fd4062a317121",
+   "storage": "5bad41b3fc18221e",
+   "cloud": "d1b20d18cf55298a"
+  },
+  {
+   "name": "searchPlayers",
+   "value": "c57249620a05ca0a",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "d1480d9e7dfbf047",
+   "storage": "372df56220043ef6",
+   "cloud": "d1b20d18cf55298a"
+  },
+  {
+   "name": "searchPlayers empty",
+   "value": "4f53cda18c2baa0c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "4f53cda18c2baa0c",
+   "storage": "372df56220043ef6",
+   "cloud": "d1b20d18cf55298a"
+  },
+  {
+   "name": "sendFriendChallenge",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "0cc70974c50e3459",
+   "storage": "372df56220043ef6",
+   "cloud": "b012ce1b008b398b"
+  },
+  {
+   "name": "subscribeToIncomingChallenges",
+   "value": "b3e493e9d1d8234f",
+   "payloads": "4aff50dc3a9f5f84",
+   "log": "6f65cd91e5755550",
+   "storage": "372df56220043ef6",
+   "cloud": "b012ce1b008b398b"
+  },
+  {
+   "name": "respondToFriendChallenge",
+   "value": "74234e98afe7498f",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "e1ff06b6f8ac41ff",
+   "storage": "372df56220043ef6",
+   "cloud": "bad590236e4fec28"
+  },
+  {
+   "name": "syncProfileToCloud after auth change",
+   "value": "b5bea41b6c623f7c",
+   "payloads": "4f53cda18c2baa0c",
+   "log": "64f5c010fbfeac8f",
+   "storage": "372df56220043ef6",
+   "cloud": "bad590236e4fec28"
+  }
+ ]
+}
