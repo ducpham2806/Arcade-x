@@ -10,6 +10,7 @@ import {
   ChamberArchetype,
 } from './types';
 import { hasWallBetween } from './levels';
+import { findEscapeTurns } from './escapeSolver';
 
 // Seeded PRNG (Mulberry32)
 function createPRNG(seedStr: string | number) {
@@ -508,7 +509,7 @@ export function generateProceduralChamber(
       const sizeLabel = `${cols}x${rows}`;
       const levelId = 2000 + floor * 10 + attempt;
 
-      bestLevel = {
+      const candidate: LevelData = {
         id: levelId,
         name: `${archetypeMeta.name} (#${floor})`,
         pyramidName: `Lăng Mộ ${pharaoh} (${sizeLabel} - ${archetypeMeta.prefix})`,
@@ -528,32 +529,39 @@ export function generateProceduralChamber(
         hintTip: `${archetypeMeta.tip} [Kích thước: ${sizeLabel} | Bẫy: ${traps.length} | Xác ướp: ${mummies.length}]`,
       };
 
+      // The grid check above ignores mummies; reject layouts where they always catch the player,
+      // and make sure par / the turn limit are reachable when the real escape is longer.
+      const escapeTurns = findEscapeTurns(candidate);
+      if (escapeTurns === null) continue;
+      if (typeof escapeTurns === 'number' && escapeTurns > candidate.parTurns) {
+        candidate.parTurns = escapeTurns;
+        candidate.maxTurns = Math.floor(escapeTurns * 1.6);
+      }
+      bestLevel = candidate;
       break;
     }
   }
 
   // Guaranteed fallback if all random attempts were blocked
-  if (!bestLevel) {
-    const fallbackCols = cols;
-    const fallbackRows = rows;
-    bestLevel = {
-      id: 3000 + floor,
-      name: `Điện Thờ ${pharaoh}`,
-      pyramidName: `Mê Cung Bất Tận - Tầng ${floor} (${fallbackCols}x${fallbackRows})`,
-      gridSize: { cols: fallbackCols, rows: fallbackRows },
-      playerStart: { x: 0, y: 0 },
-      exitPos: { x: fallbackCols - 1, y: fallbackRows - 1 },
-      exitDirection: 'right',
-      mummies: [{ type: 'white', x: fallbackCols - 1, y: 0 }],
-      horizontalWalls: [[1, 1], [fallbackCols - 2, fallbackRows - 2]],
-      verticalWalls: [[2, 1], [fallbackCols - 3, fallbackRows - 3]],
-      parTurns: fallbackCols + fallbackRows + 4,
-      maxTurns: (fallbackCols + fallbackRows) * 2,
-      timeLimitSec: 45,
-      hintTip: 'Hầm mộ thông thoáng. Tận dụng các góc tường để điều hướng xác ướp.',
-    };
-  }
-
-  return bestLevel;
+  return bestLevel ?? fallbackChamber(floor, cols, rows, pharaoh);
 }
 
+/** Open fallback chamber used when every random layout was rejected. */
+export function fallbackChamber(floor: number, cols: number, rows: number, pharaoh: string): LevelData {
+  return {
+    id: 3000 + floor,
+    name: `Điện Thờ ${pharaoh}`,
+    pyramidName: `Mê Cung Bất Tận - Tầng ${floor} (${cols}x${rows})`,
+    gridSize: { cols, rows },
+    playerStart: { x: 0, y: 0 },
+    exitPos: { x: cols - 1, y: rows - 1 },
+    exitDirection: 'right',
+    mummies: [{ type: 'white', x: cols - 1, y: 0 }],
+    horizontalWalls: [[1, 1], [cols - 2, rows - 2]],
+    verticalWalls: [[2, 1], [cols - 3, rows - 3]],
+    parTurns: cols + rows + 4,
+    maxTurns: (cols + rows) * 2,
+    timeLimitSec: 45,
+    hintTip: 'Hầm mộ thông thoáng. Tận dụng các góc tường để điều hướng xác ướp.',
+  };
+}
