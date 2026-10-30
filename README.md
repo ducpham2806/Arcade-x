@@ -27,7 +27,7 @@ Netlify build bằng `npm run build`; deploy preview chạy thêm `lint` và `bu
 | `src/services/supabase/` | `SupabaseService`: chat, đồng bộ cloud, bảng xếp hạng, bạn bè |
 | `src/games/` | Mỗi game một thư mục; `registry.ts` đăng ký, `gamePackages.tsx` tải gói theo nhu cầu, `packageAssets.json` liệt kê asset từng gói |
 | `src/games/duel/` | AI cờ, và trọng tài + phòng đấu phía server cho Chess/Xiangqi/Caro (chưa deploy, xem `docs/DUEL-SERVER.md`) |
-| `src/commerce/`, `server/commerce/`, `shared/` | Thuê game, thanh toán, duyệt admin (đang tắt bằng flag) |
+| `src/commerce/`, `server/commerce/`, `shared/` | Thuê game, thanh toán, duyệt admin (đang tắt bằng flag; thứ tự bật ở `docs/COMMERCE-ROLLOUT.md`) |
 | `supabase/` | Migrations, Edge Functions (`battleship-room`, `cosmic-verify`, `duel-room` chưa deploy), SQL Battleship, duel và mạng xã hội |
 | `public/` | Asset tĩnh: art launcher, asset game, từ điển Word Cross (`games/word-cross/lexicon.v1.json`) |
 | `standalone/` | Game build sẵn nhúng vào launcher (Chronicles Realms) |
@@ -52,6 +52,7 @@ CI (`.github/workflows/ci.yml`) chạy trên mọi PR: `lint` → `build` → `t
 | `npm run test:perf` | Launcher đứng yên không vượt 20 lượt render/giây |
 | `npm run test:bundle` | Không chunk nào > 500 kB, JS tải đầu ≤ 400 kB gzip |
 | `npm run analyze:bundle`, `npm run perf:first-load` | Báo cáo bundle và dung lượng lần tải đầu |
+| `npm run test:sql` | Mọi migration và bộ SQL (gồm subscription/commerce) trên PostgreSQL trong tiến trình, không cần Docker; nằm trong `test:fast` |
 | `npm run test:supabase` | SQL fixtures; cần Docker, chạy trên database test riêng, không kết nối production |
 
 `test:perf`, `test:smoke`, `test:offline` cần `npm run build` trước và Chromium (`npx playwright install chromium`, hoặc đặt `CHROMIUM_EXECUTABLE`). Một số bộ Playwright cũ (`tests/launcher`, `tests/auth/entry`, `tests/blossom/launcher`) đang lệch so với giao diện hiện tại và fail cả trên bản gốc 2.12.2.
