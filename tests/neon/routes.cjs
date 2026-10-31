@@ -1,7 +1,9 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert'),path=require('path');
 const source=fs.readFileSync(path.join(__dirname,'../../public/standalone/neon-run/game.js'),'utf8');
 const els=new Map();function el(){return {hidden:false,textContent:'',value:'auto',style:{setProperty(){}},setAttribute(){},addEventListener(){},append(){},replaceChildren(){},getContext(){return new Proxy({},{get:()=>()=>{}})}}}
-class Img{set src(uri){const b=fs.readFileSync(path.join(__dirname,'../../public/standalone/neon-run',uri));this.width=b.readUInt32BE(16);this.height=b.readUInt32BE(20);this.onload()}}
+// Reads pixel size from PNG or WebP (VP8L / VP8 / VP8X) headers.
+function imageSize(b){if(b.toString('ascii',0,4)==='RIFF'&&b.toString('ascii',8,12)==='WEBP'){const kind=b.toString('ascii',12,16);if(kind==='VP8L'){const v=b.readUInt32LE(21);return [(v&16383)+1,((v>>14)&16383)+1]}if(kind==='VP8X')return [b.readUIntLE(24,3)+1,b.readUIntLE(27,3)+1];return [b.readUInt16LE(26)&16383,b.readUInt16LE(28)&16383]}return [b.readUInt32BE(16),b.readUInt32BE(20)]}
+class Img{set src(uri){const b=fs.readFileSync(path.join(__dirname,'../../public/standalone/neon-run',uri));[this.width,this.height]=imageSize(b);this.onload()}}
 const c={__NEON_QA_NO_AUTOSTORY__:true,console,Math,JSON,Set,Map,Number,Object,Promise,Image:Img,localStorage:{getItem:()=>null,setItem(){}},document:{querySelector(s){if(!els.has(s))els.set(s,el());return els.get(s)},createElement:el,addEventListener(){}},addEventListener(){},requestAnimationFrame(){}};c.window=c;vm.createContext(c);vm.runInContext(source,c);const run=s=>vm.runInContext(s,c);
 // State-aware playtest driver issues only normal input, interaction, jump and dash actions.
 vm.runInContext(`
