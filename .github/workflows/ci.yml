@@ -36,6 +36,8 @@ jobs:
         run: npm run test:smoke
       - name: Every game launches, takes input and exits
         run: npm run test:games
+      - name: Neon Run sound, feel and controls
+        run: npm run test:neon-feel
       - name: Offline launcher shell
         run: npm run test:offline
       - name: Modal frame (AGENTS.md sizing)

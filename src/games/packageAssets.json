@@ -786,6 +786,7 @@
     "/standalone/neon-run/game.js",
     "/standalone/neon-run/index.html",
     "/standalone/neon-run/launcher-bridge.js",
+    "/standalone/neon-run/fx.js",
     "/game-art/icons/neon-runner.techart-895a2da736eb.webp",
     "/game-art/banners/neon-runner.webp"
   ],
