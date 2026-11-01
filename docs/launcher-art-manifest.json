@@ -79,9 +79,9 @@
     "id": "mummy-escape",
     "icon": "/game-art/icons/mummy-escape.webp",
     "banner": "/game-art/banners/mummy-escape.webp",
-    "iconBytes": 9530,
-    "bannerBytes": 26962,
-    "sha256": "17da502ff1b768a78085fca9b48e1658864564109cfc158f472e730eb75f440e"
+    "iconBytes": 21866,
+    "bannerBytes": 35728,
+    "sha256": "655e5f507aaa5a94e992af8f6d11949bcd505dfe09bd4d74221a8b28b946aa9e"
   },
   {
     "id": "shikaku",
@@ -127,17 +127,17 @@
     "id": "blocker",
     "icon": "/game-art/icons/blocker.webp",
     "banner": "/game-art/banners/blocker.webp",
-    "iconBytes": 12168,
-    "bannerBytes": 26762,
-    "sha256": "e833a75ed8043f6adc8868ae87bcf025030bc32012761876d9a861eb356e9a70"
+    "iconBytes": 20516,
+    "bannerBytes": 31284,
+    "sha256": "05214c65b15ee4f9f58ab57bbdcdb8e80e63fd4d44ee80ecf1288a46c0c339bd"
   },
   {
     "id": "chess",
     "icon": "/game-art/icons/chess.webp",
     "banner": "/game-art/banners/chess.webp",
-    "iconBytes": 10790,
-    "bannerBytes": 25410,
-    "sha256": "3eb19d0d9c7e55ad8318b27c57af5f73260c527bdb453c9424575cb00921f593"
+    "iconBytes": 17436,
+    "bannerBytes": 29444,
+    "sha256": "8cf0b83688d78d211ddb8ecff64b71ff47e4751f097ead9831d7b12d4ce1bc67"
   },
   {
     "id": "xiangqi",

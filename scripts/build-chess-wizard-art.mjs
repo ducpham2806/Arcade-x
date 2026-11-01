@@ -1,6 +1,11 @@
 // Master 2D HD Sprite Renderer & Exporter for Wizard's Chess (Harry Potter Chamber Style)
 // Generates 12 high-detail 256x256 WebP piece sprites (wk, wq, wr, wb, wn, wp, bk, bq, br, bb, bn, bp),
 // 1 square 512x512 Game Icon, and 1 widescreen 1280x720 Splash Loading Banner.
+//
+// Not used by the game: the shipped pieces, icon and splash are drawn in code
+// (src/visuals/ChessPiece.tsx, WizardChessSplashModal in src/games/chess/index.tsx,
+// NativeGameArtwork in src/visuals/gameArt.tsx). The public/games/chess/* output of this
+// script has never been committed; keep it only as a reference for raster exports.
 
 import fs from 'node:fs';
 import path from 'node:path';
