@@ -2,6 +2,8 @@
 
 Launcher mini-game dạng PWA (React 19 + Vite + Supabase) với 22 game, chơi được offline và đồng bộ tài khoản. Quy tắc giao diện và trải nghiệm trong game nằm ở `AGENTS.md`.
 
+Hướng dẫn cho Claude Code nằm ở `CLAUDE.md`. Thư mục `.claude/` chứa 19 agent và 11 skill (đánh giá game, level, cân bằng, QA, hiệu năng, UX…). Chúng được lấy từ Claude Code Game Studios và chỉnh cho web; nguồn và giấy phép MIT ghi ở `.claude/CCGS-NOTICE.md`.
+
 ## Chạy và build
 
 Dùng Node.js 24 (`.nvmrc`).
@@ -44,7 +46,7 @@ CI (`.github/workflows/ci.yml`) chạy trên mọi PR: `lint` → `build` → `t
 
 | Lệnh | Phạm vi |
 |---|---|
-| `npm run test:fast` | Các bộ không cần trình duyệt hay Docker: readability, tương thích save (`test:storage`), engine 8 game (`test:engines`), duel AI và duel server (`test:duel-server`), sync, commerce, subscriptions, battleship, social, artwork, cosmic, startup/PWA, boom, eat, dungeon, full-release |
+| `npm run test:fast` | Các bộ không cần trình duyệt hay Docker: readability, cấu trúc agent/skill (`test:claude`), tương thích save (`test:storage`), engine 8 game (`test:engines`), duel AI và duel server (`test:duel-server`), sync, commerce, subscriptions, battleship, social, artwork, cosmic, startup/PWA, boom, eat, dungeon, full-release |
 | `npm run test:smoke` | Luồng launcher trên bản build: yêu thích, chi tiết game, âm thanh, chat, vào/thoát game, Word Cross |
 | `npm run test:games` | Mở cả 22 game, chạm/nhấn phím vài giây, không lỗi JS, thoát về thư viện |
 | `npm run test:offline` | Tắt mạng sau khi service worker precache: tải lại, mở modal, chơi game đã cache |
