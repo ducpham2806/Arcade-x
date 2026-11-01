@@ -133,3 +133,19 @@ Tỉ lệ thắng là của bot C, 30 ván mỗi màn.
 1. **B1 + B2:** sửa hiển thị nhanh, người chơi thấy khác biệt ngay.
 2. **B3:** bố cục khi chơi ở điện thoại ngang và desktop.
 3. **B4:** đưa test của Blossom vào CI trước khi chỉnh độ khó (B5) và cơ chế (B7).
+
+## Đã làm (01/11)
+- **B1 + B2:**
+  - `readability.js` không còn tự đặt nền đen chỉ vì có ảnh ở phần tử cha. Điểm ảnh chưa biết được tính trong khoảng đen–trắng; nền đen chỉ thêm khi không màu chữ nào đạt chuẩn trên cả hai cực.
+  - Lớp phủ kem của Blossom chuyển vào nền gốc để readability nhìn thấy nó.
+  - Kết quả: 0 nhãn bị phủ nền ở màn bản đồ và màn chơi, ở cả 3 kích thước. Dòng seed chỉ còn trong bản review.
+- **B3:**
+  - Bàn chơi lấy kích thước theo chiều cao thật của khung (container query).
+  - Màn rộng và thấp chuyển sang 2 cột (bàn trái, HUD và công cụ phải). Điện thoại ngang ẩn thanh logo khi chơi.
+  - Bàn: 844×390 tăng từ 187 lên 314 px; 1280×760 tăng từ 365 lên 577 px và công cụ không còn bị cắt; 390×844 giữ 366 px.
+  - Ở 320×568 bàn còn 211 px (trước 250 px nhưng tràn và phải cuộn); giờ HUD, bàn và công cụ vừa một màn hình.
+- **B4:**
+  - `test:blossom-engine` (21 test logic) chạy trong `test:fast`.
+  - `test:blossom-ui` (8 bộ, 55 test, khoảng 2,7 phút) thêm vào CI, gồm bộ mới `layout-v9` kiểm tra bố cục, nền đen và dòng seed.
+  - Sửa một race của test đồng hồ trong `ui.test.ts` (hỏng khoảng 1/6 lần cả trước thay đổi).
+  - 3 bộ cũ vẫn hỏng (`branding-integration`, `launcher`, `standalone`; lý do ghi trong README), chưa đưa vào CI.
