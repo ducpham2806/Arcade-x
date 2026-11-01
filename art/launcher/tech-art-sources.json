@@ -47,5 +47,24 @@
     "sourceLibraryFileId": "libfile_4fd23607e6e48191b3caf11199b2e907",
     "sourceCreatedAt": "2026-10-21T11:08:53.132482+00:00",
     "sourceSHA256": "a06c00fa672e8fec9bdc6488fb91edfd3774b860dd1761b292090a1c452ba405"
+  },
+  "blocker": {
+    "master": "art/gemini/blocker/source/icon-crystal-frame.jpg",
+    "sourceFileName": "Xếp Gạch Crystal Jewel Blast icon (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "87bf7b0f4be7309ae076c1fb1a702ac481d3fedead4774ef194cd1bbc70452b0"
+  },
+  "mummy-escape": {
+    "master": "art/gemini/mummy-escape/source/icon-explorer-vs-pharaoh.jpg",
+    "sourceFileName": "Mummy Escape explorer vs pharaoh (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "8014abeb09c42e100de7d12f4afad941bffc9d72e1172e17480e71b8b8a441dd"
+  },
+  "chess": {
+    "master": "art/gemini/chess/source/icon-king-vs-rook.jpg",
+    "sourceFileName": "Wizard's Chess king vs rook golem (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "865314a29355d8d8fbb86648bdeccbfe902203832a521def682bc612e9d22be1",
+    "inset": 0.07
   }
 }

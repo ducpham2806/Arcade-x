@@ -32,7 +32,7 @@
     "test:duel-server": "node tests/duel/authoritative.mjs && node tests/duel/schema.mjs && node tests/duel/edge-room.mjs",
     "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs",
     "export:artwork": "node scripts/export-game-art.mjs",
-    "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
+    "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/gemini.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
     "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
     "test:boom-art": "node tests/boom-buddies/art-v3.mjs",
     "preview:boom-art": "node scripts/boom-art-preview.mjs",

@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import type { GameMetadata } from '../types';
-import { GameArtwork } from '../visuals/gameArt';
+import { GameArtwork, GAME_SPLASH_ART } from '../visuals/gameArt';
 import { prepareGamePackage, type PackageProgress } from '../games/gamePackages';
 import './splash.css';
 
@@ -19,8 +19,9 @@ export function GamePackageGate({ game, onExit, children }: { game: GameMetadata
     return () => { alive = false; controller.abort(); };
   }, [game.id, attempt]);
   const progress = Math.round(Math.max(0, Math.min(100, state.progress)));
-  const splash = <section id="game-package-splash" data-game-id={game.id} className="fixed inset-0 z-[80] bg-[#080b12] text-slate-200 flex items-center justify-center p-6" aria-busy={!error}>
-    <div className="w-full max-w-md text-center space-y-6">
+  const backdrop = GAME_SPLASH_ART[game.id];
+  const splash = <section id="game-package-splash" data-game-id={game.id} className={`fixed inset-0 z-[80] bg-[#080b12] text-slate-200 flex justify-center p-6 ${backdrop ? 'items-end bg-cover bg-center' : 'items-center'}`} style={backdrop ? {backgroundImage:`linear-gradient(to bottom, rgba(8,11,18,0) 45%, rgba(8,11,18,.85) 80%), url(${backdrop})`} : undefined} aria-busy={!error}>
+    <div className={`w-full max-w-md text-center ${backdrop ? 'space-y-4 rounded-3xl bg-[#080b12]/90 p-5 shadow-2xl ring-1 ring-white/10' : 'space-y-6'}`}>
       <div className={`arcadex-boot-logo ${error ? 'arcadex-boot-paused' : ''} w-28 h-28 mx-auto rounded-3xl`}><GameArtwork gameId={game.id} variant="icon" src={game.artwork?.icon}/><span className="arcadex-boot-orbit" aria-hidden="true"/></div>
       <div><p className="text-xs text-slate-400 mb-2">ARCADEX · CHUẨN BỊ GAME</p><h1 className="text-2xl font-bold text-white">{game.title}</h1></div>
       {error ? <div className="space-y-4"><p role="alert">Chưa tải xong game. Kiểm tra kết nối rồi thử lại; tiến trình đã lưu vẫn được giữ.</p><button className="simple-primary-button w-full justify-center" onClick={() => setAttempt(v => v + 1)}>Thử tải lại game</button></div> : <div className="space-y-3">

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 export type MummyArtKind =
   | 'explorer'
@@ -351,6 +351,13 @@ export function getMummyArtUrl(kind: MummyArtKind): string {
   return artUriCache.get(kind)!;
 }
 
+// Painted Gemini sprites (art/gemini/mummy-escape, cut by scripts/art/import-gemini.py); the
+// SVG drawings above remain for the other kinds and as the fallback if an image fails.
+const PAINTED: Partial<Record<MummyArtKind, string>> = Object.fromEntries(
+  (['explorer', 'white', 'red', 'scorpion', 'key_yellow', 'key_red', 'pit', 'spikes', 'sarcophagus', 'exit_portal'] as const)
+    .map(kind => [kind, `/games/mummy-escape/art/${kind}.webp`]),
+);
+
 export function MummySprite({
   kind,
   className = '',
@@ -358,13 +365,15 @@ export function MummySprite({
   kind: MummyArtKind;
   className?: string;
 }) {
-  const url = useMemo(() => getMummyArtUrl(kind), [kind]);
+  const [failed, setFailed] = useState(false);
+  const url = useMemo(() => (!failed && PAINTED[kind]) || getMummyArtUrl(kind), [kind, failed]);
   return (
     <img
       src={url}
       alt={kind}
       draggable={false}
       decoding="async"
+      onError={() => setFailed(true)}
       className={`mummy-sprite w-full h-full object-contain select-none pointer-events-none ${className}`}
     />
   );

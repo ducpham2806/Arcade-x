@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { PieceSymbol, Color } from 'chess.js';
 
 interface Palette {
@@ -318,12 +318,19 @@ export function ChessPiece({
   color: Color;
   className?: string;
 }) {
-  const spriteUrl = useMemo(() => getWizardPieceSpriteUrl(type, color), [type, color]);
+  // Painted Gemini statues (art/gemini/chess, cut by scripts/art/import-gemini.py); the SVG
+  // renderer above stays as the fallback if an image fails to load.
+  const [failed, setFailed] = useState(false);
+  const spriteUrl = useMemo(
+    () => (failed ? getWizardPieceSpriteUrl(type, color) : `/games/chess/art/${color}${type}.webp`),
+    [type, color, failed],
+  );
   const info = WIZARD_PIECE_LORE[`${color}${type}`];
 
   return (
     <img
       src={spriteUrl}
+      onError={() => setFailed(true)}
       alt={info?.name || `${color}${type}`}
       draggable={false}
       decoding="async"

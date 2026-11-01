@@ -39,7 +39,7 @@ import {
   useBooster,
 } from "./engine";
 import { BlockSave, hydrate, levelOpen, settle, buy, buyFrame } from "./save";
-import { JewelBlockSvg, BoosterRelicSvg } from "../../visuals/BlockerJewelArt";
+import { JewelBlockArt, BoosterRelicArt } from "../../visuals/BlockerJewelArt";
 import { blockerAudio } from "./audio";
 import "./blocker.css";
 
@@ -90,7 +90,7 @@ function Tile({
 }) {
   return (
     <span className={`bp-tile bp-color-${color} ${ice ? "bp-ice" : ""} ${gem ? "bp-gem-tile" : ""}`}>
-      <JewelBlockSvg color={color} gem={gem} ice={ice} />
+      <JewelBlockArt color={color} gem={gem} ice={ice} />
       <span className="bp-glyph">{ice ? "❄" : gem ? "★" : ""}</span>
     </span>
   );
@@ -671,15 +671,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
           <main className="bp-menu">
             <div className="bp-hero" aria-hidden="true">
               <div className="bp-hero-aura" />
-              <span className="bp-hero-piece">
-                <Tile color={1} gem />
-                <Tile color={2} />
-                <Tile color={3} gem />
-                <Tile color={4} />
-                <Tile color={5} gem />
-                <Tile color={6} />
-              </span>
-              <i>★</i>
+              <img className="bp-hero-art" src="/games/blocker/art/hero.webp" alt="" draggable={false} />
             </div>
             <div className="bp-menu-badge">
               ✨ NGỌC PHA LÊ 3D · COMBO FEVER OVERDRIVE ✨
@@ -1213,7 +1205,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                   {hammer ? (
                     <span>✓</span>
                   ) : (
-                    <BoosterRelicSvg kind="rotate" size={24} />
+                    <BoosterRelicArt kind="rotate" size={24} />
                   )}
                 </button>
                 <button
@@ -1225,7 +1217,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                   {hammer ? (
                     <span>✕</span>
                   ) : (
-                    <BoosterRelicSvg kind="hint" size={24} />
+                    <BoosterRelicArt kind="hint" size={24} />
                   )}
                 </button>
                 {(Object.keys(BOOSTERS) as Booster[]).map((kind) => (
@@ -1244,7 +1236,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
                     onClick={() => activate(kind)}
                   >
                     <span aria-hidden="true">
-                      <BoosterRelicSvg kind={kind} size={24} />
+                      <BoosterRelicArt kind={kind} size={24} />
                     </span>
                     <small>{save.inventory[kind]}</small>
                   </button>
@@ -1428,7 +1420,7 @@ export const BlockerGame: React.FC<GameComponentProps> = ({
           {(Object.keys(BOOSTERS) as Booster[]).map((kind) => (
             <div className="bp-shop-card" key={kind}>
               <span>
-                <BoosterRelicSvg kind={kind} size={36} />
+                <BoosterRelicArt kind={kind} size={36} />
               </span>
               <div>
                 <h3>{BOOSTERS[kind].name}</h3>

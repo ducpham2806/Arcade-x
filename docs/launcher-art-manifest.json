@@ -77,11 +77,15 @@
   },
   {
     "id": "mummy-escape",
-    "icon": "/game-art/icons/mummy-escape.webp",
+    "icon": "/game-art/icons/mummy-escape.techart-b2e2e07761fc.webp",
     "banner": "/game-art/banners/mummy-escape.webp",
-    "iconBytes": 21866,
-    "bannerBytes": 35728,
-    "sha256": "655e5f507aaa5a94e992af8f6d11949bcd505dfe09bd4d74221a8b28b946aa9e"
+    "iconBytes": 82704,
+    "bannerBytes": 150418,
+    "sha256": "b2e2e07761fc65b0734ef4869e36a5958f8a61c837a7a083ac8153d17b17f795",
+    "sourceType": "imagegen",
+    "sourceFileName": "Mummy Escape explorer vs pharaoh (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "8014abeb09c42e100de7d12f4afad941bffc9d72e1172e17480e71b8b8a441dd"
   },
   {
     "id": "shikaku",
@@ -125,19 +129,27 @@
   },
   {
     "id": "blocker",
-    "icon": "/game-art/icons/blocker.webp",
+    "icon": "/game-art/icons/blocker.techart-a8f8a38e3e0c.webp",
     "banner": "/game-art/banners/blocker.webp",
-    "iconBytes": 20516,
+    "iconBytes": 90440,
     "bannerBytes": 31284,
-    "sha256": "05214c65b15ee4f9f58ab57bbdcdb8e80e63fd4d44ee80ecf1288a46c0c339bd"
+    "sha256": "a8f8a38e3e0c9a0e8c177409983a9ee4bea9686f57015631e609ffd72b2393f0",
+    "sourceType": "imagegen",
+    "sourceFileName": "Xếp Gạch Crystal Jewel Blast icon (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "87bf7b0f4be7309ae076c1fb1a702ac481d3fedead4774ef194cd1bbc70452b0"
   },
   {
     "id": "chess",
-    "icon": "/game-art/icons/chess.webp",
+    "icon": "/game-art/icons/chess.techart-8639ceadda33.webp",
     "banner": "/game-art/banners/chess.webp",
-    "iconBytes": 17436,
-    "bannerBytes": 29444,
-    "sha256": "8cf0b83688d78d211ddb8ecff64b71ff47e4751f097ead9831d7b12d4ce1bc67"
+    "iconBytes": 87166,
+    "bannerBytes": 158706,
+    "sha256": "8639ceadda33c6eee496aeb602b717c6f6acf0988e89f0a58c70d9d190ba6dcc",
+    "sourceType": "imagegen",
+    "sourceFileName": "Wizard's Chess king vs rook golem (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "865314a29355d8d8fbb86648bdeccbfe902203832a521def682bc612e9d22be1"
   },
   {
     "id": "xiangqi",

@@ -1,0 +1,198 @@
+{
+ "game": "blocker",
+ "items": [
+  {
+   "name": "gem-ruby",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    14,
+    46,
+    180,
+    176
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-ruby.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "gem-sapphire",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    218,
+    46,
+    180,
+    176
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-sapphire.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "gem-emerald",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    422,
+    46,
+    180,
+    176
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-emerald.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "gem-amethyst",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    14,
+    250,
+    180,
+    180
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-amethyst.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "gem-topaz",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    218,
+    250,
+    180,
+    180
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-topaz.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "gem-diamond",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    422,
+    250,
+    176,
+    176
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-diamond.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "gem-star-core",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    630,
+    42,
+    176,
+    178
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-star-core.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "gem-ice",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    826,
+    246,
+    184,
+    178
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/gem-ice.webp",
+   "square": true,
+   "size": 128,
+   "quality": 90
+  },
+  {
+   "name": "booster-hammer",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    124,
+    503,
+    204,
+    184
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/booster-hammer.webp",
+   "square": true,
+   "size": 96,
+   "quality": 90
+  },
+  {
+   "name": "booster-shuffle",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    408,
+    503,
+    208,
+    184
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/booster-shuffle.webp",
+   "square": true,
+   "size": 96,
+   "quality": 90
+  },
+  {
+   "name": "booster-undo",
+   "source": "source/sheet-gems-boosters-vfx.jpg",
+   "box": [
+    692,
+    506,
+    208,
+    180
+   ],
+   "method": "flood",
+   "out": "public/games/blocker/art/booster-undo.webp",
+   "square": true,
+   "size": 96,
+   "quality": 90
+  },
+  {
+   "name": "icon",
+   "source": "source/icon-crystal-frame.jpg",
+   "box": [
+    0,
+    0,
+    1024,
+    1024
+   ],
+   "method": "none",
+   "out": "public/games/blocker/art/hero.webp",
+   "size": 480,
+   "quality": 86
+  },
+  {
+   "name": "splash",
+   "source": "source/splash-crystal-jewel-blast.jpg",
+   "box": [
+    0,
+    0,
+    1376,
+    768
+   ],
+   "method": "none",
+   "out": "public/games/blocker/art/splash.webp",
+   "size": 1280,
+   "quality": 80
+  }
+ ]
+}

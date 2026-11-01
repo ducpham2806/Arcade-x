@@ -34,7 +34,7 @@ Netlify build bằng `npm run build`; deploy preview chạy thêm `lint` và `bu
 | `public/` | Asset tĩnh: art launcher, asset game, từ điển Word Cross (`games/word-cross/lexicon.v1.json`) |
 | `standalone/` | Game build sẵn nhúng vào launcher (Chronicles Realms) |
 | `preview/` | Bản preview riêng (Snake Legend, gallery Dungeon) |
-| `art/` | Art nguồn: `launcher/`, `dungeon-titan/source-v5\|v6`, `block-breaker/boss-v6` |
+| `art/` | Art nguồn: `launcher/`, `dungeon-titan/source-v5\|v6`, `block-breaker/boss-v6`, `gemini/` (ảnh Gemini của Blocker, Mummy Escape, Chess và bản đồ cắt sprite, xem `art/gemini/README.md`) |
 | `review/` | Trang duyệt tĩnh: gallery art toàn bộ game, `demos/` (blocker, chess, mummy-escape) |
 | `scripts/`, `tests/`, `docs/` | Công cụ build/export, kiểm thử, tài liệu thiết kế từng game |
 

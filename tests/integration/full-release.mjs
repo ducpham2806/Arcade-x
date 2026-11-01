@@ -8,7 +8,7 @@ for(const id of ['quan-nhau-tycoon','snake','ran-san-moi']){assert.ok(!ids.inclu
 let resources=0;for(const id of ids){assert.ok(packages[id]?.length>0,id);for(const url of packages[id]){const file=url.startsWith('/chronicles-realms/')?path.join('standalone/chronicles-realms/dist',url.slice('/chronicles-realms/'.length)):path.join('public',url);assert.ok(fs.existsSync(file),url);resources++;}}
 const arts=JSON.parse(fs.readFileSync('docs/launcher-art-manifest.json'));assert.equal(arts.length,22);assert.equal(new Set(arts.map(a=>a.sha256)).size,22);for(const a of arts){assert.ok(a.iconBytes<150000);assert.ok(a.bannerBytes<220000);}
 const rasterSources=JSON.parse(fs.readFileSync('art/launcher/tech-art-sources.json')),rasterIcons=JSON.parse(fs.readFileSync('src/visuals/rasterIcons.json'));
-assert.equal(Object.keys(rasterSources).length,7);
+assert.equal(Object.keys(rasterSources).length,10);assert.deepEqual(Object.keys(rasterSources).sort(),Object.keys(rasterIcons).sort());
 for(const [id,source]of Object.entries(rasterSources)){
  const row=arts.find(row=>row.id===id),icon=fs.readFileSync('public'+rasterIcons[id]);
  assert.equal(createHash('sha256').update(fs.readFileSync(source.master)).digest('hex'),source.sourceSHA256,id+' original source');

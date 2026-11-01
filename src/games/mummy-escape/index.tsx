@@ -117,7 +117,7 @@ const MummyEscapeSplashModal: React.FC<{ onDismiss: () => void }> = ({ onDismiss
         </p>
 
         {/* Egyptian Tomb Confrontation Stage */}
-        <div className="relative w-full max-w-xl h-48 sm:h-56 my-5 rounded-2xl border-2 border-[#c8963e]/60 bg-gradient-to-b from-[#3a2612] via-[#221509] to-[#120b04] overflow-hidden flex items-center justify-around px-4 shadow-inner">
+        <div className="relative w-full max-w-xl h-48 sm:h-56 my-5 rounded-2xl border-2 border-[#c8963e]/60 bg-gradient-to-b from-[#3a2612] via-[#221509] to-[#120b04] overflow-hidden flex items-center justify-around px-2 sm:px-4 shadow-inner">
           {/* Torch Sconces */}
           <div className="absolute top-3 left-4 w-8 h-8 opacity-90">
             <MummySprite kind="torch" />
@@ -128,30 +128,30 @@ const MummyEscapeSplashModal: React.FC<{ onDismiss: () => void }> = ({ onDismiss
 
           {/* Left: Explorer & Ankh Key */}
           <div className="relative z-10 flex items-end -space-x-3">
-            <div className="w-28 h-28 sm:w-36 sm:h-36 drop-shadow-[0_10px_20px_rgba(245,158,11,0.45)]">
+            <div className="w-20 h-24 sm:w-36 sm:h-36 drop-shadow-[0_10px_20px_rgba(245,158,11,0.45)]">
               <MummySprite kind="explorer" />
             </div>
-            <div className="w-12 h-12 sm:w-14 sm:h-14 mb-4 animate-bounce">
+            <div className="w-9 h-9 sm:w-14 sm:h-14 mb-4 animate-bounce">
               <MummySprite kind="key_yellow" />
             </div>
           </div>
 
           {/* Center Golden Scarab Emblem */}
           <div className="relative z-20 flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_0_25px_rgba(250,204,21,0.85)] animate-pulse">
+            <div className="w-11 h-11 sm:w-20 sm:h-20 drop-shadow-[0_0_25px_rgba(250,204,21,0.85)] animate-pulse">
               <MummySprite kind="scarab" />
             </div>
           </div>
 
           {/* Right: Red Pharaoh Mummy, White Mummy & Scorpion */}
           <div className="relative z-10 flex items-end -space-x-5">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 mb-1">
+            <div className="w-10 h-10 sm:w-20 sm:h-20 mb-1">
               <MummySprite kind="scorpion" />
             </div>
-            <div className="w-28 h-28 sm:w-36 sm:h-36 drop-shadow-[0_10px_20px_rgba(225,29,72,0.45)]">
+            <div className="w-20 h-24 sm:w-36 sm:h-36 drop-shadow-[0_10px_20px_rgba(225,29,72,0.45)]">
               <MummySprite kind="red" />
             </div>
-            <div className="w-20 h-20 sm:w-24 sm:h-24 opacity-90">
+            <div className="w-14 h-20 sm:w-24 sm:h-24 opacity-90">
               <MummySprite kind="white" />
             </div>
           </div>

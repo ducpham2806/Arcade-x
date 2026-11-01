@@ -839,8 +839,19 @@
     "/game-art/banners/dungeon-tap.webp"
   ],
   "mummy-escape": [
-    "/game-art/icons/mummy-escape.webp",
-    "/game-art/banners/mummy-escape.webp"
+    "/game-art/icons/mummy-escape.techart-b2e2e07761fc.webp",
+    "/game-art/banners/mummy-escape.webp",
+    "/games/mummy-escape/art/exit_portal.webp",
+    "/games/mummy-escape/art/explorer.webp",
+    "/games/mummy-escape/art/key_red.webp",
+    "/games/mummy-escape/art/key_yellow.webp",
+    "/games/mummy-escape/art/pit.webp",
+    "/games/mummy-escape/art/red.webp",
+    "/games/mummy-escape/art/sarcophagus.webp",
+    "/games/mummy-escape/art/scorpion.webp",
+    "/games/mummy-escape/art/spikes.webp",
+    "/games/mummy-escape/art/splash.webp",
+    "/games/mummy-escape/art/white.webp"
   ],
   "shikaku": [
     "/game-art/icons/shikaku.webp",
@@ -863,12 +874,38 @@
     "/game-art/banners/draw-a-shape.webp"
   ],
   "blocker": [
-    "/game-art/icons/blocker.webp",
-    "/game-art/banners/blocker.webp"
+    "/game-art/icons/blocker.techart-a8f8a38e3e0c.webp",
+    "/game-art/banners/blocker.webp",
+    "/games/blocker/art/booster-hammer.webp",
+    "/games/blocker/art/booster-shuffle.webp",
+    "/games/blocker/art/booster-undo.webp",
+    "/games/blocker/art/gem-amethyst.webp",
+    "/games/blocker/art/gem-diamond.webp",
+    "/games/blocker/art/gem-emerald.webp",
+    "/games/blocker/art/gem-ice.webp",
+    "/games/blocker/art/gem-ruby.webp",
+    "/games/blocker/art/gem-sapphire.webp",
+    "/games/blocker/art/gem-star-core.webp",
+    "/games/blocker/art/gem-topaz.webp",
+    "/games/blocker/art/hero.webp",
+    "/games/blocker/art/splash.webp"
   ],
   "chess": [
-    "/game-art/icons/chess.webp",
-    "/game-art/banners/chess.webp"
+    "/game-art/icons/chess.techart-8639ceadda33.webp",
+    "/game-art/banners/chess.webp",
+    "/games/chess/art/bb.webp",
+    "/games/chess/art/bk.webp",
+    "/games/chess/art/bn.webp",
+    "/games/chess/art/bp.webp",
+    "/games/chess/art/bq.webp",
+    "/games/chess/art/br.webp",
+    "/games/chess/art/splash.webp",
+    "/games/chess/art/wb.webp",
+    "/games/chess/art/wk.webp",
+    "/games/chess/art/wn.webp",
+    "/games/chess/art/wp.webp",
+    "/games/chess/art/wq.webp",
+    "/games/chess/art/wr.webp"
   ],
   "xiangqi": [
     "/game-art/icons/xiangqi.webp",
