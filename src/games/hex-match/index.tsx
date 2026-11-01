@@ -1400,11 +1400,13 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                 <button onClick={() => setTool("")}>Hủy chọn</button>
               </p>
             )}
-            <p className="bb-run-note">
-              {groups(run).length} nhóm hợp lệ · trộn miễn phí{" "}
-              {run.freeShuffles}
-              /3 · seed {run.initialSeed}
-            </p>
+            {review && (
+              <p className="bb-run-note">
+                {groups(run).length} nhóm hợp lệ · trộn miễn phí{" "}
+                {run.freeShuffles}
+                /3 · seed {run.initialSeed}
+              </p>
+            )}
           </main>
         )}
         {screen === "garden" && (
