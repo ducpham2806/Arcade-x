@@ -58,3 +58,14 @@ Kết luận: độ khó tăng tuyến tính bằng độ dài và số quái, k
 **Làm trước:** (1) âm thanh + phản hồi, (2) luồng quay lại và điều khiển mobile/desktop, (3) làm lại thế giới 1 bằng tay làm khuôn mẫu.
 
 **Lưu ý:** repo chỉ có bản build; nên đưa mã nguồn gốc (Site source `8e1b771`) vào repo trước khi nâng cấp lớn.
+
+## Đã làm
+- **v0.14 + fx (31/10):** âm thanh và nhạc theo thế giới, khựng hình/rung, câu nhắc ở cổng khoá, ẩn nút cảm ứng khi dùng bàn phím, làm mờ nút khi điện thoại xoay ngang, ảnh WebP (11,8 → 6,1 MB). Mục 1, 2, 4, 6 và một phần mục 3, 5.
+- **tuning 0.15 (01/11):** `scripts/neon/tune-levels.mjs` sửa dữ liệu 40 màn trong `game.js` (chạy lại không đổi gì; `--check` chạy trong `test:neon`).
+  - Checkpoint: 125 → 258 điểm; khoảng cách trung vị 2.069 → 1.090 px; số đoạn > 1.500 px giảm từ 160 xuống 49 (còn lại là hành lang quá dày quái, không có chỗ hồi sinh an toàn). Màn cuối có 10 checkpoint (trước là 6).
+  - Engine (`/*nr*/`): đi quá checkpoint tối đa 400 px vẫn được lưu (trước chỉ lưu nếu chạm đất trong ô 90 px, nhảy qua là mất); 1,2 s bất tử khi hồi sinh; màn khảo sát chỉ bắt quét mục tiêu chính; băng chuyền vẽ dọc cả nền với mũi tên theo chiều đẩy; quạt gió có hình.
+  - Cơ chế sẵn có được dùng: băng chuyền ở hành lang thế giới 3, gió ở thế giới 4, cả hai xen kẽ ở thế giới 5 cùng bệ né sập.
+  - Sao 3 xoay vòng 4 loại engine đã chấm: biển hiệu trên bệ cao (10 màn), công tắc A→B trong 12 s (10), không trúng đòn từ checkpoint cuối, có nút thử lại (10), thu 70% xu (10). Lời giới thiệu NR-01–03 nay khớp với thử thách thật.
+  - Gợi ý khi vào phòng nêu mục tiêu mở cổng, ví dụ "Giữ nhảy để lên bậc cao · Bật Đèn mái nhà ở tầng trên để mở cổng".
+  - Kiểm thử: bot đi hết 40/40 màn với cơ chế mới, đi qua mọi checkpoint; 40/40 thử thách sao 3 làm được bằng thao tác thường; biển hiệu trên bệ không bật được từ mặt đất.
+- **Chưa làm:** dời mục tiêu lên trước cổng (cần sửa hình học phòng), màn ngắn/màn nghỉ, quái và boss mới, encounter, thoại, các mục "nâng cấp lớn".
