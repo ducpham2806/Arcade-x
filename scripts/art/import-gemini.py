@@ -10,13 +10,17 @@ crops.json:
               "bottom": [aw, ah] (pad to aspect, feet on the bottom edge),
               "canvas": [w, h] (shared canvas in source px, feet on the bottom edge),
               "tol"/"bgMax"/"seal" (flood tuning), "isolate": true (drop neighbours poking in),
-              "keyFlood": true (chroma: only border-connected key colour is background)}]}
+              "keyFlood": true (chroma: only border-connected key colour is background),
+              "replaces": [asset paths this sprite substitutes at runtime]}],
+   "map": "src/.../painted.json" (optional: write the replaces table there)}
 
 methods
   flood   dark design-sheet background: pixels connected to the crop border whose colour is
           close to the sampled background become transparent; edges are feathered by 1 px.
   chroma  green (default) or "key": "magenta" screen: alpha from key-colour dominance, spill
           removed from edge pixels.
+  alpha   sheet already has alpha but a noisy matte: keep the solid subject and its
+          detached parts, drop coloured speckle ("core", "minPart", "feather").
   none    plain crop (scenes, icons).
 
 Deterministic: the same sources and crops.json always give the same files. --check fails if
@@ -115,6 +119,34 @@ def border_connected(alpha):
     return Image.fromarray(np.where(near, a, 255).astype(np.uint8))
 
 
+def clean_alpha(rgba, core_thr, min_part, feather):
+    """Sheets exported with alpha but a noisy matte: keep the solid subject (connected
+    alpha >= core_thr), plus detached parts at least min_part of the largest that do not touch
+    the crop border, then a feather band of the original alpha around them. Coloured
+    low-alpha speckle elsewhere is dropped."""
+    a = np.asarray(rgba.getchannel('A'))
+    core = a >= core_thr
+    h, w = core.shape
+    lab = np.zeros((h, w), np.int32); sizes = [0]; edge = [False]; n = 0
+    for sy in range(h):
+        for sx in range(w):
+            if core[sy, sx] and not lab[sy, sx]:
+                n += 1; lab[sy, sx] = n; q = deque([(sy, sx)]); c = 0; e = False
+                while q:
+                    y, x = q.popleft(); c += 1
+                    if y in (0, h - 1) or x in (0, w - 1): e = True
+                    for ny, nx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+                        if 0 <= ny < h and 0 <= nx < w and core[ny, nx] and not lab[ny, nx]:
+                            lab[ny, nx] = n; q.append((ny, nx))
+                sizes.append(c); edge.append(e)
+    if not n: return rgba
+    big = int(np.argmax(sizes))
+    keep = [i for i in range(1, n + 1) if i == big or (not edge[i] and sizes[i] >= sizes[big] * min_part)]
+    mask = Image.fromarray((np.isin(lab, keep) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(feather * 2 + 1))
+    out = np.where((np.asarray(mask) > 0) & (a >= 20), a, 0).astype(np.uint8)
+    img = rgba.copy(); img.putalpha(Image.fromarray(out)); return img
+
+
 def drop_edge_fragments(img):
     """Clear opaque islands that touch the crop border, except the largest one (the subject).
     Neighbouring sprites poking into a crop are removed; detached parts fully inside the crop
@@ -144,12 +176,14 @@ def drop_edge_fragments(img):
 
 
 def process(item, base):
-    src = Image.open(os.path.join(base, item['source'])).convert('RGB')
+    method = item.get('method', 'none')
+    src = Image.open(os.path.join(base, item['source'])).convert('RGBA' if method == 'alpha' else 'RGB')
     x, y, w, h = item['box']
     crop = src.crop((x, y, x + w, y + h))
     rgb = np.asarray(crop)
-    method = item.get('method', 'none')
-    if method == 'flood':
+    if method == 'alpha':
+        img = clean_alpha(crop, item.get('core', 128), item.get('minPart', 0.15), item.get('feather', 2))
+    elif method == 'flood':
         img = Image.fromarray(rgb).convert('RGBA')
         img.putalpha(flood_alpha(rgb, item.get('tol', 34), item.get('bgMax', 90), item.get('seal', 0)))
     elif method == 'chroma':
@@ -210,6 +244,16 @@ def main():
         os.makedirs(os.path.dirname(out), exist_ok=True)
         open(out, 'wb').write(data)
         print('%-56s %4dx%-4d %6d B' % (out, size[0], size[1], len(data)))
+    if 'map' in spec:
+        # Runtime substitution table: original asset path -> painted file (served from public/).
+        table = {}
+        for item in spec['items']:
+            for old in item.get('replaces', []): table[old] = item['out'].replace('public', '', 1)
+        data = (json.dumps(dict(sorted(table.items())), indent=1) + '\n').encode()
+        if check:
+            if not os.path.exists(spec['map']) or open(spec['map'], 'rb').read() != data: bad.append(spec['map'])
+        else:
+            open(spec['map'], 'wb').write(data); print('%-56s %d entries' % (spec['map'], len(table)))
     if check:
         if bad: print('Out of date:', *bad, sep='\n  '); sys.exit(1)
         print(json.dumps({'items': len(spec['items']), 'status': 'up to date'}))

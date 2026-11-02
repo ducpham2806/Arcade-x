@@ -2573,3 +2573,25 @@
   .blossom.bb-screen-play .bb-header { display: none; }
   .blossom .bb-play { padding: 6px 16px; }
 }
+
+/* Gemini "Play screen" palette (art/gemini/hex-match/source/reference-play-screen.png):
+   forest-green frame and sage cells under the painted flowers. Chibi keeps its cream board. */
+.blossom .bb-board-wrap {
+  background: #4d7a3a;
+  box-shadow:
+    0 7px 0 #33572a,
+    0 14px 24px #21312830;
+}
+.blossom .bb-board {
+  border-color: #3a6230;
+  background: #9bb878;
+}
+.blossom .bb-cell {
+  background: #a6c283;
+}
+.blossom .bb-cell.alternate {
+  background: #97b672;
+}
+.blossom .bb-cell:hover:not(:disabled) {
+  background: #b8d196;
+}

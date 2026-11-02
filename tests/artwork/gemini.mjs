@@ -10,10 +10,27 @@ const sources=JSON.parse(fs.readFileSync('art/launcher/tech-art-sources.json','u
 const gameArt=fs.readFileSync('src/visuals/gameArt.tsx','utf8');
 const sha=f=>crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
 let checks=0;const games=fs.readdirSync('art/gemini').filter(g=>fs.existsSync(`art/gemini/${g}/crops.json`));
-assert.deepEqual(games.sort(),['blocker','caro-gomoku','chess','cyber-slice','mummy-escape','xiangqi']);
+assert.deepEqual(games.sort(),['blocker','caro-gomoku','chess','cyber-slice','hex-match','mummy-escape','xiangqi']);
 // Games with a painted launcher icon; the others keep their existing icon.
 const PAINTED_ICONS=['blocker','chess','mummy-escape'];
-for(const game of games){
+// Blossom Blast substitutes its original PNGs by path through painted.json (see blossom/assets.ts):
+// every replaced original exists, the table matches crops.json, and every preloaded file exists.
+{
+ const spec=JSON.parse(fs.readFileSync('art/gemini/hex-match/crops.json','utf8'));
+ const table=JSON.parse(fs.readFileSync(spec.map,'utf8')),expected={};
+ for(const it of spec.items){
+  assert.ok(fs.existsSync(`art/gemini/hex-match/${it.source}`)&&fs.existsSync(it.out),`hex-match: ${it.name} missing`);
+  assert.ok(fs.statSync(it.out).size<=(it.method==='none'?200_000:60_000),`hex-match: ${it.out} over budget`);
+  assert.ok(it.replaces?.length,`hex-match: ${it.name} replaces nothing`);
+  for(const old of it.replaces){assert.ok(fs.existsSync('public/blossom/'+old),`hex-match: ${old} is not an original asset`);expected[old]=it.out.replace(/^public/,'');}
+  checks++;
+ }
+ assert.deepEqual(table,expected,'painted.json is out of date');
+ for(const url of packages['hex-match'])assert.ok(fs.existsSync('public'+url),`hex-match: preloaded ${url} missing`);
+ for(const url of Object.values(table))assert.ok(url.startsWith('/blossom/gemini/'));
+ assert.ok(!packages['hex-match'].some(u=>u.slice('/blossom/'.length) in table),'hex-match preloads a replaced PNG');
+}
+for(const game of games.filter(g=>g!=='hex-match')){
  const {items}=JSON.parse(fs.readFileSync(`art/gemini/${game}/crops.json`,'utf8'));
  for(const it of items){
   assert.ok(fs.existsSync(`art/gemini/${game}/${it.source}`),`${game}: missing source ${it.source}`);

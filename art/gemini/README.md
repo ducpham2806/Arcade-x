@@ -15,8 +15,11 @@ python3 -I scripts/art/raster-launcher-art.py <game> --icon <ảnh vuông> [--ba
 
 Script cần Pillow và numpy. Cách tách nền:
 - `flood`: nền tối của bảng thiết kế, loang từ mép khung. `seal` dùng nét viền đen làm hàng rào để quần áo hay bóng tối không bị coi là nền.
+- `alpha`: bảng đã có nền trong suốt nhưng viền nhiễu màu; giữ phần đặc của hình và các mảnh rời đủ lớn, bỏ đốm nhiễu (`core`, `minPart`, `feather`).
 - `chroma`: nền xanh lá, hoặc `"key": "magenta"` cho nền hồng tím (độ trong suốt theo khoảng cách tới màu nền). `keyFlood` chỉ coi phần màu nền nối với mép khung là nền, để phần tím/xanh bên trong hình được giữ.
 - `isolate`: bỏ mảnh của hình bên cạnh lấn vào khung.
+
+Blossom Blast không đổi đường dẫn trong mã: mỗi sprite có `replaces` (các PNG cũ nó thay), importer ghi bảng `src/games/hex-match/blossom/painted.json`, và `asset()` trong `blossom/assets.ts` tra bảng này. PNG cũ vẫn giữ cho bản review offline.
 
 Icon launcher đăng ký trong `src/visuals/rasterIcons.json`, `docs/launcher-art-manifest.json` và `art/launcher/tech-art-sources.json`. Màn chờ khi tải game đăng ký ở `GAME_SPLASH_ART` (`src/visuals/gameArt.tsx`). Test: `node tests/artwork/gemini.mjs` (nằm trong `npm run test:artwork`).
 
@@ -30,8 +33,9 @@ Icon launcher đăng ký trong `src/visuals/rasterIcons.json`, `docs/launcher-ar
 | Cờ Tướng | mặt bàn gỗ, khung sơn mài đỏ, đĩa quân viền vàng–đỏ (Đỏ) và xanh đồng–đen (Đen), chữ vẫn vẽ chồng | — |
 | Caro | skin mặc định: kiếm chéo (X), khiên (O), bàn đá; skin trong shop giữ nguyên | banner và màn chờ lâu đài |
 | Cyber Blade | 14 loại quả và bom vẽ bằng ảnh (nửa quả khi chém là nửa ảnh), nền sân thượng neon | màn chờ |
+| Blossom Blast | 6 hoa chương 1, 5 vật phẩm đặc biệt, hạt giống, 12 chướng ngại (cỏ, đá 3 cấp, kén, băng 3 cấp, dây gai, sâu, bom giờ, mật ong), sương, cổng, 10 boss, Mia, Bibi, Pip, thỏ, cú, rùa, 10 đồ trang trí vườn, 10 nền chương, 11 icon (xu, sao, cúp, quà, cài đặt, búa, xáo, hoàn tác, +lượt, phân bón, máy hút, chổi), cánh hoa bay khi nổ, vệt cánh hoa; bàn chơi đổi sang tông xanh xô thơm theo bản thiết kế | — (icon launcher giữ nguyên) |
 
-Chưa dùng: thanh katana của Cyber Blade, bảng VFX của Blocker (nền ô caro giả trong suốt), nhà thám hiểm góc nghiêng/sau lưng, D-pad bọ hung. Block Breaker chờ ảnh đầy đủ: 4 ảnh đã gửi chỉ có 512×286.
+Chưa dùng: hoa chương 2–10 vẫn là bộ quân theo chủ đề cũ (Gemini mới có 6 hoa cho chương 1), truyện tranh mở chương, vòng lá vàng, các nút/khung trong UI kit (giao diện vẽ bằng CSS), cảnh vườn anh đào và bản đồ đường đá; thanh katana của Cyber Blade, bảng VFX của Blocker (nền ô caro giả trong suốt), nhà thám hiểm góc nghiêng/sau lưng, D-pad bọ hung. Block Breaker chờ ảnh đầy đủ: 4 ảnh đã gửi chỉ có 512×286.
 
 ## Nguồn
 
@@ -51,3 +55,15 @@ Chưa dùng: thanh katana của Cyber Blade, bảng VFX của Blocker (nền ô 
 | `xiangqi/source/sheet-wood-lacquer-tokens.png` | 1254×1254 | `26ef4847493f6b94…` |
 | `cyber-slice/source/arena-neon-terrace.png` | 1024×1536 | `8ea0987baecf4be3…` |
 | `cyber-slice/source/sheet-fruits-bomb-katana.png` | 1254×1254 | `2458678f8db40d69…` |
+| `hex-match/source/reference-garden-atelier.png` | 1536×1024 | `4f5cec56fb7d7861…` |
+| `hex-match/source/reference-play-screen.png` | 1536×1024 | `71a71571e965339f…` |
+| `hex-match/source/sheet-bosses-mia-bibi.png` | 1448×1086 | `61c7b8082bc9eaa4…` |
+| `hex-match/source/sheet-garden-friends-decor.png` | 1254×1254 | `c8d2c4a3805870aa…` |
+| `hex-match/source/sheet-obstacles.png` | 1448×1086 | `9743abf8d2990bab…` |
+| `hex-match/source/sheet-petal-vfx.png` | 1254×1254 | `b759a75986387534…` |
+| `hex-match/source/sheet-tokens-specials.png` | 1448×1086 | `50d46a865f31debc…` |
+| `hex-match/source/sheet-ui-kit.png` | 1254×1254 | `f1cd83cb2ab47c70…` |
+| `hex-match/source/vfx-golden-leaf-ring.png` | 1254×1254 | `ef24b1f8714fea0e…` |
+| `hex-match/source/worlds-01-04.png` | 1254×1254 | `70b6de4a677618bb…` |
+| `hex-match/source/worlds-05-08.png` | 1254×1254 | `d355cee0dd7da1ec…` |
+| `hex-match/source/worlds-09-10-extra.png` | 1254×1254 | `c6b6a1a1b8c2ed85…` |
