@@ -6,24 +6,33 @@ import {getLexicon,loadLexicon,type Lexicon} from './lexicon';
 import {advanceTime,createMatch,forfeit,setReady,standings,submitWord,type Match,type Seat} from './rules';
 import {WordChainSound} from './sound';
 import onlineConfig from './online-config.json';
+import {OnlineRoom,type OnlineMode} from './OnlineRoom';
+import type {WordChainClient} from './online-client';
 import './word-chain.css';
 
 const BOTS=[{name:'Mèo Mun',avatar:'🐱'},{name:'Cú Bông',avatar:'🦉'},{name:'Sóc Nâu',avatar:'🐿️'}];
 const seeded=(seed:number)=>{let x=seed>>>0;return()=>{x+=0x6D2B79F5;let t=Math.imul(x^(x>>>15),1|x);t^=t+Math.imul(t^(t>>>7),61|t);return((t^(t>>>14))>>>0)/4294967296;};};
 // Automated UI tests pin the match seed (turn order, opener, bot choices) through this global.
 const testSeed=()=>(globalThis as {__WORD_CHAIN_TEST_SEED__?:number}).__WORD_CHAIN_TEST_SEED__;
-type Screen={kind:'home'}|{kind:'setup'}|{kind:'practice';bots:number;level:BotLevel;seed:number}|{kind:'online'};
+type Screen={kind:'home'}|{kind:'setup'}|{kind:'practice';bots:number;level:BotLevel;seed:number}|{kind:'online';mode:OnlineMode};
 
-export function WordChainGame({bridge,isPaused=false,isMuted=false}:GameComponentProps){
+/** `roomClient` lets the review lab inject a local room server; normally the deployed one is used. */
+export function WordChainGame({bridge,isPaused=false,isMuted=false,roomClient}:GameComponentProps&{roomClient?:()=>Promise<{client:WordChainClient;resumeKey?:string}>}){
  const [lex,setLex]=useState<Lexicon|null>(getLexicon()),[error,setError]=useState('');
  const [screen,setScreen]=useState<Screen>({kind:'home'}),[bots,setBots]=useState(2),[level,setLevel]=useState<BotLevel>('easy'),[help,setHelp]=useState(false);
+ const [online,setOnline]=useState<{client:WordChainClient;resumeKey?:string}|null>(null),[onlineError,setOnlineError]=useState('');
  const muted=useRef(isMuted);muted.current=isMuted;
+ const canOnline=onlineConfig.enabled||!!roomClient;
+ // Opening an online screen connects lazily (account check, Edge Function client).
+ useEffect(()=>{if(screen.kind!=='online'||online||!canOnline)return;setOnlineError('');
+  (roomClient?roomClient():import('./online-platform').then(p=>p.platformWordChainClient())).then(setOnline).catch(e=>setOnlineError(e instanceof Error?e.message:'Không kết nối được phòng online.'));},[screen.kind]);
  const sound=useRef<WordChainSound|null>(null);sound.current??=new WordChainSound(()=>muted.current);
  useEffect(()=>()=>sound.current?.dispose(),[]);
  useEffect(()=>{if(!lex)loadLexicon().then(setLex).catch(()=>setError('Không tải được từ điển. Kiểm tra kết nối rồi thử lại.'));},[lex]);
  if(!lex)return <div className="nt-game nt-loading"><div className="nt-logo"><span>NỐI</span><span>TỪ</span></div><p>{error||'Đang mở từ điển…'}</p>{error&&<button className="nt-primary" onClick={()=>{setError('');setLex(null);loadLexicon().then(setLex).catch(()=>setError('Vẫn chưa tải được từ điển.'));}}>Thử lại</button>}</div>;
  if(screen.kind==='practice')return <div className="nt-game"><Practice key={screen.seed} lex={lex} bots={screen.bots} level={screen.level} seed={screen.seed} sound={sound.current} bridge={bridge} isPaused={isPaused}
   onExit={()=>setScreen({kind:'home'})} onRematch={()=>setScreen({...screen,seed:Date.now()})}/></div>;
+ if(screen.kind==='online'&&online)return <div className="nt-game"><OnlineRoom key={screen.mode} client={online.client} resumeKey={online.resumeKey} mode={screen.mode} lex={lex} sound={sound.current} bridge={bridge} onExit={()=>setScreen({kind:'home'})}/></div>;
  return <div className="nt-game nt-home">
   <div className="nt-home-inner">
    <div className="nt-logo" aria-label="Nối Từ"><span>NỐI</span><span>TỪ</span></div>
@@ -37,12 +46,12 @@ export function WordChainGame({bridge,isPaused=false,isMuted=false}:GameComponen
     <button className="nt-primary" data-testid="nt-start-practice" onClick={()=>setScreen({kind:'practice',bots,level,seed:testSeed()??Date.now()})}>VÀO TRẬN</button>
     <button onClick={()=>setScreen({kind:'home'})}>Quay lại</button>
    </div>:screen.kind==='online'?<div className="nt-card"><h2>Đấu online</h2>
-    <p>{onlineConfig.enabled?'Đang kết nối phòng…':'Phòng online (ghép trận, tạo phòng, nhập mã) đang chờ bật máy chủ. Trong lúc đó anh có thể luyện với bot.'}</p>
+    <p>{!canOnline?'Phòng online (ghép trận, tạo phòng, nhập mã) đang chờ bật máy chủ. Trong lúc đó anh có thể luyện với bot.':onlineError||'Đang kết nối phòng…'}</p>
     <button className="nt-primary" onClick={()=>setScreen({kind:'setup'})}>Luyện với bot</button><button onClick={()=>setScreen({kind:'home'})}>Quay lại</button>
    </div>:<div className="nt-menu">
     <button className="nt-primary" data-testid="nt-practice" onClick={()=>setScreen({kind:'setup'})}>LUYỆN VỚI BOT</button>
-    <button onClick={()=>setScreen({kind:'online'})}>GHÉP TRẬN<small>2–4 người</small></button>
-    <div className="nt-pair"><button onClick={()=>setScreen({kind:'online'})}>TẠO PHÒNG</button><button onClick={()=>setScreen({kind:'online'})}>NHẬP MÃ</button></div>
+    <button data-testid="nt-match" onClick={()=>setScreen({kind:'online',mode:'match'})}>GHÉP TRẬN<small>2–4 người</small></button>
+    <div className="nt-pair"><button data-testid="nt-create" onClick={()=>setScreen({kind:'online',mode:'create'})}>TẠO PHÒNG</button><button data-testid="nt-join" onClick={()=>setScreen({kind:'online',mode:'join'})}>NHẬP MÃ</button></div>
     <button className="nt-link" onClick={()=>setHelp(true)}>Cách chơi</button>
    </div>}
    <p className="nt-credit">Từ điển {lex.words.length.toLocaleString('vi-VN')} từ: Wiktionary (CC BY-SA 4.0), qua which-dialect</p>

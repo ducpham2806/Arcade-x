@@ -1,6 +1,6 @@
 # Máy chủ phòng Nối Từ (word-chain)
 
-**Trạng thái:** mã nguồn và test đã có, **chưa triển khai**. Trong game, các nút Ghép trận, Tạo phòng và Nhập mã vẫn báo "đang chờ bật máy chủ" vì `src/games/word-chain/online-config.json` đang `enabled: false`. Luyện với bot chơi được ngay, kể cả khi offline.
+**Trạng thái:** máy chủ, giao diện online và test đã có, **chưa triển khai**. Trong game, các nút Ghép trận, Tạo phòng và Nhập mã vẫn báo "đang chờ bật máy chủ" vì `src/games/word-chain/online-config.json` đang `enabled: false`. Luyện với bot chơi được ngay, kể cả khi offline.
 
 ## Cách hoạt động
 
@@ -34,4 +34,16 @@ Test Edge cũng kiểm tra bản code đã chép trùng với `src/`.
 2. Chạy `npm run prepare:word-chain-server`, rồi deploy `supabase/functions/word-chain-room` với `verify_jwt` mặc định. Biến môi trường `SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY` do Supabase cấp.
 3. Tạo secret `wc_room_service_key` trong Vault của database, thay URL trong `supabase/word-chain/scheduler.sql`, rồi chạy file này.
 4. Áp `supabase/migrations/20261102090000_word_chain_catalog.sql` để game hiện trong danh mục production.
-5. Đặt `enabled: true` trong `src/games/word-chain/online-config.json`. Giao diện online làm ở module WC4. Thử với 2–4 tài khoản thật.
+5. Đặt `enabled: true` trong `src/games/word-chain/online-config.json`, build lại, rồi thử với 2–4 tài khoản thật.
+
+## Giao diện online (WC4)
+
+- `online-client.ts`: một thao tác gửi tại một thời điểm. Thao tác đợi lần đồng bộ đang chạy xong rồi mới gửi. Nếu người khác vừa đổi phòng (lỗi `VERSION_CONFLICT`, máy chủ chưa áp dụng gì) thì client đồng bộ rồi gửi lại.
+- Hỏi trạng thái mỗi giây khi đang có đồng hồ (chuẩn bị, đếm ngược, lượt, tự bắt đầu, tái đấu), 3 giây khi chờ. Hỏi lại ngay khi quay lại tab hoặc có mạng lại.
+- `online-platform.ts`: chỉ cho tài khoản đã đăng ký. Nhớ phòng để vào lại sau khi tải lại trang.
+- `OnlineRoom.tsx` gồm các màn:
+  - tạo phòng (2–4 người), nhập mã, hàng ghép trận;
+  - phòng chờ có mã và nút sao chép, ghế trống, nút Bắt đầu cho chủ phòng;
+  - trận đấu (dùng chung `MatchView` với chế độ bot);
+  - biểu cảm khi đang xem; tái đấu kèm số phiếu và thời gian còn lại.
+- Thử không cần máy chủ: `npm run preview:word-chain` tạo `review/word-chain-room-lab.html`. Đó là 4 người chơi trên một màn hình, chạy máy chủ thật với bộ lưu trong trình duyệt. File chỉ dùng để duyệt, không nằm trong bản build.

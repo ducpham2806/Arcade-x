@@ -110,4 +110,13 @@ await test('matchmaking over HTTP: queued players share one public room; codes c
   assert.equal((await call('tok-eve', {type: 'join', code: views[0].code})).body.error, 'QUEUE_ONLY');
 });
 
+await test('production bundle (when built) has no room server or review lab code', async () => {
+  const {existsSync, readdirSync} = await import('node:fs');
+  if (!existsSync('dist/assets')) return;
+  for (const f of readdirSync('dist/assets').filter(f => f.endsWith('.js'))) {
+    const js = readFileSync('dist/assets/' + f, 'utf8');
+    assert.ok(!js.includes('LocalRoomStore') && !js.includes('word-chain-matchmaking') && !js.includes('Phòng thử 4 người'), `${f} ships review/server code`);
+  }
+});
+
 console.log(`word-chain edge room: ${checks} checks passed`);
