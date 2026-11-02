@@ -2595,3 +2595,50 @@
 .blossom .bb-cell:hover:not(:disabled) {
   background: #b8d196;
 }
+
+/* Gemini UI kit (art/gemini/hex-match/source/sheet-ui-kit.png): painted pills and panels
+   drawn on a ::before layer behind the content, over a solid fill of the same tone (so text
+   contrast is still checked against a real colour). Labels, sizes and layout stay as before;
+   the chibi style keeps its flat look. */
+.blossom:not(.bb-chibi) .bb-primary,
+.blossom:not(.bb-chibi) .bb-hud > div,
+.blossom:not(.bb-chibi) .bb-play .bb-goals > div {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent;
+  box-shadow: none;
+}
+.blossom:not(.bb-chibi) .bb-primary::before,
+.blossom:not(.bb-chibi) .bb-hud > div::before,
+.blossom:not(.bb-chibi) .bb-play .bb-goals > div::before {
+  content: "";
+  position: absolute;
+  inset: -3px -4px;
+  z-index: -1;
+  background: center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.blossom:not(.bb-chibi) .bb-primary {
+  background: #3e7a33;
+  color: #fffbe8;
+}
+.blossom:not(.bb-chibi) .bb-primary:hover:not(:disabled) {
+  background: #3e7a33;
+  filter: brightness(1.06);
+}
+.blossom:not(.bb-chibi) .bb-primary::before { background-image: url(/blossom/gemini/ui-pill-green.webp); }
+.blossom:not(.bb-chibi) .bb-hud > div { background: #fbf3dc; }
+.blossom:not(.bb-chibi) .bb-hud > div::before { background-image: url(/blossom/gemini/ui-panel.webp); }
+.blossom:not(.bb-chibi) .bb-hud > div:first-child { background: #f6c64a; }
+.blossom:not(.bb-chibi) .bb-hud > div:first-child::before { background-image: url(/blossom/gemini/ui-pill-gold.webp); }
+.blossom:not(.bb-chibi) .bb-play .bb-goals > div { background: #fbf3dc; }
+.blossom:not(.bb-chibi) .bb-play .bb-goals > div::before { background-image: url(/blossom/gemini/ui-pill-cream.webp); }
+/* Hint and selection: the painted golden leaf ring instead of a flat yellow outline. */
+.blossom .bb-cell.hint:after,
+.blossom .bb-cell.selected:after {
+  inset: -6%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: url(/blossom/gemini/ui-leaf-ring.webp) center / contain no-repeat;
+}

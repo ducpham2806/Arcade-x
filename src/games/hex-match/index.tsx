@@ -918,7 +918,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
         style={
           {
             "--bb-font": save.settings.font,
-            "--bb-bg": `url("${asset(save.settings.season === "none" ? `png/backgrounds/bg_cluster${pad(chapter)}.png` : `png/backgrounds/bg_season_${save.settings.season}.png`)}")`,
+            "--bb-bg": `url("${screen === "garden" ? "/blossom/gemini/world-garden.webp" : screen === "daily" || screen === "side" ? "/blossom/gemini/world-map.webp" : asset(save.settings.season === "none" ? `png/backgrounds/bg_cluster${pad(chapter)}.png` : `png/backgrounds/bg_season_${save.settings.season}.png`)}")`,
           } as React.CSSProperties
         }
       >

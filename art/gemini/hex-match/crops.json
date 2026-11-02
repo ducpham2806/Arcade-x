@@ -20,7 +20,16 @@
    "quality": 88,
    "out": "public/blossom/gemini/flower-red.webp",
    "replaces": [
-    "png/theme_pieces/theme01_p1_rose_red.png"
+    "png/theme_pieces/theme01_p1_rose_red.png",
+    "png/theme_pieces/theme02_p1_strawberry_red.png",
+    "png/theme_pieces/theme03_p1_sunflower_yellow.png",
+    "png/theme_pieces/theme04_p1_hibiscus_red.png",
+    "png/theme_pieces/theme05_p1_mushroom_red_red.png",
+    "png/theme_pieces/theme06_p1_cactus_pink.png",
+    "png/theme_pieces/theme07_p1_snowflake_aqua.png",
+    "png/theme_pieces/theme08_p1_lotus_pink.png",
+    "png/theme_pieces/theme09_p1_rose_aqua.png",
+    "png/theme_pieces/theme10_p1_rose_gold.png"
    ]
   },
   {
@@ -41,7 +50,16 @@
    "quality": 88,
    "out": "public/blossom/gemini/flower-yellow.webp",
    "replaces": [
-    "png/theme_pieces/theme01_p2_pansy_yellow.png"
+    "png/theme_pieces/theme01_p2_pansy_yellow.png",
+    "png/theme_pieces/theme02_p2_orange_orange.png",
+    "png/theme_pieces/theme03_p2_daisy_white.png",
+    "png/theme_pieces/theme04_p2_starfish_orange.png",
+    "png/theme_pieces/theme05_p2_mushroom_flat_purple.png",
+    "png/theme_pieces/theme06_p2_sunflower_orange.png",
+    "png/theme_pieces/theme07_p2_rose_pink.png",
+    "png/theme_pieces/theme08_p2_lily_white.png",
+    "png/theme_pieces/theme09_p2_daisy_yellow.png",
+    "png/theme_pieces/theme10_p2_sunflower_yellow.png"
    ]
   },
   {
@@ -62,7 +80,16 @@
    "quality": 88,
    "out": "public/blossom/gemini/flower-purple.webp",
    "replaces": [
-    "png/theme_pieces/theme01_p3_daisy_purple.png"
+    "png/theme_pieces/theme01_p3_daisy_purple.png",
+    "png/theme_pieces/theme02_p3_lemon_yellow.png",
+    "png/theme_pieces/theme03_p3_tulip_orange.png",
+    "png/theme_pieces/theme04_p3_shell_pink.png",
+    "png/theme_pieces/theme05_p3_orchid_lilac.png",
+    "png/theme_pieces/theme06_p3_hibiscus_yellow.png",
+    "png/theme_pieces/theme07_p3_bellflower_lilac.png",
+    "png/theme_pieces/theme08_p3_orchid_purple.png",
+    "png/theme_pieces/theme09_p3_pansy_magenta.png",
+    "png/theme_pieces/theme10_p3_lotus_pink.png"
    ]
   },
   {
@@ -83,7 +110,16 @@
    "quality": 88,
    "out": "public/blossom/gemini/flower-blue.webp",
    "replaces": [
-    "png/theme_pieces/theme01_p4_bellflower_blue.png"
+    "png/theme_pieces/theme01_p4_bellflower_blue.png",
+    "png/theme_pieces/theme02_p4_apple_green.png",
+    "png/theme_pieces/theme03_p4_bellflower_blue.png",
+    "png/theme_pieces/theme04_p4_orchid_blue.png",
+    "png/theme_pieces/theme05_p4_bellflower_teal.png",
+    "png/theme_pieces/theme06_p4_tulip_red.png",
+    "png/theme_pieces/theme07_p4_daisy_white.png",
+    "png/theme_pieces/theme08_p4_hibiscus_orange.png",
+    "png/theme_pieces/theme09_p4_lily_lime.png",
+    "png/theme_pieces/theme10_p4_hibiscus_red.png"
    ]
   },
   {
@@ -104,7 +140,16 @@
    "quality": 88,
    "out": "public/blossom/gemini/flower-green.webp",
    "replaces": [
-    "png/theme_pieces/theme01_p5_cherry_pink.png"
+    "png/theme_pieces/theme01_p5_cherry_pink.png",
+    "png/theme_pieces/theme02_p5_grapes_purple.png",
+    "png/theme_pieces/theme03_p5_lily_pink.png",
+    "png/theme_pieces/theme04_p5_cherry_yellow.png",
+    "png/theme_pieces/theme05_p5_lily_pink.png",
+    "png/theme_pieces/theme06_p5_daisy_purple.png",
+    "png/theme_pieces/theme07_p5_tulip_blue.png",
+    "png/theme_pieces/theme08_p5_cherry_magenta.png",
+    "png/theme_pieces/theme09_p5_bellflower_purple.png",
+    "png/theme_pieces/theme10_p5_orchid_white.png"
    ]
   },
   {
@@ -125,7 +170,16 @@
    "quality": 88,
    "out": "public/blossom/gemini/flower-orange.webp",
    "replaces": [
-    "png/theme_pieces/theme01_p6_lily_green.png"
+    "png/theme_pieces/theme01_p6_lily_green.png",
+    "png/theme_pieces/theme02_p6_cherries_magenta.png",
+    "png/theme_pieces/theme03_p6_cherry_lilac.png",
+    "png/theme_pieces/theme04_p6_lily_teal.png",
+    "png/theme_pieces/theme05_p6_pansy_orange.png",
+    "png/theme_pieces/theme06_p6_lily_teal.png",
+    "png/theme_pieces/theme07_p6_lily_purple.png",
+    "png/theme_pieces/theme08_p6_bellflower_teal.png",
+    "png/theme_pieces/theme09_p6_cherry_blue.png",
+    "png/theme_pieces/theme10_p6_pansy_orange.png"
    ]
   },
   {
@@ -1698,6 +1752,1242 @@
    "out": "public/blossom/gemini/world-10.webp",
    "replaces": [
     "png/backgrounds/bg_cluster10.png"
+   ]
+  },
+  {
+   "name": "ui-leaf-ring",
+   "source": "source/vfx-golden-leaf-ring.png",
+   "box": [
+    180,
+    160,
+    900,
+    920
+   ],
+   "method": "alpha",
+   "core": 60,
+   "minPart": 0.01,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-leaf-ring.webp",
+   "replaces": [
+    "png/ui/node_current.png"
+   ],
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-pill-green",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    14,
+    82,
+    320,
+    172
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-pill-green.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-pill-cream",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    334,
+    82,
+    316,
+    172
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-pill-cream.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-pill-gold",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    646,
+    86,
+    300,
+    168
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-pill-gold.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-panel",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    950,
+    30,
+    280,
+    264
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-panel.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "world-garden",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-garden.webp",
+   "usedBy": "src/games/hex-match/index.tsx"
+  },
+  {
+   "name": "world-map",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-map.webp",
+   "usedBy": "src/games/hex-match/index.tsx"
+  },
+  {
+   "name": "app-icon",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    60,
+    60,
+    500,
+    500
+   ],
+   "size": [
+    512,
+    512
+   ],
+   "quality": 88,
+   "out": "public/blossom/gemini/app-icon.webp",
+   "replaces": [
+    "png/icon/app_icon_1024.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/flower-red.webp",
+     "cx": 0.47,
+     "h": 0.66,
+     "base": 0.9
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.74,
+     "h": 0.4,
+     "base": 0.48
+    }
+   ]
+  },
+  {
+   "name": "comic-c01-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c01-p1.webp",
+   "replaces": [
+    "png/comics/comic_c01_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c01-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c01-p2.webp",
+   "replaces": [
+    "png/comics/comic_c01_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c01-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c01-p3.webp",
+   "replaces": [
+    "png/comics/comic_c01_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-01.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c02-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c02-p1.webp",
+   "replaces": [
+    "png/comics/comic_c02_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c02-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c02-p2.webp",
+   "replaces": [
+    "png/comics/comic_c02_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c02-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c02-p3.webp",
+   "replaces": [
+    "png/comics/comic_c02_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-02.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c03-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c03-p1.webp",
+   "replaces": [
+    "png/comics/comic_c03_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-pip.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c03-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c03-p2.webp",
+   "replaces": [
+    "png/comics/comic_c03_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c03-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c03-p3.webp",
+   "replaces": [
+    "png/comics/comic_c03_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-03.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c04-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c04-p1.webp",
+   "replaces": [
+    "png/comics/comic_c04_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c04-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c04-p2.webp",
+   "replaces": [
+    "png/comics/comic_c04_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c04-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c04-p3.webp",
+   "replaces": [
+    "png/comics/comic_c04_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-04.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c05-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c05-p1.webp",
+   "replaces": [
+    "png/comics/comic_c05_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-bunny.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c05-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c05-p2.webp",
+   "replaces": [
+    "png/comics/comic_c05_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c05-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c05-p3.webp",
+   "replaces": [
+    "png/comics/comic_c05_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-05.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c06-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c06-p1.webp",
+   "replaces": [
+    "png/comics/comic_c06_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c06-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c06-p2.webp",
+   "replaces": [
+    "png/comics/comic_c06_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c06-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c06-p3.webp",
+   "replaces": [
+    "png/comics/comic_c06_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-06.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c07-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c07-p1.webp",
+   "replaces": [
+    "png/comics/comic_c07_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c07-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c07-p2.webp",
+   "replaces": [
+    "png/comics/comic_c07_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c07-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c07-p3.webp",
+   "replaces": [
+    "png/comics/comic_c07_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-07.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c08-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c08-p1.webp",
+   "replaces": [
+    "png/comics/comic_c08_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-owl.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c08-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c08-p2.webp",
+   "replaces": [
+    "png/comics/comic_c08_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c08-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c08-p3.webp",
+   "replaces": [
+    "png/comics/comic_c08_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-08.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c09-p1",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c09-p1.webp",
+   "replaces": [
+    "png/comics/comic_c09_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c09-p2",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c09-p2.webp",
+   "replaces": [
+    "png/comics/comic_c09_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c09-p3",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c09-p3.webp",
+   "replaces": [
+    "png/comics/comic_c09_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-09.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c10-p1",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c10-p1.webp",
+   "replaces": [
+    "png/comics/comic_c10_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-turtle.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c10-p2",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c10-p2.webp",
+   "replaces": [
+    "png/comics/comic_c10_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c10-p3",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c10-p3.webp",
+   "replaces": [
+    "png/comics/comic_c10_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-10.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
    ]
   }
  ]

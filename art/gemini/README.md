@@ -15,6 +15,7 @@ python3 -I scripts/art/raster-launcher-art.py <game> --icon <ảnh vuông> [--ba
 
 Script cần Pillow và numpy. Cách tách nền:
 - `flood`: nền tối của bảng thiết kế, loang từ mép khung. `seal` dùng nét viền đen làm hàng rào để quần áo hay bóng tối không bị coi là nền.
+- `compose`: ghép cảnh từ một vùng nền và các sprite đã cắt trước đó (truyện tranh, icon).
 - `alpha`: bảng đã có nền trong suốt nhưng viền nhiễu màu; giữ phần đặc của hình và các mảnh rời đủ lớn, bỏ đốm nhiễu (`core`, `minPart`, `feather`).
 - `chroma`: nền xanh lá, hoặc `"key": "magenta"` cho nền hồng tím (độ trong suốt theo khoảng cách tới màu nền). `keyFlood` chỉ coi phần màu nền nối với mép khung là nền, để phần tím/xanh bên trong hình được giữ.
 - `isolate`: bỏ mảnh của hình bên cạnh lấn vào khung.
@@ -33,9 +34,9 @@ Icon launcher đăng ký trong `src/visuals/rasterIcons.json`, `docs/launcher-ar
 | Cờ Tướng | mặt bàn gỗ, khung sơn mài đỏ, đĩa quân viền vàng–đỏ (Đỏ) và xanh đồng–đen (Đen), chữ vẫn vẽ chồng | — |
 | Caro | skin mặc định: kiếm chéo (X), khiên (O), bàn đá; skin trong shop giữ nguyên | banner và màn chờ lâu đài |
 | Cyber Blade | 14 loại quả và bom vẽ bằng ảnh (nửa quả khi chém là nửa ảnh), nền sân thượng neon | màn chờ |
-| Blossom Blast | 6 hoa chương 1, 5 vật phẩm đặc biệt, hạt giống, 12 chướng ngại (cỏ, đá 3 cấp, kén, băng 3 cấp, dây gai, sâu, bom giờ, mật ong), sương, cổng, 10 boss, Mia, Bibi, Pip, thỏ, cú, rùa, 10 đồ trang trí vườn, 10 nền chương, 11 icon (xu, sao, cúp, quà, cài đặt, búa, xáo, hoàn tác, +lượt, phân bón, máy hút, chổi), cánh hoa bay khi nổ, vệt cánh hoa; bàn chơi đổi sang tông xanh xô thơm theo bản thiết kế | — (icon launcher giữ nguyên) |
+| Blossom Blast | 6 hoa cho cả 10 chương (thay bộ quân theo chủ đề cũ), vật phẩm đặc biệt, hạt giống, 12 chướng ngại, sương, cổng, 10 boss, Mia, Bibi, Pip, thỏ, cú, rùa, 10 đồ trang trí vườn, 10 nền chương, nền khu vườn (vườn anh đào) và Mỗi ngày/Vườn thử thách (bản đồ đường đá), 30 khung truyện tranh ghép từ nền chương và nhân vật, icon xu/sao/cúp/quà/cài đặt và các công cụ, vòng lá vàng (nút màn đang mở, viền gợi ý), nút chính và HUD vẽ bằng UI kit, cánh hoa bay; bàn chơi tông xanh xô thơm | icon ghép từ hoa đỏ và Bibi trên nền vườn |
 
-Chưa dùng: hoa chương 2–10 vẫn là bộ quân theo chủ đề cũ (Gemini mới có 6 hoa cho chương 1), truyện tranh mở chương, vòng lá vàng, các nút/khung trong UI kit (giao diện vẽ bằng CSS), cảnh vườn anh đào và bản đồ đường đá; thanh katana của Cyber Blade, bảng VFX của Blocker (nền ô caro giả trong suốt), nhà thám hiểm góc nghiêng/sau lưng, D-pad bọ hung. Block Breaker chờ ảnh đầy đủ: 4 ảnh đã gửi chỉ có 512×286.
+Chưa dùng: biểu cảm riêng cho nhân vật (mỗi nhân vật mới có 1 tư thế), 12 huy hiệu thành tích, vài icon nhỏ (quay lại, nhà, khoá, tạm dừng, chơi lại, nhiệm vụ), khung bàn và ô gạch; thanh katana của Cyber Blade, bảng VFX của Blocker (nền ô caro giả trong suốt), nhà thám hiểm góc nghiêng/sau lưng, D-pad bọ hung. Block Breaker chờ ảnh đầy đủ: 4 ảnh đã gửi chỉ có 512×286.
 
 ## Nguồn
 

@@ -201,11 +201,15 @@
   },
   {
     "id": "hex-match",
-    "icon": "/game-art/icons/hex-match.webp",
+    "icon": "/game-art/icons/hex-match.techart-cd332fd5e963.webp",
     "banner": "/game-art/banners/hex-match.webp",
-    "iconBytes": 15772,
+    "iconBytes": 90392,
     "bannerBytes": 32434,
-    "sha256": "1b821a6f2d69d7b188210d3b10045879bdc1d3e3db7f5f08c7dcfc78288a2b68"
+    "sha256": "cd332fd5e9639fa4150f698f1103f427abaa1437bfe2271d86eea98909ce2874",
+    "sourceType": "imagegen",
+    "sourceFileName": "Blossom Blast flower and Bibi (composed from Gemini art)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "9f18a943baf4705ccb6bdb387d33807c7dc8d724b98b197f1c39966ef11fcebc"
   },
   {
     "id": "tile-2048",

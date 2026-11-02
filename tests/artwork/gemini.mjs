@@ -20,9 +20,13 @@ const PAINTED_ICONS=['blocker','chess','mummy-escape'];
  const table=JSON.parse(fs.readFileSync(spec.map,'utf8')),expected={};
  for(const it of spec.items){
   assert.ok(fs.existsSync(`art/gemini/hex-match/${it.source}`)&&fs.existsSync(it.out),`hex-match: ${it.name} missing`);
-  assert.ok(fs.statSync(it.out).size<=(it.method==='none'?200_000:60_000),`hex-match: ${it.out} over budget`);
-  assert.ok(it.replaces?.length,`hex-match: ${it.name} replaces nothing`);
-  for(const old of it.replaces){assert.ok(fs.existsSync('public/blossom/'+old),`hex-match: ${old} is not an original asset`);expected[old]=it.out.replace(/^public/,'');}
+  assert.ok(fs.statSync(it.out).size<=(it.method==='none'||it.method==='compose'?200_000:60_000),`hex-match: ${it.out} over budget`);
+  // A sprite either substitutes original PNGs or is referenced directly by the named file.
+  if(it.usedBy)assert.ok(fs.readFileSync(it.usedBy,'utf8').includes(it.out.replace(/^public/,'')),`hex-match: ${it.name} not used in ${it.usedBy}`);
+  else assert.ok(it.replaces?.length,`hex-match: ${it.name} replaces nothing`);
+  // Composed scenes may only layer sprites produced earlier in crops.json.
+  for(const layer of it.layers||[])assert.ok(spec.items.indexOf(spec.items.find(o=>o.out===layer.sprite))>-1&&spec.items.findIndex(o=>o.out===layer.sprite)<spec.items.indexOf(it),`hex-match: ${it.name} layers an unknown or later sprite`);
+  for(const old of it.replaces||[]){assert.ok(fs.existsSync('public/blossom/'+old),`hex-match: ${old} is not an original asset`);expected[old]=it.out.replace(/^public/,'');}
   checks++;
  }
  assert.deepEqual(table,expected,'painted.json is out of date');

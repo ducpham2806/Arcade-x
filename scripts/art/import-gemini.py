@@ -19,6 +19,7 @@ methods
           close to the sampled background become transparent; edges are feathered by 1 px.
   chroma  green (default) or "key": "magenta" screen: alpha from key-colour dominance, spill
           removed from edge pixels.
+  compose scene built from a background crop and earlier outputs ("layers", see compose()).
   alpha   sheet already has alpha but a noisy matte: keep the solid subject and its
           detached parts, drop coloured speckle ("core", "minPart", "feather").
   none    plain crop (scenes, icons).
@@ -30,7 +31,7 @@ import hashlib, io, json, os, sys
 from collections import deque
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 
 def flood_alpha(rgb, tol, bg_max, seal=0):
@@ -175,7 +176,35 @@ def drop_edge_fragments(img):
     img = img.copy(); img.putalpha(Image.fromarray(alpha)); return img
 
 
+def compose(item, base):
+    """Scene from painted parts: a background crop scaled to cover "size", then each layer
+    {"sprite": earlier output path, "cx": 0..1, "h": height fraction, "base": feet y 0..1,
+    "flip": bool} pasted bottom-centred with a soft ground shadow."""
+    W, H = item['size']
+    bg = Image.open(os.path.join(base, item['source'])).convert('RGB')
+    x, y, w, h = item['box']; bg = bg.crop((x, y, x + w, y + h))
+    r = max(W / bg.width, H / bg.height)
+    bg = bg.resize((round(bg.width * r), round(bg.height * r)), Image.LANCZOS)
+    top = round((bg.height - H) * item.get('coverY', 0.5)); left = (bg.width - W) // 2
+    canvas = bg.crop((left, top, left + W, top + H)).convert('RGBA')
+    for layer in item['layers']:
+        spr = Image.open(layer['sprite']).convert('RGBA')
+        bbox = spr.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox()
+        if bbox: spr = spr.crop(bbox)
+        th = round(H * layer['h']); spr = spr.resize((max(1, round(spr.width * th / spr.height)), th), Image.LANCZOS)
+        if layer.get('flip'): spr = spr.transpose(Image.FLIP_LEFT_RIGHT)
+        cx = round(W * layer['cx']); feet = round(H * layer.get('base', 0.95))
+        shadow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        sw = round(spr.width * 0.42); sh = max(4, round(spr.width * 0.09))
+        ImageDraw.Draw(shadow).ellipse((cx - sw, feet - sh, cx + sw, feet + sh), fill=(30, 40, 20, 90))
+        canvas = Image.alpha_composite(canvas, shadow.filter(ImageFilter.GaussianBlur(6)))
+        canvas.alpha_composite(spr, (cx - spr.width // 2, feet - spr.height))
+    buf = io.BytesIO(); canvas.convert('RGB').save(buf, 'WEBP', quality=item.get('quality', 82), method=6)
+    return buf.getvalue(), (W, H)
+
+
 def process(item, base):
+    if item.get('method') == 'compose': return compose(item, base)
     method = item.get('method', 'none')
     src = Image.open(os.path.join(base, item['source'])).convert('RGBA' if method == 'alpha' else 'RGB')
     x, y, w, h = item['box']

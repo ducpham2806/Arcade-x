@@ -66,5 +66,11 @@
     "sourceLibraryFileId": "gemini-upload",
     "sourceSHA256": "865314a29355d8d8fbb86648bdeccbfe902203832a521def682bc612e9d22be1",
     "inset": 0.07
+  },
+  "hex-match": {
+    "master": "public/blossom/gemini/app-icon.webp",
+    "sourceFileName": "Blossom Blast flower and Bibi (composed from Gemini art)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "9f18a943baf4705ccb6bdb387d33807c7dc8d724b98b197f1c39966ef11fcebc"
   }
 }
