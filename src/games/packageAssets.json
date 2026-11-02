@@ -909,15 +909,39 @@
   ],
   "xiangqi": [
     "/game-art/icons/xiangqi.webp",
-    "/game-art/banners/xiangqi.webp"
+    "/game-art/banners/xiangqi.webp",
+    "/games/xiangqi/art/board-wood.webp",
+    "/games/xiangqi/art/frame-lacquer.webp",
+    "/games/xiangqi/art/token-black.webp",
+    "/games/xiangqi/art/token-red.webp"
   ],
   "caro-gomoku": [
     "/game-art/icons/caro-gomoku.webp",
-    "/game-art/banners/caro-gomoku.webp"
+    "/game-art/banners/caro-gomoku.webp",
+    "/games/caro-gomoku/art/board-stone.webp",
+    "/games/caro-gomoku/art/mark-o.webp",
+    "/games/caro-gomoku/art/mark-x.webp",
+    "/games/caro-gomoku/art/splash.webp"
   ],
   "cyber-slice": [
     "/game-art/icons/cyber-slice.webp",
-    "/game-art/banners/cyber-slice.webp"
+    "/game-art/banners/cyber-slice.webp",
+    "/games/cyber-slice/art/apple_green.webp",
+    "/games/cyber-slice/art/apple_red.webp",
+    "/games/cyber-slice/art/arena.webp",
+    "/games/cyber-slice/art/banana.webp",
+    "/games/cyber-slice/art/bomb.webp",
+    "/games/cyber-slice/art/coconut.webp",
+    "/games/cyber-slice/art/freeze_fruit.webp",
+    "/games/cyber-slice/art/frenzy_fruit.webp",
+    "/games/cyber-slice/art/golden_fruit.webp",
+    "/games/cyber-slice/art/kiwi.webp",
+    "/games/cyber-slice/art/lemon.webp",
+    "/games/cyber-slice/art/orange.webp",
+    "/games/cyber-slice/art/pineapple.webp",
+    "/games/cyber-slice/art/pomegranate.webp",
+    "/games/cyber-slice/art/strawberry.webp",
+    "/games/cyber-slice/art/watermelon.webp"
   ],
   "tile-2048": [
     "/game-art/icons/tile-2048.webp",

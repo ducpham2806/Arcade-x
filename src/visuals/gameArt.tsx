@@ -253,7 +253,7 @@ export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId
  <g className="game-artwork-scene" filter={`url(#${uid}-depth)`} transform={variant==='icon'?'translate(18 8) scale(.9)':undefined}>{variant==='icon'&&id==='hex-match'?<image href={blossomAsset(BLOSSOM_ICON)} x="85" y="0" width="250" height="250"/>:<Scene id={id} a={color} b={secondary} uid={uid}/>}</g>{variant==='icon'&&<><path d="M80 26Q210 -22 340 26" stroke="#fff" strokeOpacity=".18" strokeWidth="3"/><rect x="65" y="-20" width="290" height="290" rx="55" stroke="#fff" strokeOpacity=".16" strokeWidth="2" fill="none"/></>}</svg>;
 }
 // Painted loading backdrops (Gemini art) shown behind the package progress for these games.
-export const GAME_SPLASH_ART: Record<string,string> = {blocker:'/games/blocker/art/splash.webp','mummy-escape':'/games/mummy-escape/art/splash.webp',chess:'/games/chess/art/splash.webp'};
+export const GAME_SPLASH_ART: Record<string,string> = {blocker:'/games/blocker/art/splash.webp','mummy-escape':'/games/mummy-escape/art/splash.webp',chess:'/games/chess/art/splash.webp','caro-gomoku':'/games/caro-gomoku/art/splash.webp','cyber-slice':'/games/cyber-slice/art/arena.webp'};
 // Games whose banner still comes from the code-drawn artwork; icons use rasterIcons when present.
 const NATIVE_BANNERS = new Set(['blocker']);
 export function GameArtwork({gameId,className='',variant='banner',src}:{gameId:string;className?:string;variant?:'banner'|'icon';src?:string}) {

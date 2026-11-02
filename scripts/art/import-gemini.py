@@ -9,12 +9,14 @@ crops.json:
               "cover": [w, h] (crop to aspect then resize), "square": true, "quality": 90,
               "bottom": [aw, ah] (pad to aspect, feet on the bottom edge),
               "canvas": [w, h] (shared canvas in source px, feet on the bottom edge),
-              "tol"/"bgMax"/"seal" (flood tuning), "isolate": true (drop neighbours poking in)}]}
+              "tol"/"bgMax"/"seal" (flood tuning), "isolate": true (drop neighbours poking in),
+              "keyFlood": true (chroma: only border-connected key colour is background)}]}
 
 methods
   flood   dark design-sheet background: pixels connected to the crop border whose colour is
           close to the sampled background become transparent; edges are feathered by 1 px.
-  chroma  green screen: alpha from green dominance, green spill removed from edge pixels.
+  chroma  green (default) or "key": "magenta" screen: alpha from key-colour dominance, spill
+          removed from edge pixels.
   none    plain crop (scenes, icons).
 
 Deterministic: the same sources and crops.json always give the same files. --check fails if
@@ -66,18 +68,51 @@ def flood_alpha(rgb, tol, bg_max, seal=0):
     return alpha.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.8))
 
 
-def chroma_alpha(rgb):
+def chroma_alpha(rgb, key='green'):
     f = rgb.astype(np.float32)
     r, g, b = f[..., 0], f[..., 1], f[..., 2]
-    spill = g - np.maximum(r, b)
-    # Fully green -> 0, neutral -> 255, with a soft ramp in between.
-    a = np.clip(255 - (spill - 30) * (255 / 70), 0, 255)
     out = f.copy()
-    # Despill: pull green down to the other channels wherever it dominates.
-    g2 = np.where(spill > 0, np.maximum(r, b) + spill * 0.15, g)
-    out[..., 1] = g2
+    if key == 'magenta':
+        # Magenta screen: alpha from the distance to the screen colour sampled on the crop
+        # border, so purple subjects (far from bright magenta) stay opaque.
+        border = np.concatenate([f[0], f[-1], f[:, 0], f[:, -1]])
+        key_rgb = np.median(border[(border[:, 0] > 150) & (border[:, 2] > 150)], axis=0) if ((border[:, 0] > 150) & (border[:, 2] > 150)).any() else np.array([255, 0, 255])
+        dist = np.sqrt(((f - key_rgb) ** 2).sum(axis=2))
+        a = np.clip((dist - 70) * (255 / 90), 0, 255)
+        spill = np.minimum(r, b) - g
+        # Despill: pull red/blue toward green+neutral where magenta dominates the edge.
+        cap = g + np.clip(spill, 0, None) * 0.2
+        out[..., 0] = np.where(spill > 0, np.minimum(r, np.maximum(cap, r - spill * 0.8)), r)
+        out[..., 2] = np.where(spill > 0, np.minimum(b, np.maximum(cap, b - spill * 0.8)), b)
+    else:
+        spill = g - np.maximum(r, b)
+        # Fully green -> 0, neutral -> 255, with a soft ramp in between.
+        a = np.clip(255 - (spill - 30) * (255 / 70), 0, 255)
+        # Despill: pull green down to the other channels wherever it dominates.
+        out[..., 1] = np.where(spill > 0, np.maximum(r, b) + spill * 0.15, g)
     alpha = Image.fromarray(a.astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.6))
     return out.clip(0, 255).astype(np.uint8), alpha
+
+
+def border_connected(alpha):
+    a = np.asarray(alpha)
+    bg = a < 128
+    h, w = bg.shape
+    seen = np.zeros((h, w), bool); q = deque()
+    for x in range(w):
+        for y in (0, h - 1):
+            if bg[y, x] and not seen[y, x]: seen[y, x] = True; q.append((y, x))
+    for y in range(h):
+        for x in (0, w - 1):
+            if bg[y, x] and not seen[y, x]: seen[y, x] = True; q.append((y, x))
+    while q:
+        y, x = q.popleft()
+        for ny, nx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+            if 0 <= ny < h and 0 <= nx < w and bg[ny, nx] and not seen[ny, nx]:
+                seen[ny, nx] = True; q.append((ny, nx))
+    # Keep the soft ramp near the outside; interior keyed pixels become opaque again.
+    near = np.asarray(Image.fromarray((seen * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(5))) > 0
+    return Image.fromarray(np.where(near, a, 255).astype(np.uint8))
 
 
 def drop_edge_fragments(img):
@@ -118,7 +153,11 @@ def process(item, base):
         img = Image.fromarray(rgb).convert('RGBA')
         img.putalpha(flood_alpha(rgb, item.get('tol', 34), item.get('bgMax', 90), item.get('seal', 0)))
     elif method == 'chroma':
-        rgb2, alpha = chroma_alpha(rgb)
+        rgb2, alpha = chroma_alpha(rgb, item.get('key', 'green'))
+        if item.get('keyFlood'):
+            # Only key-coloured pixels connected to the crop border are background, so purple or
+            # green parts inside the subject survive.
+            alpha = border_connected(alpha)
         img = Image.fromarray(rgb2).convert('RGBA'); img.putalpha(alpha)
     else:
         img = crop.convert('RGBA') if item.get('alpha') else crop

@@ -692,7 +692,11 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   const skinId = bridge.getSkin ? bridge.getSkin('caro-gomoku') : 'default';
 
   // Skin mappings
+  // Default skin uses the painted Gemini marks: crossed swords for X, a shield for O
+  // (art/gemini/caro-gomoku). Shop skins keep their own gradient stones.
+  const paintedMarks = !skinId || skinId === 'default';
   const getSkinStyle = (stone: 'X' | 'O') => {
+    if (paintedMarks) return 'bg-transparent shadow-none';
     if (skinId === 'skin-caro-gomoku-crystal') return stone === 'X' ? 'bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-purple-900/40' : 'bg-gradient-to-br from-purple-200 to-purple-300 text-purple-900 shadow-purple-900/40';
     if (skinId === 'skin-caro-gomoku-golden') return stone === 'X' ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900 shadow-yellow-900/40' : 'bg-gradient-to-br from-yellow-200 to-yellow-400 text-yellow-900 shadow-yellow-900/40';
     if (skinId === 'skin-caro-gomoku-ghost') return stone === 'X' ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-gray-900 shadow-gray-900/40 opacity-80' : 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-900 shadow-gray-900/40 opacity-80';
@@ -1182,10 +1186,11 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
             symbolMarker: screenMode === 'local_hotseat' ? localP1Symbol : mySymbol,
           }}
           board={
-            <div className="arcade-board relative p-1 sm:p-2 rounded-xl sm:rounded-2xl bg-white border border-slate-300 shadow-2xl overflow-hidden w-full max-w-[480px]">
+            <div className={`arcade-board relative p-1 sm:p-2 rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden w-full max-w-[480px] ${paintedMarks ? 'bg-[#1c2433] border-2 border-[#b48a3c]' : 'bg-white border border-slate-300'}`}>
               <div
-                className="grid bg-[#f8f9fa] border border-slate-300 w-full aspect-square"
+                className={`grid w-full aspect-square ${paintedMarks ? 'caro-stone-board border border-[#b48a3c]/70' : 'bg-[#f8f9fa] border border-slate-300'}`}
                 style={{
+                  ...(paintedMarks ? { backgroundImage: 'url(/games/caro-gomoku/art/board-stone.webp)', backgroundSize: 'cover' } : {}),
                   gridTemplateColumns: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
                   gridTemplateRows: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`
                 }}
@@ -1207,9 +1212,9 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                         onClick={() => handleCellClick(row, col)}
                         onMouseEnter={() => setHoverCell({ x: row, y: col })}
                         onMouseLeave={() => setHoverCell(null)}
-                        className={`relative border-[0.5px] border-slate-300 flex items-center justify-center cursor-pointer transition-all duration-150 group aspect-square overflow-hidden ${
+                        className={`relative border-[0.5px] ${paintedMarks ? 'border-[#e8d29a]/35' : 'border-slate-300'} flex items-center justify-center cursor-pointer transition-all duration-150 group aspect-square overflow-hidden ${
                           isWinningStone
-                            ? 'bg-amber-200'
+                            ? paintedMarks ? 'bg-amber-300/45' : 'bg-amber-200'
                             : isPending
                             ? 'bg-cyan-100 ring-2 ring-inset ring-cyan-500 z-10'
                             : 'bg-transparent'
@@ -1217,7 +1222,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                       >
                         {/* Star Dot Marker */}
                         {isStar && !stone && !isPending && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-slate-400 pointer-events-none" />
+                          <div className={`w-1.5 h-1.5 rounded-full pointer-events-none ${paintedMarks ? 'bg-[#e8d29a]/70' : 'bg-slate-400'}`} />
                         )}
 
                         {/* Pending Confirmation Marker (First Tap) */}
@@ -1249,7 +1254,11 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                               getSkinStyle(stone as 'X' | 'O')
                             } ${isLast ? 'ring-2 ring-amber-400 ring-offset-1 scale-105 z-10' : ''}`}
                           >
-                            <span>{stone}</span>
+                            {paintedMarks ? (
+                              <img className="w-full h-full object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)] pointer-events-none select-none" src={`/games/caro-gomoku/art/mark-${stone === 'X' ? 'x' : 'o'}.webp`} alt={stone} draggable={false} />
+                            ) : (
+                              <span>{stone}</span>
+                            )}
                             {isLast && (
                               <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 border border-white animate-ping" />
                             )}

@@ -1,0 +1,277 @@
+{
+ "game": "cyber-slice",
+ "items": [
+  {
+   "name": "watermelon",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    22,
+    34,
+    280,
+    264
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/watermelon.webp",
+   "quality": 88
+  },
+  {
+   "name": "pineapple",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    342,
+    0,
+    248,
+    322
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/pineapple.webp",
+   "quality": 88
+  },
+  {
+   "name": "banana",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    630,
+    30,
+    292,
+    276
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/banana.webp",
+   "quality": 88
+  },
+  {
+   "name": "orange",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    962,
+    18,
+    268,
+    288
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/orange.webp",
+   "quality": 88
+  },
+  {
+   "name": "apple_red",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    26,
+    314,
+    272,
+    296
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/apple_red.webp",
+   "quality": 88
+  },
+  {
+   "name": "apple_green",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    330,
+    314,
+    284,
+    292
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/apple_green.webp",
+   "quality": 88
+  },
+  {
+   "name": "strawberry",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    646,
+    310,
+    272,
+    304
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/strawberry.webp",
+   "quality": 88
+  },
+  {
+   "name": "kiwi",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    942,
+    334,
+    300,
+    276
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/kiwi.webp",
+   "quality": 88
+  },
+  {
+   "name": "coconut",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    14,
+    630,
+    288,
+    280
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/coconut.webp",
+   "quality": 88
+  },
+  {
+   "name": "lemon",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    330,
+    622,
+    296,
+    284
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/lemon.webp",
+   "quality": 88
+  },
+  {
+   "name": "pomegranate",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    634,
+    618,
+    288,
+    292
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/pomegranate.webp",
+   "quality": 88
+  },
+  {
+   "name": "golden_fruit",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    930,
+    618,
+    308,
+    296
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": false,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/golden_fruit.webp",
+   "quality": 88,
+   "keyFlood": true
+  },
+  {
+   "name": "freeze_fruit",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    30,
+    898,
+    272,
+    324
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": false,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/freeze_fruit.webp",
+   "quality": 88,
+   "keyFlood": true
+  },
+  {
+   "name": "frenzy_fruit",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    318,
+    914,
+    308,
+    308
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": false,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/frenzy_fruit.webp",
+   "quality": 88,
+   "keyFlood": true
+  },
+  {
+   "name": "bomb",
+   "source": "source/sheet-fruits-bomb-katana.png",
+   "box": [
+    642,
+    910,
+    280,
+    312
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 160,
+   "out": "public/games/cyber-slice/art/bomb.webp",
+   "quality": 88
+  },
+  {
+   "name": "arena",
+   "source": "source/arena-neon-terrace.png",
+   "box": [
+    0,
+    0,
+    1024,
+    1536
+   ],
+   "method": "none",
+   "out": "public/games/cyber-slice/art/arena.webp",
+   "size": 1100,
+   "quality": 78
+  }
+ ]
+}

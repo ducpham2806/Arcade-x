@@ -10,7 +10,9 @@ const sources=JSON.parse(fs.readFileSync('art/launcher/tech-art-sources.json','u
 const gameArt=fs.readFileSync('src/visuals/gameArt.tsx','utf8');
 const sha=f=>crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
 let checks=0;const games=fs.readdirSync('art/gemini').filter(g=>fs.existsSync(`art/gemini/${g}/crops.json`));
-assert.deepEqual(games.sort(),['blocker','chess','mummy-escape']);
+assert.deepEqual(games.sort(),['blocker','caro-gomoku','chess','cyber-slice','mummy-escape','xiangqi']);
+// Games with a painted launcher icon; the others keep their existing icon.
+const PAINTED_ICONS=['blocker','chess','mummy-escape'];
 for(const game of games){
  const {items}=JSON.parse(fs.readFileSync(`art/gemini/${game}/crops.json`,'utf8'));
  for(const it of items){
@@ -23,13 +25,15 @@ for(const game of games){
  }
  const art=fs.readdirSync(`public/games/${game}/art`).map(f=>`/games/${game}/art/${f}`);
  for(const url of art)assert.ok(items.some(it=>it.out==='public'+url),`${game}: ${url} is not produced by crops.json`);
+ const splash=items.find(it=>/\/(splash|arena)\.webp$/.test(it.out));
+ if(splash){assert.ok(gameArt.includes(splash.out.replace(/^public/,'')),`${game}: loading backdrop not registered`);checks++;}
+ if(!PAINTED_ICONS.includes(game)){assert.ok(!(game in icons),`${game}: unexpected raster icon`);continue;}
  // Launcher icon: hashed immutable file on disk, preloaded, and traced to its Gemini master.
  const icon=icons[game];assert.ok(icon&&fs.existsSync('public'+icon),`${game}: raster icon missing`);
  assert.ok(packages[game].includes(icon),`${game}: icon not in packageAssets`);
  const row=manifest.find(r=>r.id===game);assert.equal(row.icon,icon);assert.equal(row.sha256,sha('public'+icon));
  assert.equal(row.sourceType,'imagegen');assert.equal(sources[game].sourceSHA256,sha(sources[game].master));
  assert.ok(sources[game].master.startsWith(`art/gemini/${game}/source/`));
- assert.ok(gameArt.includes(`/games/${game}/art/splash.webp`),`${game}: loading backdrop not registered`);
  checks+=3;
 }
 console.log(`gemini art: ${checks} checks passed`);

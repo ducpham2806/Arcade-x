@@ -1,0 +1,67 @@
+{
+ "game": "xiangqi",
+ "items": [
+  {
+   "name": "board-wood",
+   "source": "source/sheet-wood-lacquer-tokens.png",
+   "box": [
+    0,
+    0,
+    624,
+    624
+   ],
+   "method": "none",
+   "out": "public/games/xiangqi/art/board-wood.webp",
+   "size": 600,
+   "quality": 82
+  },
+  {
+   "name": "frame-lacquer",
+   "source": "source/sheet-wood-lacquer-tokens.png",
+   "box": [
+    630,
+    0,
+    624,
+    624
+   ],
+   "method": "none",
+   "out": "public/games/xiangqi/art/frame-lacquer.webp",
+   "size": 400,
+   "quality": 78
+  },
+  {
+   "name": "token-red",
+   "source": "source/sheet-wood-lacquer-tokens.png",
+   "box": [
+    14,
+    626,
+    596,
+    596
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "square": true,
+   "size": 128,
+   "out": "public/games/xiangqi/art/token-red.webp",
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "token-black",
+   "source": "source/sheet-wood-lacquer-tokens.png",
+   "box": [
+    642,
+    626,
+    592,
+    596
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "square": true,
+   "size": 128,
+   "out": "public/games/xiangqi/art/token-black.webp",
+   "quality": 90,
+   "isolate": true
+  }
+ ]
+}
