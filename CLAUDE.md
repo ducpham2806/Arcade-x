@@ -6,6 +6,7 @@
 PWA launcher với 23 mini-game: React 19 + Vite + TypeScript, game Canvas 2D, Supabase (tài khoản, đồng bộ, bảng xếp hạng, phòng đấu). Cấu trúc thư mục và bảng lệnh test đầy đủ ở `README.md`.
 
 - Game: `src/games/<id>/` (đăng ký ở `src/games/registry.ts`). Game build sẵn nằm ở `public/standalone/<id>/` và là output: chỉ sửa bằng script (ví dụ `scripts/neon/tune-levels.mjs`), không format tay.
+- Đọc trước: `docs/SESSION-HANDOFF.md` (những gì đã làm, trạng thái nhánh, sổ tay kỹ thuật) và `docs/OWNER-TODO.md` (việc chủ dự án cần làm).
 - Tài liệu thiết kế, đánh giá, quyết định đang chờ: `docs/` (`docs/PENDING-DECISIONS.md`, `docs/<GAME>-REVIEW.md`). QA: `docs/qa/`.
 
 ## Lệnh
