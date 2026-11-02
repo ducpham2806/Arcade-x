@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';import {parseHTML} from 'linkedom';
+import {blankCampaign,CAMPAIGN_KEY,mergeClear} from '../../src/games/snake-legend/src/story-save';
+import {CHECKPOINT_KEY,capture} from '../../src/games/snake-legend/src/checkpoint';
+import {Engine} from '../../src/games/snake-legend/src/core';import {STORY_LEVELS} from '../../src/games/snake-legend/src/story-data';
+import {mountJourney} from '../../src/games/snake-legend/src/journey';import {journeyProgress} from '../../src/games/snake-legend/src/journey-model';
+const {window}=parseHTML('<html><body><main id="root"></main></body></html>');Object.assign(globalThis,{window,document:window.document});
+const root=window.document.getElementById('root')! as unknown as HTMLElement;
+const data=new Map<string,string>();const store={getItem:(k:string)=>data.get(k)??null,setItem:(k:string,v:string)=>{data.set(k,v);}};
+const listeners=new Set<()=>void>();const hooks:any={subscribeCampaign:(fn:()=>void)=>{listeners.add(fn);return()=>listeners.delete(fn);}};const choices:any[]=[];
+const click=(s:string)=>root.querySelector<HTMLElement>(s)!.dispatchEvent(new window.Event('click',{bubbles:true}));
+const state=blankCampaign();assert.deepEqual(journeyProgress(state),{completed:0,stars:0,recommended:0});
+let hub=mountJourney(root,store,c=>choices.push(c),()=>{},hooks);assert.equal(root.querySelectorAll('[data-level]').length,10);
+assert(root.querySelector<HTMLButtonElement>('[data-level="1"]')!.disabled);click('[data-action="play"]');assert.deepEqual(choices.pop(),{level:0,resume:false});
+const unlocked=mergeClear(state,{runId:'test-clear',levelId:'1-1',time:20,score:50,stars:[true,true,false]});store.setItem(CAMPAIGN_KEY,JSON.stringify(unlocked));for(const f of listeners)f();
+assert.equal(hub.getState().selectedLevel,'1-2');assert.equal(root.querySelector<HTMLButtonElement>('[data-level="1"]')!.disabled,false);assert.equal(root.querySelector('.journey-clears')!.textContent,'1/10 màn');
+click('[data-level="0"]');for(const f of listeners)f();assert.equal(hub.getState().selectedLevel,'1-1');
+hub.setHostPaused(true);click('[data-action="play"]');assert.equal(choices.length,0);hub.destroy();assert.equal(listeners.size,0);
+// Actual serialized checkpoint remains untouched by passive journey navigation.
+const engine=new Engine(STORY_LEVELS[1]);for(let i=0;i<20;i++)engine.step({x:1,y:0,dash:false});
+const checkpoint=JSON.stringify(capture(engine,'run-resume',[]));store.setItem(CHECKPOINT_KEY,checkpoint);
+hub=mountJourney(root,store,c=>choices.push(c),()=>{},hooks);assert.equal(hub.getState().selectedLevel,'1-2');assert.equal(root.querySelector('[data-action="play"]')!.textContent,'Tiếp tục màn 1-2');
+click('[data-action="play"]');assert.deepEqual(choices.pop(),{level:1,resume:true});assert.equal(store.getItem(CHECKPOINT_KEY),checkpoint);
+click('[data-action="fresh"]');assert.deepEqual(choices.pop(),{level:1,resume:false});assert.equal(store.getItem(CHECKPOINT_KEY),checkpoint);hub.destroy();
+store.setItem(CHECKPOINT_KEY,'corrupt');hub=mountJourney(root,store,()=>{},()=>{});assert(root.querySelector('.journey-storage-note')!.textContent!.includes('Không đọc được'));assert.equal(store.getItem(CHECKPOINT_KEY),'corrupt');hub.destroy();
+const full=blankCampaign();for(let i=1;i<=10;i++)full.levels['1-'+i]={stars:[true,true,true],bestScore:100,bestTime:20};assert.deepEqual(journeyProgress(full),{completed:10,stars:30,recommended:9});
+console.log('PASS journey: locked levels, next-level recommendation, live progress refresh, preserved selection, pause, checkpoint resume/restart, corrupt save retention, all-clear summary, subscription cleanup');

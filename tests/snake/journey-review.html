@@ -1,0 +1,9 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rắn Săn Mồi · Hành trình R01</title><style>html,body{margin:0;height:100%;font-family:system-ui;background:#132e27}.review-nav{height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:12px;background:#0c2924;color:#e9edd6;font-size:12px}.review-nav button{font:inherit;min-height:34px;padding:4px 14px;border:1px solid #82996b;border-radius:8px;background:transparent;color:inherit;cursor:pointer}.review-frame{display:block;border:0;margin:auto;background:#f4f2e6;width:100%;height:calc(100dvh - 48px)}.review-frame.phone{width:360px;height:800px;max-width:100%}.frame-host{width:100%;height:100dvh}</style><body><main id="root"></main><script type="module">
+if(new URL(location.href).searchParams.has('frame')){
+ const [{mountGame},banner]=await Promise.all([import('../../src/games/snake-legend/src/app.ts'),import('../../src/preview/snake/art/banner.webp')]);
+ await import('../../src/games/snake-legend/src/styles.css');const root=document.getElementById('root');root.className='frame-host';const game=mountGame(root,{artwork:{banner:banner.default}});window.addEventListener('pagehide',()=>game.destroy(),{once:true});
+}else{
+ const root=document.getElementById('root');root.innerHTML='<nav class="review-nav"><span>R01 · Lưu trên trình duyệt</span><button id="desktop">Máy tính</button><button id="phone">Điện thoại 360px</button></nav><iframe title="Rắn Săn Mồi" class="review-frame" src="?frame=1"></iframe>';
+ document.getElementById('desktop').onclick=()=>root.querySelector('iframe').classList.remove('phone');document.getElementById('phone').onclick=()=>root.querySelector('iframe').classList.add('phone');
+}
+</script></body></html>

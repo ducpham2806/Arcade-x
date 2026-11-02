@@ -7,6 +7,10 @@ import {getRecoveryState} from '../../services/authRecovery';
 import type {GameComponentProps} from '../../types';
 import SnakeLegend from './SnakeLegend';
 import {LauncherSnakeBinding} from './integration/launcher-binding';
+import banner from '../../preview/snake/art/banner.webp';
+import {SNAKE_SAVE_TIMEOUT_MS} from './integration/save-policy';
+
+const journeyArt={banner};
 
 function BoundGame({binding,...props}:GameComponentProps&{binding:LauncherSnakeBinding}){
  const view=useSyncExternalStore(binding.subscribe,binding.getView,binding.getView);
@@ -16,7 +20,7 @@ function BoundGame({binding,...props}:GameComponentProps&{binding:LauncherSnakeB
    {view.message} {view.snapshot&&<span>· Bản {view.snapshot.revision} · {Object.keys(view.snapshot.levels).length}/10 màn xác thực · Snake Gold {view.snapshot.wallet.snake_gold} · Snake Gem {view.snapshot.wallet.snake_gem} </span>}
    <button type="button" disabled={view.status==='loading'} onClick={()=>void binding.refreshState()}>Tải lại tiến trình</button>
   </div>
-  <div style={{flex:1,minHeight:0}}><SnakeLegend {...props} createSaveSession={binding.createSaveSession}/></div>
+  <div style={{flex:1,minHeight:0}}><SnakeLegend {...props} createSaveSession={binding.createSaveSession} artwork={journeyArt}/></div>
  </div>;
 }
 
@@ -28,7 +32,7 @@ export default function SnakeLegendPreview(props:GameComponentProps){
  useEffect(()=>{
   if(!owner||!supabase||!supabasePublicConfig.url||!supabasePublicConfig.key||getRecoveryState().status!=='idle')return;
   const next=new LauncherSnakeBinding({actorId:owner,auth:supabase.auth,hostOwner:()=>hostOwner.current,
-   endpoint:supabasePublicConfig.url.replace(/\/$/,'')+'/functions/v1/snake-complete',publishableKey:supabasePublicConfig.key});
+   endpoint:supabasePublicConfig.url.replace(/\/$/,'')+'/functions/v1/snake-complete',publishableKey:supabasePublicConfig.key,timeoutMs:SNAKE_SAVE_TIMEOUT_MS});
   const invalidate=()=>next.invalidate();
   window.addEventListener('arcadex:account_switching',invalidate);
   window.addEventListener('arcadex:auth_recovery',invalidate);

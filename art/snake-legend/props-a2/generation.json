@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "asset": "exit",
+      "file": "exit-states-source.png",
+      "sha256": "58a41db09d2008818fd11719ef17a76bde64db6989a3da89254b17ca9bca0988",
+      "prompt": "exit-prompt.txt",
+      "route": "imagegen built-in",
+      "art_source": "host_image",
+      "modelReturned": null,
+      "estimateUsd": null,
+      "nativeAlpha": true,
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "reviewStatus": "reviewed at game size; candidate for human acceptance"
+    },
+    {
+      "asset": "switch",
+      "file": "switch-states-source.png",
+      "sha256": "387264d7608eb08506ebc7994990e16c3a0ae88c7c40b6cdffb800181ee8882a",
+      "prompt": "switch-prompt.txt",
+      "route": "imagegen built-in",
+      "art_source": "host_image",
+      "modelReturned": null,
+      "estimateUsd": null,
+      "nativeAlpha": true,
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "reviewStatus": "reviewed at game size; candidate for human acceptance"
+    }
+  ],
+  "styleReference": "existing a1_master atlas; source master unchanged"
+}

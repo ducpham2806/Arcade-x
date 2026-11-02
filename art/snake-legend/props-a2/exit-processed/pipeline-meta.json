@@ -1,0 +1,371 @@
+{
+  "schema": "generate2dsprite.pipeline_meta.v2",
+  "target": "asset",
+  "mode": "sheet",
+  "prompt": "",
+  "role": "",
+  "input": "exit-states-source.png",
+  "threshold": 100,
+  "edge_threshold": 150,
+  "duration": 200,
+  "background_mode": "native_alpha",
+  "resampler": "lanczos",
+  "key_quality": "auto",
+  "key": "magenta",
+  "despill_radius": 0,
+  "alpha_geometry_threshold": 16,
+  "connectivity": 8,
+  "anchor_mode": "center",
+  "alpha_hygiene": "both",
+  "alpha_floor": 4,
+  "pixel_scale": null,
+  "logical_pixel": 1,
+  "rows": 1,
+  "cols": 2,
+  "cell_size": 192,
+  "fit_scale": 0.8,
+  "trim_border": 0,
+  "edge_clean_depth": 0,
+  "align": "center",
+  "shared_scale": true,
+  "scale_strategy": "fit",
+  "component_mode": "all",
+  "component_padding": 0,
+  "min_component_area": 1,
+  "edge_touch_margin": 0,
+  "provenance": {
+    "input_sha256": "58a41db09d2008818fd11719ef17a76bde64db6989a3da89254b17ca9bca0988",
+    "source_mode": "RGBA",
+    "bit_depth": 8,
+    "conversion": "none",
+    "raw_copy": "raw-sheet.png",
+    "bytes": 1290770,
+    "format": "PNG",
+    "size": [
+      1774,
+      887
+    ]
+  },
+  "intentional_low_frame_count": false,
+  "planning_warnings": [],
+  "geometry": {
+    "alpha_geometry_threshold": 16,
+    "connectivity": 8,
+    "anchor_mode": "center",
+    "scale_strategy": "fit",
+    "pixel_scale": null,
+    "logical_pixel": 1,
+    "grid_rounding": "exact",
+    "pad_offset": [
+      0,
+      0
+    ],
+    "anchor_px": null,
+    "anchor_band_fraction": 0.12,
+    "scale": null,
+    "scale_ratio": null,
+    "registration_anchor": null,
+    "injected_shift_px": null,
+    "legacy_fractional_nearest": false
+  },
+  "hygiene": {
+    "mode": "both",
+    "floor": 4,
+    "solid_min": 32,
+    "attach_radius": 2,
+    "connectivity": 8,
+    "floor_px": 8409,
+    "detached_px": 0,
+    "detached_components": 0,
+    "max_removed_alpha": 4
+  },
+  "frame_labels": [
+    "sheet-1",
+    "sheet-2"
+  ],
+  "frames": [
+    {
+      "grid": [
+        0,
+        0
+      ],
+      "source_box": [
+        0,
+        0,
+        887,
+        887
+      ],
+      "trim_offset": [
+        0,
+        0
+      ],
+      "source_rect": [
+        140,
+        123,
+        809,
+        764
+      ],
+      "component_mode": "all",
+      "component_count": 1,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        140,
+        123,
+        809,
+        764
+      ],
+      "subject_bbox": [
+        140,
+        123,
+        809,
+        764
+      ],
+      "source_frame_size": [
+        887,
+        887
+      ],
+      "is_empty": false,
+      "subject_area": 317201,
+      "body_core_area": 249969,
+      "body_area_fraction": 0.3177158734012143,
+      "anchor_source": [
+        474.5,
+        443.5
+      ],
+      "anchor_cell": [
+        474.5,
+        443.5
+      ],
+      "source_edge_touch": false,
+      "output_edge_touch": false,
+      "edge_touch": false,
+      "paste_clamped": false,
+      "scale_strategy": "fit",
+      "output_size": [
+        153,
+        147
+      ],
+      "paste_position": [
+        19,
+        22
+      ],
+      "source_to_output_scale": 0.2295964125560538,
+      "output_anchor": [
+        95.5,
+        95.5
+      ],
+      "aligned_bbox": [
+        19,
+        22,
+        172,
+        169
+      ],
+      "output_subject_height_px": 147.0,
+      "body_scale": 0.765625
+    },
+    {
+      "grid": [
+        0,
+        1
+      ],
+      "source_box": [
+        887,
+        0,
+        1774,
+        887
+      ],
+      "trim_offset": [
+        0,
+        0
+      ],
+      "source_rect": [
+        965,
+        123,
+        1634,
+        764
+      ],
+      "component_mode": "all",
+      "component_count": 1,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        78,
+        123,
+        747,
+        764
+      ],
+      "subject_bbox": [
+        78,
+        123,
+        747,
+        764
+      ],
+      "source_frame_size": [
+        887,
+        887
+      ],
+      "is_empty": false,
+      "subject_area": 317201,
+      "body_core_area": 250320,
+      "body_area_fraction": 0.318162001807392,
+      "anchor_source": [
+        412.5,
+        443.5
+      ],
+      "anchor_cell": [
+        412.5,
+        443.5
+      ],
+      "source_edge_touch": false,
+      "output_edge_touch": false,
+      "edge_touch": false,
+      "paste_clamped": false,
+      "scale_strategy": "fit",
+      "output_size": [
+        153,
+        147
+      ],
+      "paste_position": [
+        19,
+        22
+      ],
+      "source_to_output_scale": 0.2295964125560538,
+      "output_anchor": [
+        95.5,
+        95.5
+      ],
+      "aligned_bbox": [
+        19,
+        22,
+        172,
+        169
+      ],
+      "output_subject_height_px": 147.0,
+      "body_scale": 0.765625
+    }
+  ],
+  "edge_touch_frames": [],
+  "source_edge_touch_frames": [],
+  "output_edge_touch_frames": [],
+  "empty_frames": [],
+  "paste_clamped_frames": [],
+  "qc_summary": {
+    "frame_count": 2,
+    "valid_frame_count": 2,
+    "empty_count": 0,
+    "edge_touch_count": 0,
+    "paste_clamped_count": 0,
+    "body_scale_mean": 0.765625,
+    "body_scale_cv": 0.0,
+    "legacy_body_scale_mean": 0.5638607084015919,
+    "legacy_body_scale_cv": 0.0003507972823644853,
+    "output_subject_height_mean": 147.0,
+    "output_subject_height_median": 147.0,
+    "scale_reference_height_px": 147.0,
+    "scale_reference_frames": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "anchor_x_std": 0.03494926719278468,
+    "anchor_y_std": 0.0,
+    "anchor_y_mean": 0.5,
+    "pixel_grid_off_edges": null
+  },
+  "qc_config": {
+    "strict_qc": true,
+    "reject_edge_touch": false,
+    "allow_source_edge_touch": false,
+    "max_body_scale_cv": null,
+    "max_anchor_y_std": null,
+    "max_profile_scale_drift": null
+  },
+  "gif_decoded_duration_ms": {
+    "animation.gif": [
+      200,
+      200
+    ]
+  },
+  "qa": {
+    "status": "pass",
+    "method": "generate2dsprite process geometry v2: alpha above the geometry threshold, 8- or 4-connected components, ground-line anchors, one shared sampling grid with whole-pixel offsets, output-space scale metrics, forge_matte.matte_qa key residue",
+    "notProven": [
+      "pose quality, anatomy, identity and facing",
+      "loop seam, phase order and timing at game size",
+      "colour fidelity of keyed edges beyond the matte_qa residue counts",
+      "that the subject is complete where it does not touch a cell edge"
+    ],
+    "checks": [
+      {
+        "id": "empty_frames",
+        "status": "pass",
+        "value": [],
+        "threshold": []
+      },
+      {
+        "id": "paste_clamped_frames",
+        "status": "pass",
+        "value": [],
+        "threshold": []
+      },
+      {
+        "id": "output_edge_touch_frames",
+        "status": "pass",
+        "value": [],
+        "threshold": []
+      },
+      {
+        "id": "source_edge_touch_frames",
+        "status": "pass",
+        "value": [],
+        "threshold": []
+      },
+      {
+        "id": "body_scale_cv",
+        "status": "skipped",
+        "value": 0.0,
+        "threshold": null
+      },
+      {
+        "id": "anchor_y_std",
+        "status": "skipped",
+        "value": 0.0,
+        "threshold": null
+      }
+    ],
+    "inputs": [
+      {
+        "path": "raw-sheet.png",
+        "sha256": "58a41db09d2008818fd11719ef17a76bde64db6989a3da89254b17ca9bca0988",
+        "bytes": 1290770
+      }
+    ],
+    "outputs": [
+      {
+        "path": "sheet-1.png",
+        "sha256": "02948c8cb4b80f7fe56643d66d5ae8ad66eec42378d3361654cacfc85ec9498c",
+        "bytes": 46904
+      },
+      {
+        "path": "sheet-2.png",
+        "sha256": "b19fb856383c329edaeb4bf42b3f96049b7701bb91e7eaac1e14a0296e7f9f40",
+        "bytes": 47056
+      },
+      {
+        "path": "sheet-transparent.png",
+        "sha256": "1adfbc7f3238e15707342973f45ad25f6d2749d20dc2c2df288338e49a6c7c65",
+        "bytes": 93168
+      }
+    ],
+    "tool": {
+      "name": "generate2dsprite.py process",
+      "version": "0.4.0"
+    }
+  }
+}
