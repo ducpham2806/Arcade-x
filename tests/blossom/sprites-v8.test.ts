@@ -18,7 +18,7 @@ for(const special of ['bee_h','bee_v','sun','bloom_bomb','rainbow_orb','pop'] as
  if(special==='bee_v'){await expect(fx.locator('[data-beam-axis=v]')).toHaveCount(1);await expect(fx.locator('[data-beam-axis=h]')).toHaveCount(0);}
  if(special==='bloom_bomb')await expect(fx.locator('[data-sprite=bloom_bomb]')).toHaveCount(1);
  const sheet=fx.locator('.bb-fx-sheet').first();
- expect(await sheet.locator('image').getAttribute('href')).toContain('/png/anim/anim_fx_');
+ expect(await sheet.locator('image').getAttribute('href')).toMatch(/\/blossom\/gemini\/fx-[a-z-]+\.webp$/);
  const box=await page.locator('.bb-board').boundingBox(),overlay=await page.locator('.bb-sprite-fx > svg').first().boundingBox();
  expect(Math.abs(box!.width-overlay!.width)).toBeLessThan(25);
  await page.screenshot({path:`tests/blossom/screenshots/v8-${special}.png`});

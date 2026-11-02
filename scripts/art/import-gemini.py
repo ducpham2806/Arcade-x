@@ -22,12 +22,15 @@ methods
   compose scene built from a background crop and earlier outputs ("layers", see compose()).
   alpha   sheet already has alpha but a noisy matte: keep the solid subject and its
           detached parts, drop coloured speckle ("core", "minPart", "feather").
+  flipbook animation strip ("frames" x "cell" px, one row) built from still pieces: "effect"
+          names the motion (see EFFECTS), pieces come from the spec-level "pieces" table
+          ({name: {"source", "box", "core", "minPart", "feather"}}, cut with clean_alpha).
   none    plain crop (scenes, icons).
 
 Deterministic: the same sources and crops.json always give the same files. --check fails if
 any output is missing or differs from what the sources produce.
 """
-import hashlib, io, json, os, sys
+import hashlib, io, json, math, os, sys
 from collections import deque
 
 import numpy as np
@@ -203,8 +206,95 @@ def compose(item, base):
     return buf.getvalue(), (W, H)
 
 
+PIECES = {}
+_piece_cache = {}
+
+
+def piece(name, base):
+    """Still VFX piece from the spec-level "pieces" table, matte cleaned and trimmed."""
+    if name not in _piece_cache:
+        p = PIECES[name]; x, y, w, h = p['box']
+        src = Image.open(os.path.join(base, p['source'])).convert('RGBA').crop((x, y, x + w, y + h))
+        img = clean_alpha(src, p.get('core', 60), p.get('minPart', 0.05), p.get('feather', 3))
+        _piece_cache[name] = img.crop(img.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox())
+    return _piece_cache[name]
+
+
+def place(canvas, img, cx, cy, size, rot=0, alpha=1.0):
+    """Paste img centred at (cx, cy), longest side = size px, rotated rot degrees, faded."""
+    if size < 2 or alpha <= 0: return
+    s = size / max(img.size)
+    im = img.resize((max(1, round(img.width * s)), max(1, round(img.height * s))), Image.LANCZOS)
+    if rot: im = im.rotate(rot, resample=Image.BICUBIC, expand=True)
+    if alpha < 1: im.putalpha(im.getchannel('A').point(lambda v: round(v * alpha)))
+    canvas.alpha_composite(im, (round(cx - im.width / 2), round(cy - im.height / 2)))
+
+
+def _ease(t): return 1 - (1 - t) ** 3
+
+
+def _fade_after(t, start): return 1 - max(0, (t - start) / (1 - start))
+
+
+# Each effect draws frame t (0..1) of a cell x cell square; P(name) returns a piece.
+def fx_blast(fr, t, c, P, item):
+    """Flash, then six petals of the group's colour fly out and fade."""
+    place(fr, P('orb'), c / 2, c / 2, c * (0.35 + 0.5 * _ease(t)), alpha=max(0, 1 - t * 1.6))
+    for i in range(6):
+        a = i * math.pi / 3 + 0.4; d = c * 0.36 * _ease(t)
+        place(fr, P(item['petal']), c / 2 + math.cos(a) * d, c / 2 + math.sin(a) * d, c * (0.34 - 0.12 * t),
+              rot=-math.degrees(a) + t * 80, alpha=_fade_after(t, 0.45))
+
+
+def fx_sun(fr, t, c, P, item):
+    """Golden ring spreads, glow orb, golden star grows and turns."""
+    place(fr, P('ring'), c / 2, c / 2, c * (0.3 + 0.68 * _ease(t)), alpha=1 - t)
+    place(fr, P('orb'), c / 2, c / 2, c * (0.5 + 0.3 * t), alpha=max(0, 1 - t * 1.3))
+    place(fr, P('star'), c / 2, c / 2, c * (0.25 + 0.6 * _ease(min(1, t * 1.4))), rot=t * 45, alpha=_fade_after(t, 0.55))
+
+
+def fx_rainbow(fr, t, c, P, item):
+    """Rainbow ring spreads while the rainbow star spins."""
+    place(fr, P('rainbow-ring'), c / 2, c / 2, c * (0.3 + 0.68 * _ease(t)), rot=-t * 60, alpha=1 - t)
+    place(fr, P('rainbow-star'), c / 2, c / 2, c * (0.3 + 0.55 * _ease(min(1, t * 1.5))), rot=t * 120, alpha=_fade_after(t, 0.5))
+
+
+def fx_bomb(fr, t, c, P, item):
+    """Pink bloom opens inside the golden leaf ring, then scatters."""
+    place(fr, P('leaf-ring'), c / 2, c / 2, c * (0.35 + 0.62 * _ease(t)), rot=t * 40, alpha=1 - t)
+    place(fr, P('pink-burst'), c / 2, c / 2, c * (0.25 + 0.7 * _ease(min(1, t * 1.3))), rot=t * 30, alpha=_fade_after(t, 0.5))
+    place(fr, P('orb'), c / 2, c / 2, c * 0.45, alpha=max(0, 1 - t * 2))
+
+
+def fx_merge(fr, t, c, P, item):
+    """Rainbow bloom spins around a glow orb."""
+    place(fr, P('orb'), c / 2, c / 2, c * (0.4 + 0.4 * t), alpha=max(0, 1 - t * 1.2))
+    place(fr, P('rainbow-burst'), c / 2, c / 2, c * (0.3 + 0.6 * _ease(t)), rot=t * 180, alpha=_fade_after(t, 0.6))
+
+
+def fx_spark(fr, t, c, P, item):
+    """Golden orb pulses with a small turning star."""
+    place(fr, P('orb'), c / 2, c / 2, c * (0.55 + 0.35 * math.sin(t * math.pi)), alpha=1 - t * 0.8)
+    place(fr, P('star'), c / 2, c / 2, c * (0.35 + 0.5 * t), rot=t * 90, alpha=1 - t)
+
+
+EFFECTS = {'blast': fx_blast, 'sun': fx_sun, 'rainbow': fx_rainbow, 'bomb': fx_bomb, 'merge': fx_merge, 'spark': fx_spark}
+
+
+def flipbook(item, base):
+    n, c = item['frames'], item['cell']; draw = EFFECTS[item['effect']]
+    out = Image.new('RGBA', (n * c, c), (0, 0, 0, 0))
+    for f in range(n):
+        fr = Image.new('RGBA', (c, c), (0, 0, 0, 0))
+        draw(fr, f / (n - 1), c, lambda name: piece(name, base), item)
+        out.alpha_composite(fr, (f * c, 0))
+    buf = io.BytesIO(); out.save(buf, 'WEBP', quality=item.get('quality', 88), method=6, alpha_quality=item.get('alphaQuality', 90))
+    return buf.getvalue(), out.size
+
+
 def process(item, base):
     if item.get('method') == 'compose': return compose(item, base)
+    if item.get('method') == 'flipbook': return flipbook(item, base)
     method = item.get('method', 'none')
     src = Image.open(os.path.join(base, item['source'])).convert('RGBA' if method == 'alpha' else 'RGB')
     x, y, w, h = item['box']
@@ -263,6 +353,7 @@ def process(item, base):
 def main():
     path = sys.argv[1]; check = '--check' in sys.argv
     base = os.path.dirname(path); spec = json.load(open(path))
+    PIECES.update(spec.get('pieces', {}))
     bad = []
     for item in spec['items']:
         data, size = process(item, base)

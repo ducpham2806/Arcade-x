@@ -8,6 +8,11 @@ const icons=JSON.parse(fs.readFileSync('src/visuals/rasterIcons.json','utf8'));
 const manifest=JSON.parse(fs.readFileSync('docs/launcher-art-manifest.json','utf8'));
 const sources=JSON.parse(fs.readFileSync('art/launcher/tech-art-sources.json','utf8'));
 const gameArt=fs.readFileSync('src/visuals/gameArt.tsx','utf8');
+// Canvas size of a WebP file (VP8X extended, VP8L lossless or VP8 lossy header).
+const webpSize=f=>{const b=fs.readFileSync(f),k=b.toString('ascii',12,16);
+ if(k==='VP8X')return[1+b.readUIntLE(24,3),1+b.readUIntLE(27,3)];
+ if(k==='VP8L'){const v=b.readUInt32LE(21);return[1+(v&0x3fff),1+((v>>14)&0x3fff)]}
+ return[b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff]};
 const sha=f=>crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
 let checks=0;const games=fs.readdirSync('art/gemini').filter(g=>fs.existsSync(`art/gemini/${g}/crops.json`));
 assert.deepEqual(games.sort(),['blocker','caro-gomoku','chess','cyber-slice','hex-match','mummy-escape','xiangqi']);
@@ -20,7 +25,16 @@ const PAINTED_ICONS=['blocker','chess','mummy-escape'];
  const table=JSON.parse(fs.readFileSync(spec.map,'utf8')),expected={};
  for(const it of spec.items){
   assert.ok(fs.existsSync(`art/gemini/hex-match/${it.source}`)&&fs.existsSync(it.out),`hex-match: ${it.name} missing`);
-  assert.ok(fs.statSync(it.out).size<=(it.method==='none'||it.method==='compose'?200_000:60_000),`hex-match: ${it.out} over budget`);
+  const budget=it.method==='flipbook'?it.frames*24_000:it.method==='none'||it.method==='compose'?200_000:60_000;
+  assert.ok(fs.statSync(it.out).size<=budget,`hex-match: ${it.out} over budget`);
+  // Flipbooks replace the original strips in place: same frame count and cell size, so VFX.tsx
+  // plays them unchanged; they ship in the offline package because every match uses them.
+  if(it.method==='flipbook'){
+   assert.deepEqual(webpSize(it.out),[it.frames*it.cell,it.cell],`hex-match: ${it.name} strip geometry`);
+   assert.ok(['blast','sun','rainbow','bomb','merge','spark'].includes(it.effect),`hex-match: ${it.name} unknown effect`);
+   if(it.effect==='blast')assert.ok(it.petal in spec.pieces,`hex-match: ${it.name} uses unknown piece ${it.petal}`);
+   assert.ok(packages['hex-match'].includes(it.out.replace(/^public/,'')),`hex-match: ${it.name} not in packageAssets (offline)`);
+  }
   // A sprite either substitutes original PNGs or is referenced directly by the named file.
   if(it.usedBy)assert.ok(fs.readFileSync(it.usedBy,'utf8').includes(it.out.replace(/^public/,'')),`hex-match: ${it.name} not used in ${it.usedBy}`);
   else assert.ok(it.replaces?.length,`hex-match: ${it.name} replaces nothing`);
@@ -29,6 +43,7 @@ const PAINTED_ICONS=['blocker','chess','mummy-escape'];
   for(const old of it.replaces||[]){assert.ok(fs.existsSync('public/blossom/'+old),`hex-match: ${old} is not an original asset`);expected[old]=it.out.replace(/^public/,'');}
   checks++;
  }
+ for(const [name,p] of Object.entries(spec.pieces||{}))assert.ok(fs.existsSync(`art/gemini/hex-match/${p.source}`),`hex-match: piece ${name} source missing`);
  assert.deepEqual(table,expected,'painted.json is out of date');
  for(const url of packages['hex-match'])assert.ok(fs.existsSync('public'+url),`hex-match: preloaded ${url} missing`);
  for(const url of Object.values(table))assert.ok(url.startsWith('/blossom/gemini/'));

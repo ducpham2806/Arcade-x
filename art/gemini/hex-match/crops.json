@@ -1,6 +1,149 @@
 {
  "game": "hex-match",
  "map": "src/games/hex-match/blossom/painted.json",
+ "pieces": {
+  "petal-red": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    0,
+    0,
+    314,
+    314
+   ],
+   "core": 110
+  },
+  "petal-yellow": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    314,
+    0,
+    313,
+    314
+   ],
+   "core": 110
+  },
+  "petal-purple": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    627,
+    0,
+    313,
+    314
+   ],
+   "core": 110
+  },
+  "petal-blue": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    0,
+    314,
+    314
+   ],
+   "core": 110
+  },
+  "petal-green": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    0,
+    314,
+    314,
+    313
+   ],
+   "core": 110
+  },
+  "petal-orange": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    314,
+    314,
+    313,
+    313
+   ],
+   "core": 110
+  },
+  "star": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    627,
+    314,
+    313,
+    313
+   ],
+   "core": 60
+  },
+  "rainbow-star": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    314,
+    314,
+    313
+   ],
+   "core": 60
+  },
+  "ring": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    0,
+    627,
+    314,
+    313
+   ],
+   "core": 60
+  },
+  "rainbow-ring": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    314,
+    627,
+    313,
+    313
+   ],
+   "core": 60
+  },
+  "pink-burst": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    627,
+    627,
+    313,
+    313
+   ],
+   "core": 60
+  },
+  "rainbow-burst": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    627,
+    314,
+    313
+   ],
+   "core": 60
+  },
+  "orb": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    940,
+    314,
+    314
+   ],
+   "core": 60
+  },
+  "leaf-ring": {
+   "source": "source/vfx-golden-leaf-ring.png",
+   "box": [
+    0,
+    0,
+    1254,
+    1254
+   ],
+   "core": 60,
+   "minPart": 0.01
+  }
+ },
  "items": [
   {
    "name": "flower-red",
@@ -2988,6 +3131,144 @@
      "h": 0.72,
      "base": 0.96
     }
+   ]
+  },
+  {
+   "name": "fx-blast-red",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-red",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-red.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_red.png"
+   ]
+  },
+  {
+   "name": "fx-blast-yellow",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-yellow",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-yellow.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_yellow.png"
+   ]
+  },
+  {
+   "name": "fx-blast-purple",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-purple",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-purple.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_purple.png"
+   ]
+  },
+  {
+   "name": "fx-blast-blue",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-blue",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-blue.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_blue.png"
+   ]
+  },
+  {
+   "name": "fx-blast-green",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-green",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-green.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_green.png"
+   ]
+  },
+  {
+   "name": "fx-blast-orange",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-orange",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-orange.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_orange.png"
+   ]
+  },
+  {
+   "name": "fx-bloom-bomb",
+   "source": "source/vfx-golden-leaf-ring.png",
+   "method": "flipbook",
+   "effect": "bomb",
+   "frames": 10,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-bloom-bomb.webp",
+   "replaces": [
+    "png/anim/anim_fx_bloom_bomb.png"
+   ]
+  },
+  {
+   "name": "fx-sun-burst",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "sun",
+   "frames": 10,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-sun-burst.webp",
+   "replaces": [
+    "png/anim/anim_fx_sun_burst.png"
+   ]
+  },
+  {
+   "name": "fx-rainbow-burst",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "rainbow",
+   "frames": 10,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-rainbow-burst.webp",
+   "replaces": [
+    "png/anim/anim_fx_rainbow_burst.png"
+   ]
+  },
+  {
+   "name": "fx-special-merge",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "merge",
+   "frames": 8,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-special-merge.webp",
+   "replaces": [
+    "png/anim/anim_fx_special_merge.png"
+   ]
+  },
+  {
+   "name": "fx-chain-spark",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "spark",
+   "frames": 6,
+   "cell": 128,
+   "out": "public/blossom/gemini/fx-chain-spark.webp",
+   "replaces": [
+    "png/anim/anim_fx_chain_spark.png"
    ]
   }
  ]
