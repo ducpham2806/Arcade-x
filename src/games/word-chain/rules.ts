@@ -27,7 +27,7 @@ export type Rejection = 'format' | 'chain' | 'unknown' | 'used' | 'too-fast';
 export type Check = {ok: true; key: string; word: string; reason?: undefined; need?: undefined} | {ok: false; reason: Rejection; need: string; key?: undefined; word?: undefined};
 
 export class RuleError extends Error {
-  constructor(public code: 'NOT_PLAYING' | 'NOT_YOUR_TURN' | 'UNKNOWN_SEAT' | 'BAD_PLAYERS', message: string) {super(message);}
+  constructor(public code: 'NOT_PLAYING' | 'NOT_YOUR_TURN' | 'UNKNOWN_SEAT' | 'BAD_PLAYERS', message: string) {super(message); this.name = 'RuleError';}
 }
 
 function rng(seed: number) {let x = seed >>> 0; return () => {x += 0x6D2B79F5; let t = Math.imul(x ^ (x >>> 15), 1 | x); t ^= t + Math.imul(t ^ (t >>> 7), 61 | t); return ((t ^ (t >>> 14)) >>> 0) / 4294967296;};}
