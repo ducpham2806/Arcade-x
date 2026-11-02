@@ -72,7 +72,17 @@
     "test:neon": "node scripts/neon/tune-levels.mjs --check && node tests/neon/routes.cjs && node tests/neon/web.cjs",
     "test:neon-feel": "node tests/neon/feel.cjs",
     "export:dungeon-review": "node scripts/export-dungeon-review.mjs",
-    "test:dungeon": "node scripts/export-dungeon-review.mjs && node tests/dungeon/engine.mjs && node tests/dungeon/art-v5.mjs && node tests/dungeon/facing-v6-2.mjs && node tests/dungeon/squads-v6.mjs && node tests/dungeon/equipment-v6-3.mjs && node tests/dungeon/ui.mjs"
+    "test:dungeon": "node scripts/export-dungeon-review.mjs && node tests/dungeon/engine.mjs && node tests/dungeon/art-v5.mjs && node tests/dungeon/facing-v6-2.mjs && node tests/dungeon/squads-v6.mjs && node tests/dungeon/equipment-v6-3.mjs && node tests/dungeon/ui.mjs",
+    "test:snake-cloud": "node tests/snake/cloud-campaign.mjs",
+    "test:snake-session": "node tests/snake/auth-session.mjs",
+    "test:snake-live": "node scripts/test-snake-live.mjs",
+    "test:snake-journey": "node tests/snake/journey.mjs",
+    "export:snake-journey": "node scripts/export-snake-journey.mjs",
+    "test:snake-boss": "node tests/snake/boss-presentation.mjs",
+    "test:snake-props": "node tests/snake/story-props.mjs",
+    "build:snake-props": "python3 scripts/build-snake-props.py",
+    "test:snake-audio": "node tests/snake/audio.mjs",
+    "build:snake-audio": "python3 scripts/build-snake-audio.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

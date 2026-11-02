@@ -1,0 +1,64 @@
+{
+  "frames": {
+    "exit_closed": {
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "exit_ready": {
+      "frame": {
+        "x": 198,
+        "y": 2,
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "switch_off": {
+      "frame": {
+        "x": 2,
+        "y": 198,
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "switch_on": {
+      "frame": {
+        "x": 134,
+        "y": 198,
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "size": {
+      "w": 512,
+      "h": 512
+    },
+    "decodedBytes": 1048576,
+    "art_source": "host_image",
+    "route": "imagegen built-in",
+    "model": null,
+    "estimateUsd": null,
+    "status": "A2_interactive_props_candidate"
+  }
+}

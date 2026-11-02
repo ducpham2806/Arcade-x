@@ -13,6 +13,7 @@ export type SaveHooks={
  retry():Promise<void>;
  status():SaveStatus;
  subscribe(listener:()=>void):()=>void;
+ subscribeCampaign?(listener:()=>void):()=>void;
  destroy():void;
 };
 export type SaveSessionFactory=(storage:StorageLike)=>SaveHooks;

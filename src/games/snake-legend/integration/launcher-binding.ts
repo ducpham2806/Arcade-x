@@ -2,6 +2,7 @@ import {httpSaveSession} from './host-api';
 import {authenticatedSaveCall} from './verified-completion';
 import {parseCampaign} from '../src/story-save';
 import {UUID} from './replay-proof';
+import {hydrateCampaign} from './cloud-campaign';
 import type {VerifiedResult} from './verified-result';
 import type {SaveHooks,SaveSessionFactory} from '../src/save-hooks';
 
@@ -15,7 +16,7 @@ export type LauncherAuth={
 export type BindingView={status:'idle'|'loading'|'ready'|'error'|'closed';snapshot:SnakeSnapshot|null;message:string};
 type Options={actorId:string;auth:LauncherAuth;hostOwner:()=>string|null;endpoint:string;publishableKey:string;fetcher?:typeof fetch;timeoutMs?:number};
 
-/** Validated authoritative state is a separate view, never proof or an unverified local merge. */
+/** Validate server state before display or campaign hydration; never treat local merges as proof. */
 export function parseSnakeSnapshot(value:unknown):SnakeSnapshot{
  const s=value as SnakeSnapshot;
  if(!s||Array.isArray(s)||Object.keys(s).sort().join(',')!=='levels,revision,secrets,wallet'||
@@ -33,6 +34,7 @@ export class LauncherSnakeBinding{
  private active=true;private connected=false;private epoch=0;private readId=0;
  private unsubscribe?:()=>void;private readController?:AbortController;
  private sessions=new Set<SaveHooks>();private listeners=new Set<()=>void>();
+ private campaignListeners=new Map<SaveHooks,Set<()=>void>>();
  private snapshot:SnakeSnapshot|null=null;
  private view:BindingView={status:'idle',snapshot:null,message:'Chưa tải tiến trình Snake trực tuyến.'};
  constructor(private options:Options){
@@ -45,7 +47,10 @@ export class LauncherSnakeBinding{
   this.createSaveSession=storage=>{
    if(!this.currentActor())throw Error('Account mount is closed');
    const hooks=factory(storage),destroy=hooks.destroy.bind(hooks);let stopped=false;
-   hooks.destroy=()=>{if(stopped)return;stopped=true;this.sessions.delete(hooks);destroy();};
+   const listeners=new Set<()=>void>();this.campaignListeners.set(hooks,listeners);
+   hooks.subscribeCampaign=listener=>{listeners.add(listener);return()=>{listeners.delete(listener);};};
+   hooks.destroy=()=>{if(stopped)return;stopped=true;listeners.clear();this.campaignListeners.delete(hooks);this.sessions.delete(hooks);destroy();};
+   if(this.snapshot){try{hydrateCampaign(hooks.storage,this.snapshot);}catch{this.publish('error','Tiến trình trực tuyến đã tải; chưa ghép được bản lưu trên thiết bị. Hãy thử tải lại.');}}
    this.sessions.add(hooks);return hooks;
   };
  }
@@ -71,8 +76,12 @@ export class LauncherSnakeBinding{
  }
  private acceptSnapshot(value:unknown){
   if(!this.currentActor())throw Error('Account changed');const s=parseSnakeSnapshot(value);
-  if(this.snapshot&&s.revision<=this.snapshot.revision)return;
-  this.snapshot=s;this.publish('ready','Đã tải tiến trình Snake trực tuyến.');
+  if(this.snapshot&&s.revision<this.snapshot.revision)return;
+  this.snapshot=s;this.hydrateSessions();this.publish('ready','Đã tải tiến trình Snake trực tuyến.');
+ }
+ private hydrateSessions(){
+  if(!this.snapshot||!this.currentActor())return;
+  for(const hooks of this.sessions){hydrateCampaign(hooks.storage,this.snapshot);for(const listener of this.campaignListeners.get(hooks)??[])listener();}
  }
  /** One explicit read; repeated calls cancel stale reads. No timer-based polling or proof flush. */
  async refreshState(){
@@ -88,7 +97,7 @@ export class LauncherSnakeBinding{
    })]);
    if(!this.currentActor()||epoch!==this.epoch||id!==this.readId||controller.signal.aborted)return;
    const s=value===null?{revision:0,levels:{},secrets:[],wallet:{snake_gold:0,snake_gem:0}}:parseSnakeSnapshot(value);
-   this.acceptSnapshot(s);this.publish('ready','Đã tải tiến trình Snake trực tuyến.');
+   this.acceptSnapshot(s);this.publish('ready','Đã khôi phục các màn và sao đã lưu trực tuyến. Màn đang chơi vẫn giữ trên thiết bị.');
   }catch{
    if(this.currentActor()&&epoch===this.epoch&&id===this.readId)this.publish('error','Chưa tải được tiến trình trực tuyến. Bạn có thể thử lại hoặc chơi trên thiết bị.');
   }finally{if(timer)clearTimeout(timer);if(id===this.readId)this.readController=undefined;}

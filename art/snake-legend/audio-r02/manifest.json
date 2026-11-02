@@ -1,0 +1,50 @@
+{
+  "route": "offline procedural audio",
+  "method": "filtered noise and damped inharmonic modal resonances",
+  "seed": 2806,
+  "model": null,
+  "files": [
+    {
+      "id": "sfx_dash_air",
+      "path": "sfx_dash_air.wav",
+      "bytes": 26504,
+      "sha256": "68bf50d73b00499c16c36b535e6ef9418af5a003d50922d5cb86e39456e3dd29",
+      "seconds": 0.3,
+      "rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak": 0.17999267578125,
+      "rms": 0.035790003386669586,
+      "firstSample": 0,
+      "lastSample": 0
+    },
+    {
+      "id": "sfx_boss_weak_open",
+      "path": "sfx_boss_weak_open.wav",
+      "bytes": 54728,
+      "sha256": "50008f58b6359b66f7c5a424117d1a3d31b8a13454a0ea81efeedb6469f81dcf",
+      "seconds": 0.62,
+      "rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak": 0.19000244140625,
+      "rms": 0.04910700269044597,
+      "firstSample": 0,
+      "lastSample": 0
+    },
+    {
+      "id": "sfx_boss_phase",
+      "path": "sfx_boss_phase.wav",
+      "bytes": 72368,
+      "sha256": "df81b0e29c27b67d4614366d266223eee37b9e815539a75ce73c7037caaf7a5b",
+      "seconds": 0.82,
+      "rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak": 0.17999267578125,
+      "rms": 0.03577962677424381,
+      "firstSample": 0,
+      "lastSample": 0
+    }
+  ]
+}

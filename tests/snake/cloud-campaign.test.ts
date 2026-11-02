@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {blankCampaign,CAMPAIGN_KEY,parseCampaign} from '../../src/games/snake-legend/src/story-save';
+import {hydrateCampaign,mergeCampaigns} from '../../src/games/snake-legend/integration/cloud-campaign';
+import {LauncherSnakeBinding} from '../../src/games/snake-legend/integration/launcher-binding';
+const progress=(score=10,time=20,stars=[true,false,false])=>({bestScore:score,bestTime:time,stars});
+const campaign=(levels={})=>({...blankCampaign(),levels});
+const a:any=campaign({'1-1':progress(20,30,[true,true,false])});a.receipts=['local-run'];
+const b:any=campaign({'1-1':progress(10,15,[true,false,true]),'1-2':progress()});b.secrets=['r01'];
+const merged=mergeCampaigns(a,b);
+assert.deepEqual(merged.levels['1-1'],progress(20,15,[true,true,true]));
+assert(merged.levels['1-2']);assert.deepEqual(merged.receipts,['local-run']);assert.deepEqual(merged.secrets,['r01']);
+assert.deepEqual(mergeCampaigns(merged,b),merged);assert.deepEqual(a.levels['1-1'].stars,[true,true,false]);
+let fail=false;
+const data=new Map<string,string>();const storage={getItem:(k:string)=>data.get(k)??null,setItem:(k:string,v:string)=>{if(fail)throw Error("quota");data.set(k,v);}};
+const snapshot=(revision=1)=>({revision,levels:b.levels,secrets:[],wallet:{snake_gold:999,snake_gem:999}});
+storage.setItem('checkpoint','untouched');hydrateCampaign(storage,snapshot());assert.equal(storage.getItem('checkpoint'),'untouched');
+assert(!storage.getItem(CAMPAIGN_KEY)!.includes('snake_gold'));
+storage.setItem(CAMPAIGN_KEY,'broken');assert.throws(()=>hydrateCampaign(storage,snapshot()));assert.equal(storage.getItem(CAMPAIGN_KEY),'broken');data.clear();
+const owner='00000000-0000-4000-8000-000000000001';let current:string|null=owner,reads=0,revision=2;
+const auth={getSession:async()=>({data:{session:{user:{id:owner},access_token:'fixture',expires_at:Date.now()/1000+600}},error:null}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})};
+const binding=new LauncherSnakeBinding({actorId:owner,auth,hostOwner:()=>current,endpoint:'https://fixture.invalid/save',publishableKey:'fixture',fetcher:async()=>{reads++;return new Response(JSON.stringify(snapshot(revision)));}});
+const hooks=binding.createSaveSession(storage);let updates=0;hooks.subscribeCampaign!(()=>updates++);
+await binding.refreshState();assert.equal(binding.getView().status,'ready');assert.equal(updates,1);assert(parseCampaign(hooks.storage.getItem(CAMPAIGN_KEY)).levels['1-2']);
+assert.equal(storage.getItem(CAMPAIGN_KEY),null); // only owner namespace written
+const second=binding.createSaveSession(storage);assert(parseCampaign(second.storage.getItem(CAMPAIGN_KEY)).levels['1-2']);
+revision=1;await binding.refreshState();assert.equal(binding.getView().snapshot!.revision,2);assert.equal(updates,1);
+// Quota error preserves server snapshot; the same revision can be retried.
+const failing={getItem:storage.getItem,setItem:(k:string,v:string)=>{if(fail)throw Error('quota');storage.setItem(k,v);}};
+const third=binding.createSaveSession(failing);third.storage.setItem(CAMPAIGN_KEY,JSON.stringify(blankCampaign()));fail=true;revision=3;
+await binding.refreshState();assert.equal(binding.getView().status,'error');fail=false;await binding.refreshState();assert.equal(binding.getView().status,'ready');assert(parseCampaign(third.storage.getItem(CAMPAIGN_KEY)).levels['1-2']);
+const before=reads;current=null;binding.invalidate();await binding.refreshState();assert.equal(reads,before);assert.equal(binding.getView().snapshot,null);binding.destroy();
+console.log('PASS: cloud merge, idempotence, receipts, secrets, checkpoint/wallet isolation, corrupt storage, account namespace, active notifications, cached mount, stale revision, quota retry, invalidation');

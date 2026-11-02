@@ -1,5 +1,6 @@
 import { CONFIG, LESSONS, createState, step, botInput, neutral, nextLesson, aimPath, clamp } from './engine.ts';
 import type { State, Input, Tank } from './engine.ts';
+import { readableCanvasText } from '../../accessibility/canvasText';
 
 export type TankController = { destroy: () => void; setPaused: (v: boolean) => void; snapshot: () => State };
 export function mountTankClash(root: HTMLElement, options: { paused?: boolean } = {}): TankController {
@@ -113,7 +114,7 @@ export function mountTankClash(root: HTMLElement, options: { paused?: boolean } 
     for (let i = -16; i < 18; i += 6) { ctx.beginPath(); ctx.moveTo(i, -18); ctx.lineTo(i, -11); ctx.moveTo(i, 11); ctx.lineTo(i, 18); ctx.stroke(); }
     ctx.restore(); ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(a.aim); ctx.fillStyle = a.team ? '#7a4038' : '#287b6a'; ctx.fillRect(-8, -8, 19, 16); ctx.fillStyle = '#e3e3c5'; ctx.fillRect(5, -3, 20, 6); ctx.restore();
     if (a.shield > 0) { ctx.strokeStyle = '#94dfff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(a.x, a.y, 26, 0, Math.PI * 2); ctx.stroke(); }
-    ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.font = 'bold 11px system-ui'; ctx.fillText(a.team ? 'B' : 'A', a.x, a.y - 29);
+    ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.font = 'bold 11px system-ui'; readableCanvasText(ctx, a.team ? 'B' : 'A', a.x, a.y - 29);
   }
   function draw() {
     ctx.setTransform(2, 0, 0, 2, 0, 0); ctx.fillStyle = '#172326'; ctx.fillRect(0, 0, 800, 480);
@@ -128,7 +129,7 @@ export function mountTankClash(root: HTMLElement, options: { paused?: boolean } 
       for (let x = w.x + 20; x < w.x + w.w; x += 20) { ctx.beginPath(); ctx.moveTo(x, w.y + 6); ctx.lineTo(x, w.y + w.h - 5); ctx.stroke(); }
       if (w.kind === 'brick' && w.hp === 1) { ctx.beginPath(); ctx.moveTo(w.x + 8, w.y + 4); ctx.lineTo(w.x + 25, w.y + 22); ctx.lineTo(w.x + 16, w.y + 35); ctx.stroke(); }
     }
-    if (sim.mode === 'training' && sim.lesson === 0) { const r = 26 + Math.sin(sim.time * 4) * 3; ctx.strokeStyle = '#eac785'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(280, 300, r, 0, 7); ctx.stroke(); ctx.fillStyle = '#eac785'; ctx.font = '12px system-ui'; ctx.textAlign = 'center'; ctx.fillText('ĐẾN ĐÂY', 280, 255); }
+    if (sim.mode === 'training' && sim.lesson === 0) { const r = 26 + Math.sin(sim.time * 4) * 3; ctx.strokeStyle = '#eac785'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(280, 300, r, 0, 7); ctx.stroke(); ctx.fillStyle = '#eac785'; ctx.font = '12px system-ui'; ctx.textAlign = 'center'; readableCanvasText(ctx, 'ĐẾN ĐÂY', 280, 255); }
     const a = sim.tanks[0];
     if (guide && a.hp > 0 && sim.status === 'playing') { const points = aimPath(sim, a); ctx.setLineDash([5, 8]); ctx.lineWidth = 1.7; ctx.strokeStyle = '#e4d39a99'; ctx.beginPath(); points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke(); ctx.setLineDash([]); if (points.length > 2) { ctx.fillStyle = '#f6d58d'; ctx.beginPath(); ctx.arc(points[1].x, points[1].y, 5, 0, 7); ctx.fill(); } }
     sim.tanks.forEach(drawTank);
