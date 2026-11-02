@@ -3,7 +3,7 @@
 Cập nhật: 02/11/2026. Làm xong việc nào thì đánh dấu `[x]`. Các câu hỏi cần quyết định có chi tiết ở `docs/PENDING-DECISIONS.md`. Tóm tắt những gì đã làm: `docs/SESSION-HANDOFF.md`.
 
 ## Ưu tiên cao
-- [ ] **Đưa lên production:** bảo Claude chạy đủ CI rồi merge `claude/busy-edison-1clj3h` vào `main` (16 commit: Neon Run NR4, CCGS, Blossom, art Gemini, Battleship, Nối Từ). Netlify deploy từ `main`.
+- [x] **Đưa lên production:** `claude/busy-edison-1clj3h` đã merge vào `main` (PR #11).
 - [ ] **Hiện Nối Từ ở bản production:** áp `supabase/migrations/20261102090000_word_chain_catalog.sql`. Chưa áp thì game chỉ thấy khi chạy dev. (Mục 8 trong PENDING-DECISIONS.)
 - [ ] **Bật Nối Từ online** (mục 7), làm theo `docs/WORD-CHAIN-SERVER.md`:
   1. Áp `supabase/word-chain/schema.sql` lên **staging**, rồi chạy lại `npm run test:word-chain`.

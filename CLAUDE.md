@@ -6,7 +6,7 @@
 PWA launcher với 23 mini-game: React 19 + Vite + TypeScript, game Canvas 2D, Supabase (tài khoản, đồng bộ, bảng xếp hạng, phòng đấu). Cấu trúc thư mục và bảng lệnh test đầy đủ ở `README.md`.
 
 - Game: `src/games/<id>/` (đăng ký ở `src/games/registry.ts`). Game build sẵn nằm ở `public/standalone/<id>/` và là output: chỉ sửa bằng script (ví dụ `scripts/neon/tune-levels.mjs`), không format tay.
-- Đọc trước: `docs/SESSION-HANDOFF.md` (những gì đã làm, trạng thái nhánh, sổ tay kỹ thuật) và `docs/OWNER-TODO.md` (việc chủ dự án cần làm).
+- Đọc trước: `docs/WORKLOG.md` (nhật ký bắt buộc, mới nhất ở trên), `docs/SESSION-HANDOFF.md` (những gì đã làm, trạng thái nhánh, sổ tay kỹ thuật) và `docs/OWNER-TODO.md` (việc chủ dự án cần làm).
 - Tài liệu thiết kế, đánh giá, quyết định đang chờ: `docs/` (`docs/PENDING-DECISIONS.md`, `docs/<GAME>-REVIEW.md`). QA: `docs/qa/`.
 
 ## Lệnh
@@ -24,6 +24,7 @@ Thứ tự CI: `.github/workflows/ci.yml`.
 - Chỉ merge vào `main` khi chủ dự án yêu cầu: Netlify deploy production từ `main`. Chạy đủ các bước CI trước khi merge.
 - Không bỏ qua, tắt hay nới test để có kết quả xanh. Báo đúng kết quả, kể cả phần chưa làm được.
 - Trả lời bằng tiếng Việt.
+- **Nhật ký bắt buộc:** mọi việc đã làm xong phải ghi ngay vào `docs/WORKLOG.md` (mục mới ở trên cùng: việc đã làm, file, test đã chạy và kết quả thật, phần còn dở) và commit cùng thay đổi. Đầu mỗi session đọc `docs/WORKLOG.md` trước để biết làm tiếp từ đâu.
 
 ## An toàn
 - Không chạy migration hay script lên project Supabase production (`whjatkhhupeqfngakmee`); dùng PGlite (`npm run test:sql`) hoặc staging.

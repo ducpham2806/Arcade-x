@@ -3,8 +3,8 @@
 Tài liệu tóm tắt cho người làm tiếp. Việc chủ dự án cần tự làm nằm ở `docs/OWNER-TODO.md`.
 
 ## Trạng thái nhánh
-- Nhánh làm việc `claude/busy-edison-1clj3h` đang đi trước `main` **16 commit chưa merge** (từ `76833d1` đến `6d9982d`).
-- `main` đang ở `7df4d18`, đã có M0–M8 và NR1–NR3.
+- Cập nhật 02/11/2026: nhánh `claude/busy-edison-1clj3h` đã merge vào `main` (PR #11). `main` (`c8aac24`) có thêm Tank Clash P0/P1 và Snake journey.
+- Nhật ký chi tiết từng việc, mới nhất ở trên: `docs/WORKLOG.md` (bắt buộc cập nhật).
 - Netlify deploy production từ `main`. Chỉ merge khi chủ dự án yêu cầu, và chạy đủ CI trước khi merge.
 
 ## Đã làm, theo thứ tự
