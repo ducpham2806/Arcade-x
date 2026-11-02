@@ -1,5 +1,7 @@
 node_modules/
 dist/
+/deliverables/Tank_Clash_P1_Playtest.html
+/preview/tank-clash/index.html
 .netlify/
 .env
 .env.*
