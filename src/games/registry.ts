@@ -43,6 +43,8 @@ import { CAR_ESCAPE_ACHIEVEMENTS, CAR_ESCAPE_DROP_RATES, CAR_ESCAPE_CONTROLS } f
 
 const WordCrossGame = packageLazy('word-cross', () => import('./word-cross').then(async module => { await module.loadLexicon(); return { default: module.WordCrossGame }; }));
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
+const WordChainGame = packageLazy('word-chain', () => import('./word-chain').then(async module => { const {loadLexicon} = await import('./word-chain/lexicon'); await loadLexicon(); return { default: module.WordChainGame }; }));
+import { WORD_CHAIN_ACHIEVEMENTS, WORD_CHAIN_DROP_RATES, WORD_CHAIN_CONTROLS } from './word-chain/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
   'battleship': {
@@ -89,6 +91,24 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
     achievements: WORD_CROSS_ACHIEVEMENTS,
     dropRates: WORD_CROSS_DROP_RATES,
     component: WordCrossGame,
+  },
+  'word-chain': {
+    id: 'word-chain',
+    title: 'Nối Từ Đối Kháng',
+    shortDesc: 'Đấu trí nối từ tiếng Việt 2–4 người, ai bí từ hay hết giờ thì bị loại',
+    description: 'Lần lượt gõ một từ 2 âm tiết bắt đầu bằng âm tiết cuối của từ trước: con mèo → mèo con → con người. Từ phải có trong từ điển 17.522 từ và chưa ai dùng; gõ sai được gõ lại. Mỗi lượt 30 giây, rút còn 20 rồi 15 giây ở các vòng sau. Hết giờ là bị loại, người cuối cùng thắng. Luyện với 1–3 bot Dễ hoặc Khó; phòng online 2–4 người qua ghép trận hoặc mã phòng.',
+    category: 'Multiplayer',
+    difficulty: 'Trung Bình',
+    icon: '🔤',
+    bannerGradient: 'from-indigo-900/70 via-violet-950/80 to-slate-950',
+    themeColor: '#ffbf47',
+    tags: ['Nối Từ', 'Tiếng Việt', 'Đối Kháng', 'Từ Vựng', '2-4 người', 'Word Chain'],
+    controls: WORD_CHAIN_CONTROLS,
+    achievements: WORD_CHAIN_ACHIEVEMENTS,
+    dropRates: WORD_CHAIN_DROP_RATES,
+    multiplayer: true,
+    supportsAI: true,
+    component: WordChainGame,
   },
   'car-escape': {
     id: 'car-escape',

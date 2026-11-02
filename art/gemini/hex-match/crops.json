@@ -1,0 +1,3275 @@
+{
+ "game": "hex-match",
+ "map": "src/games/hex-match/blossom/painted.json",
+ "pieces": {
+  "petal-red": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    0,
+    0,
+    314,
+    314
+   ],
+   "core": 110
+  },
+  "petal-yellow": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    314,
+    0,
+    313,
+    314
+   ],
+   "core": 110
+  },
+  "petal-purple": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    627,
+    0,
+    313,
+    314
+   ],
+   "core": 110
+  },
+  "petal-blue": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    0,
+    314,
+    314
+   ],
+   "core": 110
+  },
+  "petal-green": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    0,
+    314,
+    314,
+    313
+   ],
+   "core": 110
+  },
+  "petal-orange": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    314,
+    314,
+    313,
+    313
+   ],
+   "core": 110
+  },
+  "star": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    627,
+    314,
+    313,
+    313
+   ],
+   "core": 60
+  },
+  "rainbow-star": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    314,
+    314,
+    313
+   ],
+   "core": 60
+  },
+  "ring": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    0,
+    627,
+    314,
+    313
+   ],
+   "core": 60
+  },
+  "rainbow-ring": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    314,
+    627,
+    313,
+    313
+   ],
+   "core": 60
+  },
+  "pink-burst": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    627,
+    627,
+    313,
+    313
+   ],
+   "core": 60
+  },
+  "rainbow-burst": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    627,
+    314,
+    313
+   ],
+   "core": 60
+  },
+  "orb": {
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    940,
+    940,
+    314,
+    314
+   ],
+   "core": 60
+  },
+  "leaf-ring": {
+   "source": "source/vfx-golden-leaf-ring.png",
+   "box": [
+    0,
+    0,
+    1254,
+    1254
+   ],
+   "core": 60,
+   "minPart": 0.01
+  }
+ },
+ "items": [
+  {
+   "name": "flower-red",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    14,
+    46,
+    360,
+    332
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/flower-red.webp",
+   "replaces": [
+    "png/theme_pieces/theme01_p1_rose_red.png",
+    "png/theme_pieces/theme02_p1_strawberry_red.png",
+    "png/theme_pieces/theme03_p1_sunflower_yellow.png",
+    "png/theme_pieces/theme04_p1_hibiscus_red.png",
+    "png/theme_pieces/theme05_p1_mushroom_red_red.png",
+    "png/theme_pieces/theme06_p1_cactus_pink.png",
+    "png/theme_pieces/theme07_p1_snowflake_aqua.png",
+    "png/theme_pieces/theme08_p1_lotus_pink.png",
+    "png/theme_pieces/theme09_p1_rose_aqua.png",
+    "png/theme_pieces/theme10_p1_rose_gold.png"
+   ]
+  },
+  {
+   "name": "flower-yellow",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    374,
+    26,
+    364,
+    356
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/flower-yellow.webp",
+   "replaces": [
+    "png/theme_pieces/theme01_p2_pansy_yellow.png",
+    "png/theme_pieces/theme02_p2_orange_orange.png",
+    "png/theme_pieces/theme03_p2_daisy_white.png",
+    "png/theme_pieces/theme04_p2_starfish_orange.png",
+    "png/theme_pieces/theme05_p2_mushroom_flat_purple.png",
+    "png/theme_pieces/theme06_p2_sunflower_orange.png",
+    "png/theme_pieces/theme07_p2_rose_pink.png",
+    "png/theme_pieces/theme08_p2_lily_white.png",
+    "png/theme_pieces/theme09_p2_daisy_yellow.png",
+    "png/theme_pieces/theme10_p2_sunflower_yellow.png"
+   ]
+  },
+  {
+   "name": "flower-purple",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    738,
+    26,
+    336,
+    356
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/flower-purple.webp",
+   "replaces": [
+    "png/theme_pieces/theme01_p3_daisy_purple.png",
+    "png/theme_pieces/theme02_p3_lemon_yellow.png",
+    "png/theme_pieces/theme03_p3_tulip_orange.png",
+    "png/theme_pieces/theme04_p3_shell_pink.png",
+    "png/theme_pieces/theme05_p3_orchid_lilac.png",
+    "png/theme_pieces/theme06_p3_hibiscus_yellow.png",
+    "png/theme_pieces/theme07_p3_bellflower_lilac.png",
+    "png/theme_pieces/theme08_p3_orchid_purple.png",
+    "png/theme_pieces/theme09_p3_pansy_magenta.png",
+    "png/theme_pieces/theme10_p3_lotus_pink.png"
+   ]
+  },
+  {
+   "name": "flower-blue",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    1086,
+    46,
+    344,
+    332
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/flower-blue.webp",
+   "replaces": [
+    "png/theme_pieces/theme01_p4_bellflower_blue.png",
+    "png/theme_pieces/theme02_p4_apple_green.png",
+    "png/theme_pieces/theme03_p4_bellflower_blue.png",
+    "png/theme_pieces/theme04_p4_orchid_blue.png",
+    "png/theme_pieces/theme05_p4_bellflower_teal.png",
+    "png/theme_pieces/theme06_p4_tulip_red.png",
+    "png/theme_pieces/theme07_p4_daisy_white.png",
+    "png/theme_pieces/theme08_p4_hibiscus_orange.png",
+    "png/theme_pieces/theme09_p4_lily_lime.png",
+    "png/theme_pieces/theme10_p4_hibiscus_red.png"
+   ]
+  },
+  {
+   "name": "flower-green",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    6,
+    386,
+    376,
+    328
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/flower-green.webp",
+   "replaces": [
+    "png/theme_pieces/theme01_p5_cherry_pink.png",
+    "png/theme_pieces/theme02_p5_grapes_purple.png",
+    "png/theme_pieces/theme03_p5_lily_pink.png",
+    "png/theme_pieces/theme04_p5_cherry_yellow.png",
+    "png/theme_pieces/theme05_p5_lily_pink.png",
+    "png/theme_pieces/theme06_p5_daisy_purple.png",
+    "png/theme_pieces/theme07_p5_tulip_blue.png",
+    "png/theme_pieces/theme08_p5_cherry_magenta.png",
+    "png/theme_pieces/theme09_p5_bellflower_purple.png",
+    "png/theme_pieces/theme10_p5_orchid_white.png"
+   ]
+  },
+  {
+   "name": "flower-orange",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    366,
+    394,
+    352,
+    320
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/flower-orange.webp",
+   "replaces": [
+    "png/theme_pieces/theme01_p6_lily_green.png",
+    "png/theme_pieces/theme02_p6_cherries_magenta.png",
+    "png/theme_pieces/theme03_p6_cherry_lilac.png",
+    "png/theme_pieces/theme04_p6_lily_teal.png",
+    "png/theme_pieces/theme05_p6_pansy_orange.png",
+    "png/theme_pieces/theme06_p6_lily_teal.png",
+    "png/theme_pieces/theme07_p6_lily_purple.png",
+    "png/theme_pieces/theme08_p6_bellflower_teal.png",
+    "png/theme_pieces/theme09_p6_cherry_blue.png",
+    "png/theme_pieces/theme10_p6_pansy_orange.png"
+   ]
+  },
+  {
+   "name": "special-bee-h",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    714,
+    418,
+    392,
+    268
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/special-bee-h.webp",
+   "replaces": [
+    "png/specials/special_bee_h.png",
+    "png/items/booster_bee_start.png"
+   ]
+  },
+  {
+   "name": "special-bee-v",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    1098,
+    378,
+    340,
+    352
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/special-bee-v.webp",
+   "replaces": [
+    "png/specials/special_bee_v.png"
+   ]
+  },
+  {
+   "name": "special-bloom-bomb",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    22,
+    690,
+    348,
+    364
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/special-bloom-bomb.webp",
+   "replaces": [
+    "png/specials/special_bloom_bomb.png",
+    "png/items/booster_bomb_start.png"
+   ]
+  },
+  {
+   "name": "special-rainbow-orb",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    382,
+    746,
+    316,
+    304
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/special-rainbow-orb.webp",
+   "replaces": [
+    "png/specials/special_rainbow_orb.png",
+    "png/items/booster_rainbow_start.png"
+   ]
+  },
+  {
+   "name": "special-sun",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    722,
+    698,
+    372,
+    364
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/special-sun.webp",
+   "replaces": [
+    "png/specials/special_sun.png"
+   ]
+  },
+  {
+   "name": "goal-seed",
+   "source": "source/sheet-tokens-specials.png",
+   "box": [
+    1134,
+    726,
+    284,
+    316
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/goal-seed.webp",
+   "replaces": [
+    "png/goals/goal_seed.png"
+   ]
+  },
+  {
+   "name": "hazard-weed",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    14,
+    50,
+    368,
+    328
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-weed.webp",
+   "replaces": [
+    "png/hazards/hazard_weed.png"
+   ]
+  },
+  {
+   "name": "hazard-rock-3",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    386,
+    58,
+    352,
+    304
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-rock-3.webp",
+   "replaces": [
+    "png/hazards/hazard_rock_hp3.png"
+   ]
+  },
+  {
+   "name": "hazard-rock-2",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    726,
+    58,
+    364,
+    308
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-rock-2.webp",
+   "replaces": [
+    "png/hazards/hazard_rock_hp2.png"
+   ]
+  },
+  {
+   "name": "hazard-rock-1",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    1082,
+    58,
+    356,
+    312
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-rock-1.webp",
+   "replaces": [
+    "png/hazards/hazard_rock_hp1.png"
+   ]
+  },
+  {
+   "name": "hazard-cocoon",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    42,
+    390,
+    312,
+    304
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-cocoon.webp",
+   "replaces": [
+    "png/hazards/hazard_cocoon.png"
+   ]
+  },
+  {
+   "name": "hazard-ice-3",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    394,
+    386,
+    316,
+    304
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-ice-3.webp",
+   "replaces": [
+    "png/hazards/hazard_ice_l3.png"
+   ]
+  },
+  {
+   "name": "hazard-ice-2",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    746,
+    386,
+    316,
+    300
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-ice-2.webp",
+   "replaces": [
+    "png/hazards/hazard_ice_l2.png"
+   ]
+  },
+  {
+   "name": "hazard-ice-1",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    1086,
+    382,
+    328,
+    312
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-ice-1.webp",
+   "replaces": [
+    "png/hazards/hazard_ice_l1.png"
+   ]
+  },
+  {
+   "name": "hazard-vine",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    22,
+    690,
+    364,
+    360
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-vine.webp",
+   "replaces": [
+    "png/hazards/hazard_vine.png"
+   ]
+  },
+  {
+   "name": "hazard-bug",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    402,
+    762,
+    320,
+    256
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-bug.webp",
+   "replaces": [
+    "png/hazards/hazard_bug.png"
+   ]
+  },
+  {
+   "name": "hazard-bomb-timer",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    730,
+    674,
+    344,
+    360
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-bomb-timer.webp",
+   "replaces": [
+    "png/hazards/hazard_bomb_timer.png"
+   ]
+  },
+  {
+   "name": "hazard-honey",
+   "source": "source/sheet-obstacles.png",
+   "box": [
+    1094,
+    706,
+    324,
+    332
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.05,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-honey.webp",
+   "replaces": [
+    "png/hazards/hazard_honey.png"
+   ]
+  },
+  {
+   "name": "boss-01",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    6,
+    18,
+    404,
+    360
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-01.webp",
+   "replaces": [
+    "png/bosses/boss_01_sau_buom_xam.png"
+   ]
+  },
+  {
+   "name": "boss-02",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    390,
+    10,
+    344,
+    372
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-02.webp",
+   "replaces": [
+    "png/bosses/boss_02_qua_tham_an.png"
+   ]
+  },
+  {
+   "name": "boss-03",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    742,
+    0,
+    316,
+    384
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-03.webp",
+   "replaces": [
+    "png/bosses/boss_03_coi_xay_gio_xam.png"
+   ]
+  },
+  {
+   "name": "boss-04",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    1026,
+    54,
+    420,
+    312
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-04.webp",
+   "replaces": [
+    "png/bosses/boss_04_cua_khong_lo.png"
+   ]
+  },
+  {
+   "name": "boss-05",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    14,
+    378,
+    356,
+    336
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-05.webp",
+   "replaces": [
+    "png/bosses/boss_05_nam_doc_khong_lo.png"
+   ]
+  },
+  {
+   "name": "boss-06",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    370,
+    366,
+    372,
+    344
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-06.webp",
+   "replaces": [
+    "png/bosses/boss_06_bo_cap_xam.png"
+   ]
+  },
+  {
+   "name": "boss-07",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    742,
+    374,
+    304,
+    340
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-07.webp",
+   "replaces": [
+    "png/bosses/boss_07_yeti_bui_xam.png"
+   ]
+  },
+  {
+   "name": "boss-08",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    1082,
+    366,
+    360,
+    344
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-08.webp",
+   "replaces": [
+    "png/bosses/boss_08_rong_bui_dam.png"
+   ]
+  },
+  {
+   "name": "boss-09",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    14,
+    746,
+    384,
+    312
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-09.webp",
+   "replaces": [
+    "png/bosses/boss_09_nhen_dem.png"
+   ]
+  },
+  {
+   "name": "boss-10",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    370,
+    702,
+    420,
+    372
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/boss-10.webp",
+   "replaces": [
+    "png/bosses/boss_10_nu_hoang_xam.png"
+   ]
+  },
+  {
+   "name": "char-mia",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    790,
+    694,
+    256,
+    392
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/char-mia.webp",
+   "replaces": [
+    "png/characters/char_mia.png",
+    "png/characters/char_mia_angry.png",
+    "png/characters/char_mia_happy.png",
+    "png/characters/char_mia_sad.png",
+    "png/characters/char_mia_sleepy.png",
+    "png/characters/char_mia_surprised.png",
+    "png/characters/char_mia_wink.png"
+   ]
+  },
+  {
+   "name": "char-bibi",
+   "source": "source/sheet-bosses-mia-bibi.png",
+   "box": [
+    1078,
+    722,
+    336,
+    332
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/char-bibi.webp",
+   "replaces": [
+    "png/characters/char_bibi.png",
+    "png/characters/char_bibi_angry.png",
+    "png/characters/char_bibi_happy.png",
+    "png/characters/char_bibi_sad.png",
+    "png/characters/char_bibi_sleepy.png",
+    "png/characters/char_bibi_surprised.png",
+    "png/characters/char_bibi_wink.png"
+   ]
+  },
+  {
+   "name": "char-pip",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    10,
+    22,
+    284,
+    340
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/char-pip.webp",
+   "replaces": [
+    "png/characters/char_pip.png",
+    "png/characters/char_pip_angry.png",
+    "png/characters/char_pip_happy.png",
+    "png/characters/char_pip_sad.png",
+    "png/characters/char_pip_sleepy.png",
+    "png/characters/char_pip_surprised.png",
+    "png/characters/char_pip_wink.png"
+   ]
+  },
+  {
+   "name": "char-bunny",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    358,
+    22,
+    224,
+    340
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/char-bunny.webp",
+   "replaces": [
+    "png/characters/char_bunny.png",
+    "png/characters/char_bunny_angry.png",
+    "png/characters/char_bunny_happy.png",
+    "png/characters/char_bunny_sad.png",
+    "png/characters/char_bunny_sleepy.png",
+    "png/characters/char_bunny_surprised.png",
+    "png/characters/char_bunny_wink.png",
+    "png/goals/goal_pet_bunny.png"
+   ]
+  },
+  {
+   "name": "char-owl",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    646,
+    66,
+    272,
+    296
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/char-owl.webp",
+   "replaces": [
+    "png/characters/char_owl.png"
+   ]
+  },
+  {
+   "name": "char-turtle",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    934,
+    58,
+    316,
+    300
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 384,
+   "quality": 88,
+   "out": "public/blossom/gemini/char-turtle.webp",
+   "replaces": [
+    "png/characters/char_turtle.png",
+    "png/characters/char_turtle_angry.png",
+    "png/characters/char_turtle_happy.png",
+    "png/characters/char_turtle_sad.png",
+    "png/characters/char_turtle_sleepy.png",
+    "png/characters/char_turtle_surprised.png",
+    "png/characters/char_turtle_wink.png"
+   ]
+  },
+  {
+   "name": "garden-bench",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    6,
+    374,
+    348,
+    268
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-bench.webp",
+   "replaces": [
+    "png/garden/garden_bench.png"
+   ]
+  },
+  {
+   "name": "garden-bush",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    334,
+    362,
+    308,
+    276
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-bush.webp",
+   "replaces": [
+    "png/garden/garden_bush.png"
+   ]
+  },
+  {
+   "name": "garden-fence",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    626,
+    386,
+    328,
+    252
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-fence.webp",
+   "replaces": [
+    "png/garden/garden_fence.png"
+   ]
+  },
+  {
+   "name": "garden-fountain",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    946,
+    354,
+    300,
+    292
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-fountain.webp",
+   "replaces": [
+    "png/garden/garden_fountain.png"
+   ]
+  },
+  {
+   "name": "garden-lantern",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    46,
+    626,
+    228,
+    316
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-lantern.webp",
+   "replaces": [
+    "png/garden/garden_lantern.png"
+   ]
+  },
+  {
+   "name": "garden-mailbox",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    346,
+    622,
+    232,
+    320
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-mailbox.webp",
+   "replaces": [
+    "png/garden/garden_mailbox.png"
+   ]
+  },
+  {
+   "name": "garden-pond",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    598,
+    686,
+    360,
+    240
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-pond.webp",
+   "replaces": [
+    "png/garden/garden_pond.png"
+   ]
+  },
+  {
+   "name": "garden-scarecrow",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    942,
+    626,
+    308,
+    316
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-scarecrow.webp",
+   "replaces": [
+    "png/garden/garden_scarecrow.png"
+   ]
+  },
+  {
+   "name": "garden-signpost",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    38,
+    930,
+    264,
+    312
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-signpost.webp",
+   "replaces": [
+    "png/garden/garden_signpost.png"
+   ]
+  },
+  {
+   "name": "garden-tree",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    318,
+    930,
+    316,
+    304
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/garden-tree.webp",
+   "replaces": [
+    "png/garden/garden_tree.png"
+   ]
+  },
+  {
+   "name": "hazard-fog",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    630,
+    950,
+    300,
+    280
+   ],
+   "method": "alpha",
+   "core": 60,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-fog.webp",
+   "replaces": [
+    "png/hazards/hazard_fog.png"
+   ]
+  },
+  {
+   "name": "hazard-portal",
+   "source": "source/sheet-garden-friends-decor.png",
+   "box": [
+    918,
+    930,
+    336,
+    312
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/hazard-portal.webp",
+   "replaces": [
+    "png/hazards/hazard_portal_a.png",
+    "png/hazards/hazard_portal_b.png"
+   ]
+  },
+  {
+   "name": "ui-coin",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    14,
+    326,
+    292,
+    288
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-coin.webp",
+   "replaces": [
+    "png/ui/coin_xu.png"
+   ]
+  },
+  {
+   "name": "ui-star",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    326,
+    322,
+    288,
+    276
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-star.webp",
+   "replaces": [
+    "png/ui/star_full.png"
+   ]
+  },
+  {
+   "name": "ui-trophy",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    622,
+    310,
+    320,
+    312
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-trophy.webp",
+   "replaces": [
+    "png/ui/icon_trophy.png"
+   ]
+  },
+  {
+   "name": "ui-gift",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    946,
+    310,
+    300,
+    308
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-gift.webp",
+   "replaces": [
+    "png/ui/icon_gift.png"
+   ]
+  },
+  {
+   "name": "ui-hammer",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    14,
+    618,
+    296,
+    316
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-hammer.webp",
+   "replaces": [
+    "png/items/support_hammer.png"
+   ]
+  },
+  {
+   "name": "ui-shuffle",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    310,
+    626,
+    304,
+    308
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-shuffle.webp",
+   "replaces": [
+    "png/items/support_shuffle.png"
+   ]
+  },
+  {
+   "name": "ui-undo",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    626,
+    650,
+    304,
+    264
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-undo.webp",
+   "replaces": [
+    "png/items/support_undo.png"
+   ]
+  },
+  {
+   "name": "ui-plus-moves",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    938,
+    622,
+    308,
+    308
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-plus-moves.webp",
+   "replaces": [
+    "png/items/booster_plus5.png"
+   ]
+  },
+  {
+   "name": "ui-fertilizer",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    22,
+    926,
+    308,
+    308
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-fertilizer.webp",
+   "replaces": [
+    "png/items/booster_fertilizer.png"
+   ]
+  },
+  {
+   "name": "ui-vacuum",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    346,
+    938,
+    280,
+    280
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-vacuum.webp",
+   "replaces": [
+    "png/items/support_vacuum.png"
+   ]
+  },
+  {
+   "name": "ui-broom",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    646,
+    918,
+    280,
+    324
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-broom.webp",
+   "replaces": [
+    "png/items/support_broom.png"
+   ]
+  },
+  {
+   "name": "ui-gear",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    954,
+    946,
+    284,
+    276
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": true,
+   "size": 128,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-gear.webp",
+   "replaces": [
+    "png/ui/icon_settings.png"
+   ]
+  },
+  {
+   "name": "petal-red",
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    20,
+    20,
+    273,
+    273
+   ],
+   "method": "alpha",
+   "core": 200,
+   "minPart": 0.3,
+   "feather": 2,
+   "square": true,
+   "size": 64,
+   "quality": 88,
+   "out": "public/blossom/gemini/petal-red.webp",
+   "replaces": [
+    "png/vfx/vfx_petal_heart.png"
+   ]
+  },
+  {
+   "name": "petal-yellow",
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    333,
+    20,
+    273,
+    273
+   ],
+   "method": "alpha",
+   "core": 200,
+   "minPart": 0.3,
+   "feather": 2,
+   "square": true,
+   "size": 64,
+   "quality": 88,
+   "out": "public/blossom/gemini/petal-yellow.webp",
+   "replaces": [
+    "png/vfx/vfx_petal_star.png"
+   ]
+  },
+  {
+   "name": "petal-purple",
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    646,
+    20,
+    273,
+    273
+   ],
+   "method": "alpha",
+   "core": 200,
+   "minPart": 0.3,
+   "feather": 2,
+   "square": true,
+   "size": 64,
+   "quality": 88,
+   "out": "public/blossom/gemini/petal-purple.webp",
+   "replaces": [
+    "png/vfx/vfx_petal_flower.png"
+   ]
+  },
+  {
+   "name": "petal-blue",
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    959,
+    20,
+    273,
+    273
+   ],
+   "method": "alpha",
+   "core": 200,
+   "minPart": 0.3,
+   "feather": 2,
+   "square": true,
+   "size": 64,
+   "quality": 88,
+   "out": "public/blossom/gemini/petal-blue.webp",
+   "replaces": [
+    "png/vfx/vfx_petal_drop.png"
+   ]
+  },
+  {
+   "name": "petal-green",
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    20,
+    333,
+    273,
+    273
+   ],
+   "method": "alpha",
+   "core": 200,
+   "minPart": 0.3,
+   "feather": 2,
+   "square": true,
+   "size": 64,
+   "quality": 88,
+   "out": "public/blossom/gemini/petal-green.webp",
+   "replaces": [
+    "png/vfx/vfx_petal_leaf.png"
+   ]
+  },
+  {
+   "name": "petal-orange",
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    333,
+    333,
+    273,
+    273
+   ],
+   "method": "alpha",
+   "core": 200,
+   "minPart": 0.3,
+   "feather": 2,
+   "square": true,
+   "size": 64,
+   "quality": 88,
+   "out": "public/blossom/gemini/petal-orange.webp",
+   "replaces": [
+    "png/vfx/vfx_petal_orange.png"
+   ]
+  },
+  {
+   "name": "petal-sweep",
+   "source": "source/sheet-petal-vfx.png",
+   "box": [
+    322,
+    940,
+    328,
+    180
+   ],
+   "method": "alpha",
+   "core": 40,
+   "minPart": 0.02,
+   "feather": 3,
+   "size": [
+    512,
+    256
+   ],
+   "quality": 82,
+   "out": "public/blossom/gemini/petal-sweep.webp",
+   "replaces": [
+    "png/vfx_fx/vfx_petal_sweep_v8.png"
+   ]
+  },
+  {
+   "name": "world-01",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-01.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster01.png"
+   ]
+  },
+  {
+   "name": "world-02",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-02.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster02.png"
+   ]
+  },
+  {
+   "name": "world-03",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-03.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster03.png"
+   ]
+  },
+  {
+   "name": "world-04",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-04.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster04.png"
+   ]
+  },
+  {
+   "name": "world-05",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-05.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster05.png"
+   ]
+  },
+  {
+   "name": "world-06",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-06.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster06.png"
+   ]
+  },
+  {
+   "name": "world-07",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-07.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster07.png"
+   ]
+  },
+  {
+   "name": "world-08",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-08.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster08.png"
+   ]
+  },
+  {
+   "name": "world-09",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-09.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster09.png"
+   ]
+  },
+  {
+   "name": "world-10",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-10.webp",
+   "replaces": [
+    "png/backgrounds/bg_cluster10.png"
+   ]
+  },
+  {
+   "name": "ui-leaf-ring",
+   "source": "source/vfx-golden-leaf-ring.png",
+   "box": [
+    180,
+    160,
+    900,
+    920
+   ],
+   "method": "alpha",
+   "core": 60,
+   "minPart": 0.01,
+   "feather": 2,
+   "square": true,
+   "size": 256,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-leaf-ring.webp",
+   "replaces": [
+    "png/ui/node_current.png"
+   ],
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-pill-green",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    14,
+    82,
+    320,
+    172
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-pill-green.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-pill-cream",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    334,
+    82,
+    316,
+    172
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-pill-cream.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-pill-gold",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    646,
+    86,
+    300,
+    168
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-pill-gold.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "ui-panel",
+   "source": "source/sheet-ui-kit.png",
+   "box": [
+    950,
+    30,
+    280,
+    264
+   ],
+   "method": "alpha",
+   "core": 128,
+   "minPart": 0.15,
+   "feather": 2,
+   "square": false,
+   "size": 300,
+   "quality": 88,
+   "out": "public/blossom/gemini/ui-panel.webp",
+   "usedBy": "src/games/hex-match/blossom/blossom.css"
+  },
+  {
+   "name": "world-garden",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-garden.webp",
+   "usedBy": "src/games/hex-match/index.tsx"
+  },
+  {
+   "name": "world-map",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "method": "none",
+   "size": 627,
+   "quality": 80,
+   "out": "public/blossom/gemini/world-map.webp",
+   "usedBy": "src/games/hex-match/index.tsx"
+  },
+  {
+   "name": "app-icon",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    60,
+    60,
+    500,
+    500
+   ],
+   "size": [
+    512,
+    512
+   ],
+   "quality": 88,
+   "out": "public/blossom/gemini/app-icon.webp",
+   "replaces": [
+    "png/icon/app_icon_1024.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/flower-red.webp",
+     "cx": 0.47,
+     "h": 0.66,
+     "base": 0.9
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.74,
+     "h": 0.4,
+     "base": 0.48
+    }
+   ]
+  },
+  {
+   "name": "comic-c01-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c01-p1.webp",
+   "replaces": [
+    "png/comics/comic_c01_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c01-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c01-p2.webp",
+   "replaces": [
+    "png/comics/comic_c01_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c01-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c01-p3.webp",
+   "replaces": [
+    "png/comics/comic_c01_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-01.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c02-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c02-p1.webp",
+   "replaces": [
+    "png/comics/comic_c02_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c02-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c02-p2.webp",
+   "replaces": [
+    "png/comics/comic_c02_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c02-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c02-p3.webp",
+   "replaces": [
+    "png/comics/comic_c02_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-02.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c03-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c03-p1.webp",
+   "replaces": [
+    "png/comics/comic_c03_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-pip.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c03-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c03-p2.webp",
+   "replaces": [
+    "png/comics/comic_c03_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c03-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c03-p3.webp",
+   "replaces": [
+    "png/comics/comic_c03_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-03.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c04-p1",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c04-p1.webp",
+   "replaces": [
+    "png/comics/comic_c04_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c04-p2",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c04-p2.webp",
+   "replaces": [
+    "png/comics/comic_c04_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c04-p3",
+   "method": "compose",
+   "source": "source/worlds-01-04.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c04-p3.webp",
+   "replaces": [
+    "png/comics/comic_c04_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-04.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c05-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c05-p1.webp",
+   "replaces": [
+    "png/comics/comic_c05_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-bunny.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c05-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c05-p2.webp",
+   "replaces": [
+    "png/comics/comic_c05_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c05-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c05-p3.webp",
+   "replaces": [
+    "png/comics/comic_c05_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-05.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c06-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c06-p1.webp",
+   "replaces": [
+    "png/comics/comic_c06_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c06-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c06-p2.webp",
+   "replaces": [
+    "png/comics/comic_c06_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c06-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c06-p3.webp",
+   "replaces": [
+    "png/comics/comic_c06_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-06.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c07-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c07-p1.webp",
+   "replaces": [
+    "png/comics/comic_c07_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c07-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c07-p2.webp",
+   "replaces": [
+    "png/comics/comic_c07_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c07-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    0,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c07-p3.webp",
+   "replaces": [
+    "png/comics/comic_c07_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-07.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c08-p1",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c08-p1.webp",
+   "replaces": [
+    "png/comics/comic_c08_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-owl.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c08-p2",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c08-p2.webp",
+   "replaces": [
+    "png/comics/comic_c08_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c08-p3",
+   "method": "compose",
+   "source": "source/worlds-05-08.png",
+   "box": [
+    627,
+    627,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c08-p3.webp",
+   "replaces": [
+    "png/comics/comic_c08_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-08.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c09-p1",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c09-p1.webp",
+   "replaces": [
+    "png/comics/comic_c09_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.5,
+     "h": 0.74,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c09-p2",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c09-p2.webp",
+   "replaces": [
+    "png/comics/comic_c09_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c09-p3",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    0,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c09-p3.webp",
+   "replaces": [
+    "png/comics/comic_c09_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-09.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c10-p1",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.35,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c10-p1.webp",
+   "replaces": [
+    "png/comics/comic_c10_p1.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-turtle.webp",
+     "cx": 0.36,
+     "h": 0.5,
+     "base": 0.94
+    },
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.66,
+     "h": 0.7,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "comic-c10-p2",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.6,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c10-p2.webp",
+   "replaces": [
+    "png/comics/comic_c10_p2.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.34,
+     "h": 0.7,
+     "base": 0.96
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.68,
+     "h": 0.42,
+     "base": 0.62
+    }
+   ]
+  },
+  {
+   "name": "comic-c10-p3",
+   "method": "compose",
+   "source": "source/worlds-09-10-extra.png",
+   "box": [
+    627,
+    0,
+    627,
+    627
+   ],
+   "size": [
+    720,
+    540
+   ],
+   "coverY": 0.85,
+   "quality": 80,
+   "out": "public/blossom/gemini/comic-c10-p3.webp",
+   "replaces": [
+    "png/comics/comic_c10_p3.png"
+   ],
+   "layers": [
+    {
+     "sprite": "public/blossom/gemini/char-mia.webp",
+     "cx": 0.2,
+     "h": 0.62,
+     "base": 0.97
+    },
+    {
+     "sprite": "public/blossom/gemini/char-bibi.webp",
+     "cx": 0.4,
+     "h": 0.3,
+     "base": 0.5
+    },
+    {
+     "sprite": "public/blossom/gemini/boss-10.webp",
+     "cx": 0.72,
+     "h": 0.72,
+     "base": 0.96
+    }
+   ]
+  },
+  {
+   "name": "fx-blast-red",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-red",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-red.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_red.png"
+   ]
+  },
+  {
+   "name": "fx-blast-yellow",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-yellow",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-yellow.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_yellow.png"
+   ]
+  },
+  {
+   "name": "fx-blast-purple",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-purple",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-purple.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_purple.png"
+   ]
+  },
+  {
+   "name": "fx-blast-blue",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-blue",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-blue.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_blue.png"
+   ]
+  },
+  {
+   "name": "fx-blast-green",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-green",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-green.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_green.png"
+   ]
+  },
+  {
+   "name": "fx-blast-orange",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "blast",
+   "petal": "petal-orange",
+   "frames": 7,
+   "cell": 192,
+   "out": "public/blossom/gemini/fx-blast-orange.webp",
+   "replaces": [
+    "png/anim/anim_fx_blast_orange.png"
+   ]
+  },
+  {
+   "name": "fx-bloom-bomb",
+   "source": "source/vfx-golden-leaf-ring.png",
+   "method": "flipbook",
+   "effect": "bomb",
+   "frames": 10,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-bloom-bomb.webp",
+   "replaces": [
+    "png/anim/anim_fx_bloom_bomb.png"
+   ]
+  },
+  {
+   "name": "fx-sun-burst",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "sun",
+   "frames": 10,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-sun-burst.webp",
+   "replaces": [
+    "png/anim/anim_fx_sun_burst.png"
+   ]
+  },
+  {
+   "name": "fx-rainbow-burst",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "rainbow",
+   "frames": 10,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-rainbow-burst.webp",
+   "replaces": [
+    "png/anim/anim_fx_rainbow_burst.png"
+   ]
+  },
+  {
+   "name": "fx-special-merge",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "merge",
+   "frames": 8,
+   "cell": 256,
+   "out": "public/blossom/gemini/fx-special-merge.webp",
+   "replaces": [
+    "png/anim/anim_fx_special_merge.png"
+   ]
+  },
+  {
+   "name": "fx-chain-spark",
+   "source": "source/sheet-petal-vfx.png",
+   "method": "flipbook",
+   "effect": "spark",
+   "frames": 6,
+   "cell": 128,
+   "out": "public/blossom/gemini/fx-chain-spark.webp",
+   "replaces": [
+    "png/anim/anim_fx_chain_spark.png"
+   ]
+  }
+ ]
+}

@@ -890,17 +890,25 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
           {/* ========================================================= */}
           {/* TRADITIONAL WOODEN XIANGQI BOARD MATRIX (9 x 10)         */}
           {/* ========================================================= */}
-          <div className="arcade-board relative p-3 sm:p-5 rounded-3xl bg-gradient-to-br from-[#4a2e18] via-[#2d1b0f] to-[#1a100a] border-4 border-[#7a4e28] shadow-2xl shadow-black overflow-x-auto max-w-full">
+          <div
+            className="arcade-board relative p-3 sm:p-5 rounded-3xl bg-[#4a1610] bg-cover bg-center border-4 border-[#b8862f] shadow-2xl shadow-black overflow-x-auto max-w-full"
+            style={{ backgroundImage: 'url(/games/xiangqi/art/frame-lacquer.webp)' }}
+          >
             {/* Wooden Board Surface */}
             <div
-              className="relative bg-[#d8ab76] border-2 border-[#5c3a1e] rounded-xl p-3 sm:p-4 shadow-inner"
+              className="relative bg-[#d8ab76] bg-cover bg-center border-2 border-[#5c3a1e] rounded-xl p-3 sm:p-4 shadow-inner"
+              // Piece glyphs sit on the cream token centres and the river text on light wood: the
+              // contrast is designed, so the launcher's image-surface fallback must not box them.
+              data-readability="off"
               style={{
+                // Painted Gemini wood and lacquer (art/gemini/xiangqi); grid, river and palace are drawn on top.
+                backgroundImage: 'url(/games/xiangqi/art/board-wood.webp)',
                 width: 'min(94vw, 500px)',
                 height: 'min(105vw, 560px)',
               }}
             >
               {/* River Text Banner (Chu Hà - Hán Giới) */}
-              <div className="absolute top-[46.5%] left-4 right-4 flex items-center justify-between px-6 pointer-events-none text-[#5c3a1e]/60 font-black tracking-[0.5em] text-xs sm:text-sm uppercase font-serif">
+              <div className="absolute top-[46.5%] left-4 right-4 flex items-center justify-between px-6 pointer-events-none text-[#5c3a1e]/85 font-black tracking-[0.5em] text-xs sm:text-sm uppercase font-serif">
                 <span>楚 河</span>
                 <span>漢 界</span>
               </div>
@@ -945,11 +953,12 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                         {/* Piece Disc */}
                         {piece && (
                           <div
-                            className={`arcade-piece relative w-[88%] h-[88%] rounded-full flex items-center justify-center border-2 sm:border-4 shadow-md transition-transform ${
+                            className={`arcade-piece relative w-[92%] h-[92%] rounded-full flex items-center justify-center bg-cover bg-center shadow-md shadow-black/60 transition-transform ${
                               piece.color === 'r'
-                                ? 'bg-[#f5e6cb] border-[#b02a2a] text-[#b02a2a] shadow-red-950/50'
-                                : 'bg-[#e2d5c1] border-[#1a1a1a] text-[#1a1a1a] shadow-black/50'
+                                ? 'bg-[#f5e6cb] text-[#b02a2a]'
+                                : 'bg-[#e2d5c1] text-[#1a1a1a]'
                             } ${isSelected ? 'scale-110 ring-4 ring-amber-400 z-10' : 'hover:scale-105'}`}
+                            style={{ backgroundImage: `url(/games/xiangqi/art/token-${piece.color === 'r' ? 'red' : 'black'}.webp)` }}
                           >
                             <span className="font-serif font-black text-base sm:text-xl select-none">
                               {vnPieces?pieceNames[piece.type]:PIECE_SYMBOLS[piece.color][piece.type]}

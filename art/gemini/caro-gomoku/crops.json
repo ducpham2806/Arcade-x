@@ -1,0 +1,67 @@
+{
+ "game": "caro-gomoku",
+ "items": [
+  {
+   "name": "mark-o",
+   "source": "source/sheet-shield-swords-stone-castle.png",
+   "box": [
+    24,
+    20,
+    580,
+    568
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 128,
+   "out": "public/games/caro-gomoku/art/mark-o.webp",
+   "quality": 88
+  },
+  {
+   "name": "mark-x",
+   "source": "source/sheet-shield-swords-stone-castle.png",
+   "box": [
+    656,
+    20,
+    580,
+    560
+   ],
+   "method": "chroma",
+   "key": "magenta",
+   "isolate": true,
+   "square": true,
+   "size": 128,
+   "out": "public/games/caro-gomoku/art/mark-x.webp",
+   "quality": 88
+  },
+  {
+   "name": "board-stone",
+   "source": "source/sheet-shield-swords-stone-castle.png",
+   "box": [
+    0,
+    604,
+    624,
+    650
+   ],
+   "method": "none",
+   "out": "public/games/caro-gomoku/art/board-stone.webp",
+   "size": 512,
+   "quality": 80
+  },
+  {
+   "name": "splash",
+   "source": "source/sheet-shield-swords-stone-castle.png",
+   "box": [
+    630,
+    604,
+    624,
+    650
+   ],
+   "method": "none",
+   "out": "public/games/caro-gomoku/art/splash.webp",
+   "size": 900,
+   "quality": 82
+  }
+ ]
+}

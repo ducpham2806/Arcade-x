@@ -98,7 +98,7 @@ export default defineConfig(() => {
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/preview\/snake(?:\/|$)/, /^\/chronicles-realms\//, /^\/standalone\//],
           runtimeCaching: [
-            ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'games/word-cross', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
+            ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'games/word-cross', 'games/word-chain', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
               handler: 'CacheFirst' as const,
               options: { cacheName: GAME_ASSET_CACHE, expiration: { maxEntries: 1200, maxAgeSeconds: 60 * 60 * 24 * 30 }, cacheableResponse: { statuses: [200] } },

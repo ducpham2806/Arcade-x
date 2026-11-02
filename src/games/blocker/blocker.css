@@ -128,7 +128,7 @@
   padding: 12px 10px 25px;
 }
 .bp-hero {
-  height: 156px;
+  min-height: 156px;
   position: relative;
   display: grid;
   place-items: center;
@@ -147,28 +147,6 @@
   filter: blur(8px);
   animation: bp-aura-pulse 3.2s ease-in-out infinite;
   pointer-events: none;
-}
-.bp-hero-piece {
-  display: grid;
-  width: 152px;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  transform: rotate(-8deg);
-  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65));
-  animation: bp-hero-float 3.4s ease-in-out infinite;
-}
-.bp-hero-piece .bp-tile {
-  aspect-ratio: 1;
-}
-.bp-hero i {
-  position: absolute;
-  color: #fde047;
-  font-style: normal;
-  font-size: 52px;
-  right: 24%;
-  top: 6px;
-  transform: rotate(15deg);
-  text-shadow: 0 0 22px #f59e0b;
 }
 .bp-menu-badge {
   display: inline-flex;
@@ -626,6 +604,30 @@
     0 3px 8px rgba(0, 0, 0, 0.55),
     0 0 10px rgba(255, 255, 255, 0.14);
 }
+.bp-jewel-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+.bp-relic-img {
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+}
+.bp-hero-art {
+  position: relative;
+  width: min(196px, 48vw);
+  aspect-ratio: 1;
+  border-radius: 22%;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.6));
+  animation: bp-hero-float 3.4s ease-in-out infinite;
+}
 .bp-jewel-svg {
   position: absolute;
   inset: 0;
@@ -676,7 +678,7 @@
   background: linear-gradient(135deg, #a855f7, #581c87);
 }
 .bp-color-6 {
-  background: linear-gradient(135deg, #ec4899, #831843);
+  background: linear-gradient(135deg, #22d3ee, #0e7490);
 }
 .bp-ice {
   background: linear-gradient(135deg, #bae6fd, #0284c7);

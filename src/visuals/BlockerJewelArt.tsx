@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 export interface JewelPalette {
   name: string;
@@ -69,16 +69,72 @@ export const JEWEL_PALETTES: Record<number, JewelPalette> = {
     glow: "rgba(168, 85, 247, 0.78)",
   },
   6: {
-    name: "Kim Cương Ánh Hồng (Prism)",
-    outerTop: "#f472b6",
-    outerBottom: "#831843",
-    midTop: "#ec4899",
-    midBottom: "#be185d",
-    core: "#fce7f3",
-    spec: "#22d3ee",
+    name: "Kim Cương Băng Lam (Diamond)",
+    outerTop: "#a5f3fc",
+    outerBottom: "#0e7490",
+    midTop: "#22d3ee",
+    midBottom: "#0891b2",
+    core: "#ecfeff",
+    spec: "#ffffff",
     rim: "#fde047",
-    glow: "rgba(236, 72, 153, 0.78)",
+    glow: "rgba(34, 211, 238, 0.78)",
   },
+};
+
+// Painted Gemini jewels (art/gemini/blocker, cut by scripts/art/import-gemini.py). The SVG
+// versions below stay as the fallback if an image fails to load.
+const ART = "/games/blocker/art/";
+export const JEWEL_IMAGES: Record<number, string> = {
+  1: "gem-ruby",
+  2: "gem-topaz",
+  3: "gem-emerald",
+  4: "gem-sapphire",
+  5: "gem-amethyst",
+  6: "gem-diamond",
+};
+const BOOSTER_IMAGES: Partial<Record<string, string>> = {
+  hammer: "booster-hammer",
+  shuffle: "booster-shuffle",
+  undo: "booster-undo",
+};
+
+export const JewelBlockArt: React.FC<{
+  color: number;
+  gem?: boolean;
+  ice?: number;
+}> = (props) => {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <JewelBlockSvg {...props} />;
+  const name = props.ice ? "gem-ice" : props.gem ? "gem-star-core" : JEWEL_IMAGES[props.color] || JEWEL_IMAGES[1];
+  return (
+    <img
+      className="bp-jewel-img"
+      src={`${ART}${name}.webp`}
+      alt=""
+      draggable={false}
+      onError={() => setFailed(true)}
+    />
+  );
+};
+
+export const BoosterRelicArt: React.FC<{
+  kind: "hammer" | "shuffle" | "undo" | "rotate" | "hint";
+  size?: number;
+}> = ({ kind, size = 24 }) => {
+  const [failed, setFailed] = useState(false);
+  const name = BOOSTER_IMAGES[kind];
+  if (!name || failed) return <BoosterRelicSvg kind={kind} size={size} />;
+  return (
+    <img
+      className="bp-relic-img"
+      src={`${ART}${name}.webp`}
+      width={size}
+      height={size}
+      alt=""
+      draggable={false}
+      onError={() => setFailed(true)}
+    />
+  );
 };
 
 export const JewelBlockSvg: React.FC<{

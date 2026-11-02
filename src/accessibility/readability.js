@@ -6,10 +6,12 @@ export function installReadability(root=document.body){
  let cv;
  const color=v=>{if(cache.has(v))return cache.get(v);let c=parseColor(v);if(!c){try{cv ||=document.createElement('canvas').getContext('2d',{willReadFrequently:true});cv.clearRect(0,0,1,1);cv.fillStyle=v;cv.fillRect(0,0,1,1);const d=cv.getImageData(0,0,1,1).data;c=[d[0],d[1],d[2],d[3]/255];}catch{return null;}}cache.set(v,c);return c;};
  const gradients=v=>(v.match(/(?:rgba?|oklch|oklab|color)\([^()]*\)|#[\da-f]{3,8}\b|\btransparent\b/gi)||[]).map(color).filter(Boolean).slice(0,6);
- function backgrounds(el){let chain=[],p=el;while(p&&p instanceof HTMLElement){chain.push(p);p=p.parentElement;}let bg=[[255,255,255,1]],image=false;
-  for(const item of chain.reverse()){const s=getComputedStyle(item),c=color(s.backgroundColor);if(c&&c[3]){bg=bg.map(b=>composite(c,b));if(c[3]>.98)image=false;}
-   if(s.backgroundImage!=='none'){const stops=gradients(s.backgroundImage);if(stops.length)bg=stops.flatMap(stop=>bg.map(b=>composite(stop,b))).slice(0,12);else image=true;}}
-  return {bg,image};
+ // An image's pixels are unknown, so they are bounded by black and white; gradients listed before
+ // url() are layers above it and composite over both bounds, as do descendants' backgrounds.
+ function backgrounds(el){let chain=[],p=el;while(p&&p instanceof HTMLElement){chain.push(p);p=p.parentElement;}let bg=[[255,255,255,1]];
+  for(const item of chain.reverse()){const s=getComputedStyle(item),c=color(s.backgroundColor);if(c&&c[3])bg=bg.map(b=>composite(c,b));
+   if(s.backgroundImage!=='none'){const v=s.backgroundImage,u=v.indexOf('url(');if(u>=0)bg=[[0,0,0,1],[255,255,255,1]];const stops=gradients(u>=0?v.slice(0,u):v);if(stops.length)bg=stops.flatMap(stop=>bg.map(b=>composite(stop,b))).slice(0,12);}}
+  return bg;
  }
  function audit(){if(!active)return;timer=0;observer?.disconnect();
   // Restore only our own overrides before resolving current CSS, including hover/tab/theme changes.
@@ -22,11 +24,11 @@ export function installReadability(root=document.body){
    if(el.closest('.animate-pulse,.animate-pulse-glow')&&!el.matches('button'))continue;
    // Transparent cells and animated gradient wordmarks are intentional visual art, not labels.
    if(s.color==='rgba(0, 0, 0, 0)'||s.color==='transparent')continue;
-   const fg=color(icon&&!direct?getComputedStyle(icon).color:s.color);if(!fg||fg[3]===0)continue;const {bg,image}=backgrounds(el);const size=parseFloat(s.fontSize),weight=parseInt(s.fontWeight)||400,target=icon&&!direct||size>=24||size>=18.66&&weight>=700?3:4.5;
-   const resolved=readableColor(fg,bg,target);if(!resolved.changed&&!image)continue;
+   const fg=color(icon&&!direct?getComputedStyle(icon).color:s.color);if(!fg||fg[3]===0)continue;const bg=backgrounds(el);const size=parseFloat(s.fontSize),weight=parseInt(s.fontWeight)||400,target=icon&&!direct||size>=24||size>=18.66&&weight>=700?3:4.5;
+   const resolved=readableColor(fg,bg,target);if(!resolved.changed)continue;
    const prev={bg:el.style.backgroundColor,img:el.style.backgroundImage,appliedBg:'',appliedImg:''};managed.set(el,prev);
-   // Image/texture-backed direct labels receive a small opaque text surface; no sampled-image guess.
-   if(image||resolved.needsSurface){el.style.backgroundColor='#111c2d';prev.appliedBg=el.style.backgroundColor;el.style.backgroundImage='none';prev.appliedImg=el.style.backgroundImage;el.style.setProperty('--ax-readable-color','#ffffff');}
+   // Labels no text colour can carry (e.g. bare image/texture) receive a small opaque surface; no sampled-image guess.
+   if(resolved.needsSurface){el.style.backgroundColor='#111c2d';prev.appliedBg=el.style.backgroundColor;el.style.backgroundImage='none';prev.appliedImg=el.style.backgroundImage;el.style.setProperty('--ax-readable-color','#ffffff');}
    else el.style.setProperty('--ax-readable-color',cssColor(resolved.color));
    el.setAttribute('data-ax-readable','true');
   }

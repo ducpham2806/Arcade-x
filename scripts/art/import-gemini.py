@@ -1,0 +1,383 @@
+#!/usr/bin/env python3
+"""Cut game sprites out of Gemini design sheets and export WebP.
+
+Usage: python3 -I scripts/art/import-gemini.py art/gemini/<game>/crops.json [--check]
+
+crops.json:
+  {"items": [{"name", "source", "box": [x, y, w, h], "method": "flood" | "chroma" | "none",
+              "out": "public/...webp", "size": [w, h] or N (fit inside N x N),
+              "cover": [w, h] (crop to aspect then resize), "square": true, "quality": 90,
+              "bottom": [aw, ah] (pad to aspect, feet on the bottom edge),
+              "canvas": [w, h] (shared canvas in source px, feet on the bottom edge),
+              "tol"/"bgMax"/"seal" (flood tuning), "isolate": true (drop neighbours poking in),
+              "keyFlood": true (chroma: only border-connected key colour is background),
+              "replaces": [asset paths this sprite substitutes at runtime]}],
+   "map": "src/.../painted.json" (optional: write the replaces table there)}
+
+methods
+  flood   dark design-sheet background: pixels connected to the crop border whose colour is
+          close to the sampled background become transparent; edges are feathered by 1 px.
+  chroma  green (default) or "key": "magenta" screen: alpha from key-colour dominance, spill
+          removed from edge pixels.
+  compose scene built from a background crop and earlier outputs ("layers", see compose()).
+  alpha   sheet already has alpha but a noisy matte: keep the solid subject and its
+          detached parts, drop coloured speckle ("core", "minPart", "feather").
+  flipbook animation strip ("frames" x "cell" px, one row) built from still pieces: "effect"
+          names the motion (see EFFECTS), pieces come from the spec-level "pieces" table
+          ({name: {"source", "box", "core", "minPart", "feather"}}, cut with clean_alpha).
+  none    plain crop (scenes, icons).
+
+Deterministic: the same sources and crops.json always give the same files. --check fails if
+any output is missing or differs from what the sources produce.
+"""
+import hashlib, io, json, math, os, sys
+from collections import deque
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter
+
+
+def flood_alpha(rgb, tol, bg_max, seal=0):
+    h, w, _ = rgb.shape
+    border = np.concatenate([rgb[0], rgb[-1], rgb[:, 0], rgb[:, -1]])
+    bg = np.median(border, axis=0)
+    dist = np.sqrt(((rgb.astype(np.int32) - bg) ** 2).sum(axis=2))
+    raw = (dist < tol) & (rgb.max(axis=2) < bg_max)
+    cand = raw
+    if seal:
+        # Dark line art (darker than the background) and anything off-colour form a barrier;
+        # widening it closes the 1-2 px gaps through which dark clothing/shadows would leak.
+        lum = rgb.mean(axis=2)
+        barrier = (~raw) | (lum < bg.mean() - 18)
+        barrier = np.asarray(Image.fromarray((barrier * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(seal))) > 0
+        cand = raw & ~barrier
+    seen = np.zeros((h, w), bool)
+    q = deque()
+    for x in range(w):
+        for y in (0, h - 1):
+            if cand[y, x] and not seen[y, x]:
+                seen[y, x] = True; q.append((y, x))
+    for y in range(h):
+        for x in (0, w - 1):
+            if cand[y, x] and not seen[y, x]:
+                seen[y, x] = True; q.append((y, x))
+    while q:
+        y, x = q.popleft()
+        for ny, nx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+            if 0 <= ny < h and 0 <= nx < w and cand[ny, nx] and not seen[ny, nx]:
+                seen[ny, nx] = True; q.append((ny, nx))
+    if seal:
+        # Give back the background ring the widened barrier kept: grow the cleared area into
+        # background-coloured pixels only.
+        for _ in range(seal):
+            grown = np.asarray(Image.fromarray((seen * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(3))) > 0
+            seen = seen | (grown & raw)
+    alpha = Image.fromarray(np.where(seen, 0, 255).astype(np.uint8))
+    return alpha.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.8))
+
+
+def chroma_alpha(rgb, key='green'):
+    f = rgb.astype(np.float32)
+    r, g, b = f[..., 0], f[..., 1], f[..., 2]
+    out = f.copy()
+    if key == 'magenta':
+        # Magenta screen: alpha from the distance to the screen colour sampled on the crop
+        # border, so purple subjects (far from bright magenta) stay opaque.
+        border = np.concatenate([f[0], f[-1], f[:, 0], f[:, -1]])
+        key_rgb = np.median(border[(border[:, 0] > 150) & (border[:, 2] > 150)], axis=0) if ((border[:, 0] > 150) & (border[:, 2] > 150)).any() else np.array([255, 0, 255])
+        dist = np.sqrt(((f - key_rgb) ** 2).sum(axis=2))
+        a = np.clip((dist - 70) * (255 / 90), 0, 255)
+        spill = np.minimum(r, b) - g
+        # Despill: pull red/blue toward green+neutral where magenta dominates the edge.
+        cap = g + np.clip(spill, 0, None) * 0.2
+        out[..., 0] = np.where(spill > 0, np.minimum(r, np.maximum(cap, r - spill * 0.8)), r)
+        out[..., 2] = np.where(spill > 0, np.minimum(b, np.maximum(cap, b - spill * 0.8)), b)
+    else:
+        spill = g - np.maximum(r, b)
+        # Fully green -> 0, neutral -> 255, with a soft ramp in between.
+        a = np.clip(255 - (spill - 30) * (255 / 70), 0, 255)
+        # Despill: pull green down to the other channels wherever it dominates.
+        out[..., 1] = np.where(spill > 0, np.maximum(r, b) + spill * 0.15, g)
+    alpha = Image.fromarray(a.astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.6))
+    return out.clip(0, 255).astype(np.uint8), alpha
+
+
+def border_connected(alpha):
+    a = np.asarray(alpha)
+    bg = a < 128
+    h, w = bg.shape
+    seen = np.zeros((h, w), bool); q = deque()
+    for x in range(w):
+        for y in (0, h - 1):
+            if bg[y, x] and not seen[y, x]: seen[y, x] = True; q.append((y, x))
+    for y in range(h):
+        for x in (0, w - 1):
+            if bg[y, x] and not seen[y, x]: seen[y, x] = True; q.append((y, x))
+    while q:
+        y, x = q.popleft()
+        for ny, nx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+            if 0 <= ny < h and 0 <= nx < w and bg[ny, nx] and not seen[ny, nx]:
+                seen[ny, nx] = True; q.append((ny, nx))
+    # Keep the soft ramp near the outside; interior keyed pixels become opaque again.
+    near = np.asarray(Image.fromarray((seen * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(5))) > 0
+    return Image.fromarray(np.where(near, a, 255).astype(np.uint8))
+
+
+def clean_alpha(rgba, core_thr, min_part, feather):
+    """Sheets exported with alpha but a noisy matte: keep the solid subject (connected
+    alpha >= core_thr), plus detached parts at least min_part of the largest that do not touch
+    the crop border, then a feather band of the original alpha around them. Coloured
+    low-alpha speckle elsewhere is dropped."""
+    a = np.asarray(rgba.getchannel('A'))
+    core = a >= core_thr
+    h, w = core.shape
+    lab = np.zeros((h, w), np.int32); sizes = [0]; edge = [False]; n = 0
+    for sy in range(h):
+        for sx in range(w):
+            if core[sy, sx] and not lab[sy, sx]:
+                n += 1; lab[sy, sx] = n; q = deque([(sy, sx)]); c = 0; e = False
+                while q:
+                    y, x = q.popleft(); c += 1
+                    if y in (0, h - 1) or x in (0, w - 1): e = True
+                    for ny, nx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+                        if 0 <= ny < h and 0 <= nx < w and core[ny, nx] and not lab[ny, nx]:
+                            lab[ny, nx] = n; q.append((ny, nx))
+                sizes.append(c); edge.append(e)
+    if not n: return rgba
+    big = int(np.argmax(sizes))
+    keep = [i for i in range(1, n + 1) if i == big or (not edge[i] and sizes[i] >= sizes[big] * min_part)]
+    mask = Image.fromarray((np.isin(lab, keep) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(feather * 2 + 1))
+    out = np.where((np.asarray(mask) > 0) & (a >= 20), a, 0).astype(np.uint8)
+    img = rgba.copy(); img.putalpha(Image.fromarray(out)); return img
+
+
+def drop_edge_fragments(img):
+    """Clear opaque islands that touch the crop border, except the largest one (the subject).
+    Neighbouring sprites poking into a crop are removed; detached parts fully inside the crop
+    (a floating orb, a spark) stay."""
+    a = np.asarray(img.getchannel('A')) > 40
+    h, w = a.shape
+    lab = np.zeros((h, w), np.int32); sizes = [0]; edge = [False]; n = 0
+    for sy in range(h):
+        for sx in range(w):
+            if a[sy, sx] and not lab[sy, sx]:
+                n += 1; lab[sy, sx] = n; q = deque([(sy, sx)]); c = 0; e = False
+                while q:
+                    y, x = q.popleft(); c += 1
+                    if y in (0, h - 1) or x in (0, w - 1): e = True
+                    for ny, nx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+                        if 0 <= ny < h and 0 <= nx < w and a[ny, nx] and not lab[ny, nx]:
+                            lab[ny, nx] = n; q.append((ny, nx))
+                sizes.append(c); edge.append(e)
+    if n < 2: return img
+    biggest = int(np.argmax(sizes))
+    drop = [i for i in range(1, n + 1) if edge[i] and i != biggest]
+    if not drop: return img
+    # Grow the dropped islands by 2 px so their soft fringe goes too.
+    m = Image.fromarray((np.isin(lab, drop) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(5))
+    alpha = np.asarray(img.getchannel('A')).copy(); alpha[np.asarray(m) > 0] = 0
+    img = img.copy(); img.putalpha(Image.fromarray(alpha)); return img
+
+
+def compose(item, base):
+    """Scene from painted parts: a background crop scaled to cover "size", then each layer
+    {"sprite": earlier output path, "cx": 0..1, "h": height fraction, "base": feet y 0..1,
+    "flip": bool} pasted bottom-centred with a soft ground shadow."""
+    W, H = item['size']
+    bg = Image.open(os.path.join(base, item['source'])).convert('RGB')
+    x, y, w, h = item['box']; bg = bg.crop((x, y, x + w, y + h))
+    r = max(W / bg.width, H / bg.height)
+    bg = bg.resize((round(bg.width * r), round(bg.height * r)), Image.LANCZOS)
+    top = round((bg.height - H) * item.get('coverY', 0.5)); left = (bg.width - W) // 2
+    canvas = bg.crop((left, top, left + W, top + H)).convert('RGBA')
+    for layer in item['layers']:
+        spr = Image.open(layer['sprite']).convert('RGBA')
+        bbox = spr.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox()
+        if bbox: spr = spr.crop(bbox)
+        th = round(H * layer['h']); spr = spr.resize((max(1, round(spr.width * th / spr.height)), th), Image.LANCZOS)
+        if layer.get('flip'): spr = spr.transpose(Image.FLIP_LEFT_RIGHT)
+        cx = round(W * layer['cx']); feet = round(H * layer.get('base', 0.95))
+        shadow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        sw = round(spr.width * 0.42); sh = max(4, round(spr.width * 0.09))
+        ImageDraw.Draw(shadow).ellipse((cx - sw, feet - sh, cx + sw, feet + sh), fill=(30, 40, 20, 90))
+        canvas = Image.alpha_composite(canvas, shadow.filter(ImageFilter.GaussianBlur(6)))
+        canvas.alpha_composite(spr, (cx - spr.width // 2, feet - spr.height))
+    buf = io.BytesIO(); canvas.convert('RGB').save(buf, 'WEBP', quality=item.get('quality', 82), method=6)
+    return buf.getvalue(), (W, H)
+
+
+PIECES = {}
+_piece_cache = {}
+
+
+def piece(name, base):
+    """Still VFX piece from the spec-level "pieces" table, matte cleaned and trimmed."""
+    if name not in _piece_cache:
+        p = PIECES[name]; x, y, w, h = p['box']
+        src = Image.open(os.path.join(base, p['source'])).convert('RGBA').crop((x, y, x + w, y + h))
+        img = clean_alpha(src, p.get('core', 60), p.get('minPart', 0.05), p.get('feather', 3))
+        _piece_cache[name] = img.crop(img.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox())
+    return _piece_cache[name]
+
+
+def place(canvas, img, cx, cy, size, rot=0, alpha=1.0):
+    """Paste img centred at (cx, cy), longest side = size px, rotated rot degrees, faded."""
+    if size < 2 or alpha <= 0: return
+    s = size / max(img.size)
+    im = img.resize((max(1, round(img.width * s)), max(1, round(img.height * s))), Image.LANCZOS)
+    if rot: im = im.rotate(rot, resample=Image.BICUBIC, expand=True)
+    if alpha < 1: im.putalpha(im.getchannel('A').point(lambda v: round(v * alpha)))
+    canvas.alpha_composite(im, (round(cx - im.width / 2), round(cy - im.height / 2)))
+
+
+def _ease(t): return 1 - (1 - t) ** 3
+
+
+def _fade_after(t, start): return 1 - max(0, (t - start) / (1 - start))
+
+
+# Each effect draws frame t (0..1) of a cell x cell square; P(name) returns a piece.
+def fx_blast(fr, t, c, P, item):
+    """Flash, then six petals of the group's colour fly out and fade."""
+    place(fr, P('orb'), c / 2, c / 2, c * (0.35 + 0.5 * _ease(t)), alpha=max(0, 1 - t * 1.6))
+    for i in range(6):
+        a = i * math.pi / 3 + 0.4; d = c * 0.36 * _ease(t)
+        place(fr, P(item['petal']), c / 2 + math.cos(a) * d, c / 2 + math.sin(a) * d, c * (0.34 - 0.12 * t),
+              rot=-math.degrees(a) + t * 80, alpha=_fade_after(t, 0.45))
+
+
+def fx_sun(fr, t, c, P, item):
+    """Golden ring spreads, glow orb, golden star grows and turns."""
+    place(fr, P('ring'), c / 2, c / 2, c * (0.3 + 0.68 * _ease(t)), alpha=1 - t)
+    place(fr, P('orb'), c / 2, c / 2, c * (0.5 + 0.3 * t), alpha=max(0, 1 - t * 1.3))
+    place(fr, P('star'), c / 2, c / 2, c * (0.25 + 0.6 * _ease(min(1, t * 1.4))), rot=t * 45, alpha=_fade_after(t, 0.55))
+
+
+def fx_rainbow(fr, t, c, P, item):
+    """Rainbow ring spreads while the rainbow star spins."""
+    place(fr, P('rainbow-ring'), c / 2, c / 2, c * (0.3 + 0.68 * _ease(t)), rot=-t * 60, alpha=1 - t)
+    place(fr, P('rainbow-star'), c / 2, c / 2, c * (0.3 + 0.55 * _ease(min(1, t * 1.5))), rot=t * 120, alpha=_fade_after(t, 0.5))
+
+
+def fx_bomb(fr, t, c, P, item):
+    """Pink bloom opens inside the golden leaf ring, then scatters."""
+    place(fr, P('leaf-ring'), c / 2, c / 2, c * (0.35 + 0.62 * _ease(t)), rot=t * 40, alpha=1 - t)
+    place(fr, P('pink-burst'), c / 2, c / 2, c * (0.25 + 0.7 * _ease(min(1, t * 1.3))), rot=t * 30, alpha=_fade_after(t, 0.5))
+    place(fr, P('orb'), c / 2, c / 2, c * 0.45, alpha=max(0, 1 - t * 2))
+
+
+def fx_merge(fr, t, c, P, item):
+    """Rainbow bloom spins around a glow orb."""
+    place(fr, P('orb'), c / 2, c / 2, c * (0.4 + 0.4 * t), alpha=max(0, 1 - t * 1.2))
+    place(fr, P('rainbow-burst'), c / 2, c / 2, c * (0.3 + 0.6 * _ease(t)), rot=t * 180, alpha=_fade_after(t, 0.6))
+
+
+def fx_spark(fr, t, c, P, item):
+    """Golden orb pulses with a small turning star."""
+    place(fr, P('orb'), c / 2, c / 2, c * (0.55 + 0.35 * math.sin(t * math.pi)), alpha=1 - t * 0.8)
+    place(fr, P('star'), c / 2, c / 2, c * (0.35 + 0.5 * t), rot=t * 90, alpha=1 - t)
+
+
+EFFECTS = {'blast': fx_blast, 'sun': fx_sun, 'rainbow': fx_rainbow, 'bomb': fx_bomb, 'merge': fx_merge, 'spark': fx_spark}
+
+
+def flipbook(item, base):
+    n, c = item['frames'], item['cell']; draw = EFFECTS[item['effect']]
+    out = Image.new('RGBA', (n * c, c), (0, 0, 0, 0))
+    for f in range(n):
+        fr = Image.new('RGBA', (c, c), (0, 0, 0, 0))
+        draw(fr, f / (n - 1), c, lambda name: piece(name, base), item)
+        out.alpha_composite(fr, (f * c, 0))
+    buf = io.BytesIO(); out.save(buf, 'WEBP', quality=item.get('quality', 88), method=6, alpha_quality=item.get('alphaQuality', 90))
+    return buf.getvalue(), out.size
+
+
+def process(item, base):
+    if item.get('method') == 'compose': return compose(item, base)
+    if item.get('method') == 'flipbook': return flipbook(item, base)
+    method = item.get('method', 'none')
+    src = Image.open(os.path.join(base, item['source'])).convert('RGBA' if method == 'alpha' else 'RGB')
+    x, y, w, h = item['box']
+    crop = src.crop((x, y, x + w, y + h))
+    rgb = np.asarray(crop)
+    if method == 'alpha':
+        img = clean_alpha(crop, item.get('core', 128), item.get('minPart', 0.15), item.get('feather', 2))
+    elif method == 'flood':
+        img = Image.fromarray(rgb).convert('RGBA')
+        img.putalpha(flood_alpha(rgb, item.get('tol', 34), item.get('bgMax', 90), item.get('seal', 0)))
+    elif method == 'chroma':
+        rgb2, alpha = chroma_alpha(rgb, item.get('key', 'green'))
+        if item.get('keyFlood'):
+            # Only key-coloured pixels connected to the crop border are background, so purple or
+            # green parts inside the subject survive.
+            alpha = border_connected(alpha)
+        img = Image.fromarray(rgb2).convert('RGBA'); img.putalpha(alpha)
+    else:
+        img = crop.convert('RGBA') if item.get('alpha') else crop
+    if method != 'none':
+        if item.get('isolate'): img = drop_edge_fragments(img)
+        bbox = img.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox()
+        if bbox: img = img.crop(bbox)
+        if item.get('square'):
+            side = max(img.size); canvas = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+            canvas.paste(img, ((side - img.width) // 2, (side - img.height) // 2)); img = canvas
+        elif item.get('canvas'):
+            # Shared canvas in source pixels keeps relative sizes across a set (a pawn stays
+            # shorter than the king); bottom-centred so every figure stands on the same line.
+            cw, ch = item['canvas']
+            if img.width > cw or img.height > ch:
+                r = min(cw / img.width, ch / img.height); img = img.resize((round(img.width * r), round(img.height * r)), Image.LANCZOS)
+            canvas = Image.new('RGBA', (cw, ch), (0, 0, 0, 0))
+            canvas.paste(img, ((cw - img.width) // 2, ch - img.height)); img = canvas
+        elif item.get('bottom'):
+            # Pieces/characters stand on their base: pad to a fixed aspect, aligned to the bottom.
+            aw, ah = item['bottom']; side_w = max(img.width, round(img.height * aw / ah)); side_h = round(side_w * ah / aw)
+            canvas = Image.new('RGBA', (side_w, side_h), (0, 0, 0, 0))
+            canvas.paste(img, ((side_w - img.width) // 2, side_h - img.height)); img = canvas
+    if 'cover' in item:
+        cw, ch = item['cover']; r = max(cw / img.width, ch / img.height)
+        img = img.resize((round(img.width * r), round(img.height * r)), Image.LANCZOS)
+        left = (img.width - cw) // 2; top = round((img.height - ch) * item.get('coverY', 0.5))
+        img = img.crop((left, top, left + cw, top + ch))
+    elif 'size' in item:
+        s = item['size']
+        if isinstance(s, int):
+            r = s / max(img.size); img = img.resize((round(img.width * r), round(img.height * r)), Image.LANCZOS)
+        else:
+            img = img.resize(tuple(s), Image.LANCZOS)
+    buf = io.BytesIO()
+    img.save(buf, 'WEBP', quality=item.get('quality', 88), method=6, alpha_quality=100)
+    return buf.getvalue(), img.size
+
+
+def main():
+    path = sys.argv[1]; check = '--check' in sys.argv
+    base = os.path.dirname(path); spec = json.load(open(path))
+    PIECES.update(spec.get('pieces', {}))
+    bad = []
+    for item in spec['items']:
+        data, size = process(item, base)
+        out = item['out']
+        if check:
+            if not os.path.exists(out) or open(out, 'rb').read() != data: bad.append(out)
+            continue
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        open(out, 'wb').write(data)
+        print('%-56s %4dx%-4d %6d B' % (out, size[0], size[1], len(data)))
+    if 'map' in spec:
+        # Runtime substitution table: original asset path -> painted file (served from public/).
+        table = {}
+        for item in spec['items']:
+            for old in item.get('replaces', []): table[old] = item['out'].replace('public', '', 1)
+        data = (json.dumps(dict(sorted(table.items())), indent=1) + '\n').encode()
+        if check:
+            if not os.path.exists(spec['map']) or open(spec['map'], 'rb').read() != data: bad.append(spec['map'])
+        else:
+            open(spec['map'], 'wb').write(data); print('%-56s %d entries' % (spec['map'], len(table)))
+    if check:
+        if bad: print('Out of date:', *bad, sep='\n  '); sys.exit(1)
+        print(json.dumps({'items': len(spec['items']), 'status': 'up to date'}))
+
+
+if __name__ == '__main__':
+    main()

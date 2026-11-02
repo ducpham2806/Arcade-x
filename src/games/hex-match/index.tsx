@@ -914,11 +914,11 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
   return (
     <Localized language={save.settings.language}>
       <div
-        className={`blossom ${save.settings.style === "chibi" ? "bb-chibi" : ""} ${save.settings.reduced ? "bb-reduced" : ""}`}
+        className={`blossom bb-screen-${screen} ${save.settings.style === "chibi" ? "bb-chibi" : ""} ${save.settings.reduced ? "bb-reduced" : ""}`}
         style={
           {
             "--bb-font": save.settings.font,
-            "--bb-bg": `url("${asset(save.settings.season === "none" ? `png/backgrounds/bg_cluster${pad(chapter)}.png` : `png/backgrounds/bg_season_${save.settings.season}.png`)}")`,
+            "--bb-bg": `url("${screen === "garden" ? "/blossom/gemini/world-garden.webp" : screen === "daily" || screen === "side" ? "/blossom/gemini/world-map.webp" : asset(save.settings.season === "none" ? `png/backgrounds/bg_cluster${pad(chapter)}.png` : `png/backgrounds/bg_season_${save.settings.season}.png`)}")`,
           } as React.CSSProperties
         }
       >
@@ -1069,342 +1069,351 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
           <main
             className={`bb-play ${lesson ? "bb-teaching" : ""} ${practicingLesson ? "bb-practicing" : ""}`}
             data-lesson-target={lesson?.target}
+            style={{ "--bb-cols": run.level.cols, "--bb-rows": run.level.rows } as React.CSSProperties}
           >
-            <div className="bb-play-top">
-              <button onClick={() => setModal("pause")} aria-label={t.pause}>
-                Ⅱ
-              </button>
-              <div>
-                <p className="bb-kicker">
-                  {run.mode === "daily"
-                    ? "MỖI NGÀY"
-                    : run.mode === "side"
-                      ? "THỬ THÁCH"
-                      : `CHƯƠNG ${run.level.chapter}`}
-                </p>
-                <h2>
-                  Màn {run.level.id}{" "}
-                  <span>· {CHAPTERS[run.level.chapter - 1]}</span>
-                </h2>
+            <div className="bb-play-layout">
+              <div className="bb-play-info">
+                <div className="bb-play-top">
+                  <button onClick={() => setModal("pause")} aria-label={t.pause}>
+                    Ⅱ
+                  </button>
+                  <div>
+                    <p className="bb-kicker">
+                      {run.mode === "daily"
+                        ? "MỖI NGÀY"
+                        : run.mode === "side"
+                          ? "THỬ THÁCH"
+                          : `CHƯƠNG ${run.level.chapter}`}
+                    </p>
+                    <h2>
+                      Màn {run.level.id}{" "}
+                      <span>· {CHAPTERS[run.level.chapter - 1]}</span>
+                    </h2>
+                  </div>
+                  <button onClick={() => setModal("help")}>?</button>
+                </div>
+                <div className="bb-hud">
+                  <div>
+                    <small>{run.level.seconds ? t.time : t.moves}</small>
+                    <b
+                      className={
+                        (run.level.seconds ? run.seconds : run.moves) <= 5
+                          ? "danger"
+                          : ""
+                      }
+                    >
+                      {run.level.seconds ? run.seconds : run.moves}
+                    </b>
+                  </div>
+                  <div>
+                    <small>{t.score}</small>
+                    <b>{run.score.toLocaleString()}</b>
+                    <div className="bb-star-track">
+                      <i
+                        style={{
+                          width: `${Math.min(100, (run.score / starThresholds(run.level)[1]) * 100)}%`,
+                        }}
+                      />
+                      {starThresholds(run.level).map((n, i) => (
+                        <span
+                          key={n}
+                          style={{
+                            left: `${(n / starThresholds(run.level)[1]) * 92}%`,
+                          }}
+                          title={`${i + 2} sao: ${n}`}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <small>Combo</small>
+                    <b>
+                      ×
+                      {
+                        [1, 1.2, 1.5, 2, 2.5, 3, 3.5, 4][
+                          Math.min(7, Math.max(0, run.combo - 1))
+                        ]
+                      }
+                    </b>
+                    <small>{run.combo} lần chạm</small>
+                  </div>
+                </div>
+                {goals(run.level, run)}
+                {animating && run.status !== "playing" && <div className="bb-animation-status" role="status">{run.status === "won" ? "Đang hoàn tất hiệu ứng và thưởng lượt dư…" : "Đang diễn hoạt…"}</div>}
+                {practicingLesson && (
+                  <aside className="bb-practice-cue" role="region" aria-label="Thực hành có hướng dẫn">
+                    <div><strong>{lesson!.title}</strong><span>{lesson!.cue}</span></div>
+                    <button onClick={() => setPracticeLessonId(null)}>Xem lại</button>
+                    <button onClick={advanceLesson}>Bỏ qua bước này</button>
+                  </aside>
+                )}
               </div>
-              <button onClick={() => setModal("help")}>?</button>
-            </div>
-            <div className="bb-hud">
-              <div>
-                <small>{run.level.seconds ? t.time : t.moves}</small>
-                <b
-                  className={
-                    (run.level.seconds ? run.seconds : run.moves) <= 5
-                      ? "danger"
-                      : ""
+              <div className="bb-board-wrap">
+                <div
+                  className="bb-board"
+                  role="group"
+                  aria-label={`Bàn ${BLOSSOM_TITLE}`}
+                  style={
+                    {
+                      gridTemplateColumns: `repeat(${run.level.cols},1fr)`,
+                      "--bb-cols": run.level.cols,
+                    } as React.CSSProperties
                   }
                 >
-                  {run.level.seconds ? run.seconds : run.moves}
-                </b>
-              </div>
-              <div>
-                <small>{t.score}</small>
-                <b>{run.score.toLocaleString()}</b>
-                <div className="bb-star-track">
-                  <i
-                    style={{
-                      width: `${Math.min(100, (run.score / starThresholds(run.level)[1]) * 100)}%`,
-                    }}
-                  />
-                  {starThresholds(run.level).map((n, i) => (
-                    <span
-                      key={n}
-                      style={{
-                        left: `${(n / starThresholds(run.level)[1]) * 92}%`,
-                      }}
-                      title={`${i + 2} sao: ${n}`}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <small>Combo</small>
-                <b>
-                  ×
-                  {
-                    [1, 1.2, 1.5, 2, 2.5, 3, 3.5, 4][
-                      Math.min(7, Math.max(0, run.combo - 1))
-                    ]
-                  }
-                </b>
-                <small>{run.combo} lần chạm</small>
-              </div>
-            </div>
-            {goals(run.level, run)}
-            {animating && run.status !== "playing" && <div className="bb-animation-status" role="status">{run.status === "won" ? "Đang hoàn tất hiệu ứng và thưởng lượt dư…" : "Đang diễn hoạt…"}</div>}
-            {practicingLesson && (
-              <aside className="bb-practice-cue" role="region" aria-label="Thực hành có hướng dẫn">
-                <div><strong>{lesson!.title}</strong><span>{lesson!.cue}</span></div>
-                <button onClick={() => setPracticeLessonId(null)}>Xem lại</button>
-                <button onClick={advanceLesson}>Bỏ qua bước này</button>
-              </aside>
-            )}
-            <div className="bb-board-wrap">
-              <div
-                className="bb-board"
-                role="group"
-                aria-label={`Bàn ${BLOSSOM_TITLE}`}
-                style={
-                  {
-                    gridTemplateColumns: `repeat(${run.level.cols},1fr)`,
-                    "--bb-cols": run.level.cols,
-                  } as React.CSSProperties
-                }
-              >
-                {run.board.map((tile, i) => {
-                  const img = pieceAsset(
-                      tile,
-                      run.level.chapter,
-                      save.settings.style === "chibi",
-                      save.settings.season,
-                    ),
-                    hazard = hazardAsset(tile);
-                  return (
-                    <button
-                      key={`${i}-${tile.id}`}
-                      data-cell={i}
-                      disabled={readingLesson || (!!lesson && !lesson.cells?.includes(i)) || !!modal || !!result || !!completionData || run.status !== "playing"}
-                      style={
-                        {
-                          "--fall-x": `${fallOffsets.current.get(tile.id)?.x || 0}px`,
-                          "--fall-y": `${fallOffsets.current.get(tile.id)?.y || 0}px`,
-                          "--fall-duration": `${fallOffsets.current.get(tile.id)?.duration || 180}ms`,
-                          "--fall-delay": `${(i % run.level.cols) * 8}ms`,
-                        } as React.CSSProperties
-                      }
-                      aria-label={`Hàng ${Math.floor(i / run.level.cols) + 1}, cột ${(i % run.level.cols) + 1}, ${tile.special || tile.hazard || (tile.fog ? "sương mù" : undefined) || (tile.seed ? "hạt giống" : `hoa ${tile.color + 1}`)}`}
-                      className={`bb-cell ${(i + Math.floor(i / run.level.cols)) % 2 ? "alternate" : ""} ${hintCells.includes(i) ? "hint" : ""} ${mergeCell === i ? "selected" : ""} ${shake === i ? "shake" : ""} ${run.changed.includes(i) ? "land" : ""} ${tile.boss ? "boss-cell" : ""} ${tile.special ? `bb-special special-${tile.special}` : ""} ${lesson?.cells?.includes(i) ? "bb-tutorial-cell" : ""}`}
-                      onKeyDown={(e) => {
-                        const delta = (
+                  {run.board.map((tile, i) => {
+                    const img = pieceAsset(
+                        tile,
+                        run.level.chapter,
+                        save.settings.style === "chibi",
+                        save.settings.season,
+                      ),
+                      hazard = hazardAsset(tile);
+                    return (
+                      <button
+                        key={`${i}-${tile.id}`}
+                        data-cell={i}
+                        disabled={readingLesson || (!!lesson && !lesson.cells?.includes(i)) || !!modal || !!result || !!completionData || run.status !== "playing"}
+                        style={
                           {
-                            ArrowLeft: -1,
-                            ArrowRight: 1,
-                            ArrowUp: -run.level.cols,
-                            ArrowDown: run.level.cols,
-                          } as Record<string, number>
-                        )[e.key];
-                        if (delta !== undefined) {
-                          e.preventDefault();
-                          const next = Math.max(
-                            0,
-                            Math.min(run.board.length - 1, i + delta),
-                          );
-                          document
-                            .querySelector<HTMLButtonElement>(
-                              `.bb-cell[data-cell="${next}"]`,
-                            )
-                            ?.focus();
+                            "--fall-x": `${fallOffsets.current.get(tile.id)?.x || 0}px`,
+                            "--fall-y": `${fallOffsets.current.get(tile.id)?.y || 0}px`,
+                            "--fall-duration": `${fallOffsets.current.get(tile.id)?.duration || 180}ms`,
+                            "--fall-delay": `${(i % run.level.cols) * 8}ms`,
+                          } as React.CSSProperties
                         }
-                      }}
-                      onClick={() => tap(i)}
-                    >
-                      {img &&
-                        (!hasHazard(tile, "fog") ||
-                          tile.seed ||
-                          tile.special) && (
+                        aria-label={`Hàng ${Math.floor(i / run.level.cols) + 1}, cột ${(i % run.level.cols) + 1}, ${tile.special || tile.hazard || (tile.fog ? "sương mù" : undefined) || (tile.seed ? "hạt giống" : `hoa ${tile.color + 1}`)}`}
+                        className={`bb-cell ${(i + Math.floor(i / run.level.cols)) % 2 ? "alternate" : ""} ${hintCells.includes(i) ? "hint" : ""} ${mergeCell === i ? "selected" : ""} ${shake === i ? "shake" : ""} ${run.changed.includes(i) ? "land" : ""} ${tile.boss ? "boss-cell" : ""} ${tile.special ? `bb-special special-${tile.special}` : ""} ${lesson?.cells?.includes(i) ? "bb-tutorial-cell" : ""}`}
+                        onKeyDown={(e) => {
+                          const delta = (
+                            {
+                              ArrowLeft: -1,
+                              ArrowRight: 1,
+                              ArrowUp: -run.level.cols,
+                              ArrowDown: run.level.cols,
+                            } as Record<string, number>
+                          )[e.key];
+                          if (delta !== undefined) {
+                            e.preventDefault();
+                            const next = Math.max(
+                              0,
+                              Math.min(run.board.length - 1, i + delta),
+                            );
+                            document
+                              .querySelector<HTMLButtonElement>(
+                                `.bb-cell[data-cell="${next}"]`,
+                              )
+                              ?.focus();
+                          }
+                        }}
+                        onClick={() => tap(i)}
+                      >
+                        {img &&
+                          (!hasHazard(tile, "fog") ||
+                            tile.seed ||
+                            tile.special) && (
+                            <img
+                              draggable={false}
+                              className="bb-piece"
+                              src={img}
+                              alt=""
+                            />
+                          )}
+                        {tile.special && (
+                          <>
+                            <span className="bb-special-mark">
+                              {
+                                (
+                                  {
+                                    bee_h: "↔",
+                                    bee_v: "↕",
+                                    bloom_bomb: "◎",
+                                    rainbow_orb: "∞",
+                                    sun: "✹",
+                                  } as Record<string, string>
+                                )[tile.special]
+                              }
+                            </span>
+                            <span className="bb-special-tag">
+                              {
+                                (
+                                  {
+                                    bee_h: "ONG",
+                                    bee_v: "ONG",
+                                    bloom_bomb: "BOM",
+                                    rainbow_orb: "MÀU",
+                                    sun: "NẮNG",
+                                  } as Record<string, string>
+                                )[tile.special]
+                              }
+                            </span>
+                          </>
+                        )}
+                        {hazard && (
                           <img
-                            draggable={false}
-                            className="bb-piece"
-                            src={img}
+                            className={`bb-hazard ${["ice", "cocoon", "fog"].includes(tile.hazard!) ? "overlay" : ""}`}
+                            src={hazard}
                             alt=""
                           />
                         )}
-                      {tile.special && (
-                        <>
-                          <span className="bb-special-mark">
-                            {
-                              (
-                                {
-                                  bee_h: "↔",
-                                  bee_v: "↕",
-                                  bloom_bomb: "◎",
-                                  rainbow_orb: "∞",
-                                  sun: "✹",
-                                } as Record<string, string>
-                              )[tile.special]
-                            }
-                          </span>
-                          <span className="bb-special-tag">
-                            {
-                              (
-                                {
-                                  bee_h: "ONG",
-                                  bee_v: "ONG",
-                                  bloom_bomb: "BOM",
-                                  rainbow_orb: "MÀU",
-                                  sun: "NẮNG",
-                                } as Record<string, string>
-                              )[tile.special]
-                            }
-                          </span>
-                        </>
-                      )}
-                      {hazard && (
-                        <img
-                          className={`bb-hazard ${["ice", "cocoon", "fog"].includes(tile.hazard!) ? "overlay" : ""}`}
-                          src={hazard}
-                          alt=""
-                        />
-                      )}
-                      {tile.fog && (
-                        <img
-                          className="bb-hazard overlay bb-fog-layer"
-                          src={asset("png/hazards/hazard_fog.png")}
-                          alt="Sương mù"
-                        />
-                      )}
-                      {tile.boss && <span className="bb-boss-shadow">✦</span>}
-                      {tile.timer !== undefined && (
-                        <b className="bb-timer">{tile.timer}</b>
-                      )}
-                      {tile.pet && <span className="bb-pet">🐾</span>}
-                      {run.portals.includes(i) && (
-                        <>
-                          {" "}
+                        {tile.fog && (
                           <img
-                            className="bb-portal"
-                            src={asset(
-                              `png/hazards/hazard_portal_${i === run.portals[0] ? "a" : "b"}.png`,
-                            )}
-                            alt=""
+                            className="bb-hazard overlay bb-fog-layer"
+                            src={asset("png/hazards/hazard_fog.png")}
+                            alt="Sương mù"
                           />
-                          <span className="bb-portal-letter">
-                            {i === run.portals[0] ? "A" : "B"}
-                          </span>
-                        </>
-                      )}
-                      {save.settings.labels && tile.color >= 0 && (
-                        <span className="bb-label">{tile.color + 1}</span>
-                      )}
-                    </button>
-                  );
-                })}
-                {run.bossHP > 0 && (
-                  <div
-                    className={`bb-boss ${bossMotion ? `bb-boss-${bossMotion}` : ""}`}
-                    style={{
-                      left: `${(Math.floor((run.level.cols - Math.ceil(run.level.cols / 2)) / 2) / run.level.cols) * 100}%`,
-                      top: `${100 / run.level.rows}%`,
-                      width: `${(Math.ceil(run.level.cols / 2) / run.level.cols) * 100}%`,
-                      height: `${(Math.ceil(run.level.rows / 2) / run.level.rows) * 100}%`,
-                    }}
-                  >
-                    <img src={bossAsset(run.level.chapter)} alt="Boss" />
-                    {bossDamage > 0 && (
-                      <b className="bb-boss-damage">−{bossDamage} HP</b>
-                    )}
-                    {bossMotion === "attack" &&
-                      (run.level.chapter === 8 ||
-                        (run.level.chapter === 10 && run.phase === 3)) && (
-                        <img
-                          className="bb-boss-mist"
-                          src={asset("png/hazards/hazard_fog.png")}
-                          alt="Boss thổi sương"
-                        />
-                      )}
-                    <strong>
-                      {run.bossHP} / {run.level.bossHP} HP · Pha {run.phase}
-                    </strong>
-                  </div>
-                )}
-                <BlossomVFX run={run} reduced={save.settings.reduced} onComplete={() => setAnimating(false)} />
-              </div>
-              {readingLesson && !modal && !result && !completionData && (
-                <div className="bb-tutorial-shade">
-                  <aside className="bb-coach" role="dialog" aria-modal="true" aria-label="Hướng dẫn cơ chế mới" aria-describedby="bb-lesson-body">
-                    <header><img src={asset("png/characters/char_bibi.png")} alt="Bibi" /><div><p className="bb-kicker">BIBI HƯỚNG DẪN</p><small>{lessonQueue.length} bước còn lại · Bàn đang tạm khóa</small></div></header>
-                    <h3>{lesson!.title}</h3>
-                    <p id="bb-lesson-body">{lesson!.body}</p>
-                    <div className="bb-coach-actions">
-                      <button className="bb-primary" onClick={lesson!.practice ? beginPractice : advanceLesson}>
-                        {lesson!.practice ? "Thử trên bàn" : "Đã hiểu · Tiếp tục"}
+                        )}
+                        {tile.boss && <span className="bb-boss-shadow">✦</span>}
+                        {tile.timer !== undefined && (
+                          <b className="bb-timer">{tile.timer}</b>
+                        )}
+                        {tile.pet && <span className="bb-pet">🐾</span>}
+                        {run.portals.includes(i) && (
+                          <>
+                            {" "}
+                            <img
+                              className="bb-portal"
+                              src={asset(
+                                `png/hazards/hazard_portal_${i === run.portals[0] ? "a" : "b"}.png`,
+                              )}
+                              alt=""
+                            />
+                            <span className="bb-portal-letter">
+                              {i === run.portals[0] ? "A" : "B"}
+                            </span>
+                          </>
+                        )}
+                        {save.settings.labels && tile.color >= 0 && (
+                          <span className="bb-label">{tile.color + 1}</span>
+                        )}
                       </button>
-                      {lesson!.practice && <button onClick={advanceLesson}>Bỏ qua bước này</button>}
-                    </div>
-                  </aside>
-                </div>
-              )}
-            </div>
-            <div className="bb-tools" aria-label="Công cụ trong ván">
-              <button
-                className={tool === "merge" ? "active" : ""}
-                disabled={!!lesson || paused || !hasMergePair}
-                title={hasMergePair ? "Ghép hai special cạnh nhau" : "Cần hai special cạnh nhau"}
-                onClick={() => {
-                  setTool(tool === "merge" ? "" : "merge");
-                  setMergeCell(null);
-                }}
-              >
-                ✦<small>Ghép đôi</small>
-              </button>
-              {Object.entries(BOOSTERS)
-                .filter(
-                  ([k, b]) => !b.start && (run.used[`reserved:${k}`] || 0) > 0,
-                )
-                .map(([k, b]) => {
-                  const left =
-                    (run.used[`reserved:${k}`] || 0) - (run.used[k] || 0);
-                  return (
-                    <button
-                      key={k}
-                      disabled={
-                        !!lesson || paused || left <= 0 || (k === "undo" && !undo.current.length)
-                      }
-                      className={tool === k ? "active" : ""}
-                      onClick={() => {
-                        if (k === "undo") useUndo();
-                        else if (k === "shuffle") perform({ type: "shuffle" });
-                        else setTool(tool === k ? "" : k);
+                    );
+                  })}
+                  {run.bossHP > 0 && (
+                    <div
+                      className={`bb-boss ${bossMotion ? `bb-boss-${bossMotion}` : ""}`}
+                      style={{
+                        left: `${(Math.floor((run.level.cols - Math.ceil(run.level.cols / 2)) / 2) / run.level.cols) * 100}%`,
+                        top: `${100 / run.level.rows}%`,
+                        width: `${(Math.ceil(run.level.cols / 2) / run.level.cols) * 100}%`,
+                        height: `${(Math.ceil(run.level.rows / 2) / run.level.rows) * 100}%`,
                       }}
                     >
-                      <img src={boosterAsset(k)} alt={b.icon} />
+                      <img src={bossAsset(run.level.chapter)} alt="Boss" />
+                      {bossDamage > 0 && (
+                        <b className="bb-boss-damage">−{bossDamage} HP</b>
+                      )}
+                      {bossMotion === "attack" &&
+                        (run.level.chapter === 8 ||
+                          (run.level.chapter === 10 && run.phase === 3)) && (
+                          <img
+                            className="bb-boss-mist"
+                            src={asset("png/hazards/hazard_fog.png")}
+                            alt="Boss thổi sương"
+                          />
+                        )}
+                      <strong>
+                        {run.bossHP} / {run.level.bossHP} HP · Pha {run.phase}
+                      </strong>
+                    </div>
+                  )}
+                  <BlossomVFX run={run} reduced={save.settings.reduced} onComplete={() => setAnimating(false)} />
+                </div>
+                {readingLesson && !modal && !result && !completionData && (
+                  <div className="bb-tutorial-shade">
+                    <aside className="bb-coach" role="dialog" aria-modal="true" aria-label="Hướng dẫn cơ chế mới" aria-describedby="bb-lesson-body">
+                      <header><img src={asset("png/characters/char_bibi.png")} alt="Bibi" /><div><p className="bb-kicker">BIBI HƯỚNG DẪN</p><small>{lessonQueue.length} bước còn lại · Bàn đang tạm khóa</small></div></header>
+                      <h3>{lesson!.title}</h3>
+                      <p id="bb-lesson-body">{lesson!.body}</p>
+                      <div className="bb-coach-actions">
+                        <button className="bb-primary" onClick={lesson!.practice ? beginPractice : advanceLesson}>
+                          {lesson!.practice ? "Thử trên bàn" : "Đã hiểu · Tiếp tục"}
+                        </button>
+                        {lesson!.practice && <button onClick={advanceLesson}>Bỏ qua bước này</button>}
+                      </div>
+                    </aside>
+                  </div>
+                )}
+              </div>
+              <div className="bb-play-actions">
+                <div className="bb-tools" aria-label="Công cụ trong ván">
+                  <button
+                    className={tool === "merge" ? "active" : ""}
+                    disabled={!!lesson || paused || !hasMergePair}
+                    title={hasMergePair ? "Ghép hai special cạnh nhau" : "Cần hai special cạnh nhau"}
+                    onClick={() => {
+                      setTool(tool === "merge" ? "" : "merge");
+                      setMergeCell(null);
+                    }}
+                  >
+                    ✦<small>Ghép đôi</small>
+                  </button>
+                  {Object.entries(BOOSTERS)
+                    .filter(
+                      ([k, b]) => !b.start && (run.used[`reserved:${k}`] || 0) > 0,
+                    )
+                    .map(([k, b]) => {
+                      const left =
+                        (run.used[`reserved:${k}`] || 0) - (run.used[k] || 0);
+                      return (
+                        <button
+                          key={k}
+                          disabled={
+                            !!lesson || paused || left <= 0 || (k === "undo" && !undo.current.length)
+                          }
+                          className={tool === k ? "active" : ""}
+                          onClick={() => {
+                            if (k === "undo") useUndo();
+                            else if (k === "shuffle") perform({ type: "shuffle" });
+                            else setTool(tool === k ? "" : k);
+                          }}
+                        >
+                          <img src={boosterAsset(k)} alt={b.icon} />
+                          <small>
+                            {b.label} · {left}
+                          </small>
+                        </button>
+                      );
+                    })}
+                  {!run.level.bossHP && ["bibi", "owl"].includes(run.companion) && (
+                    <button disabled={!!lesson || paused || run.companionUsed} onClick={companion}>
+                      <img
+                        src={asset(`png/characters/char_${run.companion}.png`)}
+                        alt=""
+                      />
                       <small>
-                        {b.label} · {left}
+                        {run.companion === "bibi" ? "Gợi ý" : "Xua sương"}
                       </small>
                     </button>
-                  );
-                })}
-              {!run.level.bossHP && ["bibi", "owl"].includes(run.companion) && (
-                <button disabled={!!lesson || paused || run.companionUsed} onClick={companion}>
-                  <img
-                    src={asset(`png/characters/char_${run.companion}.png`)}
-                    alt=""
-                  />
-                  <small>
-                    {run.companion === "bibi" ? "Gợi ý" : "Xua sương"}
-                  </small>
-                </button>
-              )}
+                  )}
+                </div>
+                {tool === "merge" && (
+                  <p className="bb-instruction">
+                    {mergeCell === null ? "Chọn special thứ nhất · ghép đôi dùng 1 lượt." : "Chọn special thứ hai ở cạnh ô đang sáng."}
+                    <button onClick={() => { setTool(""); setMergeCell(null); }}>Hủy chọn</button>
+                  </p>
+                )}
+                {tool === "broom" && (
+                  <button onClick={() => setVertical(!vertical)}>
+                    Hướng quét: {vertical ? "dọc ↕" : "ngang ↔"}
+                  </button>
+                )}
+                {tool && tool !== "merge" && (
+                  <p className="bb-instruction">
+                    Chọn ô trên bàn để dùng {BOOSTERS[tool]?.label}.
+                    <button onClick={() => setTool("")}>Hủy chọn</button>
+                  </p>
+                )}
+                {review && (
+                  <p className="bb-run-note">
+                    {groups(run).length} nhóm hợp lệ · trộn miễn phí{" "}
+                    {run.freeShuffles}
+                    /3 · seed {run.initialSeed}
+                  </p>
+                )}
+              </div>
             </div>
-            {tool === "merge" && (
-              <p className="bb-instruction">
-                {mergeCell === null ? "Chọn special thứ nhất · ghép đôi dùng 1 lượt." : "Chọn special thứ hai ở cạnh ô đang sáng."}
-                <button onClick={() => { setTool(""); setMergeCell(null); }}>Hủy chọn</button>
-              </p>
-            )}
-            {tool === "broom" && (
-              <button onClick={() => setVertical(!vertical)}>
-                Hướng quét: {vertical ? "dọc ↕" : "ngang ↔"}
-              </button>
-            )}
-            {tool && tool !== "merge" && (
-              <p className="bb-instruction">
-                Chọn ô trên bàn để dùng {BOOSTERS[tool]?.label}.
-                <button onClick={() => setTool("")}>Hủy chọn</button>
-              </p>
-            )}
-            <p className="bb-run-note">
-              {groups(run).length} nhóm hợp lệ · trộn miễn phí{" "}
-              {run.freeShuffles}
-              /3 · seed {run.initialSeed}
-            </p>
           </main>
         )}
         {screen === "garden" && (

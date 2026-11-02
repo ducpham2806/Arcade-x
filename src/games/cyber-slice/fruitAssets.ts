@@ -148,7 +148,41 @@ export const FRUIT_DICTIONARY: Record<FruitKind, FruitDef> = {
  * Draws whole fruit on canvas at (0, 0) with radius r.
  * Matches styling and colors of the user-provided 3D fruit pack asset!
  */
+// Painted Gemini fruit (art/gemini/cyber-slice, cut by scripts/art/import-gemini.py). Images
+// load in the background; until one is ready, or if it fails, the canvas drawings below are used.
+const PAINTED_SIZE = 2.35;
+const painted = new Map<string, HTMLImageElement>();
+function paintedImage(name: string): HTMLImageElement | null {
+  if (typeof Image === 'undefined') return null;
+  let img = painted.get(name);
+  if (!img) {
+    img = new Image();
+    img.decoding = 'async';
+    img.src = `/games/cyber-slice/art/${name}.webp`;
+    painted.set(name, img);
+  }
+  return img.complete && img.naturalWidth > 0 ? img : null;
+}
+function drawPainted(ctx: CanvasRenderingContext2D, name: string, r: number): boolean {
+  const img = paintedImage(name);
+  if (!img) return false;
+  const size = r * PAINTED_SIZE;
+  ctx.drawImage(img, -size / 2, -size / 2, size, size);
+  return true;
+}
+
+/** Painted neon terrace behind the play field, scaled to cover; false until it has loaded. */
+export function drawPaintedArena(ctx: CanvasRenderingContext2D, width: number, height: number): boolean {
+  const img = paintedImage('arena');
+  if (!img) return false;
+  const scale = Math.max(width / img.naturalWidth, height / img.naturalHeight);
+  const w = img.naturalWidth * scale, h = img.naturalHeight * scale;
+  ctx.drawImage(img, (width - w) / 2, (height - h) * 0.6, w, h);
+  return true;
+}
+
 export function drawWholeFruit(ctx: CanvasRenderingContext2D, kind: FruitKind, r: number) {
+  if (drawPainted(ctx, kind, r)) return;
   ctx.save();
 
   switch (kind) {
@@ -559,6 +593,17 @@ export function drawSlicedHalf(
   r: number,
   half: 'left' | 'right'
 ) {
+  if (paintedImage(kind)) {
+    // Painted fruit: the clipped half of the image is the whole slice.
+    ctx.save();
+    const reach = r * PAINTED_SIZE;
+    ctx.beginPath();
+    ctx.rect(half === 'left' ? -reach : 0, -reach, reach, reach * 2);
+    ctx.clip();
+    drawPainted(ctx, kind, r);
+    ctx.restore();
+    return;
+  }
   ctx.save();
   // Clip to half circle
   ctx.beginPath();
@@ -741,6 +786,11 @@ export function drawCyberBomb(ctx: CanvasRenderingContext2D, r: number, timeTick
   ctx.arc(0, 0, r * 1.3, 0, Math.PI * 2);
   ctx.stroke();
   ctx.setLineDash([]);
+
+  if (drawPainted(ctx, 'bomb', r)) {
+    ctx.restore();
+    return;
+  }
 
   // 2. Mechanical Spikes around bomb
   ctx.fillStyle = '#334155';

@@ -1,0 +1,247 @@
+{
+ "game": "chess",
+ "items": [
+  {
+   "name": "wk",
+   "source": "source/pieces-white-greenscreen.jpg",
+   "box": [
+    76,
+    8,
+    220,
+    440
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/wk.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "wq",
+   "source": "source/pieces-white-greenscreen.jpg",
+   "box": [
+    368,
+    36,
+    360,
+    456
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/wq.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "wr",
+   "source": "source/pieces-white-greenscreen.jpg",
+   "box": [
+    940,
+    28,
+    316,
+    404
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/wr.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "wb",
+   "source": "source/pieces-white-greenscreen.jpg",
+   "box": [
+    40,
+    444,
+    272,
+    404
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/wb.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "wn",
+   "source": "source/pieces-white-greenscreen.jpg",
+   "box": [
+    628,
+    372,
+    288,
+    476
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/wn.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "wp",
+   "source": "source/pieces-white-greenscreen.jpg",
+   "box": [
+    976,
+    480,
+    264,
+    368
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/wp.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "bk",
+   "source": "source/pieces-black-greenscreen.jpg",
+   "box": [
+    80,
+    16,
+    276,
+    432
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/bk.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "bq",
+   "source": "source/pieces-black-greenscreen.jpg",
+   "box": [
+    500,
+    20,
+    300,
+    428
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/bq.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "br",
+   "source": "source/pieces-black-greenscreen.jpg",
+   "box": [
+    904,
+    16,
+    336,
+    432
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/br.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "bb",
+   "source": "source/pieces-black-greenscreen.jpg",
+   "box": [
+    84,
+    436,
+    280,
+    412
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/bb.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "bn",
+   "source": "source/pieces-black-greenscreen.jpg",
+   "box": [
+    496,
+    424,
+    380,
+    424
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/bn.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "bp",
+   "source": "source/pieces-black-greenscreen.jpg",
+   "box": [
+    928,
+    496,
+    280,
+    352
+   ],
+   "method": "chroma",
+   "out": "public/games/chess/art/bp.webp",
+   "canvas": [
+    470,
+    470
+   ],
+   "size": 256,
+   "quality": 90,
+   "isolate": true
+  },
+  {
+   "name": "splash",
+   "source": "source/scene-hall-battle.jpg",
+   "box": [
+    0,
+    0,
+    1376,
+    768
+   ],
+   "method": "none",
+   "out": "public/games/chess/art/splash.webp",
+   "size": 1280,
+   "quality": 80
+  }
+ ]
+}

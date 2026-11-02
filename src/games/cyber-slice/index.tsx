@@ -36,6 +36,7 @@ import {
   drawWholeFruit,
   drawSlicedHalf,
   drawCyberBomb,
+  drawPaintedArena,
   drawCyberBoss,
 } from './fruitAssets';
 import { BOSS_RUSH_ROSTER, getBossByPhase } from './bossConfig';
@@ -1357,7 +1358,7 @@ export const CyberSliceGame: React.FC<GameComponentProps> = ({
 
       ctx.save();
       ctx.globalAlpha = s.isFever || s.isFrozen ? 0.55 : 1;
-      drawArenaBackdrop(ctx, 'blade', width, height);
+      if (!drawPaintedArena(ctx, width, height)) drawArenaBackdrop(ctx, 'blade', width, height);
       ctx.restore();
 
       // Subtle background grid lines

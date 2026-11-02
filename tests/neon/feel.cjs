@@ -58,7 +58,8 @@ const PORT = 4325;
     check('damage triggers hit-stop, screen shake and the hurt sound');
 
     const gate = await frame.evaluate(() => L.gates.find(g => !gateOpen(g)));
-    await frame.evaluate(g => { p.x = g.x - 60; p.y = 300; p.vy = 0; }, gate);
+    // The pre-gate checkpoint would otherwise be saved in the same instant and replace the hint.
+    await frame.evaluate(g => { savedCheckpointX = g.x; p.x = g.x - 60; p.y = 300; p.vy = 0; }, gate);
     await page.keyboard.down('ArrowRight'); await page.waitForTimeout(900); await page.keyboard.up('ArrowRight');
     const message = await frame.evaluate(() => document.querySelector('#message').textContent);
     assert.match(message, /Cổng khoá — cần bật .+/);

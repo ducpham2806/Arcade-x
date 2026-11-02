@@ -1,0 +1,211 @@
+{
+ "game": "mummy-escape",
+ "items": [
+  {
+   "name": "explorer",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    30,
+    68,
+    190,
+    278
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/explorer.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "bottom": [
+    1,
+    1
+   ],
+   "seal": 5
+  },
+  {
+   "name": "white",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    502,
+    66,
+    180,
+    278
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/white.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "bottom": [
+    1,
+    1
+   ],
+   "seal": 5
+  },
+  {
+   "name": "red",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    870,
+    66,
+    150,
+    282
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/red.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "bottom": [
+    1,
+    1
+   ],
+   "seal": 5
+  },
+  {
+   "name": "scorpion",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    36,
+    398,
+    232,
+    196
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/scorpion.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "square": true,
+   "seal": 5
+  },
+  {
+   "name": "key_yellow",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    526,
+    402,
+    118,
+    118
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/key_yellow.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "square": true,
+   "seal": 5
+  },
+  {
+   "name": "key_red",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    648,
+    402,
+    110,
+    118
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/key_red.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "square": true,
+   "seal": 5
+  },
+  {
+   "name": "spikes",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    16,
+    628,
+    240,
+    170
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/spikes.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 26,
+   "bgMax": 110,
+   "square": true,
+   "seal": 5
+  },
+  {
+   "name": "pit",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    268,
+    632,
+    258,
+    166
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/pit.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "square": true,
+   "seal": 5
+  },
+  {
+   "name": "sarcophagus",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    544,
+    566,
+    113,
+    234
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/sarcophagus.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 40,
+   "bgMax": 110,
+   "bottom": [
+    1,
+    1
+   ],
+   "seal": 5
+  },
+  {
+   "name": "exit_portal",
+   "source": "source/sheet-characters-props.jpg",
+   "box": [
+    772,
+    522,
+    256,
+    284
+   ],
+   "method": "flood",
+   "out": "public/games/mummy-escape/art/exit_portal.webp",
+   "size": 192,
+   "quality": 88,
+   "tol": 30,
+   "bgMax": 80,
+   "square": true,
+   "seal": 5
+  },
+  {
+   "name": "splash",
+   "source": "source/scene-tomb-chase.jpg",
+   "box": [
+    0,
+    0,
+    1376,
+    768
+   ],
+   "method": "none",
+   "out": "public/games/mummy-escape/art/splash.webp",
+   "size": 1280,
+   "quality": 80
+  }
+ ]
+}

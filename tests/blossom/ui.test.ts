@@ -129,13 +129,19 @@ test("timed level pauses without draining time and resumes checkpoint", async ({
   await page.reload();
   await skipLessons(page);
   await page.getByRole("button", { name: "Tạm dừng", exact: true }).click();
+  // The 1 s game clock keeps its phase from level start, so one tick can land between the
+  // last lesson closing and the pause click; what must hold is that pausing stops it.
+  const seconds = () =>
+    page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("arcadex_blossom_review_v1")!).active
+          .seconds,
+    );
+  const atPause = await seconds();
+  expect(atPause).toBeGreaterThanOrEqual(74);
   await page.waitForTimeout(2200);
-  const time = await page.evaluate(
-    () =>
-      JSON.parse(localStorage.getItem("arcadex_blossom_review_v1")!).active
-        .seconds,
-  );
-  expect(time).toBe(75);
+  const time = await seconds();
+  expect(time).toBe(atPause);
   await page.getByRole("button", { name: "Tiếp tục", exact: true }).click();
   await page.waitForTimeout(1100);
   expect(
@@ -144,7 +150,7 @@ test("timed level pauses without draining time and resumes checkpoint", async ({
         JSON.parse(localStorage.getItem("arcadex_blossom_review_v1")!).active
           .seconds,
     ),
-  ).toBeLessThan(75);
+  ).toBeLessThan(time);
 });
 test("test profile buys and reserves tools; exit returns unused support only", async ({
   page,

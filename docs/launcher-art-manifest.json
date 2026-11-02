@@ -77,11 +77,15 @@
   },
   {
     "id": "mummy-escape",
-    "icon": "/game-art/icons/mummy-escape.webp",
+    "icon": "/game-art/icons/mummy-escape.techart-b2e2e07761fc.webp",
     "banner": "/game-art/banners/mummy-escape.webp",
-    "iconBytes": 9530,
-    "bannerBytes": 26962,
-    "sha256": "17da502ff1b768a78085fca9b48e1658864564109cfc158f472e730eb75f440e"
+    "iconBytes": 82704,
+    "bannerBytes": 150418,
+    "sha256": "b2e2e07761fc65b0734ef4869e36a5958f8a61c837a7a083ac8153d17b17f795",
+    "sourceType": "imagegen",
+    "sourceFileName": "Mummy Escape explorer vs pharaoh (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "8014abeb09c42e100de7d12f4afad941bffc9d72e1172e17480e71b8b8a441dd"
   },
   {
     "id": "shikaku",
@@ -125,19 +129,27 @@
   },
   {
     "id": "blocker",
-    "icon": "/game-art/icons/blocker.webp",
+    "icon": "/game-art/icons/blocker.techart-a8f8a38e3e0c.webp",
     "banner": "/game-art/banners/blocker.webp",
-    "iconBytes": 12168,
-    "bannerBytes": 26762,
-    "sha256": "e833a75ed8043f6adc8868ae87bcf025030bc32012761876d9a861eb356e9a70"
+    "iconBytes": 90440,
+    "bannerBytes": 31284,
+    "sha256": "a8f8a38e3e0c9a0e8c177409983a9ee4bea9686f57015631e609ffd72b2393f0",
+    "sourceType": "imagegen",
+    "sourceFileName": "Xếp Gạch Crystal Jewel Blast icon (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "87bf7b0f4be7309ae076c1fb1a702ac481d3fedead4774ef194cd1bbc70452b0"
   },
   {
     "id": "chess",
-    "icon": "/game-art/icons/chess.webp",
+    "icon": "/game-art/icons/chess.techart-8639ceadda33.webp",
     "banner": "/game-art/banners/chess.webp",
-    "iconBytes": 10790,
-    "bannerBytes": 25410,
-    "sha256": "3eb19d0d9c7e55ad8318b27c57af5f73260c527bdb453c9424575cb00921f593"
+    "iconBytes": 87166,
+    "bannerBytes": 158706,
+    "sha256": "8639ceadda33c6eee496aeb602b717c6f6acf0988e89f0a58c70d9d190ba6dcc",
+    "sourceType": "imagegen",
+    "sourceFileName": "Wizard's Chess king vs rook golem (Gemini)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "865314a29355d8d8fbb86648bdeccbfe902203832a521def682bc612e9d22be1"
   },
   {
     "id": "xiangqi",
@@ -152,7 +164,7 @@
     "icon": "/game-art/icons/caro-gomoku.webp",
     "banner": "/game-art/banners/caro-gomoku.webp",
     "iconBytes": 14680,
-    "bannerBytes": 30624,
+    "bannerBytes": 64050,
     "sha256": "a26dd8043313068612f4b8dc30dd8594f98fafa93959d19ff12b06373f0f3a79"
   },
   {
@@ -189,11 +201,15 @@
   },
   {
     "id": "hex-match",
-    "icon": "/game-art/icons/hex-match.webp",
+    "icon": "/game-art/icons/hex-match.techart-cd332fd5e963.webp",
     "banner": "/game-art/banners/hex-match.webp",
-    "iconBytes": 15772,
+    "iconBytes": 90392,
     "bannerBytes": 32434,
-    "sha256": "1b821a6f2d69d7b188210d3b10045879bdc1d3e3db7f5f08c7dcfc78288a2b68"
+    "sha256": "cd332fd5e9639fa4150f698f1103f427abaa1437bfe2271d86eea98909ce2874",
+    "sourceType": "imagegen",
+    "sourceFileName": "Blossom Blast flower and Bibi (composed from Gemini art)",
+    "sourceLibraryFileId": "gemini-upload",
+    "sourceSHA256": "9f18a943baf4705ccb6bdb387d33807c7dc8d724b98b197f1c39966ef11fcebc"
   },
   {
     "id": "tile-2048",
@@ -202,5 +218,13 @@
     "iconBytes": 16688,
     "bannerBytes": 34006,
     "sha256": "b1dae609c0a512c85e1e6653e131a8a9699db8194dfe42c7ae5ca5ef60d62f9f"
+  },
+  {
+    "id": "word-chain",
+    "icon": "/game-art/icons/word-chain.webp",
+    "banner": "/game-art/banners/word-chain.webp",
+    "iconBytes": 18600,
+    "bannerBytes": 34898,
+    "sha256": "bc5444ce4667f511299f0997a39f4ca10df11ba6147d768393916b7968fc8881"
   }
 ]

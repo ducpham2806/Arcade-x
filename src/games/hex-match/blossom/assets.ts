@@ -1,4 +1,7 @@
 import sets from "./piece_sets.json" with { type: "json" };
+// Painted Gemini art (art/gemini/hex-match, cut by scripts/art/import-gemini.py) replaces the
+// original vector PNGs by path; the PNGs stay for the offline review export.
+import painted from "./painted.json" with { type: "json" };
 import { Tile } from "./types";
 declare global {
   interface Window {
@@ -8,6 +11,7 @@ declare global {
 }
 export const asset = (p: string) =>
   (typeof window !== "undefined" && window.__BLOSSOM_INLINE_ASSETS__?.[p]) ||
+  (painted as Record<string, string>)[p] ||
   `/blossom/${p}`;
 export function pieceAsset(
   t: Tile,

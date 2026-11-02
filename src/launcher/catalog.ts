@@ -1,7 +1,7 @@
 import { ALL_GAMES_LIST, GAME_REGISTRY } from '../games/registry';
 import type { GameMetadata } from '../types';
 export type CatalogGame = GameMetadata & { availability: 'published' | 'maintenance'; accessModel: 'free' | 'premium'; supportsOffline: boolean; featured: boolean; sortOrder: number };
-export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker'];
+export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker','word-chain'];
 export const isLocalReviewGame=(id:string)=>import.meta.env.DEV&&LOCAL_REVIEW_GAME_IDS.includes(id);
 export type Catalog = { schemaVersion: 1; games: CatalogGame[]; commerceEnabled: boolean; support: { enabled: boolean; bankName?: string; account?: string; beneficiary?: string; message?: string } };
 export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:['battleship','boom-buddies','brick-breaker','rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };

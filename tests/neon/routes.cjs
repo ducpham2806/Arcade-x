@@ -46,14 +46,14 @@ function driveRoom(){
 setImmediate(()=>{
  const report=[];
  for(let idx=0;idx<40;idx++){if(process.env.LEVEL_INDEX&&idx!==Number(process.env.LEVEL_INDEX))continue;let trace=[];
-  run(`globalThis.neonMenuOpen=false;load(${idx});art.manual='auto';`);
+  run(`globalThis.neonMenuOpen=false;load(${idx});art.manual='auto';globalThis.cpSeen=new Set();`);
   let done=false;
   for(let f=0;f<120*420;f++){
    run('driveRoom()');if(process.env.LEVEL_INDEX&&f%6===0){trace.push(run('({x:p.x,y:p.y,on:p.on,ground:p.ground,vx:p.vx,vy:p.vy,m:L.movers[0]?.x,keys:[...keys]})'));if(trace.length>35)trace.shift()}
-   if(run('deaths>4'))break;
+   if(run('cpSeen.add(checkpoint?L.cp:0),deaths>4'))break;
    if(run('routeGoalsComplete()&&p.x>(L.boss?L.boss.arena[0]-40:L.exit-30)')){done=true;break;}
   }
-  const row=run(`({id:L.id,complete:${done},x:Math.round(p.x),y:Math.round(p.y),deaths,powered:L.routeTargets.filter(routePowered).length,targets:L.routeTargets.length,seconds:Math.round(elapsed),room:L.rooms.find(r=>p.x>=r.x&&p.x<r.end)?.kind})`);report.push(row);if(!done&&process.env.LEVEL_INDEX)console.log(trace);
+  const row=run(`({id:L.id,complete:${done},x:Math.round(p.x),y:Math.round(p.y),deaths,powered:L.routeTargets.filter(routePowered).length,targets:L.routeTargets.length,seconds:Math.round(elapsed),missedCheckpoints:L.checkpoints.filter(c=>c<p.x-120&&!cpSeen.has(c)),room:L.rooms.find(r=>p.x>=r.x&&p.x<r.end)?.kind})`);report.push(row);if(!done&&process.env.LEVEL_INDEX)console.log(trace);
  }
  const ablations=[],variants=new Set();
  for(let idx=0;idx<40;idx++){
@@ -78,4 +78,33 @@ setImmediate(()=>{
  fs.writeFileSync(path.resolve('test-results/neon-route-qa-v014.json'),JSON.stringify({driver:'actual physics, normal inputs, all hazards and enemies enabled; route completion before boss arena, not manual playtest',routes:report,ablations},null,2));
  console.log(JSON.stringify({passed:report.filter(r=>r.complete).length,total:report.length,failed:report.filter(r=>!r.complete)}));
  assert(report.every(r=>r.complete),'route driver failed');
+ assert(report.every(r=>!r.missedCheckpoints.length),'checkpoint off the played route: '+JSON.stringify(report.filter(r=>r.missedCheckpoints.length)));
+ // Star-3 challenges: every level's challenge can be met with normal inputs (enemies removed so
+ // only reachability and timing are measured).
+ const challenges=[];
+ for(let idx=0;idx<40;idx++){
+  run(`globalThis.neonMenuOpen=false;load(${idx});art.manual='auto';L.enemies=[];L.hazards=[];`);
+  const type=run('L.challengeType');let ok=false,detail='';
+  if(type==='signs'){
+   const signs=run(`L.objects.filter(o=>o.kind==='sign')`);ok=signs.length>=3;
+   for(const o of signs){
+    const ledge=o.y<300;
+    // From the ground below a ledge sign is out of reach; standing on its ledge it lights.
+    run(`spawn(${o.x});p.y=316;p.ground=true;interact();`);if(ledge&&run(`L.objects.find(o=>o.id==='${o.id}').done`)){ok=false;detail+=o.id+' reachable from ground;'}
+    run(`spawn(${o.x});p.y=${o.y+40}-p.h;p.ground=true;interact();`);if(!run(`L.objects.find(o=>o.id==='${o.id}').done`)){ok=false;detail+=o.id+' not lit;'}
+   }
+   ok=ok&&run('extra()');
+  }else if(type==='puzzle'){
+   const a=run(`L.objects.find(o=>o.id==='switchA')`),b=run(`L.objects.find(o=>o.id==='switchB')`);
+   run(`spawn(${a.x});p.y=316;interact();`);
+   for(let f=0;f<120*12&&!run('puzzleDone');f++){run('driveRoom()');if(run(`Math.abs(p.x-${b.x})<40&&p.ground`))run('interact()');}
+   ok=run('puzzleDone&&extra()');detail='A→B '+(b.x-a.x)+' px';
+  }else if(type==='clean'){
+   ok=run('L.checkpoints.includes(L.challengeStart)&&L.challengeStart<L.exit&&L.objects.some(o=>o.kind==="retry")');
+  }else ok=type==='memories'&&run('L.coins.length>0');
+  challenges.push({id:run('L.id'),type,ok,detail});
+ }
+ const types=new Set(challenges.map(c=>c.type));
+ console.log(JSON.stringify({challengeTypes:[...types],challengesOk:challenges.filter(c=>c.ok).length,failed:challenges.filter(c=>!c.ok)}));
+ assert(types.size>=4&&challenges.every(c=>c.ok),'star-3 challenge not achievable');
 });

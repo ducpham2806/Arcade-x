@@ -1,6 +1,6 @@
 # Quyết định đang chờ chủ dự án
 
-Cập nhật: 30/10/2026. Khi có câu trả lời, ghi vào cột "Quyết định" và xoá khỏi danh sách chờ.
+Cập nhật: 02/11/2026. Khi có câu trả lời, ghi vào cột "Quyết định" và xoá khỏi danh sách chờ.
 
 ## Commerce (M8) — xem `docs/COMMERCE-ROLLOUT.md`
 
@@ -15,6 +15,13 @@ Cập nhật: 30/10/2026. Khi có câu trả lời, ghi vào cột "Quyết đ�
 | # | Việc cần chủ dự án | Ảnh hưởng | Trạng thái |
 |---|---|---|---|
 | 4 | Áp `supabase/duel/schema.sql` lên staging, deploy `duel-room`, lên lịch `tick` | Chặn cutover sang server làm trọng tài | _chờ_ |
+
+## Phòng đấu Nối Từ (WC3) — xem `docs/WORD-CHAIN-SERVER.md`
+
+| # | Việc cần chủ dự án | Ảnh hưởng | Trạng thái |
+|---|---|---|---|
+| 7 | Áp `supabase/word-chain/schema.sql` lên staging, deploy `word-chain-room`, chạy `scheduler.sql` | Chặn chơi online 2–4 người (luyện với bot vẫn chơi được) | _chờ_ |
+| 8 | Áp migration danh mục `20261102090000_word_chain_catalog.sql` lên production | Game chưa hiện ở bản production cho tới khi áp | _chờ_ |
 
 ## Kho mã (M4)
 
