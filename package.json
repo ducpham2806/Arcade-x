@@ -82,7 +82,9 @@
     "test:snake-props": "node tests/snake/story-props.mjs",
     "build:snake-props": "python3 scripts/build-snake-props.py",
     "test:snake-audio": "node tests/snake/audio.mjs",
-    "build:snake-audio": "python3 scripts/build-snake-audio.py"
+    "build:snake-audio": "python3 scripts/build-snake-audio.py",
+    "test:tank-clash": "node --experimental-strip-types --test tests/tank-clash/*.test.mjs",
+    "export:tank-clash": "node scripts/export-tank-review.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

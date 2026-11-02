@@ -1,8 +1,8 @@
-# Tank Clash — Kế hoạch phát triển v1.1
+# Tank Clash — Kế hoạch phát triển v1.2
 
 Ngày lập: 02/11/2026 (Việt Nam) · Dự án: Arcade-x
 
-**Trạng thái cập nhật 02/11/2026:** đã triển khai nền P0 và bản thử P1: năm bài sân tập, đấu bot, luật hiệp, React adapter và spike WebSocket hai client cục bộ. Có GDD và bảng cân bằng v1. Bản P1 dùng hình tạm, còn cần chơi thử trên thiết bị thật; chưa có phòng online/matchmaking cho người dùng. Anh Đức đã yêu cầu merge phần đang làm sau kiểm thử.
+**Trạng thái cập nhật 02/11/2026:** P0/P1 đã merge GitHub main. Đã triển khai bản kỹ thuật P2: phòng riêng 1v1, server mô phỏng, UI tạo/vào bằng mã/link, ready/rematch, reconnect và prediction/reconciliation. 28 ca kiểm thử qua; đã kiểm UI hai client và khung mobile. P2 còn chờ chơi thử hai người qua Internet, tài khoản thật và thiết bị thật trước nghiệm thu; chưa phát hành công khai.
 
 ## 1. Mục tiêu sản phẩm
 
@@ -224,7 +224,7 @@ Những dấu hiệu buộc dừng mở rộng nội dung: người mới không
 - [x] **P0.4:** tạo thử nghiệm mạng tối thiểu chạy local với hai client, đo input/snapshot và rời–vào lại; đánh giá ứng viên room server.
 - [x] **P1.1:** dựng sân tập và bản prototype mobile/PC cho anh thử lái, ngắm, bắn bật tường và khiên.
 
-Các mục trên đã có đầu ra trong đợt P0/P1. Bước tiếp theo là P2: hoàn thiện giao thức phòng 1v1, nối UI vào server và kiểm chứng mạng Internet. Bản chơi hiện tại vẫn là luyện tập cục bộ.
+Các mục trên đã có đầu ra trong đợt P0/P1. Bản kỹ thuật P2 đã nối UI với room server thật; bước tiếp theo là dựng môi trường thử WSS và kiểm chứng với hai người/tài khoản/thiết bị thật trước khi mở P3.
 
 ## 11. Quy trình giao bản và giới hạn phát hành
 
@@ -258,3 +258,18 @@ Các nội dung cần giải quyết qua P0/P1, chưa cần hỏi thêm để ho
 | Phiên bản/ngày | Thay đổi | Trạng thái |
 |---|---|---|
 | v1.1 · 02/11/2026 | Triển khai P0 và prototype P1; bổ sung GDD, tuning và kiểm thử | Bản thử để anh chơi; chuẩn bị P2 |
+
+
+## 15. Kết quả bản kỹ thuật P2 ngày 02/11/2026
+
+- Có server phòng 1v1 nhiều phòng độc lập; mã/link, ready, đếm ngược, hiệp/kết quả, rematch và rời trận.
+- Có auth admission bằng Supabase getUser + allowlist thử nghiệm; chế độ review cục bộ gắn nhãn rõ. Quyền gói chơi/launcher vẫn thuộc P4.
+- Client dự đoán di chuyển, đối soát, nội suy; sequence/epoch/ack và revision tường; resume giữ HP, input cũ không phát lại. Không ghi DB mỗi tick.
+- 28/28 ca kiểm thử qua; mô phỏng RTT 80/150/250 ms, jitter và bỏ 1–3% snapshot ứng dụng. Hai client thống nhất kết quả. Xem `docs/tank-clash/P2-review.md` cho giới hạn phép đo.
+- `Tank_Clash_P2_Playtest.html` là bản UI hiện hành; offline vẫn có sân tập/bot. Phòng 1v1 cần server đang chạy, chưa có hosting Internet đi kèm file.
+- Đã kiểm UI hai client và form 390×844/844×390. Chưa nghiệm thu FPS mobile, 10 trận hai người thật, soak/load hoặc auth tài khoản thật.
+- Chưa mở 2v2/matchmaking, chưa sản xuất art/audio, chưa phát hành công khai.
+
+| Phiên bản/ngày | Thay đổi | Trạng thái |
+|---|---|---|
+| v1.2 · 02/11/2026 | Bản kỹ thuật phòng 1v1 P2 và kiểm thử tự động/UI | Chờ playtest Internet và thiết bị thật trước nghiệm thu P2 |

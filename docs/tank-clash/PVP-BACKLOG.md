@@ -8,7 +8,7 @@ Anh Đức yêu cầu lưu cả năm ý tưởng để phát triển dần và l
 
 | Ưu tiên dự kiến | Game | Trải nghiệm chính | Quy mô dự kiến | Trạng thái |
 |---|---|---|---|---|---|
-| 1 | Tank Clash | Xe tăng đấu trường góc nhìn từ trên xuống; né đạn, bắn bật tường, phá vật cản, phối hợp ép góc | 1v1, 2v2 trước; 3v3, 4v4 sau | Đã có nền P0 và bản thử P1; tiếp theo online 1v1 P2 |
+| 1 | Tank Clash | Xe tăng đấu trường góc nhìn từ trên xuống; né đạn, bắn bật tường, phá vật cản, phối hợp ép góc | 1v1, 2v2 trước; 3v3, 4v4 sau | Đã có bản kỹ thuật P2 phòng riêng 1v1; chờ playtest mạng/thiết bị thật |
 | 2 | Rune Brawl | Đấu sĩ dùng đánh thường, lướt né và kỹ năng riêng; thắng nhờ đọc tình huống và phối hợp | 2v2 làm trọng tâm; có thể mở 1v1, 3v3, 4v4 | Ý tưởng đã lưu |
 | 3 | Sky Artillery | Pháo chiến theo lượt; canh góc, lực, gió; phá địa hình và hỗ trợ đồng đội | 1v1 đến 4v4 | Ý tưởng đã lưu |
 | 4 | Beast Ball | Thú chiến tranh bóng; chuyền, húc, ghi bàn; thiên về chơi vui cùng bạn bè | 1v1 đến 3v3; đánh giá 4v4 sau | Ý tưởng đã lưu |
@@ -49,7 +49,7 @@ Mỗi game dùng adapter gameplay riêng. Chỉ trích xuất phần dùng chung
 
 ## Tài liệu triển khai đầu tiên
 
-**Tank_Clash_Development_Plan_v1.md** — bản hiện hành v1.1, có tiến độ P0/P1 và việc tiếp theo P2. Bản chơi thử: **Tank_Clash_P1_Playtest.html** (sân tập và bot, chưa online).
+**Tank_Clash_Development_Plan_v1.md** — bản hiện hành v1.2, có tiến độ P0/P1/P2. Bản chơi thử: **Tank_Clash_P2_Playtest.html** (sân tập/bot offline; phòng 1v1 cần server đang chạy).
 
 ## Nhật ký quyết định
 
@@ -57,5 +57,6 @@ Mỗi game dùng adapter gameplay riêng. Chỉ trích xuất phần dùng chung
 |---|---|
 | 02/11/2026 | Lưu năm ý tưởng PvP; ưu tiên Tank Clash; lập kế hoạch trước khi bước vào triển khai. |
 | 02/11/2026 | Đã dựng Tank Clash P0/P1; người dùng yêu cầu hoàn tất phần đang dừng rồi merge. |
+| 02/11/2026 | Tiếp tục bản kỹ thuật P2 phòng 1v1, kiểm thử 28 ca; chưa nghiệm thu Internet/thiết bị thật hoặc phát hành. |
 
 Khi đổi ưu tiên hoặc thêm game, cập nhật tài liệu này và ghi lý do trong nhật ký. Khi tiếp tục Tank Clash, đọc bản hiện hành của kế hoạch Tank Clash trước.

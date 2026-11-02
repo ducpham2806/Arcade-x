@@ -2,6 +2,9 @@ node_modules/
 dist/
 /deliverables/Tank_Clash_P1_Playtest.html
 /preview/tank-clash/index.html
+/preview/tank-clash/room-lab.html
+/preview/tank-clash/devices.html
+/deliverables/Tank_Clash_P2_Playtest.html
 .netlify/
 .env
 .env.*

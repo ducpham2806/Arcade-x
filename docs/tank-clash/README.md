@@ -1,60 +1,61 @@
-# Tank Clash P0/P1
+# Tank Clash P2 — phòng riêng 1v1
 
-Ngày: 02/11/2026. Trạng thái: prototype để kiểm chứng điều khiển và luật; art là hình khối tạm. Chưa tích hợp catalog sản phẩm, chưa có phòng online cho người dùng, chưa cấp thưởng.
+Bản kỹ thuật để duyệt, hình khối tạm. Sân tập và đấu bot vẫn chơi offline. Phòng riêng dùng hai kết nối WebSocket thật; chưa đăng ký catalog, matchmaking, thưởng hoặc bảng xếp hạng.
 
 ## Chạy bản thử
 
-Từ thư mục gốc Arcade-x, dùng Node 22.18+ hoặc Node 24 và cài dependencies theo lockfile của dự án:
+Dùng Node 22.18+ (khuyến nghị 24), cài dependencies của repository theo lockfile rồi:
 
 ```bash
-node scripts/export-tank-review.mjs
+npm ci --prefix server/tank-clash --ignore-scripts
+npm run export:tank-clash
+TANK_REVIEW_MODE=1 npm start --prefix server/tank-clash
 ```
 
-Mở `deliverables/Tank_Clash_P1_Playtest.html` bằng trình duyệt. File chứa toàn bộ CSS và JavaScript, không tải asset từ ngoài. `preview/tank-clash/index.html` là cùng bản để chạy qua static server.
+Mở `http://localhost:3000`, chọn **Phòng riêng** → **Tạo phòng**. Người thứ hai mở cùng máy chủ, nhập mã sáu ký tự hoặc dùng link mời. Cả hai bấm **Sẵn sàng**; đếm ngược 3 giây rồi đấu. `/room-lab.html` mở hai iframe với hai ghế/kết nối riêng để kiểm tra trên một màn hình.
 
-- Sân tập: 5 bài, phải thực hiện đúng cơ chế để mở bài kế.
-- Đấu luyện: 1v1 với bot, tối đa 3 hiệp, mỗi xe 3 máu.
-- PC: WASD/mũi tên lái, chuột ngắm và giữ chuột trái bắn, Space khiên, P/Escape tạm dừng.
-- Touch: cần trái lái; kéo cần phải ngắm, nhả bắn; chạm khiên.
-- Khi mất focus, game tạm dừng và xóa input đang giữ.
+`deliverables/Tank_Clash_P2_Playtest.html` là UI tự chứa. Mở trực tiếp vẫn chơi được sân tập/bot; phòng online cần nhập địa chỉ server đang chạy. Không có server Internet được phát hành cùng file. Muốn chơi LAN cần bind HOST phù hợp, cấu hình `TANK_ALLOWED_ORIGINS` chính xác; khi dùng tài khoản ngoài loopback cần HTTPS/WSS qua reverse proxy.
 
-Các con số trên là [PLACEHOLDER] cho chơi thử, không phải cân bằng đã được người chơi kiểm chứng.
+- PC: WASD/mũi tên lái, chuột ngắm/giữ trái bắn, Space khiên.
+- Touch: cần trái lái; kéo cần phải ngắm, nhả bắn; nút khiên riêng.
+- Offline: mất focus tạm dừng. Online: xóa input, trận vẫn chạy. Rời trận nhận thua.
+- Mất kết nối: giữ ghế 20 giây [PLACEHOLDER], xe không nhận input nhưng vẫn chịu sát thương; vào lại đúng xe/HP. Hết hạn xử thua nếu đối thủ còn; cả hai mất kết nối thì hủy trận.
+- Reload: mở Phòng riêng → **Vào lại ghế cũ** với cùng endpoint/tab; resume token chỉ lưu trong sessionStorage, không nằm trong link mời.
+- Sau trận: cần hai phiếu **Đấu lại**, hoặc về sảnh để mời người mới.
+
+Thông số gameplay vẫn là [PLACEHOLDER] theo GDD và bảng tuning P1.
+
+## Auth và vận hành
+
+`TANK_REVIEW_MODE=1` cho phép khách thử cục bộ, luôn gắn nhãn máy chủ thử nghiệm. Mặc định server từ chối chạy nếu thiếu bộ xác minh tài khoản hoặc danh sách origin. Xem `server/tank-clash/.env.example`.
+
+Chế độ tài khoản gọi Supabase `auth.getUser(jwt)` tại admission, kiểm `user.id` đã xác minh với allowlist thử nghiệm. Không tin role từ user_metadata, không dùng service-role key và không query DB trong simulation. Client nhúng nhận callback `getAccessToken`; việc nối quyền gói chơi và launcher thuộc P4, allowlist chưa thay thế entitlement sản phẩm. Không truyền JWT qua URL hoặc lưu vào resume storage.
+
+Phòng nằm trong RAM của một tiến trình. Khởi động lại hủy trận, không khôi phục dữ liệu hoặc cấp thưởng. P2 chưa hỗ trợ nhiều instance, routing vùng, lưu kết quả hoặc reconnect qua server restart. Chưa chọn/đăng ký hosting có phí.
 
 ## Kiểm thử
 
 ```bash
 npm ci --prefix server/tank-clash-spike --ignore-scripts
-node --test tests/tank-clash/engine.test.mjs tests/tank-clash/network.test.mjs
+npm ci --prefix server/tank-clash --ignore-scripts
+npm run test:tank-clash
+npm run export:tank-clash
 ```
 
-Server thử nghiệm có dependency riêng, không thêm dependency mạng vào bundle launcher. `network.test.mjs` mở server loopback và hai WebSocket client thật rồi đóng khi xong; không dùng hoặc thay đổi Supabase.
+Các server trong test chỉ mở loopback và tự đóng. Test proxy mô phỏng RTT 80/150/250 ms, jitter ±30 ms mỗi chiều, bỏ 1–3% snapshot ở lớp ứng dụng và lặp lệnh điều khiển; TCP thực vẫn đáng tin cậy. Đây chưa phải chơi thử hai người qua Internet hoặc đo FPS điện thoại.
 
-## Cấu trúc
+## Module
 
-| File | Trách nhiệm |
+| Module | Trách nhiệm |
 |---|---|
-| `src/games/tank-clash/engine.ts` | Luật thuần, fixed step, va chạm quét, bot, bài tập, kết quả hiệp |
-| `src/games/tank-clash/runtime.ts` | Input keyboard/pointer, vòng vẽ, HUD/dialog, góp ý thủ công |
-| `src/games/tank-clash/index.tsx` | Adapter React với cleanup và nhận trạng thái pause |
-| `src/games/tank-clash/preview.ts` | Điểm vào standalone |
-| `scripts/export-tank-review.mjs` | Bundle preview một file bằng esbuild hiện có |
-| `server/tank-clash-spike/server.mjs` | Thử hợp đồng input/snapshot, ghế reconnect và sequence |
+| `engine.ts` | Luật thuần, va chạm/đạn/khiên/hiệp; thống kê mỗi người |
+| `protocol.ts` | Version, input sequence/epoch, snapshot động gọn và revision tường |
+| `online-client.ts` | Transport, control command idempotent, resume, prediction xe mình, reconcile, interpolation xe khác |
+| `runtime.ts` | Offline/online UI, keyboard/touch, HUD, dialog và cleanup |
+| `server/tank-clash/rooms.mjs` | Phòng, ghế, ready/rematch, fixed step 60 Hz, timeout/forfeit |
+| `server/tank-clash/server.mjs` | HTTP/WS, auth admission, origin, giới hạn payload/rate/backpressure, snapshot 12 Hz |
+| `server/tank-clash/auth.mjs` | Supabase verified identity + test allowlist |
 
-## Giới hạn P0 network spike
+Tham số mạng cũng đang thử nghiệm. Client chỉ gửi input, server quyết định HP/đạn/hiệp/kết quả. Tường được gửi lại đến khi client xác nhận revision. Gói tin/ý định cũ không chạy sang hiệp mới; lệnh ready/rematch có opId và ack, input chuyển động không phát lại sau reconnect. Tick mô phỏng không bị đẩy nhanh bởi tốc độ gửi input; vòng catch-up có giới hạn để tránh quá tải. Dùng timestamp monotonic cho thời gian hiệp.
 
-- Chỉ bind `127.0.0.1`, một phòng hai ghế, token ghế tạm trong bộ nhớ. Đây không phải tài khoản thật, không phải hệ phòng sản phẩm.
-- Input phải hợp lệ; server quyết định vị trí, đạn và máu. Input cũ tự trung tính sau 250 ms [PLACEHOLDER].
-- Gửi snapshot động 10 Hz và mô phỏng fixed step 60 Hz [PLACEHOLDER]. Thời gian timer Node trong spike chưa phải scheduler production có bù độ trôi.
-- Tường gửi lúc hello/reconnect và khi thay đổi; không có ghi database từng tick.
-- Reconnect về đúng ghế và HP, server cấp sequence tiếp theo. Chưa có lifecycle bỏ trận đầy đủ, nhiều phòng, matchmaking hoặc định tuyến khu vực.
-- Thử nghiệm local không chứng minh chất lượng Internet. P2 cần prediction/reconciliation/interpolation, clock/scheduler, auth thật, luật rời phòng và thử RTT/jitter/loss.
-
-## Quy tắc phát triển tiếp
-
-- Giữ engine độc lập với DOM, storage và network.
-- Luật phản xạ dùng chung cho đạn và đường ngắm; sửa phải kèm kiểm thử va chạm.
-- Không ghi vị trí/đạn vào database từng frame.
-- P1 không gọi bridge cấp coin/EXP/leaderboard. Kết quả PvP sản phẩm phải được backend xác nhận.
-- Bot luôn ghi nhãn BOT. Hình tạm luôn ghi rõ P1.
-- `destroy()` phải hủy animation frame, listener và input. React adapter dùng controller, không rerender React mỗi tick.
-- Chỉ đưa vào catalog sau mốc tích hợp của plan. Trước khi phát hành công khai, giao build để anh Đức duyệt.
+`destroy()` hủy listener/RAF/timer/socket và xóa input. Chưa sửa hệ thống PvP của game khác. Chưa phát hành công khai; xem `P2-review.md` cho bằng chứng và phần còn thiếu.

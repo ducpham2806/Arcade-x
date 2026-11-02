@@ -11,11 +11,12 @@ export type Wall = { id: number; x: number; y: number; w: number; h: number; kin
 export type Tank = Vec & { id: string; team: number; angle: number; aim: number; hp: number; cooldown: number; shield: number; shieldCooldown: number; kind: 'player' | 'bot' | 'target' };
 export type Bullet = Vec & { id: number; owner: string; team: number; vx: number; vy: number; age: number; bounces: number };
 export type GameEvent = Vec & { id: number; type: 'shot' | 'bounce' | 'hit' | 'block' | 'brick' | 'lesson' | 'round'; time: number };
+export type Stats = { shots: number; hits: number; ricochets: number; blocks: number; bricks: number };
 export type State = { version: 1; mode: 'training' | 'duel'; tick: number; time: number;
   tanks: Tank[]; walls: Wall[]; bullets: Bullet[]; events: GameEvent[]; nextId: number;
   status: 'playing' | 'roundEnd' | 'finished'; round: number; scores: number[]; remaining: number;
   phaseTime: number; winner: number | null; roundWinner: number | null; lesson: number; lessonDone: boolean;
-  stats: { shots: number; hits: number; ricochets: number; blocks: number; bricks: number }; };
+  stats: Stats; statsByPlayer: Record<string, Stats>; };
 export const LESSONS = [
   { title: 'Làm quen tay lái', text: 'Di chuyển xe A đến vòng sáng. Tháp pháo và thân xe quay độc lập.' },
   { title: 'Ngắm và khai hỏa', text: 'Ngắm vào bia B rồi bắn. Trên điện thoại: kéo cần ngắm, nhả để bắn.' },
@@ -40,9 +41,11 @@ export function duelWalls(): Wall[] {
   return walls;
 }
 export function createState(mode: State['mode'] = 'training'): State {
+  const empty = (): Stats => ({ shots: 0, hits: 0, ricochets: 0, blocks: 0, bricks: 0 });
+  const statsByPlayer = { a: empty(), b: empty() };
   const s: State = { version: 1, mode, tick: 0, time: 0, tanks: [], walls: [], bullets: [], events: [], nextId: 1,
     status: 'playing', round: 1, scores: [0, 0], remaining: CONFIG.roundSeconds, phaseTime: 0,
-    winner: null, roundWinner: null, lesson: 0, lessonDone: false, stats: { shots: 0, hits: 0, ricochets: 0, blocks: 0, bricks: 0 } };
+    winner: null, roundWinner: null, lesson: 0, lessonDone: false, stats: statsByPlayer.a, statsByPlayer };
   setupRound(s); return s;
 }
 function setupRound(s: State) {
@@ -128,11 +131,11 @@ function fire(s: State, a: Tank) {
   const x = a.x, y = a.y;
   s.bullets.push({ id: s.nextId++, owner: a.id, team: a.team, x, y, vx: Math.cos(a.aim) * CONFIG.bulletSpeed,
     vy: Math.sin(a.aim) * CONFIG.bulletSpeed, age: 0, bounces: 0 });
-  a.cooldown = CONFIG.shotCooldown; if (a.id === 'a') s.stats.shots++;
+  a.cooldown = CONFIG.shotCooldown; if (s.statsByPlayer[a.id]) s.statsByPlayer[a.id].shots++;
   event(s, 'shot', x, y);
 }
-function moveTank(s: State, a: Tank, input: Input, dt: number) {
-  a.cooldown = Math.max(0, a.cooldown - dt); a.shield = Math.max(0, a.shield - dt); a.shieldCooldown = Math.max(0, a.shieldCooldown - dt);
+/** Movement only: shared by authoritative simulation and client input replay. No damage/shots/rewards. */
+export function moveVehicle(s: State, a: Tank, input: Input, dt: number) {
   if (a.hp <= 0) return;
   const norm = Math.max(1, length(input.x, input.y)), mx = input.x / norm, my = input.y / norm;
   a.aim = input.aim;
@@ -143,6 +146,11 @@ function moveTank(s: State, a: Tank, input: Input, dt: number) {
     if (canOccupy(s, a.x + dx / pieces, a.y, a.id)) a.x += dx / pieces;
     if (canOccupy(s, a.x, a.y + dy / pieces, a.id)) a.y += dy / pieces;
   }
+}
+function moveTank(s: State, a: Tank, input: Input, dt: number) {
+  a.cooldown = Math.max(0, a.cooldown - dt); a.shield = Math.max(0, a.shield - dt); a.shieldCooldown = Math.max(0, a.shieldCooldown - dt);
+  if (a.hp <= 0) return;
+  moveVehicle(s, a, input, dt);
   if (input.shield && a.shieldCooldown <= 0) { a.shield = CONFIG.shieldDuration; a.shieldCooldown = CONFIG.shieldCooldown; }
   if (input.fire) fire(s, a);
 }
@@ -161,12 +169,12 @@ function updateBullet(s: State, b: Bullet, dt: number): boolean {
     if (bestT > 1) { b.x += dx; b.y += dy; break; }
     b.x += dx * bestT; b.y += dy * bestT;
     if (tankHit) {
-      if (tankHit.shield > 0) { if (tankHit.id === 'a') s.stats.blocks++; event(s, 'block', b.x, b.y); if (s.mode === 'training' && s.lesson === 4 && tankHit.id === 'a') complete(s); }
+      if (tankHit.shield > 0) { if (s.statsByPlayer[tankHit.id]) s.statsByPlayer[tankHit.id].blocks++; event(s, 'block', b.x, b.y); if (s.mode === 'training' && s.lesson === 4 && tankHit.id === 'a') complete(s); }
       else {
         const protectedPlayer = s.mode === 'training' && tankHit.id === 'a';
         const requiresBounce = s.mode === 'training' && s.lesson === 2 && b.bounces === 0;
         if (!protectedPlayer && !requiresBounce) tankHit.hp = Math.max(0, tankHit.hp - CONFIG.damage);
-        if (b.owner === 'a' && tankHit.id !== 'a') { s.stats.hits++; if (b.bounces) s.stats.ricochets++; }
+        if (b.owner !== tankHit.id && s.statsByPlayer[b.owner]) { s.statsByPlayer[b.owner].hits++; if (b.bounces) s.statsByPlayer[b.owner].ricochets++; }
         event(s, 'hit', b.x, b.y);
         if (s.mode === 'training' && tankHit.id === 'b' && tankHit.hp === 0 && [1, 2].includes(s.lesson)) complete(s);
       }
@@ -175,7 +183,7 @@ function updateBullet(s: State, b: Bullet, dt: number): boolean {
     if (wallHit) {
       if (wallHit.w.kind === 'brick') {
         wallHit.w.hp--; event(s, 'hit', b.x, b.y);
-        if (wallHit.w.hp <= 0) { s.stats.bricks++; event(s, 'brick', b.x, b.y); if (s.mode === 'training' && s.lesson === 3) complete(s); }
+        if (wallHit.w.hp <= 0) { if (s.statsByPlayer[b.owner]) s.statsByPlayer[b.owner].bricks++; event(s, 'brick', b.x, b.y); if (s.mode === 'training' && s.lesson === 3) complete(s); }
         return false;
       }
       if (b.bounces >= CONFIG.bounces) return false;
