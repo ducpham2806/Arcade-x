@@ -970,5 +970,10 @@
   "tile-2048": [
     "/game-art/icons/tile-2048.webp",
     "/game-art/banners/tile-2048.webp"
+  ],
+  "word-chain": [
+    "/game-art/icons/word-chain.webp",
+    "/game-art/banners/word-chain.webp",
+    "/games/word-chain/words.v1.json"
   ]
 }

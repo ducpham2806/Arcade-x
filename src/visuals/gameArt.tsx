@@ -15,6 +15,7 @@ export const GAME_ART: Record<string, { color: string; secondary: string; label:
   'brick-breaker': {color:'#67eece',secondary:'#a68dff',label:'GAME MỚI',world:'Chronicles · Sáu miền Aethra'},
   'rainbow-blocks': { color:'#7fe6ff',secondary:'#d88beb',label:'GAME MỚI',world:'Cầu vồng sắc màu' },
   'word-cross': { color: '#c4a1ff', secondary: '#fb72bc', label: 'NGÔN TỪ', world: 'Thư viện ngân hà' },
+  'word-chain': { color: '#ffbf47', secondary: '#8b6cff', label: 'ĐỐI KHÁNG', world: 'Sân khấu chữ' },
   'car-escape': { color: '#ff9f6a', secondary: '#ff547c', label: 'GIẢI CỨU', world: 'Đường đua đô thị' },
   'dungeon-tap': { color: '#ffc76a', secondary: '#f46355', label: 'PHIÊU LƯU', world: 'Thành trì bóng tối' },
   'mummy-escape': { color: '#eec87c', secondary: '#48d6b2', label: 'CHIẾN THUẬT', world: 'Bí ẩn kim tự tháp' },
@@ -214,6 +215,17 @@ function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string
       <path d="M141 102V64H191V102H228V149H141Z" fill="#8dc8ad" stroke="#d1ffdf" strokeWidth="4" transform="rotate(-13 185 107)"/>
       <path d="M222 203L243 172m0 0l-19 7m19-7l1 19" stroke="#fff0cc" strokeWidth="5" strokeLinecap="round"/>
     </g>;
+    case 'word-chain': return <g>
+      <ellipse cx="213" cy="214" rx="150" ry="16" fill="#0b0820" opacity=".45"/>
+      {[['NỐI',96,70,-7,'#ffe9bf'],['TỪ',232,64,7,'#ffcd6e']].map(([t,x,y,r,f])=><g key={String(t)} transform={`rotate(${r} ${Number(x)+50} ${Number(y)+50})`}>
+        <rect x={Number(x)} y={Number(y)+12} width="100" height="96" rx="18" fill="#6f4b1b"/>
+        <rect x={Number(x)} y={Number(y)} width="100" height="96" rx="18" fill={String(f)} stroke="#fff6dc" strokeWidth="3"/>
+        <path d={`M${Number(x)+10} ${Number(y)+84}H${Number(x)+90}`} stroke="#d4a65a" strokeWidth="6" strokeLinecap="round" opacity=".7"/>
+        <text x={Number(x)+50} y={Number(y)+68} textAnchor="middle" fill="#2a1c0b" fontSize="40" fontWeight="900" fontFamily="Arial,sans-serif">{t}</text></g>)}
+      <path d="M200 118h30m-10-10l10 10-10 10" stroke="#fff3c4" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+      {[['mèo con',92,186,a],['con người',220,186,b]].map(([t,x,y,c])=><g key={String(t)}><rect x={Number(x)} y={Number(y)} width="112" height="30" rx="10" fill="#1b1540" stroke={String(c)} strokeWidth="3"/><text x={Number(x)+56} y={Number(y)+21} textAnchor="middle" fill="#f6efe2" fontSize="16" fontWeight="800" fontFamily="Arial,sans-serif">{t}</text></g>)}
+      {[[78,62,'#2fc7a8'],[352,70,'#a98bff'],[70,168,'#ff7a59'],[356,166,'#ffbe3d']].map(([x,y,c],i)=><circle key={i} cx={Number(x)} cy={Number(y)} r="13" fill={String(c)} stroke="#1b1540" strokeWidth="4"/>)}
+    </g>;
     default: return <g><path d="M146 61H281V196H146Z" fill="#334155" stroke="#94a3b8" strokeWidth="3"/><path d="M178 102H249M178 126H237M178 150H227" stroke="#cbd5e1" strokeWidth="6"/><circle cx="213" cy="184" r="5" fill="#cbd5e1"/></g>;
   }
 }
@@ -223,6 +235,7 @@ function Backdrop({id,a,b}:{id:string;a:string;b:string}){
  case 'brick-breaker':return <g><path d="M0 0H420V250H0Z" fill="#12233a"/><path d="M0 44L103 7L79 116L0 172M420 12L331 70L401 112L420 216" fill="#284760"/><path d="M0 229L121 187L180 250M420 187L334 212L316 250" fill="#386460"/><path d="M42 0L80 84L28 129M377 0L331 70L374 130" fill="none" stroke="#8562bd" strokeWidth="4"/>{[[47,37],[360,177],[65,212],[353,33]].map(([x,y],i)=><path key={i} d={`M${x} ${y-8}l8 8-8 8-8-8Z`} fill={a} opacity=".5"/>)}</g>;
  case 'rainbow-blocks':return <g>{['#25c6df','#4d6ecb','#ca6aac','#ffd873'].map((c,i)=><path key={c} d={`M${-80+i*125} 0l160 250h95L${15+i*125} 0Z`} fill={c} opacity=".17"/>)}<path d="M0 233Q209 120 420 229" stroke="#69e6dd" strokeWidth="18" opacity=".35"/></g>;
  case 'word-cross':return <g><path d="M0 0H420V250H0Z" fill="#543479"/><path d="M0 216Q120 126 221 228T420 199V250H0Z" fill="#96619b"/>{['A','B','C','?'].map((t,i)=><text key={t} x={35+i*110} y={58+i%2*148} fontSize="44" fontWeight="900" fill="#d5b5f2" opacity=".2" transform={`rotate(${i%2?15:-15} ${35+i*110} ${58+i%2*148})`}>{t}</text>)}</g>;
+ case 'word-chain':return <g><path d="M0 0H420V250H0Z" fill="#1d1640"/><circle cx="210" cy="40" r="170" fill="#4a3a9a" opacity=".45"/><path d="M0 232Q210 170 420 232V250H0Z" fill="#120d2a"/>{['Ă','Đ','Ơ','Ư','Â'].map((t,i)=><text key={t} x={22+i*92} y={i%2?212:62} fontSize="40" fontWeight="900" fill="#ffcf6b" opacity=".14" transform={`rotate(${i%2?12:-12} ${22+i*92} ${i%2?212:62})`}>{t}</text>)}</g>;
  case 'tile-2048':return <g><path d="M0 0H420V250H0Z" fill="#8b5126"/><path d="M0 202L109 89L225 214L359 37L420 93V250H0Z" fill="#dfa659" opacity=".35"/>{[0,1,2].map(i=><path key={i} d={`M${10+i*138} 0l55 35-55 35-55-35Z`} fill="#ffdca0" opacity=".17"/>)}</g>;
  case 'car-escape':return <g><path d="M0 0H420V250H0Z" fill="#263947"/><path d="M-40 0L178 250H264L45 0Z" fill="#5d737a"/><path d="M420 0L269 250H326L450 53Z" fill="#e27d60" opacity=".35"/><path d="M0 0L220 250" stroke="#f8e3ae" strokeWidth="3" strokeDasharray="17 19"/></g>;
  case 'dungeon-tap':return <g><path d="M0 250V82Q50 10 100 82V250M310 250V82Q360 10 410 82V250" fill="#35303d" stroke="#8f6142" strokeWidth="10"/><path d="M19 187l14-58 15 58m323 0l14-58 15 58" fill="#ffae47" opacity=".6"/></g>;

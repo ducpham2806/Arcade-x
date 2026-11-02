@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+// Build public/games/word-chain/words.v1.json from the Wiktionary-derived which-dialect-vi
+// package (CC BY-SA 4.0). Usage: node scripts/word-chain/build-lexicon.mjs [--check]
+// Downloads the pinned tarball, verifies its checksum, keeps two-syllable common words and writes
+// the list sorted by frequency (most common first). Deterministic: --check fails on any drift.
+import {build} from 'esbuild';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {mkdtempSync,readFileSync,readdirSync,writeFileSync,existsSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+
+const SOURCE={name:'which-dialect-vi',version:'0.2.0',tarball:'https://registry.npmjs.org/which-dialect-vi/-/which-dialect-vi-0.2.0.tgz',shasum:'a53d8b87a204666cc5f020d744089ab8b35c6925'};
+const OUT='public/games/word-chain/words.v1.json';
+// Syllables that make a word unsuitable for an all-ages game, and gloss words that mark slurs,
+// vulgar or sexual senses. A word is dropped if any syllable or any gloss matches.
+const BLOCK_SYLLABLES=['đụ','địt','đéo','đĩ','lồn','cặc','buồi','dái','cứt','đái','đ~','nứng','dâm','chịch','điếm','mõm','mẹ kiếp'];
+const BLOCK_GLOSS=/\b(vulgar|obscene|offensive|derogatory|slur|pejorative|genital|penis|vagina|vulva|testic|sexual intercourse|copulat|prostitut|whore|brothel|fuck|masturbat|erotic|pornograph)/i;
+const VIETNAMESE=/^[a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]+$/;
+
+const tmp=mkdtempSync(join(tmpdir(),'word-chain-lexicon-'));
+const tgz=join(tmp,'src.tgz');
+execFileSync('curl',['-sSfL','-o',tgz,SOURCE.tarball]);
+const sum=createHash('sha1').update(readFileSync(tgz)).digest('hex');
+if(sum!==SOURCE.shasum)throw new Error(`checksum mismatch: ${sum}`);
+execFileSync('tar',['-xzf',tgz,'-C',tmp]);
+const out=join(tmp,'normalize.cjs');
+await build({entryPoints:['src/games/word-chain/normalize.ts'],bundle:true,platform:'node',format:'cjs',outfile:out,logLevel:'silent'});
+const {wordKey,syllableKey,clean}=createRequire(import.meta.url)(out);
+
+const dir=join(tmp,'package/data/words');const entries=new Map();
+for(const f of readdirSync(dir).sort())for(const [head,list] of Object.entries(JSON.parse(readFileSync(join(dir,f),'utf8'))))entries.set(head,list);
+const blockedKeys=new Set(BLOCK_SYLLABLES.filter(s=>!s.includes('~')&&!s.includes(' ')).map(syllableKey));
+const kept=new Map();// key -> {word, freq}
+for(const [head,list] of entries){
+ const word=clean(head),parts=word.split(' ');
+ if(head!==head.toLowerCase()||parts.length!==2||!parts.every(p=>VIETNAMESE.test(p)))continue;
+ if(list.every(e=>e.pos==='name'))continue;
+ const glosses=list.flatMap(e=>(e.senses||[]).flatMap(s=>s.glosses||[])).join(' | ');
+ if(BLOCK_GLOSS.test(glosses)||/^(misspelling|nonstandard spelling) of/i.test(glosses))continue;
+ const key=wordKey(word);if(!key||key.split(' ').some(k=>blockedKeys.has(k)))continue;
+ const freq=Math.max(0,...list.map(e=>e.frequency||0)),noun=list.some(e=>e.pos==='noun');
+ const prev=kept.get(key);if(!prev||freq>prev.freq)kept.set(key,{word,freq,noun});
+}
+const words=[...kept.values()].sort((a,b)=>b.freq-a.freq||(a.word<b.word?-1:a.word>b.word?1:0));
+// Continuations per first syllable, to pick openers that are never dead ends.
+const starts=new Map();for(const {word} of words){const k=syllableKey(word.split(' ')[0]);starts.set(k,(starts.get(k)||0)+1);}
+// Openers: common nouns with two different syllables whose last syllable starts at least 12 words.
+const openers=words.filter(w=>{const [a,b]=w.word.split(' ');return w.noun&&a!==b&&w.freq>=3&&(starts.get(syllableKey(b))||0)>=12;}).map(w=>w.word);
+const json=JSON.stringify({version:1,source:`${SOURCE.name}@${SOURCE.version} (Wiktionary via Kaikki.org, CC BY-SA 4.0)`,license:'CC BY-SA 4.0',count:words.length,words:words.map(w=>w.word),openers})+'\n';
+if(process.argv.includes('--check')){
+ if(!existsSync(OUT)||readFileSync(OUT,'utf8')!==json){console.error(`${OUT} is out of date`);process.exit(1);}
+ console.log(JSON.stringify({words:words.length,openers:openers.length,status:'up to date'}));
+}else{writeFileSync(OUT,json);console.log(JSON.stringify({out:OUT,words:words.length,openers:openers.length,bytes:json.length}));}

@@ -218,5 +218,13 @@
     "iconBytes": 16688,
     "bannerBytes": 34006,
     "sha256": "b1dae609c0a512c85e1e6653e131a8a9699db8194dfe42c7ae5ca5ef60d62f9f"
+  },
+  {
+    "id": "word-chain",
+    "icon": "/game-art/icons/word-chain.webp",
+    "banner": "/game-art/banners/word-chain.webp",
+    "iconBytes": 18600,
+    "bannerBytes": 34898,
+    "sha256": "bc5444ce4667f511299f0997a39f4ca10df11ba6147d768393916b7968fc8881"
   }
 ]

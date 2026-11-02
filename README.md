@@ -1,6 +1,6 @@
 # ArcadeX · 2.12.x
 
-Launcher mini-game dạng PWA (React 19 + Vite + Supabase) với 22 game, chơi được offline và đồng bộ tài khoản. Quy tắc giao diện và trải nghiệm trong game nằm ở `AGENTS.md`.
+Launcher mini-game dạng PWA (React 19 + Vite + Supabase) với 23 game, chơi được offline và đồng bộ tài khoản. Quy tắc giao diện và trải nghiệm trong game nằm ở `AGENTS.md`.
 
 Hướng dẫn cho Claude Code nằm ở `CLAUDE.md`. Thư mục `.claude/` chứa 19 agent và 11 skill (đánh giá game, level, cân bằng, QA, hiệu năng, UX…). Chúng được lấy từ Claude Code Game Studios và chỉnh cho web; nguồn và giấy phép MIT ghi ở `.claude/CCGS-NOTICE.md`.
 
@@ -48,7 +48,7 @@ CI (`.github/workflows/ci.yml`) chạy trên mọi PR: `lint` → `build` → `t
 |---|---|
 | `npm run test:fast` | Các bộ không cần trình duyệt hay Docker: readability, cấu trúc agent/skill (`test:claude`), tương thích save (`test:storage`), engine 8 game (`test:engines`), engine Blossom Blast (`test:blossom-engine`), duel AI và duel server (`test:duel-server`), sync, commerce, subscriptions, battleship, social, artwork, cosmic, startup/PWA, boom, eat, dungeon, full-release |
 | `npm run test:smoke` | Luồng launcher trên bản build: yêu thích, chi tiết game, âm thanh, chat, vào/thoát game, Word Cross |
-| `npm run test:games` | Mở cả 22 game, chạm/nhấn phím vài giây, không lỗi JS, thoát về thư viện |
+| `npm run test:games` | Mở cả 23 game, chạm/nhấn phím vài giây, không lỗi JS, thoát về thư viện |
 | `npm run test:offline` | Tắt mạng sau khi service worker precache: tải lại, mở modal, chơi game đã cache |
 | `npm run test:modals` | Khung modal theo `AGENTS.md` ở điện thoại/tablet/desktop, không đổi kích thước khi chuyển tab; cấm bottom sheet ngắn trong mã nguồn |
 | `npm run test:blossom-ui` | Blossom Blast trên dev server: hướng dẫn, chuẩn bị màn, kết quả, lưu, sprite, bố cục màn chơi ở 320×568 đến 1280×760 (8 bộ, 55 test) |
