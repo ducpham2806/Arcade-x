@@ -1,6 +1,6 @@
-# Tank Clash P0/P1
+# Tank Clash P2 — tiếp quản
 
-Ngày: 02/11/2026. Trạng thái: prototype để kiểm chứng điều khiển và luật; art là hình khối tạm. Chưa tích hợp catalog sản phẩm, chưa có phòng online cho người dùng, chưa cấp thưởng.
+Cập nhật 03/11/2026: có sân tập/bot offline và phòng riêng online 1v1 chạy cục bộ; art là hình khối tạm. Chưa tích hợp catalog sản phẩm, hosting Internet, quyền gói chơi hoặc thưởng. **Bàn giao đầy đủ ở `PLAN.md` §15**; chỉ dùng bộ `room.ts` / `net-client.ts` / `server/tank-clash-room/` hiện hành.
 
 ## Chạy bản thử
 
@@ -10,7 +10,7 @@ Từ thư mục gốc Arcade-x, dùng Node 22.18+ hoặc Node 24 và cài depend
 node scripts/export-tank-review.mjs
 ```
 
-Mở `deliverables/Tank_Clash_P1_Playtest.html` bằng trình duyệt. File chứa toàn bộ CSS và JavaScript, không tải asset từ ngoài. `preview/tank-clash/index.html` là cùng bản để chạy qua static server.
+Mở `deliverables/Tank_Clash_P2_Playtest.html` bằng trình duyệt. File chứa toàn bộ CSS và JavaScript, không tải asset từ ngoài. Script giữ alias tên P1 cho công cụ cũ; alias được tạo lại cũng chứa UI P2 hiện hành. `preview/tank-clash/index.html` là cùng bản để chạy qua static server.
 
 - Sân tập: 5 bài, phải thực hiện đúng cơ chế để mở bài kế.
 - Đấu luyện: 1v1 với bot, tối đa 3 hiệp, mỗi xe 3 máu.

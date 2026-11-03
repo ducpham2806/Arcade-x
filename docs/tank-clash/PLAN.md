@@ -1,8 +1,8 @@
-# Tank Clash — Kế hoạch phát triển v1.1
+# Tank Clash — Kế hoạch phát triển v1.3 — bàn giao
 
 Ngày lập: 02/11/2026 (Việt Nam) · Dự án: Arcade-x
 
-**Trạng thái cập nhật 02/11/2026:** đã triển khai nền P0 và bản thử P1: năm bài sân tập, đấu bot, luật hiệp, React adapter và spike WebSocket hai client cục bộ. Có GDD và bảng cân bằng v1. Bản P1 dùng hình tạm, còn cần chơi thử trên thiết bị thật; chưa có phòng online/matchmaking cho người dùng. Anh Đức đã yêu cầu merge phần đang làm sau kiểm thử.
+**Trạng thái bàn giao 03/11/2026:** đã có P0/P1 và bản kỹ thuật P2 online 1v1. Bản bàn giao dùng room host/netcode/WS server mới hơn đã vào main qua PR #13; hợp nhất lịch sử nhánh P2 ngày 02/11 và ghi rõ các khác biệt. Xem **§15** để chạy, kiểm thử và tiếp quản. Chưa nghiệm thu Internet/thiết bị thật, chưa có 2v2/matchmaking hoặc art/audio sản xuất; chưa duyệt phát hành công khai.
 
 ## 1. Mục tiêu sản phẩm
 
@@ -267,3 +267,159 @@ Các nội dung cần giải quyết qua P0/P1, chưa cần hỏi thêm để ho
 |---|---|---|
 | v1.1 · 02/11/2026 | Triển khai P0 và prototype P1; bổ sung GDD, tuning và kiểm thử | Bản thử để anh chơi; chuẩn bị P2 |
 | v1.2 · 03/11/2026 | P2: giao thức phòng, room server, netcode, server WebSocket, giao diện online, test mạng ảo và trình duyệt | Chạy được cục bộ; chờ chọn hosting và chơi thử thật |
+
+## 15. Bàn giao cho người phát triển tiếp — 03/11/2026
+
+### 15.1. Đọc phần này trước
+
+**Điểm bàn giao:** mã nguồn P0/P1 và bản kỹ thuật P2 phòng riêng 1v1. Gameplay và online đã chạy cục bộ; chưa nghiệm thu Internet/thiết bị thật, chưa có 2v2, chưa phát hành công khai. Lấy source từ `main` của [ducpham2806/Arcade-x](https://github.com/ducpham2806/Arcade-x), không tiếp tục bằng cách copy một HTML cũ vào launcher.
+
+Repository có hai hướng P2 được phát triển song song. Lần bàn giao này hợp nhất lịch sử nhánh `feat/tank-clash-p2-rooms` với main đã nhận PR #13; giữ **một bộ chạy hiện hành** là `room.ts` + `net-client.ts` + `server/tank-clash-room/` từ bản P2 mới hơn trên main. Bản cũ `server/tank-clash/` + `online-client.ts` được bảo toàn trong lịch sử commit, không để chạy lẫn với bộ hiện hành. Chi tiết khác biệt và cách tìm lại nằm ở §15.8.
+
+| Mốc | Đã làm | Chưa hoàn tất |
+|---|---|---|
+| P0 | Audit các điểm tích hợp Arcade-x; GDD v1, tuning v1; engine thuần và spike WebSocket 2 client | Spike chỉ để tham chiếu; không dùng làm server sản phẩm |
+| P1 | Năm bài sân tập, bot 1v1, điều khiển PC/touch, luật đạn/tường/gạch/khiên/hiệp, HUD/dialog/cleanup | Playtest người mới, cân bằng, FPS mobile thật |
+| P2 | Phòng riêng 1v1 thật; tạo/vào bằng mã/link; sảnh/ready/countdown; server làm trọng tài; reconnect/forfeit/rematch; prediction/reconciliation/interpolation; WS adapter và auth hook | Hosting WSS, phiên tài khoản thật/quyền chơi, 10 trận hai thiết bị qua Internet, soak/load và đánh giá lag compensation |
+| P3 | Chưa triển khai | 2v2, party, queue/matchmaking, map đội, hủy queue, xem trận |
+| P4 | Có React adapter làm nền; chưa tích hợp catalog | Art/animation/VFX/icon/banner/audio, launcher/loading, entitlement, kết quả bền vững/thưởng |
+| P5 | Có test tự động và các lần kiểm UI cục bộ | QA đa thiết bị, playtest nhiều người, hiệu năng/soak/load, anh duyệt phát hành |
+| P6–P7 | Chỉ có định hướng | 3v3 tranh khu vực và 4v4 cướp lõi; đặc tả luật/map/respawn/camera riêng |
+
+### 15.2. Gameplay và UI đã thực hiện
+
+- Engine TypeScript thuần, chạy fixed step 60 Hz ở Node và browser; không phụ thuộc DOM, mạng hoặc database. Thân xe quay theo hướng lái; tháp pháo ngắm độc lập. Di chuyển chéo được chuẩn hóa, kiểm va chạm tường/xe và trượt dọc tường.
+- Đạn kiểm va chạm quét; một viên chỉ gây sát thương một lần; thép phản xạ một lần, gạch chặn đạn và phá sau hai lần trúng; đạn ra ngoài biên bị loại. Đạn của mình sau phản xạ có thể trúng mình; friendly fire giữa đồng đội tắt.
+- HP, hồi bắn, giới hạn số đạn, khiên có thời gian hiệu lực/hồi chiêu. Xe HP 0 ngừng tham chiến, chờ kết thúc hiệp. Bot dùng cùng luật xe/đạn/khiên; hiển thị BOT rõ.
+- Năm bài: lái tới mục tiêu → bắn bia → bắn bật → phá gạch → đỡ đạn bằng khiên. Phải thực hiện đúng hành động để mở bài tiếp; đường ngắm dự báo dùng chung luật phản xạ.
+- Bản đồ Duel đầu có thép/gạch và vật cản giữa hai điểm spawn. Tối đa ba hiệp, đạt hai hiệp thắng thì kết thúc sớm. Hết giờ so số xe sống rồi HP; bằng thì hòa. Hai bên chết cùng tick hòa. Hiệp mới reset xe/gạch/đạn.
+- PC: WASD/mũi tên lái, chuột ngắm/giữ chuột trái bắn, Space khiên. Touch: cần trái lái, kéo cần phải ngắm rồi nhả bắn, nút khiên riêng. Controls đặt ngoài vùng chiến đấu; có bố cục ngang/dọc.
+- Menu sân tập/bot/online, hướng dẫn, HUD HP/hiệp/tỉ số/thời gian/khiên, cue đổi hiệp, kết quả, pause offline và góp ý sao chép thủ công. Không tự gửi góp ý ra ngoài.
+- Offline blur/ẩn tab thì pause và xóa input. Online blur/Escape/pause từ launcher chỉ ngừng điều khiển; trận trên server vẫn chạy và xe vẫn bị bắn. UI giải thích rời trận là nhận thua.
+- Online màu/nhãn theo mình–đối thủ, ghế B thấy đúng xe mình; có ping và thông báo nối lại. Form/đấu trường đã được kiểm bố cục 1280×760, 390×844, 844×390; đây không phải benchmark mobile.
+- React adapter nhận `isPaused`, cleanup controller khi unmount. `destroy()` hủy RAF/listener/input/socket/timer sở hữu. Không gọi bridge cấp coin/EXP/leaderboard. `window.__tankClash` chỉ có trong preview để đọc trạng thái khi kiểm thử.
+
+Thông số nguồn nằm ở `CONFIG` trong engine, không đọc trực tiếp từ workbook. **Tất cả vẫn là [PLACEHOLDER]**: world 800×480, radius 16, xe 155 px/s, turnSpeed 10 rad/s, HP 3, damage 1, hồi bắn 0,65 s, tối đa 3 đạn/xe, đạn 340 px/s, radius 3, tồn tại 2,5 s, bật 1 lần, khiên 0,8 s/hồi 8 s, hiệp 60 s, tối đa 3 hiệp. Sửa bảng cân bằng không tự đổi game.
+
+### 15.3. Hệ online hiện hành
+
+- Mã phòng 6 ký tự tránh 0/O/1/I/L; nhận mã được chuẩn hóa. Chỉ hai ghế A/B, không ghép bot giả người thật. Có lỗi tiếng Việt cho sai phiên bản, mã không tồn tại, đầy, đang chơi, phiên lỗi và gửi quá nhanh.
+- Hai bên ready → đếm ngược 3 s → trận. Mỗi match có ID riêng. Server quyết định vị trí/va chạm/đạn/HP/khiên/gạch/đồng hồ/hiệp/kết quả. Chủ phòng không được sửa gameplay.
+- Hai người tranh ghế cuối chỉ một người được vào, kể cả auth bất đồng bộ. Một tài khoản đã xác thực không chiếm nhiều phòng. Khách dev không phải tài khoản sản phẩm.
+- Reconnect giữ ghế 20 s, giữ đúng HP và trạng thái; xe vẫn chịu sát thương khi mất mạng. Hết hạn xử thua nếu đối thủ còn; cả hai vắng thì hủy. Rời giữa trận xử thua ngay. Chủ phòng rời sảnh chuyển quyền; máy chủ vẫn mô phỏng độc lập với client chủ phòng.
+- Thiết bị có resume token có thể nối lại/chiếm đúng ghế, ngắt kết nối cũ. Token tạm giữ trong sessionStorage, không phải mã phòng hay JWT. Phòng và token nằm trong RAM; restart server không phục hồi trận. Phòng trống 60 s hoặc sảnh idle 10 phút được dọn.
+- Đấu lại dùng ready của cả hai, tạo match ID mới. Kết quả gọi `onResult` một lần/match ID; hiện chỉ log, chưa ghi DB. Sau kết quả đối thủ rời thì vẫn giữ màn kết quả cho người còn lại.
+- Giao thức hiện hành `tank-clash.p2.v1`: client gửi `create/join/resume/ready/leave/input/ping`; server trả `joined/room/start/snapshot/result/error/pong/left`. Input chỉ gồm x/y/aim/fire/shield, sequence và batch tối đa 4; không nhận vị trí/HP do client tự quyết.
+- Server simulation 60 Hz, snapshot 20 Hz; payload tối đa 2 KB, rate limit 120 gói/s/kết nối, hàng đợi/tín dụng tối đa 30 input. Input trễ được bù tối đa 2/nhịp trong giới hạn tín dụng, không chạy xe nhanh hơn thời gian thực; stale 250 ms về neutral.
+- Xe mình dự đoán bằng `driveTank`, replay input chưa ack để đối soát; xe khác nội suy lùi 100 ms, ngoại suy tối đa 150 ms khi thiếu snapshot, không nội suy qua reset hiệp, giới hạn bước làm mượt. HP/kết quả luôn từ server; chưa có lag compensation khi bắn.
+- Origin allowlist, heartbeat 10 s, đóng consumer chậm khi buffer vượt 256 KiB, `/health` có số liệu. Mở HTML `file://` gửi origin `null` chỉ được nhận khi server bind loopback. Server hiện hành chỉ phục vụ WS và health, **không phục vụ HTML**.
+- Tài khoản: có `SUPABASE_URL` + `SUPABASE_ANON_KEY` thì xác minh bearer token qua `/auth/v1/user`, timeout 4 s, cache ngắn 60 s. Không cần service-role key. Production mặc định không chạy nếu thiếu cấu hình auth; `TANK_ALLOW_GUESTS=1` chỉ dành môi trường thử được chủ động cấu hình.
+- Chưa nối token tài khoản vào adapter launcher, chưa có entitlement theo gói thuê và chưa tích hợp allowlist tài khoản thử nghiệm ở bộ server hiện hành. Không suy ra quyền chơi từ metadata người dùng. Không query/ghi DB trong vòng lặp bắn/lái.
+
+### 15.4. Bản đồ mã nguồn và tài liệu
+
+| Đường dẫn trong repo | Vai trò / nơi sửa tiếp |
+|---|---|
+| `src/games/tank-clash/engine.ts` | CONFIG, state, luật mô phỏng, bot, bài học, kết quả; `createState('duel', { online: true })` giữ cả hai ghế là người qua mọi hiệp |
+| `src/games/tank-clash/protocol.ts` | Hợp đồng wire, NET, validation, tên/mã phòng, snapshot |
+| `src/games/tank-clash/room.ts` | Host thuần, identity/ghế, lifecycle, input credit, deadline và `onResult` |
+| `src/games/tank-clash/net-client.ts` | `createNetSession` thuần và `connectTankRoom` cho browser, prediction/reconcile/smoothing/reconnect |
+| `src/games/tank-clash/runtime.ts` | DOM/Canvas, input/HUD/dialog và nối online; có `serverUrl`/`getToken` options để nối host sau |
+| `src/games/tank-clash/tank-clash.css` | CSS riêng prefix `tc-`, responsive và dialog |
+| `src/games/tank-clash/index.tsx` | Adapter React hiện chỉ nhận pause; chưa đăng ký launcher/catalog |
+| `src/games/tank-clash/preview.ts` | Entrypoint standalone và hook đọc trạng thái dành test |
+| `server/tank-clash-room/` | WS server hiện hành, package/lock riêng `ws@8.22.1`, chạy Node 22.18+ / khuyến nghị Node 24 |
+| `server/tank-clash-spike/` | Spike P0 lịch sử; chỉ chạy test đối chiếu, không dùng mở phòng sản phẩm |
+| `scripts/export-tank-review.mjs` | Build UI HTML tự chứa, đầu ra chính `deliverables/Tank_Clash_P2_Playtest.html`; giữ alias tên P1 để tương thích công cụ cũ |
+| `tests/tank-clash/engine.test.mjs` | 12 ca engine |
+| `tests/tank-clash/room.test.mjs` | 10 ca giao thức/phòng/race/reconnect/kết quả/rate limit |
+| `tests/tank-clash/harness.mjs`, `netcode.test.mjs` | Đồng hồ/mạng ảo, 5 ca mạng và prediction |
+| `tests/tank-clash/server.test.mjs`, `network.test.mjs` | 3 ca server thật + spike P0: tổng 4 ca |
+| `tests/tank-clash/online-ui.test.ts` | Một ca 2 browser + WS thật; create/join/ready/lái/rời xử thua |
+| `.github/workflows/ci.yml` | Các bước lint/build/budget/fast/server/browser, đã có test Tank Clash |
+| `docs/tank-clash/GDD-v1.md` | GDD/tuning mechanics bản nền |
+| `docs/tank-clash/P0-P1-review.md`, `P2-review.md` | Bằng chứng triển khai và giới hạn các lần kiểm |
+| `docs/WORKLOG.md`, `SESSION-HANDOFF.md`, `OWNER-TODO.md`, `PENDING-DECISIONS.md` | Nhật ký repo, bàn giao chung, việc chủ dự án và quyết định hosting đang chờ |
+
+Các file được sinh (`deliverables`, `preview/tank-clash/index.html`) không phải source chính; build lại bằng script. Workbook `Tank_Clash_Balance_v1.xlsx` đã lưu riêng cùng tài liệu bàn giao trước, là đề xuất tuning chưa nghiệm thu. Không đưa cả repo vào file HTML hoặc workbook.
+
+### 15.5. Dựng môi trường và chạy lại
+
+Từ một checkout **đầy đủ** của repo (không bỏ `public/`, `art/`, `standalone/`, `supabase/` nếu chạy CI toàn launcher):
+
+```bash
+git clone https://github.com/ducpham2806/Arcade-x.git
+cd Arcade-x
+git switch main
+npm ci
+npm ci --prefix server/tank-clash-room --ignore-scripts
+npm ci --prefix server/tank-clash-spike --ignore-scripts
+node scripts/export-tank-review.mjs
+npm run dev:tank-server
+```
+
+Giữ terminal server đang chạy, mặc định `ws://127.0.0.1:3223/tank`. Mở `deliverables/Tank_Clash_P2_Playtest.html` ở hai cửa sổ/tab độc lập; chọn **Online 1v1 / Phòng riêng**, tạo phòng ở máy A, nhập mã ở B, cả hai ready. Có thể chỉ định `?server=ws://127.0.0.1:3223/tank`; link mời hiện hành dùng query `?room=MÃ&server=...`. Mở HTML đơn lẻ vẫn chơi sân tập/bot được; online cần server riêng đang chạy. Chưa có URL server Internet đi kèm file.
+
+Các biến môi trường hiện hành:
+
+| Biến | Công dụng |
+|---|---|
+| `HOST`, `PORT` | Mặc định `127.0.0.1`, `3223`. Muốn LAN/staging phải cấu hình host thực và origin đúng |
+| `TANK_ALLOWED_ORIGINS` | Danh sách origin cách nhau bởi dấu phẩy; không phải URL `/tank` |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` | Bật xác thực tài khoản; chỉ đặt cấu hình thật ngoài source, không commit token/secret |
+| `NODE_ENV=production` | Bắt buộc auth mặc định; không dùng môi trường production để chạy thử DB |
+| `TANK_ALLOW_GUESTS=1` | Ngoại lệ khách cho host thử có chủ đích, không thay quyền chơi theo subscription |
+
+Môi trường máy khác cần HTTPS/WSS/reverse proxy và origin phù hợp; trang HTML nên phục vụ qua HTTPS khi thử đa thiết bị. Máy chủ WS hiện hành không tự phục vụ file game. Khi đổi giữa bản/server cũ và mới, tải lại cả client lẫn server và xóa phiên ghế cũ trong sessionStorage (key hiện hành `tank-clash.seat`); không chuyển resume token sang server khác. Các alias HTML tên P1 được script hiện hành tạo lại là UI hiện hành, không phải bản P1 lịch sử lưu ngày 02/11.
+
+Lệnh kiểm tra độc lập:
+
+```bash
+npm run test:tank-clash
+npm run test:tank-clash-server
+npm run lint
+node scripts/export-tank-review.mjs
+npm run build
+npm run test:bundle
+npm run test:fast
+# Các test browser trong CI cần Chromium và môi trường browser phù hợp:
+npm run test:tank-clash-ui
+```
+
+Thứ tự kiểm CI toàn repo lấy từ `.github/workflows/ci.yml`. Không nới test để có kết quả xanh. `test:tank-clash-ui` là script đã có cho người nhận bàn giao/CI; việc chạy browser trong từng môi trường phải tuân theo hướng dẫn công cụ của môi trường đó.
+
+### 15.6. Bằng chứng đã kiểm, không đánh đồng với nghiệm thu
+
+- Đợt P0/P1 ngày 02/11: 12 engine + 1 WS spike qua, targeted TypeScript và standalone export qua; đã kiểm sân tập/pause/bố cục dọc–ngang.
+- Đợt P2 nhánh `feat/tank-clash-p2-rooms` ngày 02/11: 28/28 qua; WS proxy thật tạo RTT danh nghĩa 80/150/250 ms, jitter ±30 ms mỗi chiều, bỏ 1/2/3% snapshot ứng dụng và lặp command. Có resume thủ công/tự nối lại giữ HP, không lặp phát bắn. JSON tải xuống ngắn khoảng 10,6–10,9 KiB/s/client; correction lớn nhất của A 8/21/44 world px. Đây là bằng chứng **bản P2 cũ**, không phải thông số giao thức hiện hành.
+- Đợt P2 mới trên main ngày 03/11 (PR #13): 27 engine/room/netcode, 4 server/spike và 1 test UI được tác giả ghi nhận qua; lint/build/budget/fast qua theo `docs/WORKLOG.md`. Đã ghi ảnh bố cục 1280×760, 390×844, 844×390. Đây là kết quả lịch sử có nguồn trong repo, không tự coi là toàn bộ CI vừa chạy lại ở lượt bàn giao.
+- Bộ hiện hành dùng mạng ảo bảo toàn thứ tự kiểu TCP: mất gói thành retransmission delay ≥200 ms và chặn gói sau. Trận đủ hiệp tại RTT 80/150/250, jitter 30, mất 1/2/3% đều thống nhất tỉ số/kết quả; tải xuống 11,5/11,3/10,2 KB/s, tải lên 4,2/4,1/3,9 KB/s; lỗi hiển thị xe đối thủ TB/p95 tương ứng 15/28, 19/40, 32/86 px. Chưa có lag compensation.
+- Kiểm lại ngay lượt bàn giao 03/11: **27/27 engine/room/netcode và 4/4 WS server/spike qua**. **`npm run lint`, `npm run build`, `npm run test:bundle`, `npm run test:fast` và export HTML P2 đều qua** sau khi lấy đủ file checkout. Build P2 tự chứa 56.280 byte. Lần đầu lint/build/budget thiếu file vì sparse checkout đã được khắc phục; không sửa/nới test. Các test UI/browser của CI không chạy lại trong lượt bàn giao; code gameplay/client/server/CI được giữ nguyên so với main PR #13, chỉ tài liệu và metadata/tên export thay đổi.
+- Không biến phép thử mạng ảo/proxy thành tuyên bố đã chơi Internet. Không biến hai browser trên một host thành hai người/mạng thật. Browser kiểm tra cũ bị giới hạn khoảng 1 FPS; chưa đo 60/30 FPS trên điện thoại.
+- Chưa có 10 trận hai thiết bị thật, soak 30 phút, load nhiều phòng, đối soát kết quả ghi DB hoặc quyền subscription sản phẩm. Chưa chạy/đổi schema Supabase trong các đợt này.
+
+### 15.7. Việc còn lại, theo thứ tự tiếp quản
+
+1. **Khép P2 vận hành:** đề xuất nơi chạy tiến trình WS lâu dài, khu vực, TLS/WSS/reverse proxy, dự toán chi phí; chỉ đăng ký tài nguyên phát sinh phí sau khi được duyệt. Không coi Netlify static/function thông thường là nơi giữ vòng mô phỏng/socket lâu dài.
+2. **Khép P2 tài khoản:** nối `getToken` từ phiên Supabase thật, kiểm hai tài khoản staging; bổ sung allowlist tester/entitlement phù hợp. Khi cấp token cho client, khóa endpoint vào origin WSS tin cậy (trừ loopback dev); không gửi JWT tới `server` lấy tùy ý từ link mời. Test user không được tự khai role/quyền. Không chạm DB production để làm thử nghiệm.
+3. **Khép P2 chơi thử:** hai người/hai máy/hai mạng hoàn tất ít nhất 10 trận; ghi disconnect/tab/screen lock, HP/hiệp/kết quả, ping/correction, ngắm/bắn và yêu cầu lag compensation. Chạy soak/load, restart/half-open, bộ nhớ và dọn timer. Xem lại retry/pending queue/timeout, input qua ranh giới hiệp, và giới hạn truy cập trước khi mở staging cho nhiều người.
+4. **Đối chiếu tính năng từ nhánh cũ nếu cần:** bộ cũ có thống kê riêng A/B, opId/ack cho command, epoch cho hiệp, revision tường có ack và allowlist tester. Bộ hiện hành chưa port nguyên các hợp đồng này; không được mô tả là đang có. Muốn giữ các khả năng đó phải thiết kế theo protocol hiện hành, kèm regression tests. UI online hiện hành chưa trình thống kê bắn/trúng cá nhân, không dùng `state.stats` (vốn phục vụ A offline) làm thống kê cho ghế B.
+5. **P3:** đặc tả rồi làm 2v2 trước: đội/party 2 người, room riêng, một queue 2v2, map Crossfire, spectator, hủy queue, thiếu người/forfeit/rematch. Chưa mở thêm queue 1v1/3v3/4v4 để phân tán người chơi.
+6. **P4:** art xe/map/animation/VFX, icon/banner/loading cùng bộ, SFX/BGM; tích hợp catalog/lazy package/launcher/PWA theo rule Arcade-x. Auth quyền gói kiểm tại backend; kết quả/thưởng ghi theo match ID chống trùng, không để client tự cấp thưởng.
+7. **P5 rồi P6/P7:** QA và anh duyệt bản cụ thể; sau đó mới thiết kế 3v3/4v4 với mục tiêu/map/camera/respawn riêng. Không chỉ tăng số slot.
+
+Giữ các rule đã chốt: CSS tách prefix; modal mobile trọn màn hình, desktop rộng và outer frame ổn định, phần trong cuộn riêng; thông báo trong trận không chặn gameplay; không force-update khi đang chơi; không ghi vị trí/đạn vào DB từng frame; bot ghi rõ BOT; art tạm ghi rõ; không làm vỡ save cũ; không sửa PvP game khác để ép vừa prototype; không public/đăng ký dịch vụ trả phí khi chưa duyệt. Đọc và cập nhật `docs/WORKLOG.md` cùng mỗi thay đổi.
+
+### 15.8. Nguồn, lịch sử nhánh và quy tắc tiếp nối
+
+- P0/P1 đã lưu bằng commit tính năng `8ced9b64b21f26f1d0dfd9991d685e0a5de13275`, merge main `6fe42ee28010098604569b25d8846214dd47c0b2`.
+- P2 ngày 02/11 của phiên làm việc này: [`1efae4587d68b524fd1ea03f3422750c1bcb6bac`](https://github.com/ducpham2806/Arcade-x/commit/1efae4587d68b524fd1ea03f3422750c1bcb6bac), nhánh `feat/tank-clash-p2-rooms`; test log và review ngày 02/11 đã lưu. Có thể dùng `git show COMMIT:path` hoặc tạo nhánh từ commit này để xem lại server/client/test cũ.
+- P2 mới hơn đã vào main qua [PR #13](https://github.com/ducpham2806/Arcade-x/pull/13), gồm `07ffed6`, `b0524ab`, `35da8a0`; bản main lúc bắt đầu bàn giao là `5815e3e`.
+- **Quyết định hợp nhất:** giữ code vận hành mới hơn của PR #13, merge lịch sử nhánh P2 ngày 02/11, ghi cả phần đã làm và phần không có trong code hiện hành. Không giữ song song hai bộ server hoặc thay protocol hiện hành bằng file từ nhánh cũ. Các thay đổi game khác trên main được giữ nguyên.
+- Hai bộ từng cùng dùng chuỗi version `tank-clash.p2.v1` nhưng wire khác (`hello/state` của bản cũ so với `create/join/snapshot` hiện hành). Chúng **không tương thích**; không dùng version string đó làm căn cứ trộn client/server. Mọi thay đổi hợp đồng tiếp theo cần version/migration rõ ràng.
+- Bản HTML P2 lưu ngày 02/11 và review tương ứng thuộc bộ cũ. Build lại từ main theo §15.5 để nhận bộ hiện hành. Tài liệu này là điểm tiếp quản; những câu "P2 tiếp theo" trong báo cáo P0/P1 là ghi chép lịch sử, không phải việc chưa code ở hiện tại.
+- Để kiểm tra bàn giao không bỏ lịch sử: `git merge-base --is-ancestor 1efae4587d68b524fd1ea03f3422750c1bcb6bac origin/main` phải trả mã 0 sau merge. Tiếp tục trên nhánh mới tách từ main, không tách lại từ nhánh P2 cũ.
+
+| Phiên bản/ngày | Thay đổi | Trạng thái |
+|---|---|---|
+| v1.3 · 03/11/2026 | Bàn giao đầy đủ P0–P2, hợp nhất lịch sử hai hướng P2, xác định bộ chạy hiện hành và checklist P2–P7 còn lại | Source bàn giao trên main sau kiểm tra; không deploy công khai |

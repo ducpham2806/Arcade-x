@@ -25,3 +25,6 @@ tests/blossom/screenshots/
 
 # Single-file Dungeon Titan playtest; regenerate with `npm run export:dungeon-review`
 /dungeon-titan-equipment-v6-3-playtest.html
+
+# Current Tank Clash review export (regenerate from source).
+/deliverables/Tank_Clash_P2_Playtest.html

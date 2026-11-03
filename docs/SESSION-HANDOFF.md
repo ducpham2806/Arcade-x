@@ -72,6 +72,8 @@ Tài liệu máy chủ: `docs/WORD-CHAIN-SERVER.md`.
 - Test: `test:tank-clash` (trong `test:fast`), `test:tank-clash-server`, `test:tank-clash-ui` (đã thêm vào CI).
 - **Chưa deploy, chưa chọn hosting, chưa vào launcher.** Báo cáo và số đo: `docs/tank-clash/P2-review.md`.
 
+- Bàn giao cập nhật 03/11: xem `docs/tank-clash/PLAN.md` v1.3 §15. Hợp nhất lịch sử nhánh `feat/tank-clash-p2-rooms`; giữ bộ PR #13 hiện hành (`room.ts`, `net-client.ts`, `server/tank-clash-room`). Bộ P2 cũ và test cũ có thể xem ở commit `1efae4587d68b524fd1ea03f3422750c1bcb6bac`; không trộn wire hai bộ.
+
 ## Sổ tay kỹ thuật
 - **CI:** thứ tự các bước trong `.github/workflows/ci.yml`. Lệnh mới của session này:
   - `test:battleship-ui`;

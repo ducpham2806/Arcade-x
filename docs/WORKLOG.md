@@ -6,6 +6,15 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `merge/tank-clash-handoff-20261103` — bàn giao Tank Clash P2
+
+- Yêu cầu: ghi toàn bộ tiến độ vào plan cho người khác tiếp quản rồi merge bản mới nhất.
+- Đã đối chiếu Library plan v1.2, nhánh `feat/tank-clash-p2-rooms` (`1efae45`) và main mới (`5815e3e`, PR #13). Hai bộ P2 có wire không tương thích dù cùng version string; giải quyết xung đột bằng cách giữ bộ vận hành mới hơn trên main. Code/test bộ cũ được bảo toàn trong lịch sử merge, không để hai server/client lẫn nhau.
+- `docs/tank-clash/PLAN.md` v1.3 §15: danh mục đầy đủ P0/P1/P2, module, thông số, protocol/auth, hướng dẫn cài/chạy/test, bằng chứng cũ/mới, tính năng chưa port và checklist tiếp tục P2–P7. Cập nhật README/backlog và SESSION-HANDOFF để người nhận tìm đúng plan.
+- Export có tên P2 và title đúng; giữ alias P1 cho công cụ cũ. Không đổi gameplay, launcher, auth hoặc DB hiện hành.
+- Kiểm lại: `test:tank-clash` 27/27, `test:tank-clash-server` 4/4; lint toàn repo, build, bundle budget và toàn `test:fast` đều qua. Export P2 56.280 byte. Lint/build/budget lúc đầu thiếu `supabase/` và PNG do sparse checkout; đã lấy đủ file, kiểm lại thành công, không nới test.
+- Không chạy lại test browser của CI trong lượt này; giữ nguyên runtime/server/test/CI của main PR #13. Chưa deploy, đăng ký hosting, sửa Supabase hoặc nghiệm thu mạng/thiết bị thật. Merge source dùng thông điệp `[skip netlify]`.
+
 ## 03/11/2026 · nhánh `ccr-ff972ce9-1yqkwu`
 
 ### Tank Clash P2 — phần 3: giao diện online + tài liệu (xong)

@@ -59,3 +59,7 @@ Mỗi game dùng adapter gameplay riêng. Chỉ trích xuất phần dùng chung
 | 02/11/2026 | Đã dựng Tank Clash P0/P1; người dùng yêu cầu hoàn tất phần đang dừng rồi merge. |
 
 Khi đổi ưu tiên hoặc thêm game, cập nhật tài liệu này và ghi lý do trong nhật ký. Khi tiếp tục Tank Clash, đọc bản hiện hành của kế hoạch Tank Clash trước.
+
+## Bàn giao 03/11/2026
+
+Tank Clash đã có P0/P1 và bản kỹ thuật phòng riêng 1v1 P2. Kế hoạch hiện hành v1.3, phần §15 hướng dẫn tiếp quản, phân biệt hai hướng P2 lịch sử và xác định bộ hiện hành trên main. Chưa nghiệm thu Internet/thiết bị thật, chưa mở 2v2/matchmaking hoặc phát hành. Đọc `docs/tank-clash/PLAN.md` trước khi tiếp tục.
