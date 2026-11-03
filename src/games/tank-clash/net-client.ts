@@ -32,7 +32,7 @@ export function createNetSession(options: SessionOptions) {
   const shown = new Map<string, { x: number; y: number; round: number }>(); let lastViewAt: number | null = null;
   const events = new Map<number, GameEvent>();
   const stats: NetStats = { snapshots: 0, teleports: 0, phaseCorrections: 0, corrections: 0, maxCorrection: 0, totalCorrection: 0, rtt: null, pendingMax: 0, sentInputs: 0 };
-  const world = (): State => ({ version: 1, mode: 'duel', online: true, tick: latest?.tick ?? 0, time: 0, tanks: [], walls, bullets: [], events: [], nextId: 0,
+  const world = (): State => ({ version: 1, mode: 'duel', online: true, tick: latest?.tick ?? 0, time: 0, width: CONFIG.width, height: CONFIG.height, out: [], tanks: [], walls, bullets: [], events: [], nextId: 0,
     status: latest?.status ?? 'playing', round: latest?.round ?? 1, scores: latest?.scores ?? [0, 0], remaining: latest?.remaining ?? CONFIG.roundSeconds,
     phaseTime: 0, winner: latest?.winner ?? null, roundWinner: latest?.roundWinner ?? null, lesson: 0, lessonDone: false, stats: { shots: 0, hits: 0, ricochets: 0, blocks: 0, bricks: 0 } });
   const toTank = (t: TankSnap): Tank => ({ ...makeTank(t.id, t.id === 'a' ? 0 : 1, t.x, t.y, 'player'), ...t });
@@ -155,7 +155,7 @@ export function createNetSession(options: SessionOptions) {
       if (seat === 'b') w.tanks.reverse(); // runtime treats tanks[0] as "you"
       const ahead = Math.max(0, Math.min(SNAPSHOT_INTERVAL_MS / TICK_MS * 2, present - latest.tick)) / CONFIG.hz;
       w.bullets = latest.bullets.map(bl => ({ ...bl, owner: bl.team ? 'b' : 'a', age: 0, x: bl.x + bl.vx * ahead, y: bl.y + bl.vy * ahead }))
-        .filter(bl => bl.x >= 0 && bl.y >= 0 && bl.x <= CONFIG.width && bl.y <= CONFIG.height);
+        .filter(bl => bl.x >= 0 && bl.y >= 0 && bl.x <= w.width && bl.y <= w.height);
       w.events = [...events.values()]; w.time = present / CONFIG.hz; w.tick = latest.tick;
       return w;
     },

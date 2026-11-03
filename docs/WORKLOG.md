@@ -6,6 +6,19 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3a: sân 2v2 ngẫu nhiên + 2v2 với bot
+
+- Chủ dự án duyệt đặc tả P3: (1) sân to, chướng ngại ngẫu nhiên từng trận; (2) hàng chờ công khai bắt đăng nhập; (3) cho đầu hàng; (4) chế độ cục bộ 1 người + 1 bot đồng đội vs 2 bot; làm luôn.
+- Đã làm P3a (chi tiết ở `docs/tank-clash/P3-SPEC.md` §13):
+  - `src/games/tank-clash/maps.ts` (mới): sân 1040×624, bộ sinh theo seed (mulberry32), nửa phải = nửa trái xoay 180°, kiểm tra tự động (không có đường bắn thẳng giữa khu xuất phát, không khu kín, đường chính ≥ 48 px, quanh điểm xuất phát 60 px trống, đối xứng), sinh lại khi không đạt, bố cục dự phòng.
+  - `engine.ts`: chế độ `squad` 4 xe `a/a2/b/b2`, kích thước sân theo state (`s.width/height`), đổi làn đồng đội mỗi hiệp, `forfeitTank()` (bỏ trận theo người, cả đội bỏ → thua, cả hai đội cùng nhịp → hủy), `surrender()`, `endReason`; bot cho mọi xe (địch gần nhất có tầm nhìn, giãn cách đồng đội, lệch nhịp bắn); lưới tìm đường có cache. Duel 1v1 không đổi hành vi (test cũ qua nguyên).
+  - `runtime.ts` + CSS: thẻ "03 / Đồng đội 2v2", HUD hai đội, ●/▲ + BOT trên sân, vòng sáng xe mình, nhãn tự phóng to theo màn hình, nút "Đầu hàng" trong màn tạm dừng, màn kết quả có mã sân. Nhãn bản build "P3a".
+  - `net-client.ts`: chỉ đổi giới hạn sân sang theo state. `scripts/export-tank-review.mjs`: đổi tiêu đề.
+- Lỗi tự tìm khi chụp màn hình rồi sửa: (1) bot đứng im ở điểm xuất phát (36/300 lượt bot trên 100 seed) do lưới tìm đường 40 px thô hơn bố cục 52 px → ô 20 px cho sân 2v2, có test hồi quy (đã xác nhận test hỏng với lưới cũ); (2) nhãn xe không đọc được ở 844×390 → phóng to theo kích thước hiển thị. Thêm cache lưới tìm đường: 0,7 → 0,3 ms/nhịp cho 3 bot.
+- Test mới: `tests/tank-clash/squad.test.mjs` (10 ca: bố cục 60 seed hợp lệ/đối xứng/khác nhau, validator, trận 4 xe, friendly fire, hòa cùng nhịp, bỏ trận, đầu hàng, bot đánh hết trận, bot ra khỏi điểm xuất phát) và `tests/tank-clash/squad-ui.test.ts` (2 trang Chromium 1280×760 và 844×390: vào trận, lái, tạm dừng → đầu hàng → kết quả → đấu lại với seed mới).
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 40/40, mất khoảng 11 giây); `npm run test:tank-clash-server` 4/4; `npm run test:tank-clash-ui` 3/3 (với `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`). Đã xem ảnh 1280×760, 844×390, 390×844.
+- **Chưa làm / rủi ro:** P3b–P3d (online 2v2, tổ đội, hàng chờ, UI online). Trên điện thoại nằm ngang xe chỉ khoảng 13 px (đánh đổi của sân to); độ khó bot và kích thước sân là [PLACEHOLDER], chưa chơi thử bằng tay trên thiết bị thật. Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
+
 ## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3: đặc tả 2v2
 
 - Chủ dự án đồng ý làm tiếp P3 khi chưa chọn hosting. Theo PLAN §15.7 mục 5 ("đặc tả rồi làm"), lượt này viết đặc tả, **chưa code**.

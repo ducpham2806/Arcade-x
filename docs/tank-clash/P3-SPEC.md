@@ -1,8 +1,8 @@
 # Tank Clash P3 — Đặc tả MVP 2v2
 
-Phiên bản: v0.1 (bản nháp chờ duyệt) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
+Phiên bản: v0.2 (đã duyệt, P3a đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
 
-**Trạng thái:** đặc tả, chưa code. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng. Các câu hỏi cần chủ dự án quyết ở **§11**; em đề xuất phương án mặc định cho từng câu để không chặn việc.
+**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a đã code** (xem §13); P3b–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
 
 ---
 
@@ -53,7 +53,7 @@ Giữ nguyên luật P2: tối đa 3 hiệp, thắng 2 hiệp là xong, hiệp 6
 
 ### 3.2 Đội và vị trí
 
-- Ghế: `a1`, `a2` (đội 0, bên trái) và `b1`, `b2` (đội 1, bên phải). Mã xe trong engine = mã ghế.
+- Ghế: `a`, `a2` (đội 0, bên trái) và `b`, `b2` (đội 1, bên phải). Mã xe trong engine = mã ghế; giữ `a`/`b` để ghế 1v1 của P2 không đổi.
 - Phân biệt (PLAN §4): đội mình **xanh + biểu tượng tròn**, đội kia **cam + biểu tượng tam giác**, xe của chính mình có **viền sáng**. Không chỉ dựa vào màu.
 - Mỗi hiệp đổi chỗ xuất phát trong đội (a1 trên ↔ a2 dưới) để không ai bị cố định ở làn yếu [PLACEHOLDER — bỏ nếu chơi thử thấy rối].
 
@@ -78,19 +78,21 @@ Giữ nguyên luật P2: tối đa 3 hiệp, thắng 2 hiệp là xong, hiệp 6
 
 Kết quả ghi rõ ai bỏ trận (`players[].forfeited`) để sau này P4 không cấp thưởng thắng cho người đã bỏ dù đội thắng (phần cấp thưởng không làm ở P3).
 
-**Câu hỏi Q3 (§11):** khi một người bỏ, có cho đội còn 1 người đầu hàng sớm không. Mặc định đề xuất: **không** trong P3 (giữ đơn giản), xem lại sau chơi thử.
+**Đầu hàng (Q3, đã duyệt: có):** engine có `surrender(state, team)` → đội kia thắng ngay, `endReason: 'surrender'`. Luật online (P3b): chỉ khi đội chỉ còn **một người đang hoạt động** (đồng đội đã bỏ trận hoặc đang mất kết nối), người đó bấm "Đầu hàng" và xác nhận một lần nữa; server ghi `reason: 'surrender'`. Chế độ cục bộ 2v2 với bot: nút "Đầu hàng" trong màn tạm dừng.
 
 ## 4. Bản đồ Crossfire
 
-### 4.1 Kích thước sân
+### 4.1 Kích thước sân (Q1, đã duyệt: sân to, chướng ngại ngẫu nhiên từng trận)
 
-Bốn xe trên sân 800×480 (xe bán kính 16) vẫn đủ chỗ nhưng chật hơn Duel. **Mặc định đề xuất: giữ 800×480** để không phải làm camera/cuộn màn hình và giữ bố cục mobile đã kiểm ở P2; nếu chơi thử thấy chật thì chuyển sang phương án B (960×576, canvas co theo tỉ lệ cũ). Đây là câu hỏi Q1.
+Crossfire dùng sân **1040×624** (gấp 1,69 lần diện tích Duel, cùng tỉ lệ 5:3 với canvas nên không phải làm camera). Kích thước sân giờ là thuộc tính của state (`s.width`/`s.height`); Duel giữ 800×480 nên 1v1 không đổi.
 
-Để làm được điều này, `CONFIG.width/height` chuyển thành thuộc tính của bản đồ (`state.map.width/height`); Duel giữ 800×480 nên không đổi hành vi 1v1.
+Đánh đổi: trên điện thoại nằm ngang 844×390, xe chỉ còn khoảng 13 px trên màn hình (Duel khoảng 18 px). Nhãn tên xe tự phóng to theo kích thước hiển thị. Nếu chơi thử thấy xe quá nhỏ, có hai hướng: thu sân (đổi một hằng số `SQUAD_SIZE`) hoặc làm camera bám xe trên điện thoại (việc lớn hơn, chưa làm).
 
-### 4.2 Bố cục nháp [PLACEHOLDER]
+### 4.2 Bố cục sinh ngẫu nhiên
 
-Đối xứng tâm (xoay 180°) để hai đội công bằng tuyệt đối. Ba làn: làn giữa có khối thép chữ thập (tạo góc bật), hai làn biên trên/dưới có gạch che, khu xuất phát mỗi đội có tường thép chắn đường bắn thẳng.
+Mỗi trận có một **seed**; cùng seed luôn ra cùng bố cục (online P3b: server chọn seed và gửi tường như P2). Nửa trái được sinh từ 7 mẫu chướng ngại (thanh thép ngang/dọc, khối thép, cặp gạch, góc chữ L, cụm hỗn hợp) đặt trên lưới ô 52 px, 7–10 mẫu mỗi trận; một trong 4 kiểu khối giữa (trống, khối thép, chữ thập, 4 gạch); nửa phải là nửa trái xoay 180°. Tường chắn trước mỗi điểm xuất phát là cố định. Bố cục giữ nguyên qua các hiệp của một trận (gạch hồi lại mỗi hiệp).
+
+Sơ đồ dưới là bản nháp ban đầu, chỉ để hình dung kiểu bố cục:
 
 ```
  0        160       320  400  480       640       800
@@ -110,19 +112,19 @@ Bốn xe trên sân 800×480 (xe bán kính 16) vẫn đủ chỗ nhưng chật 
  ## / === thép    bb gạch (2 lần trúng)    :: khu xuất phát
 ```
 
-Hình trên chỉ để hình dung; tọa độ thật nằm trong `maps.ts` và được kiểm bằng test (§8.1), không kiểm bằng mắt.
+Yêu cầu bố cục, kiểm tự động mỗi lần sinh (`validateArena`); không đạt thì sinh lại từ cùng chuỗi seed (tối đa 40 lần, sau đó dùng bố cục dự phòng có test riêng):
 
-Yêu cầu bố cục (kiểm tự động):
+1. Không có đường bắn thẳng nào qua được tường thép nối điểm xuất phát đội 0 với đội 1 (thử 9 tia lệch ±12 px mỗi cặp).
+2. Không có khu kín: mọi vị trí xe đứng được (bán kính 17) nối thông khi gạch còn nguyên.
+3. Đường chính đủ rộng: các điểm xuất phát nối với nhau bằng hành lang ≥ 48 px (1,5 thân xe). *(v0.1 ghi 2,5 thân xe: quá chặt cho sân có nhiều chướng ngại, đã hạ.)*
+4. Quanh mỗi điểm xuất phát 60 px không có tường. *(Thay cho "ít nhất hai đường ra" của v0.1, vốn khó định nghĩa để kiểm tự động; yêu cầu 2 + 3 + đối xứng đã chặn được khu xuất phát bị bịt.)*
+5. Đối xứng tâm: mọi tường ở (x, y, w, h) có bản sao ở (W−x−w, H−y−h).
 
-1. Không có đường thẳng (không bật) nào nối khu xuất phát đội 0 với khu xuất phát đội 1.
-2. Mọi điểm đi được của sân nối thông với nhau khi gạch còn nguyên (không có khu kín), với xe bán kính 16.
-3. Không có hành lang hẹp hơn 2,5 × đường kính xe (tránh hai xe kẹt nhau).
-4. Mỗi xuất phát có ít nhất hai đường ra (chống thủ góc — PLAN §4).
-5. Bản đồ đối xứng tâm: mọi tường ở (x, y, w, h) có bản sao ở (W−x−w, H−y−h).
+Đo trên 300 seed: không lần nào phải dùng dự phòng, trung bình 1,4 lần sinh, khoảng 28 ms mỗi trận (chỉ khi bắt đầu trận, có cache).
 
 ### 4.3 Bản đồ dữ liệu
 
-Tách `duelWalls()` thành `src/games/tank-clash/maps.ts`: `{ id, name, width, height, walls, spawns: { [seat]: {x, y, angle} } }`. Engine nhận `mapId` khi tạo state. Duel giữ nguyên tọa độ hiện tại để test P2 không đổi.
+`src/games/tank-clash/maps.ts`: `crossfire(seed)`, `validateArena()`, `SQUAD_SIZE`, `SQUAD_SPAWNS`. `createState('squad', { seed })` ghi `s.map = { id: 'crossfire', seed }`. `duelWalls()` giữ nguyên trong engine nên test P2 không đổi.
 
 ## 5. Giao thức và máy chủ phòng
 
@@ -156,7 +158,7 @@ Kiểm tra gói tin vẫn chặt như P2: từ chối loại lạ và field th�
 
 - Phòng 2v2 có 4 ghế; ghế cuối và nút "bắt đầu" vẫn xử lý nguyên tử (đã có cơ chế ở P2, mở rộng cho 4 ghế).
 - Điều kiện đếm ngược: **đủ 4 người, mỗi đội 2, tất cả sẵn sàng**. Không bắt đầu thiếu người, không thêm bot (D4).
-- Chủ phòng rời sảnh: chuyển quyền theo thứ tự ghế cố định `a1, a2, b1, b2`. Trong trận chủ phòng không có quyền gì thêm.
+- Chủ phòng rời sảnh: chuyển quyền theo thứ tự ghế cố định `a, a2, b, b2`. Trong trận chủ phòng không có quyền gì thêm.
 - Băng thông: snapshot giữ 20 Hz; 4 xe và tới 12 viên đạn. Ước tính tải xuống 18–24 KB/s mỗi client [PLACEHOLDER, phải đo]. Nếu vượt 30 KB/s mới cân nhắc gửi delta.
 - Người xem: tối đa 4 mỗi phòng [PLACEHOLDER]; nhận snapshot như người chơi, đến trễ 0 ms (không cần trễ chống báo tin vì MVP không có thông tin ẩn — PLAN §3.5).
 
@@ -217,9 +219,9 @@ Bot 2v2 cục bộ cần `botInput()` nhận mã xe và chọn mục tiêu là x
 - Đo lại các số của bảng P2 với 4 client: hiệu chỉnh khi đang đánh, lệch hiển thị TB/p95, băng thông lên/xuống.
 - Lag compensation vẫn **chưa** làm (chờ phản hồi chơi thật trên thiết bị — OWNER-TODO).
 
-### 7.3 Chế độ cục bộ
+### 7.3 Chế độ cục bộ (Q4, đã duyệt: 1 người + 1 bot đồng đội vs 2 bot)
 
-Thêm "2v2 với bot" trong menu (ngoài online), hữu ích để thử bản đồ Crossfire trước khi có 4 người thật. Ba xe còn lại là BOT, ghi rõ trên HUD. Bot mới: chọn mục tiêu là xe địch còn sống gần nhất có đường bắn, tránh đứng sát đồng đội; vẫn dùng chung luật xe/đạn/khiên.
+Thẻ "03 / Đồng đội 2v2" trong menu: người chơi lái xe `a`, bot `a2` là đồng đội, `b`/`b2` là đối thủ. Mọi bot ghi rõ BOT trên sân và HUD. Bot mới: chọn mục tiêu là xe địch còn sống gần nhất có đường bắn, tránh đứng sát đồng đội; vẫn dùng chung luật xe/đạn/khiên.
 
 ## 8. Kế hoạch kiểm thử
 
@@ -278,14 +280,23 @@ Mỗi phần: commit riêng, ghi `docs/WORKLOG.md`, chạy lint/build/budget/`te
 
 | # | Câu hỏi | Đề xuất mặc định |
 |---|---|---|
-| Q1 | Kích thước sân Crossfire | Giữ 800×480; đổi sang 960×576 nếu chơi thử thấy chật |
-| Q2 | Hàng chờ công khai có bắt đăng nhập không | **Có** (khách chỉ chơi phòng riêng). Chống một người mở nhiều tab chiếm hàng |
-| Q3 | Đội còn 1 người có được đầu hàng sớm | Không trong P3 |
-| Q4 | Có làm chế độ cục bộ "2v2 với bot" (§7.3) | Có, làm trong P3a để thử bản đồ khi chưa có server |
-| Q5 | Thứ tự làm | P3a ngay (không cần hosting); P3b–P3d làm tiếp, chơi thử thật sau khi có server (PENDING-DECISIONS mục 9) |
+| Q1 | Kích thước sân Crossfire | **Đã quyết:** sân to, chướng ngại ngẫu nhiên từng trận (§4) |
+| Q2 | Hàng chờ công khai có bắt đăng nhập không | **Đã quyết:** có; khách chỉ chơi phòng riêng |
+| Q3 | Đội còn 1 người có được đầu hàng sớm | **Đã quyết:** có (§3.4) |
+| Q4 | Có làm chế độ cục bộ "2v2 với bot" (§7.3) | **Đã quyết:** có, 1 người + 1 bot đồng đội vs 2 bot |
+| Q5 | Thứ tự làm | **Đã quyết:** làm luôn, bắt đầu P3a |
 
 ## 12. Nhật ký
 
 | Phiên bản | Ngày | Thay đổi |
 |---|---|---|
 | v0.1 | 03/11/2026 | Bản nháp đầu, chờ duyệt |
+| v0.2 | 03/11/2026 | Chủ dự án duyệt Q1–Q5; sân 1040×624 sinh ngẫu nhiên theo seed; ghế `a/a2/b/b2`; luật đầu hàng; P3a đã code (§13) |
+
+## 13. Kết quả P3a — 03/11/2026
+
+- **Code:** `maps.ts` (mới: bộ sinh + kiểm tra bố cục); `engine.ts` (chế độ `squad`, kích thước sân theo state, `forfeitTank`, `surrender`, `endReason`, bot cho mọi xe chọn địch gần nhất có tầm nhìn, giãn cách đồng đội, lệch nhịp bắn, lưới tìm đường có cache và ô 20 px cho sân 2v2); `runtime.ts` + CSS (thẻ menu, HUD hai đội, biểu tượng ●/▲, vòng sáng xe mình, nhãn tự phóng to, nút đầu hàng, màn kết quả có mã sân); `net-client.ts` chỉ đổi giới hạn sân theo state.
+- **Test:** `tests/tank-clash/squad.test.mjs` (10 ca, trong `test:tank-clash`) và `tests/tank-clash/squad-ui.test.ts` (2 ca ở 1280×760 và 844×390, trong `test:tank-clash-ui`).
+- **Lỗi tìm được khi chụp màn hình:** bot đứng im ở điểm xuất phát trên 36/300 lượt bot (100 seed): lưới tìm đường 40 px thô hơn bố cục 52 px nên không thấy lối. Đổi sang ô 20 px cho sân 2v2; có test hồi quy (20 seed, mỗi bot phải đi xa hơn 120 px trong 10 giây). Đã kiểm test này hỏng khi đặt lại lưới cũ.
+- **Hiệu năng (Node, máy cloud):** 3 bot + mô phỏng khoảng 0,3 ms mỗi nhịp 60 Hz (trước cache 0,7 ms). Chưa đo trên điện thoại thật.
+- **Chưa làm:** P3b (phòng 4 ghế online, protocol p3), P3c (tổ đội + hàng chờ), P3d (UI online 2v2). Chưa chơi thử bằng tay trên thiết bị thật; độ khó bot và kích thước sân là [PLACEHOLDER].
