@@ -8,6 +8,12 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — rút gọn SESSION-HANDOFF
+
+- `docs/SESSION-HANDOFF.md`: 8,7 KB → 3,3 KB. Mô tả từng module thay bằng bảng trạng thái + đường dẫn tài liệu; giữ sổ tay kỹ thuật và danh sách còn yếu. Bản cũ chép nguyên văn sang `docs/archive/SESSION-HANDOFF-2026-11-03.md`.
+- Sửa thông tin cũ sai: `main` giờ là `508d4ff` (PR #14, có Tank Clash P3a); NR4 (`5bc450f`) **đã có trong main** (kiểm bằng `git merge-base --is-ancestor`), bản cũ ghi "chưa merge"; đường dẫn Chromium thống nhất `/opt/pw-browsers/chromium` (đã kiểm tồn tại).
+- Test: chỉ đổi tài liệu, không chạy test code.
+
 ## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — rút gọn PLAN Tank Clash và lưu trữ nhật ký cũ
 
 - Mục đích: giảm token đọc đầu phiên.
