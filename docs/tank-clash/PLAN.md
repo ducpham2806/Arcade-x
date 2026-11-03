@@ -1,8 +1,8 @@
-# Tank Clash — Kế hoạch phát triển v1.3 — bàn giao
+# Tank Clash — Kế hoạch phát triển v1.4 — staging readiness
 
 Ngày lập: 02/11/2026 (Việt Nam) · Dự án: Arcade-x
 
-**Trạng thái bàn giao 03/11/2026:** đã có P0/P1 và bản kỹ thuật P2 online 1v1. Bản bàn giao dùng room host/netcode/WS server mới hơn đã vào main qua PR #13; hợp nhất lịch sử nhánh P2 ngày 02/11 và ghi rõ các khác biệt. Xem **§15** để chạy, kiểm thử và tiếp quản. Chưa nghiệm thu Internet/thiết bị thật, chưa có 2v2/matchmaking hoặc art/audio sản xuất; chưa duyệt phát hành công khai.
+**Trạng thái mới nhất 03/11/2026:** P0/P1 và P2 online 1v1 đã có; tiếp tục trên nhánh `feat/tank-clash-p2-staging-readiness` từ main `2d6b33e`. Đã thêm wire v2, tài khoản/allowlist, chống lệnh cũ/treo mạng, shutdown và gói triển khai staging. Xem **§16** cho trạng thái hiện tại, kiểm thử và việc tiếp quản; §15 là baseline bàn giao trước đó. **Chưa deploy WSS, chưa nghiệm thu hai tài khoản/thiết bị thật, P3–P7 chưa triển khai.** Không duyệt phát hành công khai qua việc hoàn tất code.
 
 ## 1. Mục tiêu sản phẩm
 
@@ -227,10 +227,11 @@ Những dấu hiệu buộc dừng mở rộng nội dung: người mới không
 Các mục trên đã có đầu ra trong đợt P0/P1.
 
 **P2 (03/11/2026, chi tiết ở `docs/tank-clash/P2-review.md`):**
-- [x] **P2.1:** giao thức `tank-clash.p2.v1`, xác thực Supabase tuỳ chọn, mã phòng, lỗi rõ ràng, khóa khi đang trong trận.
+- [x] **P2.1:** giao thức hiện tại `tank-clash.p2.v2`, adapter tài khoản và allowlist staging đã có (§16), mã phòng, lỗi rõ ràng, khóa khi đang trong trận.
 - [x] **P2.2:** máy chủ phòng làm trọng tài: sẵn sàng, đếm ngược, đồng hồ, thắng thua, giữ ghế 20 s, xử thua, hủy trận, đấu lại, kết quả một lần theo `matchId`.
 - [x] **P2.3:** client dự đoán/đối soát xe mình, nội suy xe đối thủ, tự nối lại; giao diện online trong bản preview.
 - [x] **P2.4:** thử RTT 80/150/250 ms, jitter 30 ms, mất gói 1–3 % trên mạng ảo; đo băng thông.
+- [x] **P2.4a:** harden epoch/ack, bounded queue/reconnect, shutdown; adapter tài khoản và allowlist; chuẩn bị Docker/Caddy/Render và runbook, load loopback/soak mô phỏng (§16).
 - [ ] **P2.5:** chọn hosting và deploy staging (cần anh duyệt chi phí).
 - [ ] **P2.6:** chơi thử 10 trận trên hai thiết bị thật qua Internet; quyết định có cần lag compensation.
 
@@ -268,7 +269,9 @@ Các nội dung cần giải quyết qua P0/P1, chưa cần hỏi thêm để ho
 | v1.1 · 02/11/2026 | Triển khai P0 và prototype P1; bổ sung GDD, tuning và kiểm thử | Bản thử để anh chơi; chuẩn bị P2 |
 | v1.2 · 03/11/2026 | P2: giao thức phòng, room server, netcode, server WebSocket, giao diện online, test mạng ảo và trình duyệt | Chạy được cục bộ; chờ chọn hosting và chơi thử thật |
 
-## 15. Bàn giao cho người phát triển tiếp — 03/11/2026
+## 15. Baseline bàn giao trước staging readiness — 03/11/2026
+
+**Ghi chép lịch sử v1.3, trước mốc §16.** Những mô tả “hiện hành” trong phần này áp dụng cho main `2d6b33e` lúc bàn giao, không phải nhánh v2 đang làm. Dùng §16/README/STAGING-RUNBOOK để chạy bản mới.
 
 ### 15.1. Đọc phần này trước
 
@@ -423,3 +426,65 @@ Giữ các rule đã chốt: CSS tách prefix; modal mobile trọn màn hình, d
 | Phiên bản/ngày | Thay đổi | Trạng thái |
 |---|---|---|
 | v1.3 · 03/11/2026 | Bàn giao đầy đủ P0–P2, hợp nhất lịch sử hai hướng P2, xác định bộ chạy hiện hành và checklist P2–P7 còn lại | Source bàn giao trên main sau kiểm tra; không deploy công khai |
+
+
+## 16. Tiếp tục P2 — staging readiness, 03/11/2026 (v1.4, hiện tại)
+
+### 16.1. Đã hoàn thành trong code
+
+Giữ engine/gameplay của bộ PR #13, nâng `protocol.ts` lên **`tank-clash.p2.v2`**. Không trộn với hai bộ v1 lịch sử. Base `2d6b33eb8e48cafa0844b5cea6dc2b30ee546e9b`; nhánh `feat/tank-clash-p2-staging-readiness`, chưa merge main ở mốc này.
+
+- Epoch `${matchId}:${round}` trên snapshot/input; bỏ input ngoài hiệp đang chơi và input nhảy sequence quá xa. Client bỏ snapshot/start cũ trước khi cập nhật tường/event/clock; reset clock khi rematch, xóa pending/buffer khi đổi hiệp.
+- Ready/leave có opId 32 hex và ack; biên nhận tối đa 128 mỗi peer/seat, queue command tối đa 8; retry 600 ms, timeout 10 giây. Ready kèm match context, chống biểu quyết lại ở trận khác. Kết quả một lần dựa phase guard, bỏ Set match ID toàn process tăng vô hạn.
+- Pending input client tối đa 240, server queue/credit 30; thiếu input về neutral, bù tối đa 2/nhịp, không replay offline. Timeout connect 8 giây, ứng dụng im lặng 5 giây chủ động bỏ socket treo, giới hạn buffered 64 KiB. Reconnect 250 ms tới 3 giây+jitter, hết 20 giây giữ ghế thì lỗi; không tự tạo phòng thay cho resume thất bại. Native heartbeat 5 giây, app ping 1 giây.
+- Server tối đa 64 phòng/160 socket, payload **8 KiB** (chứa JWT), rate 120 msg/s/socket; socket chưa có ghế hết hạn 60 giây. Non-loopback cần origin cụ thể; guest chỉ dev review được cấu hình chủ động. `/health` liveness, `/ready` draining readiness. Shutdown hủy active match một lần, gửi `shutdown`, đóng 1012/cắt còn treo sau 750 ms, không xử thắng giả.
+- `access.ts` + React adapter lấy phiên Supabase đã đăng ký, refresh gần expiry; không tự tạo user/anonymous/profile hoặc ghi dữ liệu game. Khi cấp JWT, pin chính xác WSS endpoint từ cấu hình (loopback dev được ws); `server=` trong invite không đổi nơi nhận token. Ghế lưu dưới key **`tank-clash.seat:v2`**, kèm protocol/endpoint; không JWT.
+- `server/tank-clash-room/auth.mjs`: verify `/auth/v1/user`, timeout 4 giây, cache 15 giây giới hạn bởi expiry, gộp request cùng token, cache 1.024/inflight 128. Chỉ verified user ID quyết định allowlist, metadata chỉ tên. Production phải có Supabase URL/public key/tester UUID, từ chối anonymous và secret/service-role. **Bỏ `TANK_ALLOW_GUESTS` bypass production.**
+- `preview-account.ts`: đăng nhập email/password của staging đã được cấp, không signup; session RAM, signout rời phòng và reload. Server tùy chọn phục vụ HTML cùng origin, inject public config đã escape, CSP/referrer/no-store. Bản HTML tải xuống không có project/key/token thật, vẫn dùng được offline/khách local. Tài khoản thật chưa được kiểm.
+- `online-config.json` mặc định `enabled:false`, `serverUrl:''`, `requireAccount:true`. Adapter React sẵn đường token nhưng chưa bật online/đăng ký catalog. Không viết migration, không chạm Supabase production, không cấp coin/EXP/leaderboard.
+- Docker Node24 + Compose/Caddy, Render Blueprint Singapore một instance tắt auto deploy, env mẫu, build context allowlist và `STAGING-RUNBOOK.md` có proposal chi phí. **Chưa build/run container/TLS/deploy hoặc tạo tài nguyên trả phí.**
+
+### 16.2. Mã/tài liệu mới và cách chạy
+
+| Đường dẫn | Vai trò |
+|---|---|
+| `access.ts`, `online-config.json`, `index.tsx` | Token provider/endpoint trust và flag adapter |
+| `preview-account.ts`, `preview.ts`, `tank-clash.css` | Đăng nhập staging tùy cấu hình, cleanup và form responsive |
+| `server/tank-clash-room/auth.mjs`, `server.mjs` | Auth/allowlist, static config, origins, readiness/drain |
+| `protocol.ts`, `room.ts`, `net-client.ts`, `runtime.ts` | Wire v2, epoch/receipt/queue, reconnect và UI lỗi |
+| `tests/tank-clash/readiness.test.mjs`, `transport.test.mjs` | 12 unit readiness + 8 WS/HTTP/transport mới |
+| `scripts/tank-clash-load.mjs` | `--virtual` soak đồng hồ mô phỏng, hoặc WS loopback thời gian thực; không phải remote WSS capacity tool |
+| `deploy/tank-clash/` | Dockerfile + context ignore, Compose/Caddy, env mẫu, Render Blueprint; cần build thực trước deploy |
+| `docs/tank-clash/STAGING-RUNBOOK.md` | Đề xuất host/giá, đầu vào tài khoản/domain, lệnh triển khai/rollback và nghiệm thu |
+| `docs/tank-clash/P2-staging-review-2026-11-03.md` | Báo cáo phạm vi và bằng chứng lần tiếp tục này |
+
+Các đường code ngắn trong bảng thuộc `src/games/tank-clash/` trừ khi đã có prefix khác. Cài/chạy local vẫn như §15.5 (`npm ci`, dependency server/spike theo lockfile, export HTML, `npm run dev:tank-server`). Có thể phục vụ HTML cùng WS trên loopback:
+
+```bash
+node scripts/export-tank-review.mjs
+TANK_STATIC_DIRECTORY=preview/tank-clash npm run dev:tank-server
+# Mở http://127.0.0.1:3223/ ở hai tab độc lập.
+```
+
+Local không cấu hình Auth là guest dev; non-loopback guest đòi `TANK_REVIEW_MODE=1` và exact origin, production tuyệt đối không bypass. Staging thật dùng runbook và hai tài khoản được cấp, không truyền credential ở query. Khi chuyển v1 → v2 tải lại client/server; key ghế v1 bị bỏ qua, không chuyển resume token giữa endpoint. Bản standalone tự chứa lớn hơn vì đã bundle Supabase SDK sẵn có; không thêm dependency/CDN mới. Khi preview tải từ file chưa có server cấu hình, online mặc định loopback.
+
+### 16.3. Kết quả kiểm và giới hạn
+
+- `test:tank-clash` **39/39**, `test:tank-clash-server` **12/12** qua, gồm các regression epoch/duplicate start/snapshot/command, token trust/refresh/anonymous/allowlist/expiry/timeout, reconnect treo/giới hạn, restart và static injection.
+- TypeScript, Vite build và bundle budget qua. Toàn `test:fast` qua (exit 0, bước cuối Tank Clash 39/39). Không chạy toàn bộ browser CI của các game khác.
+- CUA hai browser qua WS thật: tạo/vào mã, ready/countdown, đúng ghế A/B, reload B vẫn đúng ghế+HP, B rời trận thì A thắng bởi forfeit. Cloud đôi lúc ~1 FPS, không chứng minh FPS máy thật. Form tài khoản chưa đăng nhập bằng tài khoản staging thật.
+- Load 16 phòng/32 WS/60 giây thực trên loopback: JSON outbound **12,31 KiB/s/client**, RSS **216.240.128 byte**, CPU server+generator **13,57%**, event-loop p95 **10,81 ms**. Không có TLS/Internet/generator độc lập; không suy công suất host.
+- Soak mô phỏng 1.800 giây, 8 phòng: **240 trận, 29 resume, 0 phòng còn lại** sau cleanup, ~4,93 giây chạy thực. Heap có GC 12.368.096 → 13.070.064 byte; không là bằng chứng không leak hay soak 30 phút thực.
+- YAML Compose/Render parse qua. Không có Docker CLI nên image/Compose/Caddy/TLS chưa thực thi. Không live Auth hoặc DB write, chưa thử 10 trận người thật.
+
+### 16.4. Còn lại và điều kiện chuyển mốc
+
+1. **P2.5 còn mở:** chủ dự án duyệt host/ngân sách/domain; proposal cụ thể trong runbook (Singapore VPS 2 GiB/1 vCPU khoảng 12 USD/tháng; option 1 GiB 6 USD/tháng, chưa gồm thuế/domain/backup/Supabase). Chuẩn bị đủ code trước khi xin duyệt tạo tài nguyên; không tự đăng ký dịch vụ phí.
+2. Có Supabase staging riêng, hai tài khoản đã đăng ký và tester UUID. Build image, deploy HTTPS/WSS một instance, kiểm Auth thật/denied users/expiry/resume. Không dùng project production để thử.
+3. **P2.6 còn mở:** 10 trận hai người/hai thiết bị/hai mạng, lock/blur/chuyển mạng/mất mạng, forfeit/rematch, FPS và cảm giác ngắm/bắn; soak 30 phút thực trên staging và kiểm restart/cleanup. Quyết định lag compensation từ trải nghiệm này.
+4. Chưa port thống kê đóng góp riêng A/B hoặc wall revision+ack; hiện tường đầy đủ gửi khi thay đổi/resume trên WS có thứ tự. Kết quả chỉ log, không persistence/reward/entitlement. Các mục này phải được thiết kế/kiểm trước mốc sản phẩm phù hợp, không đánh dấu là đã có.
+5. Sau nghiệm thu P2 mới làm P3 2v2/party/queue/map đội; tiếp P4 art/audio/catalog/thưởng/entitlement, P5 QA và anh duyệt, P6/P7 3v3/4v4 theo mục tiêu riêng. Không tuyên bố “làm xong toàn bộ plan” chỉ vì source P2 chạy local.
+
+| Phiên bản/ngày | Thay đổi | Trạng thái |
+|---|---|---|
+| v1.4 · 03/11/2026 | P2 staging readiness: wire v2, token/allowlist, epoch/receipt/queue/reconnect/drain, optional staging login, deploy pack và kiểm cục bộ | Nhánh tính năng riêng, P2.5/P2.6 chưa nghiệm thu, không deploy/merge main trong lượt tiếp tục |

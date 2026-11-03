@@ -12,7 +12,7 @@ Cập nhật: 03/11/2026. Làm xong việc nào thì đánh dấu `[x]`. Các c�
   4. Đặt `enabled: true` trong `src/games/word-chain/online-config.json`, rồi bảo Claude build và test lại.
   5. Thử với 2–4 tài khoản thật: tạo phòng, nhập mã, ghép trận.
 
-- [ ] **Tank Clash online 1v1:** chọn nơi chạy room server (mục 9 trong PENDING-DECISIONS). Trong lúc chờ, có thể thử trên một máy: `npm ci --prefix server/tank-clash-room && npm run dev:tank-server`, rồi mở bản preview ở hai cửa sổ (`docs/tank-clash/P2-review.md`).
+- [ ] **Tank Clash staging v2:** duyệt host/ngân sách/domain theo `docs/tank-clash/STAGING-RUNBOOK.md` (đề xuất Singapore VPS 2 GiB/1 vCPU 12 USD/tháng; option 1 GiB 6 USD/tháng; chưa gồm thuế/domain/backup/Supabase). Docker/Caddy/Render pack đã chuẩn bị, chưa đăng ký/deploy. Cần Supabase staging riêng + hai tài khoản đã đăng ký và UUID allowlist; không gửi mật khẩu vào repo. Sau deploy kiểm 10 trận hai thiết bị/hai mạng và soak 30 phút thực. Chi tiết đã làm: plan v1.4 §16.
 
 ## Quyết định đang chờ (`docs/PENDING-DECISIONS.md`)
 - [ ] **1–3. Commerce:** project staging và tài khoản admin; cổng thanh toán; nơi chạy server (Supabase hay Netlify).

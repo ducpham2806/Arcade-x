@@ -17,11 +17,11 @@ export type HostOptions = { now?: () => number; authenticate?: Authenticate; onR
 
 type Queued = { seq: number; input: Input };
 type Seat = { id: SeatId; userId: string; name: string; guest: boolean; peer: string | null; token: string; ready: boolean; lastSeen: number;
-  queue: Queued[]; last: Input; lastInputAt: number; seq: number; ack: number; credit: number };
+  queue: Queued[]; last: Input; lastInputAt: number; seq: number; ack: number; credit: number; receipts: Map<string, Extract<ServerMessage, { type: 'ack' }>> };
 type Room = { code: string; phase: Phase; seats: Map<SeatId, Seat>; host: SeatId | null; lastActivity: number; emptySince: number | null;
   countdownEnd: number; state: State | null; matchId: string | null; matchCount: number; result: MatchResult | null;
   accumulator: number; lastAdvance: number; eventCursor: number; wallsKey: string };
-type Peer = { handle: PeerHandle; code: string | null; seat: SeatId | null; windowAt: number; messages: number; busy: boolean };
+type Peer = { handle: PeerHandle; code: string | null; seat: SeatId | null; windowAt: number; messages: number; busy: boolean; receipts: Map<string, Extract<ServerMessage, { type: 'ack' }>> };
 
 export const guestAuthenticate: Authenticate = (_token, name) => ({ userId: '', name: cleanName(name), guest: true });
 
@@ -31,8 +31,9 @@ export function createRoomHost(options: HostOptions = {}) {
   const authenticate = options.authenticate ?? guestAuthenticate;
   const log = options.log ?? (() => {});
   const rooms = new Map<string, Room>(), peers = new Map<string, Peer>(), userRooms = new Map<string, string>();
-  const reported = new Set<string>();
-  const metrics = { rooms: 0, matches: 0, results: 0, rejected: 0, rateLimited: 0, ticks: 0 };
+  let shuttingDown = false;
+
+  const metrics = { staleInputs: 0, rooms: 0, matches: 0, results: 0, rejected: 0, rateLimited: 0, ticks: 0 };
   const hex = (n: number) => Array.from(randomBytes(n), b => b.toString(16).padStart(2, '0')).join('');
 
   function send(peerId: string | null, msg: ServerMessage) { if (peerId) peers.get(peerId)?.handle.send(msg); }
@@ -59,8 +60,9 @@ export function createRoomHost(options: HostOptions = {}) {
   }
   const broadcastRoom = (room: Room) => broadcast(room, { type: 'room', room: view(room) });
   const ackOf = (seat: Seat) => seat.ack;
+  const epochOf = (room: Room) => `${room.matchId}:${room.state?.round ?? 0}`;
   function snapshotFor(room: Room, seat: Seat, withWalls = false) {
-    const s = room.state!; return encodeSnapshot(s, ackOf(seat), s.events.filter(e => e.id > room.eventCursor), withWalls ? s.walls : undefined);
+    const s = room.state!; return encodeSnapshot(s, ackOf(seat), s.events.filter(e => e.id > room.eventCursor), withWalls ? s.walls : undefined, epochOf(room));
   }
 
   function seatPeer(peerId: string, room: Room, seat: Seat) {
@@ -76,7 +78,7 @@ export function createRoomHost(options: HostOptions = {}) {
   }
   function makeSeat(id: SeatId, who: Identity): Seat {
     return { id, userId: who.guest ? `guest:${hex(8)}` : who.userId, name: who.name, guest: who.guest, peer: null, token: hex(24), ready: false,
-      lastSeen: now(), queue: [], last: neutral(), lastInputAt: 0, seq: -1, ack: -1, credit: 0 };
+      lastSeen: now(), queue: [], last: neutral(), lastInputAt: 0, seq: -1, ack: -1, credit: 0, receipts: new Map() };
   }
   function removeSeat(room: Room, id: SeatId) {
     const seat = room.seats.get(id); if (!seat) return;
@@ -88,12 +90,12 @@ export function createRoomHost(options: HostOptions = {}) {
     if (room.phase === 'finished' || room.phase === 'countdown') room.phase = 'lobby';
     if (!room.seats.size) closeRoom(room, 'empty'); else broadcastRoom(room);
   }
-  function closeRoom(room: Room, reason: string) {
+  function closeRoom(room: Room, reason: string, silent = false) {
     if (room.phase === 'closed') return;
     room.phase = 'closed';
     for (const seat of room.seats.values()) {
       if (userRooms.get(seat.userId) === room.code) userRooms.delete(seat.userId);
-      if (seat.peer) { fail(seat.peer, 'ROOM_CLOSED'); const p = peers.get(seat.peer); if (p) { p.code = p.seat = null; } }
+      if (seat.peer) { if (!silent) fail(seat.peer, 'ROOM_CLOSED'); const p = peers.get(seat.peer); if (p) { p.code = p.seat = null; } }
     }
     rooms.delete(room.code); log('room.closed', { code: room.code, reason });
   }
@@ -106,20 +108,21 @@ export function createRoomHost(options: HostOptions = {}) {
     broadcast(room, seat => ({ type: 'start', matchId: room.matchId!, walls: room.state!.walls, snapshot: snapshotFor(room, seat) }));
     broadcastRoom(room); log('match.start', { code: room.code, matchId: room.matchId });
   }
-  function finish(room: Room, reason: MatchResult['reason'], winner: number | null) {
+  function finish(room: Room, reason: MatchResult['reason'], winner: number | null, closeCancelled = true) {
+    if (room.phase === 'finished' || room.phase === 'closed' || !room.state) return;
     const s = room.state!;
     const result: MatchResult = { matchId: room.matchId!, code: room.code, winner, scores: [...s.scores], reason, rounds: s.round,
       players: [...room.seats.values()].map(seat => ({ seat: seat.id, userId: seat.userId, team: seat.id === 'a' ? 0 : 1 })), endedAt: now() };
     room.result = result; room.phase = 'finished';
     for (const seat of room.seats.values()) { seat.ready = false; seat.queue = []; }
-    if (!reported.has(result.matchId)) { // idempotent by match id: a result is reported once
-      reported.add(result.matchId); metrics.results++;
+    { // Phase guard makes results once-only; no process-wide unbounded set.
+      metrics.results++;
       Promise.resolve().then(() => options.onResult?.(result)).catch(error => log('result.error', { matchId: result.matchId, error: String(error) }));
     }
     broadcast(room, seat => ({ type: 'snapshot', snapshot: snapshotFor(room, seat) }));
     room.eventCursor = s.nextId - 1;
     broadcast(room, { type: 'result', result, room: view(room) }); log('match.end', { ...result });
-    if (reason === 'cancelled') closeRoom(room, 'cancelled');
+    if (reason === 'cancelled' && closeCancelled) closeRoom(room, 'cancelled');
   }
   const wallsKey = (s: State) => s.walls.map(w => w.hp).join(',');
   function tick(room: Room) {
@@ -141,7 +144,11 @@ export function createRoomHost(options: HostOptions = {}) {
       }
       const next = seat.queue.shift()!; seat.credit--; seat.ack = next.seq; seat.last = next.input; inputs[seat.id] = next.input;
     }
+    const roundBefore = s.round;
     step(s, inputs); metrics.ticks++;
+    if (s.round !== roundBefore) for (const seat of room.seats.values()) {
+      seat.queue = []; seat.ack = seat.seq; seat.credit = 0; seat.lastInputAt = 0;
+    }
     const key = wallsKey(s), wallsChanged = key !== room.wallsKey; room.wallsKey = key;
     if (s.status === 'finished') { finish(room, 'score', s.winner); return; }
     if (s.tick % NET.snapshotEvery === 0 || wallsChanged) {
@@ -187,11 +194,12 @@ export function createRoomHost(options: HostOptions = {}) {
     seatIdentity(peerId, msg, who as Identity | null);
   }
   function seatIdentity(peerId: string, msg: Extract<ClientMessage, { type: 'create' | 'join' | 'resume' }>, who: Identity | null) {
-    if (!peers.has(peerId)) return; // disconnected while authenticating
+    if (shuttingDown || !peers.has(peerId)) return; // disconnected or shut down while authenticating
     if (peers.get(peerId)!.code) return fail(peerId, 'ALREADY_IN_ROOM');
     if (!who) return fail(peerId, msg.token ? 'AUTH_FAILED' : 'AUTH_REQUIRED', true);
     // Everything below runs synchronously after the await, so seat claims are atomic.
     if (msg.type === 'create') {
+      if (rooms.size >= NET.maxRooms) return fail(peerId, 'SERVER_FULL', true);
       if (!who.guest && userRooms.has(who.userId)) return fail(peerId, 'ALREADY_IN_ROOM');
       const room: Room = { code: newCode(), phase: 'lobby', seats: new Map(), host: 'a', lastActivity: now(), emptySince: null, countdownEnd: 0, state: null,
         matchId: null, matchCount: 0, result: null, accumulator: 0, lastAdvance: now(), eventCursor: 0, wallsKey: '' };
@@ -216,6 +224,8 @@ export function createRoomHost(options: HostOptions = {}) {
     seatPeer(peerId, room, seat); broadcastRoom(room); log('room.joined', { code: room.code, seat: id });
   }
   function onInput(room: Room, seat: Seat, msg: Extract<ClientMessage, { type: 'input' }>) {
+    if (room.phase !== 'playing' || room.state?.status !== 'playing' || msg.epoch !== epochOf(room)) { metrics.staleInputs++; return; }
+    if (msg.seq > seat.seq + NET.maxPendingInputs) { metrics.rejected++; return; }
     const t = now();
     msg.inputs.forEach((input, i) => {
       const seq = msg.seq + i; if (seq <= seat.seq) return; // duplicate or replayed
@@ -230,8 +240,9 @@ export function createRoomHost(options: HostOptions = {}) {
 
   return {
     metrics,
-    connect(peerId: string, handle: PeerHandle) { peers.set(peerId, { handle, code: null, seat: null, windowAt: now(), messages: 0, busy: false }); },
+    connect(peerId: string, handle: PeerHandle) { if (shuttingDown) { handle.close?.('shutdown'); return; } peers.set(peerId, { handle, code: null, seat: null, windowAt: now(), messages: 0, busy: false, receipts: new Map() }); },
     message(peerId: string, raw: unknown): void | Promise<void> {
+      if (shuttingDown) return;
       const peer = peers.get(peerId); if (!peer) return;
       const t = now(); if (t - peer.windowAt >= 1000) { peer.windowAt = t; peer.messages = 0; }
       if (++peer.messages > NET.messagesPerSecond) { metrics.rateLimited++; if (peer.messages > NET.messagesPerSecond * 2) fail(peerId, 'RATE_LIMITED', true); return; }
@@ -242,11 +253,22 @@ export function createRoomHost(options: HostOptions = {}) {
         const pending = admit(peerId, msg); if (!pending) return;
         peer.busy = true; return pending.finally(() => { const p = peers.get(peerId); if (p) p.busy = false; });
       }
+      if ((msg.type === 'ready' || msg.type === 'leave') && peer.receipts.has(msg.opId)) { send(peerId, peer.receipts.get(msg.opId)!); return; }
       const room = peer.code ? rooms.get(peer.code) : undefined, seat = room && peer.seat ? room.seats.get(peer.seat) : undefined;
       if (!room || !seat || seat.peer !== peerId) return fail(peerId, 'NOT_IN_ROOM');
       seat.lastSeen = t;
       if (msg.type === 'input') return onInput(room, seat, msg);
       room.lastActivity = t;
+      if (msg.type === 'ready' || msg.type === 'leave') {
+        const old = seat.receipts.get(msg.opId);
+        if (old) { send(peerId, old); return; }
+        const ack: Extract<ServerMessage, { type: 'ack' }> = { type: 'ack', opId: msg.opId };
+        if (msg.type === 'ready' && msg.context !== room.matchId) ack.error = 'BAD_PHASE';
+        peer.receipts.set(msg.opId, ack); seat.receipts.set(msg.opId, ack);
+        if (peer.receipts.size > 128) peer.receipts.delete(peer.receipts.keys().next().value!);
+        if (seat.receipts.size > 128) seat.receipts.delete(seat.receipts.keys().next().value!);
+        send(peerId, ack); if (ack.error) return;
+      }
       if (msg.type === 'ready') { if (room.phase === 'lobby' || room.phase === 'finished' || room.phase === 'countdown') { seat.ready = msg.ready; maybeCountdown(room); } return; }
       if (msg.type === 'leave') {
         if (room.phase === 'playing') { // leaving a running match is an immediate forfeit
@@ -266,6 +288,16 @@ export function createRoomHost(options: HostOptions = {}) {
       broadcastRoom(room);
     },
     advance(t = now()) { for (const room of [...rooms.values()]) advanceRoom(room, t); },
+    shutdown() {
+      if (shuttingDown) return;
+      shuttingDown = true;
+      for (const room of [...rooms.values()]) {
+        if (room.phase === 'playing') finish(room, 'cancelled', null, false);
+        broadcast(room, { type: 'shutdown' });
+        closeRoom(room, 'shutdown', true);
+      }
+    },
+    seated(peerId: string) { return !!peers.get(peerId)?.code; },
     rooms: () => [...rooms.values()].map(r => ({ code: r.code, phase: r.phase, seats: r.seats.size, matchId: r.matchId, tick: r.state?.tick ?? 0 })),
     /** Test/inspection only: the live authoritative state of a room. */
     inspect(code: string) { return rooms.get(code)?.state ?? null; },

@@ -2,16 +2,17 @@ import { CONFIG, LESSONS, createState, step, botInput, neutral, nextLesson, aimP
 import type { State, Input, Tank } from './engine.ts';
 import { readableCanvasText } from '../../accessibility/canvasText';
 import { connectTankRoom } from './net-client.ts';
+import { tankEndpoint } from './access.ts';
 import { normalizeCode } from './protocol.ts';
 
-export type TankController = { destroy: () => void; setPaused: (v: boolean) => void; snapshot: () => State };
-export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined };
+export type TankController = { destroy: () => void; setPaused: (v: boolean) => void; snapshot: () => State; leaveRoom: () => void };
+export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined | Promise<string | undefined>; onlineEnabled?: boolean };
 const esc = (v: string) => v.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 function defaultServer(explicit?: string) {
-  try { const param = new URLSearchParams(location.search).get('server'); if (param && /^wss?:\/\//.test(param)) return param; } catch { /* no location */ }
   if (explicit) return explicit;
+  try { const param = new URLSearchParams(location.search).get('server'); if (param && /^wss?:\/\//.test(param)) return param; } catch { /* no location */ }
   try { const saved = localStorage.getItem('tank-clash.server'); if (saved) return saved; } catch { /* storage optional */ }
-  try { return `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname || 'localhost'}:3223/tank`; } catch { return 'ws://localhost:3223/tank'; }
+  try { return location.protocol === 'http:' || location.protocol === 'https:' ? `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/tank` : 'ws://localhost:3223/tank'; } catch { return 'ws://localhost:3223/tank'; }
 }
 export function mountTankClash(root: HTMLElement, options: TankOptions = {}): TankController {
   root.innerHTML = `<div class="tc" tabindex="0">
@@ -31,7 +32,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   let mouseFire = false, firePulse = false, shieldPulse = false, aim = 0, joystick = { x: 0, y: 0 };
   let screen: 'menu' | 'pause' | 'result' | 'feedback' | 'online' | 'lobby' | 'onlinepause' | null = 'menu';
   // P2 online. `net` exists only while the player is in the online flow; local modes never open a socket.
-  let net: ReturnType<typeof connectTankRoom> | null = null, online = false, serverUrl = defaultServer(options.serverUrl), lastPhase = '';
+  let net: ReturnType<typeof connectTankRoom> | null = null, online = false, serverUrl = defaultServer(options.serverUrl), lastPhase = '', connectionError = '';
   let playerName = (() => { try { return localStorage.getItem('tank-clash.name') ?? ''; } catch { return ''; } })();
   let inviteCode = (() => { try { return normalizeCode(new URLSearchParams(location.search).get('room')) ?? ''; } catch { return ''; } })();
   const keys = new Set<string>(), pointers = new Map<number, { type: 'move' | 'aim'; x: number; y: number }>();
@@ -41,11 +42,11 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function show(which: typeof screen) {
     screen = which; resetInput(); overlay.hidden = which === null; battle.inert = which !== null;
     if (which === null) { app.focus({ preventScroll: true }); return; }
-    if (which === 'menu') dialog.innerHTML = `<div class="tc-eyebrow">BẢN THỬ CẢM GIÁC CHƠI · 0.1</div><h1 id="tc-dialog-title">Đọc góc bắn.<br><em>Làm chủ đấu trường.</em></h1><p>Lái xe, tìm góc phản xạ và đỡ đạn đúng lúc. Bắt đầu ở sân tập an toàn, rồi thử đấu với bot.</p><div class="tc-menu-cards"><button class="tc-card" data-action="training"><span>01 / SÂN TẬP</span><b>Học qua 5 bài ngắn ↗</b><small>Lái · Bắn · Bật tường · Phá gạch · Khiên</small></button><button class="tc-card" data-action="duel"><span>02 / ĐẤU LUYỆN</span><b>1v1 với bot ↗</b><small>Tối đa 3 hiệp · 3 máu · Cùng chỉ số</small></button><button class="tc-card tc-card-online" data-action="online"><span>03 / ONLINE 1v1 · THỬ NGHIỆM</span><b>Phòng riêng ↗</b><small>Tạo mã hoặc nhập mã của bạn bè</small></button></div><div class="tc-controls-info"><span><b>PC</b> WASD lái · chuột ngắm/bắn · Space khiên</span><span><b>ĐIỆN THOẠI</b> Cần trái lái · kéo cần phải, nhả để bắn</span></div><p class="tc-note">Hình khối tạm. Online 1v1 cần máy chủ phòng đang chạy (bản thử P2); chưa có chơi nhanh/ghép trận.</p>`;
+    if (which === 'menu') dialog.innerHTML = `<div class="tc-eyebrow">BẢN THỬ CẢM GIÁC CHƠI · 0.1</div><h1 id="tc-dialog-title">Đọc góc bắn.<br><em>Làm chủ đấu trường.</em></h1><p>Lái xe, tìm góc phản xạ và đỡ đạn đúng lúc. Bắt đầu ở sân tập an toàn, rồi thử đấu với bot.</p><div class="tc-menu-cards"><button class="tc-card" data-action="training"><span>01 / SÂN TẬP</span><b>Học qua 5 bài ngắn ↗</b><small>Lái · Bắn · Bật tường · Phá gạch · Khiên</small></button><button class="tc-card" data-action="duel"><span>02 / ĐẤU LUYỆN</span><b>1v1 với bot ↗</b><small>Tối đa 3 hiệp · 3 máu · Cùng chỉ số</small></button><button class="tc-card tc-card-online" data-action="online"${options.onlineEnabled === false ? ' disabled title="Online đang chờ cấu hình máy chủ thử"' : ''}><span>03 / ONLINE 1v1 · THỬ NGHIỆM</span><b>Phòng riêng ↗</b><small>Tạo mã hoặc nhập mã của bạn bè</small></button></div><div class="tc-controls-info"><span><b>PC</b> WASD lái · chuột ngắm/bắn · Space khiên</span><span><b>ĐIỆN THOẠI</b> Cần trái lái · kéo cần phải, nhả để bắn</span></div><p class="tc-note">Hình khối tạm. Online 1v1 cần máy chủ phòng đang chạy (bản thử P2); chưa có chơi nhanh/ghép trận.</p>`;
     if (which === 'online') dialog.innerHTML = `<div class="tc-eyebrow">ONLINE 1v1 · PHÒNG RIÊNG · P2</div><h1 id="tc-dialog-title">Đấu với bạn bè.</h1><p>Tạo phòng rồi gửi mã hoặc link cho người kia. Máy chủ quyết định đạn, máu và kết quả.</p>
       <label class="tc-field-label">Tên hiển thị<input class="tc-input tc-name" maxlength="20" autocomplete="nickname" value="${esc(playerName)}" placeholder="Người chơi"></label>
       <div class="tc-online-row"><button class="tc-primary" data-action="create">Tạo phòng mới</button><span class="tc-or">hoặc</span><label class="tc-field-label tc-code-label">Mã phòng<input class="tc-input tc-code" maxlength="7" autocapitalize="characters" autocomplete="off" spellcheck="false" value="${esc(inviteCode)}" placeholder="VD: K7M2QX"></label><button data-action="join">Vào phòng</button></div>
-      <details class="tc-advanced"><summary>Máy chủ</summary><label class="tc-field-label">Địa chỉ máy chủ phòng<input class="tc-input tc-server" value="${esc(serverUrl)}" spellcheck="false"></label></details>
+      <details class="tc-advanced"><summary>Máy chủ</summary><label class="tc-field-label">Địa chỉ máy chủ phòng<input class="tc-input tc-server" ${options.getToken ? 'readonly' : ''} value="${esc(serverUrl)}" spellcheck="false"></label></details>
       <p class="tc-net-status" role="status" aria-live="polite"></p><div class="tc-buttonrow">${button('Về menu', 'leave-online')}</div>`;
     if (which === 'lobby') dialog.innerHTML = `<div class="tc-eyebrow">PHÒNG RIÊNG · 1v1</div><h1 id="tc-dialog-title">Phòng <span class="tc-roomcode"></span></h1><p class="tc-lobby-hint">Gửi mã hoặc link cho người kia. Khi cả hai sẵn sàng, trận bắt đầu sau 3 giây.</p>
       <ul class="tc-seats" aria-live="polite"></ul><div class="tc-buttonrow"><button class="tc-primary tc-ready" data-action="ready">Sẵn sàng</button>${button('Sao chép link mời', 'invite')}${button('Rời phòng', 'leave-online')}</div>
@@ -69,7 +70,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   /** Patch online status in place (room updates arrive often; re-rendering would steal focus). */
   function renderOnline() {
     const s = net?.session, status = dialog.querySelector('.tc-net-status');
-    if (status) status.textContent = !net ? '' : s?.error ? s.error.message : net.status === 'connecting' ? 'Đang kết nối máy chủ…' : net.status === 'reconnecting' ? 'Mất kết nối, đang thử lại…' : net.status === 'closed' ? 'Đã ngắt kết nối máy chủ.' : '';
+    if (status) status.textContent = connectionError || (!net ? '' : s?.error ? s.error.message : net.status === 'connecting' ? 'Đang kết nối máy chủ…' : net.status === 'reconnecting' ? 'Mất kết nối, đang thử lại…' : net.status === 'closed' ? 'Đã ngắt kết nối máy chủ.' : '');
     const room = s?.room; if (!room) return;
     const code = dialog.querySelector('.tc-roomcode'); if (code) code.textContent = room.code.replace(/(...)(...)/, '$1 $2');
     const seats = dialog.querySelector('.tc-seats');
@@ -80,13 +81,20 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     const me = room.seats.find(x => x.id === s!.seat), ready = dialog.querySelector<HTMLButtonElement>('.tc-ready');
     if (ready && me) { ready.textContent = room.phase === 'countdown' ? `Bắt đầu sau ${Math.ceil((room.countdownMs ?? 0) / 1000)}… (hủy)` : me.ready ? 'Hủy sẵn sàng' : room.phase === 'finished' ? 'Đấu lại' : 'Sẵn sàng'; ready.setAttribute('aria-pressed', String(me.ready)); }
   }
+  function connectOnline() {
+    connectionError = '';
+    try { net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, trustedServerUrl: options.serverUrl, onChange: onNet }); return true; }
+    catch (error) { connectionError = error instanceof Error ? error.message : 'Không kết nối được máy chủ phòng.'; net = null; return false; }
+  }
   function openOnline() {
+    if (options.onlineEnabled === false) return;
     online = true; lastPhase = '';
-    if (!net) net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet });
-    show(net.session.room ? 'lobby' : 'online');
+    if (!net || net.status === 'closed') connectOnline();
+    show(net?.session.room ? 'lobby' : 'online');
   }
   function onNet(kind: string) {
     if (destroyed || !net) return;
+    if (kind === 'status' && net.status !== 'open') resetInput();
     const s = net.session, phase = s.room?.phase ?? '';
     if (kind === 'joined' && s.room?.phase === 'playing') { sim = s.view() ?? sim; aim = sim.tanks[0]?.aim ?? 0; }
     if (phase !== lastPhase) {
@@ -119,8 +127,10 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
       playerName = (q<HTMLInputElement>('.tc-name').value || '').trim().slice(0, 20);
       const url = q<HTMLInputElement>('.tc-server').value.trim();
       try { localStorage.setItem('tank-clash.name', playerName); } catch { /* optional */ }
-      if (/^wss?:\/\/[^\s]+$/.test(url) && url !== serverUrl) { serverUrl = url; try { localStorage.setItem('tank-clash.server', url); } catch { /* optional */ } net?.close(); net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet }); }
-      if (!net) net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet });
+      try { tankEndpoint(url); } catch (error) { connectionError = error instanceof Error ? error.message : 'Địa chỉ máy chủ chưa hợp lệ.'; renderOnline(); return; }
+      if (url !== serverUrl) { serverUrl = url; if (!options.getToken) { try { localStorage.setItem('tank-clash.server', url); } catch {} } net?.close(); net = null; }
+      if (!net || net.status === 'closed') if (!connectOnline()) { renderOnline(); return; }
+      if (!net) return;
       if (a === 'create') net.session.create(playerName);
       else { const code = normalizeCode(q<HTMLInputElement>('.tc-code').value); if (!code) { q('.tc-net-status').textContent = 'Mã phòng gồm 6 ký tự (chữ và số, không có 0, O, 1, I, L).'; return; } inviteCode = code; net.session.join(code, playerName); }
       renderOnline();
@@ -266,5 +276,5 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   }
   show('menu'); updateHud(); raf = requestAnimationFrame(frame);
   if (inviteCode) openOnline(); // opened from an invite link (?room=CODE)
-  return { setPaused(v) { externalPaused = v; resetInput(); }, snapshot: () => structuredClone(sim), destroy() { destroyed = true; cancelAnimationFrame(raf); abort.abort(); resetInput(); net?.close(); net = null; root.replaceChildren(); } };
+  return { leaveRoom: () => leaveOnline(true), setPaused(v) { externalPaused = v; resetInput(); }, snapshot: () => structuredClone(sim), destroy() { destroyed = true; cancelAnimationFrame(raf); abort.abort(); resetInput(); net?.close(); net = null; root.replaceChildren(); } };
 }

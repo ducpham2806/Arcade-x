@@ -3,7 +3,8 @@
 Tài liệu tóm tắt cho người làm tiếp. Việc chủ dự án cần tự làm nằm ở `docs/OWNER-TODO.md`.
 
 ## Trạng thái nhánh
-- Cập nhật 02/11/2026: nhánh `claude/busy-edison-1clj3h` đã merge vào `main` (PR #11). `main` (`c8aac24`) có thêm Tank Clash P0/P1 và Snake journey.
+- Cập nhật 03/11/2026: Tank Clash P0/P1/P2 đã hợp nhất lịch sử vào main `2d6b33e`. Lượt tiếp tục đang trên `feat/tank-clash-p2-staging-readiness` (wire v2), không tự merge main. Điểm tiếp quản: `docs/tank-clash/PLAN.md` v1.4 §16.
+- Baseline trước đó 02/11/2026: nhánh `claude/busy-edison-1clj3h` đã merge vào `main` (PR #11). `main` (`c8aac24`) có thêm Tank Clash P0/P1 và Snake journey.
 - Nhật ký chi tiết từng việc, mới nhất ở trên: `docs/WORKLOG.md` (bắt buộc cập nhật).
 - Netlify deploy production từ `main`. Chỉ merge khi chủ dự án yêu cầu, và chạy đủ CI trước khi merge.
 
@@ -73,6 +74,12 @@ Tài liệu máy chủ: `docs/WORD-CHAIN-SERVER.md`.
 - **Chưa deploy, chưa chọn hosting, chưa vào launcher.** Báo cáo và số đo: `docs/tank-clash/P2-review.md`.
 
 - Bàn giao cập nhật 03/11: xem `docs/tank-clash/PLAN.md` v1.3 §15. Hợp nhất lịch sử nhánh `feat/tank-clash-p2-rooms`; giữ bộ PR #13 hiện hành (`room.ts`, `net-client.ts`, `server/tank-clash-room`). Bộ P2 cũ và test cũ có thể xem ở commit `1efae4587d68b524fd1ea03f3422750c1bcb6bac`; không trộn wire hai bộ.
+
+### 9. Tank Clash P2 staging readiness — 03/11/2026
+- Auth đã đăng ký/refresh/pin WSS endpoint, production tester allowlist, không anonymous/bypass. Online React vẫn tắt; không sửa catalog/DB production.
+- Wire v2: epoch hiệp, receipt/ack ready/leave, stale snapshot/start guards, bounded input/control queues/reconnect, half-open detection, shutdown hủy trận đúng một lần. Key ghế `tank-clash.seat:v2` ràng buộc protocol+endpoint, không JWT.
+- Optional staging login và static HTML cùng WS; Docker/Caddy/Render proposal, chưa deploy hoặc chạy image. Xem `STAGING-RUNBOOK.md` và `P2-staging-review-2026-11-03.md`.
+- 39 core + 12 WS tests, lint/build/budget qua; toàn test:fast qua (exit 0). CUA hai tab create/join/ready/reload/forfeit qua; load 16 phòng/32 WS/60 giây và soak 30 phút mô phỏng qua. Chưa live Auth/Internet/10 trận hai máy/soak thực/FPS thật. P3 chưa bắt đầu.
 
 ## Sổ tay kỹ thuật
 - **CI:** thứ tự các bước trong `.github/workflows/ci.yml`. Lệnh mới của session này:

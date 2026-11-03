@@ -6,6 +6,17 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `feat/tank-clash-p2-staging-readiness` — P2 chuẩn bị staging (hoàn tất code/kiểm cục bộ)
+
+- Port lên bộ PR #13: protocol v2, epoch theo hiệp, giới hạn input chưa ack, kiểm snapshot cũ, biên nhận ready/leave chống lặp, timeout/silence/backpressure và nối lại có giới hạn; không phát lại input offline. Shutdown hủy trận một lần, thông báo bảo trì và dọn phòng; auth đang chờ trả về sau shutdown cũng không được tạo phòng mới (đã có regression).
+- Thêm adapter tài khoản đã đăng ký, refresh token, ràng buộc đúng endpoint WSS; server kiểm `/auth/v1/user`, từ chối anonymous và bắt buộc allowlist UUID trên production. Token không được lưu trong resume storage. Không tạo user/migration hoặc ghi Supabase production.
+- Preview có form đăng nhập chỉ khi server cấu hình public Auth; server có static HTML, CSP, `/ready`, giới hạn phòng/kết nối và origin fail-closed. React adapter mặc định tắt online, chưa đăng ký launcher.
+- Chuẩn bị Docker/Compose+Caddy và Render Blueprint, chưa build image/deploy vì không có Docker CLI hoặc hosting được chọn.
+- Đã qua `test:tank-clash` 39/39, `test:tank-clash-server` 12/12 và lint. Load loopback 16 phòng/32 WS/60 giây: JSON xuống 12,31 KiB/s/client, CPU cùng process 13,57%, RSS 206,22 MiB, event-loop p95 10,81 ms. Soak đồng hồ mô phỏng 30 phút: 240 trận, 29 resume, dọn 0 phòng; không tương đương soak 30 phút thời gian thực hoặc công suất VPS.
+- Kiểm cuối: lint, export HTML 288.947 byte, Vite build, bundle budget và toàn `test:fast` (exit 0, kết thúc 39/39 Tank Clash) đều qua. CUA hai tab qua WS thật: create/join/ready/countdown, reload B đúng ghế+HP, B rời → A thắng forfeit. Form tài khoản đã kiểm mở/hiển thị desktop bằng cấu hình giả cục bộ, không nhập credential. Không chạy lại browser CI game khác, chưa login Auth thật hoặc kiểm form bằng thiết bị thật.
+- Tài liệu: plan v1.4 §16, README/review/runbook, SESSION-HANDOFF/OWNER-TODO/PENDING-DECISIONS; proposal VPS Singapore 2 GiB 12 USD/tháng, option 1 GiB 6 USD/tháng, chưa gồm thuế/domain/backup/Supabase. Không tạo tài nguyên phí. Publish nhánh riêng `[skip netlify]`, không merge main trong lượt yêu cầu tiếp tục này.
+- Còn: P2.5 host/domain/Auth staging/image/TLS thật và P2.6 10 trận hai người/hai máy/hai mạng, soak 30 phút thực, FPS/lag compensation. P3 chưa bắt đầu; kết quả chưa persistence, không thưởng/entitlement sản phẩm.
+
 ## 03/11/2026 · nhánh `merge/tank-clash-handoff-20261103` — bàn giao Tank Clash P2
 
 - Yêu cầu: ghi toàn bộ tiến độ vào plan cho người khác tiếp quản rồi merge bản mới nhất.

@@ -20,8 +20,8 @@
     "test:blossom": "playwright test tests/blossom",
     "test:blossom-engine": "playwright test -c tests/blossom/playwright.unit.config.ts",
     "test:battleship-ui": "playwright test tests/battleship/visual.test.ts",
-    "test:tank-clash": "node --test tests/tank-clash/engine.test.mjs tests/tank-clash/room.test.mjs tests/tank-clash/netcode.test.mjs",
-    "test:tank-clash-server": "node --test tests/tank-clash/server.test.mjs tests/tank-clash/network.test.mjs",
+    "test:tank-clash": "node --test tests/tank-clash/engine.test.mjs tests/tank-clash/room.test.mjs tests/tank-clash/netcode.test.mjs tests/tank-clash/readiness.test.mjs",
+    "test:tank-clash-server": "node --test tests/tank-clash/server.test.mjs tests/tank-clash/network.test.mjs tests/tank-clash/transport.test.mjs",
     "test:tank-clash-ui": "playwright test tests/tank-clash/online-ui.test.ts",
     "dev:tank-server": "node server/tank-clash-room/server.mjs",
     "test:word-chain": "node tests/word-chain/rules.mjs && node tests/word-chain/server.mjs && node tests/word-chain/schema.mjs && node tests/word-chain/edge-room.mjs",
@@ -86,7 +86,8 @@
     "test:snake-props": "node tests/snake/story-props.mjs",
     "build:snake-props": "python3 scripts/build-snake-props.py",
     "test:snake-audio": "node tests/snake/audio.mjs",
-    "build:snake-audio": "python3 scripts/build-snake-audio.py"
+    "build:snake-audio": "python3 scripts/build-snake-audio.py",
+    "test:tank-clash-load": "node scripts/tank-clash-load.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

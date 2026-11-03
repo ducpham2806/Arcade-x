@@ -1,6 +1,6 @@
 # Quyết định đang chờ chủ dự án
 
-Cập nhật: 02/11/2026. Khi có câu trả lời, ghi vào cột "Quyết định" và xoá khỏi danh sách chờ.
+Cập nhật: 03/11/2026. Khi có câu trả lời, ghi vào cột "Quyết định" và xoá khỏi danh sách chờ.
 
 ## Commerce (M8) — xem `docs/COMMERCE-ROLLOUT.md`
 
@@ -23,11 +23,11 @@ Cập nhật: 02/11/2026. Khi có câu trả lời, ghi vào cột "Quyết đ�
 | 7 | Áp `supabase/word-chain/schema.sql` lên staging, deploy `word-chain-room`, chạy `scheduler.sql` | Chặn chơi online 2–4 người (luyện với bot vẫn chơi được) | _chờ_ |
 | 8 | Áp migration danh mục `20261102090000_word_chain_catalog.sql` lên production | Game chưa hiện ở bản production cho tới khi áp | _chờ_ |
 
-## Tank Clash online (P2) — xem `docs/tank-clash/P2-review.md`
+## Tank Clash online (P2) — xem `docs/tank-clash/STAGING-RUNBOOK.md`
 
 | # | Câu hỏi | Ảnh hưởng | Quyết định |
 |---|---|---|---|
-| 9 | **Nơi chạy room server Tank Clash** (tiến trình Node giữ WebSocket lâu): VPS nhỏ hay dịch vụ container có WebSocket? Claude sẽ trình giá cụ thể trước khi đăng ký. | Chặn chơi online qua Internet và chơi thử thật (P2.5–P2.6) | _chờ_ |
+| 9 | **Nơi chạy room server Tank Clash** (tiến trình Node giữ WebSocket lâu): Đã chuẩn bị Docker/Caddy và Render Blueprint. Đề xuất Singapore VPS 2 GiB/1 vCPU 12 USD/tháng; lựa chọn 1 GiB 6 USD/tháng; chưa gồm thuế/domain/backup/Supabase. Render cần báo giá tài khoản. Chủ dự án chọn host/ngân sách/domain, cung cấp hai UUID tài khoản staging trước deploy. | Chặn chơi online qua Internet và chơi thử thật (P2.5–P2.6) | _chờ_ |
 
 ## Kho mã (M4)
 

@@ -1,0 +1,23 @@
+# Only these build inputs enter the Docker context. Exclude credentials, art and local exports.
+**
+!package.json
+!package-lock.json
+!scripts/
+!scripts/export-tank-review.mjs
+!src/
+!src/games/
+!src/games/tank-clash/
+!src/games/tank-clash/**
+!src/accessibility/
+!src/accessibility/**
+!server/
+!server/tank-clash-room/
+!server/tank-clash-room/*.mjs
+!server/tank-clash-room/package.json
+!server/tank-clash-room/package-lock.json
+!deploy/
+!deploy/tank-clash/
+!deploy/tank-clash/Dockerfile
+!deploy/tank-clash/Dockerfile.dockerignore
+**/node_modules
+**/.env*

@@ -18,11 +18,11 @@ function startedMatch(world, net = {}) {
 
 test('protocol rejects unknown types, extra input fields, huge batches and bad codes', () => {
   assert.equal(parseClientMessage('{"type":"teleport"}'), null);
-  assert.equal(parseClientMessage({ type: 'input', seq: 0, inputs: [{ ...press(), hp: 99 }] }), null);
-  assert.equal(parseClientMessage({ type: 'input', seq: 0, inputs: Array(5).fill(press()) }), null);
-  assert.equal(parseClientMessage({ type: 'input', seq: -1, inputs: [press()] }), null);
-  assert.equal(parseClientMessage({ type: 'input', seq: 0, inputs: [press({ x: 3 })] }), null);
-  assert.ok(parseClientMessage({ type: 'input', seq: 4, inputs: [press({ x: 1 })] }));
+  assert.equal(parseClientMessage({ type: 'input', epoch: 'test:1', seq: 0, inputs: [{ ...press(), hp: 99 }] }), null);
+  assert.equal(parseClientMessage({ type: 'input', epoch: 'test:1', seq: 0, inputs: Array(5).fill(press()) }), null);
+  assert.equal(parseClientMessage({ type: 'input', epoch: 'test:1', seq: -1, inputs: [press()] }), null);
+  assert.equal(parseClientMessage({ type: 'input', epoch: 'test:1', seq: 0, inputs: [press({ x: 3 })] }), null);
+  assert.ok(parseClientMessage({ type: 'input', epoch: 'test:1', seq: 4, inputs: [press({ x: 1 })] }));
   assert.equal(normalizeCode('ab0o1l'), null); assert.equal(normalizeCode(' abc-def '), 'ABCDEF');
 });
 
@@ -57,9 +57,9 @@ test('duplicate and replayed input sequences are ignored; a seat cannot drive fa
   const { a } = startedMatch(world);
   const state = world.host.inspect(a.session.code), x0 = state.tanks[0].x;
   // A cheating client floods 4-input batches far faster than 60 Hz: the queue is capped and consumed once per tick.
-  let seq = 1000;
-  for (let i = 0; i < 25; i++) a.sendRaw({ type: 'input', seq: (seq += 4) - 4, inputs: Array(4).fill(press({ x: 1 })) });
-  a.sendRaw({ type: 'input', seq: 1000, inputs: [press({ x: -1 })] }); // replay of an old sequence
+  let seq = 0;
+  for (let i = 0; i < 25; i++) a.sendRaw({ type: 'input', epoch: a.session.epoch, seq: (seq += 4) - 4, inputs: Array(4).fill(press({ x: 1 })) });
+  a.sendRaw({ type: 'input', epoch: a.session.epoch, seq: 0, inputs: [press({ x: -1 })] }); // replay of an old sequence
   world.run(1000);
   const travelled = state.tanks[0].x - x0;
   assert.ok(travelled <= 155 * (NET.inputQueueMax + 15) / 60 + 1, `travelled ${travelled.toFixed(1)} px`);

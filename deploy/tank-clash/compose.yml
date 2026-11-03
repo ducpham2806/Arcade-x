@@ -1,0 +1,42 @@
+services:
+  tank:
+    build:
+      context: ../..
+      dockerfile: deploy/tank-clash/Dockerfile
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3223
+    expose: ["3223"]
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1.0
+    restart: unless-stopped
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "3"}
+  proxy:
+    image: caddy:2-alpine
+    environment:
+      TANK_DOMAIN: ${TANK_DOMAIN:?Set a staging domain}
+      ACME_EMAIL: ${ACME_EMAIL:?Set the certificate contact}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      tank: {condition: service_healthy}
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "3"}
+volumes:
+  caddy_data:
+  caddy_config:

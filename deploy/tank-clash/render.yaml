@@ -1,0 +1,19 @@
+# Alternative managed deployment. This is a proposal, not an executed or free deployment.
+services:
+  - type: web
+    name: tank-clash-staging
+    runtime: docker
+    region: singapore
+    plan: starter
+    numInstances: 1
+    autoDeployTrigger: "off"
+    dockerfilePath: ./deploy/tank-clash/Dockerfile
+    dockerContext: .
+    healthCheckPath: /ready
+    envVars:
+      - {key: NODE_ENV, value: production}
+      - {key: HOST, value: 0.0.0.0}
+      - {key: TANK_ALLOWED_ORIGINS, sync: false}
+      - {key: SUPABASE_URL, sync: false}
+      - {key: SUPABASE_PUBLISHABLE_KEY, sync: false}
+      - {key: TANK_ALLOWED_USER_IDS, sync: false}

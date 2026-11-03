@@ -1,6 +1,6 @@
 # Tank Clash P2 — tiếp quản
 
-Cập nhật 03/11/2026: có sân tập/bot offline và phòng riêng online 1v1 chạy cục bộ; art là hình khối tạm. Chưa tích hợp catalog sản phẩm, hosting Internet, quyền gói chơi hoặc thưởng. **Bàn giao đầy đủ ở `PLAN.md` §15**; chỉ dùng bộ `room.ts` / `net-client.ts` / `server/tank-clash-room/` hiện hành.
+Cập nhật 03/11/2026: có sân tập/bot offline và phòng riêng online 1v1 chạy cục bộ; art là hình khối tạm. Chưa tích hợp catalog sản phẩm, hosting Internet, quyền gói chơi hoặc thưởng. **Bàn giao hiện tại v1.4 ở `PLAN.md` §16**; chỉ dùng bộ `room.ts` / `net-client.ts` / `server/tank-clash-room/` hiện hành.
 
 ## Chạy bản thử
 
@@ -26,7 +26,11 @@ Các con số trên là [PLACEHOLDER] cho chơi thử, không phải cân bằng
 npm ci --prefix server/tank-clash-room
 npm run dev:tank-server        # ws://127.0.0.1:3223/tank, chơi khách
 ```
-Mở bản preview ở hai cửa sổ, chọn "03 / Online 1v1". Đổi server bằng `?server=wss://...`; link mời có dạng `?room=MÃ`. Chi tiết, số đo và giới hạn: `docs/tank-clash/P2-review.md`.
+Mở bản preview ở hai cửa sổ, chọn "03 / Online 1v1". Đổi server bằng `?server=wss://...`; link mời có dạng `?room=MÃ`. Wire hiện tại **v2**; tải lại cả client/server sau khi đổi build. Có thể phục vụ HTML cùng server trên loopback: `TANK_STATIC_DIRECTORY=preview/tank-clash npm run dev:tank-server`, rồi mở `http://127.0.0.1:3223/`.
+
+Tài khoản staging: server inject public Auth config khi có Supabase URL/public key; preview có form đăng nhập, chỉ giữ session trong RAM. Production cần allowlist UUID, không nhận guest/anonymous. JWT chỉ được gửi tới endpoint WSS tin cậy; dữ liệu ghế sessionStorage ràng buộc endpoint+wire, không lưu JWT. Adapter launcher mặc định tắt online và chưa đăng ký catalog.
+
+Runbook và đề xuất host/giá: `docs/tank-clash/STAGING-RUNBOOK.md`. Kết quả mới: `P2-staging-review-2026-11-03.md`; `P2-review.md` là baseline trước wire v2. Chưa deploy/đăng nhập staging thật/10 trận hai thiết bị/soak 30 phút thực.
 
 ## Kiểm thử
 
@@ -35,10 +39,12 @@ npm ci --prefix server/tank-clash-spike --ignore-scripts
 node --test tests/tank-clash/engine.test.mjs tests/tank-clash/network.test.mjs
 npm run test:tank-clash          # engine + phòng + mạng ảo (trong test:fast)
 npm ci --prefix server/tank-clash-room && npm run test:tank-clash-server   # WebSocket thật
-npm run test:tank-clash-ui       # Playwright: 2 trang + server thật
+npm run test:tank-clash-ui       # CI / môi trường browser được cho phép: 2 trang + server thật
+npm run test:tank-clash-load -- --rooms 16 --seconds 60 --output /tmp/tank-load.json
+npm run test:tank-clash-load -- --virtual --rooms 8 --seconds 1800 --output /tmp/tank-virtual.json
 ```
 
-Server thử nghiệm có dependency riêng, không thêm dependency mạng vào bundle launcher. `network.test.mjs` mở server loopback và hai WebSocket client thật rồi đóng khi xong; không dùng hoặc thay đổi Supabase.
+Không thêm npm dependency mới; HTML standalone bundle SDK Supabase đã có sẵn để đăng nhập staging khi được cấu hình. Server thử nghiệm có dependency `ws` riêng. `network.test.mjs` mở server loopback và hai WebSocket client thật rồi đóng khi xong; không dùng hoặc thay đổi Supabase.
 
 ## Cấu trúc
 
@@ -47,13 +53,14 @@ Server thử nghiệm có dependency riêng, không thêm dependency mạng vào
 | `src/games/tank-clash/engine.ts` | Luật thuần, fixed step, va chạm quét, bot, bài tập, kết quả hiệp |
 | `src/games/tank-clash/runtime.ts` | Input keyboard/pointer, vòng vẽ, HUD/dialog, góp ý thủ công |
 | `src/games/tank-clash/index.tsx` | Adapter React với cleanup và nhận trạng thái pause |
-| `src/games/tank-clash/preview.ts` | Điểm vào standalone |
+| `src/games/tank-clash/preview.ts`, `preview-account.ts` | Điểm vào standalone, optional staging sign-in |
+| `src/games/tank-clash/access.ts`, `online-config.json` | Token provider, trusted endpoint, flag mặc định tắt |
 | `scripts/export-tank-review.mjs` | Bundle preview một file bằng esbuild hiện có |
 | `server/tank-clash-spike/server.mjs` | Thử hợp đồng input/snapshot, ghế reconnect và sequence (P0, giữ để so sánh) |
 | `src/games/tank-clash/protocol.ts` | P2: giao thức, kiểm tra gói tin, mã phòng, nén snapshot |
 | `src/games/tank-clash/room.ts` | P2: máy chủ phòng không phụ thuộc mạng (vòng đời, giữ ghế, xử thua, tín dụng input) |
 | `src/games/tank-clash/net-client.ts` | P2: dự đoán/đối soát/nội suy, wrapper WebSocket cho trình duyệt |
-| `server/tank-clash-room/server.mjs` | P2: server WebSocket, origin allowlist, xác thực Supabase tuỳ chọn |
+| `server/tank-clash-room/server.mjs` | P2: server WS + HTML tùy chọn, origin/allowlist Auth, readiness/drain |
 
 ## Giới hạn P0 network spike
 
@@ -70,6 +77,6 @@ Server thử nghiệm có dependency riêng, không thêm dependency mạng vào
 - Luật phản xạ dùng chung cho đạn và đường ngắm; sửa phải kèm kiểm thử va chạm.
 - Không ghi vị trí/đạn vào database từng frame.
 - P1 không gọi bridge cấp coin/EXP/leaderboard. Kết quả PvP sản phẩm phải được backend xác nhận.
-- Bot luôn ghi nhãn BOT. Hình tạm luôn ghi rõ P1.
+- Bot luôn ghi nhãn BOT. Hình tạm luôn ghi rõ là bản thử.
 - `destroy()` phải hủy animation frame, listener và input. React adapter dùng controller, không rerender React mỗi tick.
 - Chỉ đưa vào catalog sau mốc tích hợp của plan. Trước khi phát hành công khai, giao build để anh Đức duyệt.
