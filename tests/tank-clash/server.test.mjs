@@ -67,3 +67,27 @@ test('Supabase authenticator: valid token → account identity; bad token, netwo
   assert.equal(calls[0][0], 'https://staging.example.supabase.co/auth/v1/user');
   assert.equal(await auth('bad'), null); assert.equal(await auth('boom'), null); assert.equal(await auth(undefined), null);
 });
+
+test('2v2 over real WebSockets: two parties queue (async account check) and are matched into one game', { timeout: 30_000 }, async () => {
+  const authenticate = async (token, name) => { await pause(5); return token ? { userId: token, name: name ?? token, guest: false } : null; };
+  const server = await createTankRoomServer({ authenticate });
+  const open = name => connectTankRoom(server.url, { name, token: () => `acc-${name}`, storage: null });
+  const cs = ['A1', 'A2', 'B1', 'B2'].map(open), guest = connectTankRoom(server.url, { name: 'Khách', storage: null });
+  try {
+    await until(() => [...cs, guest].every(c => c.status === 'open'));
+    for (const [host, mate] of [[cs[0], cs[1]], [cs[2], cs[3]]]) {
+      host.session.create(undefined, '2v2'); await until(() => host.session.code);
+      mate.session.join(host.session.code); await until(() => mate.session.seat === 'b');
+      mate.session.team(0); await until(() => mate.session.seat === 'a2');
+      host.session.queue(); await until(() => host.session.room?.queue || host.session.room?.kind === 'queue');
+    }
+    await until(() => cs.every(c => c.session.room?.kind === 'queue') && new Set(cs.map(c => c.session.code)).size === 1);
+    assert.equal(cs[0].session.myTeam, cs[1].session.myTeam); assert.notEqual(cs[0].session.myTeam, cs[2].session.myTeam);
+    await until(() => cs.every(c => c.session.room?.phase === 'playing'), NET.queueCountdownMs + 3000);
+    assert.equal(server.roomHost.inspect(cs[0].session.code).tanks.length, 4);
+    guest.session.queue(); await until(() => guest.session.error);
+    assert.equal(guest.session.error.code, 'AUTH_REQUIRED'); assert.equal(guest.status, 'open', 'refused, not disconnected');
+    const health = await (await fetch(server.url.replace('ws://', 'http://').replace('/tank', '/health'))).json();
+    assert.equal(health.queued, 0); assert.equal(health.protocol, 'tank-clash.p3.v1');
+  } finally { for (const c of [...cs, guest]) c.close(); await server.close(); }
+});

@@ -46,11 +46,11 @@ export function duelWalls(): Wall[] {
   for (const x of [320, 440]) for (const y of [120, 160, 280, 320]) add(x, y, 40, 40, 'brick');
   return walls;
 }
-/** `online: true` (duel only): both tanks are human seats in every round; no bot is created.
+/** `online: true` (duel and squad): every tank is a human seat in every round; no bot is created.
  * `seed` (squad only): Crossfire layout seed; a random one is drawn when omitted. */
 export function createState(mode: Mode = 'training', options: { online?: boolean; seed?: number } = {}): State {
   const size = mode === 'squad' ? SQUAD_SIZE : DUEL_SIZE;
-  const s: State = { version: 1, mode, ...(options.online && mode === 'duel' ? { online: true } : {}), tick: 0, time: 0, width: size.width, height: size.height,
+  const s: State = { version: 1, mode, ...(options.online && mode !== 'training' ? { online: true } : {}), tick: 0, time: 0, width: size.width, height: size.height,
     ...(mode === 'squad' ? { map: { id: 'crossfire' as const, seed: (options.seed ?? newSeed()) >>> 0 } } : {}), out: [], tanks: [], walls: [], bullets: [], events: [], nextId: 1,
     status: 'playing', round: 1, scores: [0, 0], remaining: CONFIG.roundSeconds, phaseTime: 0,
     winner: null, roundWinner: null, lesson: 0, lessonDone: false, stats: { shots: 0, hits: 0, ricochets: 0, blocks: 0, bricks: 0 } };
@@ -64,7 +64,7 @@ function setupRound(s: State) {
     s.walls = crossfire(s.map!.seed).walls;
     // Team-mates swap start lanes every round; both teams swap, so the 180° symmetry holds.
     const swap = s.round % 2 === 0, at = (id: keyof typeof SQUAD_SPAWNS) => SQUAD_SPAWNS[swap ? ({ a: 'a2', a2: 'a', b: 'b2', b2: 'b' } as const)[id] : id];
-    s.tanks = (['a', 'a2', 'b', 'b2'] as const).map(id => tank(id, id.startsWith('b') ? 1 : 0, at(id).x, at(id).y, id === 'a' ? 'player' : 'bot'));
+    s.tanks = (['a', 'a2', 'b', 'b2'] as const).map(id => tank(id, id.startsWith('b') ? 1 : 0, at(id).x, at(id).y, s.online || id === 'a' ? 'player' : 'bot'));
   }
   else { s.walls = duelWalls(); s.tanks = [tank('a', 0, 100, 240), tank('b', 1, 700, 240, s.online ? 'player' : 'bot')]; }
   for (const t of s.tanks) if (s.out.includes(t.id)) t.hp = 0;

@@ -62,4 +62,4 @@ Khi đổi ưu tiên hoặc thêm game, cập nhật tài liệu này và ghi l�
 
 ## Bàn giao 03/11/2026
 
-Tank Clash đã có P0/P1 và bản kỹ thuật phòng riêng 1v1 P2. Kế hoạch hiện hành v1.3, phần §15 hướng dẫn tiếp quản, phân biệt hai hướng P2 lịch sử và xác định bộ hiện hành trên main. Chưa nghiệm thu Internet/thiết bị thật, chưa mở 2v2/matchmaking hoặc phát hành. Đọc `docs/tank-clash/PLAN.md` trước khi tiếp tục.
+Tank Clash đã có P0/P1 và bản kỹ thuật phòng riêng 1v1 P2. Kế hoạch hiện hành v1.4 (rút gọn), §10–§12 là phần tiếp quản; lịch sử hai hướng P2 ở bản lưu trữ `docs/archive/tank-clash-PLAN-v1.3.md`. Chưa nghiệm thu Internet/thiết bị thật, chưa mở 2v2/matchmaking hoặc phát hành. Đọc `docs/tank-clash/PLAN.md` trước khi tiếp tục.

@@ -1,6 +1,6 @@
 # Tank Clash P2 — tiếp quản
 
-Cập nhật 03/11/2026: có sân tập/bot offline và phòng riêng online 1v1 chạy cục bộ; art là hình khối tạm. Chưa tích hợp catalog sản phẩm, hosting Internet, quyền gói chơi hoặc thưởng. **Bàn giao đầy đủ ở `PLAN.md` §15**; chỉ dùng bộ `room.ts` / `net-client.ts` / `server/tank-clash-room/` hiện hành.
+Cập nhật 03/11/2026: có sân tập/bot offline và phòng riêng online 1v1 chạy cục bộ; art là hình khối tạm. Chưa tích hợp catalog sản phẩm, hosting Internet, quyền gói chơi hoặc thưởng. **Trạng thái và việc tiếp theo ở `PLAN.md` §10–§12** (bản đầy đủ v1.3: `docs/archive/tank-clash-PLAN-v1.3.md`); chỉ dùng bộ `room.ts` / `net-client.ts` / `server/tank-clash-room/` hiện hành.
 
 ## Chạy bản thử
 
