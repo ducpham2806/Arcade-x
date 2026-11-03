@@ -6,6 +6,16 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P2: token tài khoản và máy chủ tin cậy
+
+- Làm tiếp `docs/tank-clash/PLAN.md` §15.7 mục 2 (mục 1 chờ chủ dự án chọn hosting, mục 3 cần thiết bị thật).
+- `src/games/tank-clash/trust.ts` (mới): chỉ gửi Supabase access token tới máy chủ `wss` có trong danh sách tin cậy (khớp đúng scheme + host + port + path, chặn host giả dạng, `ws` thường, URL chứa user/mật khẩu) hoặc máy chủ loopback để dev. Link mời `?server=` trỏ tới máy chủ lạ vẫn vào được nhưng như khách, không lộ JWT.
+- `runtime.ts`: thêm option `trustedServers`, gom 3 chỗ mở kết nối vào `connect()` dùng `tokenFor(...)`; màn Online hiện dòng báo "vào với tư cách khách" khi có tài khoản mà máy chủ không tin cậy.
+- `index.tsx`: lấy `access_token` từ phiên Supabase hiện có (`getSession` + `onAuthStateChange`), không ép đăng nhập; danh sách tin cậy đọc từ `VITE_TANK_CLASH_SERVERS` (khai báo kiểu ở `src/vite-env.d.ts`, ví dụ ở `.env.example`).
+- Test mới `tests/tank-clash/trust.test.mjs` (3 ca), thêm vào `test:tank-clash`.
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 30/30); `npm run test:tank-clash-server` 4/4 (lần đầu 3/4 do máy chưa cài `server/tank-clash-spike` — đã cài như CI rồi chạy lại); `npm run test:tank-clash-ui` 1/1 (cần `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium` trong môi trường cloud này).
+- **Chưa làm:** chưa thử với hai tài khoản staging thật; chưa có allowlist tester/entitlement phía server; chưa chọn hosting nên chưa có giá trị thật cho `VITE_TANK_CLASH_SERVERS`. Không đụng Supabase/DB. Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
+
 ## 03/11/2026 · nhánh `merge/tank-clash-handoff-20261103` — bàn giao Tank Clash P2
 
 - Yêu cầu: ghi toàn bộ tiến độ vào plan cho người khác tiếp quản rồi merge bản mới nhất.

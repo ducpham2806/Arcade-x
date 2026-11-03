@@ -3,9 +3,11 @@ import type { State, Input, Tank } from './engine.ts';
 import { readableCanvasText } from '../../accessibility/canvasText';
 import { connectTankRoom } from './net-client.ts';
 import { normalizeCode } from './protocol.ts';
+import { isTrustedServer, tokenFor } from './trust.ts';
 
 export type TankController = { destroy: () => void; setPaused: (v: boolean) => void; snapshot: () => State };
-export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined };
+export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined;
+  /** wss servers allowed to receive the token; loopback dev servers are always allowed. Others get no token (guest). */ trustedServers?: readonly string[] };
 const esc = (v: string) => v.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 function defaultServer(explicit?: string) {
   try { const param = new URLSearchParams(location.search).get('server'); if (param && /^wss?:\/\//.test(param)) return param; } catch { /* no location */ }
@@ -45,7 +47,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     if (which === 'online') dialog.innerHTML = `<div class="tc-eyebrow">ONLINE 1v1 · PHÒNG RIÊNG · P2</div><h1 id="tc-dialog-title">Đấu với bạn bè.</h1><p>Tạo phòng rồi gửi mã hoặc link cho người kia. Máy chủ quyết định đạn, máu và kết quả.</p>
       <label class="tc-field-label">Tên hiển thị<input class="tc-input tc-name" maxlength="20" autocomplete="nickname" value="${esc(playerName)}" placeholder="Người chơi"></label>
       <div class="tc-online-row"><button class="tc-primary" data-action="create">Tạo phòng mới</button><span class="tc-or">hoặc</span><label class="tc-field-label tc-code-label">Mã phòng<input class="tc-input tc-code" maxlength="7" autocapitalize="characters" autocomplete="off" spellcheck="false" value="${esc(inviteCode)}" placeholder="VD: K7M2QX"></label><button data-action="join">Vào phòng</button></div>
-      <details class="tc-advanced"><summary>Máy chủ</summary><label class="tc-field-label">Địa chỉ máy chủ phòng<input class="tc-input tc-server" value="${esc(serverUrl)}" spellcheck="false"></label></details>
+      <details class="tc-advanced"><summary>Máy chủ</summary><label class="tc-field-label">Địa chỉ máy chủ phòng<input class="tc-input tc-server" value="${esc(serverUrl)}" spellcheck="false"></label></details><p class="tc-note tc-trust"></p>
       <p class="tc-net-status" role="status" aria-live="polite"></p><div class="tc-buttonrow">${button('Về menu', 'leave-online')}</div>`;
     if (which === 'lobby') dialog.innerHTML = `<div class="tc-eyebrow">PHÒNG RIÊNG · 1v1</div><h1 id="tc-dialog-title">Phòng <span class="tc-roomcode"></span></h1><p class="tc-lobby-hint">Gửi mã hoặc link cho người kia. Khi cả hai sẵn sàng, trận bắt đầu sau 3 giây.</p>
       <ul class="tc-seats" aria-live="polite"></ul><div class="tc-buttonrow"><button class="tc-primary tc-ready" data-action="ready">Sẵn sàng</button>${button('Sao chép link mời', 'invite')}${button('Rời phòng', 'leave-online')}</div>
@@ -70,6 +72,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function renderOnline() {
     const s = net?.session, status = dialog.querySelector('.tc-net-status');
     if (status) status.textContent = !net ? '' : s?.error ? s.error.message : net.status === 'connecting' ? 'Đang kết nối máy chủ…' : net.status === 'reconnecting' ? 'Mất kết nối, đang thử lại…' : net.status === 'closed' ? 'Đã ngắt kết nối máy chủ.' : '';
+    const trust = dialog.querySelector('.tc-trust'); if (trust) trust.textContent = trustNote();
     const room = s?.room; if (!room) return;
     const code = dialog.querySelector('.tc-roomcode'); if (code) code.textContent = room.code.replace(/(...)(...)/, '$1 $2');
     const seats = dialog.querySelector('.tc-seats');
@@ -80,9 +83,13 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     const me = room.seats.find(x => x.id === s!.seat), ready = dialog.querySelector<HTMLButtonElement>('.tc-ready');
     if (ready && me) { ready.textContent = room.phase === 'countdown' ? `Bắt đầu sau ${Math.ceil((room.countdownMs ?? 0) / 1000)}… (hủy)` : me.ready ? 'Hủy sẵn sàng' : room.phase === 'finished' ? 'Đấu lại' : 'Sẵn sàng'; ready.setAttribute('aria-pressed', String(me.ready)); }
   }
+  const trusted = options.trustedServers ?? [];
+  // Never hand the account token to a server taken from an invite link unless the deployment trusts it.
+  function connect() { return connectTankRoom(serverUrl, { name: playerName, token: tokenFor(serverUrl, trusted, options.getToken), onChange: onNet }); }
+  function trustNote() { return options.getToken && !isTrustedServer(serverUrl, trusted) ? 'Máy chủ này không nằm trong danh sách tin cậy: anh vào với tư cách khách, tài khoản không được gửi đi.' : ''; }
   function openOnline() {
     online = true; lastPhase = '';
-    if (!net) net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet });
+    if (!net) net = connect();
     show(net.session.room ? 'lobby' : 'online');
   }
   function onNet(kind: string) {
@@ -119,8 +126,8 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
       playerName = (q<HTMLInputElement>('.tc-name').value || '').trim().slice(0, 20);
       const url = q<HTMLInputElement>('.tc-server').value.trim();
       try { localStorage.setItem('tank-clash.name', playerName); } catch { /* optional */ }
-      if (/^wss?:\/\/[^\s]+$/.test(url) && url !== serverUrl) { serverUrl = url; try { localStorage.setItem('tank-clash.server', url); } catch { /* optional */ } net?.close(); net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet }); }
-      if (!net) net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet });
+      if (/^wss?:\/\/[^\s]+$/.test(url) && url !== serverUrl) { serverUrl = url; try { localStorage.setItem('tank-clash.server', url); } catch { /* optional */ } net?.close(); net = connect(); }
+      if (!net) net = connect();
       if (a === 'create') net.session.create(playerName);
       else { const code = normalizeCode(q<HTMLInputElement>('.tc-code').value); if (!code) { q('.tc-net-status').textContent = 'Mã phòng gồm 6 ký tự (chữ và số, không có 0, O, 1, I, L).'; return; } inviteCode = code; net.session.join(code, playerName); }
       renderOnline();

@@ -12,7 +12,7 @@ Cập nhật: 03/11/2026. Làm xong việc nào thì đánh dấu `[x]`. Các c�
   4. Đặt `enabled: true` trong `src/games/word-chain/online-config.json`, rồi bảo Claude build và test lại.
   5. Thử với 2–4 tài khoản thật: tạo phòng, nhập mã, ghép trận.
 
-- [ ] **Tank Clash online 1v1:** chọn nơi chạy room server (mục 9 trong PENDING-DECISIONS). Trong lúc chờ, có thể thử trên một máy: `npm ci --prefix server/tank-clash-room && npm run dev:tank-server`, rồi mở bản preview ở hai cửa sổ (`docs/tank-clash/P2-review.md`).
+- [ ] **Tank Clash online 1v1:** chọn nơi chạy room server (mục 9 trong PENDING-DECISIONS). Trong lúc chờ, có thể thử trên một máy: `npm ci --prefix server/tank-clash-room && npm run dev:tank-server`, rồi mở bản preview ở hai cửa sổ (`docs/tank-clash/P2-review.md`). Khi đã có server, đặt biến build `VITE_TANK_CLASH_SERVERS="wss://<máy chủ>/tank"` trên Netlify; thiếu biến này thì game không gửi tài khoản tới server (chơi khách).
 
 ## Quyết định đang chờ (`docs/PENDING-DECISIONS.md`)
 - [ ] **1–3. Commerce:** project staging và tài khoản admin; cổng thanh toán; nơi chạy server (Supabase hay Netlify).
