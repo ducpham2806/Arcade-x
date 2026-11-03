@@ -6,6 +6,17 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3b: phòng 2v2 trên server
+
+- Chủ dự án bảo làm tiếp. Đã làm P3b theo `docs/tank-clash/P3-SPEC.md` (chi tiết và bảng số đo ở §14):
+  - `protocol.ts`: lên `tank-clash.p3.v1` (client P2 cũ nhận `PROTOCOL_MISMATCH` "tải lại trang"). 4 ghế `a/a2/b/b2`, `format` 1v1/2v2, tin `team`, `move`, `surrender`, `join` dạng xem; thêm đội/bỏ trận vào view và kết quả; 6 mã lỗi mới có câu tiếng Việt.
+  - `room.ts`: phòng 2v2 (xếp ghế a, b, a2, b2 cho cân đội; cần đủ 4 người sẵn sàng; chủ phòng chuyển theo thứ tự a, a2, b, b2), đổi đội, chủ phòng xếp người (xóa sẵn sàng mọi người), bỏ trận theo người (rời trận hoặc hết 20 giây giữ ghế → xe ra khỏi trận, đồng đội đánh tiếp; cả đội → thua; cả hai đội trong cùng nhịp → hủy), không cho quay lại ghế đã bỏ, ghế người bỏ được trả khi có kết quả, đầu hàng (chỉ khi không còn đồng đội đang chơi), người xem (tối đa 4, vào cả lúc đang trận, không điều khiển được), seed sân mới mỗi trận.
+  - `net-client.ts`: sân theo format, xe mình đứng đầu danh sách, `switchTeam/move/surrender`, xem trận, tự xem lại khi nối lại. `runtime.ts`: chỉ đổi cách tính đội của mình (UI online 2v2 là P3d). `engine.ts`: `squad` online.
+- Test mới: `tests/tank-clash/room2v2.test.mjs` (9 ca) và `tests/tank-clash/netcode2v2.test.mjs` (4 ca, 4 client qua mạng ảo RTT 80/150/250, jitter 30, mất 1–3 %), thêm vào `test:tank-clash`.
+- Phát hiện khi đo: số lần hiệu chỉnh xe mình ở 2v2 cao hơn 1v1 (tới 32 lần/người/trận ở RTT 250). Đã phân tích bằng lịch sử server: tất cả xảy ra khi vừa chạm xe khác hoặc gạch vừa vỡ, chạy tự do là 0–1 lần. Test giờ kiểm riêng loại "tự do" (≤ 3) và độ lớn (< 48 px), có in số liệu từng loại. Không nới test 1v1.
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 53/53); `npm run test:tank-clash-server` 4/4; `npm run test:tank-clash-ui` 3/3 (với `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`). Test P2 cũ không phải sửa.
+- **Chưa làm / rủi ro:** UI online 2v2 và test server 4 WebSocket thật (P3d); tổ đội + hàng chờ (P3c); hiệu chỉnh khi chạm xe ở mạng chậm có thể thấy rõ trên máy thật (tối đa khoảng 40 px, có làm mượt) — cần chơi thử. Chưa chạy server thật qua Internet (chờ hosting). Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
+
 ## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3a: sân 2v2 ngẫu nhiên + 2v2 với bot
 
 - Chủ dự án duyệt đặc tả P3: (1) sân to, chướng ngại ngẫu nhiên từng trận; (2) hàng chờ công khai bắt đăng nhập; (3) cho đầu hàng; (4) chế độ cục bộ 1 người + 1 bot đồng đội vs 2 bot; làm luôn.

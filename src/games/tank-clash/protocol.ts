@@ -1,11 +1,12 @@
-/** Tank Clash P2 wire protocol, shared by the room host (server) and the browser client.
+/** Tank Clash wire protocol (P2 1v1 + P3 2v2), shared by the room host (server) and the browser client.
  * Plain TypeScript with no runtime dependencies so Node can load it with type stripping.
  * Clients send intents only (movement, aim, fire, shield). The server owns positions, HP, rounds and results.
  */
 import { CONFIG, validInput } from './engine.ts';
 import type { Input, State, Wall, GameEvent } from './engine.ts';
 
-export const PROTOCOL = 'tank-clash.p2.v1';
+/** p3.v1 adds formats (1v1/2v2), four seats, teams, spectators and surrender. Not wire-compatible with p2.v1. */
+export const PROTOCOL = 'tank-clash.p3.v1';
 /** Tuning for P2 networking. All values are [PLACEHOLDER] until measured on real networks. */
 export const NET = Object.freeze({
   snapshotEvery: 3,          // server ticks between snapshots: 60 Hz / 3 = 20 Hz
@@ -20,14 +21,23 @@ export const NET = Object.freeze({
   messagesPerSecond: 120,
   interpolationMs: 100,
   maxPayload: 2048,
+  spectatorsMax: 4,          // [PLACEHOLDER]
 });
 export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L
 export const ROOM_CODE_LENGTH = 6;
-export const SEATS = ['a', 'b'] as const;
+/** Seat order is also the host-transfer order. Seat id = tank id; team 0 = a/a2 (left), team 1 = b/b2 (right). */
+export const SEATS = ['a', 'a2', 'b', 'b2'] as const;
 export type SeatId = typeof SEATS[number];
+export type Format = '1v1' | '2v2';
+export const FORMATS: Record<Format, readonly SeatId[]> = { '1v1': ['a', 'b'], '2v2': ['a', 'a2', 'b', 'b2'] };
+/** Order new players are seated in, so teams fill evenly. */
+export const FILL_ORDER: Record<Format, readonly SeatId[]> = { '1v1': ['a', 'b'], '2v2': ['a', 'b', 'a2', 'b2'] };
+export const teamOf = (seat: string | null | undefined) => seat?.startsWith('b') ? 1 : 0;
+export const isSeat = (v: unknown): v is SeatId => typeof v === 'string' && (SEATS as readonly string[]).includes(v);
 
 export type ErrorCode = 'PROTOCOL_MISMATCH' | 'BAD_MESSAGE' | 'AUTH_REQUIRED' | 'AUTH_FAILED' | 'ROOM_NOT_FOUND'
-  | 'ROOM_FULL' | 'ROOM_IN_PROGRESS' | 'ROOM_CLOSED' | 'RESUME_INVALID' | 'ALREADY_IN_ROOM' | 'NOT_IN_ROOM' | 'RATE_LIMITED';
+  | 'ROOM_FULL' | 'ROOM_IN_PROGRESS' | 'ROOM_CLOSED' | 'RESUME_INVALID' | 'ALREADY_IN_ROOM' | 'NOT_IN_ROOM' | 'RATE_LIMITED'
+  | 'TEAM_FULL' | 'NOT_HOST' | 'WRONG_PHASE' | 'SPECTATORS_FULL' | 'SPECTATOR' | 'SURRENDER_DENIED';
 export const ERROR_TEXT: Record<ErrorCode, string> = {
   PROTOCOL_MISMATCH: 'Phiên bản game khác máy chủ. Hãy tải lại trang.',
   BAD_MESSAGE: 'Gói tin không hợp lệ.',
@@ -41,28 +51,41 @@ export const ERROR_TEXT: Record<ErrorCode, string> = {
   ALREADY_IN_ROOM: 'Kết nối này đã ở trong một phòng.',
   NOT_IN_ROOM: 'Chưa vào phòng.',
   RATE_LIMITED: 'Gửi quá nhiều gói tin.',
+  TEAM_FULL: 'Đội kia đã đủ người.',
+  NOT_HOST: 'Chỉ chủ phòng mới làm được việc này.',
+  WRONG_PHASE: 'Không làm được việc này lúc này.',
+  SPECTATORS_FULL: 'Phòng đã đủ người xem.',
+  SPECTATOR: 'Người xem không điều khiển được xe.',
+  SURRENDER_DENIED: 'Chỉ đầu hàng được khi đội anh chỉ còn mình anh.',
 };
 
 export type Phase = 'lobby' | 'countdown' | 'playing' | 'finished' | 'closed';
-export type SeatView = { id: SeatId; name: string; ready: boolean; connected: boolean; host: boolean; holdMs: number | null };
-export type MatchResult = { matchId: string; code: string; winner: number | null; scores: number[];
-  reason: 'score' | 'forfeit' | 'cancelled'; rounds: number; players: { seat: SeatId; userId: string; team: number }[]; endedAt: number };
-export type RoomView = { code: string; phase: Phase; seats: SeatView[]; countdownMs: number | null; matchId: string | null; result: MatchResult | null };
+export type SeatView = { id: SeatId; team: number; name: string; ready: boolean; connected: boolean; host: boolean; holdMs: number | null; forfeited: boolean };
+export type MatchResult = { matchId: string; code: string; format: Format; winner: number | null; scores: number[];
+  reason: 'score' | 'forfeit' | 'surrender' | 'cancelled'; rounds: number; seed: number | null;
+  players: { seat: SeatId; userId: string; team: number; forfeited: boolean }[]; endedAt: number };
+export type RoomView = { code: string; format: Format; phase: Phase; seats: SeatView[]; spectators: number; countdownMs: number | null; matchId: string | null; result: MatchResult | null };
 export type TankSnap = { id: string; x: number; y: number; angle: number; aim: number; hp: number; cooldown: number; shield: number; shieldCooldown: number };
 export type BulletSnap = { id: number; team: number; x: number; y: number; vx: number; vy: number; bounces: number };
 export type Snapshot = { tick: number; ack: number; status: State['status']; round: number; scores: number[]; remaining: number;
   winner: number | null; roundWinner: number | null; tanks: TankSnap[]; bullets: BulletSnap[]; events: GameEvent[]; walls?: Wall[] };
 
 export type ClientMessage =
-  | { type: 'create'; protocol: string; name?: string; token?: string }
-  | { type: 'join'; protocol: string; code: string; name?: string; token?: string }
+  | { type: 'create'; protocol: string; name?: string; token?: string; format?: Format }
+  | { type: 'join'; protocol: string; code: string; name?: string; token?: string; as?: 'player' | 'spectator' }
   | { type: 'resume'; protocol: string; code: string; resumeToken: string; token?: string }
   | { type: 'ready'; ready: boolean }
   | { type: 'leave' }
+  /** Move yourself to a free seat of the other team (lobby only; clears your ready). */
+  | { type: 'team' }
+  /** Host only, lobby only: move the player in `seat` to `to` (swapping if taken). Clears everyone's ready. */
+  | { type: 'move'; seat: SeatId; to: SeatId }
+  /** Give up the match for your team. Only when nobody else on your team is still playing. */
+  | { type: 'surrender' }
   | { type: 'input'; seq: number; inputs: Input[] }
   | { type: 'ping'; at: number };
 export type ServerMessage =
-  | { type: 'joined'; code: string; seat: SeatId; resumeToken: string; nextSeq: number; serverTime: number; room: RoomView; walls?: Wall[]; snapshot?: Snapshot }
+  | { type: 'joined'; code: string; role: 'player' | 'spectator'; seat: SeatId | null; resumeToken: string; nextSeq: number; serverTime: number; room: RoomView; walls?: Wall[]; snapshot?: Snapshot }
   | { type: 'room'; room: RoomView }
   | { type: 'start'; matchId: string; walls: Wall[]; snapshot: Snapshot }
   | { type: 'snapshot'; snapshot: Snapshot }
@@ -95,8 +118,11 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
   if (!m || typeof m !== 'object' || Array.isArray(m)) return null;
   const str = (v: unknown, max: number) => v === undefined || (typeof v === 'string' && v.length <= max);
   switch (m.type) {
-    case 'create': return typeof m.protocol === 'string' && str(m.name, 64) && str(m.token, 4096) ? m as ClientMessage : null;
-    case 'join': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && str(m.name, 64) && str(m.token, 4096) ? m as ClientMessage : null;
+    case 'create': return typeof m.protocol === 'string' && str(m.name, 64) && str(m.token, 4096) && (m.format === undefined || m.format === '1v1' || m.format === '2v2') ? m as ClientMessage : null;
+    case 'join': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && str(m.name, 64) && str(m.token, 4096)
+      && (m.as === undefined || m.as === 'player' || m.as === 'spectator') ? m as ClientMessage : null;
+    case 'team': case 'surrender': return Object.keys(m).length === 1 ? m as ClientMessage : null;
+    case 'move': return isSeat(m.seat) && isSeat(m.to) && m.seat !== m.to ? m as ClientMessage : null;
     case 'resume': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && typeof m.resumeToken === 'string' && m.resumeToken.length <= 128 && str(m.token, 4096) ? m as ClientMessage : null;
     case 'ready': return typeof m.ready === 'boolean' ? m as ClientMessage : null;
     case 'leave': return m as ClientMessage;

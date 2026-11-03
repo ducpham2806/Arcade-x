@@ -1,8 +1,8 @@
 # Tank Clash P3 — Đặc tả MVP 2v2
 
-Phiên bản: v0.2 (đã duyệt, P3a đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
+Phiên bản: v0.3 (đã duyệt; P3a, P3b đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
 
-**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a đã code** (xem §13); P3b–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
+**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a và P3b đã code** (xem §13, §14); P3c–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
 
 ---
 
@@ -140,19 +140,20 @@ Client → server (thêm/sửa):
 |---|---|---|
 | `create` | thêm `format: '1v1' \| '2v2'` | Mặc định `1v1` |
 | `join` | thêm `as?: 'player' \| 'spectator'` | Người chơi chỉ vào được ở sảnh; người xem vào được cả khi đang trận |
-| `team` | `{ team: 0 \| 1 }` | Tự chuyển đội khi đội kia còn ghế; xóa trạng thái sẵn sàng của mình |
-| `move` | `{ seat, team }` | Chỉ chủ phòng, chỉ ở sảnh; xóa sẵn sàng của **mọi người** (PLAN §5) |
+| `team` | `{}` | Tự chuyển sang ghế trống đầu tiên của đội kia; xóa trạng thái sẵn sàng của mình |
+| `move` | `{ seat, to }` | Chỉ chủ phòng, chỉ ở sảnh; ghế đích có người thì đổi chỗ hai người; xóa sẵn sàng của **mọi người** (PLAN §5). Quyền chủ phòng đi theo người, không theo ghế |
+| `surrender` | `{}` | Chỉ khi đang trận và không còn đồng đội nào đang kết nối và chưa bỏ trận |
 | `queue` | `{}` | Chủ phòng của phòng riêng 2v2 có ≤2 người cùng đội, hoặc người chơi lẻ từ menu |
 | `unqueue` | `{}` | Ai trong tổ đội cũng hủy được; hủy cho cả tổ |
 
 Server → client (thêm/sửa):
 
 - `SeatView` thêm `team`, `forfeited`; `RoomView` thêm `format`, `spectators: number`, `queue: { since, estimate? } | null`.
-- `joined` thêm `role: 'player' | 'spectator'`; người xem không có `resumeToken` ghế (có token riêng chỉ để nối lại xem).
+- `joined` thêm `role: 'player' | 'spectator'`; `seat` là `null` với người xem và `resumeToken` rỗng. Người xem mất kết nối thì client tự gửi lại `join` dạng xem (không giữ chỗ, vì người xem không ảnh hưởng trận).
 - `MatchResult.players[]` thêm `forfeited: boolean`; `reason` giữ `'score' | 'forfeit' | 'cancelled'`.
-- Mã lỗi mới: `TEAM_FULL`, `NOT_HOST`, `WRONG_PHASE`, `QUEUE_INVALID` (kèm câu tiếng Việt như các mã cũ).
+- Mã lỗi mới: `TEAM_FULL`, `NOT_HOST`, `WRONG_PHASE`, `SPECTATORS_FULL`, `SPECTATOR`, `SURRENDER_DENIED` (P3b) và `QUEUE_INVALID` (P3c), kèm câu tiếng Việt như các mã cũ.
 
-Kiểm tra gói tin vẫn chặt như P2: từ chối loại lạ và field thừa; người xem gửi `input`/`ready` → `BAD_MESSAGE` (không ngắt kết nối).
+Kiểm tra gói tin vẫn chặt như P2: từ chối loại lạ và field thừa. Người xem gửi `ready`/`team`/`move`/`surrender` → lỗi `SPECTATOR` (không ngắt kết nối); `input` của người xem bị bỏ qua lặng lẽ để không gửi lại 30 lỗi mỗi giây.
 
 ### 5.3 Phòng
 
@@ -292,6 +293,23 @@ Mỗi phần: commit riêng, ghi `docs/WORKLOG.md`, chạy lint/build/budget/`te
 |---|---|---|
 | v0.1 | 03/11/2026 | Bản nháp đầu, chờ duyệt |
 | v0.2 | 03/11/2026 | Chủ dự án duyệt Q1–Q5; sân 1040×624 sinh ngẫu nhiên theo seed; ghế `a/a2/b/b2`; luật đầu hàng; P3a đã code (§13) |
+| v0.3 | 03/11/2026 | P3b đã code (§14); chốt dạng tin `team`/`move`/`surrender`, cách người xem nối lại |
+
+## 14. Kết quả P3b — 03/11/2026
+
+- **Code:** `protocol.ts` lên `tank-clash.p3.v1` (4 ghế `a/a2/b/b2`, `format`, `teamOf`, tin `team`/`move`/`surrender`, `join` dạng xem, `SeatView.team/forfeited`, `RoomView.format/spectators`, `MatchResult.format/seed/players[].forfeited`, 6 mã lỗi mới); `room.ts` (phòng 1v1/2v2, xếp ghế cân đội, đổi đội, chủ phòng xếp người, bỏ trận theo người qua `forfeitTank` của engine, người hết giờ giữ ghế cùng lúc xử trong một nhịp, đầu hàng, người xem, ghế người đã bỏ được trả lại khi có kết quả, seed sân mỗi trận); `net-client.ts` (sân theo format, xe mình luôn đứng đầu danh sách, `switchTeam/move/surrender`, xem trận và tự xem lại khi nối lại); `engine.ts` cho phép `squad` online (cả 4 xe là người).
+- Phòng 1v1 P2 giữ nguyên hành vi: toàn bộ test P2 (phòng, netcode, server, UI 2 trang) qua mà không sửa test.
+- **Test:** `tests/tank-clash/room2v2.test.mjs` (9 ca), `tests/tank-clash/netcode2v2.test.mjs` (4 ca: trận đủ ở 3 mức mạng + nối lại), cả hai trong `test:tank-clash`.
+- **Số đo trên mạng ảo (không phải máy thật), 4 client:**
+
+| Mạng | Tải xuống/client | Tải lên/client | Lệch hiển thị xe khác (TB / p95) | Hiệu chỉnh xe mình: chạm xe / gạch vỡ / tự do |
+|---|---|---|---|---|
+| RTT 80, jitter 30, mất 1 % | 19,1 KB/s | 4,2 KB/s | 11 / 24 px | 9 / 5 / 1 |
+| RTT 150, jitter 30, mất 2 % | 19,5 KB/s | 4,2 KB/s | 16 / 37 px | 7 / 1 / 1 |
+| RTT 250, jitter 30, mất 3 % | 19,8 KB/s | 4,2 KB/s | 23 / 53 px | 21 / 15 / 0 |
+
+  Hiệu chỉnh là tổng của 4 người trong cả trận. Gần như mọi hiệu chỉnh xảy ra khi xe mình vừa chạm xe khác (client chỉ thấy xe kia ở vị trí trễ) hoặc khi gạch vừa vỡ; lớn nhất 40 px, được làm mượt dần như P2. Băng thông dưới ngưỡng 30 KB/s nên chưa cần gửi delta.
+- **Chưa làm:** giao diện online 2v2 (sảnh 4 ghế, đổi đội, xem trận, đầu hàng online — P3d); tổ đội và hàng chờ (P3c); test server với 4 WebSocket thật (P3d); chạy room server thật qua Internet (chờ chọn hosting).
 
 ## 13. Kết quả P3a — 03/11/2026
 
