@@ -95,7 +95,7 @@ export function createNetSession(options: SessionOptions) {
       else if (!code && queue) { queue = null; api.findMatch(); } // a solo queue spot does not survive a dropped socket: queue again
     },
     /** Public 2v2 queue: solo outside a room, or the whole party when the host of a private 2v2 room calls it. */
-    findMatch() { error = null; send({ type: 'queue', protocol: PROTOCOL, name: options.name, token: options.token?.() }); },
+    findMatch(name = options.name) { error = null; if (name !== undefined) options.name = name; send({ type: 'queue', protocol: PROTOCOL, name, token: options.token?.() }); },
     cancelMatch() { send({ type: 'unqueue' }); },
     switchTeam() { send({ type: 'team' }); },
     move(from: SeatId, to: SeatId) { send({ type: 'move', seat: from, to }); },

@@ -33,6 +33,7 @@ Cập nhật: 03/11/2026. Làm xong việc nào thì đánh dấu `[x]`. Các c�
 - [ ] Đọc lướt từ điển Nối Từ: báo cho Claude từ thông dụng bị thiếu hoặc từ không phù hợp còn sót (sửa trong `scripts/word-chain/build-lexicon.mjs`).
 - [ ] Battleship trên điện thoại cấu hình thấp (độ mượt của bàn phối cảnh).
 - [ ] Tank Clash online: khi đã có server, chơi 10 trận trên hai thiết bị thật; báo cảm giác bắn vào xe đang chạy (để quyết định lag compensation).
+- [ ] Tank Clash 2v2 online (khi đã có server, hoặc thử local: `npm run dev:tank-server` rồi mở bản preview ở 4 cửa sổ): phòng riêng 2v2, tìm trận (1 tổ + 2 người lẻ), xem trận, đầu hàng. Báo chỗ nào khó hiểu hoặc xe giật khi chạm nhau (`docs/tank-clash/P3-review.md` §5).
 
 ## Tuỳ chọn, bảo Claude làm khi cần
 - [ ] Sinh lại toàn bộ icon và banner (sửa vệt đen ở banner cũ). Cần cài `sharp` cho `scripts/build-launcher-art.mjs`.

@@ -195,7 +195,7 @@ export function createRoomHost(options: HostOptions = {}) {
     });
     for (const [, seat] of placed) { room.seats.set(seat.id, seat); if (!seat.guest) userRooms.set(seat.userId, room.code); seat.ready = true; seat.peer = null; }
     room.units = units; room.phase = 'countdown'; room.countdownEnd = now() + NET.queueCountdownMs;
-    for (const [peerId, seat] of placed) { send(peerId, { type: 'queue', queue: null }); seatPeer(peerId, room, seat); }
+    for (const [peerId, seat] of placed) seatPeer(peerId, room, seat); // `joined` into a matched room also clears the client's queue state
     broadcastRoom(room); metrics.queueMatches++; log('queue.matched', { code: room.code, units: units.map(u => u.seats.length) });
   }
   /** Matched countdown failed (someone dropped or declined): the others go back to the front of the queue, parties together. */

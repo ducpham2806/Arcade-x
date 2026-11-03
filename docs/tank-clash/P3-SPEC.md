@@ -1,8 +1,8 @@
 # Tank Clash P3 — Đặc tả MVP 2v2
 
-Phiên bản: v0.4 (đã duyệt; P3a, P3b, P3c đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
+Phiên bản: v0.5 (đã duyệt; P3a–P3d đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
 
-**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a, P3b, P3c đã code** (xem §13–§15); P3d (giao diện online 2v2) chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
+**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a–P3d đã code** (xem §13–§16 và báo cáo `docs/tank-clash/P3-review.md`); chưa chơi thử thật, chưa deploy. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
 
 ---
 
@@ -296,6 +296,13 @@ Mỗi phần: commit riêng, ghi `docs/WORKLOG.md`, chạy lint/build/budget/`te
 | v0.2 | 03/11/2026 | Chủ dự án duyệt Q1–Q5; sân 1040×624 sinh ngẫu nhiên theo seed; ghế `a/a2/b/b2`; luật đầu hàng; P3a đã code (§13) |
 | v0.3 | 03/11/2026 | P3b đã code (§14); chốt dạng tin `team`/`move`/`surrender`, cách người xem nối lại |
 | v0.4 | 03/11/2026 | P3c đã code (§15); tổ đội không cần ngồi cùng đội trong phòng; người lẻ mất kết nối rời hàng ngay |
+| v0.5 | 03/11/2026 | P3d đã code (§16); báo cáo `P3-review.md` |
+
+## 16. Kết quả P3d — 03/11/2026
+
+- **Code:** `runtime.ts` + CSS: menu online mới (chọn 1v1/2v2, xem trận, tìm trận 2v2), màn chờ ghép (đồng hồ, gợi ý sau 60 giây: đợi tiếp / luyện 2v2 với bot), sảnh 2 cột đội (đổi đội, chủ phòng đổi đội cho người khác, tìm trận cho tổ, hủy, số người xem), trận ghép, HUD và nhãn tên 2v2 online, ghi chú đồng đội rời/mất kết nối ở chân trang, tạm dừng có đầu hàng khi chỉ còn mình, chế độ người xem, màn kết quả theo đội (đấu lại / tìm trận mới / giải tán). Vùng giao diện chỉ được vẽ lại khi nội dung đổi, để nút không bị thay dưới con trỏ. `net-client.ts`: `findMatch(name)`. `room.ts`: thông báo vào phòng ghép bằng `joined` (bỏ tin `queue: null` gây nháy màn). Mặc định tạo phòng vẫn là 1v1 để giữ hành vi P2.
+- **Test:** `tests/tank-clash/online2v2-ui.test.ts` (3 ca, trong `test:tank-clash-ui`): phòng riêng 2v2 với 4 trang + 1 người xem (đổi đội, bắt đầu trận, đồng đội rời, đầu hàng, kết quả cho cả 3 góc nhìn); hàng chờ (1 tổ + 2 lẻ); chờ 60 giây bằng đồng hồ giả rồi chuyển sang luyện với bot.
+- **Lỗi tìm được và đã sửa:** (1) menu online tràn khỏi khung trên PC → rút gọn; (2) test mới mở trang mà không đóng làm test khác bị tạm dừng do mất focus → đóng trang sau mỗi ca (không đổi logic tạm dừng); (3) test chờ 60 giây tua đồng hồ trước khi màn chờ hiện → đợi màn chờ trước.
 
 ## 15. Kết quả P3c — 03/11/2026
 

@@ -67,6 +67,11 @@ Code nằm trong `src/games/word-chain/`. Luật chơi:
 
 Tài liệu máy chủ: `docs/WORD-CHAIN-SERVER.md`.
 
+### 9. Tank Clash P3 — MVP 2v2 (03/11/2026, nhánh `ccr-e38a635d-qyei9d`, chưa merge)
+- Token tài khoản chỉ gửi tới máy chủ tin cậy (`trust.ts`, `VITE_TANK_CLASH_SERVERS`); sân Crossfire sinh ngẫu nhiên (`maps.ts`); 2v2 với bot; giao thức `tank-clash.p3.v1`; phòng 2v2, người xem, đầu hàng; tổ đội + hàng chờ 2v2; giao diện online 2v2.
+- Đặc tả `docs/tank-clash/P3-SPEC.md` v0.5, báo cáo `docs/tank-clash/P3-review.md`. Test: `test:tank-clash` 64, `test:tank-clash-server` 5, `test:tank-clash-ui` 6.
+- **Chưa chơi thử thật, chưa deploy, chưa chọn hosting.**
+
 ### 8. Tank Clash P2 — online 1v1 (03/11/2026, nhánh `ccr-ff972ce9-1yqkwu`)
 - Giao thức `protocol.ts`, máy chủ phòng `room.ts`, netcode `net-client.ts`, server WebSocket `server/tank-clash-room/`, giao diện online trong bản preview.
 - Test: `test:tank-clash` (trong `test:fast`), `test:tank-clash-server`, `test:tank-clash-ui` (đã thêm vào CI).

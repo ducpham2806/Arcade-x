@@ -6,6 +6,18 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3d: giao diện online 2v2 (P3 xong phần code)
+
+- Chủ dự án bảo làm tiếp và nhắc ghi lại việc đã làm vào file: mục này + báo cáo tổng hợp `docs/tank-clash/P3-review.md` (bảng P3a–P3d, giao diện, test, số đo, giới hạn, bước tiếp).
+- Đã làm P3d (chi tiết `docs/tank-clash/P3-SPEC.md` §16):
+  - `runtime.ts` + `tank-clash.css`: menu online (chọn 1v1/2v2 — mặc định 1v1 như P2, Xem trận, Tìm trận 2v2); màn chờ ghép có đồng hồ, sau 60 giây gợi ý "Tiếp tục đợi" / "Luyện 2v2 với bot"; sảnh 2 cột đội (Sang đội kia, chủ phòng ⇄ Đổi đội cho người khác, Tìm trận/Hủy cho tổ, số người xem); trận ghép (không sẵn sàng/đổi đội/mời); HUD và nhãn tên 2v2 online; ghi chú đồng đội rời/mất kết nối ở chân trang, không chặn trận; tạm dừng có Đầu hàng khi đội chỉ còn mình; chế độ người xem (ẩn cần điều khiển, "Ngừng xem"); kết quả theo đội (Đấu lại, Tìm trận mới, giữ kết quả khi phòng ghép giải tán). Giao diện chỉ vẽ lại vùng có thay đổi để không nuốt cú bấm.
+  - `net-client.ts`: `findMatch(name)`. `room.ts`: bỏ tin `queue: null` trước `joined` khi ghép (gây nháy màn). Nhãn bản build "P3", tiêu đề export cập nhật.
+- Test mới `tests/tank-clash/online2v2-ui.test.ts` (3 ca: phòng riêng 4 trang + người xem + đồng đội rời + đầu hàng; hàng chờ 1 tổ + 2 lẻ; chờ 60 giây bằng đồng hồ giả → luyện với bot), thêm vào `test:tank-clash-ui`.
+- Lỗi tìm được và đã sửa: menu online tràn khung trên PC; test mới mở trang không đóng làm test "2v2 với bot" bị tạm dừng do mất focus (sửa test: đóng trang sau mỗi ca, không đổi logic tạm dừng); test 60 giây tua đồng hồ trước khi màn chờ hiện (sửa test: đợi màn chờ). Lần đầu test 1v1 cũ hỏng vì em đặt mặc định 2v2 → đã trả mặc định về 1v1, không sửa test cũ.
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 64/64); `npm run test:tank-clash-server` 5/5; `npm run test:tank-clash-ui` 6/6, chạy 2 lần liên tiếp (với `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`). Đã xem ảnh menu online, sảnh 2v2, trận online ở 1280×760, 844×390, 390×844 và màn chờ.
+- Cập nhật thêm: `PLAN.md` §15.7, `SESSION-HANDOFF.md` (mục 9 mới), `OWNER-TODO.md` (việc thử tay 2v2 online).
+- **Chưa làm / rủi ro:** chưa chơi thử bằng người thật; chưa có máy chủ thật (chờ hosting); thông số sân/bot/hàng chờ là [PLACEHOLDER]; chưa lưu kết quả/cấp thưởng/vào launcher (P4). Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher). Nhánh chưa merge vào `main`.
+
 ## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3c: tổ đội + hàng chờ 2v2
 
 - Chủ dự án bảo làm tiếp. Đã làm P3c theo `docs/tank-clash/P3-SPEC.md` §6 (kết quả ở §15):
