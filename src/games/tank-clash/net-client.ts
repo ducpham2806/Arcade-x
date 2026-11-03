@@ -11,7 +11,7 @@ import { CONFIG, driveTank, neutral, tank as makeTank } from './engine.ts';
 import type { Input, State, Tank, Wall, GameEvent } from './engine.ts';
 import { DUEL_SIZE, SQUAD_SIZE } from './maps.ts';
 import { NET, PROTOCOL, SNAPSHOT_INTERVAL_MS, quantizeInput, teamOf } from './protocol.ts';
-import type { ClientMessage, ErrorCode, Format, MatchResult, RoomView, SeatId, ServerMessage, Snapshot, TankSnap } from './protocol.ts';
+import type { ClientMessage, ErrorCode, Format, MatchResult, QueueView, RoomView, SeatId, ServerMessage, Snapshot, TankSnap } from './protocol.ts';
 
 export type NetStats = { snapshots: number; teleports: number; phaseCorrections: number; corrections: number; maxCorrection: number; totalCorrection: number; rtt: number | null; pendingMax: number; sentInputs: number };
 export type SessionOptions = { send: (msg: ClientMessage) => void; now: () => number; name?: string; token?: () => string | undefined;
@@ -24,6 +24,7 @@ export function createNetSession(options: SessionOptions) {
   const { send, now } = options;
   let code: string | null = null, seat: SeatId | null = null, resumeToken: string | null = null, nextSeq = 0, role: 'player' | 'spectator' | null = null;
   let room: RoomView | null = null, result: MatchResult | null = null, matchId: string | null = null;
+  let queue: QueueView | null = null, leftReason: 'disbanded' | 'requeued' | null = null;
   let error: { code: ErrorCode; message: string; fatal: boolean } | null = null;
   let walls: Wall[] = [], latest: Snapshot | null = null;
   let buffer: { snap: Snapshot; at: number }[] = [];
@@ -81,7 +82,9 @@ export function createNetSession(options: SessionOptions) {
     stats,
     get code() { return code; }, get seat() { return seat; }, get role() { return role; },
     /** Team of this player (spectators: 0, so the view keeps team A on the left). */ get team() { return teamOf(seat); },
-    get canResume() { return !!code && (role === 'spectator' || !!resumeToken); }, get room() { return room; }, get result() { return result; },
+    get canResume() { return (!!code && (role === 'spectator' || !!resumeToken)) || (!code && !!queue); },
+    /** Queue status (solo or party). */ get queue() { return queue; },
+    /** Why the last room ended for us without a leave of our own ('disbanded' keeps the last result visible). */ get leftReason() { return leftReason; }, get room() { return room; }, get result() { return result; },
     get error() { return error; }, get matchId() { return matchId; }, get resumeToken() { return resumeToken; }, get pendingCount() { return pending.length; },
     create(name = options.name, format: Format = '1v1') { error = null; send({ type: 'create', protocol: PROTOCOL, name, token: options.token?.(), ...(format !== '1v1' ? { format } : {}) }); },
     join(roomCode: string, name = options.name, as: 'player' | 'spectator' = 'player') { error = null; send({ type: 'join', protocol: PROTOCOL, code: roomCode, name, token: options.token?.(), ...(as === 'spectator' ? { as } : {}) }); },
@@ -89,7 +92,11 @@ export function createNetSession(options: SessionOptions) {
     resume() {
       if (code && role === 'spectator') send({ type: 'join', protocol: PROTOCOL, code, name: options.name, token: options.token?.(), as: 'spectator' });
       else if (code && resumeToken) send({ type: 'resume', protocol: PROTOCOL, code, resumeToken, token: options.token?.() });
+      else if (!code && queue) { queue = null; api.findMatch(); } // a solo queue spot does not survive a dropped socket: queue again
     },
+    /** Public 2v2 queue: solo outside a room, or the whole party when the host of a private 2v2 room calls it. */
+    findMatch() { error = null; send({ type: 'queue', protocol: PROTOCOL, name: options.name, token: options.token?.() }); },
+    cancelMatch() { send({ type: 'unqueue' }); },
     switchTeam() { send({ type: 'team' }); },
     move(from: SeatId, to: SeatId) { send({ type: 'move', seat: from, to }); },
     surrender() { send({ type: 'surrender' }); },
@@ -100,7 +107,7 @@ export function createNetSession(options: SessionOptions) {
     receive(msg: ServerMessage) {
       switch (msg.type) {
         case 'joined':
-          code = msg.code; seat = msg.seat; role = msg.role; resumeToken = msg.resumeToken || null; nextSeq = msg.nextSeq; room = msg.room; result = msg.room.result; error = null;
+          code = msg.code; seat = msg.seat; role = msg.role; leftReason = null; if (msg.room.kind === 'queue') queue = null; resumeToken = msg.resumeToken || null; nextSeq = msg.nextSeq; room = msg.room; result = msg.room.result; error = null;
           reset(); if (msg.walls) walls = msg.walls; if (msg.snapshot) { matchId = msg.room.matchId; onSnapshot(msg.snapshot); }
           break;
         case 'room': room = msg.room; if (msg.room.phase !== 'finished') result = msg.room.result; break;
@@ -111,7 +118,8 @@ export function createNetSession(options: SessionOptions) {
         case 'error': error = { code: msg.code, message: msg.message, fatal: msg.fatal };
           if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = resumeToken = role = null; room = null; reset(); }
           break;
-        case 'left': code = seat = resumeToken = role = null; room = null; result = null; reset(); break;
+        case 'left': code = seat = resumeToken = role = null; room = null; leftReason = msg.reason ?? null; if (msg.reason !== 'disbanded') result = null; reset(); break;
+        case 'queue': queue = msg.queue; break;
       }
       options.onChange?.(msg.type);
     },

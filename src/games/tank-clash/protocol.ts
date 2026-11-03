@@ -22,6 +22,10 @@ export const NET = Object.freeze({
   interpolationMs: 100,
   maxPayload: 2048,
   spectatorsMax: 4,          // [PLACEHOLDER]
+  queueCountdownMs: 5_000,   // matched 2v2: countdown before the first match, no ready needed [PLACEHOLDER]
+  queueRematchMs: 20_000,    // matched room: all four must ready again within this window, else it disbands [PLACEHOLDER]
+  queueDropMs: 10_000,       // a queued party member offline this long takes the party out of the queue [PLACEHOLDER]
+  queueWaitHintMs: 60_000,   // client offers "keep waiting / practise with bots" after this long [PLACEHOLDER]
 });
 export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L
 export const ROOM_CODE_LENGTH = 6;
@@ -37,7 +41,7 @@ export const isSeat = (v: unknown): v is SeatId => typeof v === 'string' && (SEA
 
 export type ErrorCode = 'PROTOCOL_MISMATCH' | 'BAD_MESSAGE' | 'AUTH_REQUIRED' | 'AUTH_FAILED' | 'ROOM_NOT_FOUND'
   | 'ROOM_FULL' | 'ROOM_IN_PROGRESS' | 'ROOM_CLOSED' | 'RESUME_INVALID' | 'ALREADY_IN_ROOM' | 'NOT_IN_ROOM' | 'RATE_LIMITED'
-  | 'TEAM_FULL' | 'NOT_HOST' | 'WRONG_PHASE' | 'SPECTATORS_FULL' | 'SPECTATOR' | 'SURRENDER_DENIED';
+  | 'TEAM_FULL' | 'NOT_HOST' | 'WRONG_PHASE' | 'SPECTATORS_FULL' | 'SPECTATOR' | 'SURRENDER_DENIED' | 'QUEUE_INVALID' | 'QUEUE_LOGIN';
 export const ERROR_TEXT: Record<ErrorCode, string> = {
   PROTOCOL_MISMATCH: 'Phiên bản game khác máy chủ. Hãy tải lại trang.',
   BAD_MESSAGE: 'Gói tin không hợp lệ.',
@@ -57,6 +61,8 @@ export const ERROR_TEXT: Record<ErrorCode, string> = {
   SPECTATORS_FULL: 'Phòng đã đủ người xem.',
   SPECTATOR: 'Người xem không điều khiển được xe.',
   SURRENDER_DENIED: 'Chỉ đầu hàng được khi đội anh chỉ còn mình anh.',
+  QUEUE_INVALID: 'Chỉ phòng 2v2 chưa vào trận, có tối đa 2 người đang kết nối, mới tìm trận được.',
+  QUEUE_LOGIN: 'Cần đăng nhập để tìm trận công khai. Khách vẫn chơi được phòng riêng.',
 };
 
 export type Phase = 'lobby' | 'countdown' | 'playing' | 'finished' | 'closed';
@@ -64,7 +70,10 @@ export type SeatView = { id: SeatId; team: number; name: string; ready: boolean;
 export type MatchResult = { matchId: string; code: string; format: Format; winner: number | null; scores: number[];
   reason: 'score' | 'forfeit' | 'surrender' | 'cancelled'; rounds: number; seed: number | null;
   players: { seat: SeatId; userId: string; team: number; forfeited: boolean }[]; endedAt: number };
-export type RoomView = { code: string; format: Format; phase: Phase; seats: SeatView[]; spectators: number; countdownMs: number | null; matchId: string | null; result: MatchResult | null };
+export type QueueView = { since: number; size: number };
+/** kind 'queue' = made by matchmaking: no host, no seat changes, disbands if the four do not rematch. */
+export type RoomView = { code: string; format: Format; kind: 'private' | 'queue'; phase: Phase; seats: SeatView[]; spectators: number; countdownMs: number | null;
+  matchId: string | null; result: MatchResult | null; /** party room waiting in the 2v2 queue */ queue: QueueView | null };
 export type TankSnap = { id: string; x: number; y: number; angle: number; aim: number; hp: number; cooldown: number; shield: number; shieldCooldown: number };
 export type BulletSnap = { id: number; team: number; x: number; y: number; vx: number; vy: number; bounces: number };
 export type Snapshot = { tick: number; ack: number; status: State['status']; round: number; scores: number[]; remaining: number;
@@ -82,6 +91,9 @@ export type ClientMessage =
   | { type: 'move'; seat: SeatId; to: SeatId }
   /** Give up the match for your team. Only when nobody else on your team is still playing. */
   | { type: 'surrender' }
+  /** Join the 2v2 queue. From a private 2v2 room (host): the whole party. Outside a room: solo (needs protocol + auth). */
+  | { type: 'queue'; protocol?: string; name?: string; token?: string }
+  | { type: 'unqueue' }
   | { type: 'input'; seq: number; inputs: Input[] }
   | { type: 'ping'; at: number };
 export type ServerMessage =
@@ -92,7 +104,10 @@ export type ServerMessage =
   | { type: 'result'; result: MatchResult; room: RoomView }
   | { type: 'pong'; at: number; serverTime: number; tick: number }
   | { type: 'error'; code: ErrorCode; message: string; fatal: boolean }
-  | { type: 'left' };
+  /** Queue status for this connection (solo or party). null = not queued. */
+  | { type: 'queue'; queue: QueueView | null }
+  /** reason 'disbanded': matched room closed after the result; 'requeued': matched countdown failed, you are back in the queue. */
+  | { type: 'left'; reason?: 'disbanded' | 'requeued' };
 
 const q = (n: number, p = 10) => Math.round(n * p) / p;
 export function quantizeInput(input: Input): Input {
@@ -121,7 +136,8 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
     case 'create': return typeof m.protocol === 'string' && str(m.name, 64) && str(m.token, 4096) && (m.format === undefined || m.format === '1v1' || m.format === '2v2') ? m as ClientMessage : null;
     case 'join': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && str(m.name, 64) && str(m.token, 4096)
       && (m.as === undefined || m.as === 'player' || m.as === 'spectator') ? m as ClientMessage : null;
-    case 'team': case 'surrender': return Object.keys(m).length === 1 ? m as ClientMessage : null;
+    case 'team': case 'surrender': case 'unqueue': return Object.keys(m).length === 1 ? m as ClientMessage : null;
+    case 'queue': return (m.protocol === undefined || (typeof m.protocol === 'string' && m.protocol.length <= 64)) && str(m.name, 64) && str(m.token, 4096) ? m as ClientMessage : null;
     case 'move': return isSeat(m.seat) && isSeat(m.to) && m.seat !== m.to ? m as ClientMessage : null;
     case 'resume': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && typeof m.resumeToken === 'string' && m.resumeToken.length <= 128 && str(m.token, 4096) ? m as ClientMessage : null;
     case 'ready': return typeof m.ready === 'boolean' ? m as ClientMessage : null;

@@ -67,3 +67,27 @@ test('Supabase authenticator: valid token → account identity; bad token, netwo
   assert.equal(calls[0][0], 'https://staging.example.supabase.co/auth/v1/user');
   assert.equal(await auth('bad'), null); assert.equal(await auth('boom'), null); assert.equal(await auth(undefined), null);
 });
+
+test('P3: a party and two solos meet through the public 2v2 queue over real WebSockets and play a server-run match', { timeout: 30_000 }, async () => {
+  const server = await createTankRoomServer({}); // guest-only dev server: guests may queue
+  const [host, mate, x, y] = ['An', 'Ánh', 'Xuân', 'Yến'].map(name => connectTankRoom(server.url, { name, storage: null }));
+  let ticker;
+  try {
+    await until(() => [host, mate, x, y].every(c => c.status === 'open'));
+    host.session.create('An', '2v2'); await until(() => host.session.code);
+    mate.session.join(host.session.code); await until(() => mate.session.seat);
+    host.session.findMatch(); await until(() => mate.session.queue?.size === 2);
+    x.session.findMatch(); await until(() => x.session.queue);
+    const health = await (await fetch(server.url.replace('ws', 'http').replace(/\/tank$/, '') + '/health')).json();
+    assert.equal(health.queued, 2);
+    y.session.findMatch();
+    await until(() => [host, mate, x, y].every(c => c.session.room?.kind === 'queue'));
+    assert.equal(new Set([host, mate, x, y].map(c => c.session.code)).size, 1);
+    assert.deepEqual([host, mate, x, y].map(c => c.session.team), [0, 0, 1, 1]);
+    await until(() => host.session.room?.phase === 'playing', NET.queueCountdownMs + 2000);
+    ticker = setInterval(() => { for (const c of [host, mate, x, y]) c.session.tick(input({ y: c === x ? -1 : 0 })); }, 1000 / 60);
+    const state = server.roomHost.inspect(host.session.code), id = x.session.seat, y0 = state.tanks.find(t => t.id === id).y;
+    await pause(400); assert.ok(state.tanks.find(t => t.id === id).y < y0 - 20, 'solo player drives its own tank');
+    assert.equal(state.mode, 'squad');
+  } finally { clearInterval(ticker); for (const c of [host, mate, x, y]) c.close(); await server.close(); }
+});

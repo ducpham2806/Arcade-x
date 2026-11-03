@@ -6,6 +6,16 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3c: tổ đội + hàng chờ 2v2
+
+- Chủ dự án bảo làm tiếp. Đã làm P3c theo `docs/tank-clash/P3-SPEC.md` §6 (kết quả ở §15):
+  - `room.ts`: một hàng chờ 2v2 trong bộ nhớ server. Người lẻ xếp hàng từ ngoài phòng; tổ đội là phòng riêng 2v2 có ≤ 2 người, chủ phòng bấm tìm trận (phòng bị khóa trong lúc chờ). Ghép: tổ+tổ trước, rồi tổ+2 lẻ, rồi 4 lẻ theo thứ tự vào hàng; tổ luôn chung đội. Phòng ghép: đếm ngược 5 giây, không chủ phòng, không đổi đội; ai rớt/rời/bỏ sẵn sàng lúc đếm ngược → người còn lại về đầu hàng (tổ về phòng riêng mới). Sau kết quả: đủ 4 người đấu lại trong 20 giây, không thì phòng giải tán (client giữ màn kết quả). Một tài khoản chỉ ở một nơi; khách cần đăng nhập để vào hàng (máy chủ dev chỉ có khách thì cho phép).
+  - `protocol.ts`: tin `queue`/`unqueue`, `RoomView.kind/queue`, `left.reason`, mã lỗi `QUEUE_INVALID`/`QUEUE_LOGIN`, 4 thông số [PLACEHOLDER]. `net-client.ts`: `findMatch()`/`cancelMatch()`, trạng thái hàng chờ, tự xếp lại khi nối lại. `server.mjs`: bật hàng chờ cho khách ở máy chủ dev, `/health` báo số người chờ.
+  - Đổi so với đặc tả v0.3: bỏ điều kiện tổ đội phải ngồi cùng đội trong phòng (khi ghép luôn chung đội); người lẻ mất kết nối rời hàng ngay. Đã ghi vào đặc tả v0.4.
+- Test mới: `tests/tank-clash/queue.test.mjs` (11 ca) trong `test:tank-clash`; 1 ca WebSocket thật trong `test:tank-clash-server`. Đã thử làm hỏng 3 quy tắc để kiểm test: 2 quy tắc bị bắt ngay; quy tắc "quay về đầu hàng" chưa bị bắt nên đã thêm ca riêng, giờ bắt được.
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 64/64); `npm run test:tank-clash-server` 5/5; `npm run test:tank-clash-ui` 3/3 (với `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`).
+- **Chưa làm / rủi ro:** P3d (giao diện online 2v2: sảnh 4 ghế, nút tìm trận/hủy, màn chờ 60 giây với lựa chọn "luyện với bot", xem trận, đầu hàng online, test 4 trang). Hàng chờ chỉ chạy trong một tiến trình máy chủ; chưa xét kỹ năng/khu vực. Chưa chạy máy chủ thật qua Internet (chờ hosting). Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
+
 ## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3b: phòng 2v2 trên server
 
 - Chủ dự án bảo làm tiếp. Đã làm P3b theo `docs/tank-clash/P3-SPEC.md` (chi tiết và bảng số đo ở §14):

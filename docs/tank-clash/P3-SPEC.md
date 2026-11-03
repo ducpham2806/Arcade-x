@@ -1,8 +1,8 @@
 # Tank Clash P3 — Đặc tả MVP 2v2
 
-Phiên bản: v0.3 (đã duyệt; P3a, P3b đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
+Phiên bản: v0.4 (đã duyệt; P3a, P3b, P3c đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
 
-**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a và P3b đã code** (xem §13, §14); P3c–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
+**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a, P3b, P3c đã code** (xem §13–§15); P3d (giao diện online 2v2) chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
 
 ---
 
@@ -143,7 +143,7 @@ Client → server (thêm/sửa):
 | `team` | `{}` | Tự chuyển sang ghế trống đầu tiên của đội kia; xóa trạng thái sẵn sàng của mình |
 | `move` | `{ seat, to }` | Chỉ chủ phòng, chỉ ở sảnh; ghế đích có người thì đổi chỗ hai người; xóa sẵn sàng của **mọi người** (PLAN §5). Quyền chủ phòng đi theo người, không theo ghế |
 | `surrender` | `{}` | Chỉ khi đang trận và không còn đồng đội nào đang kết nối và chưa bỏ trận |
-| `queue` | `{}` | Chủ phòng của phòng riêng 2v2 có ≤2 người cùng đội, hoặc người chơi lẻ từ menu |
+| `queue` | `{ protocol?, name?, token? }` | Chủ phòng của phòng riêng 2v2 có ≤ 2 người (cả tổ), hoặc người chơi lẻ ngoài phòng (cần `protocol` + xác thực như `create`) |
 | `unqueue` | `{}` | Ai trong tổ đội cũng hủy được; hủy cho cả tổ |
 
 Server → client (thêm/sửa):
@@ -172,16 +172,17 @@ Kiểm tra gói tin vẫn chặt như P2: từ chối loại lạ và field th�
 
 ### 6.1 Tổ đội
 
-Tổ đội = phòng riêng 2v2 chưa đủ người. Không làm hệ thống bạn bè hay lời mời riêng trong P3: rủ bạn bằng mã/link như P2, hai người cùng đội rồi chủ phòng bấm "Tìm trận". Nhờ vậy dùng lại toàn bộ luồng phòng đã có test.
+Tổ đội = phòng riêng 2v2 chưa đủ người. Không làm hệ thống bạn bè hay lời mời riêng trong P3: rủ bạn bằng mã/link như P2, rồi chủ phòng bấm "Tìm trận". Nhờ vậy dùng lại toàn bộ luồng phòng đã có test. *(v0.4: bỏ điều kiện hai người phải ngồi cùng đội trong phòng — khi ghép, tổ luôn được xếp chung một đội, nên điều kiện đó chỉ thêm một bước bấm.)* Phòng tổ đội đang tìm trận bị khóa: không ai vào thêm, không đổi đội/sẵn sàng.
 
 ### 6.2 Hàng chờ
 
 - **Một** hàng chờ 2v2 trong bộ nhớ của tiến trình server (một máy chủ, một khu vực ở P3).
 - Đơn vị xếp hàng: người lẻ (1) hoặc tổ đội (2). Ghép trận khi đủ hai đội: tổ+tổ, tổ+2 lẻ, hoặc 4 lẻ (lẻ ghép thành đội theo thứ tự vào hàng).
 - Thứ tự: vào trước ghép trước; ưu tiên tổ+tổ khi có, để tổ đội không phải đánh với hai người lẻ chưa quen nhau nếu không cần. Chưa xét kỹ năng (chưa có dữ liệu — PLAN §5).
-- Khi ghép xong: server tạo phòng `2v2` loại `queue`, đưa cả 4 vào, đếm ngược 5 giây [PLACEHOLDER], không cần bấm sẵn sàng. Ai mất kết nối trong lúc đếm ngược → hủy, ba người còn lại **quay về đầu hàng chờ** (giữ thứ tự cũ), người mất kết nối bị bỏ khỏi hàng.
+- Khi ghép xong: server tạo phòng `2v2` loại `queue` (không có chủ phòng, không đổi đội), đưa cả 4 vào, đếm ngược 5 giây [PLACEHOLDER], không cần bấm sẵn sàng. Phòng tổ đội cũ được gộp vào phòng ghép. Ai mất kết nối, rời hoặc bỏ sẵn sàng trong lúc đếm ngược → hủy, những người còn lại **quay về đầu hàng chờ** (giữ thứ tự cũ); tổ đội được trả về một phòng riêng mới gồm đúng những người đó; người gây hủy bị bỏ khỏi hàng.
 - Một tài khoản chỉ ở một nơi: trong hàng chờ **hoặc** một phòng (đã có `ALREADY_IN_ROOM` cho phòng; mở rộng cho hàng chờ).
-- Hủy tìm trận giải phóng chỗ ngay; mất kết nối trong hàng chờ quá 10 giây [PLACEHOLDER] → tự rời hàng.
+- Hủy tìm trận giải phóng chỗ ngay. Người lẻ mất kết nối → rời hàng ngay (không có ghế để giữ; client tự xếp hàng lại khi nối lại, vào cuối hàng). Thành viên tổ đội mất kết nối: tổ không được ghép trong lúc đó, quá 10 giây [PLACEHOLDER] thì cả tổ rời hàng.
+- Khách (chưa đăng nhập) không vào được hàng chờ công khai (`QUEUE_LOGIN`, Q2). Máy chủ dev chỉ có khách thì cho phép để thử local.
 
 ### 6.3 Thiếu người
 
@@ -294,6 +295,13 @@ Mỗi phần: commit riêng, ghi `docs/WORKLOG.md`, chạy lint/build/budget/`te
 | v0.1 | 03/11/2026 | Bản nháp đầu, chờ duyệt |
 | v0.2 | 03/11/2026 | Chủ dự án duyệt Q1–Q5; sân 1040×624 sinh ngẫu nhiên theo seed; ghế `a/a2/b/b2`; luật đầu hàng; P3a đã code (§13) |
 | v0.3 | 03/11/2026 | P3b đã code (§14); chốt dạng tin `team`/`move`/`surrender`, cách người xem nối lại |
+| v0.4 | 03/11/2026 | P3c đã code (§15); tổ đội không cần ngồi cùng đội trong phòng; người lẻ mất kết nối rời hàng ngay |
+
+## 15. Kết quả P3c — 03/11/2026
+
+- **Code:** `room.ts` thêm hàng chờ 2v2 trong bộ nhớ (người lẻ và tổ đội từ phòng riêng 2v2), ghép theo thứ tự ưu tiên tổ+tổ → tổ+2 lẻ → 4 lẻ, phòng ghép loại `queue` (đếm ngược 5 giây, không chủ phòng, không đổi đội, người xem được, bỏ trận như phòng riêng), đếm ngược hỏng → người còn lại về đầu hàng (tổ được trả về phòng riêng mới), sau kết quả cần đủ 4 người đấu lại trong 20 giây nếu không phòng giải tán (client giữ màn kết quả, `left.reason = 'disbanded'`), một tài khoản chỉ ở một nơi, khách cần đăng nhập. `protocol.ts`: tin `queue`/`unqueue`, `RoomView.kind/queue`, `QueueView`, `left.reason`, mã lỗi `QUEUE_INVALID`/`QUEUE_LOGIN`, 4 thông số hàng chờ [PLACEHOLDER]. `net-client.ts`: `findMatch()`/`cancelMatch()`, trạng thái `queue`, `leftReason`, tự xếp hàng lại khi nối lại. `server.mjs`: cho khách xếp hàng khi máy chủ chỉ có khách (dev), `/health` có số người đang chờ.
+- **Test:** `tests/tank-clash/queue.test.mjs` (11 ca, phủ đủ bảng §6.4 cộng khóa phòng tổ, người lẻ rời, phòng ghép sau kết quả, người xem, thứ tự quay lại hàng) trong `test:tank-clash`; thêm 1 ca WebSocket thật trong `test:tank-clash-server` (1 tổ + 2 lẻ được ghép và chơi). Đã cố ý làm hỏng 3 quy tắc (ưu tiên tổ+tổ, quay về đầu hàng, một tài khoản một nơi) để chắc test bắt được; ca "quay về đầu hàng" ban đầu không bắt được nên đã thêm test riêng.
+- **Giới hạn:** hàng chờ nằm trong một tiến trình (không chạy nhiều máy chủ được); chưa xét kỹ năng/khu vực; chưa có giao diện (P3d).
 
 ## 14. Kết quả P3b — 03/11/2026
 

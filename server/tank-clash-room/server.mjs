@@ -36,10 +36,11 @@ export function supabaseAuthenticator({ url, anonKey, fetchImpl = fetch, timeout
 }
 
 export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allowedOrigins = [], authenticate = guestAuthenticate, onResult, log = () => {} } = {}) {
-  const roomHost = createRoomHost({ now: () => performance.now(), authenticate, onResult, log });
+  // Public 2v2 queue needs an account (owner decision); a guest-only dev server lets guests queue so it can be tried locally.
+  const roomHost = createRoomHost({ now: () => performance.now(), authenticate, onResult, log, allowGuestQueue: authenticate === guestAuthenticate });
   const transport = { connections: 0, open: 0, bytesIn: 0, bytesOut: 0, refusedOrigin: 0 };
   const http = createServer((req, res) => {
-    const body = req.url === '/health' ? { ok: true, protocol: PROTOCOL, rooms: roomHost.rooms().length, transport, host: roomHost.metrics } : { ok: false };
+    const body = req.url === '/health' ? { ok: true, protocol: PROTOCOL, rooms: roomHost.rooms().length, queued: roomHost.queue().length, transport, host: roomHost.metrics } : { ok: false };
     res.writeHead(req.url === '/health' ? 200 : 404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body));
   });
   // A file:// page sends Origin "null"; accept it only on a loopback-bound dev host (owner playtest of the HTML file).
