@@ -6,6 +6,17 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-ff972ce9-1yqkwu`
+
+### Tank Clash P2 — phần 3: giao diện online + tài liệu (xong)
+- `src/games/tank-clash/runtime.ts`, `tank-clash.css`: thẻ "03 / Online 1v1" ở menu; màn tạo phòng/nhập mã (Enter để vào), link mời `?room=MÃ&server=...`; sảnh có ghế A/B, chủ phòng, sẵn sàng, đếm ngược, giờ giữ ghế khi mất kết nối; trận online không tạm dừng (Escape/blur/launcher pause → xe đứng yên, có nút rời trận = xử thua); màn kết quả do server xác nhận (thắng/thua/hòa/xử thua/hủy) và đấu lại; chân trang hiện ping và "đang nối lại". Nhãn bản build đổi thành "P2 · HÌNH TẠM".
+- Sửa lỗi tìm được khi chụp màn hình: (1) ghế B thấy xe mình màu cam trong khi HUD tô mình màu xanh → giờ màu theo "mình/đối thủ" khi online; (2) form trên điện thoại 390 px bị lộn xộn → xếp lại; (3) đối thủ rời sau khi có kết quả làm mất màn kết quả → giữ lại tới khi người chơi chọn.
+- Server nhận origin `null` (mở file HTML trực tiếp) chỉ khi bind loopback. `preview.ts` gắn `window.__tankClash` (chỉ bản preview) cho test đọc trạng thái.
+- Test mới `tests/tank-clash/online-ui.test.ts` (`npm run test:tank-clash-ui`, đã thêm vào CI): 2 trang Chromium + server thật.
+- Tài liệu: `docs/tank-clash/P2-review.md` (mới: đã làm, số đo, giới hạn, quyết định hosting); cập nhật `PLAN.md` (checklist P2, nhật ký v1.2), `README.md`, `PVP-BACKLOG.md`, `docs/PENDING-DECISIONS.md` (mục 9: nơi chạy room server), `docs/OWNER-TODO.md`, `docs/SESSION-HANDOFF.md` (mục 8).
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua toàn bộ (gồm `test:tank-clash` 27/27); `npm run test:tank-clash-server` 4/4; `npm run test:tank-clash-ui` 1/1. Đã xem ảnh chụp 1280×760, 390×844, 844×390.
+- **Chưa làm / còn rủi ro:** chưa deploy, chưa chọn hosting (chờ chủ dự án); chưa chơi thử trên Internet/thiết bị thật; chưa có lag compensation; chưa lưu kết quả vào database; chưa vào launcher (P4); chưa có 2v2/ghép trận (P3). Chưa chạy các bước CI cần trình duyệt của game khác (`test:smoke`, `test:games`, `test:modals`…) vì không đụng tới launcher.
+
 ## 02/11/2026 · nhánh `ccr-ff972ce9-1yqkwu` (tách từ `main` `c8aac24`)
 
 ### Tank Clash P2 — phần 2: máy chủ WebSocket (xong, chưa deploy)

@@ -20,11 +20,22 @@ Mở `deliverables/Tank_Clash_P1_Playtest.html` bằng trình duyệt. File ch�
 
 Các con số trên là [PLACEHOLDER] cho chơi thử, không phải cân bằng đã được người chơi kiểm chứng.
 
+## Online 1v1 (P2)
+
+```bash
+npm ci --prefix server/tank-clash-room
+npm run dev:tank-server        # ws://127.0.0.1:3223/tank, chơi khách
+```
+Mở bản preview ở hai cửa sổ, chọn "03 / Online 1v1". Đổi server bằng `?server=wss://...`; link mời có dạng `?room=MÃ`. Chi tiết, số đo và giới hạn: `docs/tank-clash/P2-review.md`.
+
 ## Kiểm thử
 
 ```bash
 npm ci --prefix server/tank-clash-spike --ignore-scripts
 node --test tests/tank-clash/engine.test.mjs tests/tank-clash/network.test.mjs
+npm run test:tank-clash          # engine + phòng + mạng ảo (trong test:fast)
+npm ci --prefix server/tank-clash-room && npm run test:tank-clash-server   # WebSocket thật
+npm run test:tank-clash-ui       # Playwright: 2 trang + server thật
 ```
 
 Server thử nghiệm có dependency riêng, không thêm dependency mạng vào bundle launcher. `network.test.mjs` mở server loopback và hai WebSocket client thật rồi đóng khi xong; không dùng hoặc thay đổi Supabase.
@@ -38,7 +49,11 @@ Server thử nghiệm có dependency riêng, không thêm dependency mạng vào
 | `src/games/tank-clash/index.tsx` | Adapter React với cleanup và nhận trạng thái pause |
 | `src/games/tank-clash/preview.ts` | Điểm vào standalone |
 | `scripts/export-tank-review.mjs` | Bundle preview một file bằng esbuild hiện có |
-| `server/tank-clash-spike/server.mjs` | Thử hợp đồng input/snapshot, ghế reconnect và sequence |
+| `server/tank-clash-spike/server.mjs` | Thử hợp đồng input/snapshot, ghế reconnect và sequence (P0, giữ để so sánh) |
+| `src/games/tank-clash/protocol.ts` | P2: giao thức, kiểm tra gói tin, mã phòng, nén snapshot |
+| `src/games/tank-clash/room.ts` | P2: máy chủ phòng không phụ thuộc mạng (vòng đời, giữ ghế, xử thua, tín dụng input) |
+| `src/games/tank-clash/net-client.ts` | P2: dự đoán/đối soát/nội suy, wrapper WebSocket cho trình duyệt |
+| `server/tank-clash-room/server.mjs` | P2: server WebSocket, origin allowlist, xác thực Supabase tuỳ chọn |
 
 ## Giới hạn P0 network spike
 

@@ -67,6 +67,11 @@ Code nằm trong `src/games/word-chain/`. Luật chơi:
 
 Tài liệu máy chủ: `docs/WORD-CHAIN-SERVER.md`.
 
+### 8. Tank Clash P2 — online 1v1 (03/11/2026, nhánh `ccr-ff972ce9-1yqkwu`)
+- Giao thức `protocol.ts`, máy chủ phòng `room.ts`, netcode `net-client.ts`, server WebSocket `server/tank-clash-room/`, giao diện online trong bản preview.
+- Test: `test:tank-clash` (trong `test:fast`), `test:tank-clash-server`, `test:tank-clash-ui` (đã thêm vào CI).
+- **Chưa deploy, chưa chọn hosting, chưa vào launcher.** Báo cáo và số đo: `docs/tank-clash/P2-review.md`.
+
 ## Sổ tay kỹ thuật
 - **CI:** thứ tự các bước trong `.github/workflows/ci.yml`. Lệnh mới của session này:
   - `test:battleship-ui`;

@@ -50,5 +50,7 @@ jobs:
         run: npm run test:battleship-ui
       - name: Nối Từ practice match (Playwright, dev server)
         run: npm run test:word-chain-ui
+      - name: Tank Clash online 1v1 (Playwright, two pages + room server)
+        run: npm run test:tank-clash-ui
       - name: Generated files are not left behind
         run: git diff --exit-code && test -z "$(git status --porcelain)"

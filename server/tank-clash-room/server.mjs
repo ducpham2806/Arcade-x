@@ -42,7 +42,9 @@ export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allow
     const body = req.url === '/health' ? { ok: true, protocol: PROTOCOL, rooms: roomHost.rooms().length, transport, host: roomHost.metrics } : { ok: false };
     res.writeHead(req.url === '/health' ? 200 : 404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body));
   });
-  const originOk = origin => !origin || LOCAL_ORIGIN.test(origin) || allowedOrigins.includes(origin);
+  // A file:// page sends Origin "null"; accept it only on a loopback-bound dev host (owner playtest of the HTML file).
+  const loopback = ['127.0.0.1', 'localhost', '::1'].includes(host);
+  const originOk = origin => !origin || LOCAL_ORIGIN.test(origin) || allowedOrigins.includes(origin) || (loopback && origin === 'null');
   const wss = new WebSocketServer({ server: http, path: '/tank', maxPayload: NET.maxPayload, perMessageDeflate: false,
     verifyClient: ({ origin }, done) => { if (originOk(origin)) done(true); else { transport.refusedOrigin++; done(false, 403, 'Origin not allowed'); } } });
   let nextId = 0;
