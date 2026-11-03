@@ -1,6 +1,6 @@
 # Tank Clash P3 — Đặc tả MVP 2v2
 
-Phiên bản: v0.2 (đã duyệt, P3a đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5; code P2 hiện hành trên main.
+Phiên bản: v0.2 (đã duyệt, P3a đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5 của v1.3 (nay là §10 mục 5); code P2 hiện hành trên main.
 
 **Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a đã code** (xem §13); P3b–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
 
@@ -130,7 +130,7 @@ Yêu cầu bố cục, kiểm tự động mỗi lần sinh (`validateArena`); k
 
 ### 5.1 Phiên bản
 
-Đổi hợp đồng nên lên **`tank-clash.p3.v1`** (handoff §15.8: không tái dùng version string khi wire đổi). Server P3 phục vụ cả 1v1 và 2v2 qua `format`; client P2 cũ nhận `PROTOCOL_MISMATCH` kèm câu "tải lại trang". Không chạy song song hai server.
+Đổi hợp đồng nên lên **`tank-clash.p3.v1`** (PLAN §12, v1.3 §15.8: không tái dùng version string khi wire đổi). Server P3 phục vụ cả 1v1 và 2v2 qua `format`; client P2 cũ nhận `PROTOCOL_MISMATCH` kèm câu "tải lại trang". Không chạy song song hai server.
 
 ### 5.2 Thay đổi tin nhắn
 
