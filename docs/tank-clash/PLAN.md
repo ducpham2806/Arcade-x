@@ -224,7 +224,15 @@ Những dấu hiệu buộc dừng mở rộng nội dung: người mới không
 - [x] **P0.4:** tạo thử nghiệm mạng tối thiểu chạy local với hai client, đo input/snapshot và rời–vào lại; đánh giá ứng viên room server.
 - [x] **P1.1:** dựng sân tập và bản prototype mobile/PC cho anh thử lái, ngắm, bắn bật tường và khiên.
 
-Các mục trên đã có đầu ra trong đợt P0/P1. Bước tiếp theo là P2: hoàn thiện giao thức phòng 1v1, nối UI vào server và kiểm chứng mạng Internet. Bản chơi hiện tại vẫn là luyện tập cục bộ.
+Các mục trên đã có đầu ra trong đợt P0/P1.
+
+**P2 (03/11/2026, chi tiết ở `docs/tank-clash/P2-review.md`):**
+- [x] **P2.1:** giao thức `tank-clash.p2.v1`, xác thực Supabase tuỳ chọn, mã phòng, lỗi rõ ràng, khóa khi đang trong trận.
+- [x] **P2.2:** máy chủ phòng làm trọng tài: sẵn sàng, đếm ngược, đồng hồ, thắng thua, giữ ghế 20 s, xử thua, hủy trận, đấu lại, kết quả một lần theo `matchId`.
+- [x] **P2.3:** client dự đoán/đối soát xe mình, nội suy xe đối thủ, tự nối lại; giao diện online trong bản preview.
+- [x] **P2.4:** thử RTT 80/150/250 ms, jitter 30 ms, mất gói 1–3 % trên mạng ảo; đo băng thông.
+- [ ] **P2.5:** chọn hosting và deploy staging (cần anh duyệt chi phí).
+- [ ] **P2.6:** chơi thử 10 trận trên hai thiết bị thật qua Internet; quyết định có cần lag compensation.
 
 ## 11. Quy trình giao bản và giới hạn phát hành
 
@@ -258,3 +266,4 @@ Các nội dung cần giải quyết qua P0/P1, chưa cần hỏi thêm để ho
 | Phiên bản/ngày | Thay đổi | Trạng thái |
 |---|---|---|
 | v1.1 · 02/11/2026 | Triển khai P0 và prototype P1; bổ sung GDD, tuning và kiểm thử | Bản thử để anh chơi; chuẩn bị P2 |
+| v1.2 · 03/11/2026 | P2: giao thức phòng, room server, netcode, server WebSocket, giao diện online, test mạng ảo và trình duyệt | Chạy được cục bộ; chờ chọn hosting và chơi thử thật |

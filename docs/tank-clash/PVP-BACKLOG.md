@@ -8,7 +8,7 @@ Anh Đức yêu cầu lưu cả năm ý tưởng để phát triển dần và l
 
 | Ưu tiên dự kiến | Game | Trải nghiệm chính | Quy mô dự kiến | Trạng thái |
 |---|---|---|---|---|---|
-| 1 | Tank Clash | Xe tăng đấu trường góc nhìn từ trên xuống; né đạn, bắn bật tường, phá vật cản, phối hợp ép góc | 1v1, 2v2 trước; 3v3, 4v4 sau | Đã có nền P0 và bản thử P1; tiếp theo online 1v1 P2 |
+| 1 | Tank Clash | Xe tăng đấu trường góc nhìn từ trên xuống; né đạn, bắn bật tường, phá vật cản, phối hợp ép góc | 1v1, 2v2 trước; 3v3, 4v4 sau | P0/P1 xong; P2 online 1v1 chạy cục bộ (03/11/2026), chờ hosting và chơi thử thật |
 | 2 | Rune Brawl | Đấu sĩ dùng đánh thường, lướt né và kỹ năng riêng; thắng nhờ đọc tình huống và phối hợp | 2v2 làm trọng tâm; có thể mở 1v1, 3v3, 4v4 | Ý tưởng đã lưu |
 | 3 | Sky Artillery | Pháo chiến theo lượt; canh góc, lực, gió; phá địa hình và hỗ trợ đồng đội | 1v1 đến 4v4 | Ý tưởng đã lưu |
 | 4 | Beast Ball | Thú chiến tranh bóng; chuyền, húc, ghi bàn; thiên về chơi vui cùng bạn bè | 1v1 đến 3v3; đánh giá 4v4 sau | Ý tưởng đã lưu |

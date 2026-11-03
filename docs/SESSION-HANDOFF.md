@@ -3,8 +3,8 @@
 Tài liệu tóm tắt cho người làm tiếp. Việc chủ dự án cần tự làm nằm ở `docs/OWNER-TODO.md`.
 
 ## Trạng thái nhánh
-- Nhánh làm việc `claude/busy-edison-1clj3h` đang đi trước `main` **16 commit chưa merge** (từ `76833d1` đến `6d9982d`).
-- `main` đang ở `7df4d18`, đã có M0–M8 và NR1–NR3.
+- Cập nhật 02/11/2026: nhánh `claude/busy-edison-1clj3h` đã merge vào `main` (PR #11). `main` (`c8aac24`) có thêm Tank Clash P0/P1 và Snake journey.
+- Nhật ký chi tiết từng việc, mới nhất ở trên: `docs/WORKLOG.md` (bắt buộc cập nhật).
 - Netlify deploy production từ `main`. Chỉ merge khi chủ dự án yêu cầu, và chạy đủ CI trước khi merge.
 
 ## Đã làm, theo thứ tự
@@ -66,6 +66,11 @@ Code nằm trong `src/games/word-chain/`. Luật chơi:
 | **WC4** | Client `online-client.ts`, giao diện `OnlineRoom.tsx`, trang duyệt `RoomLab.tsx` mô phỏng 4 người trên một máy (`npm run preview:word-chain`). Các nút online đang tắt (`online-config.json`, `enabled: false`). |
 
 Tài liệu máy chủ: `docs/WORD-CHAIN-SERVER.md`.
+
+### 8. Tank Clash P2 — online 1v1 (03/11/2026, nhánh `ccr-ff972ce9-1yqkwu`)
+- Giao thức `protocol.ts`, máy chủ phòng `room.ts`, netcode `net-client.ts`, server WebSocket `server/tank-clash-room/`, giao diện online trong bản preview.
+- Test: `test:tank-clash` (trong `test:fast`), `test:tank-clash-server`, `test:tank-clash-ui` (đã thêm vào CI).
+- **Chưa deploy, chưa chọn hosting, chưa vào launcher.** Báo cáo và số đo: `docs/tank-clash/P2-review.md`.
 
 ## Sổ tay kỹ thuật
 - **CI:** thứ tự các bước trong `.github/workflows/ci.yml`. Lệnh mới của session này:
