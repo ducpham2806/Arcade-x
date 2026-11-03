@@ -11,7 +11,7 @@ export type Wall = { id: number; x: number; y: number; w: number; h: number; kin
 export type Tank = Vec & { id: string; team: number; angle: number; aim: number; hp: number; cooldown: number; shield: number; shieldCooldown: number; kind: 'player' | 'bot' | 'target' };
 export type Bullet = Vec & { id: number; owner: string; team: number; vx: number; vy: number; age: number; bounces: number };
 export type GameEvent = Vec & { id: number; type: 'shot' | 'bounce' | 'hit' | 'block' | 'brick' | 'lesson' | 'round'; time: number };
-export type State = { version: 1; mode: 'training' | 'duel'; tick: number; time: number;
+export type State = { version: 1; mode: 'training' | 'duel'; online?: boolean; tick: number; time: number;
   tanks: Tank[]; walls: Wall[]; bullets: Bullet[]; events: GameEvent[]; nextId: number;
   status: 'playing' | 'roundEnd' | 'finished'; round: number; scores: number[]; remaining: number;
   phaseTime: number; winner: number | null; roundWinner: number | null; lesson: number; lessonDone: boolean;
@@ -39,8 +39,9 @@ export function duelWalls(): Wall[] {
   for (const x of [320, 440]) for (const y of [120, 160, 280, 320]) add(x, y, 40, 40, 'brick');
   return walls;
 }
-export function createState(mode: State['mode'] = 'training'): State {
-  const s: State = { version: 1, mode, tick: 0, time: 0, tanks: [], walls: [], bullets: [], events: [], nextId: 1,
+/** `online: true` (duel only): both tanks are human seats in every round; no bot is created. */
+export function createState(mode: State['mode'] = 'training', options: { online?: boolean } = {}): State {
+  const s: State = { version: 1, mode, ...(options.online && mode === 'duel' ? { online: true } : {}), tick: 0, time: 0, tanks: [], walls: [], bullets: [], events: [], nextId: 1,
     status: 'playing', round: 1, scores: [0, 0], remaining: CONFIG.roundSeconds, phaseTime: 0,
     winner: null, roundWinner: null, lesson: 0, lessonDone: false, stats: { shots: 0, hits: 0, ricochets: 0, blocks: 0, bricks: 0 } };
   setupRound(s); return s;
@@ -49,7 +50,7 @@ function setupRound(s: State) {
   s.bullets = []; s.remaining = CONFIG.roundSeconds; s.status = 'playing'; s.phaseTime = 0;
   s.roundWinner = null;
   if (s.mode === 'training') setupLesson(s);
-  else { s.walls = duelWalls(); s.tanks = [tank('a', 0, 100, 240), tank('b', 1, 700, 240, 'bot')]; }
+  else { s.walls = duelWalls(); s.tanks = [tank('a', 0, 100, 240), tank('b', 1, 700, 240, s.online ? 'player' : 'bot')]; }
 }
 function setupLesson(s: State) {
   s.lessonDone = false; s.walls = []; s.bullets = [];
@@ -134,6 +135,14 @@ function fire(s: State, a: Tank) {
 function moveTank(s: State, a: Tank, input: Input, dt: number) {
   a.cooldown = Math.max(0, a.cooldown - dt); a.shield = Math.max(0, a.shield - dt); a.shieldCooldown = Math.max(0, a.shieldCooldown - dt);
   if (a.hp <= 0) return;
+  driveTank(s, a, input, dt);
+  if (input.shield && a.shieldCooldown <= 0) { a.shield = CONFIG.shieldDuration; a.shieldCooldown = CONFIG.shieldCooldown; }
+  if (input.fire) fire(s, a);
+}
+/** Movement, hull turn and turret only. Shared by the server step and client-side prediction (P2),
+ * so a predicted tank follows exactly the same collision and sliding rules. */
+export function driveTank(s: State, a: Tank, input: Input, dt = 1 / CONFIG.hz) {
+  if (a.hp <= 0) return;
   const norm = Math.max(1, length(input.x, input.y)), mx = input.x / norm, my = input.y / norm;
   a.aim = input.aim;
   if (mx || my) a.angle = moveAngle(a.angle, Math.atan2(my, mx), CONFIG.turnSpeed * dt);
@@ -143,8 +152,6 @@ function moveTank(s: State, a: Tank, input: Input, dt: number) {
     if (canOccupy(s, a.x + dx / pieces, a.y, a.id)) a.x += dx / pieces;
     if (canOccupy(s, a.x, a.y + dy / pieces, a.id)) a.y += dy / pieces;
   }
-  if (input.shield && a.shieldCooldown <= 0) { a.shield = CONFIG.shieldDuration; a.shieldCooldown = CONFIG.shieldCooldown; }
-  if (input.fire) fire(s, a);
 }
 function updateBullet(s: State, b: Bullet, dt: number): boolean {
   b.age += dt; if (b.age >= CONFIG.bulletLife) return false;
