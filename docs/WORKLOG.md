@@ -8,6 +8,14 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — kiểm tra đủ CI và merge vào `main`
+
+- Chủ dự án yêu cầu ghi nhật ký và merge. Nhánh gồm 4 phần: rút gọn PLAN + lưu trữ nhật ký cũ, rút gọn SESSION-HANDOFF, Tank Clash P3b, Tank Clash P3c (mục chi tiết bên dưới).
+- Chạy đủ các bước trong `.github/workflows/ci.yml` trên commit `e2f89e9`: `npm run lint`, `build`, `test:bundle`, `test:fast` (gồm `test:tank-clash` 65/65), `test:tank-clash-server` 5/5, `test:perf`, `test:smoke`, `test:games`, `test:neon-feel`, `test:offline`, `test:modals`, `test:blossom-ui` 55/55, `test:battleship-ui` 2/2, `test:word-chain-ui` 4/4, `test:tank-clash-ui` 3/3 — tất cả qua (trình duyệt: `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`); `git status` sạch sau khi chạy (không để lại file sinh).
+- `main` lúc merge: `508d4ff` (không có commit mới), nhánh merge không xung đột.
+- **Lưu ý cho production:** Tank Clash chưa có trong launcher/catalog, nên merge này không đổi gì người chơi thấy; máy chủ phòng Tank Clash vẫn chưa deploy (chờ chọn hosting).
+- **Việc tiếp theo:** P3d (giao diện online 2v2 + hàng chờ), xem `docs/tank-clash/PLAN.md` §10.
+
 ## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — Tank Clash P3c: hàng chờ 2v2 và tổ đội
 
 - Chủ dự án đồng ý làm P3c. Chi tiết: `docs/tank-clash/P3-SPEC.md` §15.
