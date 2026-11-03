@@ -10,7 +10,7 @@ import { CONFIG, driveTank, neutral, tank as makeTank } from './engine.ts';
 import type { Input, State, Tank, Wall, GameEvent } from './engine.ts';
 import { DUEL_SIZE, SQUAD_SIZE } from './maps.ts';
 import { NET, PROTOCOL, SNAPSHOT_INTERVAL_MS, quantizeInput, teamOf } from './protocol.ts';
-import type { ClientMessage, ErrorCode, Format, MatchResult, RoomView, SeatId, ServerMessage, Snapshot, TankSnap } from './protocol.ts';
+import type { ClientMessage, ErrorCode, Format, MatchResult, QueueView, RoomView, SeatId, ServerMessage, Snapshot, TankSnap } from './protocol.ts';
 
 export type NetStats = { snapshots: number; teleports: number; phaseCorrections: number; corrections: number; maxCorrection: number; totalCorrection: number; rtt: number | null; pendingMax: number; sentInputs: number };
 export type SessionOptions = { send: (msg: ClientMessage) => void; now: () => number; name?: string; token?: () => string | undefined;
@@ -24,6 +24,8 @@ export function createNetSession(options: SessionOptions) {
   let code: string | null = null, seat: SeatId | null = null, role: 'player' | 'spectator' | null = null, resumeToken: string | null = null, nextSeq = 0;
   let room: RoomView | null = null, result: MatchResult | null = null, matchId: string | null = null;
   let error: { code: ErrorCode; message: string; fatal: boolean } | null = null;
+  // Solo queue status (a party's status is room.queue). `queueAt` = local time the status arrived.
+  let soloQueue: QueueView | null = null, queueAt = 0, queueReason: string | null = null, roomAt = 0;
   let walls: Wall[] = [], latest: Snapshot | null = null;
   let buffer: { snap: Snapshot; at: number }[] = [];
   let pending: { seq: number; input: Input }[] = [], outbox: Input[] = [], outboxSeq = 0;
@@ -87,6 +89,17 @@ export function createNetSession(options: SessionOptions) {
     move(seatId: SeatId, team: number) { send({ type: 'move', seat: seatId, team }); },
     /** Only accepted when nobody else on your team is still playing. */
     surrender() { send({ type: 'surrender' }); },
+    /** Search for a 2v2 match: solo from the menu, or (host) the whole party from a 2v2 room. Needs a signed-in account. */
+    queue(name = options.name) { error = null; send({ type: 'queue', protocol: PROTOCOL, name, token: options.token?.() }); },
+    unqueue() { send({ type: 'unqueue' }); },
+    /** Current queue status (solo or party) with the wait advanced locally; null when not searching. */
+    get queueStatus(): (QueueView & { reason: string | null }) | null {
+      const q = soloQueue ? { ...soloQueue, waitedMs: soloQueue.waitedMs + Math.max(0, now() - queueAt) }
+        : room?.queue ? { ...room.queue, waitedMs: room.queue.waitedMs + Math.max(0, now() - roomAt) } : null;
+      return q ? { ...q, reason: queueReason } : null;
+    },
+    /** True while searching solo (the browser wrapper re-sends `queue` after a reconnect). */
+    get queueing() { return !!soloQueue; },
     /** Re-attach to the previous seat after a dropped connection. */
     resume() { if (code && resumeToken) send({ type: 'resume', protocol: PROTOCOL, code, resumeToken, token: options.token?.() }); },
     restore(saved: { code: string; resumeToken: string }) { code = saved.code; resumeToken = saved.resumeToken; },
@@ -94,12 +107,18 @@ export function createNetSession(options: SessionOptions) {
     leave() { send({ type: 'leave' }); },
     ping() { send({ type: 'ping', at: now() }); },
     receive(msg: ServerMessage) {
+      if ('room' in msg && msg.room) roomAt = now();
       switch (msg.type) {
         case 'joined':
+          soloQueue = null; queueReason = null;
           code = msg.code; seat = msg.seat; role = msg.role; resumeToken = msg.resumeToken; nextSeq = msg.nextSeq; room = msg.room; result = msg.room.result; error = null;
           reset(); if (msg.walls) walls = msg.walls; if (msg.snapshot) { matchId = msg.room.matchId; onSnapshot(msg.snapshot); }
           break;
         case 'seat': seat = msg.seat; break;
+        case 'queue': // solo queue status: searching solo means not being in a room
+          soloQueue = msg.queue; queueAt = now(); queueReason = msg.reason ?? null;
+          if (msg.queue) { code = seat = role = resumeToken = null; room = null; result = null; reset(); }
+          break;
         case 'room': room = msg.room; if (msg.room.phase !== 'finished') result = msg.room.result; break;
         case 'start': matchId = msg.matchId; result = null; reset(); walls = msg.walls; onSnapshot(msg.snapshot); break;
         case 'snapshot': onSnapshot(msg.snapshot); break;
@@ -108,7 +127,7 @@ export function createNetSession(options: SessionOptions) {
         case 'error': error = { code: msg.code, message: msg.message, fatal: msg.fatal };
           if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = role = resumeToken = null; room = null; reset(); }
           break;
-        case 'left': code = seat = role = resumeToken = null; room = null; result = null; reset(); break;
+        case 'left': code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); break;
       }
       options.onChange?.(msg.type);
     },
@@ -183,7 +202,7 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
   const session = createNetSession({ now: () => performance.now(), name: options.name, token: options.token,
     send: msg => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg)); else if (msg.type !== 'input' && msg.type !== 'ping') queue.push(msg); },
     onChange: kind => {
-      try { if (session.code && session.resumeToken) store?.setItem('tank-clash.seat', JSON.stringify({ code: session.code, resumeToken: session.resumeToken })); else if (kind === 'left' || kind === 'error') store?.removeItem('tank-clash.seat'); } catch { /* storage optional */ }
+      try { if (session.code && session.resumeToken) store?.setItem('tank-clash.seat', JSON.stringify({ code: session.code, resumeToken: session.resumeToken })); else if (kind === 'left' || kind === 'error' || kind === 'queue') store?.removeItem('tank-clash.seat'); } catch { /* storage optional */ }
       options.onChange?.(kind);
     } });
   try { const saved = JSON.parse(store?.getItem('tank-clash.seat') ?? 'null'); if (saved?.code && saved?.resumeToken) session.restore(saved); } catch { /* ignore */ }
@@ -196,6 +215,7 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
       const wasSeated = !!(session.code && session.resumeToken);
       const waiting = queue; queue = [];
       if (wasSeated && !waiting.some(m => m.type === 'create' || m.type === 'join')) session.resume();
+      else if (session.queueing && !waiting.some(m => m.type === 'queue')) session.queue(); // same account keeps its place
       for (const m of waiting) socket.send(JSON.stringify(m));
       clearInterval(pingTimer); pingTimer = setInterval(() => session.ping(), 1000);
     };

@@ -8,6 +8,15 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — Tank Clash P3c: hàng chờ 2v2 và tổ đội
+
+- Chủ dự án đồng ý làm P3c. Chi tiết: `docs/tank-clash/P3-SPEC.md` §15.
+- Code: `protocol.ts` (tin `queue`/`unqueue`, `RoomView.kind/queue/rematchMs`, mã lỗi `QUEUE_INVALID`/`ROOM_QUEUED`, thông số thời gian hàng chờ trong `NET`), `room.ts` (hàng chờ trong bộ nhớ, ghép tổ + tổ trước rồi theo thứ tự, phòng ghép đếm ngược 5 giây, hủy và trả về chỗ cũ, cửa sổ đấu lại 20 giây rồi giải tán, giữ chỗ 10 giây khi mất mạng, bắt đăng nhập), `net-client.ts` (`queue()`, `unqueue()`, `queueStatus`, tự xếp lại sau khi nối lại), `server.mjs` (`TANK_QUEUE_GUESTS`, `/health` có số đang chờ), `tests/tank-clash/harness.mjs` (client có token).
+- Test mới: `tests/tank-clash/queue.test.mjs` (12 ca, đủ bảng §6.4) trong `test:tank-clash`; 1 ca WebSocket thật trong `server.test.mjs`. Thử làm hỏng code 7 chỗ: lần đầu test bắt 4/7, 3 chỗ lọt vì test dựng sai tình huống (một test qua mà không kiểm gì) → sửa test, bắt 7/7.
+- Lỗi tìm được: thời gian chờ của tổ đội hiển thị đứng yên → client tự cộng thời gian.
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 65/65); `npm run test:tank-clash-server` 5/5; `npm run test:tank-clash-ui` 3/3 (`CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`).
+- **Chưa làm / rủi ro:** P3d (giao diện online 2v2, màn hàng chờ và "thiếu người" sau 60 giây, test UI 4 trang, ảnh chụp, `P3-review.md`). Hàng chờ một tiến trình, mất khi server khởi động lại; chưa xét kỹ năng. Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
+
 ## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — Tank Clash P3b: phòng 2v2 online, người xem, đầu hàng
 
 - Chủ dự án đồng ý làm P3b. Chi tiết và số đo: `docs/tank-clash/P3-SPEC.md` §14.

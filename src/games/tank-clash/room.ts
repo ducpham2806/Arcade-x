@@ -1,29 +1,38 @@
-/** Tank Clash room host (P2 1v1, P3b 2v2): private rooms with codes, teams, ready, countdown, authoritative
- * match, seat hold on disconnect, per-player forfeit, surrender, spectators, rematch and a once-only result hook.
+/** Tank Clash room host (P2 1v1, P3b 2v2, P3c queue): private rooms with codes, teams, ready, countdown, authoritative
+ * match, seat hold on disconnect, per-player forfeit, surrender, spectators, rematch, a once-only result hook, and one
+ * in-memory 2v2 queue for solo players and parties (a party = a private 2v2 room with up to two players on one team).
  * Transport-agnostic: the WebSocket server (server/tank-clash-room) and the network-condition tests
  * both drive it through `connect/message/disconnect/advance`. Time is injected, never read globally.
  */
 import { CONFIG, createState, driveTank, forfeitTank, neutral, step, surrender } from './engine.ts';
 import type { Input, State } from './engine.ts';
 import { ERROR_TEXT, JOIN_ORDER, NET, PROTOCOL, ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, SEATS, SEATS_OF, cleanName, encodeSnapshot, normalizeCode, parseClientMessage, teamOf } from './protocol.ts';
-import type { ClientMessage, ErrorCode, Format, MatchResult, Phase, RoomView, SeatId, ServerMessage } from './protocol.ts';
+import type { ClientMessage, ErrorCode, Format, MatchResult, Phase, QueueView, RoomKind, RoomView, SeatId, ServerMessage } from './protocol.ts';
 
 export type Identity = { userId: string; name: string; guest: boolean };
 /** Resolve a client token to an account. Return null to reject. Guests are only for local/dev hosts. */
 export type Authenticate = (token: string | undefined, name: string | undefined) => Identity | null | Promise<Identity | null>;
 export type PeerHandle = { send: (msg: ServerMessage) => void; close?: (reason: string) => void };
 export type HostOptions = { now?: () => number; authenticate?: Authenticate; onResult?: (result: MatchResult) => void | Promise<void>;
-  randomBytes?: (n: number) => Uint8Array; log?: (event: string, data: Record<string, unknown>) => void };
+  randomBytes?: (n: number) => Uint8Array; log?: (event: string, data: Record<string, unknown>) => void;
+  /** The public queue needs a signed-in account (owner decision Q2). true only for a local dev host without accounts. */
+  guestQueue?: boolean };
 
 type Queued = { seq: number; input: Input };
 type Seat = { id: SeatId; userId: string; name: string; guest: boolean; peer: string | null; token: string; ready: boolean; lastSeen: number;
   queue: Queued[]; last: Input; lastInputAt: number; seq: number; ack: number; credit: number; forfeited: boolean };
 /** Spectators watch with a public view (MVP has no hidden information). They never send input or count toward start/end. */
 type Spectator = { token: string; name: string; peer: string | null; lastSeen: number };
-type Room = { code: string; format: Format; phase: Phase; seats: Map<SeatId, Seat>; spectators: Map<string, Spectator>; host: SeatId | null;
+/** A queued unit: one solo player (not in any room) or a party room. `since` orders the queue and survives a cancelled countdown. */
+type Member = { peer: string | null; userId: string; name: string; guest: boolean };
+type QEntry = { id: number; since: number; solo: (Member & { offlineSince: number | null }) | null; party: string | null };
+/** Who came in together, so a party can be put back together after a matched room ends. */
+type Group = { party: boolean; since: number; userIds: string[] };
+type Room = { code: string; kind: RoomKind; format: Format; phase: Phase; seats: Map<SeatId, Seat>; spectators: Map<string, Spectator>; host: SeatId | null;
   lastActivity: number; emptySince: number | null; countdownEnd: number; state: State | null; matchId: string | null; matchCount: number;
-  result: MatchResult | null; accumulator: number; lastAdvance: number; eventCursor: number; wallsKey: string };
-type Peer = { handle: PeerHandle; code: string | null; seat: SeatId | null; spectator: string | null; windowAt: number; messages: number; busy: boolean };
+  result: MatchResult | null; accumulator: number; lastAdvance: number; eventCursor: number; wallsKey: string;
+  /** Party room in the queue. */ queued: QEntry | null; /** Matched room: arrival groups. */ groups: Group[]; /** Matched room: end of the rematch window. */ dissolveAt: number | null };
+type Peer = { handle: PeerHandle; code: string | null; seat: SeatId | null; spectator: string | null; queued: QEntry | null; windowAt: number; messages: number; busy: boolean };
 
 export const guestAuthenticate: Authenticate = (_token, name) => ({ userId: '', name: cleanName(name), guest: true });
 
@@ -34,6 +43,7 @@ export function createRoomHost(options: HostOptions = {}) {
   const log = options.log ?? (() => {});
   const rooms = new Map<string, Room>(), peers = new Map<string, Peer>(), userRooms = new Map<string, string>();
   const reported = new Set<string>();
+  const queue: QEntry[] = [], queuedUsers = new Map<string, QEntry>(); let entryIds = 0;
   const metrics = { rooms: 0, matches: 0, results: 0, rejected: 0, rateLimited: 0, ticks: 0 };
   const hex = (n: number) => Array.from(randomBytes(n), b => b.toString(16).padStart(2, '0')).join('');
   const seatCount = (room: Room) => SEATS_OF[room.format].length;
@@ -53,7 +63,8 @@ export function createRoomHost(options: HostOptions = {}) {
   }
   function view(room: Room): RoomView {
     const t = now();
-    return { code: room.code, format: room.format, phase: room.phase, countdownMs: room.phase === 'countdown' ? Math.max(0, room.countdownEnd - t) : null,
+    return { code: room.code, kind: room.kind, format: room.format, phase: room.phase, queue: room.queued ? queueView(room.queued) : null,
+      rematchMs: room.kind === 'queue' && room.phase === 'finished' && room.dissolveAt !== null ? Math.max(0, room.dissolveAt - t) : null, countdownMs: room.phase === 'countdown' ? Math.max(0, room.countdownEnd - t) : null,
       matchId: room.matchId, result: room.result, spectators: [...room.spectators.values()].filter(v => v.peer).length,
       seats: SEATS_OF[room.format].filter(id => room.seats.has(id)).map(id => { const s = room.seats.get(id)!;
         return { id, team: teamOf(id), name: s.name, ready: s.ready, connected: !!s.peer, host: room.host === id, forfeited: s.forfeited,
@@ -89,7 +100,7 @@ export function createRoomHost(options: HostOptions = {}) {
     send(peerId, joinedMessage(room, 'spectator', null, v.token));
   }
   function makeSeat(id: SeatId, who: Identity): Seat {
-    return { id, userId: who.guest ? `guest:${hex(8)}` : who.userId, name: who.name, guest: who.guest, peer: null, token: hex(24), ready: false,
+    return { id, userId: who.guest && !who.userId ? `guest:${hex(8)}` : who.userId, name: who.name, guest: who.guest, peer: null, token: hex(24), ready: false,
       lastSeen: now(), queue: [], last: neutral(), lastInputAt: 0, seq: -1, ack: -1, credit: 0, forfeited: false };
   }
   function releaseUser(room: Room, seat: Seat) { if (userRooms.get(seat.userId) === room.code) userRooms.delete(seat.userId); }
@@ -97,9 +108,11 @@ export function createRoomHost(options: HostOptions = {}) {
     const seat = room.seats.get(id); if (!seat) return;
     releaseUser(room, seat); detach(seat.peer);
     room.seats.delete(id);
+    if (room.queued) dropEntry(room.queued); // a party member left: the whole party leaves the queue
     if (room.host === id) room.host = SEATS.find(s => room.seats.has(s)) ?? null; // fixed rule: a, a2, b, b2
     for (const s of room.seats.values()) s.ready = false;
-    if (room.phase === 'finished' || room.phase === 'countdown') room.phase = 'lobby';
+    if (room.kind === 'queue') { if (room.phase === 'countdown' && room.matchCount) room.phase = 'finished'; } // matched rooms take no newcomers
+    else if (room.phase === 'finished' || room.phase === 'countdown') room.phase = 'lobby';
     if (!room.seats.size) closeRoom(room, 'empty'); else broadcastRoom(room);
   }
   /** Move a seated player to a free seat of `team`. Returns false when that team is full. */
@@ -112,8 +125,15 @@ export function createRoomHost(options: HostOptions = {}) {
     send(seat.peer, { type: 'seat', seat: to });
     return true;
   }
+  function newRoom(format: Format, kind: RoomKind): Room {
+    const room: Room = { code: newCode(), kind, format, phase: 'lobby', seats: new Map(), spectators: new Map(), host: kind === 'private' ? 'a' : null, lastActivity: now(),
+      emptySince: null, countdownEnd: 0, state: null, matchId: null, matchCount: 0, result: null, accumulator: 0, lastAdvance: now(), eventCursor: 0, wallsKey: '',
+      queued: null, groups: [], dissolveAt: null };
+    rooms.set(room.code, room); metrics.rooms++; return room;
+  }
   function closeRoom(room: Room, reason: string) {
     if (room.phase === 'closed') return;
+    if (room.queued) dropEntry(room.queued);
     room.phase = 'closed';
     for (const seat of room.seats.values()) { releaseUser(room, seat); if (seat.peer) { fail(seat.peer, 'ROOM_CLOSED'); detach(seat.peer); } }
     for (const v of room.spectators.values()) if (v.peer) { fail(v.peer, 'ROOM_CLOSED'); detach(v.peer); }
@@ -123,7 +143,7 @@ export function createRoomHost(options: HostOptions = {}) {
   function startMatch(room: Room) {
     const seed = parseInt(hex(4), 16) >>> 0;
     room.state = createState(room.format === '2v2' ? 'squad' : 'duel', { online: true, seed }); room.matchCount++; metrics.matches++;
-    room.matchId = `${room.code}-${room.matchCount}-${hex(4)}`; room.result = null; room.phase = 'playing';
+    room.matchId = `${room.code}-${room.matchCount}-${hex(4)}`; room.result = null; room.phase = 'playing'; room.dissolveAt = null;
     room.accumulator = 0; room.lastAdvance = now(); room.eventCursor = room.state.nextId - 1; room.wallsKey = wallsKey(room.state);
     for (const seat of room.seats.values()) { seat.ready = false; seat.forfeited = false; seat.queue = []; seat.ack = seat.seq; seat.credit = 0; seat.lastInputAt = 0; seat.last = neutral(room.state.tanks.find(t => t.id === seat.id)!.aim); }
     broadcast(room, ack => ({ type: 'start', matchId: room.matchId!, walls: room.state!.walls, snapshot: snapshotFor(room, ack) }));
@@ -135,6 +155,7 @@ export function createRoomHost(options: HostOptions = {}) {
       players: SEATS_OF[room.format].filter(id => room.seats.has(id)).map(id => { const seat = room.seats.get(id)!;
         return { seat: id, userId: seat.userId, name: seat.name, team: teamOf(id), forfeited: seat.forfeited }; }), endedAt: now() };
     room.result = result; room.phase = 'finished';
+    if (room.kind === 'queue') room.dissolveAt = now() + NET.queueRematchMs;
     for (const seat of room.seats.values()) { seat.ready = false; seat.queue = []; }
     if (!reported.has(result.matchId)) { // idempotent by match id: a result is reported once
       reported.add(result.matchId); metrics.results++;
@@ -195,6 +216,12 @@ export function createRoomHost(options: HostOptions = {}) {
       while (room.accumulator >= step && room.phase === 'playing') { room.accumulator -= step; tick(room); }
       return;
     }
+    if (room.kind === 'queue' && room.phase === 'countdown' && !room.matchCount) { // matched countdown: no ready needed, nobody may drop
+      if (room.seats.size < seatCount(room) || held.length) cancelMatched(room); else if (t >= room.countdownEnd) startMatch(room);
+      return;
+    }
+    if (room.kind === 'queue' && room.phase === 'finished' && room.dissolveAt !== null && t >= room.dissolveAt) { dissolve(room); return; }
+    if (room.queued && held.some(s => t - s.lastSeen >= NET.queueDropMs)) { dropEntry(room.queued); broadcastRoom(room); }
     for (const seat of expired) removeSeat(room, seat.id);
     if (room.phase === 'closed') return;
     if (room.emptySince !== null && t - room.emptySince >= NET.emptyRoomMs) { closeRoom(room, 'empty'); return; }
@@ -209,11 +236,123 @@ export function createRoomHost(options: HostOptions = {}) {
     if ((room.phase === 'lobby' || room.phase === 'finished') && room.seats.size === seatCount(room) && [...room.seats.values()].every(s => s.ready && s.peer)) startCountdown(room);
     else broadcastRoom(room);
   }
+  // ---- 2v2 queue (P3-SPEC §6) ----------------------------------------------------------------------------------
+  function queueView(e: QEntry): QueueView { return { waitedMs: Math.max(0, now() - e.since), size: entryMembers(e).length }; }
+  function entryMembers(e: QEntry): Member[] {
+    if (e.solo) return [e.solo];
+    const room = rooms.get(e.party!); if (!room) return [];
+    return SEATS.filter(id => room.seats.has(id)).map(id => { const s = room.seats.get(id)!; return { peer: s.peer, userId: s.userId, name: s.name, guest: s.guest }; });
+  }
+  const entryOnline = (e: QEntry) => { const m = entryMembers(e); return m.length > 0 && m.every(x => x.peer); };
+  function addEntry(e: QEntry) {
+    queue.push(e); queue.sort((x, y) => x.since - y.since || x.id - y.id);
+    if (e.solo) { queuedUsers.set(e.solo.userId, e); const p = e.solo.peer ? peers.get(e.solo.peer) : undefined; if (p) p.queued = e; }
+    else rooms.get(e.party!)!.queued = e;
+  }
+  function dropEntry(e: QEntry) {
+    const i = queue.indexOf(e); if (i >= 0) queue.splice(i, 1);
+    if (e.solo) { if (queuedUsers.get(e.solo.userId) === e) queuedUsers.delete(e.solo.userId); const p = e.solo.peer ? peers.get(e.solo.peer) : undefined; if (p?.queued === e) p.queued = null; }
+    else { const room = rooms.get(e.party!); if (room?.queued === e) room.queued = null; }
+  }
+  function soloStatus(e: QEntry, reason?: 'returned') { send(e.solo!.peer, { type: 'queue', queue: queueView(e), ...(reason ? { reason } : {}) }); }
+  /** Match when two teams can be formed. Parties are never split; party + party first, then arrival order (§6.2). */
+  function matchQueue() {
+    for (;;) {
+      const live = queue.filter(entryOnline), size = (e: QEntry) => entryMembers(e).length;
+      const full = live.filter(e => size(e) === 2), single = live.filter(e => size(e) === 1);
+      let teams: QEntry[][] | null = null;
+      if (full.length >= 2) teams = [[full[0]], [full[1]]];
+      else {
+        const units = full.map(e => [e]);
+        for (let i = 0; i + 1 < single.length; i += 2) units.push([single[i], single[i + 1]]);
+        units.sort((x, y) => x[0].since - y[0].since || x[0].id - y[0].id);
+        if (units.length >= 2) teams = [units[0], units[1]];
+      }
+      if (!teams) return;
+      startMatched(teams);
+    }
+  }
+  /** Take every member out of the queue (and out of its party room) and seat them in a new matched room. */
+  function startMatched(teams: QEntry[][]) {
+    const room = newRoom('2v2', 'queue'), arrivals: [string, Seat][] = [];
+    teams.forEach((unit, team) => {
+      const free = SEATS_OF['2v2'].filter(id => teamOf(id) === team);
+      for (const e of unit) {
+        const members = entryMembers(e); dropEntry(e);
+        if (e.party) { const party = rooms.get(e.party)!; for (const id of [...party.seats.keys()]) removeSeat(party, id); }
+        room.groups.push({ party: !!e.party, since: e.since, userIds: members.map(m => m.userId) });
+        for (const m of members) {
+          const seat = makeSeat(free.shift()!, m); room.seats.set(seat.id, seat); userRooms.set(seat.userId, room.code); arrivals.push([m.peer!, seat]);
+        }
+      }
+    });
+    room.phase = 'countdown'; room.countdownEnd = now() + NET.queueCountdownMs;
+    for (const [peerId, seat] of arrivals) seatPeer(peerId, room, seat);
+    broadcastRoom(room); log('queue.matched', { code: room.code, groups: room.groups.map(g => g.userIds.length) });
+  }
+  /** Close a room without telling its seated players (they are being moved elsewhere). Spectators are told. */
+  function quietClose(room: Room) {
+    for (const seat of room.seats.values()) { releaseUser(room, seat); detach(seat.peer); }
+    room.seats.clear(); closeRoom(room, 'moved');
+  }
+  /** The connected members of each arrival group of a matched room. */
+  function groupMembers(room: Room) {
+    return room.groups.map(g => ({ g, members: g.userIds.map(u => [...room.seats.values()].find(s => s.userId === u))
+      .filter((s): s is Seat => !!s && !!s.peer && !s.forfeited).map(s => ({ peer: s.peer, userId: s.userId, name: s.name, guest: s.guest })) }));
+  }
+  /** A party gets its own private 2v2 room back (team 0, first member hosts), optionally still queued. */
+  function restoreParty(members: Member[], since: number | null) {
+    const room = newRoom('2v2', 'private'), seats = members.map((m, i) => makeSeat(i ? 'a2' : 'a', m));
+    for (const seat of seats) { room.seats.set(seat.id, seat); userRooms.set(seat.userId, room.code); }
+    if (since !== null) addEntry({ id: ++entryIds, since, solo: null, party: room.code });
+    seats.forEach((seat, i) => seatPeer(members[i].peer!, room, seat));
+    broadcastRoom(room);
+  }
+  /** Someone dropped or left during the matched countdown: cancel; the others go back to their old place (§6.2). */
+  function cancelMatched(room: Room) {
+    const back = groupMembers(room); quietClose(room);
+    for (const { g, members } of back) {
+      if (!members.length) continue;
+      if (g.party) { restoreParty(members, g.since); continue; }
+      const m = members[0], e: QEntry = { id: ++entryIds, since: g.since, solo: { ...m, offlineSince: null }, party: null };
+      addEntry(e); soloStatus(e, 'returned');
+    }
+    log('queue.cancelled', { code: room.code }); matchQueue();
+  }
+  /** Matched room after its rematch window: parties go back to a private room together, solo players to the menu. */
+  function dissolve(room: Room) {
+    const back = groupMembers(room); quietClose(room);
+    for (const { g, members } of back) {
+      if (!members.length) continue;
+      if (g.party && members.length) restoreParty(members, null); else for (const m of members) send(m.peer, { type: 'left' });
+    }
+  }
+  function queueSolo(peerId: string, who: Identity) {
+    if (who.guest && !options.guestQueue) return fail(peerId, 'AUTH_REQUIRED');
+    const userId = who.guest ? `guest:${hex(8)}` : who.userId, waiting = queuedUsers.get(userId);
+    if (waiting?.solo && !waiting.solo.peer) { // same account back within the drop window keeps its place
+      waiting.solo.peer = peerId; waiting.solo.offlineSince = null; peers.get(peerId)!.queued = waiting; soloStatus(waiting); matchQueue(); return;
+    }
+    if (waiting || userRooms.has(userId)) return fail(peerId, 'ALREADY_IN_ROOM');
+    const e: QEntry = { id: ++entryIds, since: now(), solo: { peer: peerId, userId, name: who.name, guest: who.guest, offlineSince: null }, party: null };
+    addEntry(e); soloStatus(e); log('queue.solo', { userId }); matchQueue();
+  }
+  function queueParty(peerId: string, room: Room, seat: Seat) {
+    if (room.host !== seat.id) return fail(peerId, 'NOT_HOST');
+    const seats = [...room.seats.values()];
+    if (room.kind !== 'private' || room.format !== '2v2' || room.phase !== 'lobby' || room.queued || new Set(seats.map(s => teamOf(s.id))).size !== 1 || seats.some(s => !s.peer))
+      return fail(peerId, 'QUEUE_INVALID');
+    if (!options.guestQueue && seats.some(s => s.guest)) return fail(peerId, 'AUTH_REQUIRED');
+    for (const s of seats) s.ready = false;
+    addEntry({ id: ++entryIds, since: now(), solo: null, party: room.code }); broadcastRoom(room); log('queue.party', { code: room.code, size: seats.length }); matchQueue();
+  }
+
   /** Synchronous when the authenticator is; a Promise only while waiting on a remote token check. */
-  function admit(peerId: string, msg: Extract<ClientMessage, { type: 'create' | 'join' | 'resume' }>): void | Promise<void> {
+  type Admission = Extract<ClientMessage, { type: 'create' | 'join' | 'resume' | 'queue' }>;
+  function admit(peerId: string, msg: Admission): void | Promise<void> {
     const peer = peers.get(peerId)!;
     if (msg.protocol !== PROTOCOL) return fail(peerId, 'PROTOCOL_MISMATCH', true);
-    if (peer.code) return fail(peerId, 'ALREADY_IN_ROOM');
+    if (peer.code || peer.queued) return fail(peerId, 'ALREADY_IN_ROOM');
     let who: Identity | null | Promise<Identity | null>;
     try { who = authenticate(msg.token, 'name' in msg ? msg.name : undefined); } catch { who = null; }
     if (who && typeof (who as Promise<Identity | null>).then === 'function') {
@@ -221,16 +360,16 @@ export function createRoomHost(options: HostOptions = {}) {
     }
     seatIdentity(peerId, msg, who as Identity | null);
   }
-  function seatIdentity(peerId: string, msg: Extract<ClientMessage, { type: 'create' | 'join' | 'resume' }>, who: Identity | null) {
+  function seatIdentity(peerId: string, msg: Admission, who: Identity | null) {
     if (!peers.has(peerId)) return; // disconnected while authenticating
-    if (peers.get(peerId)!.code) return fail(peerId, 'ALREADY_IN_ROOM');
-    if (!who) return fail(peerId, msg.token ? 'AUTH_FAILED' : 'AUTH_REQUIRED', true);
-    // Everything below runs synchronously after the await, so seat claims are atomic.
+    if (peers.get(peerId)!.code || peers.get(peerId)!.queued) return fail(peerId, 'ALREADY_IN_ROOM');
+    if (!who) return fail(peerId, msg.token ? 'AUTH_FAILED' : 'AUTH_REQUIRED', msg.type !== 'queue');
+    // Everything below runs synchronously after the await, so seat claims and queue entries are atomic.
+    if (msg.type === 'queue') return queueSolo(peerId, who);
+    if (!who.guest && queuedUsers.has(who.userId)) return fail(peerId, 'ALREADY_IN_ROOM');
     if (msg.type === 'create') {
       if (!who.guest && userRooms.has(who.userId)) return fail(peerId, 'ALREADY_IN_ROOM');
-      const room: Room = { code: newCode(), format: msg.format ?? '1v1', phase: 'lobby', seats: new Map(), spectators: new Map(), host: 'a', lastActivity: now(),
-        emptySince: null, countdownEnd: 0, state: null, matchId: null, matchCount: 0, result: null, accumulator: 0, lastAdvance: now(), eventCursor: 0, wallsKey: '' };
-      rooms.set(room.code, room); metrics.rooms++;
+      const room = newRoom(msg.format ?? '1v1', 'private');
       const seat = makeSeat('a', who); room.seats.set('a', seat); if (!who.guest) userRooms.set(seat.userId, room.code);
       seatPeer(peerId, room, seat); log('room.created', { code: room.code, format: room.format }); return;
     }
@@ -251,7 +390,8 @@ export function createRoomHost(options: HostOptions = {}) {
       const v: Spectator = { token: hex(24), name: who.name, peer: null, lastSeen: now() }; room.spectators.set(v.token, v);
       watchPeer(peerId, room, v); broadcastRoom(room); log('room.spectator', { code: room.code }); return;
     }
-    if (room.phase !== 'lobby' && room.phase !== 'finished') return fail(peerId, 'ROOM_IN_PROGRESS');
+    if (room.kind === 'queue' || (room.phase !== 'lobby' && room.phase !== 'finished')) return fail(peerId, 'ROOM_IN_PROGRESS');
+    if (room.queued) return fail(peerId, 'ROOM_QUEUED');
     if (!who.guest && userRooms.has(who.userId)) return fail(peerId, 'ALREADY_IN_ROOM');
     const id = JOIN_ORDER[room.format].find(s => !room.seats.has(s)); if (!id) return fail(peerId, 'ROOM_FULL');
     const seat = makeSeat(id, who); room.seats.set(id, seat); if (!who.guest) userRooms.set(seat.userId, room.code);
@@ -274,14 +414,16 @@ export function createRoomHost(options: HostOptions = {}) {
 
   return {
     metrics,
-    connect(peerId: string, handle: PeerHandle) { peers.set(peerId, { handle, code: null, seat: null, spectator: null, windowAt: now(), messages: 0, busy: false }); },
+    connect(peerId: string, handle: PeerHandle) { peers.set(peerId, { handle, code: null, seat: null, spectator: null, queued: null, windowAt: now(), messages: 0, busy: false }); },
     message(peerId: string, raw: unknown): void | Promise<void> {
       const peer = peers.get(peerId); if (!peer) return;
       const t = now(); if (t - peer.windowAt >= 1000) { peer.windowAt = t; peer.messages = 0; }
       if (++peer.messages > NET.messagesPerSecond) { metrics.rateLimited++; if (peer.messages > NET.messagesPerSecond * 2) fail(peerId, 'RATE_LIMITED', true); return; }
       const msg = parseClientMessage(raw); if (!msg) return fail(peerId, 'BAD_MESSAGE');
       if (msg.type === 'ping') { send(peerId, { type: 'pong', at: msg.at, serverTime: t, tick: peer.code ? rooms.get(peer.code)?.state?.tick ?? 0 : 0 }); return; }
-      if (msg.type === 'create' || msg.type === 'join' || msg.type === 'resume') {
+      if (msg.type === 'unqueue' && peer.queued) { const e = peer.queued; dropEntry(e); send(peerId, { type: 'queue', queue: null, reason: 'unqueued' }); return; }
+      if (msg.type === 'create' || msg.type === 'join' || msg.type === 'resume' || (msg.type === 'queue' && !peer.code)) {
+        if (msg.type === 'queue' && msg.protocol === undefined) return fail(peerId, 'BAD_MESSAGE');
         if (peer.busy) return fail(peerId, 'BAD_MESSAGE');
         const pending = admit(peerId, msg); if (!pending) return;
         peer.busy = true; return pending.finally(() => { const p = peers.get(peerId); if (p) p.busy = false; });
@@ -299,14 +441,16 @@ export function createRoomHost(options: HostOptions = {}) {
       if (msg.type === 'input') return onInput(room, seat, msg);
       room.lastActivity = t;
       if (msg.type === 'ready') { if (inLobby(room)) { seat.ready = msg.ready; maybeCountdown(room); } return; }
+      if (msg.type === 'queue') return queueParty(peerId, room, seat);
+      if (msg.type === 'unqueue') { if (!room.queued) return fail(peerId, 'WRONG_PHASE'); dropEntry(room.queued); broadcastRoom(room); return; }
       if (msg.type === 'team') {
-        if (!inLobby(room)) return fail(peerId, 'WRONG_PHASE');
+        if (!inLobby(room) || room.kind === 'queue' || room.queued) return fail(peerId, 'WRONG_PHASE');
         if (!moveSeat(room, seat, msg.team)) return fail(peerId, 'TEAM_FULL');
         seat.ready = false; maybeCountdown(room); return;
       }
       if (msg.type === 'move') {
         if (room.host !== seat.id) return fail(peerId, 'NOT_HOST');
-        if (!inLobby(room)) return fail(peerId, 'WRONG_PHASE');
+        if (!inLobby(room) || room.queued) return fail(peerId, 'WRONG_PHASE');
         const target = room.seats.get(msg.seat); if (!target) return fail(peerId, 'BAD_MESSAGE');
         if (!moveSeat(room, target, msg.team)) return fail(peerId, 'TEAM_FULL');
         for (const s of room.seats.values()) s.ready = false; // the host changed the line-up: everyone confirms again
@@ -327,7 +471,9 @@ export function createRoomHost(options: HostOptions = {}) {
       }
     },
     disconnect(peerId: string) {
-      const peer = peers.get(peerId); peers.delete(peerId); if (!peer?.code) return;
+      const peer = peers.get(peerId); peers.delete(peerId);
+      if (peer?.queued?.solo) { peer.queued.solo.peer = null; peer.queued.solo.offlineSince = now(); return; } // keeps its place for NET.queueDropMs
+      if (!peer?.code) return;
       const room = rooms.get(peer.code); if (!room) return;
       if (peer.spectator) { const v = room.spectators.get(peer.spectator); if (v && v.peer === peerId) { v.peer = null; v.lastSeen = now(); broadcastRoom(room); } return; }
       const seat = peer.seat ? room.seats.get(peer.seat) : undefined;
@@ -336,8 +482,14 @@ export function createRoomHost(options: HostOptions = {}) {
       seat.peer = null; seat.lastSeen = now(); seat.queue = []; seat.ready = false; seat.lastInputAt = 0;
       broadcastRoom(room);
     },
-    advance(t = now()) { for (const room of [...rooms.values()]) advanceRoom(room, t); },
-    rooms: () => [...rooms.values()].map(r => ({ code: r.code, format: r.format, phase: r.phase, seats: r.seats.size, spectators: r.spectators.size, matchId: r.matchId, tick: r.state?.tick ?? 0 })),
+    advance(t = now()) {
+      for (const e of [...queue]) if (e.solo && !e.solo.peer && t - e.solo.offlineSince! >= NET.queueDropMs) dropEntry(e);
+      for (const room of [...rooms.values()]) if (rooms.get(room.code) === room) advanceRoom(room, t);
+      matchQueue();
+    },
+    /** Inspection: queued units in order. */
+    queue: () => queue.map(e => ({ since: e.since, party: e.party, members: entryMembers(e).map(m => m.userId), online: entryOnline(e) })),
+    rooms: () => [...rooms.values()].map(r => ({ code: r.code, kind: r.kind, format: r.format, phase: r.phase, seats: r.seats.size, spectators: r.spectators.size, matchId: r.matchId, tick: r.state?.tick ?? 0 })),
     /** Test/inspection only: the live authoritative state of a room. */
     inspect(code: string) { return rooms.get(code)?.state ?? null; },
   };

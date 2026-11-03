@@ -31,9 +31,9 @@ export function createWorld({ hostOptions = {}, seed = 7 } = {}) {
     c.sendRaw = msg => { const json = JSON.stringify(msg); c.bytesUp += json.length; up(json.length, () => host.message(id, json)); };
   }
   /** A client: a NetSession wired to the host through an up and a down link. */
-  function client(net = {}, name = 'P') {
+  function client(net = {}, name = 'P', token) {
     const c = { id: '', inbox: [], bytesUp: 0, bytesDown: 0, connected: false, session: null, sendRaw: () => {} };
-    c.session = createNetSession({ now: () => time, name, send: msg => { if (c.connected) c.sendRaw(msg); } });
+    c.session = createNetSession({ now: () => time, name, token: token ? () => token : undefined, send: msg => { if (c.connected) c.sendRaw(msg); } });
     attach(c, net);
     c.drop = () => { c.connected = false; host.disconnect(c.id); };
     c.last = type => [...c.inbox].reverse().find(m => m.type === type);

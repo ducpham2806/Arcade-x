@@ -1,8 +1,8 @@
 # Tank Clash P3 — Đặc tả MVP 2v2
 
-Phiên bản: v0.3 (đã duyệt, P3a + P3b đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5 của v1.3 (nay là §10 mục 5); code P2 hiện hành trên main.
+Phiên bản: v0.4 (đã duyệt, P3a–P3c đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5 của v1.3 (nay là §10 mục 5); code P2 hiện hành trên main.
 
-**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a và P3b đã code** (xem §13, §14); P3c–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
+**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a, P3b, P3c đã code** (xem §13–§15); P3d (giao diện online 2v2) chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
 
 ---
 
@@ -292,6 +292,7 @@ Mỗi phần: commit riêng, ghi `docs/WORKLOG.md`, chạy lint/build/budget/`te
 |---|---|---|
 | v0.1 | 03/11/2026 | Bản nháp đầu, chờ duyệt |
 | v0.2 | 03/11/2026 | Chủ dự án duyệt Q1–Q5; sân 1040×624 sinh ngẫu nhiên theo seed; ghế `a/a2/b/b2`; luật đầu hàng; P3a đã code (§13) |
+| v0.4 | 03/11/2026 | P3c đã code (§15): hàng chờ, tổ đội, phòng ghép có cửa sổ đấu lại 20 giây |
 | v0.3 | 03/11/2026 | P3b đã code (§14); thêm tin `seat` và `surrender`, mã lỗi `SURRENDER_LOCKED`; snapshot bỏ trường hồi chiêu/khiên khi bằng 0 |
 
 ## 13. Kết quả P3a — 03/11/2026
@@ -323,3 +324,18 @@ Số đo 2v2 (mạng ảo, 4 client, một trận đủ hiệp, không phải m�
 - Tải xuống 2v2 sát trần 20 KB/s (cao nhất 19,3). Nếu thêm dữ liệu vào snapshot sẽ vượt; hướng tiếp theo là gửi phần thay đổi (delta) hoặc giảm độ chính xác tọa độ xe khác.
 - Khác 1v1 (luôn 0), 2v2 có hiệu chỉnh xe mình khi đang đánh (tới 11 lần/trận, tối đa khoảng 21 px, được làm mờ trong khoảng 100 ms). Nguyên nhân khả dĩ: xe mình được dự đoán va chạm với vị trí cũ (nội suy lùi 100 ms) của 3 xe khác. Cần chơi thật để biết có thấy giật không.
 - Chưa làm: hàng chờ và tổ đội (P3c); giao diện online 2v2, test server 4 WebSocket và test UI 4 trang (P3d).
+
+## 15. Kết quả P3c — 03/11/2026
+
+- **Giao thức** (vẫn `tank-clash.p3.v1`, chỉ thêm tin): client gửi `queue` (người lẻ từ menu: kèm protocol/tên/token; chủ phòng tổ đội: không cần gì thêm) và `unqueue`; server gửi `queue` (trạng thái chờ của người lẻ: thời gian đã chờ, số người; lý do `unqueued`/`returned`). `RoomView` thêm `kind` (`private`/`queue`), `queue` (tổ đội đang tìm trận) và `rematchMs` (thời gian còn lại để đồng ý đấu lại ở phòng ghép). Mã lỗi mới `QUEUE_INVALID`, `ROOM_QUEUED`.
+- **Hàng chờ** (`room.ts`), đúng §6:
+  - Một hàng trong bộ nhớ; đơn vị là người lẻ hoặc tổ đội (phòng riêng 2v2, 1–2 người cùng một đội, chủ phòng bấm tìm). Bắt đăng nhập (Q2): khách bị trả `AUTH_REQUIRED` nhưng không bị ngắt, vẫn chơi phòng riêng được.
+  - Ghép ngay khi đủ: tổ + tổ trước, rồi theo thứ tự vào hàng (người lẻ ghép đôi theo thứ tự). Không bao giờ tách tổ. Ai đang mất mạng thì chưa được ghép.
+  - Phòng ghép: đếm ngược 5 giây không cần sẵn sàng; không vào bằng mã được; có người xem được. Có người rớt hoặc rời trong lúc đếm ngược → hủy; những người còn lại về **đúng chỗ cũ** trong hàng (tổ đội được dựng lại thành phòng riêng và vẫn đang tìm), người rớt bị bỏ khỏi hàng.
+  - Sau kết quả: 20 giây để cả bốn đồng ý đấu lại; hết giờ thì phòng giải tán: tổ đội về lại một phòng riêng chung (không tìm tiếp), người lẻ nhận `left` về menu.
+  - Một tài khoản chỉ ở một nơi (hàng chờ hoặc một phòng). Tổ đội đang tìm thì khóa: không nhận người mới (`ROOM_QUEUED`), không đổi đội; một người hủy hoặc rời → cả tổ rời hàng. Mất mạng trong hàng: quay lại trong 10 giây (cùng tài khoản gửi lại `queue`) thì giữ chỗ, lâu hơn thì bị bỏ; tổ đội có người mất mạng quá 10 giây thì hủy tìm.
+- **Client** (`net-client.ts`): `queue()`, `unqueue()`, `queueStatus` (thời gian chờ tự cộng theo đồng hồ máy, cả cho tổ đội), `queueing`; trình duyệt tự gửi lại `queue` sau khi nối lại mạng.
+- **Server** (`server.mjs`): biến `TANK_QUEUE_GUESTS=1` cho khách dùng hàng chờ khi thử trên máy (bị bỏ qua ở production); `/health` có số đang chờ.
+- **Test:** `tests/tank-clash/queue.test.mjs` (12 ca: đủ 9 dòng bảng §6.4 cộng bắt đăng nhập, giữ chỗ/bỏ khi mất mạng, phòng ghép đấu lại/giải tán, về đúng chỗ cũ, không ghép người mất mạng, ưu tiên tổ + tổ) trong `test:tank-clash`; thêm 1 ca vào `server.test.mjs` (4 WebSocket thật, 2 tổ đội được ghép, khách bị từ chối, `/health`). Đã thử cố tình làm hỏng code 7 chỗ: lần đầu test bắt 4; 3 chỗ lọt vì test chưa dựng đúng tình huống (một test còn qua mà không kiểm gì) → sửa test, sau đó bắt đủ 7/7.
+- **Lỗi tìm được:** thời gian chờ của tổ đội trên client đứng yên giữa hai lần cập nhật phòng → client tự cộng thời gian trôi.
+- **Giới hạn:** một tiến trình, một khu vực; chưa xét kỹ năng; hàng chờ mất khi server khởi động lại. Màn "Chưa đủ người — Tiếp tục đợi / Luyện với bot" sau 60 giây là phần giao diện (P3d); server không bao giờ thêm bot.

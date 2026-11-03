@@ -22,6 +22,10 @@ export const NET = Object.freeze({
   interpolationMs: 100,
   maxPayload: 2048,
   spectatorsMax: 4,          // per room (P3-SPEC §5.3)
+  queueCountdownMs: 5_000,   // matched 2v2: start without ready (P3-SPEC §6.2)
+  queueDropMs: 10_000,       // offline this long while queued → leaves the queue
+  queueRematchMs: 20_000,    // matched room: window to agree on a rematch, then it dissolves (§5.4)
+  queueHintMs: 60_000,       // client: offer "keep waiting / practise with bots" after this wait (§6.3)
 });
 export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L
 export const ROOM_CODE_LENGTH = 6;
@@ -39,7 +43,7 @@ export const teamOf = (seat: string) => seat.startsWith('b') ? 1 : 0;
 
 export type ErrorCode = 'PROTOCOL_MISMATCH' | 'BAD_MESSAGE' | 'AUTH_REQUIRED' | 'AUTH_FAILED' | 'ROOM_NOT_FOUND'
   | 'ROOM_FULL' | 'ROOM_IN_PROGRESS' | 'ROOM_CLOSED' | 'RESUME_INVALID' | 'ALREADY_IN_ROOM' | 'NOT_IN_ROOM' | 'RATE_LIMITED'
-  | 'TEAM_FULL' | 'NOT_HOST' | 'WRONG_PHASE' | 'SURRENDER_LOCKED';
+  | 'TEAM_FULL' | 'NOT_HOST' | 'WRONG_PHASE' | 'SURRENDER_LOCKED' | 'QUEUE_INVALID' | 'ROOM_QUEUED';
 export const ERROR_TEXT: Record<ErrorCode, string> = {
   PROTOCOL_MISMATCH: 'Phiên bản game khác máy chủ. Hãy tải lại trang.',
   BAD_MESSAGE: 'Gói tin không hợp lệ.',
@@ -57,6 +61,8 @@ export const ERROR_TEXT: Record<ErrorCode, string> = {
   NOT_HOST: 'Chỉ chủ phòng làm được việc này.',
   WRONG_PHASE: 'Không làm được việc này lúc này.',
   SURRENDER_LOCKED: 'Chỉ đầu hàng được khi đội chỉ còn mình anh.',
+  QUEUE_INVALID: 'Chỉ tìm trận được từ phòng 2v2 khi cả tổ (tối đa 2 người) cùng một đội và đều đang kết nối.',
+  ROOM_QUEUED: 'Phòng này đang tìm trận, chưa vào được.',
 };
 
 export type Phase = 'lobby' | 'countdown' | 'playing' | 'finished' | 'closed';
@@ -65,7 +71,12 @@ export type SeatView = { id: SeatId; team: number; name: string; ready: boolean;
 export type MatchResult = { matchId: string; code: string; format: Format; winner: number | null; scores: number[];
   reason: 'score' | 'forfeit' | 'surrender' | 'cancelled'; rounds: number;
   players: { seat: SeatId; userId: string; name: string; team: number; forfeited: boolean }[]; endedAt: number };
-export type RoomView = { code: string; format: Format; phase: Phase; seats: SeatView[]; spectators: number; countdownMs: number | null; matchId: string | null; result: MatchResult | null };
+/** Queue status: how long this entry has waited and how many players it brings (1 or 2). */
+export type QueueView = { waitedMs: number; size: number };
+/** `private`: made with a code. `queue`: made by the 2v2 matchmaker (no joining by code, rematch window). */
+export type RoomKind = 'private' | 'queue';
+export type RoomView = { code: string; kind: RoomKind; format: Format; phase: Phase;
+  /** Party room searching for a match. */ queue: QueueView | null; /** Matched room after a result: time left to agree on a rematch. */ rematchMs: number | null; seats: SeatView[]; spectators: number; countdownMs: number | null; matchId: string | null; result: MatchResult | null };
 /** Timers are omitted while zero (the client defaults them to 0): keeps 2v2 snapshots under the bandwidth ceiling. */
 export type TankSnap = { id: string; x: number; y: number; angle: number; aim: number; hp: number; cooldown?: number; shield?: number; shieldCooldown?: number };
 export type BulletSnap = { id: number; team: number; x: number; y: number; vx: number; vy: number; bounces: number };
@@ -84,6 +95,10 @@ export type ClientMessage =
   | { type: 'move'; seat: SeatId; team: number }
   /** Only when nobody else on your team is still playing (P3-SPEC §3.4). */
   | { type: 'surrender' }
+  /** Search for a 2v2 match. From a party room (host): no other field is needed. Solo (not in a room): protocol, name, token. */
+  | { type: 'queue'; protocol?: string; name?: string; token?: string }
+  /** Leave the queue (any party member cancels for the whole party). */
+  | { type: 'unqueue' }
   | { type: 'input'; seq: number; inputs: Input[] }
   | { type: 'ping'; at: number };
 export type ServerMessage =
@@ -91,6 +106,8 @@ export type ServerMessage =
   | { type: 'room'; room: RoomView }
   /** Your seat id changed (team switch or host move); the resume token stays the same. */
   | { type: 'seat'; seat: SeatId }
+  /** Solo queue status. null = not queued. `returned`: a matched countdown was cancelled, you are back at your old place. */
+  | { type: 'queue'; queue: QueueView | null; reason?: 'unqueued' | 'returned' | 'dropped' }
   | { type: 'start'; matchId: string; walls: Wall[]; snapshot: Snapshot }
   | { type: 'snapshot'; snapshot: Snapshot }
   | { type: 'result'; result: MatchResult; room: RoomView }
@@ -118,6 +135,7 @@ function exactInput(v: unknown): v is Input {
 const MESSAGE_KEYS: Record<string, string[]> = {
   create: ['protocol', 'format', 'name', 'token'], join: ['protocol', 'code', 'as', 'name', 'token'], resume: ['protocol', 'code', 'resumeToken', 'token'],
   ready: ['ready'], leave: [], team: ['team'], move: ['seat', 'team'], surrender: [], input: ['seq', 'inputs'], ping: ['at'],
+  queue: ['protocol', 'name', 'token'], unqueue: [],
 };
 const isTeam = (v: unknown) => v === 0 || v === 1;
 /** Strict structural validation. Unknown message types, unknown fields and extra input fields are rejected. */
@@ -134,7 +152,8 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
       && str(m.name, 64) && str(m.token, 4096) ? m as ClientMessage : null;
     case 'resume': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && typeof m.resumeToken === 'string' && m.resumeToken.length <= 128 && str(m.token, 4096) ? m as ClientMessage : null;
     case 'ready': return typeof m.ready === 'boolean' ? m as ClientMessage : null;
-    case 'leave': case 'surrender': return m as ClientMessage;
+    case 'leave': case 'surrender': case 'unqueue': return m as ClientMessage;
+    case 'queue': return str(m.protocol, 64) && str(m.name, 64) && str(m.token, 4096) ? m as ClientMessage : null;
     case 'team': return isTeam(m.team) ? m as ClientMessage : null;
     case 'move': return SEATS.includes(m.seat as SeatId) && isTeam(m.team) ? m as ClientMessage : null;
     case 'ping': return Number.isFinite(m.at) ? m as ClientMessage : null;
