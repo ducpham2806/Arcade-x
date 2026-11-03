@@ -14,6 +14,8 @@ Cập nhật: 03/11/2026. Làm xong việc nào thì đánh dấu `[x]`. Các c�
 
 - [ ] **Tank Clash online 1v1:** chọn nơi chạy room server (mục 9 trong PENDING-DECISIONS). Trong lúc chờ, có thể thử trên một máy: `npm ci --prefix server/tank-clash-room && npm run dev:tank-server`, rồi mở bản preview ở hai cửa sổ (`docs/tank-clash/P2-review.md`). Khi đã có server, đặt biến build `VITE_TANK_CLASH_SERVERS="wss://<máy chủ>/tank"` trên Netlify; thiếu biến này thì game không gửi tài khoản tới server (chơi khách).
 
+- [ ] **Tank Clash 2v2 (P3):** đọc `docs/tank-clash/P3-SPEC.md`, duyệt hoặc sửa 4 câu hỏi ở §11 (mục 10–14 trong PENDING-DECISIONS).
+
 ## Quyết định đang chờ (`docs/PENDING-DECISIONS.md`)
 - [ ] **1–3. Commerce:** project staging và tài khoản admin; cổng thanh toán; nơi chạy server (Supabase hay Netlify).
 - [ ] **4. Duel server** (Cờ vua, Cờ tướng, Caro): áp schema, deploy `duel-room`, lên lịch `tick` (`docs/DUEL-SERVER.md`).

@@ -6,6 +6,14 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3: đặc tả 2v2
+
+- Chủ dự án đồng ý làm tiếp P3 khi chưa chọn hosting. Theo PLAN §15.7 mục 5 ("đặc tả rồi làm"), lượt này viết đặc tả, **chưa code**.
+- `docs/tank-clash/P3-SPEC.md` (mới, v0.1): tiêu chí xong D1–D7; hiện trạng code (engine đã có luật đội, friendly fire tắt, so đội khi hết giờ; phải đổi room/protocol/client); luật 2v2 và bảng mất mạng/bỏ trận theo người; bản đồ Crossfire (5 yêu cầu kiểm tự động, dữ liệu `maps.ts`); protocol `tank-clash.p3.v1` (tin `team`, `move`, `queue`, `unqueue`, người xem, mã lỗi mới); tổ đội = phòng riêng 2v2, một hàng chờ trong bộ nhớ, bảng 9 tình huống ghép; xử lý thiếu người không có bot ẩn; UI theo AGENTS.md; kế hoạch test §8; chia P3a–P3d; rủi ro; 5 câu hỏi Q1–Q5.
+- Cập nhật `PLAN.md` §15.7 mục 5, `PENDING-DECISIONS.md` (mục 10–14), `OWNER-TODO.md`.
+- Test: không đổi code nên không chạy lại; các số hiện trạng trong đặc tả đối chiếu trực tiếp với `engine.ts`, `protocol.ts`, `room.ts`.
+- **Còn lại:** chờ duyệt đặc tả; sau đó làm P3a (bản đồ Crossfire, engine 4 xe, bot 2v2 cục bộ). Sơ đồ ASCII Crossfire chỉ để hình dung, tọa độ thật phải qua test §8.1.
+
 ## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P2: token tài khoản và máy chủ tin cậy
 
 - Làm tiếp `docs/tank-clash/PLAN.md` §15.7 mục 2 (mục 1 chờ chủ dự án chọn hosting, mục 3 cần thiết bị thật).
