@@ -1,8 +1,8 @@
 # Tank Clash P3 — Đặc tả MVP 2v2
 
-Phiên bản: v0.2 (đã duyệt, P3a đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5 của v1.3 (nay là §10 mục 5); code P2 hiện hành trên main.
+Phiên bản: v0.3 (đã duyệt, P3a + P3b đã code) · Ngày: 03/11/2026 · Căn cứ: `PLAN.md` §2–§5, §8 (P3), §15.7 mục 5 của v1.3 (nay là §10 mục 5); code P2 hiện hành trên main.
 
-**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a đã code** (xem §13); P3b–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
+**Trạng thái:** chủ dự án đã quyết 4 câu hỏi ở §11 ngày 03/11/2026. **P3a và P3b đã code** (xem §13, §14); P3c–P3d chưa làm. Mọi số liệu ghi [PLACEHOLDER] là giá trị khởi điểm để thử, chưa phải cân bằng.
 
 ---
 
@@ -292,6 +292,7 @@ Mỗi phần: commit riêng, ghi `docs/WORKLOG.md`, chạy lint/build/budget/`te
 |---|---|---|
 | v0.1 | 03/11/2026 | Bản nháp đầu, chờ duyệt |
 | v0.2 | 03/11/2026 | Chủ dự án duyệt Q1–Q5; sân 1040×624 sinh ngẫu nhiên theo seed; ghế `a/a2/b/b2`; luật đầu hàng; P3a đã code (§13) |
+| v0.3 | 03/11/2026 | P3b đã code (§14); thêm tin `seat` và `surrender`, mã lỗi `SURRENDER_LOCKED`; snapshot bỏ trường hồi chiêu/khiên khi bằng 0 |
 
 ## 13. Kết quả P3a — 03/11/2026
 
@@ -300,3 +301,25 @@ Mỗi phần: commit riêng, ghi `docs/WORKLOG.md`, chạy lint/build/budget/`te
 - **Lỗi tìm được khi chụp màn hình:** bot đứng im ở điểm xuất phát trên 36/300 lượt bot (100 seed): lưới tìm đường 40 px thô hơn bố cục 52 px nên không thấy lối. Đổi sang ô 20 px cho sân 2v2; có test hồi quy (20 seed, mỗi bot phải đi xa hơn 120 px trong 10 giây). Đã kiểm test này hỏng khi đặt lại lưới cũ.
 - **Hiệu năng (Node, máy cloud):** 3 bot + mô phỏng khoảng 0,3 ms mỗi nhịp 60 Hz (trước cache 0,7 ms). Chưa đo trên điện thoại thật.
 - **Chưa làm:** P3b (phòng 4 ghế online, protocol p3), P3c (tổ đội + hàng chờ), P3d (UI online 2v2). Chưa chơi thử bằng tay trên thiết bị thật; độ khó bot và kích thước sân là [PLACEHOLDER].
+
+## 14. Kết quả P3b — 03/11/2026
+
+- **Giao thức `tank-clash.p3.v1`** (`protocol.ts`): `create.format` (`1v1`/`2v2`), `join.as` (`player`/`spectator`), tin mới `team`, `move`, `surrender`; server gửi thêm `seat` khi ghế của mình đổi (đổi đội, chủ phòng xếp lại) để client biết ghế mới, token nối lại giữ nguyên. `SeatView` có `team`, `forfeited`; `RoomView` có `format`, `spectators`; `MatchResult` có `format`, `players[].name/forfeited`, `reason: 'surrender'`. Mã lỗi mới: `TEAM_FULL`, `NOT_HOST`, `WRONG_PHASE`, `SURRENDER_LOCKED`. Gói tin có trường lạ ở bất kỳ loại tin nào đều bị từ chối. Client P2 cũ nhận `PROTOCOL_MISMATCH`.
+- **Phòng** (`room.ts`): 4 ghế, người mới vào xen kẽ đội (`a, b, a2, b2`), chủ phòng chuyển theo `a, a2, b, b2`; chỉ đếm ngược khi đủ 2 + 2, cả bốn kết nối và sẵn sàng; không có bot. Bỏ trận **theo người** (rời trận hoặc hết 20 giây giữ ghế): xe bị loại tới hết trận, đồng đội đánh tiếp; cả đội bỏ → thua `forfeit`; hai đội cùng hết người trong một nhịp → hủy. Ghế bỏ trận không nối lại được và được giải phóng sau khi có kết quả. Đầu hàng chỉ nhận khi mọi đồng đội đã bỏ trận hoặc đang mất kết nối. Người xem: tối đa 4, vào được cả khi đang đấu, nhận snapshot như người chơi, mọi tin khác ngoài `leave` bị trả `BAD_MESSAGE` (không ngắt kết nối), có token riêng để nối lại xem. Mỗi trận có seed bố cục mới.
+- **Engine:** chế độ `squad` nhận `online: true` (cả bốn xe là người).
+- **Client** (`net-client.ts`): sân và chế độ theo `room.format`; nội suy mọi xe không phải của mình; xe mình luôn đứng đầu danh sách (người xem giữ thứ tự ghế); hàm `create(name, format)`, `join(code, name, as)`, `team()`, `move()`, `surrender()`, getter `role`, `myTeam`. `runtime.ts` chỉ đổi phần xác định đội của mình theo ghế; **giao diện sảnh/HUD 2v2 online để P3d**.
+- **Băng thông:** đo lần đầu ở RTT 150 là 21,1 KB/s/client, vượt trần 20 KB/s (PLAN §9). Không nới test; snapshot bỏ `cooldown/shield/shieldCooldown` khi bằng 0 (client mặc định 0). Sau đó 1v1 giảm từ khoảng 11 xuống 9,8–10,7 KB/s.
+- **Test mới:** `tests/tank-clash/squad-room.test.mjs` (9 ca: giao thức, xếp ghế, đổi đội/chủ phòng xếp, trận 4 người không bot, người xem, rời trận/bỏ cả đội, hết giờ giữ ghế + đầu hàng, hủy khi cả bốn mất, đấu lại cần đủ 4 và có seed mới) và `tests/tank-clash/squad-netcode.test.mjs` (4 ca: trận đủ hiệp với 4 client ở 3 mức mạng, nối lại ghế `b2` giữa hiệp). Cả hai trong `test:tank-clash`. Đã thử cố tình làm hỏng code ở 5 chỗ: 3 chỗ test bắt được; 2 chỗ không bắt được là lớp phòng thủ thừa (xe bỏ trận có HP 0 nên engine bỏ qua input; ghế bỏ trận đã hết hạn giữ ghế nên resume bị chặn sẵn).
+
+Số đo 2v2 (mạng ảo, 4 client, một trận đủ hiệp, không phải máy thật):
+
+| Mạng | Tải xuống tối đa/client | Tải lên | Hiệu chỉnh khi đang đánh (4 client) | Lệch hiển thị 3 xe khác (TB / p95) |
+|---|---|---|---|---|
+| RTT 80, jitter 30, mất 1 % | 16,9 KB/s | 3,9 KB/s | 0 / 0 / 0 / 0 | 11,7 / 21,1 px |
+| RTT 150, jitter 30, mất 2 % | 19,3 KB/s | 4,2 KB/s | 11 / 0 / 9 / 9 (tối đa 20,6 px) | 16,6 / 34,3 px |
+| RTT 250, jitter 30, mất 3 % | 17,6 KB/s | 4,1 KB/s | 8 / 0 / 0 / 0 (tối đa 21,9 px) | 22,6 / 55,8 px |
+
+**Nhận xét và rủi ro:**
+- Tải xuống 2v2 sát trần 20 KB/s (cao nhất 19,3). Nếu thêm dữ liệu vào snapshot sẽ vượt; hướng tiếp theo là gửi phần thay đổi (delta) hoặc giảm độ chính xác tọa độ xe khác.
+- Khác 1v1 (luôn 0), 2v2 có hiệu chỉnh xe mình khi đang đánh (tới 11 lần/trận, tối đa khoảng 21 px, được làm mờ trong khoảng 100 ms). Nguyên nhân khả dĩ: xe mình được dự đoán va chạm với vị trí cũ (nội suy lùi 100 ms) của 3 xe khác. Cần chơi thật để biết có thấy giật không.
+- Chưa làm: hàng chờ và tổ đội (P3c); giao diện online 2v2, test server 4 WebSocket và test UI 4 trang (P3d).

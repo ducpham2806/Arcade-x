@@ -1,4 +1,4 @@
-/** Tank Clash P2 room server: WebSocket transport around src/games/tank-clash/room.ts.
+/** Tank Clash room server (1v1 + 2v2): WebSocket transport around src/games/tank-clash/room.ts.
  * Long-running Node process (rooms live in memory). NOT DEPLOYED: hosting is an owner decision
  * (docs/tank-clash/P2-review.md). Defaults are local-only: bind 127.0.0.1, guests allowed, localhost origins.
  *

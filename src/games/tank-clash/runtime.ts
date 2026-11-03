@@ -2,7 +2,7 @@ import { CONFIG, LESSONS, createState, step, botInput, neutral, nextLesson, aimP
 import type { State, Input, Tank } from './engine.ts';
 import { readableCanvasText } from '../../accessibility/canvasText';
 import { connectTankRoom } from './net-client.ts';
-import { normalizeCode } from './protocol.ts';
+import { SEATS_OF, normalizeCode } from './protocol.ts';
 import { isTrustedServer, tokenFor } from './trust.ts';
 
 export type TankController = { destroy: () => void; setPaused: (v: boolean) => void; snapshot: () => State };
@@ -56,7 +56,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     if (which === 'lobby' || which === 'online') renderOnline();
     if (which === 'pause') dialog.innerHTML = `<div class="tc-eyebrow">TANK CLASH / TẠM DỪNG</div><h1 id="tc-dialog-title">Nghỉ một nhịp.</h1><p>Trận đấu cục bộ đã dừng. Khi quay lại, xe sẽ chờ thao tác mới.</p><div class="tc-buttonrow">${button('Tiếp tục', 'resume', true)}${button('Chơi lại', 'restart')}${sim.mode === 'squad' && sim.status !== 'finished' ? button('Đầu hàng', 'surrender') : ''}${button('Về menu', 'menu')}${button('Góp ý bản thử', 'feedback')}</div>`;
     if (which === 'result' && online && net?.session.result) {
-      const r = net.session.result, myTeam = net.session.seat === 'b' ? 1 : 0, mine = r.scores[myTeam], theirs = r.scores[1 - myTeam];
+      const r = net.session.result, myTeam = net.session.myTeam ?? 0, mine = r.scores[myTeam], theirs = r.scores[1 - myTeam];
       const title = r.reason === 'cancelled' ? 'Trận bị hủy.' : r.winner === null ? 'Một trận hòa.' : r.winner === myTeam ? 'Anh thắng trận!' : 'Đối thủ thắng trận này.';
       const why = r.reason === 'forfeit' ? (r.winner === myTeam ? 'Đối thủ rời trận hoặc mất kết nối quá 20 giây.' : 'Anh rời trận hoặc mất kết nối quá 20 giây.') : r.reason === 'cancelled' ? 'Cả hai mất kết nối; không tính thắng thua.' : `${r.rounds} hiệp.`;
       dialog.innerHTML = `<div class="tc-eyebrow">KẾT QUẢ ONLINE · MÁY CHỦ XÁC NHẬN</div><h1 id="tc-dialog-title">${title}</h1><div class="tc-resultscore">${mine} <span>:</span> ${theirs}</div><p>${why}</p><ul class="tc-seats" aria-live="polite"></ul><div class="tc-buttonrow"><button class="tc-primary tc-ready" data-action="ready">Đấu lại</button>${button('Rời phòng', 'leave-online')}</div><p class="tc-note">Bản thử: chưa cấp thưởng hoặc ghi bảng xếp hạng. Mã trận ${esc(r.matchId)}.</p><p class="tc-net-status" role="status" aria-live="polite"></p>`;
@@ -77,7 +77,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     const room = s?.room; if (!room) return;
     const code = dialog.querySelector('.tc-roomcode'); if (code) code.textContent = room.code.replace(/(...)(...)/, '$1 $2');
     const seats = dialog.querySelector('.tc-seats');
-    if (seats) seats.innerHTML = (['a', 'b'] as const).map(id => { const seat = room.seats.find(x => x.id === id);
+    if (seats) seats.innerHTML = SEATS_OF[room.format].map(id => { const seat = room.seats.find(x => x.id === id);
       if (!seat) return `<li class="tc-seat tc-seat-empty"><b>${id.toUpperCase()}</b><span>Đang chờ người chơi…</span></li>`;
       const state = !seat.connected ? `Mất kết nối · giữ ghế ${Math.ceil((seat.holdMs ?? 0) / 1000)}s` : seat.ready ? '✓ Sẵn sàng' : 'Chưa sẵn sàng';
       return `<li class="tc-seat${seat.ready ? ' is-ready' : ''}"><b>${id.toUpperCase()}</b><span>${esc(seat.name)}${seat.id === s!.seat ? ' (anh)' : ''}${seat.host ? ' · chủ phòng' : ''}</span><em>${state}</em></li>`; }).join('');
@@ -207,7 +207,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     shield.innerHTML = `${a.shield > 0 ? '◈' : '◇'}<small>${a.shieldCooldown > 0 ? Math.ceil(a.shieldCooldown) + 's' : 'KHIÊN'}</small>`;
     q('.tc-fps').textContent = online && net ? `${fps} FPS · ONLINE${net.session.stats.rtt !== null ? ` · ping ${Math.round(net.session.stats.rtt)} ms` : ''}${net.status === 'reconnecting' ? ' · ĐANG NỐI LẠI…' : ''}` : `${fps} FPS · CỤC BỘ`;
     if (online && net?.session.room) {
-      const s = net.session, mine = s.seat === 'b' ? 1 : 0, other = s.room!.seats.find(x => x.id !== s.seat);
+      const s = net.session, mine = s.myTeam ?? 0, other = s.room!.seats.find(x => x.id !== s.seat);
       q('.tc-player').firstChild!.textContent = `${(s.seat ?? 'a').toUpperCase()} · BẠN `;
       q('.tc-enemy').firstChild!.textContent = `${other ? other.id.toUpperCase() + ' · ' + other.name.toUpperCase() : 'ĐỐI THỦ'}${other && !other.connected ? ' (MẤT KẾT NỐI)' : ''} `;
       q('.tc-mode').textContent = `ONLINE 1v1 · HIỆP ${sim.round}`;
@@ -220,7 +220,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     if (!online) q('.tc-roundcue').textContent = paused || externalPaused ? 'TẠM DỪNG' : sim.status === 'roundEnd' ? (sim.roundWinner === null ? 'HIỆP HÒA' : squad ? (sim.roundWinner === 0 ? 'ĐỘI A THẮNG HIỆP' : 'ĐỘI B THẮNG HIỆP') : sim.roundWinner === 0 ? 'A THẮNG HIỆP' : 'B THẮNG HIỆP') : sim.mode === 'training' && sim.lessonDone ? 'HOÀN THÀNH ✓' : a.hp <= 0 && sim.status === 'playing' ? (squad && mateAlive ? 'ĐANG XEM ĐỒNG ĐỘI' : 'ĐANG XEM TRẬN') : '';
   }
   // Colours mean "you" (mint) and "opponent" (coral), plus the seat letter; online seat B is still drawn mint.
-  const myTeam = () => (online && net?.session.seat === 'b' ? 1 : 0);
+  const myTeam = () => (online ? net?.session.myTeam ?? 0 : 0);
   function drawTank(a: Tank) {
     if (a.hp <= 0) { ctx.strokeStyle = '#ff8269'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(a.x - 10, a.y - 10); ctx.lineTo(a.x + 10, a.y + 10); ctx.moveTo(a.x + 10, a.y - 10); ctx.lineTo(a.x - 10, a.y + 10); ctx.stroke(); return; }
     const foe = a.team !== myTeam(), color = foe ? '#ff8b72' : '#8de6c9';

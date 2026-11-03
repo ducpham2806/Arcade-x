@@ -16,7 +16,7 @@ Nhật ký chi tiết: `docs/WORKLOG.md`. Việc chủ dự án: `docs/OWNER-TOD
 | Art Gemini (7 game) | Công cụ `scripts/art/import-gemini.py` | `art/gemini/<game>/crops.json` |
 | Battleship phối cảnh + UI thép & đồng | Xong | `docs/battleship/` |
 | Nối Từ (game #23) WC1–WC4 | Offline chạy; online tắt, **server chưa deploy, migration chưa áp** | `docs/WORD-CHAIN-SERVER.md` |
-| Tank Clash P0–P3a | Chạy cục bộ; chưa hosting, chưa vào launcher | `docs/tank-clash/PLAN.md` §10–§12 |
+| Tank Clash P0–P3b | Chạy cục bộ; P3b chưa có giao diện online 2v2; chưa hosting, chưa vào launcher | `docs/tank-clash/PLAN.md` §10–§12 |
 | Agent/skill `.claude/` | Xong | `CLAUDE.md`, `.claude/CCGS-NOTICE.md` |
 
 ## Sổ tay kỹ thuật

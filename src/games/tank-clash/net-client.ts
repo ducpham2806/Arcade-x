@@ -1,15 +1,16 @@
-/** Tank Clash P2 client netcode. Transport-agnostic core (`createNetSession`) plus a thin browser
+/** Tank Clash client netcode (P2 1v1, P3b 2v2 and spectators). Transport-agnostic core (`createNetSession`) plus a thin browser
  * WebSocket wrapper (`connectTankRoom`).
  *
  * - Own tank: predicted locally with the same `driveTank` rules as the server, reconciled on every
  *   snapshot by replaying inputs the server has not acknowledged yet. Visible corrections are blended out.
- * - Other tank: interpolated between snapshots ~100 ms in the past, never extrapolated more than one interval.
+ * - Other tanks (1 or 3): interpolated between snapshots ~100 ms in the past, never extrapolated more than one interval.
  * - HP, bullets, rounds and results always come from the server.
  */
 import { CONFIG, driveTank, neutral, tank as makeTank } from './engine.ts';
 import type { Input, State, Tank, Wall, GameEvent } from './engine.ts';
-import { NET, PROTOCOL, SNAPSHOT_INTERVAL_MS, quantizeInput } from './protocol.ts';
-import type { ClientMessage, ErrorCode, MatchResult, RoomView, SeatId, ServerMessage, Snapshot, TankSnap } from './protocol.ts';
+import { DUEL_SIZE, SQUAD_SIZE } from './maps.ts';
+import { NET, PROTOCOL, SNAPSHOT_INTERVAL_MS, quantizeInput, teamOf } from './protocol.ts';
+import type { ClientMessage, ErrorCode, Format, MatchResult, RoomView, SeatId, ServerMessage, Snapshot, TankSnap } from './protocol.ts';
 
 export type NetStats = { snapshots: number; teleports: number; phaseCorrections: number; corrections: number; maxCorrection: number; totalCorrection: number; rtt: number | null; pendingMax: number; sentInputs: number };
 export type SessionOptions = { send: (msg: ClientMessage) => void; now: () => number; name?: string; token?: () => string | undefined;
@@ -20,7 +21,7 @@ const lerpAngle = (a: number, b: number, t: number) => a + Math.atan2(Math.sin(b
 
 export function createNetSession(options: SessionOptions) {
   const { send, now } = options;
-  let code: string | null = null, seat: SeatId | null = null, resumeToken: string | null = null, nextSeq = 0;
+  let code: string | null = null, seat: SeatId | null = null, role: 'player' | 'spectator' | null = null, resumeToken: string | null = null, nextSeq = 0;
   let room: RoomView | null = null, result: MatchResult | null = null, matchId: string | null = null;
   let error: { code: ErrorCode; message: string; fatal: boolean } | null = null;
   let walls: Wall[] = [], latest: Snapshot | null = null;
@@ -32,10 +33,11 @@ export function createNetSession(options: SessionOptions) {
   const shown = new Map<string, { x: number; y: number; round: number }>(); let lastViewAt: number | null = null;
   const events = new Map<number, GameEvent>();
   const stats: NetStats = { snapshots: 0, teleports: 0, phaseCorrections: 0, corrections: 0, maxCorrection: 0, totalCorrection: 0, rtt: null, pendingMax: 0, sentInputs: 0 };
-  const world = (): State => ({ version: 1, mode: 'duel', online: true, tick: latest?.tick ?? 0, time: 0, width: CONFIG.width, height: CONFIG.height, out: [], tanks: [], walls, bullets: [], events: [], nextId: 0,
+  const squad = () => room?.format === '2v2', size = () => squad() ? SQUAD_SIZE : DUEL_SIZE;
+  const world = (): State => ({ version: 1, mode: squad() ? 'squad' : 'duel', online: true, tick: latest?.tick ?? 0, time: 0, width: size().width, height: size().height, out: [], tanks: [], walls, bullets: [], events: [], nextId: 0,
     status: latest?.status ?? 'playing', round: latest?.round ?? 1, scores: latest?.scores ?? [0, 0], remaining: latest?.remaining ?? CONFIG.roundSeconds,
     phaseTime: 0, winner: latest?.winner ?? null, roundWinner: latest?.roundWinner ?? null, lesson: 0, lessonDone: false, stats: { shots: 0, hits: 0, ricochets: 0, blocks: 0, bricks: 0 } });
-  const toTank = (t: TankSnap): Tank => ({ ...makeTank(t.id, t.id === 'a' ? 0 : 1, t.x, t.y, 'player'), ...t });
+  const toTank = (t: TankSnap): Tank => ({ ...makeTank(t.id, teamOf(t.id), t.x, t.y, 'player'), ...t });
   const playingNow = () => room?.phase === 'playing' && latest?.status === 'playing';
 
   /** Rebuild the own tank from the authoritative snapshot and replay unacknowledged inputs on top. */
@@ -75,10 +77,16 @@ export function createNetSession(options: SessionOptions) {
 
   const api = {
     stats,
-    get code() { return code; }, get seat() { return seat; }, get room() { return room; }, get result() { return result; },
+    get code() { return code; }, get seat() { return seat; }, get role() { return role; }, get myTeam() { return seat ? teamOf(seat) : null; }, get room() { return room; }, get result() { return result; },
     get error() { return error; }, get matchId() { return matchId; }, get resumeToken() { return resumeToken; }, get pendingCount() { return pending.length; },
-    create(name = options.name) { error = null; send({ type: 'create', protocol: PROTOCOL, name, token: options.token?.() }); },
-    join(roomCode: string, name = options.name) { error = null; send({ type: 'join', protocol: PROTOCOL, code: roomCode, name, token: options.token?.() }); },
+    create(name = options.name, format: Format = '1v1') { error = null; send({ type: 'create', protocol: PROTOCOL, format, name, token: options.token?.() }); },
+    join(roomCode: string, name = options.name, as: 'player' | 'spectator' = 'player') { error = null; send({ type: 'join', protocol: PROTOCOL, code: roomCode, as, name, token: options.token?.() }); },
+    /** Switch to the other team (lobby). */
+    team(team: number) { send({ type: 'team', team }); },
+    /** Host only: move the player in `seatId` to `team` (lobby). */
+    move(seatId: SeatId, team: number) { send({ type: 'move', seat: seatId, team }); },
+    /** Only accepted when nobody else on your team is still playing. */
+    surrender() { send({ type: 'surrender' }); },
     /** Re-attach to the previous seat after a dropped connection. */
     resume() { if (code && resumeToken) send({ type: 'resume', protocol: PROTOCOL, code, resumeToken, token: options.token?.() }); },
     restore(saved: { code: string; resumeToken: string }) { code = saved.code; resumeToken = saved.resumeToken; },
@@ -88,18 +96,19 @@ export function createNetSession(options: SessionOptions) {
     receive(msg: ServerMessage) {
       switch (msg.type) {
         case 'joined':
-          code = msg.code; seat = msg.seat; resumeToken = msg.resumeToken; nextSeq = msg.nextSeq; room = msg.room; result = msg.room.result; error = null;
+          code = msg.code; seat = msg.seat; role = msg.role; resumeToken = msg.resumeToken; nextSeq = msg.nextSeq; room = msg.room; result = msg.room.result; error = null;
           reset(); if (msg.walls) walls = msg.walls; if (msg.snapshot) { matchId = msg.room.matchId; onSnapshot(msg.snapshot); }
           break;
+        case 'seat': seat = msg.seat; break;
         case 'room': room = msg.room; if (msg.room.phase !== 'finished') result = msg.room.result; break;
         case 'start': matchId = msg.matchId; result = null; reset(); walls = msg.walls; onSnapshot(msg.snapshot); break;
         case 'snapshot': onSnapshot(msg.snapshot); break;
         case 'result': result = msg.result; room = msg.room; pending = []; outbox = []; break;
         case 'pong': { const rtt = now() - msg.at; stats.rtt = stats.rtt === null ? rtt : stats.rtt * 0.8 + rtt * 0.2; break; }
         case 'error': error = { code: msg.code, message: msg.message, fatal: msg.fatal };
-          if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = resumeToken = null; room = null; reset(); }
+          if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = role = resumeToken = null; room = null; reset(); }
           break;
-        case 'left': code = seat = resumeToken = null; room = null; result = null; reset(); break;
+        case 'left': code = seat = role = resumeToken = null; room = null; result = null; reset(); break;
       }
       options.onChange?.(msg.type);
     },
@@ -152,9 +161,10 @@ export function createNetSession(options: SessionOptions) {
         shown.set(snap.id, { x, y, round: latest!.round });
         return { ...toTank(snap), x, y, angle: lerpAngle(pa.angle, pb.angle, t), aim: lerpAngle(pa.aim, pb.aim, t) };
       });
-      if (seat === 'b') w.tanks.reverse(); // runtime treats tanks[0] as "you"
+      // The runtime treats tanks[0] as "you": put the own tank first (spectators keep seat order).
+      const own = seat ? w.tanks.findIndex(t => t.id === seat) : -1; if (own > 0) w.tanks.unshift(...w.tanks.splice(own, 1));
       const ahead = Math.max(0, Math.min(SNAPSHOT_INTERVAL_MS / TICK_MS * 2, present - latest.tick)) / CONFIG.hz;
-      w.bullets = latest.bullets.map(bl => ({ ...bl, owner: bl.team ? 'b' : 'a', age: 0, x: bl.x + bl.vx * ahead, y: bl.y + bl.vy * ahead }))
+      w.bullets = latest.bullets.map(bl => ({ ...bl, owner: '', age: 0, x: bl.x + bl.vx * ahead, y: bl.y + bl.vy * ahead }))
         .filter(bl => bl.x >= 0 && bl.y >= 0 && bl.x <= w.width && bl.y <= w.height);
       w.events = [...events.values()]; w.time = present / CONFIG.hz; w.tick = latest.tick;
       return w;

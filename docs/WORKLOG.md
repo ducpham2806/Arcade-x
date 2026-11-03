@@ -8,6 +8,15 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ---
 
+## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — Tank Clash P3b: phòng 2v2 online, người xem, đầu hàng
+
+- Chủ dự án đồng ý làm P3b. Chi tiết và số đo: `docs/tank-clash/P3-SPEC.md` §14.
+- Code: `protocol.ts` (giao thức `tank-clash.p3.v1`: định dạng phòng, đội, xếp ghế, người xem, đầu hàng, tin `seat`, mã lỗi mới, chặn trường lạ, snapshot bỏ trường bằng 0), `room.ts` (viết lại cho 4 ghế; bỏ trận theo người; người xem; seed mới mỗi trận), `engine.ts` (squad online không bot), `net-client.ts` (n xe, xe mình đứng đầu, API mới), `runtime.ts` (chỉ đổi cách xác định đội mình). Giao diện online 2v2 để P3d.
+- Test mới: `tests/tank-clash/squad-room.test.mjs` (9 ca), `tests/tank-clash/squad-netcode.test.mjs` (4 ca), thêm vào `test:tank-clash`. Thử làm hỏng code 5 chỗ: test bắt 3; 2 chỗ còn lại là kiểm tra thừa (giải thích ở đặc tả).
+- Lần đo đầu: 2v2 ở RTT 150 tải xuống 21,1 KB/s, vượt trần 20 KB/s → giảm cỡ snapshot, không nới test. Sau sửa: 2v2 cao nhất 19,3 KB/s (sát trần); 1v1 9,8–10,7 KB/s.
+- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 53/53); `npm run test:tank-clash-server` 4/4; `npm run test:tank-clash-ui` 3/3 (`CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`).
+- **Chưa làm / rủi ro:** P3c (hàng chờ, tổ đội), P3d (giao diện sảnh/HUD/kết quả 2v2 online, test 4 WebSocket, test UI 4 trang). 2v2 có hiệu chỉnh xe mình khi đang đánh (tới 11 lần/trận, tối đa ~21 px; 1v1 là 0), chưa chơi thật. Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
+
 ## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — rút gọn SESSION-HANDOFF
 
 - `docs/SESSION-HANDOFF.md`: 8,7 KB → 3,3 KB. Mô tả từng module thay bằng bảng trạng thái + đường dẫn tài liệu; giữ sổ tay kỹ thuật và danh sách còn yếu. Bản cũ chép nguyên văn sang `docs/archive/SESSION-HANDOFF-2026-11-03.md`.

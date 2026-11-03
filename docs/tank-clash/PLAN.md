@@ -2,7 +2,7 @@
 
 Lập 02/11/2026 · rút gọn 03/11/2026. Bản đầy đủ v1.3 (bằng chứng từng đợt, lịch sử nhánh P2, căn cứ Colyseus, nhật ký phiên bản) ở `docs/archive/tank-clash-PLAN-v1.3.md`. Số mục §1–§9 giữ như v1.3 để các dẫn chiếu cũ vẫn đúng; §10–§12 thay cho §10–§15 cũ.
 
-**Trạng thái 03/11/2026:** xong P0, P1, P2 (kỹ thuật, chạy cục bộ), P3a (2v2 cục bộ với bot). Chưa có hosting, chưa thử Internet/thiết bị thật, chưa vào launcher, art/âm thanh là tạm. Chưa duyệt phát hành.
+**Trạng thái 03/11/2026:** xong P0, P1, P2 (kỹ thuật, chạy cục bộ), P3a (2v2 cục bộ với bot), P3b (phòng 2v2 online, người xem — chưa có giao diện). Chưa có hosting, chưa thử Internet/thiết bị thật, chưa vào launcher, art/âm thanh là tạm. Chưa duyệt phát hành.
 
 ## 1. Mục tiêu
 
@@ -80,7 +80,7 @@ Nguyên tắc: client gửi ý định, không gửi vị trí/HP; server giới
 | P0 | Kiểm kê source, GDD, tuning, spike mạng | Có đường chạy local và lên online | Xong |
 | P1 | Cảm giác chơi cục bộ, bot, sân tập | Không kẹt góc/xuyên tường; bắn bật thú vị | Xong (chưa playtest người mới) |
 | P2 | Online 1v1: server trọng tài, mã phòng, ready, nối lại, dự đoán/đối soát | Hai máy cùng kết quả; có số đo trễ/băng thông | Xong kỹ thuật; còn hosting + chơi thật |
-| P3 | 2v2: đội, tổ đội, phòng riêng, hàng chờ, Crossfire, xem trận, đấu lại | Ghép đúng; xử lý thiếu người/bỏ trận; không bot ẩn | P3a xong; P3b–P3d chưa |
+| P3 | 2v2: đội, tổ đội, phòng riêng, hàng chờ, Crossfire, xem trận, đấu lại | Ghép đúng; xử lý thiếu người/bỏ trận; không bot ẩn | P3a, P3b xong; P3c–P3d chưa |
 | P4 | Art/VFX/UI/âm thanh, tích hợp launcher, quyền chơi, lưu kết quả | Loading đúng; quyền đúng; thoát sạch | Chưa |
 | P5 | QA, mạng yếu, thiết bị, soak/load | Đạt tiêu chí §9, chủ dự án duyệt | Chưa |
 | P6 / P7 | 3v3 tranh khu vực / 4v4 cướp lõi, đặc tả riêng | Kiểm thử riêng, không chỉ tăng slot | Chưa |
@@ -108,7 +108,7 @@ Mạng ảo và hai tab trên một máy **không** thay cho chơi thật; báo 
 2. **P2 tài khoản** — phần client xong (`trust.ts`: chỉ gửi token tới `wss` trong `VITE_TANK_CLASH_SERVERS` hoặc loopback). Còn: thử hai tài khoản staging; allowlist tester/entitlement phía server. Không đụng DB production.
 3. **P2 chơi thật** — 10 trận hai máy/hai mạng; ghi mất mạng/tab/khóa màn hình, ping, hiệu chỉnh, nhu cầu lag compensation; soak/load, restart, bộ nhớ.
 4. **Tính năng bộ P2 cũ chưa port** (chỉ làm nếu cần, theo protocol hiện hành + test): thống kê riêng A/B, opId/ack lệnh, epoch hiệp, revision tường, allowlist tester. UI online không dùng `state.stats` làm thống kê ghế B.
-5. **P3b–P3d** theo `docs/tank-clash/P3-SPEC.md` §9: protocol `tank-clash.p3.v1`, phòng 4 ghế, người xem, đấu lại → hàng chờ + tổ đội → UI online.
+5. **P3c–P3d** theo `docs/tank-clash/P3-SPEC.md` §9 (P3b xong, xem §14 của đặc tả): hàng chờ + tổ đội → giao diện online 2v2, test server 4 WebSocket và UI 4 trang.
 6. **P4**, rồi **P5**, rồi P6/P7 như §8.
 
 Quy tắc giữ nguyên: CSS prefix `tc-`; modal và toast theo `AGENTS.md`; không force-update khi đang chơi; bot ghi rõ BOT; art tạm ghi rõ; không làm vỡ save cũ; không sửa game PvP khác để ép vừa; ghi `docs/WORKLOG.md` cùng mỗi thay đổi.
@@ -119,7 +119,7 @@ Quy tắc giữ nguyên: CSS prefix `tc-`; modal và toast theo `AGENTS.md`; kh�
 |---|---|
 | `src/games/tank-clash/engine.ts` | CONFIG, state, luật, bot, bài học, kết quả; `createState('duel', { online: true })`, chế độ `squad` 4 xe |
 | `src/games/tank-clash/maps.ts` | Sinh sân 2v2 theo seed + validator |
-| `src/games/tank-clash/protocol.ts` | Hợp đồng wire `tank-clash.p2.v1`, kiểm gói, mã phòng |
+| `src/games/tank-clash/protocol.ts` | Hợp đồng wire `tank-clash.p3.v1` (1v1 + 2v2, người xem), kiểm gói, mã phòng |
 | `src/games/tank-clash/room.ts` | Host phòng thuần (ghế, vòng đời, tín dụng input, `onResult`) |
 | `src/games/tank-clash/net-client.ts` | Dự đoán/đối soát/nội suy, `connectTankRoom` |
 | `src/games/tank-clash/trust.ts` | Danh sách máy chủ được nhận token |
@@ -128,7 +128,7 @@ Quy tắc giữ nguyên: CSS prefix `tc-`; modal và toast theo `AGENTS.md`; kh�
 | `server/tank-clash-room/` | WS server hiện hành (`ws@8.22.1`, Node 22.18+) |
 | `server/tank-clash-spike/` | Spike P0, chỉ để test đối chiếu |
 | `scripts/export-tank-review.mjs` | Build `deliverables/Tank_Clash_P2_Playtest.html` (file sinh, không sửa tay) |
-| `tests/tank-clash/` | engine, room, netcode (+harness), squad, trust, server, network; UI: `online-ui`, `squad-ui` |
+| `tests/tank-clash/` | engine, room, netcode (+harness), squad, squad-room, squad-netcode, trust, server, network; UI: `online-ui`, `squad-ui` |
 | `docs/tank-clash/` | `GDD-v1.md`, `P0-P1-review.md`, `P2-review.md`, `P3-SPEC.md`, `README.md` |
 
 ```bash
