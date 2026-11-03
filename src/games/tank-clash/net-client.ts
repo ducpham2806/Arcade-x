@@ -167,7 +167,8 @@ export type NetSession = ReturnType<typeof createNetSession>;
 
 /** Browser wrapper: one WebSocket, auto-resume within the seat hold window, pings every second. */
 export function connectTankRoom(url: string, options: { name?: string; token?: () => string | undefined; onChange?: (kind: string) => void; storage?: Storage | null }) {
-  let ws: WebSocket | null = null, closed = false, retry = 0, retryTimer = 0, pingTimer = 0, queue: ClientMessage[] = [];
+  let ws: WebSocket | null = null, closed = false, retry = 0, queue: ClientMessage[] = [];
+  let retryTimer: ReturnType<typeof setTimeout> | undefined, pingTimer: ReturnType<typeof setInterval> | undefined;
   const store = options.storage === undefined ? (() => { try { return sessionStorage; } catch { return null; } })() : options.storage;
   const session = createNetSession({ now: () => performance.now(), name: options.name, token: options.token,
     send: msg => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg)); else if (msg.type !== 'input' && msg.type !== 'ping') queue.push(msg); },
@@ -186,7 +187,7 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
       const waiting = queue; queue = [];
       if (wasSeated && !waiting.some(m => m.type === 'create' || m.type === 'join')) session.resume();
       for (const m of waiting) socket.send(JSON.stringify(m));
-      clearInterval(pingTimer); pingTimer = window.setInterval(() => session.ping(), 1000);
+      clearInterval(pingTimer); pingTimer = setInterval(() => session.ping(), 1000);
     };
     socket.onmessage = e => { try { session.receive(JSON.parse(String(e.data))); } catch { /* malformed server frame */ } };
     socket.onclose = () => {
@@ -196,7 +197,7 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
       if (fatal) { status = 'closed'; options.onChange?.('status'); return; }
       // Retry inside the 20 s hold window: 0.5, 1, 2, 4, 4, 4 ... seconds.
       status = 'reconnecting'; options.onChange?.('status');
-      retryTimer = window.setTimeout(open, Math.min(4000, 500 * 2 ** retry++));
+      retryTimer = setTimeout(open, Math.min(4000, 500 * 2 ** retry++));
     };
     socket.onerror = () => {};
   }

@@ -252,7 +252,7 @@ export function createRoomHost(options: HostOptions = {}) {
         if (room.phase === 'playing') { // leaving a running match is an immediate forfeit
           seat.peer = null; seat.lastSeen = -Infinity; peer.code = peer.seat = null;
           finish(room, 'forfeit', seat.id === 'a' ? 1 : 0);
-          if (room.phase !== 'closed') removeSeat(room, seat.id);
+          if ((room.phase as Phase) !== 'closed') removeSeat(room, seat.id);
         } else removeSeat(room, seat.id);
         send(peerId, { type: 'left' });
       }

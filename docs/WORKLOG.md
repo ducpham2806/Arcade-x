@@ -8,6 +8,14 @@ Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã 
 
 ## 02/11/2026 · nhánh `ccr-ff972ce9-1yqkwu` (tách từ `main` `c8aac24`)
 
+### Tank Clash P2 — phần 2: máy chủ WebSocket (xong, chưa deploy)
+- `server/tank-clash-room/server.mjs` (mới, có `package.json` + lockfile riêng, chỉ phụ thuộc `ws@8.22.1`): bọc `room.ts`. Mặc định chỉ bind `127.0.0.1`, chỉ nhận origin localhost (thêm bằng `TANK_ALLOWED_ORIGINS`), gói tin tối đa 2 KB, ngắt client đọc chậm, heartbeat 10 giây, bộ lập lịch dùng thời gian thực (không trôi giờ), `/health` trả số liệu.
+- Xác thực: có `SUPABASE_URL` + `SUPABASE_ANON_KEY` thì bắt buộc đăng nhập (kiểm token ở `/auth/v1/user`, không cần service-role key); không có thì chơi khách (dev). `NODE_ENV=production` mà không cấu hình Supabase thì server từ chối chạy.
+- Kết quả trận hiện chỉ ghi log (`match.result`); lưu vào database để lại cho mốc tích hợp.
+- Lệnh mới: `npm run dev:tank-server`, `npm run test:tank-clash` (nằm trong `test:fast`), `npm run test:tank-clash-server` (cần `npm ci --prefix server/tank-clash-room`; đã thêm bước vào CI).
+- Test `tests/tank-clash/server.test.mjs`: 2 client trình duyệt qua WebSocket thật (tạo, vào, sẵn sàng, chơi, server cắt socket → client tự nối lại đúng ghế và HP, máy khác chiếm ghế bằng resume token, rời trận → xử thua, `/health`); chặn origin lạ (403) và gói quá cỡ (1009); bộ xác thực Supabase với fetch giả.
+- Đã chạy: `npm run lint` sạch; `npm run test:tank-clash` 27/27; `npm run test:tank-clash-server` 4/4 (3 ca mới + spike P0 cũ).
+
 ### Tank Clash P2 — phần 1: giao thức, máy chủ phòng, netcode (xong)
 - `src/games/tank-clash/engine.ts`: thêm `createState('duel', { online: true })` (cả hai ghế là người ở mọi hiệp) và tách `driveTank()` để server và client dự đoán dùng chung luật lái/va chạm.
 - `src/games/tank-clash/protocol.ts` (mới): giao thức `tank-clash.p2.v1`, mã lỗi kèm câu tiếng Việt, kiểm tra gói tin chặt (từ chối loại lạ, field thừa, batch quá 4), mã phòng 6 ký tự không có 0/O/1/I/L, nén số trong snapshot.

@@ -1,0 +1,1 @@
+{"name":"tank-clash-room-server","private":true,"type":"module","engines":{"node":">=22.18"},"scripts":{"start":"node server.mjs"},"dependencies":{"ws":"8.22.1"}}

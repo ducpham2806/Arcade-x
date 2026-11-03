@@ -28,6 +28,8 @@ jobs:
         run: npm run test:bundle
       - name: Fast test suites (no browser, no Docker)
         run: npm run test:fast
+      - name: Tank Clash room server over real WebSockets (loopback)
+        run: npm ci --prefix server/tank-clash-room --ignore-scripts && npm ci --prefix server/tank-clash-spike --ignore-scripts && npm run test:tank-clash-server
       - name: Install Chromium for browser checks
         run: npx playwright install --with-deps chromium
       - name: Launcher idle render budget
