@@ -1,7 +1,9 @@
-/** Tank Clash P1. Pure fixed-step simulation: no DOM, network, storage or rewards.
+/** Tank Clash P1–P3a. Pure fixed-step simulation: no DOM, network, storage or rewards.
  * All tuning values are provisional until human playtesting. Units: pixels, seconds.
  */
-export const CONFIG = Object.freeze({ width: 800, height: 480, hz: 60, radius: 16,
+import { DUEL_SIZE, SQUAD_SIZE, SQUAD_SPAWNS, crossfire, newSeed } from './maps.ts';
+/** width/height are the Duel arena; read the arena of a state from `s.width`/`s.height`. */
+export const CONFIG = Object.freeze({ width: DUEL_SIZE.width, height: DUEL_SIZE.height, hz: 60, radius: 16,
   speed: 155, turnSpeed: 10, hp: 3, damage: 1, shotCooldown: .65, maxBullets: 3,
   bulletSpeed: 340, bulletRadius: 3, bulletLife: 2.5, bounces: 1,
   shieldDuration: .8, shieldCooldown: 8, roundSeconds: 60, maxRounds: 3 });
@@ -11,7 +13,12 @@ export type Wall = { id: number; x: number; y: number; w: number; h: number; kin
 export type Tank = Vec & { id: string; team: number; angle: number; aim: number; hp: number; cooldown: number; shield: number; shieldCooldown: number; kind: 'player' | 'bot' | 'target' };
 export type Bullet = Vec & { id: number; owner: string; team: number; vx: number; vy: number; age: number; bounces: number };
 export type GameEvent = Vec & { id: number; type: 'shot' | 'bounce' | 'hit' | 'block' | 'brick' | 'lesson' | 'round'; time: number };
-export type State = { version: 1; mode: 'training' | 'duel'; online?: boolean; tick: number; time: number;
+/** 'squad' = 2v2 (P3a): tanks a, a2 (team 0) vs b, b2 (team 1) on a Crossfire arena generated per match. */
+export type Mode = 'training' | 'duel' | 'squad';
+export type State = { version: 1; mode: Mode; online?: boolean; tick: number; time: number; width: number; height: number;
+  /** Crossfire seed; the same seed always gives the same layout. */ map?: { id: 'crossfire'; seed: number };
+  /** Tanks out for the rest of the match (left / seat hold expired). */ out: string[];
+  /** How the match ended: score, a whole team forfeited, a team surrendered, or every player left. */ endReason?: 'score' | 'forfeit' | 'surrender' | 'cancelled';
   tanks: Tank[]; walls: Wall[]; bullets: Bullet[]; events: GameEvent[]; nextId: number;
   status: 'playing' | 'roundEnd' | 'finished'; round: number; scores: number[]; remaining: number;
   phaseTime: number; winner: number | null; roundWinner: number | null; lesson: number; lessonDone: boolean;
@@ -39,9 +46,12 @@ export function duelWalls(): Wall[] {
   for (const x of [320, 440]) for (const y of [120, 160, 280, 320]) add(x, y, 40, 40, 'brick');
   return walls;
 }
-/** `online: true` (duel only): both tanks are human seats in every round; no bot is created. */
-export function createState(mode: State['mode'] = 'training', options: { online?: boolean } = {}): State {
-  const s: State = { version: 1, mode, ...(options.online && mode === 'duel' ? { online: true } : {}), tick: 0, time: 0, tanks: [], walls: [], bullets: [], events: [], nextId: 1,
+/** `online: true` (duel only): both tanks are human seats in every round; no bot is created.
+ * `seed` (squad only): Crossfire layout seed; a random one is drawn when omitted. */
+export function createState(mode: Mode = 'training', options: { online?: boolean; seed?: number } = {}): State {
+  const size = mode === 'squad' ? SQUAD_SIZE : DUEL_SIZE;
+  const s: State = { version: 1, mode, ...(options.online && mode === 'duel' ? { online: true } : {}), tick: 0, time: 0, width: size.width, height: size.height,
+    ...(mode === 'squad' ? { map: { id: 'crossfire' as const, seed: (options.seed ?? newSeed()) >>> 0 } } : {}), out: [], tanks: [], walls: [], bullets: [], events: [], nextId: 1,
     status: 'playing', round: 1, scores: [0, 0], remaining: CONFIG.roundSeconds, phaseTime: 0,
     winner: null, roundWinner: null, lesson: 0, lessonDone: false, stats: { shots: 0, hits: 0, ricochets: 0, blocks: 0, bricks: 0 } };
   setupRound(s); return s;
@@ -50,7 +60,14 @@ function setupRound(s: State) {
   s.bullets = []; s.remaining = CONFIG.roundSeconds; s.status = 'playing'; s.phaseTime = 0;
   s.roundWinner = null;
   if (s.mode === 'training') setupLesson(s);
+  else if (s.mode === 'squad') {
+    s.walls = crossfire(s.map!.seed).walls;
+    // Team-mates swap start lanes every round; both teams swap, so the 180° symmetry holds.
+    const swap = s.round % 2 === 0, at = (id: keyof typeof SQUAD_SPAWNS) => SQUAD_SPAWNS[swap ? ({ a: 'a2', a2: 'a', b: 'b2', b2: 'b' } as const)[id] : id];
+    s.tanks = (['a', 'a2', 'b', 'b2'] as const).map(id => tank(id, id.startsWith('b') ? 1 : 0, at(id).x, at(id).y, id === 'a' ? 'player' : 'bot'));
+  }
   else { s.walls = duelWalls(); s.tanks = [tank('a', 0, 100, 240), tank('b', 1, 700, 240, s.online ? 'player' : 'bot')]; }
+  for (const t of s.tanks) if (s.out.includes(t.id)) t.hp = 0;
 }
 function setupLesson(s: State) {
   s.lessonDone = false; s.walls = []; s.bullets = [];
@@ -78,7 +95,7 @@ function circleRect(x: number, y: number, r: number, w: Wall) {
 }
 export function canOccupy(s: State, x: number, y: number, ignoreId?: string) {
   const r = CONFIG.radius;
-  return x >= r && y >= r && x <= CONFIG.width - r && y <= CONFIG.height - r
+  return x >= r && y >= r && x <= s.width - r && y <= s.height - r
     && !s.walls.some(w => w.hp > 0 && circleRect(x, y, r, w))
     && !s.tanks.some(t => t.id !== ignoreId && t.hp > 0 && length(x - t.x, y - t.y) < r * 2 - .01);
 }
@@ -113,8 +130,8 @@ export function aimPath(s: State, a: Tank): Vec[] {
     const dx = vx * distance, dy = vy * distance;
     let best: { t: number; nx: number; ny: number; w: Wall } | null = null;
     for (const w of s.walls) if (w.hp > 0) { const h = rayBox(x, y, dx, dy, w); if (h && (!best || h.t < best.t)) best = { ...h, w }; }
-    const boundary = Math.min(1, vx > 0 ? (CONFIG.width - x) / dx : vx < 0 ? -x / dx : 1,
-      vy > 0 ? (CONFIG.height - y) / dy : vy < 0 ? -y / dy : 1);
+    const boundary = Math.min(1, vx > 0 ? (s.width - x) / dx : vx < 0 ? -x / dx : 1,
+      vy > 0 ? (s.height - y) / dy : vy < 0 ? -y / dy : 1);
     const t = best && best.t < boundary ? best.t : boundary;
     x += dx * t; y += dy * t; points.push({ x, y });
     if (!best || best.t >= boundary || best.w.kind !== 'steel') break;
@@ -192,7 +209,7 @@ function updateBullet(s: State, b: Bullet, dt: number): boolean {
       left *= 1 - bestT;
     }
   }
-  return b.x >= 0 && b.y >= 0 && b.x <= CONFIG.width && b.y <= CONFIG.height;
+  return b.x >= 0 && b.y >= 0 && b.x <= s.width && b.y <= s.height;
 }
 function resolveRound(s: State) {
   const teams = [0, 1].map(team => s.tanks.filter(t => t.team === team && t.hp > 0));
@@ -201,8 +218,27 @@ function resolveRound(s: State) {
   s.roundWinner = cmp === 0 ? null : cmp > 0 ? 0 : 1;
   if (s.roundWinner !== null) s.scores[s.roundWinner]++;
   s.status = s.round >= CONFIG.maxRounds || Math.max(...s.scores) >= 2 ? 'finished' : 'roundEnd';
-  if (s.status === 'finished') s.winner = s.scores[0] === s.scores[1] ? null : s.scores[0] > s.scores[1] ? 0 : 1;
-  s.phaseTime = 2; s.bullets = []; event(s, 'round', 400, 240);
+  if (s.status === 'finished') { s.winner = s.scores[0] === s.scores[1] ? null : s.scores[0] > s.scores[1] ? 0 : 1; s.endReason = 'score'; }
+  s.phaseTime = 2; s.bullets = []; event(s, 'round', s.width / 2, s.height / 2);
+}
+function endMatch(s: State, winner: number | null, reason: NonNullable<State['endReason']>) {
+  s.status = 'finished'; s.winner = winner; s.endReason = reason; s.roundWinner = null; s.bullets = []; s.phaseTime = 0;
+  event(s, 'round', s.width / 2, s.height / 2);
+}
+/** Players leave or their seat holds expire: those tanks are out for the rest of the match (no respawn
+ * in later rounds). Team-mates play on; a team with nobody left loses by forfeit. Pass every id that
+ * left in the same server tick together: if that empties both teams the match is cancelled. */
+export function forfeitTank(s: State, ...ids: string[]) {
+  if (s.status === 'finished') return;
+  for (const id of ids) { const t = s.tanks.find(x => x.id === id); if (!t || s.out.includes(id)) continue; s.out.push(id); t.hp = 0; t.shield = 0; }
+  const gone = [0, 1].map(team => s.tanks.filter(x => x.team === team).every(x => s.out.includes(x.id)));
+  if (gone[0] && gone[1]) endMatch(s, null, 'cancelled');
+  else if (gone[0] || gone[1]) endMatch(s, gone[0] ? 1 : 0, 'forfeit');
+}
+/** A team gives up: the other team wins the match at once. Who may surrender is the caller's rule. */
+export function surrender(s: State, team: number) {
+  if (s.status === 'finished' || (team !== 0 && team !== 1)) return;
+  endMatch(s, 1 - team, 'surrender');
 }
 /** One fixed 1/60-second step. Inputs are neutral by default; the server owns timing. */
 export function step(s: State, inputs: Record<string, Input> = {}) {
@@ -214,11 +250,24 @@ export function step(s: State, inputs: Record<string, Input> = {}) {
   // Move every projectile before deciding round outcome so same-tick mutual eliminations draw.
   s.bullets = s.bullets.filter(b => updateBullet(s, b, dt));
   if (s.mode === 'training' && s.lesson === 0 && length(s.tanks[0].x - 280, s.tanks[0].y - 300) < 26) complete(s);
-  if (s.mode === 'duel') resolveRound(s);
+  if (s.mode === 'duel' || s.mode === 'squad') resolveRound(s);
 }
 /** Grid pathfinding for the training bot; all directions still go through real collision. */
+/** Blocked path cells depend only on which walls still stand, so they are cached per wall list and
+ * rebuilt only when a brick breaks (the standing count drops) or a new round replaces the list. */
+const blockedCache = new WeakMap<Wall[], { standing: number; cells: Uint8Array }>();
+function blockedCells(s: State, size: number, cols: number, rows: number) {
+  const standing = s.walls.filter(w => w.hp > 0), hit = blockedCache.get(s.walls);
+  if (hit && hit.standing === standing.length) return hit.cells;
+  const cells = new Uint8Array(cols * rows);
+  for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++)
+    if (standing.some(w => circleRect(x * size + size / 2, y * size + size / 2, CONFIG.radius + 2, w))) cells[y * cols + x] = 1;
+  blockedCache.set(s.walls, { standing: standing.length, cells }); return cells;
+}
 function pathDirection(s: State, a: Tank, target: Tank): Vec {
-  const size = 40, cols = 20, rows = 12, key = (x: number, y: number) => y * cols + x;
+  // 2v2 arenas are generated on a 52 px layout: a 20 px grid finds every corridor the map validator guarantees.
+  const size = s.mode === 'squad' ? 20 : 40, cols = Math.ceil(s.width / size), rows = Math.ceil(s.height / size), key = (x: number, y: number) => y * cols + x;
+  const blocked = blockedCells(s, size, cols, rows);
   const ax = Math.floor(a.x / size), ay = Math.floor(a.y / size), end = key(Math.floor(target.x / size), Math.floor(target.y / size));
   const start = key(ax, ay), queue = [start], previous = new Map<number, number>([[start, -1]]);
   for (let cursor = 0; cursor < queue.length; cursor++) {
@@ -226,25 +275,34 @@ function pathDirection(s: State, a: Tank, target: Tank): Vec {
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const x = n % cols + dx, y = Math.floor(n / cols) + dy, k = key(x, y);
       if (x < 0 || y < 0 || x >= cols || y >= rows || previous.has(k)) continue;
-      const px = x * size + 20, py = y * size + 20;
-      if (s.walls.some(w => w.hp > 0 && circleRect(px, py, CONFIG.radius + 2, w))) continue;
+      if (blocked[k]) continue;
       previous.set(k, n); queue.push(k);
     }
   }
   if (!previous.has(end)) return { x: 0, y: 0 };
   let n = end; while (previous.get(n) !== start && previous.get(n) !== -1) n = previous.get(n)!;
-  const dx = n % cols * size + 20 - a.x, dy = Math.floor(n / cols) * size + 20 - a.y, d = length(dx, dy) || 1;
+  const dx = n % cols * size + size / 2 - a.x, dy = Math.floor(n / cols) * size + size / 2 - a.y, d = length(dx, dy) || 1;
   return { x: dx / d, y: dy / d };
 }
-export function botInput(s: State): Input {
-  const a = s.tanks.find(a => a.id === 'b'), target = s.tanks[0];
-  if (!a || a.hp <= 0) return neutral();
+/** Bot for any tank id (default 'b'). Targets the nearest living enemy, preferring one in clear view;
+ * team-mate bots keep a little distance from each other. Same tank, bullet and shield rules as players. */
+export function botInput(s: State, id = 'b'): Input {
+  const a = s.tanks.find(t => t.id === id);
+  if (!a || a.hp <= 0) return neutral(a?.aim);
   if (s.mode === 'training') return { ...neutral(Math.PI), fire: s.lesson === 4 && s.tick % 150 === 0 };
+  const enemies = s.tanks.filter(t => t.team !== a.team && t.hp > 0 && t.kind !== 'target');
+  if (!enemies.length) return neutral(a.aim);
+  const sees = (t: Tank) => !s.walls.some(w => w.hp > 0 && rayBox(a.x, a.y, t.x - a.x, t.y - a.y, w));
+  const near = (t: Tank) => length(t.x - a.x, t.y - a.y) - (sees(t) ? 400 : 0);
+  const target = enemies.reduce((best, t) => near(t) < near(best) ? t : best);
+  const phase = ({ b: 0, a2: .4, b2: .8 } as Record<string, number>)[a.id] ?? 0;
   const dx = target.x - a.x, dy = target.y - a.y, distance = length(dx, dy), desired = Math.atan2(dy, dx);
   const clear = !s.walls.some(w => w.hp > 0 && rayBox(a.x, a.y, dx, dy, w));
-  const direction = clear && distance < 280 ? { x: -dy / (distance || 1) * Math.sin(s.time * 1.3), y: dx / (distance || 1) * Math.sin(s.time * 1.3) } : pathDirection(s, a, target);
+  let direction = clear && distance < 280 ? { x: -dy / (distance || 1) * Math.sin(s.time * 1.3 + phase * 4), y: dx / (distance || 1) * Math.sin(s.time * 1.3 + phase * 4) } : pathDirection(s, a, target);
+  const mate = s.tanks.find(t => t.id !== a.id && t.team === a.team && t.hp > 0), gap = mate ? length(a.x - mate.x, a.y - mate.y) : Infinity;
+  if (mate && gap < 60) direction = { x: direction.x + (a.x - mate.x) / gap, y: direction.y + (a.y - mate.y) / gap };
   const danger = s.bullets.some(b => b.team !== a.team && length(b.x - a.x, b.y - a.y) < 90 && (a.x - b.x) * b.vx + (a.y - b.y) * b.vy > 0);
-  return { ...direction, aim: moveAngle(a.aim, desired + Math.sin(s.time * 2.7) * .1, .075),
-    fire: clear && Math.abs(angleDiff(a.aim, desired)) < .18 && s.time % 1.2 > .35,
+  return { x: clamp(direction.x, -1, 1), y: clamp(direction.y, -1, 1), aim: moveAngle(a.aim, desired + Math.sin(s.time * 2.7) * .1, .075),
+    fire: clear && Math.abs(angleDiff(a.aim, desired)) < .18 && (s.time + phase) % 1.2 > .35,
     shield: danger && Math.sin(s.time * 2) > .4 };
 }

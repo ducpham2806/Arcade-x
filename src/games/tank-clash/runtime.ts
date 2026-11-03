@@ -1,11 +1,13 @@
-import { CONFIG, LESSONS, createState, step, botInput, neutral, nextLesson, aimPath, clamp } from './engine.ts';
+import { CONFIG, LESSONS, createState, step, botInput, neutral, nextLesson, aimPath, clamp, surrender } from './engine.ts';
 import type { State, Input, Tank } from './engine.ts';
 import { readableCanvasText } from '../../accessibility/canvasText';
 import { connectTankRoom } from './net-client.ts';
 import { normalizeCode } from './protocol.ts';
+import { isTrustedServer, tokenFor } from './trust.ts';
 
 export type TankController = { destroy: () => void; setPaused: (v: boolean) => void; snapshot: () => State };
-export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined };
+export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined;
+  /** wss servers allowed to receive the token; loopback dev servers are always allowed. Others get no token (guest). */ trustedServers?: readonly string[] };
 const esc = (v: string) => v.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 function defaultServer(explicit?: string) {
   try { const param = new URLSearchParams(location.search).get('server'); if (param && /^wss?:\/\//.test(param)) return param; } catch { /* no location */ }
@@ -15,7 +17,7 @@ function defaultServer(explicit?: string) {
 }
 export function mountTankClash(root: HTMLElement, options: TankOptions = {}): TankController {
   root.innerHTML = `<div class="tc" tabindex="0">
-    <header class="tc-header"><div class="tc-brand"><span class="tc-mark">TC</span><span>TANK CLASH<small>ARCADE-X · RICOCHET LAB</small></span></div><span class="tc-build">P2 · HÌNH TẠM</span><div class="tc-actions"><button data-action="guide" aria-pressed="true" title="Bật/tắt đường ngắm">Đường ngắm</button><button data-action="pause">Tạm dừng</button><button data-action="menu">Menu</button></div></header>
+    <header class="tc-header"><div class="tc-brand"><span class="tc-mark">TC</span><span>TANK CLASH<small>ARCADE-X · RICOCHET LAB</small></span></div><span class="tc-build">P3a · HÌNH TẠM</span><div class="tc-actions"><button data-action="guide" aria-pressed="true" title="Bật/tắt đường ngắm">Đường ngắm</button><button data-action="pause">Tạm dừng</button><button data-action="menu">Menu</button></div></header>
     <div class="tc-objective" role="status"><span class="tc-mode">SÂN TẬP</span><span class="tc-task">Làm quen tay lái</span><button class="tc-next" data-action="next" hidden>Tiếp theo →</button></div>
     <div class="tc-score"><span class="tc-player">A · BẠN <b class="tc-hp">● ● ●</b></span><span class="tc-clock">SÂN TẬP</span><span class="tc-enemy">B · BOT <b class="tc-enemyhp">● ● ●</b></span></div>
     <main class="tc-battle"><div class="tc-side tc-left"><div class="tc-stick tc-move" role="group" aria-label="Cần di chuyển"><i></i><span>DI CHUYỂN</span></div><small>W A S D</small></div><div class="tc-field"><canvas width="1600" height="960" aria-label="Đấu trường Tank Clash. Dùng WASD để lái, chuột để ngắm và bắn."></canvas><div class="tc-roundcue" aria-live="polite"></div><div class="tc-rotate">Xoay ngang để có sân chơi rộng hơn</div></div><div class="tc-side tc-right"><button class="tc-shield" data-action="shield" aria-label="Kích hoạt khiên">◇<small>KHIÊN</small></button><div class="tc-stick tc-aim" role="group" aria-label="Kéo để ngắm, nhả để bắn"><i></i><span>NGẮM · NHẢ BẮN</span></div><small>CHUỘT · SPACE = KHIÊN</small></div></main>
@@ -41,18 +43,18 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function show(which: typeof screen) {
     screen = which; resetInput(); overlay.hidden = which === null; battle.inert = which !== null;
     if (which === null) { app.focus({ preventScroll: true }); return; }
-    if (which === 'menu') dialog.innerHTML = `<div class="tc-eyebrow">BẢN THỬ CẢM GIÁC CHƠI · 0.1</div><h1 id="tc-dialog-title">Đọc góc bắn.<br><em>Làm chủ đấu trường.</em></h1><p>Lái xe, tìm góc phản xạ và đỡ đạn đúng lúc. Bắt đầu ở sân tập an toàn, rồi thử đấu với bot.</p><div class="tc-menu-cards"><button class="tc-card" data-action="training"><span>01 / SÂN TẬP</span><b>Học qua 5 bài ngắn ↗</b><small>Lái · Bắn · Bật tường · Phá gạch · Khiên</small></button><button class="tc-card" data-action="duel"><span>02 / ĐẤU LUYỆN</span><b>1v1 với bot ↗</b><small>Tối đa 3 hiệp · 3 máu · Cùng chỉ số</small></button><button class="tc-card tc-card-online" data-action="online"><span>03 / ONLINE 1v1 · THỬ NGHIỆM</span><b>Phòng riêng ↗</b><small>Tạo mã hoặc nhập mã của bạn bè</small></button></div><div class="tc-controls-info"><span><b>PC</b> WASD lái · chuột ngắm/bắn · Space khiên</span><span><b>ĐIỆN THOẠI</b> Cần trái lái · kéo cần phải, nhả để bắn</span></div><p class="tc-note">Hình khối tạm. Online 1v1 cần máy chủ phòng đang chạy (bản thử P2); chưa có chơi nhanh/ghép trận.</p>`;
+    if (which === 'menu') dialog.innerHTML = `<div class="tc-eyebrow">BẢN THỬ CẢM GIÁC CHƠI · 0.1</div><h1 id="tc-dialog-title">Đọc góc bắn.<br><em>Làm chủ đấu trường.</em></h1><p>Lái xe, tìm góc phản xạ và đỡ đạn đúng lúc. Bắt đầu ở sân tập an toàn, rồi thử đấu với bot hoặc cùng đồng đội bot đấu 2v2.</p><div class="tc-menu-cards"><button class="tc-card" data-action="training"><span>01 / SÂN TẬP</span><b>Học qua 5 bài ngắn ↗</b><small>Lái · Bắn · Bật tường · Phá gạch · Khiên</small></button><button class="tc-card" data-action="duel"><span>02 / ĐẤU LUYỆN</span><b>1v1 với bot ↗</b><small>Tối đa 3 hiệp · 3 máu · Cùng chỉ số</small></button><button class="tc-card tc-card-squad" data-action="squad"><span>03 / ĐỒNG ĐỘI 2v2</span><b>Anh + 1 bot vs 2 bot ↗</b><small>Sân lớn · Chướng ngại mới mỗi trận</small></button><button class="tc-card tc-card-online" data-action="online"><span>04 / ONLINE 1v1 · THỬ NGHIỆM</span><b>Phòng riêng ↗</b><small>Tạo mã hoặc nhập mã của bạn bè</small></button></div><div class="tc-controls-info"><span><b>PC</b> WASD lái · chuột ngắm/bắn · Space khiên</span><span><b>ĐIỆN THOẠI</b> Cần trái lái · kéo cần phải, nhả để bắn</span></div><p class="tc-note">Hình khối tạm. Online 1v1 cần máy chủ phòng đang chạy (bản thử P2); chưa có chơi nhanh/ghép trận.</p>`;
     if (which === 'online') dialog.innerHTML = `<div class="tc-eyebrow">ONLINE 1v1 · PHÒNG RIÊNG · P2</div><h1 id="tc-dialog-title">Đấu với bạn bè.</h1><p>Tạo phòng rồi gửi mã hoặc link cho người kia. Máy chủ quyết định đạn, máu và kết quả.</p>
       <label class="tc-field-label">Tên hiển thị<input class="tc-input tc-name" maxlength="20" autocomplete="nickname" value="${esc(playerName)}" placeholder="Người chơi"></label>
       <div class="tc-online-row"><button class="tc-primary" data-action="create">Tạo phòng mới</button><span class="tc-or">hoặc</span><label class="tc-field-label tc-code-label">Mã phòng<input class="tc-input tc-code" maxlength="7" autocapitalize="characters" autocomplete="off" spellcheck="false" value="${esc(inviteCode)}" placeholder="VD: K7M2QX"></label><button data-action="join">Vào phòng</button></div>
-      <details class="tc-advanced"><summary>Máy chủ</summary><label class="tc-field-label">Địa chỉ máy chủ phòng<input class="tc-input tc-server" value="${esc(serverUrl)}" spellcheck="false"></label></details>
+      <details class="tc-advanced"><summary>Máy chủ</summary><label class="tc-field-label">Địa chỉ máy chủ phòng<input class="tc-input tc-server" value="${esc(serverUrl)}" spellcheck="false"></label></details><p class="tc-note tc-trust"></p>
       <p class="tc-net-status" role="status" aria-live="polite"></p><div class="tc-buttonrow">${button('Về menu', 'leave-online')}</div>`;
     if (which === 'lobby') dialog.innerHTML = `<div class="tc-eyebrow">PHÒNG RIÊNG · 1v1</div><h1 id="tc-dialog-title">Phòng <span class="tc-roomcode"></span></h1><p class="tc-lobby-hint">Gửi mã hoặc link cho người kia. Khi cả hai sẵn sàng, trận bắt đầu sau 3 giây.</p>
       <ul class="tc-seats" aria-live="polite"></ul><div class="tc-buttonrow"><button class="tc-primary tc-ready" data-action="ready">Sẵn sàng</button>${button('Sao chép link mời', 'invite')}${button('Rời phòng', 'leave-online')}</div>
       <p class="tc-net-status" role="status" aria-live="polite"></p>`;
     if (which === 'onlinepause') dialog.innerHTML = `<div class="tc-eyebrow">ONLINE · TRẬN VẪN ĐANG CHẠY</div><h1 id="tc-dialog-title">Trận không tạm dừng được.</h1><p>Máy chủ vẫn chạy trận; xe của anh đứng yên và vẫn có thể trúng đạn. Rời trận lúc này bị xử thua.</p><div class="tc-buttonrow">${button('Quay lại trận', 'resume', true)}${button('Rời trận (xử thua)', 'leave-online')}</div>`;
     if (which === 'lobby' || which === 'online') renderOnline();
-    if (which === 'pause') dialog.innerHTML = `<div class="tc-eyebrow">TANK CLASH / TẠM DỪNG</div><h1 id="tc-dialog-title">Nghỉ một nhịp.</h1><p>Trận đấu cục bộ đã dừng. Khi quay lại, xe sẽ chờ thao tác mới.</p><div class="tc-buttonrow">${button('Tiếp tục', 'resume', true)}${button('Chơi lại', 'restart')}${button('Về menu', 'menu')}${button('Góp ý bản thử', 'feedback')}</div>`;
+    if (which === 'pause') dialog.innerHTML = `<div class="tc-eyebrow">TANK CLASH / TẠM DỪNG</div><h1 id="tc-dialog-title">Nghỉ một nhịp.</h1><p>Trận đấu cục bộ đã dừng. Khi quay lại, xe sẽ chờ thao tác mới.</p><div class="tc-buttonrow">${button('Tiếp tục', 'resume', true)}${button('Chơi lại', 'restart')}${sim.mode === 'squad' && sim.status !== 'finished' ? button('Đầu hàng', 'surrender') : ''}${button('Về menu', 'menu')}${button('Góp ý bản thử', 'feedback')}</div>`;
     if (which === 'result' && online && net?.session.result) {
       const r = net.session.result, myTeam = net.session.seat === 'b' ? 1 : 0, mine = r.scores[myTeam], theirs = r.scores[1 - myTeam];
       const title = r.reason === 'cancelled' ? 'Trận bị hủy.' : r.winner === null ? 'Một trận hòa.' : r.winner === myTeam ? 'Anh thắng trận!' : 'Đối thủ thắng trận này.';
@@ -60,8 +62,9 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
       dialog.innerHTML = `<div class="tc-eyebrow">KẾT QUẢ ONLINE · MÁY CHỦ XÁC NHẬN</div><h1 id="tc-dialog-title">${title}</h1><div class="tc-resultscore">${mine} <span>:</span> ${theirs}</div><p>${why}</p><ul class="tc-seats" aria-live="polite"></ul><div class="tc-buttonrow"><button class="tc-primary tc-ready" data-action="ready">Đấu lại</button>${button('Rời phòng', 'leave-online')}</div><p class="tc-note">Bản thử: chưa cấp thưởng hoặc ghi bảng xếp hạng. Mã trận ${esc(r.matchId)}.</p><p class="tc-net-status" role="status" aria-live="polite"></p>`;
       renderOnline();
     } else if (which === 'result') {
-      const title = sim.winner === null ? 'Một trận hòa.' : sim.winner === 0 ? 'Góc bắn của anh!' : 'Bot thắng trận này.';
-      dialog.innerHTML = `<div class="tc-eyebrow">KẾT QUẢ ĐẤU LUYỆN</div><h1 id="tc-dialog-title">${title}</h1><div class="tc-resultscore">${sim.scores[0]} <span>:</span> ${sim.scores[1]}</div><p>${sim.stats.shots} phát bắn · ${sim.stats.hits} lần trúng · ${sim.stats.ricochets} lần trúng sau bật tường · ${sim.stats.blocks} lần đỡ</p><div class="tc-buttonrow">${button('Đấu lại', 'duel', true)}${button('Sân tập', 'training')}${button('Menu', 'menu')}${button('Góp ý', 'feedback')}</div><p class="tc-note">Kết quả thử nghiệm trên thiết bị, không cấp thưởng hoặc ghi bảng xếp hạng.</p>`;
+      const squad = sim.mode === 'squad';
+      const title = sim.endReason === 'surrender' ? 'Đội anh đã đầu hàng.' : sim.winner === null ? 'Một trận hòa.' : sim.winner === 0 ? (squad ? 'Đội anh thắng!' : 'Góc bắn của anh!') : squad ? 'Đội bot đối thủ thắng.' : 'Bot thắng trận này.';
+      dialog.innerHTML = `<div class="tc-eyebrow">${squad ? 'KẾT QUẢ 2v2 VỚI BOT' : 'KẾT QUẢ ĐẤU LUYỆN'}</div><h1 id="tc-dialog-title">${title}</h1><div class="tc-resultscore">${sim.scores[0]} <span>:</span> ${sim.scores[1]}</div><p>Phát bắn của anh: ${sim.stats.shots} phát · ${sim.stats.hits} lần trúng · ${sim.stats.ricochets} lần trúng sau bật tường · ${sim.stats.blocks} lần đỡ</p>${squad ? `<p class="tc-note">Sân Crossfire · mã sân ${sim.map?.seed ?? '-'} (mỗi trận một bố cục mới).</p>` : ''}<div class="tc-buttonrow">${button('Đấu lại', 'restart', true)}${button('Sân tập', 'training')}${button('Menu', 'menu')}${button('Góp ý', 'feedback')}</div><p class="tc-note">Kết quả thử nghiệm trên thiết bị, không cấp thưởng hoặc ghi bảng xếp hạng.</p>`;
     }
     if (which === 'feedback') dialog.innerHTML = `<div class="tc-eyebrow">GÓP Ý CHƠI THỬ</div><h1 id="tc-dialog-title">Cảm giác điều khiển?</h1><label class="tc-feedbacklabel">Anh thấy phần nào khó điều khiển hoặc chưa rõ?<textarea rows="4" maxlength="1200" placeholder="Ví dụ: ngắm hơi nhạy, cần lái nhỏ, chưa thấy rõ đạn bật..."></textarea></label><div class="tc-buttonrow">${button('Sao chép góp ý + số liệu', 'copy', true)}${button('Quay lại', 'back')}</div><p class="tc-note tc-copy-status">Chỉ sao chép khi anh bấm; không tự gửi dữ liệu ra ngoài.</p>`;
     queueMicrotask(() => { if (!destroyed) dialog.querySelector<HTMLElement>(which === 'online' ? '.tc-name' : 'button,textarea,input')?.focus({ preventScroll: true }); });
@@ -70,6 +73,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function renderOnline() {
     const s = net?.session, status = dialog.querySelector('.tc-net-status');
     if (status) status.textContent = !net ? '' : s?.error ? s.error.message : net.status === 'connecting' ? 'Đang kết nối máy chủ…' : net.status === 'reconnecting' ? 'Mất kết nối, đang thử lại…' : net.status === 'closed' ? 'Đã ngắt kết nối máy chủ.' : '';
+    const trust = dialog.querySelector('.tc-trust'); if (trust) trust.textContent = trustNote();
     const room = s?.room; if (!room) return;
     const code = dialog.querySelector('.tc-roomcode'); if (code) code.textContent = room.code.replace(/(...)(...)/, '$1 $2');
     const seats = dialog.querySelector('.tc-seats');
@@ -80,9 +84,13 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     const me = room.seats.find(x => x.id === s!.seat), ready = dialog.querySelector<HTMLButtonElement>('.tc-ready');
     if (ready && me) { ready.textContent = room.phase === 'countdown' ? `Bắt đầu sau ${Math.ceil((room.countdownMs ?? 0) / 1000)}… (hủy)` : me.ready ? 'Hủy sẵn sàng' : room.phase === 'finished' ? 'Đấu lại' : 'Sẵn sàng'; ready.setAttribute('aria-pressed', String(me.ready)); }
   }
+  const trusted = options.trustedServers ?? [];
+  // Never hand the account token to a server taken from an invite link unless the deployment trusts it.
+  function connect() { return connectTankRoom(serverUrl, { name: playerName, token: tokenFor(serverUrl, trusted, options.getToken), onChange: onNet }); }
+  function trustNote() { return options.getToken && !isTrustedServer(serverUrl, trusted) ? 'Máy chủ này không nằm trong danh sách tin cậy: anh vào với tư cách khách, tài khoản không được gửi đi.' : ''; }
   function openOnline() {
     online = true; lastPhase = '';
-    if (!net) net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet });
+    if (!net) net = connect();
     show(net.session.room ? 'lobby' : 'online');
   }
   function onNet(kind: string) {
@@ -110,7 +118,8 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function start(mode: State['mode']) { sim = createState(mode); aim = sim.tanks[0].aim; paused = false; shownResult = false; show(null); updateHud(); }
   function localPause() { resetInput(); if (online) { if (!screen) show('onlinepause'); return; } if (!screen && sim.status !== 'finished') { paused = true; show('pause'); } }
   function action(a: string) {
-    if (a === 'training' || a === 'duel') start(a);
+    if (a === 'training' || a === 'duel' || a === 'squad') start(a);
+    if (a === 'surrender' && sim.mode === 'squad' && !online) { surrender(sim, 0); paused = false; shownResult = true; updateHud(); show('result'); }
     if (a === 'menu') { if (online) { show(net?.session.room?.phase === 'playing' ? 'onlinepause' : net?.session.room ? 'lobby' : 'online'); return; } paused = true; show('menu'); }
     if (a === 'pause') { if (screen === 'pause') { paused = false; show(null); } else localPause(); }
     if (a === 'resume') { paused = false; show(online && net?.session.room?.phase !== 'playing' ? 'lobby' : null); }
@@ -119,8 +128,8 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
       playerName = (q<HTMLInputElement>('.tc-name').value || '').trim().slice(0, 20);
       const url = q<HTMLInputElement>('.tc-server').value.trim();
       try { localStorage.setItem('tank-clash.name', playerName); } catch { /* optional */ }
-      if (/^wss?:\/\/[^\s]+$/.test(url) && url !== serverUrl) { serverUrl = url; try { localStorage.setItem('tank-clash.server', url); } catch { /* optional */ } net?.close(); net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet }); }
-      if (!net) net = connectTankRoom(serverUrl, { name: playerName, token: options.getToken, onChange: onNet });
+      if (/^wss?:\/\/[^\s]+$/.test(url) && url !== serverUrl) { serverUrl = url; try { localStorage.setItem('tank-clash.server', url); } catch { /* optional */ } net?.close(); net = connect(); }
+      if (!net) net = connect();
       if (a === 'create') net.session.create(playerName);
       else { const code = normalizeCode(q<HTMLInputElement>('.tc-code').value); if (!code) { q('.tc-net-status').textContent = 'Mã phòng gồm 6 ký tự (chữ và số, không có 0, O, 1, I, L).'; return; } inviteCode = code; net.session.join(code, playerName); }
       renderOnline();
@@ -139,7 +148,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     if (a === 'feedback') show('feedback');
     if (a === 'back') show(sim.status === 'finished' || (online && net?.session.result) ? 'result' : online ? 'onlinepause' : 'pause');
     if (a === 'copy') {
-      const report = { build: online ? 'tank-clash-p2.0-online' : 'tank-clash-p1.0', net: online && net ? { rtt: net.session.stats.rtt, corrections: net.session.stats.corrections, snapshots: net.session.stats.snapshots } : undefined, feedback: q<HTMLTextAreaElement>('textarea').value, mode: sim.mode, lesson: sim.lesson + 1, stats: sim.stats, scores: sim.scores, fps, viewport: [app.clientWidth, app.clientHeight] };
+      const report = { build: online ? 'tank-clash-p2.0-online' : sim.mode === 'squad' ? 'tank-clash-p3a-squad' : 'tank-clash-p1.0', map: sim.map, net: online && net ? { rtt: net.session.stats.rtt, corrections: net.session.stats.corrections, snapshots: net.session.stats.snapshots } : undefined, feedback: q<HTMLTextAreaElement>('textarea').value, mode: sim.mode, lesson: sim.lesson + 1, stats: sim.stats, scores: sim.scores, fps, viewport: [app.clientWidth, app.clientHeight] };
       const text = JSON.stringify(report, null, 2);
       if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => q('.tc-copy-status').textContent = 'Đã sao chép. Anh có thể dán vào cuộc trò chuyện.').catch(() => { q<HTMLTextAreaElement>('textarea').value = text; q<HTMLTextAreaElement>('textarea').select(); q('.tc-copy-status').textContent = 'Hãy sao chép phần đã chọn.'; });
       else { q<HTMLTextAreaElement>('textarea').value = text; q<HTMLTextAreaElement>('textarea').select(); q('.tc-copy-status').textContent = 'Hãy sao chép phần đã chọn.'; }
@@ -161,7 +170,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   on(window, 'keyup', ((e: KeyboardEvent) => keys.delete(e.key.toLowerCase())) as EventListener);
   on(window, 'blur', (() => localPause()) as EventListener);
   on(document, 'visibilitychange', (() => { if (document.hidden) localPause(); }) as EventListener);
-  function worldPoint(e: PointerEvent) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * CONFIG.width, y: (e.clientY - r.top) / r.height * CONFIG.height }; }
+  function worldPoint(e: PointerEvent) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * sim.width, y: (e.clientY - r.top) / r.height * sim.height }; }
   on(canvas, 'pointermove', ((e: PointerEvent) => { if (e.pointerType === 'mouse' && !screen) { const p = worldPoint(e), a = sim.tanks[0]; aim = Math.atan2(p.y - a.y, p.x - a.x); } }) as EventListener);
   on(canvas, 'pointerdown', ((e: PointerEvent) => { if (screen || e.pointerType !== 'mouse' || e.button !== 0) return; canvas.setPointerCapture(e.pointerId); const p = worldPoint(e), a = sim.tanks[0]; aim = Math.atan2(p.y - a.y, p.x - a.x); mouseFire = true; }) as EventListener);
   on(window, 'pointerup', (() => mouseFire = false) as EventListener);
@@ -183,12 +192,14 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     on(pad, 'pointercancel', ((e: PointerEvent) => end(e, true)) as EventListener);
     on(pad, 'lostpointercapture', ((e: PointerEvent) => end(e, true)) as EventListener);
   }
+  const hp = (t?: Tank) => !t ? '—' : sim.out.includes(t.id) ? 'RỜI' : '●'.repeat(t.hp) + '○'.repeat(CONFIG.hp - t.hp);
   function updateHud() {
-    const a = sim.tanks[0], b = sim.tanks[1];
-    q('.tc-hp').textContent = '●'.repeat(a.hp) + '○'.repeat(CONFIG.hp - a.hp);
-    q('.tc-enemyhp').textContent = b ? (b.kind === 'target' ? 'BIA TẬP' : '●'.repeat(b.hp) + '○'.repeat(CONFIG.hp - b.hp)) : '—';
-    q('.tc-mode').textContent = sim.mode === 'training' ? `SÂN TẬP ${sim.lesson + 1}/5` : `ĐẤU LUYỆN · HIỆP ${sim.round}`;
-    q('.tc-task').textContent = sim.mode === 'training' ? (sim.lessonDone ? '✓ ' : '') + LESSONS[sim.lesson].title : 'Đấu với BOT · Loại hết đối thủ để thắng hiệp';
+    const a = sim.tanks[0], b = sim.tanks[1], squad = sim.mode === 'squad';
+    const team = (n: number) => sim.tanks.filter(t => t.team === n);
+    q('.tc-hp').textContent = squad ? team(0).map(hp).join('  ') : hp(a);
+    q('.tc-enemyhp').textContent = squad ? team(1).map(hp).join('  ') : b ? (b.kind === 'target' ? 'BIA TẬP' : hp(b)) : '—';
+    q('.tc-mode').textContent = sim.mode === 'training' ? `SÂN TẬP ${sim.lesson + 1}/5` : squad ? `2v2 VỚI BOT · HIỆP ${sim.round}` : `ĐẤU LUYỆN · HIỆP ${sim.round}`;
+    q('.tc-task').textContent = sim.mode === 'training' ? (sim.lessonDone ? '✓ ' : '') + LESSONS[sim.lesson].title : squad ? 'Đồng đội A2 là BOT · Loại cả hai xe đối thủ để thắng hiệp' : 'Đấu với BOT · Loại hết đối thủ để thắng hiệp';
     q('.tc-clock').textContent = sim.mode === 'training' ? 'AN TOÀN' : `${sim.scores[0]} : ${sim.scores[1]}  |  ${Math.ceil(sim.remaining)}s`;
     q('.tc-tip').textContent = sim.mode === 'training' ? LESSONS[sim.lesson].text : `Đạn đã bật có thể trúng chính mình. ${sim.stats.shots} phát · ${sim.stats.ricochets} trúng bật tường`;
     const next = q<HTMLButtonElement>('.tc-next'); next.hidden = !(sim.mode === 'training' && sim.lessonDone); next.textContent = sim.lesson === 4 ? 'Đấu với bot →' : 'Tiếp theo →';
@@ -204,8 +215,9 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
       q('.tc-clock').textContent = `${sim.scores[mine]} : ${sim.scores[1 - mine]}  |  ${Math.ceil(sim.remaining)}s`;
       q('.tc-tip').textContent = 'Máy chủ quyết định đạn, máu và kết quả. Đạn đã bật có thể trúng chính mình.';
       q('.tc-roundcue').textContent = sim.status === 'roundEnd' ? (sim.roundWinner === null ? 'HIỆP HÒA' : sim.roundWinner === mine ? 'BẠN THẮNG HIỆP' : 'ĐỐI THỦ THẮNG HIỆP') : a.hp <= 0 && sim.status === 'playing' ? 'ĐANG XEM TRẬN' : net.status === 'reconnecting' ? 'ĐANG NỐI LẠI…' : '';
-    } else if (!online) { q('.tc-player').firstChild!.textContent = 'A · BẠN '; q('.tc-enemy').firstChild!.textContent = 'B · BOT '; }
-    if (!online) q('.tc-roundcue').textContent = paused || externalPaused ? 'TẠM DỪNG' : sim.status === 'roundEnd' ? (sim.roundWinner === null ? 'HIỆP HÒA' : sim.roundWinner === 0 ? 'A THẮNG HIỆP' : 'B THẮNG HIỆP') : sim.mode === 'training' && sim.lessonDone ? 'HOÀN THÀNH ✓' : a.hp <= 0 && sim.status === 'playing' ? 'ĐANG XEM TRẬN' : '';
+    } else if (!online) { q('.tc-player').firstChild!.textContent = squad ? '● ĐỘI A · BẠN + BOT ' : 'A · BẠN '; q('.tc-enemy').firstChild!.textContent = squad ? '▲ ĐỘI B · 2 BOT ' : 'B · BOT '; }
+    const mateAlive = sim.tanks.some(t => t !== a && t.team === a.team && t.hp > 0);
+    if (!online) q('.tc-roundcue').textContent = paused || externalPaused ? 'TẠM DỪNG' : sim.status === 'roundEnd' ? (sim.roundWinner === null ? 'HIỆP HÒA' : squad ? (sim.roundWinner === 0 ? 'ĐỘI A THẮNG HIỆP' : 'ĐỘI B THẮNG HIỆP') : sim.roundWinner === 0 ? 'A THẮNG HIỆP' : 'B THẮNG HIỆP') : sim.mode === 'training' && sim.lessonDone ? 'HOÀN THÀNH ✓' : a.hp <= 0 && sim.status === 'playing' ? (squad && mateAlive ? 'ĐANG XEM ĐỒNG ĐỘI' : 'ĐANG XEM TRẬN') : '';
   }
   // Colours mean "you" (mint) and "opponent" (coral), plus the seat letter; online seat B is still drawn mint.
   const myTeam = () => (online && net?.session.seat === 'b' ? 1 : 0);
@@ -217,14 +229,20 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     for (let i = -16; i < 18; i += 6) { ctx.beginPath(); ctx.moveTo(i, -18); ctx.lineTo(i, -11); ctx.moveTo(i, 11); ctx.lineTo(i, 18); ctx.stroke(); }
     ctx.restore(); ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(a.aim); ctx.fillStyle = foe ? '#7a4038' : '#287b6a'; ctx.fillRect(-8, -8, 19, 16); ctx.fillStyle = '#e3e3c5'; ctx.fillRect(5, -3, 20, 6); ctx.restore();
     if (a.shield > 0) { ctx.strokeStyle = '#94dfff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(a.x, a.y, 26, 0, Math.PI * 2); ctx.stroke(); }
-    ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.font = 'bold 11px system-ui'; readableCanvasText(ctx, a.id === 'b' ? 'B' : 'A', a.x, a.y - 29);
+    // 2v2: team is shown by colour, a shape (● team-mate side, ▲ opponents) and BOT tags; your own tank gets a bright ring.
+    const squad = sim.mode === 'squad', label = !squad ? (a.id === 'b' ? 'B' : 'A') : `${foe ? '▲' : '●'} ${a === sim.tanks[0] ? 'BẠN' : a.id.toUpperCase()}${a.kind === 'bot' ? ' · BOT' : ''}`;
+    if (squad && a === sim.tanks[0]) { ctx.strokeStyle = '#f4f1cf'; ctx.lineWidth = 1.6; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(a.x, a.y, 24, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
+    // Keep labels ≥ ~10 CSS px however small the canvas is drawn (large 2v2 arena on phones).
+    const ui = Math.max(1, sim.width / Math.max(1, canvas.clientWidth) * .9), size = Math.round(11 * ui);
+    ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.font = `bold ${size}px system-ui`; readableCanvasText(ctx, label, a.x, a.y - 22 - size * .65);
   }
   function draw() {
-    ctx.setTransform(2, 0, 0, 2, 0, 0); ctx.fillStyle = '#172326'; ctx.fillRect(0, 0, 800, 480);
+    const W = sim.width, H = sim.height, k = canvas.width / W; // canvas is 5:3 like every arena
+    ctx.setTransform(k, 0, 0, k, 0, 0); ctx.fillStyle = '#172326'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = '#263436'; ctx.lineWidth = 1;
-    for (let x = 0; x < 800; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 480); ctx.stroke(); }
-    for (let y = 0; y < 480; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(800, y); ctx.stroke(); }
-    ctx.strokeStyle = '#52605c'; ctx.lineWidth = 5; ctx.strokeRect(2.5, 2.5, 795, 475);
+    for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    ctx.strokeStyle = '#52605c'; ctx.lineWidth = 5; ctx.strokeRect(2.5, 2.5, W - 5, H - 5);
     for (const w of sim.walls) if (w.hp > 0) {
       ctx.fillStyle = w.kind === 'steel' ? '#85948f' : w.hp === 1 ? '#9e613e' : '#c28656'; ctx.fillRect(w.x + 1, w.y + 1, w.w - 2, w.h - 2);
       ctx.fillStyle = w.kind === 'steel' ? '#b8c9bd' : '#e2ab77'; ctx.fillRect(w.x + 3, w.y + 2, w.w - 6, 3);
@@ -254,7 +272,8 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     } else if (!screen && !paused && !externalPaused) {
       accumulator = Math.min(accumulator + elapsed, .12);
       while (accumulator >= 1 / CONFIG.hz) {
-        step(sim, { a: readInput(), b: botInput(sim) }); firePulse = shieldPulse = false; accumulator -= 1 / CONFIG.hz;
+        step(sim, sim.mode === 'squad' ? { a: readInput(), a2: botInput(sim, 'a2'), b: botInput(sim, 'b'), b2: botInput(sim, 'b2') } : { a: readInput(), b: botInput(sim) });
+        firePulse = shieldPulse = false; accumulator -= 1 / CONFIG.hz;
       }
     } else accumulator = 0;
     draw(); fpsFrames++;

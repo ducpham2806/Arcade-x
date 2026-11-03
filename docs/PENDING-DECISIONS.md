@@ -29,6 +29,16 @@ Cập nhật: 02/11/2026. Khi có câu trả lời, ghi vào cột "Quyết đ�
 |---|---|---|---|
 | 9 | **Nơi chạy room server Tank Clash** (tiến trình Node giữ WebSocket lâu): VPS nhỏ hay dịch vụ container có WebSocket? Claude sẽ trình giá cụ thể trước khi đăng ký. | Chặn chơi online qua Internet và chơi thử thật (P2.5–P2.6) | _chờ_ |
 
+## Tank Clash 2v2 (P3) — xem `docs/tank-clash/P3-SPEC.md` §11
+
+| # | Câu hỏi | Đề xuất của Claude | Quyết định |
+|---|---|---|---|
+| 10 | Duyệt đặc tả P3 và cách chia P3a–P3d | Duyệt; làm P3a trước (không cần hosting) | **Đã duyệt 03/11** — làm luôn |
+| 11 | Kích thước sân Crossfire (Q1) | Giữ 800×480, đổi 960×576 nếu chơi thử thấy chật | **Sân to, chướng ngại ngẫu nhiên từng trận** (đã làm: 1040×624) |
+| 12 | Hàng chờ 2v2 công khai có bắt đăng nhập (Q2) | Có; khách chỉ chơi phòng riêng | **Có** |
+| 13 | Đội còn 1 người có được đầu hàng sớm (Q3) | Không trong P3 | **Có, cho đầu hàng** |
+| 14 | Chế độ cục bộ "2v2 với bot" (Q4) | Có, trong P3a | **Có: 1 người + 1 bot đồng đội vs 2 bot** (đã làm) |
+
 ## Kho mã (M4)
 
 | # | Câu hỏi | Ảnh hưởng | Quyết định |
