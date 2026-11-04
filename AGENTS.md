@@ -1,15 +1,17 @@
-# ArcadeX Development Guidelines & Persisted Design Rules
+# ArcadeX — quy tắc chung
 
-## 1. Modal Sizing & Screen Space Utilization
-- **Spacious, Full-Size Modals**: Modals and menus (such as Menu Tiện Ích, Hồ Sơ Game Thủ, Sổ Nhiệm Vụ, Cửa Hàng, Lò Rèn, BXH) must utilize the full screen on mobile (`w-full h-full`) and spacious fixed sizing on desktop (`sm:h-[92vh] sm:max-h-[900px] sm:max-w-4xl lg:max-w-5xl`).
-- **No Unnecessary Scrolling**: Do NOT artificially restrict modal height (e.g., `max-h-[85vh]` bottom sheets with small inner heights) when there is plenty of screen estate. All menu items and actions should fit comfortably in view without requiring scrolling on standard screens.
-- **Responsive Grid Scaling**: Use flexible grids (`grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`) with compact cards and balanced spacing so all utility buttons render cleanly on a single screen.
+## Đọc và làm việc
+- Đầu phiên: đọc `docs/SESSION-HANDOFF.md` và mục mới nhất trong `docs/WORKLOG.md`; chọn tài liệu theo `docs/INDEX.md`. Chỉ đọc plan/spec của module đang làm; archive dùng để truy vết.
+- Mọi phần hoàn tất phải ghi ngay vào `docs/WORKLOG.md`: ngày, nhánh, việc/file, kiểm tra và kết quả thật, phần còn dở; commit cùng thay đổi. Trả lời tiếng Việt.
+- Làm trên nhánh riêng, theo module được chủ dự án duyệt; commit/push nhánh làm việc. Chỉ merge `main` khi chủ dự án yêu cầu (Netlify tự deploy); chạy đủ CI trước merge. Không tắt/nới test để xanh.
 
-## 2. Modal Frame Stability & Tab Switching
-- **Fixed Container Size**: Keep the outer container dimensions fixed across all tabs in the same modal.
-- **Independent Scroll Areas**: Always wrap tab contents in `<div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">` with fixed header/footer so switching between tabs never causes layout jumping, resizing, or auto-scaling.
+## Giao diện (giữ nguyên quy tắc đã duyệt)
+- Menu/modal: mobile `w-full h-full`; desktop `sm:h-[92vh] sm:max-h-[900px] sm:max-w-4xl lg:max-w-5xl`. Không ép bottom sheet ngắn (`max-h-[85vh]`) gây cuộn thừa.
+- Grid `grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`, thẻ gọn/cân đối để các mục và thao tác vừa màn hình chuẩn.
+- Khung ngoài cố định qua các tab; header/footer cố định, nội dung `<div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">` cuộn riêng, không nhảy kích thước.
+- Trong trận: thưởng/lên cấp dùng `LevelUpToast`; banner ăn mừng đầy đủ ở launcher. Force update chỉ khi `activeGameId === null`.
 
-## 3. Gameplay Experience & Notifications
-- **In-Game Non-Intrusive Toasts**: When a player levels up or earns rewards inside a game match, display a toast notification (`LevelUpToast`) instead of interrupting gameplay with a blocking modal. Full level-up celebration banners appear on the launcher screen.
-- **Force Update Protection**: Force update modals must only appear when the user is on the launcher screen (`activeGameId === null`). Never block or interrupt an active game session.
-
+## Dữ liệu và kiểm chứng
+- Không chạy migration/script lên Supabase production `whjatkhhupeqfngakmee`; dùng PGlite hoặc staging. Không đưa database password/service-role key vào frontend; commerce mặc định tắt.
+- Giữ tương thích save; chỉ đổi `tests/storage/*-golden.json` khi chủ đích đổi hành vi. Output sinh bằng script, không sửa tay (đặc biệt `public/standalone/`).
+- Node 24; lệnh ở `package.json`, thứ tự CI ở `.github/workflows/ci.yml`. Chạy test đúng phạm vi; báo rõ chưa chạy/chưa kiểm trên thiết bị thật.
