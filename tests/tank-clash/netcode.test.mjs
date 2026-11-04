@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { createWorld, press } from './harness.mjs';
 import { NET } from '../../src/games/tank-clash/protocol.ts';
 import { CONFIG } from '../../src/games/tank-clash/engine.ts';
+import { createNetSession } from '../../src/games/tank-clash/net-client.ts';
 
 const PROFILES = [
   { name: 'rtt80-j30-l1', rtt: 80, jitter: 30, loss: 0.01 },
@@ -112,4 +113,19 @@ test('reconnect mid-round under loss: same seat, match continues, everyone agree
   assert.equal(results.length, 1);
   assert.deepEqual(a.session.result, b.session.result);
   assert.equal(a.session.result.matchId, results[0].matchId);
+});
+
+
+test('room countdown, held-seat and rematch displays advance without server traffic or mutating the snapshot', () => {
+  let at = 1000; const session = createNetSession({ send() {}, now: () => at });
+  const room = Object.freeze({ code: 'ABC234', kind: 'private', format: '2v2', phase: 'countdown', queue: null, countdownMs: 3000, rematchMs: null, spectators: 0, matchId: null, result: null,
+    seats: Object.freeze([Object.freeze({ id: 'b2', team: 1, name: 'B2', ready: false, connected: false, host: false, forfeited: false, holdMs: 20000 })]) });
+  session.receive({ type: 'room', room }); at += 1250;
+  assert.equal(session.timedRoom.countdownMs, 1750); assert.equal(session.timedRoom.seats[0].holdMs, 18750);
+  assert.deepEqual(session.timedRoom, session.timedRoom, 'reading twice must not decrement twice');
+  assert.equal(room.countdownMs, 3000); assert.equal(room.seats[0].holdMs, 20000);
+  at += 21000; assert.equal(session.timedRoom.countdownMs, 0); assert.equal(session.timedRoom.seats[0].holdMs, 0);
+  session.receive({ type: 'room', room: { ...room, phase: 'finished', countdownMs: null, rematchMs: 20000 } });
+  at += 3000; assert.equal(session.timedRoom.rematchMs, 17000); assert.equal(session.timedRoom.countdownMs, null);
+  at += 21000; assert.equal(session.timedRoom.rematchMs, 0);
 });

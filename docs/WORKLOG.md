@@ -2,6 +2,15 @@
 
 Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết quả thật, phần còn dở; commit cùng thay đổi (`AGENTS.md`). Mới nhất ở trên; chỉ giữ tối đa 3 mục, chuyển nguyên văn phần cũ sang `archive/WORKLOG-YYYY-MM.md`. Đầu phiên chỉ đọc mục mới nhất; trạng thái hiện tại ở `SESSION-HANDOFF.md`.
 
+## 04/11/2026 · `codex/tank-clash-p3d` — TC1: UI online 2v2 và bản duyệt P3
+
+- Chủ dự án yêu cầu tiếp tục plan; đã nối lại checkpoint `6721df6` trên nền `bfb6732`, giữ các sửa VFX/Battleship/Dungeon. Không phát hành và không đưa Tank vào catalog.
+- Hoàn thiện `online-ui.ts` + runtime/CSS: phòng 1v1/2v2, sảnh 4 ghế/đội/host/ready/link/người xem, queue lẻ/tổ và lựa chọn 60 s, HUD bốn HP/tên/viền, toast nối lại/rời, đầu hàng xác nhận, kết quả và hai loại rematch. Khung fullscreen mobile, desktop 92dvh/4xl–5xl; giữ focus, nội dung cuộn riêng.
+- Sửa đồng hồ countdown/giữ ghế/rematch đứng do metadata chỉ đến theo sự kiện: `timedRoom` tính thời gian trôi, giữ nguyên `room`/wire/snapshot 20 Hz. Lỗi hủy queue giữ online để thử lại, không mở bot khi chưa hủy; bot chỉ chạy cục bộ.
+- Thêm WS 4 client và 6 UI kịch bản P3d vào `test:tank-clash-ui`/CI, dùng server loopback/fixture, không gọi Supabase. Qua Node 24/Chrome macOS: lint/build/bundle, test:fast, core 66/66, WS 6/6, UI 9/9 (cả 1v1 cũ và bot), smoke 7, modal 22; ảnh lobby/queue/match/result ở 1280×760, 390×844, 844×390. Mạng mô phỏng max 19,26 KB/s/client <20; không thay giao thức.
+- Thêm `docs/tank-clash/P3-review.md` đối chiếu D1–D7, số đo/giới hạn; cập nhật handoff/plan/spec/README. Chuyển nguyên văn mục docs cũ sang archive, WORKLOG giữ 3 mục. Export mới `deliverables/Tank_Clash_P3_Playtest.html`; P1/P2 vẫn là alias sinh từ script.
+- Bản duyệt riêng `http://localhost:4338/`, WS `ws://127.0.0.1:3223/tank`; host thử local cho phép khách queue, server thường vẫn bắt đăng nhập. Chưa có tài khoản staging, hosting/mạng/điện thoại thật, soak/load hoặc nghiệm thu cảm giác chơi; TC2 còn quyết định #9. VFX 4337 vẫn chờ chủ dự án duyệt. Không push/merge/deploy Netlify.
+
 ## 04/11/2026 · `codex/fix-battleship-dungeon-polish` — căn tàu, radar, chuyển động Dungeon và lưu nền
 
 - Theo ảnh/lỗi chủ dự án: Battleship lệch hàng, lửa dưới tàu, gạch chéo lệch; Dungeon giật, chữ có ô đen; bỏ thông báo lưu/đồng bộ thành công. Giữ bản test riêng, chưa phát hành.
@@ -20,14 +29,5 @@ Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết
 - Qua: lint/build/bundle, test:fast, test:battleship; test:games 23/23, motion 46/46 (23 game × 2 chế độ OS), VFX 16/16 (12 Blossom trong launcher + 4 Battleship, ảnh decode/timeline/flipbook/Canvas thật); smoke 7, offline 4, modal 22; perf 3,5 render/s <20. Node 24.22.2, Chrome macOS 156.0.8078.80; đã xem ảnh VFX. Không tuyên bố chơi hết mọi màn hoặc đã thử Windows/máy của chủ dự án.
 - Bản test riêng `/private/tmp/arcadex-pc-animation-review`, `http://localhost:4335/`: 23 game, 0 request API backend, 0 lỗi JS trong kiểm tra mở Battleship; offline/bot và save trên origin test. Có ZIP + script chạy lại. Chỉ commit cục bộ, không push/merge/deploy để giữ bước phát hành chờ chủ dự án duyệt.
 
-## 04/11/2026 · `docs/project-plan-and-handoff` — kế hoạch và tài liệu đầu vào
 
-- Yêu cầu: lập kế hoạch chi tiết, kiểm tra lịch sử, giảm token tài liệu mà vẫn đủ tiếp quản. Đã xác nhận có WORKLOG và archive; không tạo sổ lịch sử trùng.
-- Thêm `docs/PROJECT-PLAN.md` (đầu việc/phụ thuộc/đầu ra/nghiệm thu), `docs/INDEX.md` (đọc theo nhiệm vụ), `docs/DOCUMENTATION-AUDIT.md` (phạm vi, số đo, chính sách giữ tài liệu).
-- Rút gọn `AGENTS.md`, `CLAUDE.md`, `README.md`, handoff/owner/decisions và Tank README/PLAN/P3-SPEC; sửa mốc main PR #15, P3 protocol, vị trí nút online; giữ nguyên quyết định/luật đã duyệt.
-- Sửa backlog PvP lỗi thời; bỏ số 22 game cũ trong 19 mô tả agent, không đổi vai trò/skill.
-- Chuyển nguyên văn 6 mục cũ vào `archive/WORKLOG-2026-11.md`; giữ nguyên bản Tank PLAN v1.4/P3-SPEC v0.4 trong archive. Lịch sử P3a–P3c và bằng chứng test không bị xóa.
-- Kiểm tra qua: `node tests/claude/structure.cjs` (19 agent/11 skill); `git diff --check`; kiểm 40 link local, 2 archive nguyên byte, 6 mục log nguyên văn và đủ số mục PLAN/SPEC + D1–D7. Chỉ file Markdown thay đổi. Không chạy build/gameplay; CI main là lần chạy trước.
-- Chỉ sửa tài liệu; chưa triển khai TC1 hay dịch vụ/database, chưa merge main. Backend production chưa được kiểm trực tiếp.
-
-Lịch sử 02–03/11: [archive/WORKLOG-2026-11.md](archive/WORKLOG-2026-11.md).
+Lịch sử trước đó: [archive/WORKLOG-2026-11.md](archive/WORKLOG-2026-11.md).

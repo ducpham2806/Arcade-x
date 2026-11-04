@@ -5,14 +5,14 @@ Mốc đã kiểm: `main@affc5e8` (PR #15, P3b/P3c), CI [41727993592](https://gi
 | Mảng | Hiện trạng / việc kế tiếp |
 |---|---|
 | Nền tảng | 23 game; M0–M8, Neon NR1–NR4 đã merge. Commerce vẫn tắt; adapter thật chưa đủ. |
-| Tank Clash | P0/P1, P2 local, P3a–P3c xong; **P3d UI online 2v2 chưa làm**. Chưa hosting, launcher, art sản xuất, lưu kết quả hoặc nghiệm thu thiết bị thật. |
+| Tank Clash | P0–P3d đã có code/test cục bộ; [P3-review](tank-clash/P3-review.md). Bản duyệt 4338; **tiếp TC2 hosting/auth/mạng thật**. Chưa launcher, art sản xuất, lưu kết quả hoặc nghiệm thu thiết bị thật. |
 | Nối Từ | Bot/offline và UI online có code; `online-config.json` tắt. Catalog migration, server/scheduler theo bàn giao chưa triển khai; phải xác minh môi trường trước làm. |
 | Duel | Trọng tài server có code/test; Chess/Xiangqi/Caro còn đường online cũ, cần deploy và nối UI sau flag. |
 | Chất lượng | Test cũ lệch auth; Battleship cần đo điện thoại, Nối Từ cần Telex/VNI; banner có vệt đen; Block Breaker thiếu ảnh gốc, Blossom thiếu art phụ. |
 
-**Ưu tiên 04/11 — chờ chủ dự án test:** VFX Chrome gốc đã sửa tại `4aac880` ([DESKTOP-MOTION-FIX](DESKTOP-MOTION-FIX.md)). Phản hồi kế tiếp đã được xử lý trên `codex/fix-battleship-dungeon-polish`: căn tàu/lửa/gạch chéo, radar có beep, chuyển động/chữ Dungeon và lưu nền; xem mục mới nhất [WORKLOG](WORKLOG.md). Bản test mới `http://localhost:4337/`, tắt backend, lưu riêng. Chỉ commit cục bộ; **không push/merge/deploy Netlify trước khi được duyệt**. Tank P3d giữ riêng ở `6721df6` (`feat/tank-clash-p3d`), chưa nghiệm thu xong.
+**Đợt hiện tại 04/11:** chủ dự án yêu cầu tiếp tục plan; TC1/P3d có code/test cục bộ trên `codex/tank-clash-p3d`, xem [P3-review](tank-clash/P3-review.md) và mục mới nhất [WORKLOG](WORKLOG.md). Bản riêng `http://localhost:4338/` + WS loopback 3223, chưa catalog/hosting. Bản sửa Battleship/Dungeon `bfb6732`, `http://localhost:4337/` vẫn chờ duyệt; [DESKTOP-MOTION-FIX](DESKTOP-MOTION-FIX.md) giữ bằng chứng VFX gốc. **Không push/merge/deploy Netlify trước khi được duyệt.**
 
-**Làm tiếp sau khi chốt VFX:** [PROJECT-PLAN.md](PROJECT-PLAN.md) → TC1 (P3d); đọc [tank-clash/P3-SPEC.md](tank-clash/P3-SPEC.md) §7–§9. Chọn hosting song song qua [PENDING-DECISIONS.md](PENDING-DECISIONS.md) #9. Kế hoạch này chưa phải phê duyệt các module mới hay triển khai production.
+**Tiếp theo:** [PROJECT-PLAN](PROJECT-PLAN.md) → TC2; đọc [Tank PLAN §10–§12](tank-clash/PLAN.md), chốt hosting qua [PENDING-DECISIONS](PENDING-DECISIONS.md) #9 trước đăng ký/triển khai. Chuẩn bị staging/auth, thử ≥10 trận mỗi quy mô và soak/load; test cục bộ không thay nghiệm thu mạng/thiết bị thật. Chưa mở TC3/commerce hoặc production.
 
 **Lưu ý kỹ thuật:** CSS riêng game (`tc-`, `nt-`, `wc-`); game chỉ hiện production khi có trong `launcher_games`, dev dùng `LOCAL_REVIEW_GAME_IDS`. Đổi số game cần xem `tests/{integration/full-release.mjs,artwork/catalog.mjs,readability/contrast.mjs}`. Phòng online dùng CAS/receipt/presence 90 s; đang lặp 3 bộ (xem `TECH-DEBT.md`). Tank dùng WS riêng. Cosmic `legacy-*` vẫn được engine/replay sử dụng.
 

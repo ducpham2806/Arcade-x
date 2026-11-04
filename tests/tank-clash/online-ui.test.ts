@@ -7,7 +7,7 @@ const PREVIEW = path.resolve('preview/tank-clash/index.html'), PORT = 3291;
 let server: ChildProcess;
 test.beforeAll(async () => {
   execFileSync(process.execPath, ['scripts/export-tank-review.mjs'], { stdio: 'ignore' });
-  server = spawn(process.execPath, ['server/tank-clash-room/server.mjs'], { env: { ...process.env, PORT: String(PORT), NODE_ENV: 'development' }, stdio: 'ignore' });
+  server = spawn(process.execPath, ['server/tank-clash-room/server.mjs'], { env: { ...process.env, SUPABASE_URL: '', SUPABASE_ANON_KEY: '', PORT: String(PORT), NODE_ENV: 'development' }, stdio: 'ignore' });
   for (let i = 0; i < 50; i++) { try { if ((await fetch(`http://127.0.0.1:${PORT}/health`)).ok) return; } catch { /* starting */ } await new Promise(r => setTimeout(r, 100)); }
   throw new Error('room server did not start');
 });
@@ -26,7 +26,7 @@ test('online 1v1: room code, ready, server-driven match, leave = forfeit', async
   const pa = await (await browser.newContext()).newPage(), pb = await (await browser.newContext()).newPage();
   for (const p of [pa, pb]) p.on('pageerror', e => errors.push(String(e)));
   await open(pa, 'An'); await open(pb, 'Bình');
-  await pa.getByRole('button', { name: 'Tạo phòng mới' }).click();
+  await pa.getByRole('button', { name: 'Tạo phòng mới · 1v1' }).click();
   await expect(pa.locator('.tc-roomcode')).toHaveText(/^[A-Z2-9]{3} [A-Z2-9]{3}$/);
   const code = (await pa.locator('.tc-roomcode').innerText()).replace(' ', '');
   await pb.locator('.tc-code').fill(code.toLowerCase()); await pb.locator('.tc-code').press('Enter');

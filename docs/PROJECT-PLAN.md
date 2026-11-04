@@ -2,14 +2,14 @@
 
 Căn cứ: `main@affc5e8`, PR #15, code/config và bàn giao trong repo. CI mốc này qua; trạng thái production/backend chưa kiểm trực tiếp. `[ ]` là chưa nghiệm thu, kể cả phần đã có code. Đây là kế hoạch đề xuất; không tự mở rộng phạm vi P3 đã duyệt thành phê duyệt hosting, thanh toán hay phát hành.
 
-Ưu tiên bổ sung 04/11: **FX1 — VFX Chrome và bản test cục bộ**. Đã sửa lỗi chung (`DESKTOP-MOTION-FIX.md`), tiếp tục xử lý phản hồi Battleship/Dungeon trên `codex/fix-battleship-dungeon-polish`; bằng chứng ở mục mới nhất `WORKLOG.md`, test `http://localhost:4337/`. Chờ chủ dự án duyệt trước khi quay lại TC1 hoặc phát hành; không deploy Netlify.
+Cập nhật 04/11: FX1 đã có bản sửa/test riêng 4337, vẫn chờ chủ dự án duyệt, không deploy Netlify. Chủ dự án yêu cầu tiếp tục plan: **TC1/P3d đã có code/test cục bộ** trên `codex/tank-clash-p3d`, bản duyệt 4338; xem `tank-clash/P3-review.md` và WORKLOG. Tiếp theo TC2; các bước hosting/production vẫn theo quyết định chờ và duyệt riêng.
 
 ## 1. Thứ tự và cách chia đợt
 
 | Đợt | Đầu ra | Phụ thuộc / ai xử lý |
 |---|---|---|
-| D0 (lần này) | Kế hoạch, lối đọc ngắn, lịch sử nguyên vẹn | Người triển khai tài liệu; đang hoàn tất |
-| A | TC1: UI online 2v2, bản thử để duyệt | Có thể làm ngay theo P3; QA1 có thể làm độc lập |
+| D0 (lần này) | Kế hoạch, lối đọc ngắn, lịch sử nguyên vẹn | Đã hoàn tất, bằng chứng trong WORKLOG/archive |
+| A | TC1: UI online 2v2, bản thử để duyệt | Code/test cục bộ xong; chờ chủ dự án duyệt; QA1 độc lập |
 | B | TC2: hosting + thử mạng thật; WC1/WC2 và DU1 trên staging | Chủ dự án chốt #1/#4/#7/#8/#9; kỹ thuật chuẩn bị trước khi triển khai |
 | C | TC3/TC4: tích hợp + QA để xin duyệt phát hành | TC1 + TC2 đạt; art dựa trên phản hồi gameplay |
 | D | CM1 → CM2 → CM3/CM4: commerce pilot | #1/#2/#3, phục hồi và xác thực admin thật |
@@ -21,14 +21,16 @@ Một đợt kỹ thuật nên vừa một thay đổi có thể review/test/com
 
 ## 2. Tank Clash
 
-### TC1 · P3d — ưu tiên đầu tiên
+### TC1 · P3d — code/test cục bộ xong, chờ duyệt
 
-- [ ] Thêm lối vào 1v1 riêng / 2v2 riêng / tìm trận 2v2; dùng API hiện hành `room.ts`/`net-client.ts`, protocol `tank-clash.p3.v1`.
-- [ ] Sảnh 4 ghế: mã/link mời, chuyển đội, chủ phòng xếp ghế, ready, người xem; không bắt đầu thiếu người, không bot online.
-- [ ] Hàng chờ người lẻ/tổ: đồng hồ, số người, hủy luôn thấy; sau 60 s cho đợi tiếp hoặc rời hàng để luyện bot **cục bộ**. Hiển thị đăng nhập cần thiết cho hàng chờ.
-- [ ] HUD 4 xe, HP/đội/tên, viền xe mình; báo đồng đội rớt/rời không chặn trận. Người xem không có điều khiển.
-- [ ] Kết quả theo server, đánh dấu bỏ trận, đầu hàng đúng điều kiện; đấu lại phòng riêng/phòng ghép theo đặc tả, hết hạn 20 s không chờ vô tận.
-- [ ] Bổ sung test server/UI 4 trang; ảnh 1280×760, 390×844, 844×390; tạo `docs/tank-clash/P3-review.md` **sau khi có kết quả thật**.
+- [x] Thêm lối vào 1v1 riêng / 2v2 riêng / tìm trận 2v2; dùng API hiện hành `room.ts`/`net-client.ts`, protocol `tank-clash.p3.v1`.
+- [x] Sảnh 4 ghế: mã/link mời, chuyển đội, chủ phòng xếp ghế, ready, người xem; không bắt đầu thiếu người, không bot online.
+- [x] Hàng chờ người lẻ/tổ: đồng hồ, số người, hủy luôn thấy; sau 60 s cho đợi tiếp hoặc rời hàng để luyện bot **cục bộ**. Hiển thị đăng nhập cần thiết cho hàng chờ.
+- [x] HUD 4 xe, HP/đội/tên, viền xe mình; báo đồng đội rớt/rời không chặn trận. Người xem không có điều khiển.
+- [x] Kết quả theo server, đánh dấu bỏ trận, đầu hàng đúng điều kiện; đấu lại phòng riêng/phòng ghép theo đặc tả, hết hạn 20 s không chờ vô tận.
+- [x] Bổ sung test server/UI 4 trang; ảnh 1280×760, 390×844, 844×390; tạo `docs/tank-clash/P3-review.md` **sau khi có kết quả thật**.
+
+**Bằng chứng:** `tank-clash/P3-review.md`; 66 core, 6 WS, 9 UI; ảnh 3 viewport. Còn nghiệm thu cảm giác chơi và TC2 trên thiết bị/mạng thật.
 
 **Đầu ra:** bản preview + code/test + báo cáo P3, không đưa vào catalog. **Nghiệm thu:** D1–D7 trong `tank-clash/P3-SPEC.md`; cả 4 client cùng kết quả; tổ không bị tách; hủy/mất mạng/đấu lại đúng; 1v1 cũ không hỏng; modal đúng AGENTS.
 **Kiểm tra:** lint, build, bundle, test:fast, test:tank-clash-server, test:tank-clash-ui; thêm smoke/modals khi chạm launcher/khung modal. Giữ đo băng thông ≤20 KB/s/client; hiện 19,3 sát trần, không thêm snapshot tùy tiện.

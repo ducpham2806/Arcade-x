@@ -1,6 +1,6 @@
 # Tank Clash P3 — đặc tả MVP 2v2 · v0.5
 
-Rút gọn 04/11/2026 từ [v0.4 nguyên văn](../archive/tank-clash-P3-SPEC-v0.4.md). Quyết định đã duyệt 03/11 giữ nguyên; P3a–P3c đã code, **P3d UI chưa làm**. Giữ số mục để tra dẫn chiếu. Số tuning là khởi điểm, chưa nghiệm thu thiết bị thật. Làm P3d: §7–§9 trước, mở luật liên quan khi cần.
+Rút gọn 04/11/2026 từ [v0.4 nguyên văn](../archive/tank-clash-P3-SPEC-v0.4.md). Quyết định đã duyệt 03/11 giữ nguyên; P3a–P3d đã có code/test cục bộ; [P3-review](P3-review.md) ghi bằng chứng và giới hạn. Giữ số mục để tra dẫn chiếu. Số tuning là khởi điểm, chưa nghiệm thu thiết bị thật. Làm P3d: §7–§9 trước, mở luật liên quan khi cần.
 
 ## 1. Mục tiêu và điều kiện xong
 
@@ -22,7 +22,7 @@ P3 biến bản 1v1 online thành **bản thử 2v2 hai hoặc bốn người**:
 
 ## 2. Hiện trạng code liên quan (để ước lượng đúng)
 
-P3a engine/maps/bot, P3b phòng/client 4 ghế, P3c queue/tổ đã có. `runtime.ts` vẫn UI online 1v1; 2v2 bot cục bộ có UI riêng. Không viết lại server để làm P3d; dùng API đã có trong `net-client.ts`. Nguồn tuning là `CONFIG`/`NET`/`maps.ts`.
+P3a engine/maps/bot, P3b phòng/client 4 ghế, P3c queue/tổ và P3d UI online 1v1/2v2 đã có. `runtime.ts` + `online-ui.ts` dùng chung backend hiện hành; 2v2 bot cục bộ có UI riêng. Không viết lại server để làm P3d; dùng API đã có trong `net-client.ts`. Nguồn tuning là `CONFIG`/`NET`/`maps.ts`.
 
 ## 3. Luật chơi 2v2
 
@@ -167,7 +167,7 @@ Crossfire 5 điều kiện §4 + fallback/seed; Duel hồi quy; friendly fire/t�
 
 ### 8.5 Server và UI
 
-**P3d còn thiếu:** luồng 4 WebSocket thật tạo/join/chia đội/ready/chơi; test UI 4 trang (sảnh/đổi đội/queue/hủy/thiếu người/trận/kết quả/rematch); spectator/đầu hàng/reconnect phù hợp. Đã có test WS 2 tổ ghép ở P3c; tái dùng thay vì tự coi đã đủ UI. Chụp 1280×760, 390×844, 844×390. Hồi quy online 1v1 và 2v2 bot.
+**P3d đã kiểm cục bộ:** WS 4 client; UI 4–5 trang cho sảnh/đổi đội/queue/hủy/thiếu người/trận/kết quả/rematch, spectator/đầu hàng/reconnect; ảnh 1280×760, 390×844, 844×390; hồi quy 1v1 và 2v2 bot. Xem [P3-review](P3-review.md). Mạng/tài khoản/thiết bị thật, soak/load và duyệt phát hành vẫn chưa đạt bằng các test này.
 
 ## 9. Chia việc (để duyệt theo phần)
 
@@ -176,7 +176,7 @@ Crossfire 5 điều kiện §4 + fallback/seed; Duel hồi quy; friendly fire/t�
 | P3a | Xong maps/engine/bot/cục bộ + test |
 | P3b | Xong wire/phòng 4 ghế/spectator/surrender/client + test |
 | P3c | Xong queue/tổ/reconnect/rematch + test |
-| **P3d** | Chưa: UI §7, server/UI §8.5, ảnh 3 viewport, `P3-review.md`; phụ thuộc b/c đã đạt |
+| **P3d** | Code/test cục bộ §7/§8.5 + ảnh 3 viewport + `P3-review.md`; chờ chủ dự án duyệt và TC2 thật |
 
 Mỗi phần commit + WORKLOG; lint/build/bundle/test:fast + test:tank-clash-server/ui. Trước merge đủ CI. Chi tiết checklist/hosting/phát hành: TC1–TC4 trong `../PROJECT-PLAN.md`.
 
@@ -202,4 +202,4 @@ Room 4 ghế/protocol/client xong; 9 room + 4 netcode tests lịch sử. Mạng 
 
 ## 15. Kết quả P3c — 03/11/2026
 
-Queue/tổ/reconnect/rematch xong; 12 queue tests + WS ghép hai tổ. Sửa đồng hồ chờ đứng bằng cộng thời gian client. Giới hạn một tiến trình/chưa MMR. Bằng chứng mutation test/code đầy đủ: archive v0.4 §15; CI của mốc merge trong handoff. P3d UI vẫn chưa làm.
+Queue/tổ/reconnect/rematch xong; 12 queue tests + WS ghép hai tổ. Sửa đồng hồ chờ đứng bằng cộng thời gian client. Giới hạn một tiến trình/chưa MMR. Bằng chứng mutation test/code đầy đủ: archive v0.4 §15; CI của mốc merge trong handoff. P3d được bổ sung ở đợt tiếp theo; xem `P3-review.md`.

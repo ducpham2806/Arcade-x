@@ -1,6 +1,6 @@
 # Tank Clash — kế hoạch v1.5 · 04/11/2026
 
-P0/P1, P2 local, P3a–P3c đã code trên `main@affc5e8`; **P3d chưa làm**. Chưa hosting, nghiệm thu Internet/thiết bị thật, launcher, art sản xuất, lưu kết quả hay duyệt phát hành. Bản đầy đủ trước rút gọn: [v1.4](../archive/tank-clash-PLAN-v1.4.md); lịch sử P2 cũ: [v1.3](../archive/tank-clash-PLAN-v1.3.md). Giữ số §1–§12 để tra dẫn chiếu cũ.
+P0/P1, P2 local, P3a–P3c đã code trên `main@affc5e8`; **P3d có code/test cục bộ** trên `codex/tank-clash-p3d`, xem [P3-review](P3-review.md). Chưa hosting, nghiệm thu Internet/thiết bị thật, launcher, art sản xuất, lưu kết quả hay duyệt phát hành. Bản đầy đủ trước rút gọn: [v1.4](../archive/tank-clash-PLAN-v1.4.md); lịch sử P2 cũ: [v1.3](../archive/tank-clash-PLAN-v1.3.md). Giữ số §1–§12 để tra dẫn chiếu cũ.
 
 ## 1. Mục tiêu
 
@@ -42,7 +42,7 @@ Arcade cơ khí 2D: thép/gạch khác hình và phản hồi; trạng thái xe 
 |---|---|
 | P0/P1 | Xong code sân tập/bot/spike; còn playtest người mới |
 | P2 | 1v1 local xong kỹ thuật; còn hosting/auth thật/mạng thật |
-| P3 | a bản đồ/bot, b phòng 2v2, c queue/tổ xong; d UI + test 4 trang chưa. Phải chia đội đúng, xử thiếu/bỏ, không bot ẩn |
+| P3 | a–d có code/test cục bộ; `P3-review.md`. Còn chủ dự án duyệt cảm giác chơi và TC2 mạng/thiết bị thật |
 | P4 | Chưa: art/âm thanh, launcher/quyền/kết quả, loading/exit sạch |
 | P5 | Chưa: QA/load/soak/thiết bị thật, đạt §9 và chủ dự án duyệt |
 | P6/P7 | Chưa: 3v3/4v4 sau MVP |
@@ -55,7 +55,7 @@ Dừng mở rộng nếu khó hiểu vì sao chết, thủ góc quá mạnh, tou
 
 ## 10. Việc tiếp theo
 
-1. **P3d:** đọc `P3-SPEC.md` §7–§9; sảnh/queue/HUD/kết quả, test UI/server 4 client, ảnh 3 viewport, báo cáo P3.
+1. **Duyệt P3d:** xem `P3-review.md` và bản 4338; đã có sảnh/queue/HUD/kết quả, test 4–5 client và ảnh 3 viewport. Sửa theo phản hồi, chưa mở P4.
 2. **Hosting/auth:** chờ quyết định #9, trình khu vực/chi phí/WSS trước đăng ký. Thử hai tài khoản staging và tester/entitlement server; token chỉ tới host tin cậy. TC2 ở `../PROJECT-PLAN.md` là checklist.
 3. **Chơi thật/soak/load/restart:** ≥10 trận/quy mô; ghi RTT/correction/tab/lock, nhu cầu lag compensation. Không tự coi mô phỏng là đạt.
 4. Bộ P2 cũ có stats A/B, opId/ack, epoch hiệp, revision tường, allowlist tester chưa port đầy đủ; chỉ bổ sung khi cần và có test. Không dùng `state.stats` làm thống kê ghế B trong UI online.
@@ -77,7 +77,7 @@ npm run test:tank-clash-server
 npm run test:tank-clash-ui
 ```
 
-Preview: `deliverables/Tank_Clash_P2_Playtest.html` hoặc `preview/tank-clash/index.html` (output). Server mặc định `127.0.0.1:3223/tank`, có `/health`, không phục vụ HTML. Env: `HOST`/`PORT`, `TANK_ALLOWED_ORIGINS`, `SUPABASE_URL`/`SUPABASE_ANON_KEY`; production bắt buộc auth. `TANK_ALLOW_GUESTS=1`, `TANK_QUEUE_GUESTS=1` chỉ môi trường thử (queue guests bị bỏ qua ở production). Build allowlist: `VITE_TANK_CLASH_SERVERS`, chỉ WSS/loopback nhận token. Resume key `tank-clash.seat` trong sessionStorage. Chromium tùy máy; cloud cũ dùng `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`, không giả định máy mới có đường dẫn đó.
+Preview: `deliverables/Tank_Clash_P3_Playtest.html` hoặc `preview/tank-clash/index.html` (output). Server mặc định `127.0.0.1:3223/tank`, có `/health`, không phục vụ HTML. Env: `HOST`/`PORT`, `TANK_ALLOWED_ORIGINS`, `SUPABASE_URL`/`SUPABASE_ANON_KEY`; production bắt buộc auth. `TANK_ALLOW_GUESTS=1`, `TANK_QUEUE_GUESTS=1` chỉ môi trường thử (queue guests bị bỏ qua ở production). Build allowlist: `VITE_TANK_CLASH_SERVERS`, chỉ WSS/loopback nhận token. Resume key `tank-clash.seat` trong sessionStorage. Chromium tùy máy; cloud cũ dùng `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`, không giả định máy mới có đường dẫn đó.
 
 ## 12. Quy tắc tiếp nối
 
