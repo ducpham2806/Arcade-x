@@ -38,6 +38,8 @@ jobs:
         run: npm run test:smoke
       - name: Every game launches, takes input and exits
         run: npm run test:games
+      - name: Desktop animation isolation and Canvas loops (all games, normal and reduced motion)
+        run: npm run test:animations
       - name: Neon Run sound, feel and controls
         run: npm run test:neon-feel
       - name: Offline launcher shell

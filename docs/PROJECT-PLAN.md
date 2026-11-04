@@ -2,6 +2,8 @@
 
 Căn cứ: `main@affc5e8`, PR #15, code/config và bàn giao trong repo. CI mốc này qua; trạng thái production/backend chưa kiểm trực tiếp. `[ ]` là chưa nghiệm thu, kể cả phần đã có code. Đây là kế hoạch đề xuất; không tự mở rộng phạm vi P3 đã duyệt thành phê duyệt hosting, thanh toán hay phát hành.
 
+Ưu tiên bổ sung 04/11: **FX1 — sửa VFX Chrome và bản test cục bộ**, theo yêu cầu chủ dự án; xem `DESKTOP-MOTION-FIX.md`. Hoàn tất và chờ duyệt trước khi quay lại TC1. Không deploy Netlify.
+
 ## 1. Thứ tự và cách chia đợt
 
 | Đợt | Đầu ra | Phụ thuộc / ai xử lý |

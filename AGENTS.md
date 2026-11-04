@@ -9,6 +9,7 @@
 - Menu/modal: mobile `w-full h-full`; desktop `sm:h-[92vh] sm:max-h-[900px] sm:max-w-4xl lg:max-w-5xl`. Không ép bottom sheet ngắn (`max-h-[85vh]`) gây cuộn thừa.
 - Grid `grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`, thẻ gọn/cân đối để các mục và thao tác vừa màn hình chuẩn.
 - Khung ngoài cố định qua các tab; header/footer cố định, nội dung `<div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">` cuộn riêng, không nhảy kích thước.
+- CSS giảm chuyển động của launcher chỉ áp lên `.arcade-launcher`/chrome của nền tảng, không dùng wildcard dưới `.arcade-app` để tắt animation game. Game tự xử lý accessibility; sửa CSS dùng chung phải chạy `npm run test:animations`.
 - Trong trận: thưởng/lên cấp dùng `LevelUpToast`; banner ăn mừng đầy đủ ở launcher. Force update chỉ khi `activeGameId === null`.
 
 ## Dữ liệu và kiểm chứng

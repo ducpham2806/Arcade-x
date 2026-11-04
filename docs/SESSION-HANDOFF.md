@@ -10,7 +10,9 @@ Mốc đã kiểm: `main@affc5e8` (PR #15, P3b/P3c), CI [41727993592](https://gi
 | Duel | Trọng tài server có code/test; Chess/Xiangqi/Caro còn đường online cũ, cần deploy và nối UI sau flag. |
 | Chất lượng | Test cũ lệch auth; Battleship cần đo điện thoại, Nối Từ cần Telex/VNI; banner có vệt đen; Block Breaker thiếu ảnh gốc, Blossom thiếu art phụ. |
 
-**Làm tiếp:** [PROJECT-PLAN.md](PROJECT-PLAN.md) → TC1 (P3d); đọc [tank-clash/P3-SPEC.md](tank-clash/P3-SPEC.md) §7–§9. Chọn hosting song song qua [PENDING-DECISIONS.md](PENDING-DECISIONS.md) #9. Kế hoạch này chưa phải phê duyệt các module mới hay triển khai production.
+**Ưu tiên mới 04/11:** chủ dự án yêu cầu sửa VFX Chrome trước. Bản sửa ở nhánh `fix/desktop-game-animation`, test cục bộ `http://localhost:4335/`; xem [DESKTOP-MOTION-FIX](DESKTOP-MOTION-FIX.md). Không deploy trước khi chủ dự án duyệt. Tank P3d đang được giữ riêng tại checkpoint `6721df6` (`feat/tank-clash-p3d`), chưa nghiệm thu xong.
+
+**Làm tiếp sau khi chốt VFX:** [PROJECT-PLAN.md](PROJECT-PLAN.md) → TC1 (P3d); đọc [tank-clash/P3-SPEC.md](tank-clash/P3-SPEC.md) §7–§9. Chọn hosting song song qua [PENDING-DECISIONS.md](PENDING-DECISIONS.md) #9. Kế hoạch này chưa phải phê duyệt các module mới hay triển khai production.
 
 **Lưu ý kỹ thuật:** CSS riêng game (`tc-`, `nt-`, `wc-`); game chỉ hiện production khi có trong `launcher_games`, dev dùng `LOCAL_REVIEW_GAME_IDS`. Đổi số game cần xem `tests/{integration/full-release.mjs,artwork/catalog.mjs,readability/contrast.mjs}`. Phòng online dùng CAS/receipt/presence 90 s; đang lặp 3 bộ (xem `TECH-DEBT.md`). Tank dùng WS riêng. Cosmic `legacy-*` vẫn được engine/replay sử dụng.
 

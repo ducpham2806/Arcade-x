@@ -56,7 +56,13 @@ function render3D(ctx:CanvasRenderingContext2D,p:Live,t:number,cache:Cache){
    const path=(k:number)=>{const su=.5+(u-.5)*.2,sv=1.35;return {u:su+(u-su)*k,v:sv+(v-sv)*k,h:Math.sin(Math.PI*k)*.32+(1-k)*.05};};
    const k=age/TRAVEL_MS,a=path(k),b=path(Math.min(1,k+.02)),q=cam.project(a.u,a.v,a.h),q2=cam.project(b.u,b.v,b.h),sz=cellWidth(cam,a.u,Math.min(1,a.v),n)*1.25;
    items.push({depth:9,draw:()=>{ctx.save();ctx.translate(q.x,q.y);ctx.rotate(Math.atan2(q2.y-q.y,q2.x-q.x)+Math.PI/2);ctx.drawImage(p.art.images.missile,-sz*.2,-sz*.5,sz*.4,sz);ctx.restore();}});continue;}
-  if(!p.reduced&&age<TRAVEL_MS+600)items.push({depth:v+.001,draw:()=>fx(shot.hit?'explosion':'splash',age-TRAVEL_MS,u,v,shot.hit?.02:0,shot.hit?2.3:2)});
+  // Reduced motion removes travel/bobbing, not the feedback that explains a hit or miss.
+  // Show a brief, stationary middle frame instead of silently dropping every impact VFX.
+  const impactAt=p.reduced?0:TRAVEL_MS,impactDuration=p.reduced?300:600;
+  if(age>=impactAt&&age<impactAt+impactDuration)items.push({depth:v+.001,draw:()=>{
+   const name=shot.hit?'explosion':'splash',f=p.art.fx[name];
+   fx(name,p.reduced?Math.floor(f.sequence.length/2)*f.ms:age-impactAt,u,v,shot.hit?.02:0,shot.hit?2.3:2);
+  }});
  }
  if(!p.reduced)for(const shot of shots.filter(q=>q.hit).slice(-6)){const age=now-shot.at;if(age<TRAVEL_MS+600)continue;const {u,v}=c(shot.row,shot.col),a=p.paused?0:age;
   items.push({depth:v+.002,draw:()=>{fx('fire',a,u,v,.03,1.25,true);fx('smoke',a,u,v-cell*.1,.12,1.6,true,.5);}});}
