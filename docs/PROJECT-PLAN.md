@@ -2,7 +2,7 @@
 
 Căn cứ: `main@affc5e8`, PR #15, code/config và bàn giao trong repo. CI mốc này qua; trạng thái production/backend chưa kiểm trực tiếp. `[ ]` là chưa nghiệm thu, kể cả phần đã có code. Đây là kế hoạch đề xuất; không tự mở rộng phạm vi P3 đã duyệt thành phê duyệt hosting, thanh toán hay phát hành.
 
-Cập nhật 04/11: FX1 đã có bản sửa/test riêng 4337, vẫn chờ chủ dự án duyệt, không deploy Netlify. Chủ dự án yêu cầu tiếp tục plan: **TC1/P3d đã có code/test cục bộ** trên `codex/tank-clash-p3d`, bản duyệt 4338; xem `tank-clash/P3-review.md` và WORKLOG. Tiếp theo TC2; các bước hosting/production vẫn theo quyết định chờ và duyệt riêng.
+Cập nhật 04/11: FX1 đã có bản sửa/test riêng 4337, vẫn chờ chủ dự án duyệt, không deploy Netlify. **TC1/P3d có code/test cục bộ**, bản duyệt 4338; tiếp TC2 trên `codex/tank-clash-tc2-readiness`. Supabase staging đã tạo theo lựa chọn chủ dự án, local Auth/config/ops/WSS đã kiểm; xem `tank-clash/TC2-review.md`. Hosting/production vẫn theo quyết định chờ và duyệt riêng.
 
 ## 1. Thứ tự và cách chia đợt
 
@@ -38,11 +38,13 @@ Một đợt kỹ thuật nên vừa một thay đổi có thể review/test/com
 ### TC2 · Hosting, tài khoản, mạng thật
 
 **Phụ thuộc:** #9 cho đăng ký/triển khai, staging cho tài khoản; TC1 trước nghiệm thu UI 2v2.
-- [ ] Đề xuất VPS/container hỗ trợ WS dài hạn: khu vực, chi phí, WSS/reverse proxy, health check, log, restart, rollback. Không dùng static/serverless ngắn hạn để giữ WS.
+- [x] Đề xuất VPS hỗ trợ WS dài hạn: [TC2-RUNBOOK](tank-clash/TC2-RUNBOOK.md), giá/khu vực, template WSS/systemd/env, health/metrics/log/restart/rollback, package + preflight đã kiểm cục bộ; chưa đăng ký/deploy VPS.
+- [x] Tạo Supabase staging riêng theo chủ dự án: Nam A Uniform, Singapore; metadata/Auth endpoint/public schema/advisors đã kiểm, ref ở [TC2-review](tank-clash/TC2-review.md); không dữ liệu/migration production.
+- [x] Chuẩn bị gate Auth/tester/origin/cap/metrics/restart, 15 WS/ops + 9 Chrome UI qua; local WSS và soak 30 phút (204 trận 1v1/167 trận 2v2) có báo cáo nguồn/số đo/giới hạn ở [TC2-review](tank-clash/TC2-review.md).
 - [ ] Thiết lập staging: origin allowlist, auth Supabase thật, tester/entitlement phía server; `VITE_TANK_CLASH_SERVERS` đúng WSS. Kiểm không gửi token ra host ngoài allowlist; không dùng cờ khách thử nghiệm trên production.
 - [ ] Chạy 2 tài khoản staging; thử token sai/hết hạn, trùng tài khoản, spectator, reconnect đúng ghế/HP; không ghi log token.
 - [ ] ≥10 trận mỗi quy mô 2/4 người, hai thiết bị/hai mạng; bao gồm phòng riêng và hàng chờ. Ghi RTT, jitter/loss nếu đo được, hiệu chỉnh xe, kết quả, tab/khóa màn hình, reconnect.
-- [ ] Soak ≥30 phút, load tăng dần và đo giới hạn thực: CPU/RAM, số phòng/socket, băng thông, listener/timer; thử restart (hiện trận/hàng chờ trong RAM sẽ mất), ghi giới hạn phục vụ và cách báo người chơi.
+- [ ] Soak ≥30 phút trên VPS đích, load tăng dần và đo giới hạn thực: CPU/RAM, số phòng/socket, băng thông, listener/timer; thử restart (hiện trận/hàng chờ trong RAM sẽ mất), ghi giới hạn phục vụ và cách báo người chơi. Kết quả loopback ở trên chưa thay bước này.
 
 **Đầu ra:** runbook + URL staging + báo cáo đo, không chứa secret. **Nghiệm thu:** auth/origin đúng, không lệch HP/hiệp/kết quả; không nhân ghế; tài nguyên không tăng vô hạn; công khai rủi ro restart. Chỉ làm lag compensation khi số đo/phản hồi chứng minh cần.
 

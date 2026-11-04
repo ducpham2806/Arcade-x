@@ -42,7 +42,6 @@ export function createRoomHost(options: HostOptions = {}) {
   const authenticate = options.authenticate ?? guestAuthenticate;
   const log = options.log ?? (() => {});
   const rooms = new Map<string, Room>(), peers = new Map<string, Peer>(), userRooms = new Map<string, string>();
-  const reported = new Set<string>();
   const queue: QEntry[] = [], queuedUsers = new Map<string, QEntry>(); let entryIds = 0;
   const metrics = { rooms: 0, matches: 0, results: 0, rejected: 0, rateLimited: 0, ticks: 0 };
   const hex = (n: number) => Array.from(randomBytes(n), b => b.toString(16).padStart(2, '0')).join('');
@@ -150,6 +149,7 @@ export function createRoomHost(options: HostOptions = {}) {
     broadcastRoom(room); log('match.start', { code: room.code, format: room.format, matchId: room.matchId, seed });
   }
   function finish(room: Room, reason: MatchResult['reason'], winner: number | null) {
+    if (room.result?.matchId === room.matchId) return; // exactly once while this match exists
     const s = room.state!;
     const result: MatchResult = { matchId: room.matchId!, code: room.code, format: room.format, winner, scores: [...s.scores], reason, rounds: s.round,
       players: SEATS_OF[room.format].filter(id => room.seats.has(id)).map(id => { const seat = room.seats.get(id)!;
@@ -157,10 +157,8 @@ export function createRoomHost(options: HostOptions = {}) {
     room.result = result; room.phase = 'finished';
     if (room.kind === 'queue') room.dissolveAt = now() + NET.queueRematchMs;
     for (const seat of room.seats.values()) { seat.ready = false; seat.queue = []; }
-    if (!reported.has(result.matchId)) { // idempotent by match id: a result is reported once
-      reported.add(result.matchId); metrics.results++;
-      Promise.resolve().then(() => options.onResult?.(result)).catch(error => log('result.error', { matchId: result.matchId, error: String(error) }));
-    }
+    metrics.results++;
+    Promise.resolve().then(() => options.onResult?.(result)).catch(error => log('result.error', { matchId: result.matchId, error: String(error) }));
     broadcast(room, ack => ({ type: 'snapshot', snapshot: snapshotFor(room, ack) }));
     room.eventCursor = s.nextId - 1;
     broadcast(room, { type: 'result', result, room: view(room) }); log('match.end', { ...result });
@@ -490,6 +488,8 @@ export function createRoomHost(options: HostOptions = {}) {
     /** Inspection: queued units in order. */
     queue: () => queue.map(e => ({ since: e.since, party: e.party, members: entryMembers(e).map(m => m.userId), online: entryOnline(e) })),
     rooms: () => [...rooms.values()].map(r => ({ code: r.code, kind: r.kind, format: r.format, phase: r.phase, seats: r.seats.size, spectators: r.spectators.size, matchId: r.matchId, tick: r.state?.tick ?? 0 })),
+    /** Counts only: no identities/tokens in operational metrics. */
+    diagnostics: () => ({ rooms: rooms.size, peers: peers.size, users: userRooms.size, queueEntries: queue.length, queuedUsers: queuedUsers.size }),
     /** Test/inspection only: the live authoritative state of a room. */
     inspect(code: string) { return rooms.get(code)?.state ?? null; },
   };

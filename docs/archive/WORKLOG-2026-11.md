@@ -140,3 +140,11 @@ Các mục cũ chuyển từ `docs/WORKLOG.md` (nguyên văn, mới nhất ở t
 - Chuyển nguyên văn 6 mục cũ vào `archive/WORKLOG-2026-11.md`; giữ nguyên bản Tank PLAN v1.4/P3-SPEC v0.4 trong archive. Lịch sử P3a–P3c và bằng chứng test không bị xóa.
 - Kiểm tra qua: `node tests/claude/structure.cjs` (19 agent/11 skill); `git diff --check`; kiểm 40 link local, 2 archive nguyên byte, 6 mục log nguyên văn và đủ số mục PLAN/SPEC + D1–D7. Chỉ file Markdown thay đổi. Không chạy build/gameplay; CI main là lần chạy trước.
 - Chỉ sửa tài liệu; chưa triển khai TC1 hay dịch vụ/database, chưa merge main. Backend production chưa được kiểm trực tiếp.
+
+## 04/11/2026 · `fix/desktop-game-animation` — khôi phục VFX Chrome, bản test cục bộ
+
+- Chủ dự án báo Chrome hầu như mất VFX (Blossom/Battleship), yêu cầu kiểm toàn bộ, commit và đưa bản test; không deploy trước khi duyệt. Đã giữ P3d riêng ở checkpoint `6721df6` trên `feat/tank-clash-p3d`.
+- Tái hiện CSS `.arcade-app *` ép animation còn 0,01 ms khi OS giảm chuyển động; test build gốc fail `1e-05s !== 2s`. Sửa phạm vi thành `.arcade-launcher`; Battleship reduced vẫn có khung nổ/cột nước đứng yên ngắn thay vì bỏ hết VFX. Không đổi luật/save/backend.
+- Thêm `tests/motion/desktop.cjs`, `vfx.test.ts` + fixture renderer thật, `test:animations` trong CI; smoke giờ đối chiếu đủ engine, chặn backend để không ghi production. Bổ sung quy tắc CSS vào AGENTS và báo cáo `docs/DESKTOP-MOTION-FIX.md`; cập nhật handoff/plan.
+- Qua: lint/build/bundle, test:fast, test:battleship; test:games 23/23, motion 46/46 (23 game × 2 chế độ OS), VFX 16/16 (12 Blossom trong launcher + 4 Battleship, ảnh decode/timeline/flipbook/Canvas thật); smoke 7, offline 4, modal 22; perf 3,5 render/s <20. Node 24.22.2, Chrome macOS 156.0.8078.80; đã xem ảnh VFX. Không tuyên bố chơi hết mọi màn hoặc đã thử Windows/máy của chủ dự án.
+- Bản test riêng `/private/tmp/arcadex-pc-animation-review`, `http://localhost:4335/`: 23 game, 0 request API backend, 0 lỗi JS trong kiểm tra mở Battleship; offline/bot và save trên origin test. Có ZIP + script chạy lại. Chỉ commit cục bộ, không push/merge/deploy để giữ bước phát hành chờ chủ dự án duyệt.

@@ -11,6 +11,7 @@
 | Lập kế hoạch tổng thể | [PROJECT-PLAN](PROJECT-PLAN.md); IDs/quyết định ở [PENDING-DECISIONS](PENDING-DECISIONS.md), việc chủ dự án ở [OWNER-TODO](OWNER-TODO.md) |
 | Tank P3d | [P3-SPEC](tank-clash/P3-SPEC.md) §7–§9; [PLAN](tank-clash/PLAN.md) §10–§12 khi cần hosting/kiến trúc; [README](tank-clash/README.md) để chạy |
 | Tank network/thiết kế | `tank-clash/P3-review.md` (mốc cục bộ mới nhất), `tank-clash/P2-review.md` (lịch sử), `GDD-v1.md`; ý tưởng sau MVP: `PVP-BACKLOG.md` |
+| Tank TC2 hosting/Auth/vận hành | [TC2-review](tank-clash/TC2-review.md) (bằng chứng/việc còn lại) → [TC2-RUNBOOK](tank-clash/TC2-RUNBOOK.md) (cấu hình/triển khai/rollback); không đọc lại toàn bộ P3 spec |
 | Nối Từ | [WORD-CHAIN-SERVER](WORD-CHAIN-SERVER.md), `src/games/word-chain/online-config.json`; nguồn từ điển `public/games/word-chain/SOURCES.md` |
 | Chess/Xiangqi/Caro online | [DUEL-SERVER](DUEL-SERVER.md); `DUEL-UPGRADE.md` khi sửa AI |
 | Commerce/quyền chơi | [COMMERCE-ROLLOUT](COMMERCE-ROLLOUT.md) → `server/commerce/README.md`; trước nhận tiền phải đọc [SECURITY-RECOVERY](operations/SECURITY-RECOVERY.md); schema/access gốc: `SUBSCRIPTION-FOUNDATION.md` |

@@ -3,7 +3,7 @@
 Quyết định chỉ ghi ở [PENDING-DECISIONS.md](PENDING-DECISIONS.md); bước kỹ thuật/tiêu chí xong ở [PROJECT-PLAN.md](PROJECT-PLAN.md). Chưa kiểm trực tiếp môi trường production.
 
 - [ ] Chọn hosting Tank Clash (#9); chốt khu vực/chi phí/WSS trước đăng ký.
-- [ ] Chọn staging và tài khoản thử/admin (#1); sau khi triển khai thử, bố trí 2–4 tài khoản/thiết bị cho TC2, WC2, DU1.
+- [ ] Staging đã tạo theo #1; còn tài khoản thử/admin/người vận hành. Bố trí 4 tài khoản/thiết bị cho TC2 2v2; WC2/DU1 sau đó.
 - [ ] Xác nhận thời điểm đưa Nối Từ vào catalog production (#8); online là bước riêng (#7).
 - [ ] Chọn nơi chạy commerce (#3), nhà cung cấp thanh toán + merchant test (#2) trước CM2/CM3.
 - [ ] Chơi thử Tank Clash: sân 2v2 trên điện thoại, độ khó bot; khi có hosting, ≥10 trận mỗi quy mô 2/4 người. Ghi mã sân xấu, RTT, giật xe, mất mạng/tab/khóa màn hình.

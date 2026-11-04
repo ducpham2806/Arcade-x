@@ -1,0 +1,10 @@
+# Replace this hostname with the approved DNS name before validation/reload.
+tank-staging.example.com {
+	@public path /tank /health
+	handle @public {
+		reverse_proxy 127.0.0.1:3223
+	}
+	handle {
+		respond 404
+	}
+}

@@ -4,7 +4,7 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 
 | ID | Cần chốt | Chặn | Tài liệu chi tiết |
 |---|---|---|---|
-| 1 | Supabase staging nào; tài khoản admin/test và người vận hành | CM1; môi trường WC2/DU1 | `COMMERCE-ROLLOUT.md` |
+| 1 | Tài khoản admin/test và người vận hành; staging đã tạo theo lựa chọn 04/11 | TC2/CM1; môi trường WC2/DU1 | `tank-clash/TC2-review.md`, `COMMERCE-ROLLOUT.md` |
 | 2 | Cổng thanh toán VND, webhook ký số, merchant sandbox | CM3 | `COMMERCE-ROLLOUT.md` |
 | 3 | Commerce chạy Supabase Edge hay Netlify Functions | CM2–CM4 | `server/commerce/README.md` |
 | 4 | Lịch/môi trường triển khai Duel + cutover UI | DU1 | `DUEL-SERVER.md` |
@@ -12,7 +12,11 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 | 6 | Có cho popup xác nhận/kết quả kích thước nhỏ ngoại lệ modal không | Chỉ khi đổi quy tắc | Chưa duyệt; giữ `AGENTS.md` hiện hành |
 | 7 | Môi trường/lịch bật Nối Từ online sau thử staging | WC2 | `WORD-CHAIN-SERVER.md` |
 | 8 | Thời điểm áp catalog Nối Từ lên production | WC1 | `supabase/migrations/20261102090000_word_chain_catalog.sql` |
-| 9 | Hosting WS Tank Clash: khu vực, WSS, ngân sách | TC2 | `tank-clash/PLAN.md` §10; trình phương án/giá trước đăng ký |
+| 9 | Hosting WS Tank Clash: VPS/domain/ngân sách; đề xuất Singapore 2 GiB 12 USD/tháng | TC2 | `tank-clash/TC2-RUNBOOK.md` §1; chưa đăng ký |
+
+## Đã quyết · 04/11/2026
+
+#1 (môi trường): chủ dự án yêu cầu tạo `arcade-x-staging`, chọn Nam A Uniform/Singapore. Đã có project riêng, bằng chứng/ref ở `tank-clash/TC2-review.md`; chưa chọn admin/tester/người vận hành. Không phải duyệt migration hoặc commerce production.
 
 ## Đã quyết · 03/11/2026
 

@@ -77,7 +77,7 @@ npm run test:tank-clash-server
 npm run test:tank-clash-ui
 ```
 
-Preview: `deliverables/Tank_Clash_P3_Playtest.html` hoặc `preview/tank-clash/index.html` (output). Server mặc định `127.0.0.1:3223/tank`, có `/health`, không phục vụ HTML. Env: `HOST`/`PORT`, `TANK_ALLOWED_ORIGINS`, `SUPABASE_URL`/`SUPABASE_ANON_KEY`; production bắt buộc auth. `TANK_ALLOW_GUESTS=1`, `TANK_QUEUE_GUESTS=1` chỉ môi trường thử (queue guests bị bỏ qua ở production). Build allowlist: `VITE_TANK_CLASH_SERVERS`, chỉ WSS/loopback nhận token. Resume key `tank-clash.seat` trong sessionStorage. Chromium tùy máy; cloud cũ dùng `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`, không giả định máy mới có đường dẫn đó.
+Preview: `deliverables/Tank_Clash_P3_Playtest.html` hoặc `preview/tank-clash/index.html` (output). Server mặc định `127.0.0.1:3223/tank`, không phục vụ HTML. Production mode bắt buộc Auth đã xác minh, UUID tester, exact HTTPS origins và metrics token; từ chối guest flags. Cấu hình đầy đủ/hosting/restart/rollback: [TC2-RUNBOOK](TC2-RUNBOOK.md). Build allowlist `VITE_TANK_CLASH_SERVERS` chỉ WSS/loopback nhận token; resume key `tank-clash.seat` trong sessionStorage. Chromium tùy máy, không giả định đường dẫn cloud cũ có trên máy mới.
 
 ## 12. Quy tắc tiếp nối
 

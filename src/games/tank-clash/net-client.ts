@@ -132,7 +132,7 @@ export function createNetSession(options: SessionOptions) {
         case 'result': result = msg.result; room = msg.room; pending = []; outbox = []; break;
         case 'pong': { const rtt = now() - msg.at; stats.rtt = stats.rtt === null ? rtt : stats.rtt * 0.8 + rtt * 0.2; break; }
         case 'error': error = { code: msg.code, message: msg.message, fatal: msg.fatal };
-          if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = role = resumeToken = null; room = null; reset(); }
+          if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); }
           break;
         case 'left': code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); break;
       }

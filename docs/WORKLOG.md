@@ -2,6 +2,14 @@
 
 Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết quả thật, phần còn dở; commit cùng thay đổi (`AGENTS.md`). Mới nhất ở trên; chỉ giữ tối đa 3 mục, chuyển nguyên văn phần cũ sang `archive/WORKLOG-YYYY-MM.md`. Đầu phiên chỉ đọc mục mới nhất; trạng thái hiện tại ở `SESSION-HANDOFF.md`.
 
+## 04/11/2026 · `codex/tank-clash-tc2-readiness` — TC2: staging/Auth và chuẩn bị vận hành
+
+- Chủ dự án yêu cầu tiếp TC2, tạo Supabase staging; chọn organization Nam A Uniform. Đã tạo `arcade-x-staging` ref `khqipuipeawzlkqmdzdg`, Singapore, xác minh `ACTIVE_HEALTHY`, organization Free, public schema rỗng, Auth 0 user, security advisors không có lint. Chỉ đọc kiểm tra staging; không migration/copy dữ liệu/secret từ production. Public env riêng `.env.tank-staging.local` bị Git ignore.
+- Server thêm `config.mjs`: production bắt buộc Auth/UUID tester/exact HTTPS origins/metrics token, từ chối guest flags, staging chặn ref production; Auth kiểm registered user và allowlist từ id đã xác minh, cache không vượt JWT exp. Health public tối giản, metrics token chỉ nội bộ, cap socket; SIGTERM báo `ROOM_CLOSED`, client xóa room/result/solo queue. Bỏ Set match ID lịch sử vô hạn; once-only vẫn theo result của phòng sống.
+- Đã qua Node 24: 15/15 WS/ops (gồm 9 case mới Auth/config/origin/cap/health/timeout/package/restart/log không token), 9/9 Chrome UI; lint/build/bundle/test:fast. Template systemd/Caddy, preflight, package chỉ 13 file + manifest; chạy isolated release thật. Caddy chính thức 2.11.7 validate qua; WSS local với CA tin trong test, origin/health/metrics 404/restart 1012 qua; không cài CA hệ thống/public ACME.
+- Soak 1.802,3 giây thực qua: 204 trận 1v1, 167 trận 2v2 (83 queue), mọi client cùng kết quả; thực đo max 48 socket/14 phòng, RSS 177,3 MiB, CPU interval max 17,4% một core Mac arm64, p95 histogram 21,82 ms/resolution 20 ms. Cuối test room/peer/user/queue/socket về 0, 2 listener không tăng; JSON gốc + source digest ở `tank-clash/evidence/`. Mục tiêu 60 socket/20 phòng chưa đạt; JSONL mất phần đầu do Playwright dọn output, summary vẫn tính đủ 142 mẫu trong RAM. Chưa đo VPS/Internet/thiết bị thật hoặc session Auth thật.
+- Runbook `tank-clash/TC2-RUNBOOK.md`, báo cáo `TC2-review.md`; cập nhật README/PLAN/env/test CI. Bản 4338 dùng query server loopback 3224 đã kiểm HTML/health/create/join/leave, server 3223 giữ nguyên. Hosting/domain/tester còn phải hoàn tất, gate pilot chưa entitlement TC3; không push/merge/deploy Netlify, không đăng ký VPS trả phí. Chuyển nguyên văn mục VFX cũ vào archive, giữ tối đa 3 mục.
+
 ## 04/11/2026 · `codex/tank-clash-p3d` — TC1: UI online 2v2 và bản duyệt P3
 
 - Chủ dự án yêu cầu tiếp tục plan; đã nối lại checkpoint `6721df6` trên nền `bfb6732`, giữ các sửa VFX/Battleship/Dungeon. Không phát hành và không đưa Tank vào catalog.
@@ -21,13 +29,6 @@ Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết
 - Test mới nằm trong `test:animations`/CI; fixture dùng renderer/audio thật và chặn backend. Bản riêng `/private/tmp/arcadex-battleship-dungeon-review`, `http://localhost:4337/`, ZIP `ArcadeX-Battleship-Dungeon-test-2026-11-04.zip` có hướng dẫn/script. Kiểm build gói: đủ 23 game, radar 3,2 s, save Dungeon thật, 0 request API backend, 0 lỗi JS.
 - Chưa kiểm điện thoại thật, nghe loa thật, tài khoản/phòng online thật; không thay luật/save schema/backend, không push/merge/deploy Netlify.
 
-## 04/11/2026 · `fix/desktop-game-animation` — khôi phục VFX Chrome, bản test cục bộ
-
-- Chủ dự án báo Chrome hầu như mất VFX (Blossom/Battleship), yêu cầu kiểm toàn bộ, commit và đưa bản test; không deploy trước khi duyệt. Đã giữ P3d riêng ở checkpoint `6721df6` trên `feat/tank-clash-p3d`.
-- Tái hiện CSS `.arcade-app *` ép animation còn 0,01 ms khi OS giảm chuyển động; test build gốc fail `1e-05s !== 2s`. Sửa phạm vi thành `.arcade-launcher`; Battleship reduced vẫn có khung nổ/cột nước đứng yên ngắn thay vì bỏ hết VFX. Không đổi luật/save/backend.
-- Thêm `tests/motion/desktop.cjs`, `vfx.test.ts` + fixture renderer thật, `test:animations` trong CI; smoke giờ đối chiếu đủ engine, chặn backend để không ghi production. Bổ sung quy tắc CSS vào AGENTS và báo cáo `docs/DESKTOP-MOTION-FIX.md`; cập nhật handoff/plan.
-- Qua: lint/build/bundle, test:fast, test:battleship; test:games 23/23, motion 46/46 (23 game × 2 chế độ OS), VFX 16/16 (12 Blossom trong launcher + 4 Battleship, ảnh decode/timeline/flipbook/Canvas thật); smoke 7, offline 4, modal 22; perf 3,5 render/s <20. Node 24.22.2, Chrome macOS 156.0.8078.80; đã xem ảnh VFX. Không tuyên bố chơi hết mọi màn hoặc đã thử Windows/máy của chủ dự án.
-- Bản test riêng `/private/tmp/arcadex-pc-animation-review`, `http://localhost:4335/`: 23 game, 0 request API backend, 0 lỗi JS trong kiểm tra mở Battleship; offline/bot và save trên origin test. Có ZIP + script chạy lại. Chỉ commit cục bộ, không push/merge/deploy để giữ bước phát hành chờ chủ dự án duyệt.
 
 
 Lịch sử trước đó: [archive/WORKLOG-2026-11.md](archive/WORKLOG-2026-11.md).
