@@ -31,10 +31,9 @@ function CloudGameSaveGate({ gameId, onResolved, children }: {
     <button onClick={() => resolve('remote')} className="w-full p-3 rounded-xl border border-white/20 font-semibold">Chơi ván đã lưu trực tuyến</button>
     {error && <p role="alert">{error}</p>}
   </div>;
-  let guest = true;
-  try { guest = JSON.parse(localStorage.getItem('arcadex_player_profile') || '{}').id?.startsWith('guest_') ?? true; } catch { /* local-only */ }
-  const text = gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : status === 'error' ? 'Chưa lưu được ván trên thiết bị.' : status === 'conflict' ? 'Ván này đang lưu trên máy; có bản trực tuyến khác để chọn khi mở lại game.' : status === 'synced' && !guest ? 'Đã đồng bộ' : guest || status === 'local' ? 'Đã lưu trên thiết bị' : 'Đã lưu trên thiết bị · chờ đồng bộ';
-  return <>{statusSlot && createPortal(<span className="text-[9px] truncate max-w-[90px] sm:max-w-[220px]" role="status" title={text}>{text}</span>, statusSlot)}{children}</>;
+  // Routine writes/sync remain background work. Only failures or a conflict need player attention.
+  const text = status === 'error' ? 'Chưa lưu được ván trên thiết bị.' : status === 'conflict' ? 'Có bản lưu trực tuyến khác; chọn ván khi mở lại game.' : '';
+  return <>{statusSlot && text && createPortal(<span className="text-[9px] truncate max-w-[90px] sm:max-w-[220px]" role="status" title={text}>{text}</span>, statusSlot)}{children}</>;
 }
 
 export class GameLoadBoundary extends React.Component<{ children: React.ReactNode; onExit: () => void }, { failed: boolean }> {
@@ -49,8 +48,4 @@ export class GameLoadBoundary extends React.Component<{ children: React.ReactNod
   }
 }
 
-
-
-
-function LocalCampaignGate({children}:{children:React.ReactNode}){const [slot,setSlot]=useState<HTMLElement|null>(null);useEffect(()=>setSlot(document.getElementById('game-save-status-slot')),[]);return <>{slot&&createPortal(<span role="status" title="Game quản lý lưu cục bộ. Xem thông báo trong game khi có lỗi.">Lưu riêng trên thiết bị</span>,slot)}{children}</>;}
-export function GameSaveGate(props:{gameId:string;onResolved:()=>void;children:React.ReactNode}){return props.gameId==='snake-legend'?<LocalCampaignGate>{props.children}</LocalCampaignGate>:<CloudGameSaveGate {...props}/>;}
+export function GameSaveGate(props:{gameId:string;onResolved:()=>void;children:React.ReactNode}){return props.gameId==='snake-legend'?<>{props.children}</>:<CloudGameSaveGate {...props}/>;}

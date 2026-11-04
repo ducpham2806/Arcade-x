@@ -36,5 +36,5 @@ export function CombatFX({s}:{s:DungeonState}){
  if(spell){row=2;age=spell.cooldown-spell.currentCooldown;}
  if(s.elapsed-stamp.current.at<.32){row=1;age=s.elapsed-stamp.current.at;}
  if(age<0||age>=.32)return null;
- return <RasterSprite src={ART.fx} cols={4} rows={3} index={row*4+Math.min(3,Math.floor(age/.08))} className="dt-combat-fx"/>;
+ return <RasterSprite key={`${row}:${row===0?s.lastTap:row===1?stamp.current.id:s.skills.indexOf(spell!)}`} src={ART.fx} cols={4} rows={3} index={row*4} className="dt-combat-fx"/>;
 }

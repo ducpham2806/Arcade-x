@@ -395,7 +395,7 @@ export const WordCrossGame: React.FC<GameComponentProps> = ({
           <p className="wc-footer">
             {run.ticket
               ? "Ván xếp hạng · thời gian tính cả tạm dừng"
-              : "Đã lưu trên thiết bị · tiếp tục ván sẽ giữ nguyên bảng chữ"}
+              : "Tiếp tục ván sẽ giữ nguyên bảng chữ"}
           </p>
           {run.status !== "playing" && !sessionFinished && (
             <WordDialog

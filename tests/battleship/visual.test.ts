@@ -4,6 +4,7 @@ import {boardCamera,cellPercent} from '../../src/games/battleship/projection';
 // that cell; the rotate button sits beside the ship being placed; nothing throws.
 const cam=boardCamera(),coord=(r:number,c:number)=>`${String.fromCharCode(65+r)}${c+1}`;
 async function openBattleship(page:Page){
+ await page.route('**/*.supabase.co/**',route=>route.abort());
  await page.goto('/');await page.locator('#btn-play-battleship').click();
  await page.locator('.bs-home').waitFor({timeout:30000});
 }

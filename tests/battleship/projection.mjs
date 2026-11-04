@@ -22,3 +22,20 @@ const above=cam.project(.5,.5,.1),water=cam.project(.5,.5,0);assert.ok(above.y<w
 assert.equal(cellAt(cam,4,4,10),null);assert.equal(cellAt(cam,BOARD_CANVAS.width/2,BOARD_CANVAS.height-4,10),null);
 const pc=cellPercent(cam,0,0,10);assert.ok(pc.x>0&&pc.x<100&&pc.y>0&&pc.y<100);
 console.log(`battleship projection: ${checks+4} checks passed`);
+// Deck art and fire share this registration. All legal placements must remain inside their
+// logical row/column, including near/far edges, vertical hulls and settled sunk hulls.
+await build({entryPoints:['src/games/battleship/scene.ts'],bundle:true,platform:'node',format:'cjs',outfile:join(out,'scene.cjs'),logLevel:'silent'});
+const {footprint,shipPoint}=req(join(out,'scene.cjs'));let placements=0;
+for(const n of [10,14])for(const horizontal of [false,true])for(const length of [2,3,4,5])for(const sink of [0,.5,1]){
+ for(let row=0;row<=n-(horizontal?1:length);row++)for(let col=0;col<=n-(horizontal?length:1);col++){
+  const ship={img:{width:160,height:500},n,row,col,length,horizontal,height:.48,sink};
+  const {uc,vc,len,beam}=footprint(ship),centre=shipPoint(cam,ship,uc,vc),grid=cam.project(uc,vc);
+  assert.ok(Math.hypot(centre.x-grid.x,centre.y-grid.y)<1e-8,'deck centre must register to grid centre');
+  for(const a of [-.5,.5])for(const b of [-.5,.5]){
+   const u=uc+(horizontal?a*len:b*beam),v=vc+(horizontal?b*beam:a*len),p=shipPoint(cam,ship,u,v),q=cam.unproject(p.x,p.y);
+   assert.ok(q.u*n>col&&q.u*n<col+(horizontal?length:1)&&q.v*n>row&&q.v*n<row+(horizontal?1:length),`deck outside occupied cells: ${JSON.stringify(ship)}`);
+  }
+  placements++;
+ }
+}
+console.log(`battleship deck: ${placements} placements stay inside grid cells; deck/FX centres coincide`);

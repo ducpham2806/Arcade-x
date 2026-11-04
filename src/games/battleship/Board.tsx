@@ -2,7 +2,7 @@ import React, {useEffect,useRef} from 'react';
 import {cellsOf,lengthOf,type Ship,type Seat,viewFor} from './engine';
 import type {Art} from './art';
 import {boardCamera,cellAt,BOARD_CANVAS} from './projection';
-import {cellWidth,drawHaze,drawSea,layer,quad,ring,shipSprite,type ShipPose} from './scene';
+import {cellWidth,drawHaze,drawSea,layer,quad,ring,shipSprite,shipPoint,type ShipPose} from './scene';
 type View=ReturnType<typeof viewFor>;
 type Props={view:View;own:boolean;art:Art;faction:'us'|'jp';selected:{row:number;col:number}|null;ghost:Ship|null;ghostValid:boolean;reduced:boolean;paused:boolean;viewerSeat?:Seat;clockOffset?:number;viewerTeam?:0|1;interactive?:boolean;
  /** Top-down overview (the small switch board); the main board is drawn in perspective. */ flat?:boolean;onCursor?:(row:number,col:number)=>void;onCell:(row:number,col:number)=>void};
@@ -43,30 +43,32 @@ function render3D(ctx:CanvasRenderingContext2D,p:Live,t:number,cache:Cache){
   else{ctx.save();ring(ctx,cam,u,v,cell*.26);ctx.strokeStyle='#e6f3fbcc';ctx.lineWidth=2.5;ctx.stroke();ring(ctx,cam,u,v,cell*.07);ctx.fillStyle='#e6f3fb';ctx.fill();ctx.restore();}}
  if(p.selected){const {row,col}=p.selected;ctx.save();quad(ctx,cam,col*cell,row*cell,(col+1)*cell,(row+1)*cell);ctx.fillStyle='#f7d28f26';ctx.fill();ctx.strokeStyle='#ffe2a8';ctx.lineWidth=5;ctx.globalAlpha=.35;ctx.stroke();ctx.globalAlpha=1;ctx.strokeStyle='#f7d28f';ctx.lineWidth=2.5;ctx.stroke();ctx.restore();}
  if(p.ghost&&p.own)for(const g of cellsOf(p.ghost)){if(g.row<0||g.col<0||g.row>=n||g.col>=n)continue;quad(ctx,cam,g.col*cell,g.row*cell,(g.col+1)*cell,(g.row+1)*cell);ctx.fillStyle=p.ghostValid?'#6fcdb85c':'#fa776b66';ctx.fill();}
- // Ships, fire and smoke sorted far to near so nearer things overlap farther ones.
- type Item={depth:number;draw:()=>void};const items:Item[]=[];
- const blit=(pose:ShipPose,afloat:boolean)=>{const sp=shipSprite(cam,pose),phase=(pose.row*7+pose.col*3)%11,bob=animate&&afloat?Math.sin(t*.0014+phase)*cellWidth(cam,.5,(pose.row+.5)*cell,n)*.035:0;ctx.drawImage(sp.canvas,sp.x,sp.y+bob);};
+ // Hulls sort by depth; fire/smoke composite over the completed deck layer.
+ type Item={depth:number;draw:()=>void};const items:Item[]=[],effects:Item[]=[];
+ const blit=(pose:ShipPose,afloat:boolean)=>{const sp=shipSprite(cam,pose),phase=(pose.row*7+pose.col*3)%11,bob=animate&&afloat?Math.sin(t*.0014+phase)*cellWidth(cam,.5,(pose.row+.5)*cell,n)*.012:0;ctx.drawImage(sp.canvas,sp.x,sp.y+bob);};
  const ships=p.own?p.view.own:p.view.revealedEnemy;
  for(const ship of ships){const at=sunk.get(ship.id),sink=at===undefined?0:p.reduced?1:Math.min(1,Math.max(0,(now-at-TRAVEL_MS)/SINK_MS)),len=lengthOf(ship);
   items.push({depth:(ship.row+(ship.horizontal?1:len))*cell,draw:()=>blit({img:shipImage(p,ship),n,row:ship.row,col:ship.col,length:len,horizontal:ship.horizontal,height:DECK[ship.type]??.4,sink,foamColor:p.own&&p.view.mode==='squad'&&ship.owner!==p.viewerSeat?'#7fe3ff':undefined},sink===0)});}
  if(p.ghost&&p.own){const g=p.ghost;items.push({depth:2,draw:()=>blit({img:shipImage(p,g),n,row:g.row,col:g.col,length:lengthOf(g),horizontal:g.horizontal,height:DECK[g.type]??.4,alpha:.62,ghost:true},false)});}
- const fx=(name:string,age:number,u:number,v:number,h:number,size:number,loop=false,alpha=1)=>{const f=p.art.fx[name],i=loop?Math.floor(age/f.ms)%f.sequence.length:Math.min(f.sequence.length-1,Math.floor(age/f.ms)),q=cam.project(u,v,h),sz=cellWidth(cam,u,v,n)*size;ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(f.frames[f.sequence[Math.max(0,i)]],q.x-sz*141/276,q.y-sz*.78,sz,sz);ctx.restore();};
+ const fx=(name:string,age:number,u:number,v:number,h:number,size:number,loop=false,alpha=1)=>{const f=p.art.fx[name],i=loop?Math.floor(age/f.ms)%f.sequence.length:Math.min(f.sequence.length-1,Math.floor(age/f.ms)),ship=ships.find(s=>cellsOf(s).some(c=>c.row===Math.floor(v*n)&&c.col===Math.floor(u*n))),pose=ship?{img:shipImage(p,ship),n,row:ship.row,col:ship.col,length:lengthOf(ship),horizontal:ship.horizontal,height:DECK[ship.type]??.4,sink:sunk.has(ship.id)?Math.min(1,Math.max(0,(now-sunk.get(ship.id)!-TRAVEL_MS)/SINK_MS)):0}:null,q=pose?shipPoint(cam,pose,u,v,h):cam.project(u,v,h),sz=cellWidth(cam,u,v,n)*size;ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(f.frames[f.sequence[Math.max(0,i)]],q.x-sz*141/276,q.y-sz*.78,sz,sz);ctx.restore();};
  for(const shot of shots){const age=Math.max(0,now-shot.at),{u,v}=c(shot.row,shot.col);
   if(!p.reduced&&age<TRAVEL_MS){// Missile arcs in from behind the camera, over the near edge.
    const path=(k:number)=>{const su=.5+(u-.5)*.2,sv=1.35;return {u:su+(u-su)*k,v:sv+(v-sv)*k,h:Math.sin(Math.PI*k)*.32+(1-k)*.05};};
    const k=age/TRAVEL_MS,a=path(k),b=path(Math.min(1,k+.02)),q=cam.project(a.u,a.v,a.h),q2=cam.project(b.u,b.v,b.h),sz=cellWidth(cam,a.u,Math.min(1,a.v),n)*1.25;
-   items.push({depth:9,draw:()=>{ctx.save();ctx.translate(q.x,q.y);ctx.rotate(Math.atan2(q2.y-q.y,q2.x-q.x)+Math.PI/2);ctx.drawImage(p.art.images.missile,-sz*.2,-sz*.5,sz*.4,sz);ctx.restore();}});continue;}
+   effects.push({depth:9,draw:()=>{ctx.save();ctx.translate(q.x,q.y);ctx.rotate(Math.atan2(q2.y-q.y,q2.x-q.x)+Math.PI/2);ctx.drawImage(p.art.images.missile,-sz*.2,-sz*.5,sz*.4,sz);ctx.restore();}});continue;}
   // Reduced motion removes travel/bobbing, not the feedback that explains a hit or miss.
   // Show a brief, stationary middle frame instead of silently dropping every impact VFX.
   const impactAt=p.reduced?0:TRAVEL_MS,impactDuration=p.reduced?300:600;
-  if(age>=impactAt&&age<impactAt+impactDuration)items.push({depth:v+.001,draw:()=>{
+  if(age>=impactAt&&age<impactAt+impactDuration)effects.push({depth:v+.001,draw:()=>{
    const name=shot.hit?'explosion':'splash',f=p.art.fx[name];
-   fx(name,p.reduced?Math.floor(f.sequence.length/2)*f.ms:age-impactAt,u,v,shot.hit?.02:0,shot.hit?2.3:2);
+   fx(name,p.reduced?Math.floor(f.sequence.length/2)*f.ms:age-impactAt,u,v,0,shot.hit?2.3:2);
   }});
  }
  if(!p.reduced)for(const shot of shots.filter(q=>q.hit).slice(-6)){const age=now-shot.at;if(age<TRAVEL_MS+600)continue;const {u,v}=c(shot.row,shot.col),a=p.paused?0:age;
-  items.push({depth:v+.002,draw:()=>{fx('fire',a,u,v,.03,1.25,true);fx('smoke',a,u,v-cell*.1,.12,1.6,true,.5);}});}
+  effects.push({depth:v+.002,draw:()=>{fx('fire',a,u,v,0,1.25,true);fx('smoke',a,u,v-cell*.1,.04,1.6,true,.5);}});}
  items.sort((a,b)=>a.depth-b.depth);for(const it of items)it.draw();
+ // Effects composite after every hull: fire from a far cell must not be painted under its own ship.
+ effects.sort((a,b)=>a.depth-b.depth);for(const it of effects)it.draw();
  ctx.drawImage(layer('haze',W,H,x=>drawHaze(x,cam,cam.project(.5,0).y+40),cache.haze),0,0);
 }
 /** Static board layer: plate, brass rim, grid, team divider and coordinates. */
@@ -94,7 +96,7 @@ function renderFlat(ctx:CanvasRenderingContext2D,p:Live,t:number){
  for(let y=0;y<extent;y+=12){const shift=p.reduced||p.paused?0:Math.sin(y*.02+t*.0006)*4;ctx.drawImage(sea,40+shift,40+y/extent*920,940,16,pad,pad+y,extent,13);}
  ctx.fillStyle='#00142155';ctx.fillRect(pad,pad,extent,extent);ctx.strokeStyle='#d9b67399';ctx.lineWidth=4;ctx.strokeRect(pad,pad,extent,extent);ctx.strokeStyle='#d0e3ed40';ctx.lineWidth=1;
  for(let i=1;i<n;i++){ctx.beginPath();ctx.moveTo(pad+i*s,pad);ctx.lineTo(pad+i*s,pad+extent);ctx.moveTo(pad,pad+i*s);ctx.lineTo(pad+extent,pad+i*s);ctx.stroke();}
- for(const ship of p.own?p.view.own:p.view.revealedEnemy){const a=cell(ship.row,ship.col),length=lengthOf(ship),im=shipImage(p,ship);ctx.save();ctx.globalAlpha=p.own?1:.7;ctx.translate(a.x+(ship.horizontal?(length-1)*s/2:0),a.y+(!ship.horizontal?(length-1)*s/2:0));if(ship.horizontal)ctx.rotate(Math.PI/2);const sx=Math.min(s*1.15,length*s*.96*im.width/im.height)/im.width,sy=length*s*.96/im.height;ctx.drawImage(im,-im.width*sx/2,-im.height*sy/2,im.width*sx,im.height*sy);ctx.restore();}
+ for(const ship of p.own?p.view.own:p.view.revealedEnemy){const a=cell(ship.row,ship.col),length=lengthOf(ship),im=shipImage(p,ship);ctx.save();ctx.globalAlpha=p.own?1:.7;ctx.translate(a.x+(ship.horizontal?(length-1)*s/2:0),a.y+(!ship.horizontal?(length-1)*s/2:0));if(ship.horizontal)ctx.rotate(Math.PI/2);const sx=Math.min(s*.82,length*s*.96*im.width/im.height)/im.width,sy=length*s*.96/im.height;ctx.drawImage(im,-im.width*sx/2,-im.height*sy/2,im.width*sx,im.height*sy);ctx.restore();}
  const target=p.own?p.viewerTeam:p.viewerTeam===0?1:0;
  for(const shot of p.view.shots.filter(q=>q.target===target)){if(now-shot.at<(p.reduced?0:TRAVEL_MS))continue;const a=cell(shot.row,shot.col);ctx.beginPath();ctx.arc(a.x,a.y,s*.26,0,Math.PI*2);ctx.fillStyle=shot.hit?'#ff8a3d':'#e1eef7aa';ctx.fill();}
 }

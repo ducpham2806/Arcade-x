@@ -10,7 +10,7 @@ Mốc đã kiểm: `main@affc5e8` (PR #15, P3b/P3c), CI [41727993592](https://gi
 | Duel | Trọng tài server có code/test; Chess/Xiangqi/Caro còn đường online cũ, cần deploy và nối UI sau flag. |
 | Chất lượng | Test cũ lệch auth; Battleship cần đo điện thoại, Nối Từ cần Telex/VNI; banner có vệt đen; Block Breaker thiếu ảnh gốc, Blossom thiếu art phụ. |
 
-**Ưu tiên mới 04/11:** chủ dự án yêu cầu sửa VFX Chrome trước. Bản sửa ở nhánh `fix/desktop-game-animation`, test cục bộ `http://localhost:4335/`; xem [DESKTOP-MOTION-FIX](DESKTOP-MOTION-FIX.md). Không deploy trước khi chủ dự án duyệt. Tank P3d đang được giữ riêng tại checkpoint `6721df6` (`feat/tank-clash-p3d`), chưa nghiệm thu xong.
+**Ưu tiên 04/11 — chờ chủ dự án test:** VFX Chrome gốc đã sửa tại `4aac880` ([DESKTOP-MOTION-FIX](DESKTOP-MOTION-FIX.md)). Phản hồi kế tiếp đã được xử lý trên `codex/fix-battleship-dungeon-polish`: căn tàu/lửa/gạch chéo, radar có beep, chuyển động/chữ Dungeon và lưu nền; xem mục mới nhất [WORKLOG](WORKLOG.md). Bản test mới `http://localhost:4337/`, tắt backend, lưu riêng. Chỉ commit cục bộ; **không push/merge/deploy Netlify trước khi được duyệt**. Tank P3d giữ riêng ở `6721df6` (`feat/tank-clash-p3d`), chưa nghiệm thu xong.
 
 **Làm tiếp sau khi chốt VFX:** [PROJECT-PLAN.md](PROJECT-PLAN.md) → TC1 (P3d); đọc [tank-clash/P3-SPEC.md](tank-clash/P3-SPEC.md) §7–§9. Chọn hosting song song qua [PENDING-DECISIONS.md](PENDING-DECISIONS.md) #9. Kế hoạch này chưa phải phê duyệt các module mới hay triển khai production.
 

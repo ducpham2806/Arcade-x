@@ -42,7 +42,6 @@ import { useRippleEffect } from './hooks/useRippleEffect';
 import { whenIdle } from './utils/whenIdle';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { DiscardSessionConfirmModal } from './components/common/DiscardSessionConfirmModal';
-import { CloudSyncStatusIndicator } from './components/common/CloudSyncStatusIndicator';
 import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy, Pause, Save, Bot, Trash2 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -189,9 +188,6 @@ const AppContent: React.FC = () => {
           setShowDiscardConfirmModal(false);
         }}
       />
-
-      {/* Subtle Cloud Auto-saving Status Indicator (Floating Top-Right) */}
-      <CloudSyncStatusIndicator />
 
       {/* Non-intrusive game invitations */}
       <NonIntrusiveToastManager />

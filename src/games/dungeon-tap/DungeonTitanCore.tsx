@@ -22,7 +22,7 @@ export const DungeonTitanCore:React.FC<GameComponentProps & {onOpenLeaderboard?:
  useEffect(()=>{let last=performance.now();const timer=setInterval(()=>{const now=performance.now(),dt=Math.min(.25,(now-last)/1000);last=now;if(pausedRef.current||overlay.current)return;
    let tap=false;if(hold.current){holdClock.current+=dt;if(holdClock.current>=.25){holdClock.current%=.25;tap=true;}}
    setS(prev=>{const next=reduceDungeon(prev,{type:'tick',dt});return tap?reduceDungeon(next,{type:'tap'}):next;});
-  },100);return()=>clearInterval(timer);},[]);
+  },50);return()=>clearInterval(timer);},[]);
  useEffect(()=>{if(paused)stop();},[paused,stop]);
  useEffect(()=>{if(!ready||!s.event.id)return;const now=performance.now();if(now-lastSound.current<140)return;lastSound.current=now;try{soundBridge.current.playSound(s.event.kind==='win'?'win':s.event.kind==='loot'?'coin':s.event.kind==='parry'?'parry':s.event.kind==='crit'?'combo':'hit');}catch{}},[s.event.id,ready]);
  useEffect(()=>{if(ready&&s.maxStageReached>lastReport.current){lastReport.current=s.maxStageReached;if(s.maxStageReached>=5)bridge.reportProgress('ach-dungeon-floor-5',s.maxStageReached,true);}},[s.maxStageReached,ready,bridge]);

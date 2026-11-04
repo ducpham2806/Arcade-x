@@ -2,6 +2,16 @@
 
 Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết quả thật, phần còn dở; commit cùng thay đổi (`AGENTS.md`). Mới nhất ở trên; chỉ giữ tối đa 3 mục, chuyển nguyên văn phần cũ sang `archive/WORKLOG-YYYY-MM.md`. Đầu phiên chỉ đọc mục mới nhất; trạng thái hiện tại ở `SESSION-HANDOFF.md`.
 
+## 04/11/2026 · `codex/fix-battleship-dungeon-polish` — căn tàu, radar, chuyển động Dungeon và lưu nền
+
+- Theo ảnh/lỗi chủ dự án: Battleship lệch hàng, lửa dưới tàu, gạch chéo lệch; Dungeon giật, chữ có ô đen; bỏ thông báo lưu/đồng bộ thành công. Giữ bản test riêng, chưa phát hành.
+- Battleship `scene`/`Board`: thu beam trong một ô, đăng ký mặt boong theo tâm lưới; hiệu ứng dùng chung điểm chiếu, vẽ sau thân tàu; giảm bob/roll. `FleetStatus` đặt tâm ảnh và gạch chéo vào cùng khung. Thêm `Radar` quay 3,2 s/vòng, hai beep hữu hạn sau thao tác mở âm thanh; dùng chính sách mute/pause/ẩn tab/thoát hiện có. Sửa thêm race mở audio ở capture-phase khiến nút mute/resume đổi nghĩa giữa pointerdown và click; Chrome kiểm chuỗi pause/resume/mute/thoát qua 3 lần liên tiếp.
+- Dungeon `TitanArt`/`CombatArt`/`polish.css`: hòa hai tư thế liên tiếp, chuyển động/flipbook do CSS nội suy; giữ hướng riêng mỗi khung, dừng khi pause/giảm chuyển động. Tick 50 ms giảm nhịp giữ chém lệch 200/300 ms; bỏ đòn đánh ngẫu nhiên của lính. Đổi vật liệu nền/chữ trên header, tab, nhãn cảnh để bộ tương phản không chèn ô đen.
+- Bỏ indicator cloud thành công và status lưu thường ở `App`, `GameSaveGate`, `ResumeCard`, Battleship online/Word Cross; giữ xử lý lưu, cảnh báo lỗi và chọn bản lưu xung đột.
+- Qua Node 24: lint, build/bundle, `test:fast`, `test:battleship`, `test:dungeon`; 5.664 cách đặt tàu (10×10/14×14, ngang/dọc, chìm/nổi) giữ boong trong ô. Chrome macOS: motion 46/46 (23 game × 2 chế độ), VFX 16/16, polish 9/9, Battleship UI 2/2; radar 3 lượt liên tiếp; smoke 7, offline 4, modal 22. Đã kiểm 8 màn Dungeon PC/mobile viewport × normal/reduced, thêm boss/đồ/đồng đội/kỹ năng tiến trình cao và đổi atlas cùng số khung; lưu thật vẫn hoạt động, hình còn rõ khi pause.
+- Test mới nằm trong `test:animations`/CI; fixture dùng renderer/audio thật và chặn backend. Bản riêng `/private/tmp/arcadex-battleship-dungeon-review`, `http://localhost:4337/`, ZIP `ArcadeX-Battleship-Dungeon-test-2026-11-04.zip` có hướng dẫn/script. Kiểm build gói: đủ 23 game, radar 3,2 s, save Dungeon thật, 0 request API backend, 0 lỗi JS.
+- Chưa kiểm điện thoại thật, nghe loa thật, tài khoản/phòng online thật; không thay luật/save schema/backend, không push/merge/deploy Netlify.
+
 ## 04/11/2026 · `fix/desktop-game-animation` — khôi phục VFX Chrome, bản test cục bộ
 
 - Chủ dự án báo Chrome hầu như mất VFX (Blossom/Battleship), yêu cầu kiểm toàn bộ, commit và đưa bản test; không deploy trước khi duyệt. Đã giữ P3d riêng ở checkpoint `6721df6` trên `feat/tank-clash-p3d`.

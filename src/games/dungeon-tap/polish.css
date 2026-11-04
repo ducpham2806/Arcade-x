@@ -1,0 +1,49 @@
+/* Text is designed against coherent materials, not per-word opaque repair tiles. */
+.fx-root[data-art=raster-v6]{--dt-header:linear-gradient(100deg,#75341d,#93451f 65%,#70361e)}
+.fx-root .fx-enemy-heading{background:linear-gradient(90deg,#713219,#93451f 65%,#73351b)}
+.fx-root :is(.fx-nav,.fx-modal-tabs)>button{--dt-tab-top:#804426;--dt-tab-bottom:#472e21}
+.fx-root :is(.fx-nav,.fx-modal-tabs)>button:nth-child(2){--dt-tab-top:#285963;--dt-tab-bottom:#193e46}
+.fx-root :is(.fx-nav,.fx-modal-tabs)>button:nth-child(3){--dt-tab-top:#685820;--dt-tab-bottom:#443b1b}
+.fx-root :is(.fx-nav,.fx-modal-tabs)>button:nth-child(4){--dt-tab-top:#415b2c;--dt-tab-bottom:#293b22}
+.fx-root :is(.fx-nav,.fx-modal-tabs)>button:nth-child(5){--dt-tab-top:#614c73;--dt-tab-bottom:#3e304f}
+.fx-root :is(.fx-nav,.fx-modal-tabs)>button>span{color:#fff6df;text-shadow:0 1px 2px #07120c}
+.fx-root .fx-enemy-heading :is(h1,span,b){color:#fff6df}
+.fx-root .v6-biome-name,.fx-root .fx-first-hint{color:#fff4d5;background:#15281deb;border:1px solid #a58a4e66;border-radius:6px;padding:4px 10px;text-shadow:none}
+/* Atlas layers carry their own facing; outgoing poses must not flip with the next pose. */
+.dt-layered.dt-face-mirrored{scale:1}
+.dt-actor-motion,.dt-actor-frame{position:absolute;inset:0;display:block;width:100%;height:100%}
+.dt-actor-motion{transform-origin:50% 90%}
+.dt-frame-blend{animation:dt-frame-in .09s linear both}
+.dt-frame-previous{animation:dt-frame-out .09s linear both;pointer-events:none}
+@keyframes dt-frame-in{from{opacity:0}to{opacity:1}}
+@keyframes dt-frame-out{from{opacity:1}to{opacity:0}}
+/* Continuous browser interpolation, independent of the fixed simulation cadence. */
+.v6-battlefield .dt-pose-idle>.dt-actor-motion{animation:dt-rest 3.2s ease-in-out infinite}
+.v6-battlefield .dt-pose-attack>.dt-actor-motion{animation:dt-strike .25s ease-out both}
+.v6-battlefield .dt-pose-hurt>.dt-actor-motion{animation:dt-recoil .24s ease-out both}
+.v6-battlefield .dt-pose-windup>.dt-actor-motion{animation:dt-prepare .45s ease-in-out both}
+.v6-battlefield .dt-pose-recovery>.dt-actor-motion{animation:dt-recover .32s ease-out both}
+.v6-battlefield .dt-pose-defeat>.dt-actor-motion{animation:dt-fall .5s ease-in both}
+.v6-battlefield .dt-actor[data-facing=left]{--dt-forward:-1}
+.v6-battlefield .dt-actor[data-facing=right]{--dt-forward:1}
+.v6-hero .dt-pose-attack>.dt-actor-motion{animation-duration:.15s}
+.v6-companion .dt-pose-attack>.dt-actor-motion{animation-duration:.2s}
+.v6-enemy .dt-pose-hurt>.dt-actor-motion{animation-duration:.16s}
+@keyframes dt-rest{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-1px) scaleY(1.015)}}
+@keyframes dt-strike{0%{transform:translateX(calc(var(--dt-forward,1) * -2px)) rotate(-2deg)}38%{transform:translateX(calc(var(--dt-forward,1) * 5px)) rotate(2deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes dt-recoil{0%,100%{transform:translateX(0)}30%{transform:translateX(calc(var(--dt-forward,1) * -3px)) rotate(-2deg)}}
+@keyframes dt-prepare{to{transform:translateX(calc(var(--dt-forward,1) * -3px)) rotate(-2deg)}}
+@keyframes dt-recover{from{transform:translateX(calc(var(--dt-forward,1) * 3px))}to{transform:translateX(0)}}
+@keyframes dt-fall{to{transform:translateY(8px) rotate(8deg);opacity:0}}
+.dt-combat-fx{animation:dt-combat-frames .32s steps(4,jump-none) both}
+@keyframes dt-combat-frames{from{background-position-x:0%}to{background-position-x:100%}}
+.v6-unit-health i,.fx-enemy-hp i{transition:width .1s linear}
+@media(prefers-reduced-motion:reduce){
+ .dt-layered .dt-actor-motion,.dt-layered .dt-actor-frame{animation:none!important}
+ .dt-frame-previous{display:none}
+ .v6-unit-health i,.fx-enemy-hp i{transition:none}
+}
+
+.fx-root :is(.fx-nav,.fx-modal-tabs)>button:nth-child(n){background:linear-gradient(var(--dt-tab-top),var(--dt-tab-bottom))!important}
+.fx-root[data-art-paused=true] .dt-frame-current{animation:none;opacity:1}
+.fx-root[data-art-paused=true] .dt-frame-previous{display:none}
