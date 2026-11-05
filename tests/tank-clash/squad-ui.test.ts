@@ -12,7 +12,7 @@ for (const viewport of [{ width: 1280, height: 760 }, { width: 844, height: 390 
     const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
     await page.setViewportSize(viewport);
     await page.goto(`file://${PREVIEW}`);
-    await page.getByRole('button', { name: /Anh \+ 1 bot vs 2 bot/ }).click();
+    await page.getByRole('button', { name: /Bạn \+ 1 bot vs 2 bot/ }).click();
     await expect(page.locator('.tc-overlay')).toBeHidden();
     await expect(page.locator('.tc-mode')).toHaveText('2v2 VỚI BOT · HIỆP 1');
     await expect(page.locator('.tc-player')).toContainText('ĐỘI A · BẠN + BOT');

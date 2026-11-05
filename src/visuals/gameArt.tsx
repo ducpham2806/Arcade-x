@@ -9,6 +9,7 @@ import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
 export const GAME_ART: Record<string, { color: string; secondary: string; label: string; world: string }> = {
+  'tank-clash': {color:'#8de6c9',secondary:'#ff8b72',label:'GAME MỚI',world:'Đấu trường xe tăng · Bắn bật tường'},
   'snake-legend': {color:'#e8c367',secondary:'#6baa76',label:'BẢN THỬ',world:'Thảo Nguyên Xanh'},
   'battleship': {color:'#dfbb7e',secondary:'#6ca7c2',label:'HẢI CHIẾN',world:'Naval Warfare · Hạm đội vỏ thép'},
   'boom-buddies': {color:'#ffa846',secondary:'#89ce57',label:'GAME MỚI',world:'Khu vườn bom vui nhộn'},
@@ -50,6 +51,19 @@ function Tile({ x, y, size = 56, color, text }: { x: number; y: number; size?: n
 }
 function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string }) {
   switch (id) {
+    case 'tank-clash': return <g>
+      <path d="M82 204L133 66H305L355 204Z" fill="#162c2c" stroke="#8de6c9" strokeWidth="3"/>
+      <path d="M105 167H159V192H105ZM257 80H310V108H257ZM186 107H229V137H186Z" fill="#a67750" stroke="#e8bb81" strokeWidth="3"/>
+      <path d="M166 150L203 62L285 149L239 172" stroke="#ffe09a" strokeWidth="5" strokeDasharray="8 7" strokeLinejoin="round"/>
+      {[[137,153,-25,'#8de6c9'],[276,157,148,'#ff8b72']].map(([x,y,angle,color],i)=><g key={i} transform={`translate(${x} ${y}) rotate(${angle})`}>
+        <rect x="-32" y="-31" width="64" height="18" rx="6" fill="#0b1719" stroke="#62827d" strokeWidth="3"/>
+        <rect x="-32" y="13" width="64" height="18" rx="6" fill="#0b1719" stroke="#62827d" strokeWidth="3"/>
+        <rect x="-26" y="-20" width="52" height="40" rx="9" fill={String(color)} stroke="#e0f7dc" strokeWidth="3"/>
+        <rect x="-13" y="-12" width="26" height="24" rx="8" fill="#254e49"/>
+        <path d="M4 0H48" stroke="#f6eed3" strokeWidth="10"/>
+      </g>)}
+      <circle cx="239" cy="172" r="8" fill="#ffe09a"/><path d="M237 154v-12m16 19l10-8m-7 24l13 4" stroke="#ffe09a" strokeWidth="4" strokeLinecap="round"/>
+    </g>;
     case 'boom-buddies': return <g>
       <path d="M80 208L128 112H318L365 208Z" fill="#639c3d" stroke="#c4ec92" strokeWidth="4"/>
       {[0,1,2,3].map(i=><path key={i} d={`M${110+i*65} 205L${141+i*51} 116M105 ${136+i*21}H345`} stroke="#3d742d" strokeWidth="3"/>)}

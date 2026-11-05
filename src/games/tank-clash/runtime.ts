@@ -8,7 +8,7 @@ import type { OnlineScreen } from './online-ui.ts';
 import { isTrustedServer, tokenFor } from './trust.ts';
 
 export type TankController = { destroy: (options?: { leaveOnline?: boolean }) => void; setPaused: (v: boolean) => void; snapshot: () => State };
-export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined;
+export type TankOptions = { paused?: boolean; requireAuthentication?: boolean; onAuthRequired?: () => void; inviteGameId?: string; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined;
   /** Staging review: keep tokens and invitations bound to this page's configured backend. */ fixedServer?: boolean;
   /** wss servers allowed to receive the token; loopback dev servers are always allowed. Others get no token (guest). */ trustedServers?: readonly string[] };
 const esc = (v: string) => v.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
@@ -20,7 +20,7 @@ function defaultServer(explicit?: string) {
 }
 export function mountTankClash(root: HTMLElement, options: TankOptions = {}): TankController {
   root.innerHTML = `<div class="tc" tabindex="0">
-    <header class="tc-header"><div class="tc-brand"><span class="tc-mark">TC</span><span>TANK CLASH<small>ARCADE-X · RICOCHET LAB</small></span></div><span class="tc-build">P3d · HÌNH TẠM</span><div class="tc-actions"><button data-action="guide" aria-pressed="true" title="Bật/tắt đường ngắm">Đường ngắm</button><button data-action="pause">Tạm dừng</button><button data-action="menu">Menu</button></div></header>
+    <header class="tc-header"><div class="tc-brand"><span class="tc-mark">TC</span><span>TANK CLASH<small>ARCADE-X · RICOCHET LAB</small></span></div><span class="tc-build">1v1 · 2v2</span><div class="tc-actions"><button data-action="guide" aria-pressed="true" title="Bật/tắt đường ngắm">Đường ngắm</button><button data-action="pause">Tạm dừng</button><button data-action="menu">Menu</button></div></header>
     <div class="tc-objective" role="status"><span class="tc-mode">SÂN TẬP</span><span class="tc-task">Làm quen tay lái</span><button class="tc-next" data-action="next" hidden>Tiếp theo →</button></div>
     <div class="tc-score"><span class="tc-player">A · BẠN <b class="tc-hp">● ● ●</b></span><span class="tc-clock">SÂN TẬP</span><span class="tc-enemy">B · BOT <b class="tc-enemyhp">● ● ●</b></span></div>
     <main class="tc-battle"><div class="tc-side tc-left"><div class="tc-stick tc-move" role="group" aria-label="Cần di chuyển"><i></i><span>DI CHUYỂN</span></div><small>W A S D</small></div><div class="tc-field"><canvas width="1600" height="960" aria-label="Đấu trường Tank Clash. Dùng WASD để lái, chuột để ngắm và bắn."></canvas><div class="tc-roundcue" aria-live="polite"></div><div class="tc-rotate">Xoay ngang để có sân chơi rộng hơn</div></div><div class="tc-side tc-right"><button class="tc-shield" data-action="shield" aria-label="Kích hoạt khiên">◇<small>KHIÊN</small></button><div class="tc-stick tc-aim" role="group" aria-label="Kéo để ngắm, nhả để bắn"><i></i><span>NGẮM · NHẢ BẮN</span></div><small>CHUỘT · SPACE = KHIÊN</small></div></main>
@@ -48,9 +48,10 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function show(which: typeof screen) {
     screen = which; app.dataset.screen = which ?? 'playing'; app.classList.toggle('tc-online-dialog', online && which !== null); resetInput(); overlay.hidden = which === null; battle.inert = which !== null;
     if (which === null) { app.focus({ preventScroll: true }); return; }
-    if (which === 'menu') dialog.innerHTML = `<div class="tc-eyebrow">BẢN THỬ CẢM GIÁC CHƠI · 0.1</div><h1 id="tc-dialog-title">Đọc góc bắn.<br><em>Làm chủ đấu trường.</em></h1><p>Lái xe, tìm góc phản xạ và đỡ đạn đúng lúc. Bắt đầu ở sân tập an toàn, rồi thử đấu với bot hoặc cùng đồng đội bot đấu 2v2.</p><div class="tc-menu-cards"><button class="tc-card" data-action="training"><span>01 / SÂN TẬP</span><b>Học qua 5 bài ngắn ↗</b><small>Lái · Bắn · Bật tường · Phá gạch · Khiên</small></button><button class="tc-card" data-action="duel"><span>02 / ĐẤU LUYỆN</span><b>1v1 với bot ↗</b><small>Tối đa 3 hiệp · 3 máu · Cùng chỉ số</small></button><button class="tc-card tc-card-squad" data-action="squad"><span>03 / ĐỒNG ĐỘI 2v2</span><b>Anh + 1 bot vs 2 bot ↗</b><small>Sân lớn · Chướng ngại mới mỗi trận</small></button><button class="tc-card tc-card-online" data-action="online"><span>04 / ONLINE · THỬ NGHIỆM</span><b>Phòng riêng &amp; tìm trận ↗</b><small>1v1 · 2v2 · Mời bạn · Xem trận</small></button></div><div class="tc-controls-info"><span><b>PC</b> WASD lái · chuột ngắm/bắn · Space khiên</span><span><b>ĐIỆN THOẠI</b> Cần trái lái · kéo cần phải, nhả để bắn</span></div><p class="tc-note">Hình khối tạm. Online cần máy chủ phòng đang chạy. Ghép trận 2v2 không thêm bot vào ghế trống.</p>`;
+    if (which === 'menu') dialog.innerHTML = `<div class="tc-eyebrow">TANK CLASH · BẮN BẬT TƯỜNG</div><h1 id="tc-dialog-title">Đọc góc bắn.<br><em>Làm chủ đấu trường.</em></h1><p>Lái xe, tìm góc phản xạ và đỡ đạn đúng lúc. Bắt đầu ở sân tập an toàn, rồi thử đấu với bot hoặc cùng đồng đội bot đấu 2v2.</p><div class="tc-menu-cards"><button class="tc-card" data-action="training"><span>01 / SÂN TẬP</span><b>Học qua 5 bài ngắn ↗</b><small>Lái · Bắn · Bật tường · Phá gạch · Khiên</small></button><button class="tc-card" data-action="duel"><span>02 / ĐẤU LUYỆN</span><b>1v1 với bot ↗</b><small>Tối đa 3 hiệp · 3 máu · Cùng chỉ số</small></button><button class="tc-card tc-card-squad" data-action="squad"><span>03 / ĐỒNG ĐỘI 2v2</span><b>Bạn + 1 bot vs 2 bot ↗</b><small>Sân lớn · Chướng ngại mới mỗi trận</small></button><button class="tc-card tc-card-online" data-action="online"><span>04 / ONLINE</span><b>Phòng riêng &amp; tìm trận ↗</b><small>1v1 · 2v2 · Mời bạn · Xem trận</small></button></div><div class="tc-controls-info"><span><b>PC</b> WASD lái · chuột ngắm/bắn · Space khiên</span><span><b>ĐIỆN THOẠI</b> Cần trái lái · kéo cần phải, nhả để bắn</span></div><p class="tc-note">Online cần đăng nhập ArcadeX. Ghép trận 2v2 không thêm bot vào ghế trống. Máy chủ có thể cần khoảng một phút để khởi động sau thời gian nghỉ.</p>`;
     if (which === 'online' || which === 'lobby' || which === 'queue' || which === 'onlinepause' || which === 'onlineconfirm') {
       dialog.innerHTML = onlineDialog(which, net?.session, { name: playerName, code: inviteCode, server: serverUrl });
+      if(options.fixedServer)dialog.querySelector('.tc-server')?.closest('details')?.remove();
       renderOnline();
     }
     if (which === 'pause') dialog.innerHTML = `<div class="tc-eyebrow">TANK CLASH / TẠM DỪNG</div><h1 id="tc-dialog-title">Nghỉ một nhịp.</h1><p>Trận đấu cục bộ đã dừng. Khi quay lại, xe sẽ chờ thao tác mới.</p><div class="tc-buttonrow">${button('Tiếp tục', 'resume', true)}${button('Chơi lại', 'restart')}${sim.mode === 'squad' && sim.status !== 'finished' ? button('Đầu hàng', 'surrender') : ''}${button('Về menu', 'menu')}${button('Góp ý bản thử', 'feedback')}</div>`;
@@ -77,6 +78,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function connect() { return connectTankRoom(serverUrl, { name: playerName, token: tokenFor(serverUrl, trusted, options.getToken), onChange: onNet }); }
   function trustNote() { return options.getToken && !isTrustedServer(serverUrl, trusted) ? 'Máy chủ này không nằm trong danh sách tin cậy: anh vào với tư cách khách, tài khoản không được gửi đi.' : ''; }
   function openOnline() {
+    if (options.requireAuthentication && !options.getToken?.()) { options.onAuthRequired?.(); return; }
     online = true; lastPhase = '';
     if (!net) net = connect();
     show(net.session.room ? 'lobby' : 'online');
@@ -157,7 +159,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     if (a === 'room-lobby') show('lobby');
     if (a === 'ready' && net?.session.room) { const me = net.session.room.seats.find(x => x.id === net!.session.seat); net.session.ready(!me?.ready); }
     if (a === 'invite' && net?.session.code) {
-      let link = ''; try { const u = new URL(location.href); u.searchParams.set('room', net.session.code); u.searchParams.set('server', serverUrl); link = u.toString(); } catch { link = net.session.code; }
+      let link = ''; try { const u = new URL(location.href); u.searchParams.set('room', net.session.code); if(options.inviteGameId)u.searchParams.set('game',options.inviteGameId); if(options.fixedServer)u.searchParams.delete('server'); else u.searchParams.set('server', serverUrl); link = u.toString(); } catch { link = net.session.code; }
       const done = (msg: string) => { const el = dialog.querySelector('.tc-net-status'); if (el) el.textContent = msg; };
       if (navigator.clipboard?.writeText) navigator.clipboard.writeText(link).then(() => done('Đã sao chép link mời.')).catch(() => done(`Link mời: ${link}`)); else done(`Link mời: ${link}`);
     }
@@ -317,6 +319,6 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     raf = requestAnimationFrame(frame);
   }
   show('menu'); updateHud(); raf = requestAnimationFrame(frame);
-  if (inviteCode) openOnline(); // opened from an invite link (?room=CODE)
+  if (inviteCode && (!options.requireAuthentication || options.getToken?.())) openOnline(); // signed-in invite; guests choose Online to sign in
   return { setPaused(v) { externalPaused = v; resetInput(); }, snapshot: () => structuredClone(sim), destroy(options) { destroyed = true; cancelAnimationFrame(raf); abort.abort(); resetInput(); if (options?.leaveOnline) net?.session.leave(); net?.close(); net = null; for (const n of leaving) n.close(); leaving.clear(); root.replaceChildren(); } };
 }

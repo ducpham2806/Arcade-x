@@ -19,7 +19,7 @@ function load(path,mocks={}){const out={};const code=ts.transpileModule(fs.readF
  let user=null,pending=[];const catalog={games:[{id:'test',accessModel:'premium',availability:'published'}]};
  const repo={cachedCatalog:()=>catalog,fetchCatalog:async()=>catalog,checkAccess:()=>new Promise(resolve=>pending.push(resolve)),readLibrary:async()=>[],pendingFavorites:()=>[],flushFavorites:async()=>{}};
  const storageApi={loadFavorites:()=>[],loadRecentlyPlayed:()=>[],saveFavorites:()=>{},saveRecentlyPlayed:()=>{}};
- const {LauncherProvider,useLauncher}=load('src/launcher/LauncherContext.tsx',{'../context/AuthContext':{useAuth:()=>({currentUser:user})},'../services/storage':{StorageService:storageApi},'./repository':repo,'./catalog':{isLocalReviewGame:()=>false}});
+ const {LauncherProvider,useLauncher}=load('src/launcher/LauncherContext.tsx',{'../context/AuthContext':{useAuth:()=>({currentUser:user})},'../services/storage':{StorageService:storageApi},'./repository':repo,'./catalog':{isDeviceLibraryGame:()=>false}});
  let launcher;function Probe(){launcher=useLauncher();return null;}const root4=createRoot(document.getElementById('root'));
  await act(async()=>root4.render(React.createElement(LauncherProvider,null,React.createElement(Probe))));let outcome;await act(async()=>{outcome=launcher.authorize('test');});
  user={id:'restored-user'};await act(async()=>root4.render(React.createElement(LauncherProvider,null,React.createElement(Probe))));await act(async()=>pending.shift()({allowed:true,reason:'server'}));assert.equal(pending.length,1,'identity change must recheck entitlement instead of discard click');

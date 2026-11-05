@@ -39,6 +39,7 @@ async function authoredAnimations(page) {
   });
 }
 async function startCanvasGame(page,id) {
+  if(id==='tank-clash')await page.locator('[data-action="training"]').click();
   if(id==='rainbow-blocks')await page.locator('#rb-play').click();
   if(id==='cosmic-defense')await page.locator('#cd-quick-play').click();
   if(id==='eat-em-all')await page.getByRole('button',{name:'Chơi màn 1',exact:true}).click();
@@ -71,7 +72,7 @@ async function startCanvasGame(page,id) {
      await page.waitForTimeout(450); // launcher entrance/lazy save gate must settle before attaching a probe
      const css=await probe(page,'#game-viewport-stage');
      assert.equal(css.duration,'2s',id+': launcher CSS truncates gameplay animation');assert.equal(css.pseudoDuration,'2s',id+': launcher CSS truncates pseudo animation');assert.equal(css.iterations,'infinite');assert.ok(css.advanced&&css.changed,id+': animation must visibly progress, not just exist '+JSON.stringify(css));
-     const continuous=['rainbow-blocks','cosmic-defense','cyber-slice','eat-em-all','neon-runner','brick-breaker','boom-buddies'].includes(id);
+     const continuous=['tank-clash','rainbow-blocks','cosmic-defense','cyber-slice','eat-em-all','neon-runner','brick-breaker','boom-buddies'].includes(id);
      let painting=null;
      if(continuous){
       await startCanvasGame(page,id);await page.waitForTimeout(600);

@@ -226,5 +226,13 @@
     "iconBytes": 18600,
     "bannerBytes": 34898,
     "sha256": "bc5444ce4667f511299f0997a39f4ca10df11ba6147d768393916b7968fc8881"
+  },
+  {
+    "id": "tank-clash",
+    "icon": "/game-art/icons/tank-clash.webp",
+    "banner": "/game-art/banners/tank-clash.webp",
+    "iconBytes": 13870,
+    "bannerBytes": 29354,
+    "sha256": "1d92a07341d678d287f9137ae844d90f180b220c0d8e25a6255a27e5ae1ed4ed"
   }
 ]

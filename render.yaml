@@ -1,16 +1,16 @@
-# Optional TC2 pilot backend. Applying this Blueprint creates a Render Free web service.
-# Netlify frontend is unchanged. Complete Auth tester values before starting.
+# Tank Clash public free-play backend; reuses the existing single Render Free service.
+# Supabase Auth verification only: no production DB scripts, rewards or result writes.
 services:
   - type: web
     name: arcadex-tank-staging
     runtime: node
     plan: free
     region: singapore
-    branch: codex/tank-clash-tc2-readiness
+    branch: main
     numInstances: 1
     autoDeployTrigger: 'off'
     healthCheckPath: /health
-    buildCommand: npm ci --ignore-scripts && npm ci --prefix server/tank-clash-room --omit=dev --ignore-scripts && node scripts/export-tank-staging-review.mjs
+    buildCommand: npm ci --prefix server/tank-clash-room --omit=dev --ignore-scripts
     startCommand: node scripts/tank-clash/preflight.mjs && node server/tank-clash-room/server.mjs
     envVars:
       - key: NODE_VERSION
@@ -20,7 +20,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: TANK_ENV
-        value: staging
+        value: production
+      - key: TANK_ACCESS_MODE
+        value: registered-free
       - key: HOST
         value: 0.0.0.0
       - key: PORT
@@ -30,7 +32,7 @@ services:
       - key: TANK_ALLOWED_ORIGINS
         value: https://arcade-x.netlify.app
       - key: SUPABASE_URL
-        value: https://khqipuipeawzlkqmdzdg.supabase.co
+        value: https://whjatkhhupeqfngakmee.supabase.co
       - key: SUPABASE_PUBLISHABLE_KEY
         sync: false
       - key: TANK_ALLOWED_USERS
@@ -40,4 +42,4 @@ services:
       - key: TANK_METRICS_ENABLED
         value: '0'
       - key: TANK_REVIEW_ENABLED
-        value: '1'
+        value: '0'

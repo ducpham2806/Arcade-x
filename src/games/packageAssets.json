@@ -975,5 +975,9 @@
     "/game-art/icons/word-chain.webp",
     "/game-art/banners/word-chain.webp",
     "/games/word-chain/words.v1.json"
+  ],
+  "tank-clash": [
+    "/game-art/icons/tank-clash.webp",
+    "/game-art/banners/tank-clash.webp"
   ]
 }

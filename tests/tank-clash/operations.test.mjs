@@ -134,3 +134,18 @@ test('lifecycle, result and resume logs never contain the access or seat tokens'
   for(const event of ['room.created','room.joined','match.start','match.end','persist-result','seat.resumed'])assert(logs.some(l=>l.event===event),event);
  }finally{a.close();b.close();resumed?.close();await s.close();}
 });
+
+
+test('public registered-free mode is explicit, production-only and pinned to ArcadeX Auth; staging keeps tester allowlist',async()=>{
+ const settings={...env,PORT:'10000',RENDER:'true',HOST:'0.0.0.0',TANK_METRICS_ENABLED:'0',TANK_ENV:'production',TANK_ACCESS_MODE:'registered-free',SUPABASE_URL:'https://whjatkhhupeqfngakmee.supabase.co',TANK_ALLOWED_USERS:''};
+ const config=loadServerConfig(settings);assert.equal(config.allowedUserIds,undefined);assert.equal(preflight(settings).auth,'ArcadeX registered free play');
+ assert.throws(()=>loadServerConfig({...settings,TANK_ENV:'staging'}),/explicit production/);
+ assert.throws(()=>loadServerConfig({...settings,SUPABASE_URL:env.SUPABASE_URL}),/ArcadeX accounts/);
+ assert.throws(()=>loadServerConfig({...settings,TANK_ACCESS_MODE:'guest'}),/Unknown/);
+ assert.throws(()=>loadServerConfig({...settings,TANK_REVIEW_ENABLED:'1'}),/staging only/);
+ assert.throws(()=>loadServerConfig({...env,TANK_ALLOWED_USERS:''}),/TANK_ALLOWED_USERS/);
+ const auth=supabaseAuthenticator({url:config.supabaseUrl,anonKey:'public',requireRegistered:true,allowedUserIds:config.allowedUserIds,
+  fetchImpl:async(url,init)=>{assert.equal(url,config.supabaseUrl+'/auth/v1/user');return {ok:init.headers.Authorization!=='Bearer invalid',json:async()=>({id:init.headers.Authorization,is_anonymous:init.headers.Authorization==='Bearer anonymous'})};}});
+ assert.equal(await auth('invalid'),null);assert.equal(await auth('anonymous'),null);
+ assert.notEqual((await auth('account-a')).userId,(await auth('account-b')).userId,'all registered ArcadeX accounts may play, without sharing identity');
+});

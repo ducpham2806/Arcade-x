@@ -1,6 +1,6 @@
 # ArcadeX · 2.12.2
 
-PWA launcher 23 mini-game, React 19 + Vite + TypeScript + Supabase; hỗ trợ offline và đồng bộ tài khoản. Tank Clash còn là bản thử riêng, chưa nằm trong 23 game.
+PWA launcher 24 mini-game, React 19 + Vite + TypeScript + Supabase; hỗ trợ offline và đồng bộ tài khoản. Tank Clash có sân tập, bot và online 1v1/2v2; cấu hình phát hành ở [LAUNCHER-RELEASE](docs/tank-clash/LAUNCHER-RELEASE.md).
 
 ## Bắt đầu
 

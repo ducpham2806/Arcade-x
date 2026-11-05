@@ -1,4 +1,5 @@
 import { packageLazy } from './gamePackages';
+const TankClashGame = packageLazy('tank-clash', () => import('./tank-clash'));
 const BattleshipGame = packageLazy('battleship', () => import('./battleship')); 
 import { BLOSSOM_TITLE } from './hex-match/blossom/branding';
 const BrickBreakerGame = packageLazy('brick-breaker', () => import('./brick-breaker'));
@@ -47,6 +48,14 @@ const WordChainGame = packageLazy('word-chain', () => import('./word-chain').the
 import { WORD_CHAIN_ACHIEVEMENTS, WORD_CHAIN_DROP_RATES, WORD_CHAIN_CONTROLS } from './word-chain/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
+  'tank-clash': {
+    id:'tank-clash', title:'Tank Clash', shortDesc:'Xe tăng bắn bật tường · Luyện bot và online 1v1, 2v2',
+    description:'Đọc góc bắn, dùng tường để đưa đạn tới đối thủ và đỡ đạn bằng khiên. Học qua năm bài ngắn, luyện 1v1 hoặc đồng đội 2v2 với bot, tạo phòng và tìm trận online bằng tài khoản ArcadeX. Miễn phí; chưa có thưởng hoặc bảng xếp hạng.',
+    category:'Multiplayer', difficulty:'Trung Bình', icon:'🎯', bannerGradient:'from-emerald-950 via-slate-900 to-orange-950', themeColor:'#8de6c9',
+    tags:['Game mới','Xe tăng','Bật tường','Bot','Online 2v2'], supportsAI:true, multiplayer:true,
+    controls:[{key:'WASD / Mũi tên',action:'Lái xe',touchInstruction:'Kéo cần bên trái'},{key:'Chuột',action:'Ngắm và bắn',touchInstruction:'Kéo cần bên phải, nhả để bắn'},{key:'Space',action:'Kích hoạt khiên'},{key:'P / Escape',action:'Tạm dừng'}],
+    achievements:[],dropRates:{baseChestDropChance:0,scoreThresholdForDrop:Number.MAX_SAFE_INTEGER,chestWeights:[]},component:TankClashGame,
+  },
   'battleship': {
     id:'battleship', title:'Battleship · Naval Warfare', shortDesc:'Hải chiến · online 1vs1, 2vs2 và luyện tập với bot',
     description:'Hải chiến vỏ thép lấy cảm hứng Mỹ–Nhật. Đặt 5 tàu, bắn từng ô trong 30 giây và đánh chìm toàn bộ hạm đội đối thủ. Tìm trận 1vs1 hoặc tạo phòng bằng mã. Online 2vs2 có bàn 14×14, hai người mỗi phe; bot dễ/thường và tập 2vs2 với ba bot. Vắng 90 giây: 1vs1 có thể bị xử thua, 2vs2 đồng đội có thể bắn thay.',

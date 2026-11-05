@@ -1,7 +1,7 @@
 import { SYNC } from '../services/syncPolicy';
 import {accessPreviewEnabled} from '../commerce/api';
 import { supabase } from '../services/supabaseClient';
-import { bundledCatalog, parseCatalog, isLocalReviewGame, type Catalog, type CatalogGame } from './catalog';
+import { bundledCatalog, parseCatalog, isLocalReviewGame, isDeviceLibraryGame, type Catalog, type CatalogGame } from './catalog';
 const cacheKey='launcher_catalog_v1';
 export function cachedCatalog(): Catalog {
   try { return parseCatalog(JSON.parse(localStorage.getItem(cacheKey)||'null')) || bundledCatalog; } catch { return bundledCatalog; }
@@ -32,6 +32,7 @@ export async function checkAccess(game: CatalogGame): Promise<{allowed:boolean;r
     return {allowed:false,reason:'connection'};
   }
   if(game.availability!=='published')return {allowed:false,reason:'unavailable'};
+  if(game.id==='tank-clash'&&game.deviceOnly&&game.accessModel==='free')return {allowed:true,reason:'bundled_free'};
   if(isLocalReviewGame(game.id)&&game.accessModel==='free'&&game.supportsOffline)return {allowed:true,reason:'local_review'};
   if(!navigator.onLine)return {allowed:game.accessModel==='free' && game.supportsOffline,reason:'offline'};
   try {
@@ -61,7 +62,7 @@ export function enqueueFavorite(owner:string,gameId:string,favorite:boolean){
 const inFlight=new Map<string,Promise<void>>();
 export async function flushFavorites(owner:string):Promise<void>{
   if(inFlight.has(owner))return inFlight.get(owner)!;
-  const task=(async()=>{if(import.meta.env.DEV){const remaining=queue(owner).filter(row=>!isLocalReviewGame(row.gameId));localStorage.setItem(queueKey(owner),JSON.stringify(remaining));}for(const mutation of queue(owner)){
+  const task=(async()=>{{const remaining=queue(owner).filter(row=>!isDeviceLibraryGame(row.gameId));localStorage.setItem(queueKey(owner),JSON.stringify(remaining));}for(const mutation of queue(owner)){
     await requireOwner(owner);await rpc('launcher_set_favorite',{p_game_id:mutation.gameId,p_favorite:mutation.favorite,p_expected_owner:owner});
     localStorage.setItem(queueKey(owner),JSON.stringify(queue(owner).filter(row=>row.id!==mutation.id)));
   }})();inFlight.set(owner,task);try{await task;}finally{inFlight.delete(owner);}

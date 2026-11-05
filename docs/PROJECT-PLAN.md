@@ -2,7 +2,7 @@
 
 Căn cứ: `main@affc5e8`, PR #15, code/config và bàn giao trong repo. CI mốc này qua; trạng thái production/backend chưa kiểm trực tiếp. `[ ]` là chưa nghiệm thu, kể cả phần đã có code. Đây là kế hoạch đề xuất; không tự mở rộng phạm vi P3 đã duyệt thành phê duyệt hosting, thanh toán hay phát hành.
 
-Cập nhật 05/11: FX1/TC1 đã có bản sửa/test cục bộ, vẫn chờ duyệt. TC2 trên `codex/tank-clash-tc2-readiness`: Render Free/review `3950abb` đã Live, 4 tester staging; 17 WS/ops + 11 UI và một phiên thật tạo/rời phòng qua. Còn trận nhiều người, hai mạng/thiết bị và tải Render; xem `tank-clash/TC2-review.md`. Không deploy Netlify trước khi duyệt.
+Cập nhật 05/11: FX1/TC1 đã có bản sửa/test cục bộ, vẫn chờ duyệt. TC2 trên `codex/tank-clash-tc2-readiness`: Render Free/review `3950abb` đã Live, 4 tester staging; 17 WS/ops + 11 UI và một phiên thật tạo/rời phòng qua. Còn trận nhiều người, hai mạng/thiết bị và tải Render; xem `tank-clash/TC2-review.md`. Chủ dự án đã duyệt merge/phát hành bot + online cho tài khoản ArcadeX ngày 05/11; thực hiện ở `codex/tank-clash-launcher-release`, [phạm vi](tank-clash/LAUNCHER-RELEASE.md). Các phép đo TC2 còn thiếu vẫn chưa đánh dấu đạt.
 
 ## 1. Thứ tự và cách chia đợt
 
@@ -53,10 +53,10 @@ Một đợt kỹ thuật nên vừa một thay đổi có thể review/test/com
 ### TC3 · P4 — tích hợp sản phẩm
 
 **Phụ thuộc:** TC1/TC2 đạt, chủ dự án chấp thuận hướng gameplay.
-- [ ] Adapter launcher: tải gói, pause/mute/exit, cleanup socket/timer/RAF, lỗi kết nối; catalog/registry/packageAssets/art đồng bộ.
+- [x] Adapter launcher: tải gói, pause/mute/exit, cleanup socket/timer/RAF, lỗi kết nối; catalog/registry/packageAssets/art đồng bộ.
 - [ ] Quyền chơi và kết quả do backend xác nhận, ghi một lần theo match ID; nối lại không cấp thưởng trùng, không ghi vị trí/đạn theo tick. Chốt mô hình dữ liệu/thưởng trước khi xây; chưa coi là đã có.
 - [ ] Art/VFX/âm thanh sản xuất, phân biệt đội bằng màu + biểu tượng, BOT rõ; giới hạn âm thanh chồng và dừng khi thoát. Đo bundle sau đổi asset.
-- [ ] Bổ sung test save/quyền/kết quả và cập nhật 3 test cố định số game khi đăng ký game thứ 24.
+- [x] Đăng ký game thứ 24: cập nhật 3 test catalog/art/readability, package/offline và kiểm từ sảnh; thêm fixture adapter Auth/địa chỉ máy chủ/logout. Test thưởng/DB result chờ triển khai phần đó.
 
 **Nghiệm thu:** vào/thoát nhiều lần sạch tài nguyên, quyền đúng, reward không trùng, save cũ giữ được; build/bundle/fast + launcher/game/offline/modal liên quan qua.
 

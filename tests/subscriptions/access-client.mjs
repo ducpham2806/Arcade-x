@@ -5,7 +5,7 @@ Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:t
 const bundle=await build({entryPoints:['src/launcher/repository.ts'],bundle:true,write:false,format:'esm',platform:'node',define:{'import.meta.env.VITE_ACCESS_CONTROL_V2':'"true"'},plugins:[{name:'fake-cloud',setup(b){
  b.onResolve({filter:/supabaseClient$/},()=>({path:'cloud',namespace:'test'}));
  b.onResolve({filter:/\.\/catalog$/},()=>({path:'catalog',namespace:'test'}));
- b.onLoad({filter:/.*/,namespace:'test'},({path})=>({contents:path==='cloud'?`export const supabase={rpc(name){globalThis.lastRpc=name;return {abortSignal:async()=>{if(globalThis.failRpc)throw Error('network');return {data:globalThis.access,error:null}}}}};`:`export const bundledCatalog={};export const parseCatalog=x=>x;export const isLocalReviewGame=()=>true;`}));
+ b.onLoad({filter:/.*/,namespace:'test'},({path})=>({contents:path==='cloud'?`export const supabase={rpc(name){globalThis.lastRpc=name;return {abortSignal:async()=>{if(globalThis.failRpc)throw Error('network');return {data:globalThis.access,error:null}}}}};`:`export const bundledCatalog={};export const parseCatalog=x=>x;export const isLocalReviewGame=()=>true;export const isDeviceLibraryGame=()=>false;`}));
 }}]});
 const {checkAccess}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].text).toString('base64'));
 let checks=0;
