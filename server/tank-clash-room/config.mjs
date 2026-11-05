@@ -7,6 +7,8 @@ export function loadServerConfig(env = process.env) {
   const port = Number(env.PORT || 3223), maxConnections = Number(env.TANK_MAX_CONNECTIONS || 64);
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw Error('PORT must be an integer from 0 to 65535');
   if (!Number.isInteger(maxConnections) || maxConnections < 2 || maxConnections > 10000) throw Error('TANK_MAX_CONNECTIONS must be 2..10000');
+  const reviewEnabled = env.TANK_REVIEW_ENABLED === '1';
+  if (reviewEnabled && env.TANK_ENV !== 'staging') throw Error('The review page is staging only');
   if (env.TANK_METRICS_ENABLED && !['0', '1'].includes(env.TANK_METRICS_ENABLED)) throw Error('TANK_METRICS_ENABLED must be 0 or 1');
   const allowedOrigins = split(env.TANK_ALLOWED_ORIGINS).map(raw => {
     const u = new URL(raw);
@@ -14,6 +16,11 @@ export function loadServerConfig(env = process.env) {
     return u.origin;
   });
   const supabaseUrl = env.SUPABASE_URL?.replace(/\/$/, '') || '', publishableKey = env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY || '';
+  if (reviewEnabled && env.RENDER === 'true') {
+    const review = new URL(env.RENDER_EXTERNAL_URL || '');
+    if (review.protocol !== 'https:' || !review.hostname.endsWith('.onrender.com') || review.username || review.password || review.pathname !== '/' || review.search || review.hash) throw Error('Review needs the exact Render HTTPS origin');
+    if (!allowedOrigins.includes(review.origin)) allowedOrigins.push(review.origin);
+  }
   const allowedUserIds = split(env.TANK_ALLOWED_USERS);
   if (allowedUserIds.some(id => !uuid.test(id))) throw Error('TANK_ALLOWED_USERS must contain Auth user UUIDs');
   if (supabaseUrl) {
@@ -32,6 +39,6 @@ export function loadServerConfig(env = process.env) {
   }
   return { production, host, port, allowedOrigins, maxConnections, supabaseUrl, publishableKey,
     allowedUserIds: allowedUserIds.length ? allowedUserIds : undefined, metricsToken: env.TANK_METRICS_TOKEN || '',
-    metricsEnabled: env.TANK_METRICS_ENABLED !== '0',
+    metricsEnabled: env.TANK_METRICS_ENABLED !== '0', reviewEnabled,
     guestQueue: !production && env.TANK_QUEUE_GUESTS === '1' };
 }

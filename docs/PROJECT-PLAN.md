@@ -2,7 +2,7 @@
 
 Căn cứ: `main@affc5e8`, PR #15, code/config và bàn giao trong repo. CI mốc này qua; trạng thái production/backend chưa kiểm trực tiếp. `[ ]` là chưa nghiệm thu, kể cả phần đã có code. Đây là kế hoạch đề xuất; không tự mở rộng phạm vi P3 đã duyệt thành phê duyệt hosting, thanh toán hay phát hành.
 
-Cập nhật 05/11: FX1/TC1 đã có bản sửa/test cục bộ, vẫn chờ duyệt. Tiếp TC2 trên `codex/tank-clash-tc2-readiness`: Supabase staging đã tạo, local Auth/config/ops/WSS đã kiểm; Render Free đã duyệt, Blueprint/profile và exact frontend origin có code/test. Còn cấu hình service/tài khoản thật/mạng; xem `tank-clash/TC2-review.md`. Không deploy Netlify trước khi duyệt.
+Cập nhật 05/11: FX1/TC1 đã có bản sửa/test cục bộ, vẫn chờ duyệt. TC2 trên `codex/tank-clash-tc2-readiness`: Supabase staging/4 tester đã có, Render Free đã Live và có smoke HTTPS/WSS; code review đăng nhập đã qua 17 WS/ops + 11 UI. Còn cập nhật review, phiên/trận/mạng thật; xem `tank-clash/TC2-review.md`. Không deploy Netlify trước khi duyệt.
 
 ## 1. Thứ tự và cách chia đợt
 
@@ -42,6 +42,7 @@ Một đợt kỹ thuật nên vừa một thay đổi có thể review/test/com
 - [x] Tạo Supabase staging riêng theo chủ dự án: Nam A Uniform, Singapore; metadata/Auth endpoint/public schema/advisors đã kiểm, ref ở [TC2-review](tank-clash/TC2-review.md); không dữ liệu/migration production.
 - [x] Chuẩn bị gate Auth/tester/origin/cap/metrics/restart, 15 WS/ops + 9 Chrome UI qua; local WSS và soak 30 phút (204 trận 1v1/167 trận 2v2) có báo cáo nguồn/số đo/giới hạn ở [TC2-review](tank-clash/TC2-review.md).
 - [x] Profile Render Free/Singapore/Node24/một process, exact frontend origin Netlify, metrics public tắt: 16 WS/ops + schema Blueprint/lint qua ngày 05/11; chưa deploy hoặc chạy lại soak trên profile này.
+- [x] Tạo backend Free thật từ `50c7b36`, WSS/TLS/origin/token giả qua; 4 tester staging đã xác nhận. Thêm code review đăng nhập/refresh/logout/đổi tài khoản/backend cố định; 17 WS/ops + 11 UI, chưa nghiệm thu phiên thật trên trang review.
 - [ ] Thiết lập staging: origin allowlist, auth Supabase thật, tester/entitlement phía server; `VITE_TANK_CLASH_SERVERS` đúng WSS. Kiểm không gửi token ra host ngoài allowlist; không dùng cờ khách thử nghiệm trên production.
 - [ ] Chạy 2 tài khoản staging; thử token sai/hết hạn, trùng tài khoản, spectator, reconnect đúng ghế/HP; không ghi log token.
 - [ ] ≥10 trận mỗi quy mô 2/4 người, hai thiết bị/hai mạng; bao gồm phòng riêng và hàng chờ. Ghi RTT, jitter/loss nếu đo được, hiệu chỉnh xe, kết quả, tab/khóa màn hình, reconnect.

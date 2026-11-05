@@ -10,7 +10,7 @@ services:
     numInstances: 1
     autoDeployTrigger: 'off'
     healthCheckPath: /health
-    buildCommand: npm ci --prefix server/tank-clash-room --omit=dev --ignore-scripts
+    buildCommand: npm ci --ignore-scripts && npm ci --prefix server/tank-clash-room --omit=dev --ignore-scripts && node scripts/export-tank-staging-review.mjs
     startCommand: node scripts/tank-clash/preflight.mjs && node server/tank-clash-room/server.mjs
     envVars:
       - key: NODE_VERSION
@@ -39,3 +39,5 @@ services:
         generateValue: true
       - key: TANK_METRICS_ENABLED
         value: '0'
+      - key: TANK_REVIEW_ENABLED
+        value: '1'

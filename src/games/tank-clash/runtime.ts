@@ -7,8 +7,9 @@ import { onlineDialog, patchOnlineDialog, canSurrender } from './online-ui.ts';
 import type { OnlineScreen } from './online-ui.ts';
 import { isTrustedServer, tokenFor } from './trust.ts';
 
-export type TankController = { destroy: () => void; setPaused: (v: boolean) => void; snapshot: () => State };
+export type TankController = { destroy: (options?: { leaveOnline?: boolean }) => void; setPaused: (v: boolean) => void; snapshot: () => State };
 export type TankOptions = { paused?: boolean; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined;
+  /** Staging review: keep tokens and invitations bound to this page's configured backend. */ fixedServer?: boolean;
   /** wss servers allowed to receive the token; loopback dev servers are always allowed. Others get no token (guest). */ trustedServers?: readonly string[] };
 const esc = (v: string) => v.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 function defaultServer(explicit?: string) {
@@ -35,7 +36,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   let mouseFire = false, firePulse = false, shieldPulse = false, aim = 0, joystick = { x: 0, y: 0 };
   let screen: 'menu' | 'pause' | 'result' | 'feedback' | 'online' | 'lobby' | 'queue' | 'onlinepause' | 'onlineconfirm' | null = 'menu';
   // `net` exists only while the player is in the online flow; local modes never open a socket.
-  let net: ReturnType<typeof connectTankRoom> | null = null, online = false, serverUrl = defaultServer(options.serverUrl), lastPhase = '';
+  let net: ReturnType<typeof connectTankRoom> | null = null, online = false, serverUrl = options.fixedServer && options.serverUrl ? options.serverUrl : defaultServer(options.serverUrl), lastPhase = '';
   let playerName = (() => { try { return localStorage.getItem('tank-clash.name') ?? ''; } catch { return ''; } })();
   let inviteCode = (() => { try { return normalizeCode(new URLSearchParams(location.search).get('room')) ?? ''; } catch { return ''; } })();
   const leaving = new Set<ReturnType<typeof connectTankRoom>>(); let pendingBots = false, lastResult = '', toastUntil = 0;
@@ -136,7 +137,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     const entryAction = screen === 'online';
     if (a === 'create' || a === 'create-squad' || a === 'join' || a === 'spectate' || (a === 'queue' && entryAction)) {
       playerName = (q<HTMLInputElement>('.tc-name').value || '').trim().slice(0, 20);
-      const url = q<HTMLInputElement>('.tc-server').value.trim();
+      const url = options.fixedServer ? serverUrl : q<HTMLInputElement>('.tc-server').value.trim();
       try { localStorage.setItem('tank-clash.name', playerName); } catch { /* optional */ }
       if (/^wss?:\/\/[^\s]+$/.test(url) && url !== serverUrl) { serverUrl = url; try { localStorage.setItem('tank-clash.server', url); } catch { /* optional */ } net?.close(); net = connect(); }
       if (!net) net = connect();
@@ -317,5 +318,5 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   }
   show('menu'); updateHud(); raf = requestAnimationFrame(frame);
   if (inviteCode) openOnline(); // opened from an invite link (?room=CODE)
-  return { setPaused(v) { externalPaused = v; resetInput(); }, snapshot: () => structuredClone(sim), destroy() { destroyed = true; cancelAnimationFrame(raf); abort.abort(); resetInput(); net?.close(); net = null; for (const n of leaving) n.close(); leaving.clear(); root.replaceChildren(); } };
+  return { setPaused(v) { externalPaused = v; resetInput(); }, snapshot: () => structuredClone(sim), destroy(options) { destroyed = true; cancelAnimationFrame(raf); abort.abort(); resetInput(); if (options?.leaveOnline) net?.session.leave(); net?.close(); net = null; for (const n of leaving) n.close(); leaving.clear(); root.replaceChildren(); } };
 }

@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { monitorEventLoopDelay } from 'node:perf_hooks';
 import { loadServerConfig } from './config.mjs';
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { WebSocketServer, WebSocket } from 'ws';
 import { createRoomHost, guestAuthenticate } from '../../src/games/tank-clash/room.ts';
@@ -35,7 +36,7 @@ export function supabaseAuthenticator({ url, anonKey, fetchImpl = fetch, timeout
   };
 }
 
-export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allowedOrigins = [], authenticate = guestAuthenticate, onResult, log = () => {}, guestQueue = false, allowLocalOrigins = true, allowMissingOrigin = true, maxConnections = 256, detailedHealth = true, metricsToken = '', metricsEnabled = true } = {}) {
+export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allowedOrigins = [], authenticate = guestAuthenticate, onResult, log = () => {}, guestQueue = false, allowLocalOrigins = true, allowMissingOrigin = true, maxConnections = 256, detailedHealth = true, metricsToken = '', metricsEnabled = true, review = null } = {}) {
   const roomHost = createRoomHost({ now: () => performance.now(), authenticate, onResult, log, guestQueue });
   const transport = { connections: 0, open: 0, bytesIn: 0, bytesOut: 0, refusedOrigin: 0, refusedCapacity: 0 };
   const instance = randomUUID(), started = performance.now(), lag = monitorEventLoopDelay({ resolution: 20 }); lag.enable();
@@ -47,6 +48,11 @@ export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allow
   const authorizedMetrics = req => { const given = Buffer.from(String(req.headers.authorization || '').replace(/^Bearer /, '')), expected = Buffer.from(metricsToken); return !!expected.length && given.length === expected.length && timingSafeEqual(given, expected); };
   const http = createServer((req, res) => {
     const path = String(req.url).split('?')[0];
+    if (review && ['GET', 'HEAD'].includes(req.method) && ['/review', '/review/config'].includes(path)) {
+      const html = path === '/review';
+      res.writeHead(200, { 'Content-Type': html ? 'text/html; charset=utf-8' : 'application/json', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "frame-ancestors 'none'; base-uri 'none'" });
+      res.end(req.method === 'HEAD' ? undefined : html ? review.html : JSON.stringify({ supabaseUrl: review.supabaseUrl, publishableKey: review.publishableKey })); return;
+    }
     let status = 404, body = { ok: false };
     if (req.method !== 'GET' && req.method !== 'HEAD') status = 405;
     else if (path === '/health') { status = closing ? 503 : 200; body = detailedHealth ? stats() : { ok: !closing, protocol: PROTOCOL, instance }; }
@@ -106,6 +112,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const authenticate = config.supabaseUrl && config.publishableKey ? supabaseAuthenticator({ url: config.supabaseUrl, anonKey: config.publishableKey, allowedUserIds: config.allowedUserIds, requireRegistered: config.production }) : guestAuthenticate;
   const server = await createTankRoomServer({ ...config, authenticate, allowLocalOrigins: !config.production,
     allowMissingOrigin: !config.production, detailedHealth: !config.production,
+    review: config.reviewEnabled ? { html: readFileSync('deliverables/tank-clash-staging-review.html', 'utf8'), supabaseUrl: config.supabaseUrl, publishableKey: config.publishableKey } : null,
     onResult: r => console.log(JSON.stringify({ event: 'match.result', ...r })),
     log: (event, data) => console.log(JSON.stringify({ event, ...data })) });
   console.log(`Tank Clash room server (${PROTOCOL}) on ${server.url} · auth: ${authenticate === guestAuthenticate ? 'guests (dev)' : 'Supabase'} · instance: ${server.stats().instance}`);

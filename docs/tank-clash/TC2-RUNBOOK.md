@@ -4,21 +4,21 @@ Phạm vi: một Node 24 giữ phòng/hàng chờ trong RAM, wire `tank-clash.p3
 
 ## 1. Hosting đề xuất · kiểm giá 04/11/2026
 
-**Cập nhật 05/11:** chủ dự án xác nhận **chưa có VPS**, hiện chỉ dùng frontend `https://arcade-x.netlify.app`. Đã duyệt Render Free và đăng nhập dashboard; chưa tạo service hoặc duyệt thuê máy mới. Các giá VPS dưới đây chỉ là phương án tham khảo cũ.
+**Cập nhật 05/11:** chủ dự án xác nhận **chưa có VPS**, frontend `https://arcade-x.netlify.app`; đã duyệt Render Free, đăng nhập và tự tạo 4 tester staging. Backend `https://arcadex-tank-staging.onrender.com` đã Live ở mốc `50c7b36`; trang review đăng nhập đang được cập nhật theo [TC2-review](TC2-review.md). Không duyệt thuê máy/nâng plan/chi phí vượt quota. Các giá VPS dưới đây chỉ là phương án tham khảo cũ.
 
 `arcade-x.netlify.app` là [subdomain mặc định của site Netlify](https://docs.netlify.com/manage/domains/domains-fundamentals/understand-domains/); dùng làm **frontend origin**, không thay cho địa chỉ VPS hoặc hostname backend. Cặp cấu hình cần hoàn tất:
 
 | Thành phần | Giá trị hiện biết |
 |---|---|
 | Frontend được server chấp nhận | `TANK_ALLOWED_ORIGINS=https://arcade-x.netlify.app` |
-| Backend trên VPS | `wss://<hostname-backend-đã-có-TLS>/tank` — chờ thông tin VPS/domain riêng hoặc hostname do nhà cung cấp cấp |
+| Backend pilot đã có | `wss://arcadex-tank-staging.onrender.com/tank` |
 | Allowlist token ở frontend thử | `VITE_TANK_CLASH_SERVERS` = URL WSS backend ở trên; chưa điền domain frontend vào đây |
 
 Chỉ thêm origin của bản review staging khi biết URL chính xác; không dùng `*.netlify.app`, không tự cho mọi Deploy Preview. Bản local hiện tại vẫn chỉ gọi loopback. Việc đưa URL frontend production vào template **không đổi Supabase/build/biến môi trường của website đang chạy**.
 
 ### Render Free — cấu hình đã chuẩn bị, chưa triển khai
 
-[Blueprint](../../render.yaml) chỉ tạo **một web service Free**, không database/disk/add-on; Singapore, Node 24, một process, cap pilot 16 socket, `autoDeployTrigger: off`. Đây chưa phải năng lực đã đo trên Render. Build chỉ cài dependency server; không build/deploy frontend Netlify.
+[Blueprint](../../render.yaml) chỉ tạo **một web service Free**, không database/disk/add-on; Singapore, Node 24, một process, cap pilot 16 socket, `autoDeployTrigger: off`. Đây chưa phải năng lực đã đo trên Render. Build cài dependency để bundle review và chạy server; không build/deploy frontend Netlify.
 
 Theo [giới hạn Free](https://render.com/docs/free), service ngủ sau 15 phút không có HTTP/WS inbound, khởi động lại khoảng một phút, có thể bị restart và mất phòng/queue RAM. Quota miễn phí theo workspace; vượt bandwidth/build có thể phát sinh phí nếu workspace đã có phương thức thanh toán. Chưa có ngân sách trả phí: không thêm card, nâng plan hoặc bật chi tiêu vượt quota để hoàn tất pilot.
 
@@ -31,6 +31,14 @@ Sau khi chủ dự án duyệt/kết nối tài khoản Render:
 5. Cập nhật allowlist token vào build **review staging** riêng khi có WSS và origin review chính xác; chưa đổi cấu hình/live site `arcade-x.netlify.app`. Chạy tài khoản/trận/mạng/soak thật theo §4–§5; Free chỉ thử nghiệm, không nghiệm thu production bằng số đo Mac.
 
 Không có Render connector; dùng browser để cấu hình sau khi chủ dự án duyệt và đăng nhập. Quyền đọc repo/điều khoản phát sinh xử lý tại đúng bước, không tự cấp thêm quyền hoặc chấp nhận điều khoản thay chủ dự án.
+
+### Trang review riêng trên Render
+
+`/review` được bật bằng `TANK_REVIEW_ENABLED=1` **chỉ với `TANK_ENV=staging`**. Build chạy `npm run export:tank-staging`, output `deliverables/tank-clash-staging-review.html` do script sinh, không commit. `/review/config` chỉ trả URL + publishable key staging, no-store; không trả UUID allowlist/metrics token/password. Khi tắt cờ, hai route đều 404. Cấu hình Render tự thêm đúng `RENDER_EXTERNAL_URL` HTTPS vào origin allowlist; không wildcard hoặc trỏ frontend production sang staging.
+
+Trang dùng SDK Supabase, chỉ đăng nhập bằng 4 tài khoản thử đã cấp; không signup/gửi email/cấp thưởng/lưu kết quả DB. Session Auth chỉ trong RAM từng tab, tự refresh; không lưu password/JWT/refresh token vào localStorage. Đăng xuất rời phòng/queue rồi xóa thông tin ghế, đổi tài khoản không dùng resume cũ. Reload cần đăng nhập lại; cùng tài khoản có thể resume trong cửa sổ giữ ghế. Backend cố định theo origin của trang, link mời không đổi nơi nhận JWT.
+
+Để thử 2v2: mở 4 tab/thiết bị, đăng nhập 4 tài khoản khác nhau → Online → một người tạo phòng 2v2 → ba người nhập mã → cả bốn sẵn sàng. Xem trạng thái deploy/URL thật ở TC2-review trước gửi link. Sau code push, giữ Auto Sync **No** và deploy thủ công; mỗi lần redeploy mất phòng RAM.
 
 | Phương án Singapore | Tài nguyên / giá cơ bản | Nhận định cho pilot |
 |---|---|---|
@@ -89,7 +97,7 @@ VITE_TANK_CLASH_SERVERS=wss://DOMAIN_DA_DUYET/tank
 
 Frontend origin phải đúng từng giá trị HTTPS trong `TANK_ALLOWED_ORIGINS`; WS URL phải đúng allowlist frontend (cả path). Template server đã có origin frontend chủ dự án gửi ở §1; hostname backend trong Caddyfile vẫn để placeholder đến khi có domain VPS. Link mời host lạ không nhận access token. `.env.tank-staging.local` đã có URL/public key trên máy này, bị Git ignore; `TANK_EXPECTED_STAGING_REF=khqipuipeawzlkqmdzdg npm run test:tank-clash-staging` chỉ kiểm Auth read-only, không signup/gửi email. File không chuyển sang máy khác qua Git; lấy public key từ dashboard staging khi cần.
 
-Standalone HTML hiện tại **không có login**, chỉ duyệt khách cục bộ; launcher chưa đăng ký Tank trong `LOCAL_REVIEW_GAME_IDS`/registry. Nghiệm thu Auth/game thật cần review harness đăng nhập hoặc bước tích hợp staging riêng, không bật catalog production. Không đổi `.env` production để thử.
+Standalone P3 HTML cũ **không có login**, chỉ duyệt khách cục bộ; review có login dùng route riêng ở §1. Launcher chưa đăng ký Tank trong `LOCAL_REVIEW_GAME_IDS`/registry. Không bật catalog hoặc đổi `.env` production để thử.
 
 ## 4. TLS, khởi động và kiểm sau triển khai
 

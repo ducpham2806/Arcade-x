@@ -2,13 +2,14 @@
 
 Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết quả thật, phần còn dở; commit cùng thay đổi (`AGENTS.md`). Mới nhất ở trên; chỉ giữ tối đa 3 mục, chuyển nguyên văn phần cũ sang `archive/WORKLOG-YYYY-MM.md`. Đầu phiên chỉ đọc mục mới nhất; trạng thái hiện tại ở `SESSION-HANDOFF.md`.
 
-## 05/11/2026 · `codex/tank-clash-tc2-readiness` — frontend origin và Render Free pilot
+## 05/11/2026 · `codex/tank-clash-tc2-readiness` — Render Free và review đăng nhập
 
 - Chủ dự án xác nhận chưa VPS, chỉ có `https://arcade-x.netlify.app`; đã duyệt dùng Render Free và đăng nhập trên tab Render để tiếp cấu hình. Không duyệt nâng gói/chi phí vượt quota. Frontend public HTTP 200/title ArcadeX; xác định đúng Netlify site qua connector NamA bằng đọc metadata, không sửa env/deploy.
-- Template server dùng exact origin đã gửi; WS test từ chối HTTP/domain giả/Deploy Preview chưa cho phép. Thêm `render.yaml`: Node 24/Singapore/Free/một process, cap 16 socket, manual deploy, chỉ cài dependency server và Supabase staging; chưa có service/WSS public.
-- Preflight hỗ trợ managed TLS Render khi `RENDER=true`, bind 0.0.0.0 và HTTP metrics tắt; VPS vẫn loopback. `/metrics` trả 404 cả khi có token ở profile tắt; Auth/tester gate không đổi. Qua Node 24: 16/16 WS/ops, lint; package độc lập vẫn 13 file. Blueprint qua schema Render chính thức Draft 2020-12 + URI formats (Ruby YAML→JSON, Ajv); validator phụ chỉ cài trong /private/tmp.
-- Cập nhật runbook/decisions/plan/handoff; chuyển nguyên văn mục Battleship/Dungeon cũ vào archive, WORKLOG giữ 3 mục. Soak 30 phút trước đây thuộc a8d472b/ngày 04/11, chưa chạy lại sau đổi startup/metrics; chưa thử runtime Render, tài khoản thật hoặc hai mạng.
-- Commit/push nhánh dùng `[skip netlify]` theo AGENTS mới và hướng dẫn Netlify; không `[skip ci]`, không nới test/merge main/deploy Netlify. Còn quyền repo Render, 4 tester Auth staging và nghiệm thu backend public; không tạo UUID giả để vượt preflight.
+- `50c7b36` push qua GitHub Desktop, giữ nguyên lịch sử; HTTPS CLI thiếu credentials, SSH chưa có known host nên không bỏ kiểm tra hoặc đọc key. Đặt upstream/refspec đúng nhánh. Netlify deploy `6aeaa023dbc469c9cfe7b896` giữ nguyên, không active deploy. Cờ `[skip netlify]`, không `[skip ci]`/merge main.
+- Render Free đã Live từ `50c7b36`: service `srv-dbm1r9t6e07s73asmulg`, Singapore/Node24/1 process/16 socket; Blueprint Auto Sync chuyển No, manual deploy. HTTPS/WSS `arcadex-tank-staging.onrender.com`: health200, metrics404, TLS valid, origin thiếu/null/giả403, token giả AUTH_FAILED. Không đăng ký/nâng gói trả phí; 4 Auth user do chủ dự án tạo đã xác nhận email/non-anonymous qua SQL đọc staging.
+- Thêm `/review` + `/review/config` opt-in/staging-only, exporter và `staging-preview.ts`: SDK Auth session trong RAM riêng mỗi tab, refresh, backend cố định theo origin, không JWT ra link mời lạ. Logout rời phòng/queue, xóa resume; controller destroy thêm lựa chọn leave riêng, reload vẫn giữ cửa sổ resume. Không signup/thưởng/DB result hoặc tích hợp launcher. Render hiện mới chạy backend 50c7b36; trang review đang chuẩn bị cập nhật.
+- Qua Node24: lint/build/bundle, 17 WS/ops, 11 Chrome UI; 4 phiên Auth HTTP fixture + socket thật vào 2v2, logout/đổi tài khoản không ghế treo, không lưu JWT/refresh token. Hai lượt đầu sai locator nút 1v1 đã sửa theo tên UI, không giảm assertion. Blueprint valid schema Render Draft2020-12/URI formats; package VPS vẫn 13 file (review build từ repo đầy đủ).
+- Cập nhật runbook/decisions/plan/handoff, archive nguyên văn mục Battleship/Dungeon; giữ WORKLOG 3 mục. Soak 30 phút a8d472b/04-11 vẫn là bằng chứng cũ, chưa chạy tải hoặc trận tài khoản thật trên Render/hai mạng/thiết bị; còn cập nhật review và nghiệm thu TC2.
 
 ## 04/11/2026 · `codex/tank-clash-tc2-readiness` — TC2: staging/Auth và chuẩn bị vận hành
 

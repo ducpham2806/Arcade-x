@@ -80,6 +80,18 @@ test('Render pilot starts behind managed TLS with public metrics disabled; VPS b
  finally{await s.close();}
 });
 
+test('review is opt-in staging only; Render adds exactly its own HTTPS origin',async()=>{
+ const settings={...env,TANK_REVIEW_ENABLED:'1',RENDER:'true',RENDER_EXTERNAL_URL:'https://arcadex-tank-staging.onrender.com'};
+ assert.deepEqual(loadServerConfig(settings).allowedOrigins,[origin,'https://arcadex-tank-staging.onrender.com']);
+ assert.throws(()=>loadServerConfig({...settings,TANK_ENV:'production'}),/staging only/);
+ for(const url of ['http://arcadex-tank-staging.onrender.com','https://arcadex-tank-staging.onrender.com.evil.example','https://arcadex-tank-staging.onrender.com/path'])assert.throws(()=>loadServerConfig({...settings,RENDER_EXTERNAL_URL:url}));
+ const off=await createTankRoomServer();const on=await createTankRoomServer({review:{html:'<!doctype html><p>Review</p>',supabaseUrl:env.SUPABASE_URL,publishableKey:'sb_publishable_fixture'}});
+ try{const base=s=>s.url.replace('ws:','http:').replace('/tank','');assert.equal((await fetch(base(off)+'/review')).status,404);assert.equal((await fetch(base(off)+'/review/config')).status,404);
+  const response=await fetch(base(on)+'/review');assert.equal(response.status,200);assert.match(response.headers.get('content-type'),/text\/html/);assert.equal(response.headers.get('cache-control'),'no-store');assert.match(await response.text(),/Review/);
+  assert.deepEqual(await (await fetch(base(on)+'/review/config')).json(),{supabaseUrl:env.SUPABASE_URL,publishableKey:'sb_publishable_fixture'});
+ }finally{await off.close();await on.close();}
+});
+
 test('isolated minimal release boots with only shipped simulation files and ws; package refuses stray env files',async()=>{
  const out=mkdtempSync(join(tmpdir(),'arcadex-tank-release-'));let child;
  try{
