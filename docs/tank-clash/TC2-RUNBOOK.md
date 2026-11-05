@@ -4,7 +4,7 @@ Phạm vi: một Node 24 giữ phòng/hàng chờ trong RAM, wire `tank-clash.p3
 
 ## 1. Hosting đề xuất · kiểm giá 04/11/2026
 
-**Cập nhật 05/11:** chủ dự án xác nhận **chưa có VPS**, frontend `https://arcade-x.netlify.app`; đã duyệt Render Free, đăng nhập và tự tạo 4 tester staging. Backend `https://arcadex-tank-staging.onrender.com` đã Live ở mốc `50c7b36`; trang review đăng nhập đang được cập nhật theo [TC2-review](TC2-review.md). Không duyệt thuê máy/nâng plan/chi phí vượt quota. Các giá VPS dưới đây chỉ là phương án tham khảo cũ.
+**Cập nhật 05/11:** chủ dự án xác nhận **chưa có VPS**, frontend `https://arcade-x.netlify.app`; đã duyệt Render Free, đăng nhập và tự tạo 4 tester staging. **[Bản review có đăng nhập](https://arcadex-tank-staging.onrender.com/review)** đã Live ở `3950abb`; một tester thật tạo/rời phòng qua, chi tiết [TC2-review](TC2-review.md). Không duyệt thuê máy/nâng plan/chi phí vượt quota. Các giá VPS dưới đây chỉ là phương án tham khảo cũ.
 
 `arcade-x.netlify.app` là [subdomain mặc định của site Netlify](https://docs.netlify.com/manage/domains/domains-fundamentals/understand-domains/); dùng làm **frontend origin**, không thay cho địa chỉ VPS hoặc hostname backend. Cặp cấu hình cần hoàn tất:
 
@@ -16,7 +16,7 @@ Phạm vi: một Node 24 giữ phòng/hàng chờ trong RAM, wire `tank-clash.p3
 
 Chỉ thêm origin của bản review staging khi biết URL chính xác; không dùng `*.netlify.app`, không tự cho mọi Deploy Preview. Bản local hiện tại vẫn chỉ gọi loopback. Việc đưa URL frontend production vào template **không đổi Supabase/build/biến môi trường của website đang chạy**.
 
-### Render Free — cấu hình đã chuẩn bị, chưa triển khai
+### Render Free — đã triển khai pilot
 
 [Blueprint](../../render.yaml) chỉ tạo **một web service Free**, không database/disk/add-on; Singapore, Node 24, một process, cap pilot 16 socket, `autoDeployTrigger: off`. Đây chưa phải năng lực đã đo trên Render. Build cài dependency để bundle review và chạy server; không build/deploy frontend Netlify.
 
