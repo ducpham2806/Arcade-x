@@ -5,14 +5,14 @@ Chủ dự án đã duyệt bản chơi thử, yêu cầu merge `main`, đưa ic
 ## Phạm vi
 
 - Game thứ 24: registry tải lười, icon/banner SVG + WebP sinh bằng `build-launcher-art.mjs --only=tank-clash`, package/offline, banner game mới; giữ palette/menu riêng.
-- Catalog cũ thiếu Tank Clash được bổ sung game miễn phí ngay trong bản web. Dòng catalog hợp lệ của server luôn ưu tiên (kể cả maintenance/premium); không chạy SQL/migration production. Yêu thích/lịch sử của Tank giữ trên thiết bị tới khi có catalog server; các game khác giữ đường đồng bộ cũ.
+- Catalog cũ thiếu Tank Clash được bổ sung game miễn phí ngay trong bản web. Dòng catalog hợp lệ của server luôn ưu tiên (kể cả maintenance/premium); không chạy SQL/migration production. Yêu thích/lịch sử của Tank giữ trên thiết bị trong đợt này; các game khác giữ đường đồng bộ cũ.
 - Adapter đợi Auth khởi tạo, chỉ gửi token registered tới WSS cố định `wss://arcadex-tank-staging.onrender.com/tank`. Link mời `?game=tank-clash&room=CODE` không chọn máy chủ. Khách chơi bot; chọn online mở đăng nhập ArcadeX. Refresh token không khởi tạo lại game; logout/đổi tài khoản/thoát game rời phòng và xóa resume. Không nhận ghế cũ từ bản staging.
 - Tái dùng **một** service Render Free/Singapore/Node24, cap 16 socket, Auto Sync No/deploy thủ công. `NODE_ENV=production`, `TANK_ENV=production`, `TANK_ACCESS_MODE=registered-free`, Supabase URL/key public của ArcadeX, review/metrics public tắt. Chỉ gọi Auth `/auth/v1/user` để xác minh; không SQL production, service-role key, thưởng, ghi kết quả hoặc mở commerce.
 - Mặc định server vẫn là chính sách tester; chỉ cấu hình production tường minh mới cho toàn bộ tài khoản ArcadeX registered. Staging tiếp tục chặn ref production. Tên hostname có “staging” được giữ để tái dùng service, không phải nguồn Auth sau chuyển đổi.
 
 ## Kiểm chứng và giới hạn
 
-Node24/Chrome macOS: lint/build/bundle, fast suites và 18 WS/ops qua. Kiểm tra catalog production không cần DB và không vượt server maintenance/premium qua. UI từ sảnh kiểm lái/tạm dừng/thoát/đăng nhập; fixture adapter kiểm WSS cố định, chờ Auth và rời phòng khi logout. 13/13 Chrome UI qua; CI và trạng thái deploy ghi tiếp trong WORKLOG/PR.
+Node24/Chrome macOS: lint/build/bundle, fast suites và 18 WS/ops qua. Kiểm tra catalog production không cần DB và không vượt server maintenance/premium qua. UI từ sảnh kiểm lái/tạm dừng/thoát/đăng nhập; fixture adapter kiểm WSS cố định, chờ Auth và rời phòng khi logout. 13/13 Chrome UI qua, adapter đã chạy lại sau khi hoàn thiện bridge fixture. Các bộ kiểm tra còn lại của workflow đã chạy cục bộ; [kết quả/giới hạn](evidence/LAUNCHER-local-2026-11-05.json). GitHub CI/Linux, merge và deploy còn chờ mở khóa Mac để push bằng GitHub Desktop; trạng thái tiếp theo ghi ở WORKLOG/PR.
 
 Free có thể ngủ sau 15 phút không có inbound, thức lại khoảng một phút, restart mất phòng/hàng chờ RAM. Chưa đo tải Render 30 phút, ≥10 trận mỗi format/hai thiết bị/hai mạng, hoặc nghiệm thu phần thưởng/DB result. Các phép đo cục bộ cũ ở [TC2-review](TC2-review.md) không chứng minh các tiêu chí này.
 
