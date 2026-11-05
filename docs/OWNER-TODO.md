@@ -1,8 +1,8 @@
-# Việc cần chủ dự án · 04/11/2026
+# Việc cần chủ dự án · 05/11/2026
 
 Quyết định chỉ ghi ở [PENDING-DECISIONS.md](PENDING-DECISIONS.md); bước kỹ thuật/tiêu chí xong ở [PROJECT-PLAN.md](PROJECT-PLAN.md). Chưa kiểm trực tiếp môi trường production.
 
-- [ ] Chọn hosting Tank Clash (#9); chốt khu vực/chi phí/WSS trước đăng ký.
+- [ ] Render Free đã duyệt và đăng nhập (#9); còn quyền repo/cấu hình service và 4 tester Auth staging. Hiện frontend Netlify, chưa VPS; chưa duyệt chi phí trả thêm.
 - [ ] Staging đã tạo theo #1; còn tài khoản thử/admin/người vận hành. Bố trí 4 tài khoản/thiết bị cho TC2 2v2; WC2/DU1 sau đó.
 - [ ] Xác nhận thời điểm đưa Nối Từ vào catalog production (#8); online là bước riêng (#7).
 - [ ] Chọn nơi chạy commerce (#3), nhà cung cấp thanh toán + merchant test (#2) trước CM2/CM3.

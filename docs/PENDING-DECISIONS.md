@@ -1,4 +1,4 @@
-# Quyết định chờ · 04/11/2026
+# Quyết định chờ · 05/11/2026
 
 Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi có câu trả lời, chuyển xuống “Đã quyết”, ghi ngày và cập nhật task liên quan.
 
@@ -12,7 +12,11 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 | 6 | Có cho popup xác nhận/kết quả kích thước nhỏ ngoại lệ modal không | Chỉ khi đổi quy tắc | Chưa duyệt; giữ `AGENTS.md` hiện hành |
 | 7 | Môi trường/lịch bật Nối Từ online sau thử staging | WC2 | `WORD-CHAIN-SERVER.md` |
 | 8 | Thời điểm áp catalog Nối Từ lên production | WC1 | `supabase/migrations/20261102090000_word_chain_catalog.sql` |
-| 9 | Hosting WS Tank Clash: VPS/domain/ngân sách; đề xuất Singapore 2 GiB 12 USD/tháng | TC2 | `tank-clash/TC2-RUNBOOK.md` §1; chưa đăng ký |
+| 9 | Render Free pilot đã duyệt; còn quyền repo/cấu hình account/service/WSS. Chưa duyệt chi phí phát sinh | TC2 | `tank-clash/TC2-RUNBOOK.md` §1; chưa tạo service/thuê máy |
+
+## Đã quyết · 05/11/2026
+
+#9: chủ dự án xác nhận chỉ có Netlify, chưa VPS; frontend `https://arcade-x.netlify.app`. Đã duyệt Render Free cho backend thử và đăng nhập dashboard; còn cấp quyền repo/cấu hình service. Không suy thành đã duyệt thuê VPS, nâng gói hoặc chi phí vượt quota.
 
 ## Đã quyết · 04/11/2026
 

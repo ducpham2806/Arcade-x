@@ -2,6 +2,14 @@
 
 Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết quả thật, phần còn dở; commit cùng thay đổi (`AGENTS.md`). Mới nhất ở trên; chỉ giữ tối đa 3 mục, chuyển nguyên văn phần cũ sang `archive/WORKLOG-YYYY-MM.md`. Đầu phiên chỉ đọc mục mới nhất; trạng thái hiện tại ở `SESSION-HANDOFF.md`.
 
+## 05/11/2026 · `codex/tank-clash-tc2-readiness` — frontend origin và Render Free pilot
+
+- Chủ dự án xác nhận chưa VPS, chỉ có `https://arcade-x.netlify.app`; đã duyệt dùng Render Free và đăng nhập trên tab Render để tiếp cấu hình. Không duyệt nâng gói/chi phí vượt quota. Frontend public HTTP 200/title ArcadeX; xác định đúng Netlify site qua connector NamA bằng đọc metadata, không sửa env/deploy.
+- Template server dùng exact origin đã gửi; WS test từ chối HTTP/domain giả/Deploy Preview chưa cho phép. Thêm `render.yaml`: Node 24/Singapore/Free/một process, cap 16 socket, manual deploy, chỉ cài dependency server và Supabase staging; chưa có service/WSS public.
+- Preflight hỗ trợ managed TLS Render khi `RENDER=true`, bind 0.0.0.0 và HTTP metrics tắt; VPS vẫn loopback. `/metrics` trả 404 cả khi có token ở profile tắt; Auth/tester gate không đổi. Qua Node 24: 16/16 WS/ops, lint; package độc lập vẫn 13 file. Blueprint qua schema Render chính thức Draft 2020-12 + URI formats (Ruby YAML→JSON, Ajv); validator phụ chỉ cài trong /private/tmp.
+- Cập nhật runbook/decisions/plan/handoff; chuyển nguyên văn mục Battleship/Dungeon cũ vào archive, WORKLOG giữ 3 mục. Soak 30 phút trước đây thuộc a8d472b/ngày 04/11, chưa chạy lại sau đổi startup/metrics; chưa thử runtime Render, tài khoản thật hoặc hai mạng.
+- Commit/push nhánh dùng `[skip netlify]` theo AGENTS mới và hướng dẫn Netlify; không `[skip ci]`, không nới test/merge main/deploy Netlify. Còn quyền repo Render, 4 tester Auth staging và nghiệm thu backend public; không tạo UUID giả để vượt preflight.
+
 ## 04/11/2026 · `codex/tank-clash-tc2-readiness` — TC2: staging/Auth và chuẩn bị vận hành
 
 - Chủ dự án yêu cầu tiếp TC2, tạo Supabase staging; chọn organization Nam A Uniform. Đã tạo `arcade-x-staging` ref `khqipuipeawzlkqmdzdg`, Singapore, xác minh `ACTIVE_HEALTHY`, organization Free, public schema rỗng, Auth 0 user, security advisors không có lint. Chỉ đọc kiểm tra staging; không migration/copy dữ liệu/secret từ production. Public env riêng `.env.tank-staging.local` bị Git ignore.
@@ -18,16 +26,6 @@ Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết
 - Thêm WS 4 client và 6 UI kịch bản P3d vào `test:tank-clash-ui`/CI, dùng server loopback/fixture, không gọi Supabase. Qua Node 24/Chrome macOS: lint/build/bundle, test:fast, core 66/66, WS 6/6, UI 9/9 (cả 1v1 cũ và bot), smoke 7, modal 22; ảnh lobby/queue/match/result ở 1280×760, 390×844, 844×390. Mạng mô phỏng max 19,26 KB/s/client <20; không thay giao thức.
 - Thêm `docs/tank-clash/P3-review.md` đối chiếu D1–D7, số đo/giới hạn; cập nhật handoff/plan/spec/README. Chuyển nguyên văn mục docs cũ sang archive, WORKLOG giữ 3 mục. Export mới `deliverables/Tank_Clash_P3_Playtest.html`; P1/P2 vẫn là alias sinh từ script.
 - Bản duyệt riêng `http://localhost:4338/`, WS `ws://127.0.0.1:3223/tank`; host thử local cho phép khách queue, server thường vẫn bắt đăng nhập. Chưa có tài khoản staging, hosting/mạng/điện thoại thật, soak/load hoặc nghiệm thu cảm giác chơi; TC2 còn quyết định #9. VFX 4337 vẫn chờ chủ dự án duyệt. Không push/merge/deploy Netlify.
-
-## 04/11/2026 · `codex/fix-battleship-dungeon-polish` — căn tàu, radar, chuyển động Dungeon và lưu nền
-
-- Theo ảnh/lỗi chủ dự án: Battleship lệch hàng, lửa dưới tàu, gạch chéo lệch; Dungeon giật, chữ có ô đen; bỏ thông báo lưu/đồng bộ thành công. Giữ bản test riêng, chưa phát hành.
-- Battleship `scene`/`Board`: thu beam trong một ô, đăng ký mặt boong theo tâm lưới; hiệu ứng dùng chung điểm chiếu, vẽ sau thân tàu; giảm bob/roll. `FleetStatus` đặt tâm ảnh và gạch chéo vào cùng khung. Thêm `Radar` quay 3,2 s/vòng, hai beep hữu hạn sau thao tác mở âm thanh; dùng chính sách mute/pause/ẩn tab/thoát hiện có. Sửa thêm race mở audio ở capture-phase khiến nút mute/resume đổi nghĩa giữa pointerdown và click; Chrome kiểm chuỗi pause/resume/mute/thoát qua 3 lần liên tiếp.
-- Dungeon `TitanArt`/`CombatArt`/`polish.css`: hòa hai tư thế liên tiếp, chuyển động/flipbook do CSS nội suy; giữ hướng riêng mỗi khung, dừng khi pause/giảm chuyển động. Tick 50 ms giảm nhịp giữ chém lệch 200/300 ms; bỏ đòn đánh ngẫu nhiên của lính. Đổi vật liệu nền/chữ trên header, tab, nhãn cảnh để bộ tương phản không chèn ô đen.
-- Bỏ indicator cloud thành công và status lưu thường ở `App`, `GameSaveGate`, `ResumeCard`, Battleship online/Word Cross; giữ xử lý lưu, cảnh báo lỗi và chọn bản lưu xung đột.
-- Qua Node 24: lint, build/bundle, `test:fast`, `test:battleship`, `test:dungeon`; 5.664 cách đặt tàu (10×10/14×14, ngang/dọc, chìm/nổi) giữ boong trong ô. Chrome macOS: motion 46/46 (23 game × 2 chế độ), VFX 16/16, polish 9/9, Battleship UI 2/2; radar 3 lượt liên tiếp; smoke 7, offline 4, modal 22. Đã kiểm 8 màn Dungeon PC/mobile viewport × normal/reduced, thêm boss/đồ/đồng đội/kỹ năng tiến trình cao và đổi atlas cùng số khung; lưu thật vẫn hoạt động, hình còn rõ khi pause.
-- Test mới nằm trong `test:animations`/CI; fixture dùng renderer/audio thật và chặn backend. Bản riêng `/private/tmp/arcadex-battleship-dungeon-review`, `http://localhost:4337/`, ZIP `ArcadeX-Battleship-Dungeon-test-2026-11-04.zip` có hướng dẫn/script. Kiểm build gói: đủ 23 game, radar 3,2 s, save Dungeon thật, 0 request API backend, 0 lỗi JS.
-- Chưa kiểm điện thoại thật, nghe loa thật, tài khoản/phòng online thật; không thay luật/save schema/backend, không push/merge/deploy Netlify.
 
 
 

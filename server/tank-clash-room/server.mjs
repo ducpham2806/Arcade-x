@@ -35,7 +35,7 @@ export function supabaseAuthenticator({ url, anonKey, fetchImpl = fetch, timeout
   };
 }
 
-export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allowedOrigins = [], authenticate = guestAuthenticate, onResult, log = () => {}, guestQueue = false, allowLocalOrigins = true, allowMissingOrigin = true, maxConnections = 256, detailedHealth = true, metricsToken = '' } = {}) {
+export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allowedOrigins = [], authenticate = guestAuthenticate, onResult, log = () => {}, guestQueue = false, allowLocalOrigins = true, allowMissingOrigin = true, maxConnections = 256, detailedHealth = true, metricsToken = '', metricsEnabled = true } = {}) {
   const roomHost = createRoomHost({ now: () => performance.now(), authenticate, onResult, log, guestQueue });
   const transport = { connections: 0, open: 0, bytesIn: 0, bytesOut: 0, refusedOrigin: 0, refusedCapacity: 0 };
   const instance = randomUUID(), started = performance.now(), lag = monitorEventLoopDelay({ resolution: 20 }); lag.enable();
@@ -50,7 +50,7 @@ export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allow
     let status = 404, body = { ok: false };
     if (req.method !== 'GET' && req.method !== 'HEAD') status = 405;
     else if (path === '/health') { status = closing ? 503 : 200; body = detailedHealth ? stats() : { ok: !closing, protocol: PROTOCOL, instance }; }
-    else if (path === '/metrics') { status = authorizedMetrics(req) ? 200 : 401; if (status === 200) body = stats(); }
+    else if (path === '/metrics' && metricsEnabled) { status = authorizedMetrics(req) ? 200 : 401; if (status === 200) body = stats(); }
     res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(req.method === 'HEAD' ? undefined : JSON.stringify(body));
   });
   // A file:// page sends Origin "null"; accept it only on a loopback-bound dev host (owner playtest of the HTML file).

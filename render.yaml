@@ -1,0 +1,41 @@
+# Optional TC2 pilot backend. Applying this Blueprint creates a Render Free web service.
+# Netlify frontend is unchanged. Complete Auth tester values before starting.
+services:
+  - type: web
+    name: arcadex-tank-staging
+    runtime: node
+    plan: free
+    region: singapore
+    branch: codex/tank-clash-tc2-readiness
+    numInstances: 1
+    autoDeployTrigger: 'off'
+    healthCheckPath: /health
+    buildCommand: npm ci --prefix server/tank-clash-room --omit=dev --ignore-scripts
+    startCommand: node scripts/tank-clash/preflight.mjs && node server/tank-clash-room/server.mjs
+    envVars:
+      - key: NODE_VERSION
+        value: '24.22.2'
+      - key: SKIP_INSTALL_DEPS
+        value: 'true'
+      - key: NODE_ENV
+        value: production
+      - key: TANK_ENV
+        value: staging
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: '10000'
+      - key: TANK_MAX_CONNECTIONS
+        value: '16'
+      - key: TANK_ALLOWED_ORIGINS
+        value: https://arcade-x.netlify.app
+      - key: SUPABASE_URL
+        value: https://khqipuipeawzlkqmdzdg.supabase.co
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: TANK_ALLOWED_USERS
+        sync: false
+      - key: TANK_METRICS_TOKEN
+        generateValue: true
+      - key: TANK_METRICS_ENABLED
+        value: '0'

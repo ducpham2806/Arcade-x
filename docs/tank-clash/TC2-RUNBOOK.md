@@ -4,6 +4,34 @@ Phạm vi: một Node 24 giữ phòng/hàng chờ trong RAM, wire `tank-clash.p3
 
 ## 1. Hosting đề xuất · kiểm giá 04/11/2026
 
+**Cập nhật 05/11:** chủ dự án xác nhận **chưa có VPS**, hiện chỉ dùng frontend `https://arcade-x.netlify.app`. Đã duyệt Render Free và đăng nhập dashboard; chưa tạo service hoặc duyệt thuê máy mới. Các giá VPS dưới đây chỉ là phương án tham khảo cũ.
+
+`arcade-x.netlify.app` là [subdomain mặc định của site Netlify](https://docs.netlify.com/manage/domains/domains-fundamentals/understand-domains/); dùng làm **frontend origin**, không thay cho địa chỉ VPS hoặc hostname backend. Cặp cấu hình cần hoàn tất:
+
+| Thành phần | Giá trị hiện biết |
+|---|---|
+| Frontend được server chấp nhận | `TANK_ALLOWED_ORIGINS=https://arcade-x.netlify.app` |
+| Backend trên VPS | `wss://<hostname-backend-đã-có-TLS>/tank` — chờ thông tin VPS/domain riêng hoặc hostname do nhà cung cấp cấp |
+| Allowlist token ở frontend thử | `VITE_TANK_CLASH_SERVERS` = URL WSS backend ở trên; chưa điền domain frontend vào đây |
+
+Chỉ thêm origin của bản review staging khi biết URL chính xác; không dùng `*.netlify.app`, không tự cho mọi Deploy Preview. Bản local hiện tại vẫn chỉ gọi loopback. Việc đưa URL frontend production vào template **không đổi Supabase/build/biến môi trường của website đang chạy**.
+
+### Render Free — cấu hình đã chuẩn bị, chưa triển khai
+
+[Blueprint](../../render.yaml) chỉ tạo **một web service Free**, không database/disk/add-on; Singapore, Node 24, một process, cap pilot 16 socket, `autoDeployTrigger: off`. Đây chưa phải năng lực đã đo trên Render. Build chỉ cài dependency server; không build/deploy frontend Netlify.
+
+Theo [giới hạn Free](https://render.com/docs/free), service ngủ sau 15 phút không có HTTP/WS inbound, khởi động lại khoảng một phút, có thể bị restart và mất phòng/queue RAM. Quota miễn phí theo workspace; vượt bandwidth/build có thể phát sinh phí nếu workspace đã có phương thức thanh toán. Chưa có ngân sách trả phí: không thêm card, nâng plan hoặc bật chi tiêu vượt quota để hoàn tất pilot.
+
+Sau khi chủ dự án duyệt/kết nối tài khoản Render:
+
+1. New → Blueprint, chọn repo `ducpham2806/Arcade-x`, nhánh `codex/tank-clash-tc2-readiness`, file `render.yaml`; kiểm chỉ có service Free, tắt Blueprint auto-sync trong dashboard để thay đổi cấu hình không tự áp khi push.
+2. Nhập `SUPABASE_PUBLISHABLE_KEY` của staging và `TANK_ALLOWED_USERS` là UUID tester đã xác nhận. Blueprint sinh metrics token; không nhập database/service-role key. Tester chưa có thì hoàn tất Auth staging trước, không điền UUID giả để vượt preflight.
+3. Render tự đặt `RENDER=true`; preflight chỉ chấp nhận `HOST=0.0.0.0` ở profile này khi HTTP metrics đã tắt (`TANK_METRICS_ENABLED=0`). VPS giữ nguyên bắt buộc loopback/Caddy. Auth/allowlist/guest flags vẫn kiểm như nhau.
+4. Lấy URL **thật** `https://<service>.onrender.com`, kiểm `/health` 200, `/metrics` 404 kể cả có token; WSS `wss://<service>.onrender.com/tank`. [Render hỗ trợ WS và TLS](https://render.com/docs/websocket); không tự chế hostname từ tên dự kiến.
+5. Cập nhật allowlist token vào build **review staging** riêng khi có WSS và origin review chính xác; chưa đổi cấu hình/live site `arcade-x.netlify.app`. Chạy tài khoản/trận/mạng/soak thật theo §4–§5; Free chỉ thử nghiệm, không nghiệm thu production bằng số đo Mac.
+
+Không có Render connector; dùng browser để cấu hình sau khi chủ dự án duyệt và đăng nhập. Quyền đọc repo/điều khoản phát sinh xử lý tại đúng bước, không tự cấp thêm quyền hoặc chấp nhận điều khoản thay chủ dự án.
+
 | Phương án Singapore | Tài nguyên / giá cơ bản | Nhận định cho pilot |
 |---|---|---|
 | DigitalOcean Basic Regular | 1 vCPU, 2 GiB RAM, 50 GiB SSD, 2.000 GiB transfer; **12 USD/tháng** | Đề xuất; tự vận hành Ubuntu + Node + Caddy. Chưa đo trên VPS này. |
@@ -49,7 +77,7 @@ Tạo system user không login `arcadex-tank`; release đọc được bởi use
 node --env-file=/etc/arcadex-tank/staging.env scripts/tank-clash/preflight.mjs
 ```
 
-Preflight không in key/token/UUID. Production mode từ chối guest flags, thiếu Auth/tester UUID/metrics token, origin wildcard hoặc HTTP. `TANK_ENV=staging` chặn project production. Giữ `HOST=127.0.0.1`, port 3223 không public. Firewall chỉ cho 80/443 và SSH giới hạn người vận hành; không mở 3223.
+Preflight không in key/token/UUID. Production mode từ chối guest flags, thiếu Auth/tester UUID/metrics token, origin wildcard hoặc HTTP. `TANK_ENV=staging` chặn project production. **VPS:** giữ `HOST=127.0.0.1`, port 3223 không public; firewall chỉ cho 80/443 và SSH giới hạn người vận hành. **Render:** dùng profile §1 với managed TLS và metrics tắt, không cài systemd/Caddy trên platform.
 
 Frontend thử dùng env build riêng:
 
@@ -59,7 +87,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=STAGING_PUBLIC_KEY
 VITE_TANK_CLASH_SERVERS=wss://DOMAIN_DA_DUYET/tank
 ```
 
-Frontend origin phải đúng từng giá trị HTTPS trong `TANK_ALLOWED_ORIGINS`; WS URL phải đúng allowlist frontend (cả path). Link mời host lạ không nhận access token. `.env.tank-staging.local` đã có URL/public key trên máy này, bị Git ignore; `TANK_EXPECTED_STAGING_REF=khqipuipeawzlkqmdzdg npm run test:tank-clash-staging` chỉ kiểm Auth read-only, không signup/gửi email. File không chuyển sang máy khác qua Git; lấy public key từ dashboard staging khi cần.
+Frontend origin phải đúng từng giá trị HTTPS trong `TANK_ALLOWED_ORIGINS`; WS URL phải đúng allowlist frontend (cả path). Template server đã có origin frontend chủ dự án gửi ở §1; hostname backend trong Caddyfile vẫn để placeholder đến khi có domain VPS. Link mời host lạ không nhận access token. `.env.tank-staging.local` đã có URL/public key trên máy này, bị Git ignore; `TANK_EXPECTED_STAGING_REF=khqipuipeawzlkqmdzdg npm run test:tank-clash-staging` chỉ kiểm Auth read-only, không signup/gửi email. File không chuyển sang máy khác qua Git; lấy public key từ dashboard staging khi cần.
 
 Standalone HTML hiện tại **không có login**, chỉ duyệt khách cục bộ; launcher chưa đăng ký Tank trong `LOCAL_REVIEW_GAME_IDS`/registry. Nghiệm thu Auth/game thật cần review harness đăng nhập hoặc bước tích hợp staging riêng, không bật catalog production. Không đổi `.env` production để thử.
 

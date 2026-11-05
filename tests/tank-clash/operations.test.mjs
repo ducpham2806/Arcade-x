@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-const uid='00000000-0000-4000-8000-000000000001',origin='https://review.example.com',metricsToken='a'.repeat(40);
+const uid='00000000-0000-4000-8000-000000000001',origin='https://arcade-x.netlify.app',metricsToken='a'.repeat(40);
 const env={NODE_ENV:'production',TANK_ENV:'staging',HOST:'127.0.0.1',PORT:'0',SUPABASE_URL:'https://staging.example.supabase.co',SUPABASE_PUBLISHABLE_KEY:'public-test-key',TANK_ALLOWED_ORIGINS:origin,TANK_ALLOWED_USERS:uid,TANK_METRICS_TOKEN:metricsToken};
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 async function until(check,ms=6000){const end=performance.now()+ms;while(performance.now()<end){if(check())return;await delay(10);}assert.fail('condition timed out');}
@@ -41,7 +41,7 @@ test('Auth authorization uses the verified ID and anonymous flag, not editable m
 test('strict production-style origin allowlist rejects missing, null and localhost; capacity recovers after disconnect',async()=>{
  const s=await createTankRoomServer({allowedOrigins:[origin],allowLocalOrigins:false,allowMissingOrigin:false,maxConnections:2});const sockets=[];
  try{
-  for(const from of [undefined,'null','http://localhost:3000','https://foreign.example'])assert.equal(await connect(s.url,from),403);
+  for(const from of [undefined,'null','http://localhost:3000','https://foreign.example','http://arcade-x.netlify.app','https://arcade-x.netlify.app.evil.example','https://deploy-preview-1--arcade-x.netlify.app'])assert.equal(await connect(s.url,from),403);
   const a=await connect(s.url,origin),b=await connect(s.url,origin);sockets.push(a,b);assert.equal(await connect(s.url,origin),503);
   a.close();await until(()=>s.transport.open===1);const c=await connect(s.url,origin);sockets.push(c);assert(c instanceof WS);assert.equal(s.stats().transport.open,2);
  }finally{sockets.forEach(x=>x.close());await s.close();}
@@ -67,6 +67,17 @@ test('pilot preflight rejects placeholders, external bind and secret keys; outpu
  assert.throws(()=>preflight({...valid,HOST:'0.0.0.0'}),/loopback/);
  assert.throws(()=>preflight({...valid,SUPABASE_PUBLISHABLE_KEY:'REPLACE_WITH_PUBLIC_KEY'}),/template/);
  assert.throws(()=>preflight({...valid,SUPABASE_PUBLISHABLE_KEY:'sb_secret_fake'}),/publishable/);
+});
+
+test('Render pilot starts behind managed TLS with public metrics disabled; VPS binding rules stay strict',async()=>{
+ const settings={...env,PORT:'10000',SUPABASE_URL:'https://testproject123.supabase.co',TANK_ALLOWED_ORIGINS:origin,RENDER:'true',HOST:'0.0.0.0',TANK_METRICS_ENABLED:'0'};
+ assert.equal(preflight(settings).ok,true);
+ assert.throws(()=>preflight({...settings,TANK_METRICS_ENABLED:'1'}),/metrics/);
+ assert.throws(()=>preflight({...settings,RENDER:''}),/loopback/);
+ assert.throws(()=>loadServerConfig({...settings,TANK_METRICS_ENABLED:'false'}),/0 or 1/);
+ const s=await createTankRoomServer({metricsEnabled:false,metricsToken,detailedHealth:false});const base=s.url.replace('ws:','http:').replace('/tank','');
+ try{for(const method of ['GET','HEAD'])for(const headers of [{},{Authorization:`Bearer ${metricsToken}`}])assert.equal((await fetch(base+'/metrics',{method,headers})).status,404);assert.equal((await fetch(base+'/health')).status,200);}
+ finally{await s.close();}
 });
 
 test('isolated minimal release boots with only shipped simulation files and ws; package refuses stray env files',async()=>{

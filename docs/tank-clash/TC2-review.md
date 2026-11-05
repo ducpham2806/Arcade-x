@@ -1,6 +1,13 @@
 # TC2 · bằng chứng và phần còn lại · 04/11/2026
 
-Nhánh `codex/tank-clash-tc2-readiness`, nền `6eb394c`. Chuẩn bị staging/vận hành, **chưa nghiệm thu TC2 trên VPS/thiết bị/mạng thật**. Chưa launcher, entitlement, DB result hoặc phát hành; bản duyệt gameplay vẫn [P3-review](P3-review.md).
+Nhánh `codex/tank-clash-tc2-readiness`, nền `6eb394c`; bằng chứng 04/11 ở `a8d472b`, cập nhật profile hosting 05/11 bên dưới. Chuẩn bị staging/vận hành, **chưa nghiệm thu TC2 trên backend public/thiết bị/mạng thật**. Chưa launcher, entitlement, DB result hoặc phát hành; bản duyệt gameplay vẫn [P3-review](P3-review.md).
+
+## Cập nhật 05/11 — origin và Render pilot
+
+- Chủ dự án xác nhận chỉ dùng Netlify, chưa VPS. Đọc public URL `https://arcade-x.netlify.app/`: HTTP 200, title ArcadeX. Đã xác định đúng site qua Netlify connector **NamA**, site `2f4bcb1f-79f5-47ca-b836-61a11a799195`; connector mang tên Arcade-x đang liệt kê site khác nên không dùng để sửa site này. Không sửa env/deploy/site settings.
+- Template dùng exact frontend origin; WS test từ chối HTTP, hostname nối đuôi giả mạo và Deploy Preview chưa cho phép. `render.yaml` chuẩn bị service Free/Singapore/Node24/một process, deploy thủ công, 16 socket; backend URL vẫn chờ Render cấp, chưa có service/public WSS.
+- Preflight Render cho bind `0.0.0.0` sau managed TLS chỉ khi metrics HTTP tắt; VPS vẫn loopback. Metrics tắt trả 404 ngay cả với token hợp lệ. 16/16 WS/ops qua Node 24; không đổi engine/wire/gameplay/UI. Blueprint kiểm schema chính thức; chưa thử build/runtime trên Render, chưa chạy lại soak 30 phút sau thay config/route metrics.
+- Quy trình chi tiết ở runbook §1. Nhánh được chuẩn bị push với `[skip netlify]` theo AGENTS 05/11; không merge/main/Netlify deploy, không dùng `[skip ci]` hoặc nới test.
 
 ## Môi trường đã xác minh
 
@@ -23,7 +30,7 @@ Template systemd chưa chạy trên Linux/VPS; local TLS không chứng minh pub
 
 ## Soak cục bộ
 
-**Đạt 1.802,3 giây thực** (30 phút), Node server riêng process + client loopback dùng fixture, không gọi Supabase. Kết quả gốc do script sinh: [TC2-loopback-2026-11-04.json](evidence/TC2-loopback-2026-11-04.json); digest đã đối chiếu đúng các nguồn server/engine/client/harness hiện tại.
+**Mốc 04/11 `a8d472b`: đạt 1.802,3 giây thực** (30 phút), Node server riêng process + client loopback dùng fixture, không gọi Supabase. Kết quả gốc do script sinh: [TC2-loopback-2026-11-04.json](evidence/TC2-loopback-2026-11-04.json); digest đã đối chiếu nguồn server/engine/client/harness tại thời điểm đo. Không dùng digest cũ để xác nhận các thay đổi profile/metrics 05/11.
 
 | Số đo | Kết quả |
 |---|---|
@@ -38,9 +45,9 @@ Mục tiêu tải 2→5→10 phòng mỗi format rồi giảm về 2; giữ 60 H
 
 ## Bước tiếp theo
 
-1. Chủ dự án chọn VPS/domain/ngân sách (#9): đề xuất DO Singapore 2 GiB 12 USD/tháng, cấu hình và phương án thay thế đã có ở runbook; chưa đăng ký hoặc thanh toán.
+1. Chủ dự án duyệt/kết nối tài khoản backend pilot (#9): Render Free đã có Blueprint; chưa có VPS hoặc service public. Không mua VPS/domain bằng phê duyệt tiếp tục làm code.
 2. Có 4 tài khoản Auth staging đã xác nhận, người vận hành và review harness đăng nhập. Connector hiện không có API quản lý Auth users; chưa có credential tester/admin dùng cho việc tạo user. Không gửi thư signup thử hoặc đưa admin key vào app để vượt bước này.
 3. Triển khai pilot một process sau duyệt hosting; origin/WSS/public env đúng staging, thử 2–4 session thật, invalid/expired/duplicate/spectator/reconnect và log không token.
 4. ≥10 trận mỗi format trên hai thiết bị/hai mạng + ≥30 phút soak VPS, đo RTT/correction/bandwidth/CPU/RAM và restart/rollback theo runbook. Sau đó mới đánh dấu TC2 đạt và mở TC3.
 
-Không push/merge/deploy Netlify trong đợt này. [Bản guest cục bộ dùng server TC2](http://localhost:4338/?server=ws%3A%2F%2F127.0.0.1%3A3224%2Ftank) đã kiểm HTML/health 200 và create/join/leave thật; server cũ 3223 giữ nguyên. Đây không phải hosting staging công khai hoặc login thật.
+Không merge/main/deploy Netlify trong đợt này. [Bản guest cục bộ dùng server TC2](http://localhost:4338/?server=ws%3A%2F%2F127.0.0.1%3A3224%2Ftank) kiểm ngày 04/11: HTML/health 200 và create/join/leave thật; không khẳng định process còn sống vào phiên sau. Đây không phải hosting staging công khai hoặc login thật.
