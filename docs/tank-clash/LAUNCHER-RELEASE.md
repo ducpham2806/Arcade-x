@@ -12,7 +12,7 @@ Chủ dự án đã duyệt bản chơi thử, yêu cầu merge `main`, đưa ic
 
 ## Kiểm chứng và giới hạn
 
-Node24/Chrome macOS: lint/build/bundle, fast suites và 18 WS/ops qua. Kiểm tra catalog production không cần DB và không vượt server maintenance/premium qua. UI từ sảnh kiểm lái/tạm dừng/thoát/đăng nhập; fixture adapter kiểm WSS cố định, chờ Auth và rời phòng khi logout. 13/13 Chrome UI qua, adapter đã chạy lại sau khi hoàn thiện bridge fixture. Các bộ kiểm tra còn lại của workflow đã chạy cục bộ; [kết quả/giới hạn](evidence/LAUNCHER-local-2026-11-05.json). GitHub CI/Linux, merge và deploy còn chờ mở khóa Mac để push bằng GitHub Desktop; trạng thái tiếp theo ghi ở WORKLOG/PR.
+Node24/Chrome macOS: lint/build/bundle, fast suites và 18 WS/ops qua. Kiểm tra catalog production không cần DB và không vượt server maintenance/premium qua. UI từ sảnh kiểm lái/tạm dừng/thoát/đăng nhập; fixture adapter kiểm WSS cố định, chờ Auth và rời phòng khi logout. 13/13 Chrome UI qua, adapter đã chạy lại sau khi hoàn thiện bridge fixture. Các bộ kiểm tra còn lại của workflow đã chạy cục bộ; [kết quả/giới hạn](evidence/LAUNCHER-local-2026-11-05.json). Nhánh đã push, PR #16 đang qua CI/Linux; lượt đầu dừng vì WS chưa được cài trước Typecheck, đã sửa thứ tự cài. Merge/deploy chờ CI head cuối; trạng thái tiếp theo ghi ở WORKLOG/PR.
 
 Free có thể ngủ sau 15 phút không có inbound, thức lại khoảng một phút, restart mất phòng/hàng chờ RAM. Chưa đo tải Render 30 phút, ≥10 trận mỗi format/hai thiết bị/hai mạng, hoặc nghiệm thu phần thưởng/DB result. Các phép đo cục bộ cũ ở [TC2-review](TC2-review.md) không chứng minh các tiêu chí này.
 
