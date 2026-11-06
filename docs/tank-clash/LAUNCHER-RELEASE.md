@@ -1,5 +1,7 @@
 # Tank Clash · phát hành vào sảnh · 05/11/2026
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](../PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 Chủ dự án đã duyệt bản chơi thử, yêu cầu merge `main`, đưa icon ra sảnh và mở **bot + online cho tài khoản ArcadeX**, tiếp tục Render Free, không phát sinh phí. Quyết định này mở phạm vi tích hợp/phát hành; không biến các phép đo TC2 còn thiếu thành đã đạt.
 
 ## Phạm vi

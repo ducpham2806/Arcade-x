@@ -1,5 +1,7 @@
 # Chronicles of the Shattered Realms — bản chơi thử v0.1
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](../../docs/PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 Bản game web PC/mobile sử dụng trực tiếp 26 spritesheet, atlas 547 khung, 96 màn và danh mục 84 skin từ dev kit người dùng cung cấp. Hình ảnh là sprite 2D giả 3D của gói, không phải mô hình GLB. Không có quảng cáo, thanh toán hay tiền thật.
 
 ## Chạy

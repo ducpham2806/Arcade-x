@@ -1,4 +1,4 @@
-# Quyết định chờ · 05/11/2026
+# Quyết định chờ · 06/11/2026
 
 Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi có câu trả lời, chuyển xuống “Đã quyết”, ghi ngày và cập nhật task liên quan.
 
@@ -12,6 +12,12 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 | 6 | Có cho popup xác nhận/kết quả kích thước nhỏ ngoại lệ modal không | Chỉ khi đổi quy tắc | Chưa duyệt; giữ `AGENTS.md` hiện hành |
 | 7 | Môi trường/lịch bật Nối Từ online sau thử staging | WC2 | `WORD-CHAIN-SERVER.md` |
 | 8 | Thời điểm áp catalog Nối Từ lên production | WC1 | `supabase/migrations/20261102090000_word_chain_catalog.sql` |
+
+## Đã quyết / xác minh · 06/11/2026
+
+- Ưu tiên hiện tại: cập nhật tài liệu, roadmap game dở, một nhật ký chính, đầu vào điều phối Markdown; tóm tắt/thu gọn trước chuyển việc, giữ chi tiết archive. Cài toàn bộ thư viện Game Studio theo nhu cầu, không nạp tất cả mỗi phiên.
+- Chủ dự án cho phép publish toàn bộ Game_Studio_Agent (nguồn private) vào ArcadeX public, trả lời trực tiếp trong chat ngày 06/11/2026.
+- PR #16 đã merge (main c705100). Quyền phát hành Tank bot + online tài khoản/Render Free đã duyệt 05/11 vẫn giữ; kiểm deployment/mạng thật còn thiếu. Roadmap mới không tự mở rộng quyền SQL/payment/chi phí.
 
 ## Đã quyết · 05/11/2026
 

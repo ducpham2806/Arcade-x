@@ -1,5 +1,7 @@
 # Cosmic Defend — campaign encounter revision v4
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 ## Problem and resulting play
 
 V3 fed nearly every mission from one evenly spaced wave loop; retry seeds replaced authored routes and several path IDs shared the same motion. V4 gives all 100 missions a composition: four short phrases, a launch respite, alternating flanks, then a stronger closing section. Non-boss missions schedule at least 90 enemies; early missions schedule about 110–120, with lighter kill chains around priority targets. Stage 9 combines seven encounters. Boss stages retain six small escort windows rather than constant background spawns.

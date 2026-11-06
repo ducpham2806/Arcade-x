@@ -1,10 +1,15 @@
 # Chỉ mục đọc theo nhiệm vụ
 
-## Đầu phiên — chỉ 3 đầu vào
+## Đầu phiên — đọc tối thiểu
 
-1. `AGENTS.md` (tự nạp bởi công cụ nếu có): quy tắc chung duy nhất.
-2. [SESSION-HANDOFF](SESSION-HANDOFF.md): trạng thái/bước kế tiếp; [WORKLOG](WORKLOG.md): **chỉ mục mới nhất**. Đọc mục cũ khi có liên quan.
-3. Chọn **một hàng bên dưới**. Không đọc toàn bộ plan, archive, agent hay skill. Đang làm P3d: đọc P3-SPEC §7–§9; mở phần luật liên quan khi cần.
+AGENTS (nếu chưa tự nạp) → [SESSION-HANDOFF](SESSION-HANDOFF.md) → một thẻ `plans/*.md` trong [PROJECT-PLAN](PROJECT-PLAN.md). Không cần đọc cả file chỉ mục này hoặc toàn bộ WORKLOG mỗi phiên.
+
+- Cách đóng/tóm tắt trước đổi task: [WORKFLOW](WORKFLOW.md).
+- Thành quả đã thu gọn: [COMPLETED](COMPLETED.md); nhật ký chính: [WORKLOG](WORKLOG.md).
+- Công nghệ/cấu hình làm việc: [project.md](../project.md).
+- Thư viện 116 skill/21 vai trò: [studio/INDEX](studio/INDEX.md), chỉ nạp phần phù hợp.
+
+## Tra sâu khi thẻ việc yêu cầu
 
 | Nhiệm vụ | Tài liệu đầu vào tiếp theo |
 |---|---|

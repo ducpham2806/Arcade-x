@@ -1,19 +1,19 @@
-# Bàn giao hiện tại · 05/11/2026
+# Bàn giao · 07/11/2026
 
-Mốc đã kiểm: `main@affc5e8` (PR #15, P3b/P3c), CI [41727993592](https://github.com/ducpham2806/Arcade-x/actions/runs/41727993592) qua. Đây là bằng chứng CI ngày 04/11 theo giờ Việt Nam; chưa kiểm trạng thái backend/hosting trực tiếp. Đầu phiên dùng `git log -1`/`git status` để xác định checkout hiện tại.
+**Gameplay đang phát hành:** main c705100. **Nhánh:** codex/tank-clash-release-verification, PR#17; kiểm git status/log trước sửa. DOC-01 và QA/sửa nguồn Auth đã tóm tắt ở COMPLETED.
 
-| Mảng | Hiện trạng / việc kế tiếp |
-|---|---|
-| Nền tảng | 24 game trong code; M0–M8, Neon NR1–NR4 đã merge. Commerce vẫn tắt; adapter thật chưa đủ. |
-| Tank Clash | Chủ dự án đã duyệt phát hành bot + online tài khoản ArcadeX; adapter/icon/catalog game 24 đã có. Đang CI/merge/deploy trên `codex/tank-clash-launcher-release`; [LAUNCHER-RELEASE](tank-clash/LAUNCHER-RELEASE.md). TC2 tải/hai mạng vẫn còn; chưa thưởng/DB result. |
-| Nối Từ | Bot/offline và UI online có code; `online-config.json` tắt. Catalog migration, server/scheduler theo bàn giao chưa triển khai; phải xác minh môi trường trước làm. |
-| Duel | Trọng tài server có code/test; Chess/Xiangqi/Caro còn đường online cũ, cần deploy và nối UI sau flag. |
-| Chất lượng | Test cũ lệch auth; Battleship cần đo điện thoại, Nối Từ cần Telex/VNI; banner có vệt đen; Block Breaker thiếu ảnh gốc, Blossom thiếu art phụ. |
+## Hiện tại · sửa Netlify để tiếp tục TC-R0
 
-**Đợt hiện tại 05/11:** `codex/tank-clash-launcher-release`, worktree riêng vì thư mục gốc được chuyển về main trong lúc làm. Đã duyệt merge main + Netlify và online public, giữ một Render Free; không hỏi lại phê duyệt này. Mốc backend cũ `3950abb` vẫn staging cho tới khi chuyển cấu hình theo [LAUNCHER-RELEASE](tank-clash/LAUNCHER-RELEASE.md). Kiểm chứng hiện tại ở mục mới nhất [WORKLOG](WORKLOG.md).
+- Chủ dự án báo preview lỗi TS2307 thiếu ws trong server/tank-clash-room/node_modules khi lint. CI cài dependency server trước lint nhưng Netlify chưa có. [Bằng chứng/sửa](qa/NETLIFY-BUILD-2026-11-07.md).
+- Sửa deps:tank-clash dùng chung CI và Netlify production/preview; giữ lint, build và Snake preview. Checkout sạch tái hiện đúng lỗi; sau sửa lint/build/Snake preview exit0. Tiếp: commit/push, kiểm build Netlify mới + full CI trước merge. Không dùng CI head cũ thay cho head mới.
+- Auth xuyên tab: listener giữ identity riêng, authEpoch hủy restore cũ; regression5/5 (4fail trước sửa), lint/build/bundle/fast qua; UI AuthProvider fixture A→guest→B qua. Chưa merge/deploy. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
+- Account B thật khác A; tab game nhận B, mã A cũ không còn, B tạo phòng mới qua. Race logout cần retest sau phát hành. Giữ phiên cho chủ dự án; không tự logout khi chưa vào ca. Quan sát bảng kết quả2hiệp không đủ TC-R1.
+- Netlify dashboard07/11 xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75 lúc06/11 13:26 UTC+7. Render main/c705100 Live06/11, Free/cap16/registered-free; health/origin/token/review404 đã qua. Không deploy lại server vô cớ; Blueprint cũ paused.
+- Nối Từ có source+test trong main/nhánh, không bị bỏ sót merge. RPC catalog công khai trả23mục, không có word-chain; fallback chỉ DEV, online flagfalse. [Audit](qa/WC-R0-2026-11-07.md). Chưa sửa DB; WC-R0 staging/history còn dở.
 
-**Tiếp theo:** Mac đã mở khóa, nhánh đã push/PR #16; sửa thứ tự cài WS trước Typecheck sau CI 42022618828 lỗi môi trường, job CI được cấp 30 phút để chạy đủ các suite browser (không đổi test), chờ CI trên commit cuối → merge main → kiểm Netlify/Render, icon/chơi bot/online Auth đúng project. Không SQL production, thêm chi phí hoặc guest/wildcard. Sau phát hành vẫn phải đo TC2 hai thiết bị/hai mạng/tải backend đích; không coi owner duyệt là bằng chứng các phép đo này.
+## Giới hạn và quy tắc giữ lại
 
-**Lưu ý kỹ thuật:** CSS riêng game (`tc-`, `nt-`, `wc-`); catalog server chọn game trong `launcher_games`; Tank Clash là bản miễn phí bổ sung từ bundle khi catalog cũ chưa có dòng, server maintenance/premium vẫn ưu tiên. Dev dùng `LOCAL_REVIEW_GAME_IDS`. Đổi số game cần xem `tests/{integration/full-release.mjs,artwork/catalog.mjs,readability/contrast.mjs}`. Phòng online dùng CAS/receipt/presence 90 s; đang lặp 3 bộ (xem `TECH-DEBT.md`). Tank dùng WS riêng. Cosmic `legacy-*` vẫn được engine/replay sử dụng.
-
-Tra lệnh/cấu trúc: [README](../README.md); tra đúng module: [INDEX](INDEX.md). Lịch sử: mục mới nhất [WORKLOG](WORKLOG.md), chi tiết cũ `archive/`; chỉ đọc khi truy vết.
+- Chủ dự án cho phép public thư viện Game Studio và metadata báo cáo TC-R0. Không lưu định danh tài khoản/token/secret.
+- TC-R1 ≥10trận mỗi format/2thiết bị/2mạng/soak30phút chưa đạt. P2 wire cũ: chỉ port phần thiếu sang P3, không merge nguyên nhánh.
+- Duel UI còn tích hợp, Snake preview, commerce tắt; không SQL production/chi phí thêm. deliverables/ local không commit.
+- Đọc tối thiểu: AGENTS → bàn giao → một thẻ plans; Studio chỉ nạp skill cần. Trước đổi việc: COMPLETED, WORKLOG≤3, archive nguyên văn và doc checker theo WORKFLOW.

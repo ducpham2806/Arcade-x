@@ -1,16 +1,18 @@
 # Kiểm thử và bản duyệt
 
-Tách từ README ngày 04/11/2026; lệnh hiện hành tra `package.json`, thứ tự CI tra `.github/workflows/ci.yml`. Cần Node 24. Chỉ đọc mục phù hợp thay đổi.
+Cập nhật chỉ mục ngày 06/11/2026; tách từ README ngày 04/11/2026; lệnh hiện hành tra `package.json`, thứ tự CI tra `.github/workflows/ci.yml`. Cần Node 24. Chỉ đọc mục phù hợp thay đổi.
 
 ## Kiểm thử
 
-CI (`.github/workflows/ci.yml`) chạy trên mọi PR: `lint` → `build` → `test:bundle` → `test:fast` → `test:perf` → `test:smoke` → `test:games` → `test:neon-feel` → `test:offline` → `test:modals` → `test:blossom-ui`, rồi kiểm tra không còn file sinh ra bị bỏ lại.
+CI (`.github/workflows/ci.yml`) là nguồn thứ tự chính xác: cài dependency root + hai room server → lint → build → bundle → fast → Tank WS/ops → Chromium → perf/smoke/all-games → motion/VFX → Neon/offline/modal → Blossom/Battleship/Nối Từ/Tank UI → kiểm working tree sạch. Không dùng danh sách rút gọn này thay workflow.
+
+Tài liệu/Studio: `python3 scripts/check-docs.py` kiểm link, budget, Markdown entrypoints, nhật ký và snapshot nguồn; `npm run test:claude` kiểm adapter cũ. Đổi prose/thư viện chưa dùng không phải thay gameplay; chỉ chạy full game CI khi phạm vi cần. Kết quả gameplay trước đợt docs không được tính thành nghiệm thu mới.
 
 | Lệnh | Phạm vi |
 |---|---|
 | `npm run test:fast` | Các bộ không cần trình duyệt hay Docker: readability, cấu trúc agent/skill (`test:claude`), tương thích save (`test:storage`), engine 8 game (`test:engines`), engine Blossom Blast (`test:blossom-engine`), duel AI và duel server (`test:duel-server`), Nối Từ (`test:word-chain`: luật, từ điển, bot, máy chủ phòng, schema PGlite, Edge Function), sync, commerce, subscriptions, battleship, social, artwork, cosmic, startup/PWA, boom, eat, dungeon, full-release |
 | `npm run test:smoke` | Luồng launcher trên bản build: yêu thích, chi tiết game, âm thanh, chat, vào/thoát game, Word Cross |
-| `npm run test:games` | Mở cả 23 game, chạm/nhấn phím vài giây, không lỗi JS, thoát về thư viện |
+| `npm run test:games` | Mở cả 24 game, chạm/nhấn phím vài giây, không lỗi JS, thoát về thư viện |
 | `npm run test:offline` | Tắt mạng sau khi service worker precache: tải lại, mở modal, chơi game đã cache |
 | `npm run test:modals` | Khung modal theo `AGENTS.md` ở điện thoại/tablet/desktop, không đổi kích thước khi chuyển tab; cấm bottom sheet ngắn trong mã nguồn |
 | `npm run test:blossom-ui` | Blossom Blast trên dev server: hướng dẫn, chuẩn bị màn, kết quả, lưu, sprite, bố cục màn chơi ở 320×568 đến 1280×760 (8 bộ, 55 test) |

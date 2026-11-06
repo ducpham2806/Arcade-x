@@ -158,12 +158,19 @@ export class AuthService {
     } catch (error) { return epoch !== authEpoch ? { success: false, cancelled: true } : { success: false, error: errorText(error), requiresRestore: true }; }
   }
   public static listen(callback: () => void): () => void {
+    // Keep the identity this tab observed. Another tab may rewrite USER_KEY
+    // before the SDK delivers its broadcast, while our React state is still old.
+    let observedId = this.getCurrentUser()?.id;
     const subscription = supabase?.auth.onAuthStateChange((event, session) => {
+      const previousId = observedId;
+      const nextId = session?.user && !session.user.is_anonymous ? session.user.id : undefined;
+      observedId = nextId;
       if (event === 'PASSWORD_RECOVERY') { authEpoch++; setTimeout(callback, 0); return; }
       if (manualOperations > 0 || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') return;
-      const currentId = this.getCurrentUser()?.id;
-      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && !session?.user.is_anonymous && session?.user.id !== currentId
-        || event === 'SIGNED_OUT' && currentId) {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && nextId !== previousId
+        || event === 'SIGNED_OUT' && previousId) {
+        // An in-flight restore for the former identity must not win this switch.
+        authEpoch++;
         // Never await Supabase calls inside the auth callback (the SDK holds its lock).
         setTimeout(callback, 0);
       }

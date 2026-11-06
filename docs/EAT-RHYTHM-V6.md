@@ -1,5 +1,7 @@
 # Eat Em All — encounter rhythm v6
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 Implemented in the agreed order: individual fall speeds, authored bursts and recovery gaps, overtaking pairs, then four boss attack cycles.
 
 ## Fall and pacing

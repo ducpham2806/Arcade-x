@@ -23,7 +23,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Install room server dependencies before typechecking browser fixtures
-        run: npm ci --prefix server/tank-clash-room --ignore-scripts && npm ci --prefix server/tank-clash-spike --ignore-scripts
+        run: npm run deps:tank-clash
       - name: Typecheck
         run: npm run lint
       - name: Build

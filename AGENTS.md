@@ -1,8 +1,11 @@
 # ArcadeX — quy tắc chung
 
 ## Đọc và làm việc
-- Đầu phiên: đọc `docs/SESSION-HANDOFF.md` và mục mới nhất trong `docs/WORKLOG.md`; chọn tài liệu theo `docs/INDEX.md`. Chỉ đọc plan/spec của module đang làm; archive dùng để truy vết.
-- Mọi phần hoàn tất phải ghi ngay vào `docs/WORKLOG.md`: ngày, nhánh, việc/file, kiểm tra và kết quả thật, phần còn dở; commit cùng thay đổi. Trả lời tiếng Việt.
+- Đầu phiên: đọc `docs/SESSION-HANDOFF.md`, sau đó đúng một thẻ việc trong `docs/plans/` qua `docs/PROJECT-PLAN.md`. Chỉ đọc mục mới nhất `docs/WORKLOG.md` nếu cần bằng chứng gần nhất; không mặc định nạp toàn bộ INDEX, plan chi tiết, archive hay thư viện skill.
+- Mọi đầu vào hướng dẫn/session, cấu hình làm việc, plan, task, nhật ký và bàn giao phải là `.md`; cấu hình làm việc ở `project.md`. Dữ liệu/config runtime, mã nguồn và artifact máy đọc giữ định dạng gốc; chỉ mở khi nhiệm vụ cần.
+- Dùng duy nhất `docs/WORKLOG.md` làm nhật ký chính. Trước chuyển việc: tóm tắt task xong (kết quả, quyết định, kiểm tra, giới hạn, bước tiếp) vào `docs/COMPLETED.md`; thu gọn log còn tối đa 3 mục; giữ chi tiết nguyên văn trong `docs/archive/`; cập nhật bàn giao rồi mới bắt đầu việc mới. Quy trình/budget: `docs/WORKFLOW.md`.
+- Mọi phần hoàn tất ghi ngày, nhánh, việc/file, kiểm tra thật và phần còn dở; commit cùng thay đổi. Phân biệt đã code/merge/deploy/nghiệm thu; không dùng báo cáo cũ chứng minh production hiện tại. Trả lời tiếng Việt.
+- Game Studio đã cài ở `.agents/game-studio/`; tra `docs/studio/INDEX.md`, chỉ nạp 1–3 skill phù hợp. Dùng `project.md` và bàn giao hiện có thay các template `project.yaml`/active-session của nguồn. Quyết định người dùng và quy tắc ArcadeX ưu tiên; không chạy initializer ghi đè dự án.
 - Làm trên nhánh riêng, theo module được chủ dự án duyệt; commit/push nhánh làm việc. Chỉ merge `main` khi chủ dự án yêu cầu (Netlify tự deploy); chạy đủ CI trước merge. Không tắt/nới test để xanh.
 
 ## Giao diện (giữ nguyên quy tắc đã duyệt)

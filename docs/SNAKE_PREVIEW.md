@@ -1,5 +1,7 @@
 > Update 2026-11-02: campaign hydration is implemented locally in `feat/snake-cloud-progress`. See [SNAKE_CLOUD_PROGRESS.md](SNAKE_CLOUD_PROGRESS.md) for current behavior and remaining live QA. The report below describes the original preview checkpoint.
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 # Snake Legend — launcher integration checkpoint
 
 24 October 2026 · Asia/Ho_Chi_Minh. Baseline: `b211a336634ac66f9f84cd2bac6dc7e48794ab3e`.

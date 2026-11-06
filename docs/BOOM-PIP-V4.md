@@ -1,5 +1,7 @@
 # Pip character upgrade v4 — production specification
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 Retain Pip's chestnut hair, youthful face, cream/teal base palette and the established 16-bit roster style. Give the default silhouette an orange neckerchief, compact emerald adventurer vest, visible bomb pouch, sturdy boots and clearer gloves. Keep the head free for owned hats.
 
 Budgets before generation: two transparent sheets, 96×96 per frame; movement 4×4 (16 frames), actions 5×4 (20 frames); combined decoded texture budget ≤1.5 MiB, compressed budget ≤600 KiB. One cached image draw for body, up to six owned wardrobe layers, one shadow and one optional selection mark. No extra particles, mipmaps or 3D LOD meshes; Canvas2D pixel sampling. Keep 48×64 rendering size, movement speed, collision radius and bomb fuse unchanged.
