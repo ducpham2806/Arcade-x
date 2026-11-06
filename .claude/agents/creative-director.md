@@ -15,7 +15,7 @@ games resonate with their audience.
 
 ### Working in ArcadeX
 
-You are a subagent of the main Claude session working on **ArcadeX**: a PWA launcher of 22 mini-games
+You are a subagent of the main Claude session working on **ArcadeX**: a PWA mini-game launcher
 (React 19 + Vite + TypeScript, Canvas 2D games, Supabase for accounts and sync). Read `AGENTS.md`
 first — its modal, in-game toast and force-update rules are binding.
 

@@ -1,47 +1,26 @@
-# Quyết định đang chờ chủ dự án
+# Quyết định chờ · 05/11/2026
 
-Cập nhật: 02/11/2026. Khi có câu trả lời, ghi vào cột "Quyết định" và xoá khỏi danh sách chờ.
+Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi có câu trả lời, chuyển xuống “Đã quyết”, ghi ngày và cập nhật task liên quan.
 
-## Commerce (M8) — xem `docs/COMMERCE-ROLLOUT.md`
-
-| # | Câu hỏi | Ảnh hưởng | Quyết định |
+| ID | Cần chốt | Chặn | Tài liệu chi tiết |
 |---|---|---|---|
-| 1 | Project Supabase **staging** nào dùng để thử flag `VITE_ACCESS_CONTROL_V2`, và tài khoản nào làm admin? | Chặn bước 1 (đã sẵn sàng thử) | _chờ_ |
-| 2 | **Nhà cung cấp thanh toán** cho checkout (cổng VND, webhook ký số, tài khoản merchant test)? | Chặn bước 4 | _chờ_ |
-| 3 | **Nơi chạy** server commerce: Supabase Edge Function hay Netlify Function? | Chặn bước 2–5 | _chờ_ |
+| 1 | Admin/người vận hành; staging và 4 tester đã có, chưa chọn admin commerce | TC2/CM1; môi trường WC2/DU1 | `tank-clash/TC2-review.md`, `COMMERCE-ROLLOUT.md` |
+| 2 | Cổng thanh toán VND, webhook ký số, merchant sandbox | CM3 | `COMMERCE-ROLLOUT.md` |
+| 3 | Commerce chạy Supabase Edge hay Netlify Functions | CM2–CM4 | `server/commerce/README.md` |
+| 4 | Lịch/môi trường triển khai Duel + cutover UI | DU1 | `DUEL-SERVER.md` |
+| 5 | Có xử lý lịch sử Git/art bằng rewrite hay LFS không | TD3 (tùy chọn) | Đo dung lượng trước; con số cũ 114 MB không còn là số đo hiện tại |
+| 6 | Có cho popup xác nhận/kết quả kích thước nhỏ ngoại lệ modal không | Chỉ khi đổi quy tắc | Chưa duyệt; giữ `AGENTS.md` hiện hành |
+| 7 | Môi trường/lịch bật Nối Từ online sau thử staging | WC2 | `WORD-CHAIN-SERVER.md` |
+| 8 | Thời điểm áp catalog Nối Từ lên production | WC1 | `supabase/migrations/20261102090000_word_chain_catalog.sql` |
 
-## Phòng đấu Chess/Xiangqi/Caro (M7) — xem `docs/DUEL-SERVER.md`
+## Đã quyết · 05/11/2026
 
-| # | Việc cần chủ dự án | Ảnh hưởng | Trạng thái |
-|---|---|---|---|
-| 4 | Áp `supabase/duel/schema.sql` lên staging, deploy `duel-room`, lên lịch `tick` | Chặn cutover sang server làm trọng tài | _chờ_ |
+#9: đã duyệt và tạo Render Free pilot, backend/WSS thật ở `tank-clash/TC2-review.md`; giữ frontend Netlify và Auto Sync No/manual deploy. Không duyệt thuê VPS, nâng gói hoặc chi phí vượt quota. #1 (tester): chủ dự án tự tạo 4 Auth user staging, đã xác nhận email và non-anonymous; admin/người vận hành còn chờ.
 
-## Phòng đấu Nối Từ (WC3) — xem `docs/WORD-CHAIN-SERVER.md`
+## Đã quyết · 04/11/2026
 
-| # | Việc cần chủ dự án | Ảnh hưởng | Trạng thái |
-|---|---|---|---|
-| 7 | Áp `supabase/word-chain/schema.sql` lên staging, deploy `word-chain-room`, chạy `scheduler.sql` | Chặn chơi online 2–4 người (luyện với bot vẫn chơi được) | _chờ_ |
-| 8 | Áp migration danh mục `20261102090000_word_chain_catalog.sql` lên production | Game chưa hiện ở bản production cho tới khi áp | _chờ_ |
+#1 (môi trường): chủ dự án yêu cầu tạo `arcade-x-staging`, chọn Nam A Uniform/Singapore. Đã có project riêng, bằng chứng/ref ở `tank-clash/TC2-review.md`; chưa chọn admin/tester/người vận hành. Không phải duyệt migration hoặc commerce production.
 
-## Tank Clash online (P2) — xem `docs/tank-clash/P2-review.md`
+## Đã quyết · 03/11/2026
 
-| # | Câu hỏi | Ảnh hưởng | Quyết định |
-|---|---|---|---|
-| 9 | **Nơi chạy room server Tank Clash** (tiến trình Node giữ WebSocket lâu): VPS nhỏ hay dịch vụ container có WebSocket? Claude sẽ trình giá cụ thể trước khi đăng ký. | Chặn chơi online qua Internet và chơi thử thật (P2.5–P2.6) | _chờ_ |
-
-## Tank Clash 2v2 (P3) — xem `docs/tank-clash/P3-SPEC.md` §11
-
-| # | Câu hỏi | Đề xuất của Claude | Quyết định |
-|---|---|---|---|
-| 10 | Duyệt đặc tả P3 và cách chia P3a–P3d | Duyệt; làm P3a trước (không cần hosting) | **Đã duyệt 03/11** — làm luôn |
-| 11 | Kích thước sân Crossfire (Q1) | Giữ 800×480, đổi 960×576 nếu chơi thử thấy chật | **Sân to, chướng ngại ngẫu nhiên từng trận** (đã làm: 1040×624) |
-| 12 | Hàng chờ 2v2 công khai có bắt đăng nhập (Q2) | Có; khách chỉ chơi phòng riêng | **Có** |
-| 13 | Đội còn 1 người có được đầu hàng sớm (Q3) | Không trong P3 | **Có, cho đầu hàng** |
-| 14 | Chế độ cục bộ "2v2 với bot" (Q4) | Có, trong P3a | **Có: 1 người + 1 bot đồng đội vs 2 bot** (đã làm) |
-
-## Kho mã (M4)
-
-| # | Câu hỏi | Ảnh hưởng | Quyết định |
-|---|---|---|---|
-| 5 | Giảm `.git` (114 MB): viết lại lịch sử hay chuyển art nguồn sang Git LFS? | Dung lượng clone | _chờ_ |
-| 6 | Có ghi ngoại lệ "hộp thoại xác nhận/popup kết quả giữ kích thước nhỏ" vào `AGENTS.md` không? | Quy tắc modal | _chờ_ |
+#10 duyệt P3; #11 sân lớn/ngẫu nhiên (đã làm 1040×624); #12 hàng chờ công khai bắt đăng nhập; #13 cho đầu hàng; #14 cục bộ 1 người + bot đồng đội vs 2 bot. Luật chính xác: `tank-clash/P3-SPEC.md`. Không hỏi lại các quyết định này.

@@ -91,3 +91,29 @@ test('2v2 over real WebSockets: two parties queue (async account check) and are 
     assert.equal(health.queued, 0); assert.equal(health.protocol, 'tank-clash.p3.v1');
   } finally { for (const c of [...cs, guest]) c.close(); await server.close(); }
 });
+
+test('private 2v2 over four real WebSockets: seating, ready, input ownership, reconnect and one shared result', { timeout: 30_000 }, async () => {
+  const results = [], server = await createTankRoomServer({ onResult: r => results.push(r) });
+  const cs = ['An', 'Bình', 'Chi', 'Dũng'].map(name => connectTankRoom(server.url, { name, storage: null }));
+  let ticker;
+  try {
+    await until(() => cs.every(c => c.status === 'open'));
+    cs[0].session.create(undefined, '2v2'); await until(() => cs[0].session.code);
+    for (const c of cs.slice(1)) { c.session.join(cs[0].session.code); await until(() => c.session.seat); }
+    assert.deepEqual(cs.map(c => c.session.seat), ['a', 'b', 'a2', 'b2']);
+    cs.forEach(c => c.session.ready(true));
+    await until(() => cs.every(c => c.session.room?.phase === 'playing'), NET.countdownMs + 2000);
+    const code = cs[0].session.code, state = server.roomHost.inspect(code), y0 = state.tanks.find(t => t.id === 'a').y;
+    ticker = setInterval(() => cs.forEach((c, i) => c.session.tick(input({ y: i === 0 ? 1 : 0 }))), 1000 / 60);
+    await until(() => state.tanks.find(t => t.id === 'a').y > y0 + 10);
+    const dropped = [...server.wss.clients][3], hp = state.tanks.find(t => t.id === 'b2').hp;
+    dropped.terminate(); await until(() => cs[3].status === 'reconnecting');
+    await until(() => cs[3].status === 'open' && cs[3].session.room?.seats.every(s => s.connected), 5000);
+    assert.equal(cs[3].session.seat, 'b2'); assert.equal(state.tanks.find(t => t.id === 'b2').hp, hp); assert.equal(state.tanks.length, 4);
+    cs[2].session.leave(); await until(() => cs[0].session.room?.seats.find(s => s.id === 'a2')?.forfeited);
+    cs[0].session.surrender(); await until(() => [cs[0], cs[1], cs[3]].every(c => c.session.result));
+    const rs = [cs[0], cs[1], cs[3]].map(c => c.session.result);
+    assert.ok(rs.every(r => r.reason === 'surrender' && r.winner === 1 && r.matchId === rs[0].matchId));
+    assert.equal(results.length, 1); assert.ok(rs[0].players.find(p => p.seat === 'a2').forfeited);
+  } finally { clearInterval(ticker); cs.forEach(c => c.close()); await server.close(); }
+});

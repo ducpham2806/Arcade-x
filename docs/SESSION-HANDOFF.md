@@ -1,37 +1,19 @@
-# Bàn giao (rút gọn 03/11/2026)
+# Bàn giao hiện tại · 05/11/2026
 
-Nhật ký chi tiết: `docs/WORKLOG.md`. Việc chủ dự án: `docs/OWNER-TODO.md`. Bản đầy đủ trước khi rút gọn (mô tả từng module, luật Nối Từ, chi tiết art/Battleship): `docs/archive/SESSION-HANDOFF-2026-11-03.md`.
+Mốc đã kiểm: `main@affc5e8` (PR #15, P3b/P3c), CI [41727993592](https://github.com/ducpham2806/Arcade-x/actions/runs/41727993592) qua. Đây là bằng chứng CI ngày 04/11 theo giờ Việt Nam; chưa kiểm trạng thái backend/hosting trực tiếp. Đầu phiên dùng `git log -1`/`git status` để xác định checkout hiện tại.
 
-## Trạng thái nhánh
-- `main` = `508d4ff` (PR #14): có M0–M8, Neon Run NR1–NR4, Blossom, Battleship, Nối Từ, Snake journey, Tank Clash P0–P3a.
-- Netlify deploy production từ `main`; chỉ merge khi chủ dự án yêu cầu, chạy đủ CI trước.
+| Mảng | Hiện trạng / việc kế tiếp |
+|---|---|
+| Nền tảng | 24 game trong code; M0–M8, Neon NR1–NR4 đã merge. Commerce vẫn tắt; adapter thật chưa đủ. |
+| Tank Clash | Chủ dự án đã duyệt phát hành bot + online tài khoản ArcadeX; adapter/icon/catalog game 24 đã có. Đang CI/merge/deploy trên `codex/tank-clash-launcher-release`; [LAUNCHER-RELEASE](tank-clash/LAUNCHER-RELEASE.md). TC2 tải/hai mạng vẫn còn; chưa thưởng/DB result. |
+| Nối Từ | Bot/offline và UI online có code; `online-config.json` tắt. Catalog migration, server/scheduler theo bàn giao chưa triển khai; phải xác minh môi trường trước làm. |
+| Duel | Trọng tài server có code/test; Chess/Xiangqi/Caro còn đường online cũ, cần deploy và nối UI sau flag. |
+| Chất lượng | Test cũ lệch auth; Battleship cần đo điện thoại, Nối Từ cần Telex/VNI; banner có vệt đen; Block Breaker thiếu ảnh gốc, Blossom thiếu art phụ. |
 
-## Đã làm (chi tiết ở tài liệu riêng)
-| Mảng | Trạng thái | Tài liệu |
-|---|---|---|
-| Nền tảng M0–M8 (tách storage/context, lazy-load, AppModal, smoke test, PGlite) | Đã merge | `README.md`, `docs/TECH-DEBT.md` |
-| Duel server Cờ vua/Cờ tướng/Caro (M7) | Code xong, **chưa deploy** | `docs/DUEL-SERVER.md` |
-| Neon Run NR1–NR4 | Đã merge | `docs/NEON-RUN-REVIEW.md` |
-| Blossom Blast | Xong đợt review + art Gemini + 11 VFX | `docs/BLOSSOM-BLAST-REVIEW.md` |
-| Art Gemini (7 game) | Công cụ `scripts/art/import-gemini.py` | `art/gemini/<game>/crops.json` |
-| Battleship phối cảnh + UI thép & đồng | Xong | `docs/battleship/` |
-| Nối Từ (game #23) WC1–WC4 | Offline chạy; online tắt, **server chưa deploy, migration chưa áp** | `docs/WORD-CHAIN-SERVER.md` |
-| Tank Clash P0–P3c | Chạy cục bộ; 2v2 online và hàng chờ chưa có giao diện (P3d); chưa hosting, chưa vào launcher | `docs/tank-clash/PLAN.md` §10–§12 |
-| Agent/skill `.claude/` | Xong | `CLAUDE.md`, `.claude/CCGS-NOTICE.md` |
+**Đợt hiện tại 05/11:** `codex/tank-clash-launcher-release`, worktree riêng vì thư mục gốc được chuyển về main trong lúc làm. Đã duyệt merge main + Netlify và online public, giữ một Render Free; không hỏi lại phê duyệt này. Mốc backend cũ `3950abb` vẫn staging cho tới khi chuyển cấu hình theo [LAUNCHER-RELEASE](tank-clash/LAUNCHER-RELEASE.md). Kiểm chứng hiện tại ở mục mới nhất [WORKLOG](WORKLOG.md).
 
-## Sổ tay kỹ thuật
-- CI: thứ tự ở `.github/workflows/ci.yml`. Test riêng: `test:battleship-ui`, `test:word-chain` (trong `test:fast`), `test:word-chain-ui`, `test:tank-clash*`.
-- Chromium ở máy cloud: `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`.
-- File sinh chỉ sửa bằng script, kiểm bằng `--check`/test: `build-lexicon.mjs --check`, `import-gemini.py … --check`, `prepare:word-chain-server`, `prepare:duel-server`, `scripts/build-launcher-art.mjs` (cần `sharp`, máy cloud chưa có).
-- CSS prefix riêng từng game (Nối Từ `nt-`, Word Cross `wc-`, Tank Clash `tc-`).
-- Game mới chỉ hiện ở production khi có dòng trong `launcher_games`; dev thì thêm vào `LOCAL_REVIEW_GAME_IDS`. Ba test cố định số game: `tests/integration/full-release.mjs`, `tests/artwork/catalog.mjs`, `tests/readability/contrast.mjs`.
-- Phòng online (Duel, Nối Từ): server trọng tài, CAS theo version, biên nhận chống lặp, vắng 90 giây. Mẫu đã chép 3 lần (`docs/TECH-DEBT.md`) — gộp trước khi thêm game online thứ tư. Tank Clash dùng WS server riêng (`server/tank-clash-room/`).
-- Không chạy migration/script lên Supabase production (`whjatkhhupeqfngakmee`); dùng PGlite hoặc staging.
+**Tiếp theo:** Mac đã mở khóa, nhánh đã push/PR #16; sửa thứ tự cài WS trước Typecheck sau CI 42022618828 lỗi môi trường, job CI được cấp 30 phút để chạy đủ các suite browser (không đổi test), chờ CI trên commit cuối → merge main → kiểm Netlify/Render, icon/chơi bot/online Auth đúng project. Không SQL production, thêm chi phí hoặc guest/wildcard. Sau phát hành vẫn phải đo TC2 hai thiết bị/hai mạng/tải backend đích; không coi owner duyệt là bằng chứng các phép đo này.
 
-## Còn yếu
-- Block Breaker: chờ ảnh độ phân giải đầy đủ.
-- Blossom: nhân vật một biểu cảm; huy hiệu, icon nhỏ, khung/ô bàn còn art cũ.
-- Battleship: chưa `/ux-review`, chưa đo điện thoại thật; tốn CPU ~1,6 lần bản cũ.
-- Banner launcher còn vệt đen (sửa mẫu xong, cần `sharp` để sinh lại).
-- Nối Từ: chưa thử Telex/VNI trên máy thật; từ điển thiếu một số từ; online cần deploy server.
-- Tank Clash: xem `docs/tank-clash/PLAN.md` §10.
+**Lưu ý kỹ thuật:** CSS riêng game (`tc-`, `nt-`, `wc-`); catalog server chọn game trong `launcher_games`; Tank Clash là bản miễn phí bổ sung từ bundle khi catalog cũ chưa có dòng, server maintenance/premium vẫn ưu tiên. Dev dùng `LOCAL_REVIEW_GAME_IDS`. Đổi số game cần xem `tests/{integration/full-release.mjs,artwork/catalog.mjs,readability/contrast.mjs}`. Phòng online dùng CAS/receipt/presence 90 s; đang lặp 3 bộ (xem `TECH-DEBT.md`). Tank dùng WS riêng. Cosmic `legacy-*` vẫn được engine/replay sử dụng.
+
+Tra lệnh/cấu trúc: [README](../README.md); tra đúng module: [INDEX](INDEX.md). Lịch sử: mục mới nhất [WORKLOG](WORKLOG.md), chi tiết cũ `archive/`; chỉ đọc khi truy vết.

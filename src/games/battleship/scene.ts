@@ -55,23 +55,31 @@ export type ShipPose = {
 /** Footprint of a ship sprite on the plane: centre, along-axis length and beam in board units. */
 export function footprint(s: Pick<ShipPose, 'img' | 'n' | 'row' | 'col' | 'length' | 'horizontal'>) {
   const cell = 1 / s.n, len = .96 * s.length * cell;
-  const beam = Math.min(1.22 * cell, Math.max(.4 * cell, len * s.img.width / s.img.height));
+  const beam = Math.min(.82 * cell, Math.max(.4 * cell, len * s.img.width / s.img.height));
   const uc = (s.col + (s.horizontal ? s.length / 2 : .5)) * cell, vc = (s.row + (s.horizontal ? .5 : s.length / 2)) * cell;
   return {uc, vc, len, beam};
+}
+
+/** Shallow deck: a board piece must read inside its logical row, not half a row above it. */
+export const deckHeight = (s: Pick<ShipPose,'height'|'n'|'sink'>) => Math.max(.004, Math.min(.1, s.height * .22) * (1 - (s.sink ?? 0) * .92)) / s.n;
+/** Project deck/FX points with the same registration: deck centre stays on the grid centre. */
+export function shipPoint(cam: Camera, s: ShipPose, u: number, v: number, lift = 0) {
+  const {uc,vc}=footprint(s),h=deckHeight(s),water=cam.project(uc,vc),deck=cam.project(uc,vc,h),p=cam.project(u,v,h+lift);
+  return {...p,x:p.x+water.x-deck.x,y:p.y+water.y-deck.y};
 }
 
 /** Ship at rest (or settling while it sinks) drawn in screen space; see shipSprite for the cached
  * version the board uses every frame. */
 export function drawShip(ctx: CanvasRenderingContext2D, cam: Camera, s: ShipPose) {
   const prep = prepare(s.img), {uc, vc, len, beam} = footprint(s), cell = 1 / s.n, sink = s.sink ?? 0;
-  const roll = sink * .18 * beam;
-  const deck = Math.max(.004 * cell, s.height * (1 - sink * .92) * cell);
+  const roll = sink * .08 * beam;
+  const deck = deckHeight(s);
   const width = beam * (1 - sink * .12);
   // a: 0 at the bow, 1 at the stern. Vertical ships point up the board (bow on the far row),
   // horizontal ships point right, matching the original top-down art orientation.
   const at = (a: number, b: number, h: number) => s.horizontal
-    ? cam.project(uc + len / 2 - a * len, vc + b * width + roll, h)
-    : cam.project(uc + b * width + roll, vc - len / 2 + a * len, h);
+    ? shipPoint(cam, s, uc + len / 2 - a * len, vc + b * width + roll, h-deck)
+    : shipPoint(cam, s, uc + b * width + roll, vc - len / 2 + a * len, h-deck);
   const padA = prep.pad / s.img.height, padB = prep.pad / s.img.width;
   const strips = 6 + s.length * 3, alpha = (s.alpha ?? 1) * (1 - sink * .15);
   ctx.save();

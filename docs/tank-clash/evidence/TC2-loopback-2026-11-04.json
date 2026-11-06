@@ -1,0 +1,30 @@
+{
+  "scope": "Real-time loopback, scripted clients, separate Node server; fixture identities; not VPS/mobile/Internet/Auth acceptance",
+  "sourceDigest": "9ebbfd5f6ba340a00e512f5ab27f727edde6446b07dd9686703128d13a567915",
+  "durationSeconds": 1802.3,
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpus": 10,
+    "node": "v24.22.2"
+  },
+  "completed": {
+    "1v1": 204,
+    "2v2": 167,
+    "queue2v2": 83
+  },
+  "maxPlayers": 48,
+  "maxRooms": 14,
+  "maxRssMiB": 177.3,
+  "maxCpuPercentOneCore": 17.4,
+  "eventLoopP95Ms": 21.82,
+  "finalRetained": {
+    "rooms": 0,
+    "peers": 0,
+    "users": 0,
+    "queueEntries": 0,
+    "queuedUsers": 0
+  },
+  "samples": 142,
+  "failures": []
+}

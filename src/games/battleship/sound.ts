@@ -1,6 +1,6 @@
 /** Named, finite audio events. Native web adapter for the playtest; no gameplay-owned nodes. */
 import type {Seat,Shot,Ship,Phase,Team} from './engine';
-export type SoundEvent='launch'|'hit'|'miss'|'sunk'|'turn'|'win'|'loss'|'place'|'ready';
+export type SoundEvent='launch'|'hit'|'miss'|'sunk'|'turn'|'win'|'loss'|'place'|'ready'|'radar';
 export type SoundCue={event:SoundEvent;delay?:number;pan?:number};
 export type SoundView={phase:Phase;turn:number;activeSeat:Seat;shots:Shot[];own:Ship[];ready:Seat[];size:number;winner:Team|null};
 export class SoundTracker{
@@ -55,6 +55,7 @@ export class BattleshipAudio{
    case 'hit':noise(1700,140,.56,.8);tone(95,34,.48,.35);break;
    case 'miss':noise(4200,1300,.5,.32);break;
    case 'sunk':noise(1900,110,.78,.85);tone(78,28,.74,.4);noise(1000,180,.48,.35,.18);break;
+   case 'radar':tone(920,880,.075,.1);tone(1120,1040,.065,.08,.15);break;
    case 'turn':tone(420,560,.12,.12);break;
    case 'place':noise(850,280,.1,.2);break;
    case 'ready':tone(330,440,.18,.12);break;

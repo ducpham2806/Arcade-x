@@ -3,9 +3,10 @@ import {ChevronLeft,ChevronRight,Pause,Play} from 'lucide-react';
 import type {CatalogGame} from './catalog';
 import {GameArtwork} from '../visuals/gameArt';
 export const FEATURED_INTERVAL=15_000;
-export const NEW_GAME_IDS=['neon-runner','battleship','boom-buddies','brick-breaker','rainbow-blocks'];
+export const NEW_GAME_IDS=['tank-clash','neon-runner','battleship','boom-buddies','brick-breaker','rainbow-blocks'];
 const priority=[...NEW_GAME_IDS,'hex-match','car-escape','tile-2048','word-cross','blocker'];
 const copy:Record<string,{eyebrow:string;title:string;accent:string;body:string}>={
+ 'tank-clash':{eyebrow:'GAME MỚI · TANK CLASH',title:'Đọc góc bắn.',accent:'Làm chủ đấu trường.',body:'Luyện cùng bot hoặc mời bạn đấu online 1v1, 2v2. Một cú bật tường có thể đổi cả trận đấu.'},
  'neon-runner':{eyebrow:'GAME MỚI · NEON RUN',title:'Bước qua bóng tối.',accent:'Thắp sáng Luma.',body:'40 màn qua năm thế giới. Cùng Néo và Pip mang ánh sáng trở về.'},
  'battleship':{eyebrow:'GAME MỚI · BATTLESHIP',title:'Khóa một tọa độ.',accent:'Đánh chìm hạm đội.',body:'Đặt tàu, đọc dấu bắn và thử sức trong 30 giây mỗi lượt. Tìm trận online 1vs1, lập đội 2vs2 hoặc luyện tập với bot.'},
  'boom-buddies':{eyebrow:'GAME MỚI · BOOM BUDDIES',title:'Đặt bom thật khéo.',accent:'Cùng bạn bùng nổ.',body:'Khám phá mê cung, né ngọn lửa và mở lối đi cùng Pip và Bum.'},

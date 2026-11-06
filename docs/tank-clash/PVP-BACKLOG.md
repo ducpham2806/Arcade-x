@@ -8,7 +8,7 @@ Anh Đức yêu cầu lưu cả năm ý tưởng để phát triển dần và l
 
 | Ưu tiên dự kiến | Game | Trải nghiệm chính | Quy mô dự kiến | Trạng thái |
 |---|---|---|---|---|---|
-| 1 | Tank Clash | Xe tăng đấu trường góc nhìn từ trên xuống; né đạn, bắn bật tường, phá vật cản, phối hợp ép góc | 1v1, 2v2 trước; 3v3, 4v4 sau | P0/P1 xong; P2 online 1v1 chạy cục bộ (03/11/2026), chờ hosting và chơi thử thật |
+| 1 | Tank Clash | Xe tăng đấu trường góc nhìn từ trên xuống; né đạn, bắn bật tường, phá vật cản, phối hợp ép góc | 1v1, 2v2 trước; 3v3, 4v4 sau | P0–P3d có code/test cục bộ; chờ duyệt P3, hosting/chơi thật, chưa launcher |
 | 2 | Rune Brawl | Đấu sĩ dùng đánh thường, lướt né và kỹ năng riêng; thắng nhờ đọc tình huống và phối hợp | 2v2 làm trọng tâm; có thể mở 1v1, 3v3, 4v4 | Ý tưởng đã lưu |
 | 3 | Sky Artillery | Pháo chiến theo lượt; canh góc, lực, gió; phá địa hình và hỗ trợ đồng đội | 1v1 đến 4v4 | Ý tưởng đã lưu |
 | 4 | Beast Ball | Thú chiến tranh bóng; chuyền, húc, ghi bàn; thiên về chơi vui cùng bạn bè | 1v1 đến 3v3; đánh giá 4v4 sau | Ý tưởng đã lưu |
@@ -49,7 +49,7 @@ Mỗi game dùng adapter gameplay riêng. Chỉ trích xuất phần dùng chung
 
 ## Tài liệu triển khai đầu tiên
 
-**Tank_Clash_Development_Plan_v1.md** — bản hiện hành v1.1, có tiến độ P0/P1 và việc tiếp theo P2. Bản chơi thử: **Tank_Clash_P1_Playtest.html** (sân tập và bot, chưa online).
+Kế hoạch hiện hành: `docs/tank-clash/PLAN.md` v1.5, §10–§12. Chạy bản thử: `docs/tank-clash/README.md`; UI hiện có online 1v1/2v2, 2v2 bot và queue/tổ; P3d đã kiểm cục bộ (`P3-review.md`), chưa hosting/mạng thật.
 
 ## Nhật ký quyết định
 
@@ -60,6 +60,6 @@ Mỗi game dùng adapter gameplay riêng. Chỉ trích xuất phần dùng chung
 
 Khi đổi ưu tiên hoặc thêm game, cập nhật tài liệu này và ghi lý do trong nhật ký. Khi tiếp tục Tank Clash, đọc bản hiện hành của kế hoạch Tank Clash trước.
 
-## Bàn giao 03/11/2026
+## Tiếp quản
 
-Tank Clash đã có P0/P1 và bản kỹ thuật phòng riêng 1v1 P2. Kế hoạch hiện hành v1.4 (rút gọn), §10–§12 là phần tiếp quản; lịch sử hai hướng P2 ở bản lưu trữ `docs/archive/tank-clash-PLAN-v1.3.md`. Chưa nghiệm thu Internet/thiết bị thật, chưa mở 2v2/matchmaking hoặc phát hành. Đọc `docs/tank-clash/PLAN.md` trước khi tiếp tục.
+Trạng thái hiện tại ở `docs/SESSION-HANDOFF.md`; đầu việc Tank ở `docs/tank-clash/PLAN.md` §10 và `docs/PROJECT-PLAN.md` TC1–TC4. Lịch sử hai hướng P2: `docs/archive/tank-clash-PLAN-v1.3.md`. Chưa nghiệm thu Internet/thiết bị thật hay phát hành.

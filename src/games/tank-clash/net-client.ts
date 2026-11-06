@@ -79,7 +79,14 @@ export function createNetSession(options: SessionOptions) {
 
   const api = {
     stats,
-    get code() { return code; }, get seat() { return seat; }, get role() { return role; }, get myTeam() { return seat ? teamOf(seat) : null; }, get room() { return room; }, get result() { return result; },
+    get code() { return code; }, get seat() { return seat; }, get role() { return role; }, get myTeam() { return seat ? teamOf(seat) : null; }, get room() { return room; },
+    // Room updates are event-driven. Advance display timers locally without adding snapshots.
+    get timedRoom(): RoomView | null {
+      if (!room) return null;
+      const elapsed = Math.max(0, now() - roomAt), remaining = (ms: number | null) => ms === null ? null : Math.max(0, ms - elapsed);
+      return { ...room, countdownMs: remaining(room.countdownMs), rematchMs: remaining(room.rematchMs),
+        seats: room.seats.map(s => s.holdMs === null ? s : { ...s, holdMs: remaining(s.holdMs) }) };
+    }, get result() { return result; },
     get error() { return error; }, get matchId() { return matchId; }, get resumeToken() { return resumeToken; }, get pendingCount() { return pending.length; },
     create(name = options.name, format: Format = '1v1') { error = null; send({ type: 'create', protocol: PROTOCOL, format, name, token: options.token?.() }); },
     join(roomCode: string, name = options.name, as: 'player' | 'spectator' = 'player') { error = null; send({ type: 'join', protocol: PROTOCOL, code: roomCode, as, name, token: options.token?.() }); },
@@ -125,7 +132,7 @@ export function createNetSession(options: SessionOptions) {
         case 'result': result = msg.result; room = msg.room; pending = []; outbox = []; break;
         case 'pong': { const rtt = now() - msg.at; stats.rtt = stats.rtt === null ? rtt : stats.rtt * 0.8 + rtt * 0.2; break; }
         case 'error': error = { code: msg.code, message: msg.message, fatal: msg.fatal };
-          if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = role = resumeToken = null; room = null; reset(); }
+          if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); }
           break;
         case 'left': code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); break;
       }

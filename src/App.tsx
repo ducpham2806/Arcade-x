@@ -1,7 +1,7 @@
 import { GamePackageGate } from './components/GamePackageGate';
 import { installReadability } from './accessibility/readability.js';
 import './accessibility/readability.css';
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { LauncherProvider, useLauncher } from './launcher/LauncherContext';
 import { ResumeCard } from './launcher/ResumeCard';
 import { SupportPanel } from './launcher/SupportPanel';
@@ -42,7 +42,6 @@ import { useRippleEffect } from './hooks/useRippleEffect';
 import { whenIdle } from './utils/whenIdle';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { DiscardSessionConfirmModal } from './components/common/DiscardSessionConfirmModal';
-import { CloudSyncStatusIndicator } from './components/common/CloudSyncStatusIndicator';
 import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy, Pause, Save, Bot, Trash2 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -55,6 +54,7 @@ const AppContent: React.FC = () => {
 
   const {
     activeGameId,
+    launchGame,
     exitGame,
     pausedGameSession,
     resumePausedGame,
@@ -69,6 +69,14 @@ const AppContent: React.FC = () => {
     toggleChat,
     openChat,
   } = useLauncherUi();
+
+  const inviteOpened = useRef(false);
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    if (!inviteOpened.current && query.get('game') === 'tank-clash' && /^[A-HJ-KM-NP-Z2-9]{6}$/i.test(query.get('room') || '')) {
+      inviteOpened.current = true; launchGame('tank-clash');
+    }
+  }, [launchGame]);
 
   const [chatMounted, setChatMounted] = useState(false);
   useEffect(() => { if (isChatOpen) setChatMounted(true); }, [isChatOpen]);
@@ -189,9 +197,6 @@ const AppContent: React.FC = () => {
           setShowDiscardConfirmModal(false);
         }}
       />
-
-      {/* Subtle Cloud Auto-saving Status Indicator (Floating Top-Right) */}
-      <CloudSyncStatusIndicator />
 
       {/* Non-intrusive game invitations */}
       <NonIntrusiveToastManager />

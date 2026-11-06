@@ -91,3 +91,17 @@
 @media(min-width:801px){.bs-layout{grid-template-columns:minmax(0,1fr) 320px}.bs-combat{max-width:min(960px,calc((100dvh - 300px)*1.22 + 40px))}.bs-board-main{max-width:min(920px,calc((100dvh - 390px)*1.22))}}
 @media(max-width:800px){.bs-layout{grid-template-columns:1fr}.bs-combat{max-width:100%}.bs-board-main{max-width:100%}.bs-clock{width:54px;height:54px;min-width:54px;font-size:15px}.bs-header h1{font-size:18px}.bs-fleet canvas{width:100%;height:auto;aspect-ratio:220/96}.bs-coordinate{max-width:200px}.bs-game .bs-ribbon{font-size:21px;margin:12px -36px 16px}}
 @media(prefers-reduced-motion:reduce){.bs-coordinate::before,.bs-turnbar,.bs-clock.bs-urgent{animation:none}}
+/* Fleet thumbnails have a real 52×24 frame: grid intrinsic size must not move art below its strike. */
+.bs-fleet-icon{position:absolute;inset:0;display:block;overflow:hidden}
+.bs-fleet-row .bs-fleet-icon img{position:absolute;left:50%;top:50%;width:auto;height:46px;max-width:18px;max-height:none;transform:translate(-50%,-50%) rotate(90deg);object-fit:contain}
+.bs-fleet-row li.sunk::after{top:50%;transform:translateY(-50%) rotate(-12deg);transform-origin:center}
+.bs-radar.bs-coordinate{height:112px;min-height:112px;display:grid;place-items:center;padding:10px 0 22px;color:#a2ffe0;isolation:isolate}
+.bs-radar::before,.bs-radar::after{display:none}
+.bs-radar-grid{position:absolute;inset:0;width:100%;height:100%;color:#4fdeaf66;pointer-events:none}
+.bs-radar-sweep{position:absolute;left:50%;top:50%;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;background:conic-gradient(from 0deg,#7bffd4a0,#60edbc38 30deg,#3fd5a800 75deg,transparent 360deg);animation:bs-radar-turn 3.2s linear infinite;pointer-events:none;z-index:-1}
+.bs-radar-sweep:after{content:'';position:absolute;left:50%;top:0;height:50%;width:1px;transform:translateX(-50%);background:#a7ffdf;box-shadow:0 0 5px #62e6c3}
+.bs-radar-coordinate{position:relative;z-index:1;padding:0 9px;border-radius:5px;background:#06201ad9;font:800 30px ui-monospace,monospace;line-height:1.4;color:#baffea;letter-spacing:.12em;text-shadow:0 0 12px #3fe0b077}
+.bs-radar-label{position:absolute;bottom:8px;left:0;right:0;font:700 8px system-ui;letter-spacing:.14em;color:#98dcc4!important;text-align:center}
+.bs-radar[data-paused=true] .bs-radar-sweep{animation-play-state:paused}
+.bs-radar[data-reduced=true] .bs-radar-sweep{animation:none;opacity:.3}
+@keyframes bs-radar-turn{to{transform:rotate(360deg)}}

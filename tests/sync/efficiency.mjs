@@ -78,7 +78,7 @@ test('catalog reads share in-flight work and a 5 minute cache; access remains ch
  const r=await load('src/launcher/repository.ts',{
   '../services/supabaseClient':'export const supabase=globalThis.__catalogDB;',
   '../commerce/api':'export const accessPreviewEnabled=false;',
-  './catalog':'export const bundledCatalog={schemaVersion:1,games:[]};export const parseCatalog=x=>x?.schemaVersion===1?x:null;export const isLocalReviewGame=()=>false;'
+  './catalog':'export const bundledCatalog={schemaVersion:1,games:[]};export const parseCatalog=x=>x?.schemaVersion===1?x:null;export const isLocalReviewGame=()=>false;export const isDeviceLibraryGame=()=>false;'
  });
  await Promise.all([r.fetchCatalog(),r.fetchCatalog()]);assert.equal(reads,1);t.mock.timers.tick(299_000);await r.fetchCatalog();assert.equal(reads,1);t.mock.timers.tick(1001);await r.fetchCatalog();assert.equal(reads,2);
  const game={id:'premium',availability:'published',accessModel:'premium',supportsOffline:false};assert.equal((await r.checkAccess(game)).allowed,false);assert.equal((await r.checkAccess(game)).allowed,false);assert.equal(access,2);

@@ -1,0 +1,17 @@
+{
+  "clientDate": "2026-11-05",
+  "sourceCommit": "3950abb84fe4dd0fca9663e69d69a29f5989c8c6",
+  "url": "https://arcadex-tank-staging.onrender.com",
+  "health": 200,
+  "review": 200,
+  "reviewSha256": "76fb23380218b8c7d27d74ebda9b6b7783167455f3edea67f5e84c43b2015728",
+  "reviewMatchesLocalBuild": true,
+  "configPublicOnly": true,
+  "metrics": 404,
+  "unlistedOrigins": 403,
+  "wssTrustedTLS": true,
+  "netlifyAndReviewOriginsAccepted": true,
+  "missingAuth": "AUTH_REQUIRED",
+  "invalidAuth": "AUTH_FAILED",
+  "scope": "Public negative smoke and deployed artifact identity; real tester matches, devices/networks and Render soak not yet accepted"
+}

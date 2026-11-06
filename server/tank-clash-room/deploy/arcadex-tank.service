@@ -1,0 +1,31 @@
+[Unit]
+Description=ArcadeX Tank Clash staging room server
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=arcadex-tank
+Group=arcadex-tank
+WorkingDirectory=/opt/arcadex-tank/current
+EnvironmentFile=/etc/arcadex-tank/staging.env
+ExecStartPre=/usr/bin/node scripts/tank-clash/preflight.mjs
+ExecStart=/usr/bin/node server/tank-clash-room/server.mjs
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=1G
+LimitNOFILE=4096
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=arcadex-tank
+
+[Install]
+WantedBy=multi-user.target

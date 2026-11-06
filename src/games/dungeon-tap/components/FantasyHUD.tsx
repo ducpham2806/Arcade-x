@@ -14,6 +14,7 @@ import '../fantasy.css';
 import '../battlefield-v6.css';
 import '../unified-v6-2.css';
 import '../equipment-v6-3.css';
+import '../polish.css';
 
 type Page='hero'|'allies'|'gear'|'journey'|'runes'|'spells'|'menu'|'help';
 const NAV:[Page,string,string][]=[['hero','hero','Anh hùng'],['allies','allies','Đội hình'],['gear','bag','Túi đồ'],['journey','map','Bản đồ'],['runes','rune','Ấn Titan']];

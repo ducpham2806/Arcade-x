@@ -1,63 +1,35 @@
-# Nhật ký công việc (bắt buộc)
+# Nhật ký công việc
 
-Quy tắc của chủ dự án (02/11/2026): **mọi việc Claude làm xong đều phải ghi vào file này**, ngay khi xong từng phần (không đợi cuối session), và commit cùng thay đổi đó. Mục mới nhất ở trên cùng.
+Mỗi phần hoàn tất ghi ngay: ngày/nhánh, việc + file, kiểm tra/kết quả thật, phần còn dở; commit cùng thay đổi (`AGENTS.md`). Mới nhất ở trên; chỉ giữ tối đa 3 mục, chuyển nguyên văn phần cũ sang `archive/WORKLOG-YYYY-MM.md`. Đầu phiên chỉ đọc mục mới nhất; trạng thái hiện tại ở `SESSION-HANDOFF.md`.
 
-Chỉ giữ vài mục gần nhất ở đây cho nhẹ đầu phiên; mục cũ hơn chuyển nguyên văn sang `docs/archive/WORKLOG-YYYY-MM.md` (hiện có `docs/archive/WORKLOG-2026-11.md`).
+## 05/11/2026 · `codex/tank-clash-launcher-release` — đưa Tank Clash vào sảnh
 
-Mỗi mục ghi: ngày, nhánh, việc đã làm, file chính, lệnh test đã chạy và kết quả thật, phần chưa làm hoặc còn rủi ro. Tóm tắt dài hạn nằm ở `docs/SESSION-HANDOFF.md`; việc chủ dự án cần làm ở `docs/OWNER-TODO.md`.
+- Chủ dự án duyệt bản thử và yêu cầu merge main/Netlify, đưa icon vào sảnh; chọn bot + online cho tài khoản ArcadeX, giữ Render Free/không chi phí thêm. Tách worktree khi checkout gốc bị chuyển sang main, giữ nguyên nhánh/nguồn đã duyệt.
+- Registry/catalog/package/banner + icon Tank Clash sinh bằng exporter, game thứ 24. Catalog cũ thiếu dòng được bổ sung game miễn phí từ bundle; server maintenance/premium ưu tiên, library Tank giữ local. Không SQL/migration production. Adapter chờ Auth, khóa WSS, mở đăng nhập cho khách chọn online, giải phóng phòng khi logout/đổi tài khoản/thoát; link mời mở đúng game.
+- Server thêm `registered-free` chỉ khi production tường minh, ref ArcadeX cố định; mặc định staging vẫn bắt tester/không cho production ref. Render blueprint tái dùng một Free/cap16, review/metrics public tắt; chưa thưởng/DB result/commerce. Runbook/phạm vi ở `tank-clash/LAUNCHER-RELEASE.md`.
+- Qua Node24: lint/build/bundle, test:fast, 18 WS/ops; kiểm catalog production và luồng Chrome từ sảnh lái/pause/exit/login qua. 13/13 Chrome UI qua, gồm adapter đăng nhập/WSS/logout, 1v1/2v2/queue và staging; sửa locator theo tên “Bạn + 1 bot”, không giảm kiểm tra. Bộ duyệt lệnh từng hết hạn mức/timeout, chưa chạy hai lệnh ở lượt bị từ chối; chạy lại được sau đó, dọn ba process cũ bị chặn mạng.
+- Mở rộng kiểm tra bản dựng: 24/24 game mở/chơi/thoát, 48/48 animation normal/reduce, 25 VFX/polish, smoke7, offline4, modal22, Neon feel7, Blossom55, Battleship2, Nối Từ4 qua; idle 3,5 render/s <20. Lint cuối bắt bridge fixture thiếu interface, đã sửa đủ kiểu + cấm reward/save và chạy lại lint/2 adapter UI qua. Bundle qua trên build cuối. JSON sinh từ log: `tank-clash/evidence/LAUNCHER-local-2026-11-05.json` (application source `39d68f6`, fixture digest riêng).
+- Chỉ đọc Auth production bằng public key có sẵn: settings200, token giả403; không SQL/ghi dữ liệu. Bản xem trước sảnh có Tank chụp cục bộ, không phải site đã deploy.
+- Chủ dự án mở khóa Mac; đã push `e383a53` qua GitHub Desktop và mở PR #16. CI 42022618828 dừng Typecheck vì fixture import WS trước bước cài dependency server. Chuyển hai lệnh npm ci server lên trước Typecheck, giữ đủ các bước/test; CI 42022978952 đã qua typecheck/build/bundle/fast/WS và các bước sảnh, 24 game, motion/VFX, tới Blossom sau hơn 16 phút; vẫn còn Battleship/Nối Từ/Tank. Tăng ngân sách toàn job 20→30 phút để chạy đủ chuỗi, giữ nguyên timeout/assertion từng case và mọi bước CI. Chờ CI head mới. Main/Render Auth/Netlify chưa chuyển.
+- Render đã lưu public key/URL ArcadeX, production/registered-free/review0 bằng Save only để chờ code mới; chưa restart/deploy, một service Free giữ nguyên. Đọc toàn bộ env Netlify bị auto-review từ chối vì phạm vi secret không cần thiết; không đổi cách đọc env, chỉ đọc module web công khai xác nhận đúng host production.
+- Chưa merge/deploy bản tích hợp ở mốc commit này: còn CI cuối, chuyển Auth backend Render sang ArcadeX và kiểm Netlify public. Còn tải Render/hai thiết bị/hai mạng theo TC2; không ghi thành đã đạt. WORKLOG giữ 3 mục, mục TC1 chuyển nguyên văn vào archive.
 
----
+## 05/11/2026 · `codex/tank-clash-tc2-readiness` — Render Free và review đăng nhập
 
-## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — kiểm tra đủ CI và merge vào `main`
+- Chủ dự án xác nhận chưa VPS, chỉ có `https://arcade-x.netlify.app`; đã duyệt dùng Render Free và đăng nhập trên tab Render để tiếp cấu hình. Không duyệt nâng gói/chi phí vượt quota. Frontend public HTTP 200/title ArcadeX; xác định đúng Netlify site qua connector NamA bằng đọc metadata, không sửa env/deploy.
+- `50c7b36` và `3950abb` push qua GitHub Desktop, giữ nguyên lịch sử; HTTPS CLI thiếu credentials, SSH chưa có known host nên không bỏ kiểm tra hoặc đọc key. Đặt upstream/refspec đúng nhánh. Netlify deploy `6aeaa023dbc469c9cfe7b896` giữ nguyên, không active deploy. Cờ `[skip netlify]`, không `[skip ci]`/merge main.
+- Render Free đã Live từ `50c7b36`: service `srv-dbm1r9t6e07s73asmulg`, Singapore/Node24/1 process/16 socket; Blueprint Auto Sync chuyển No, manual deploy. HTTPS/WSS `arcadex-tank-staging.onrender.com`: health200, metrics404, TLS valid, origin thiếu/null/giả403, token giả AUTH_FAILED. Không đăng ký/nâng gói trả phí; 4 Auth user do chủ dự án tạo đã xác nhận email/non-anonymous qua SQL đọc staging.
+- Thêm `/review` + `/review/config` opt-in/staging-only, exporter và `staging-preview.ts`: SDK Auth session trong RAM riêng mỗi tab, refresh, backend cố định theo origin, không JWT ra link mời lạ. Logout rời phòng/queue, xóa resume; controller destroy thêm lựa chọn leave riêng, reload vẫn giữ cửa sổ resume. Không signup/thưởng/DB result hoặc tích hợp launcher. Manual Sync Blueprint đã đưa `3950abb` Live (deploy `dep-dbm2jj9srm7s73essv6g`, 1m14s); giữ Auto Sync No/Free.
+- Qua Node24: lint/build/bundle, 17 WS/ops, 11 Chrome UI; 4 phiên Auth HTTP fixture + socket thật vào 2v2, logout/đổi tài khoản không ghế treo, không lưu JWT/refresh token. Hai lượt đầu sai locator nút 1v1 đã sửa theo tên UI, không giảm assertion. Blueprint valid schema Render Draft2020-12/URI formats; package VPS vẫn 13 file (review build từ repo đầy đủ).
+- Public `/review` HTTP200/hash khớp build local, config chỉ hai trường public; health/metrics/origin/TLS/Auth âm qua, JSON gốc `tank-clash/evidence/TC2-render-smoke-2026-11-05.json`. Sau khi chủ dự án đăng nhập trực tiếp, một tester thật tạo/rời sảnh 1v1 trên Render; nhập lại mã cũ nhận “Không tìm thấy phòng với mã này.” Không bắt đầu/hoàn tất trận, không lưu email/UUID/token thật vào repo.
+- Cập nhật runbook/decisions/plan/handoff, archive nguyên văn mục Battleship/Dungeon; giữ WORKLOG 3 mục. Soak 30 phút a8d472b/04-11 vẫn là bằng chứng cũ; còn trận nhiều tài khoản, hai mạng/thiết bị, reconnect và tải Render trước nghiệm thu TC2.
 
-- Chủ dự án yêu cầu ghi nhật ký và merge. Nhánh gồm 4 phần: rút gọn PLAN + lưu trữ nhật ký cũ, rút gọn SESSION-HANDOFF, Tank Clash P3b, Tank Clash P3c (mục chi tiết bên dưới).
-- Chạy đủ các bước trong `.github/workflows/ci.yml` trên commit `e2f89e9`: `npm run lint`, `build`, `test:bundle`, `test:fast` (gồm `test:tank-clash` 65/65), `test:tank-clash-server` 5/5, `test:perf`, `test:smoke`, `test:games`, `test:neon-feel`, `test:offline`, `test:modals`, `test:blossom-ui` 55/55, `test:battleship-ui` 2/2, `test:word-chain-ui` 4/4, `test:tank-clash-ui` 3/3 — tất cả qua (trình duyệt: `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`); `git status` sạch sau khi chạy (không để lại file sinh).
-- `main` lúc merge: `508d4ff` (không có commit mới), nhánh merge không xung đột.
-- **Lưu ý cho production:** Tank Clash chưa có trong launcher/catalog, nên merge này không đổi gì người chơi thấy; máy chủ phòng Tank Clash vẫn chưa deploy (chờ chọn hosting).
-- **Việc tiếp theo:** P3d (giao diện online 2v2 + hàng chờ), xem `docs/tank-clash/PLAN.md` §10.
+## 04/11/2026 · `codex/tank-clash-tc2-readiness` — TC2: staging/Auth và chuẩn bị vận hành
 
-## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — Tank Clash P3c: hàng chờ 2v2 và tổ đội
+- Chủ dự án yêu cầu tiếp TC2, tạo Supabase staging; chọn organization Nam A Uniform. Đã tạo `arcade-x-staging` ref `khqipuipeawzlkqmdzdg`, Singapore, xác minh `ACTIVE_HEALTHY`, organization Free, public schema rỗng, Auth 0 user, security advisors không có lint. Chỉ đọc kiểm tra staging; không migration/copy dữ liệu/secret từ production. Public env riêng `.env.tank-staging.local` bị Git ignore.
+- Server thêm `config.mjs`: production bắt buộc Auth/UUID tester/exact HTTPS origins/metrics token, từ chối guest flags, staging chặn ref production; Auth kiểm registered user và allowlist từ id đã xác minh, cache không vượt JWT exp. Health public tối giản, metrics token chỉ nội bộ, cap socket; SIGTERM báo `ROOM_CLOSED`, client xóa room/result/solo queue. Bỏ Set match ID lịch sử vô hạn; once-only vẫn theo result của phòng sống.
+- Đã qua Node 24: 15/15 WS/ops (gồm 9 case mới Auth/config/origin/cap/health/timeout/package/restart/log không token), 9/9 Chrome UI; lint/build/bundle/test:fast. Template systemd/Caddy, preflight, package chỉ 13 file + manifest; chạy isolated release thật. Caddy chính thức 2.11.7 validate qua; WSS local với CA tin trong test, origin/health/metrics 404/restart 1012 qua; không cài CA hệ thống/public ACME.
+- Soak 1.802,3 giây thực qua: 204 trận 1v1, 167 trận 2v2 (83 queue), mọi client cùng kết quả; thực đo max 48 socket/14 phòng, RSS 177,3 MiB, CPU interval max 17,4% một core Mac arm64, p95 histogram 21,82 ms/resolution 20 ms. Cuối test room/peer/user/queue/socket về 0, 2 listener không tăng; JSON gốc + source digest ở `tank-clash/evidence/`. Mục tiêu 60 socket/20 phòng chưa đạt; JSONL mất phần đầu do Playwright dọn output, summary vẫn tính đủ 142 mẫu trong RAM. Chưa đo VPS/Internet/thiết bị thật hoặc session Auth thật.
+- Runbook `tank-clash/TC2-RUNBOOK.md`, báo cáo `TC2-review.md`; cập nhật README/PLAN/env/test CI. Bản 4338 dùng query server loopback 3224 đã kiểm HTML/health/create/join/leave, server 3223 giữ nguyên. Hosting/domain/tester còn phải hoàn tất, gate pilot chưa entitlement TC3; không push/merge/deploy Netlify, không đăng ký VPS trả phí. Chuyển nguyên văn mục VFX cũ vào archive, giữ tối đa 3 mục.
 
-- Chủ dự án đồng ý làm P3c. Chi tiết: `docs/tank-clash/P3-SPEC.md` §15.
-- Code: `protocol.ts` (tin `queue`/`unqueue`, `RoomView.kind/queue/rematchMs`, mã lỗi `QUEUE_INVALID`/`ROOM_QUEUED`, thông số thời gian hàng chờ trong `NET`), `room.ts` (hàng chờ trong bộ nhớ, ghép tổ + tổ trước rồi theo thứ tự, phòng ghép đếm ngược 5 giây, hủy và trả về chỗ cũ, cửa sổ đấu lại 20 giây rồi giải tán, giữ chỗ 10 giây khi mất mạng, bắt đăng nhập), `net-client.ts` (`queue()`, `unqueue()`, `queueStatus`, tự xếp lại sau khi nối lại), `server.mjs` (`TANK_QUEUE_GUESTS`, `/health` có số đang chờ), `tests/tank-clash/harness.mjs` (client có token).
-- Test mới: `tests/tank-clash/queue.test.mjs` (12 ca, đủ bảng §6.4) trong `test:tank-clash`; 1 ca WebSocket thật trong `server.test.mjs`. Thử làm hỏng code 7 chỗ: lần đầu test bắt 4/7, 3 chỗ lọt vì test dựng sai tình huống (một test qua mà không kiểm gì) → sửa test, bắt 7/7.
-- Lỗi tìm được: thời gian chờ của tổ đội hiển thị đứng yên → client tự cộng thời gian.
-- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 65/65); `npm run test:tank-clash-server` 5/5; `npm run test:tank-clash-ui` 3/3 (`CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`).
-- **Chưa làm / rủi ro:** P3d (giao diện online 2v2, màn hàng chờ và "thiếu người" sau 60 giây, test UI 4 trang, ảnh chụp, `P3-review.md`). Hàng chờ một tiến trình, mất khi server khởi động lại; chưa xét kỹ năng. Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
-
-## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — Tank Clash P3b: phòng 2v2 online, người xem, đầu hàng
-
-- Chủ dự án đồng ý làm P3b. Chi tiết và số đo: `docs/tank-clash/P3-SPEC.md` §14.
-- Code: `protocol.ts` (giao thức `tank-clash.p3.v1`: định dạng phòng, đội, xếp ghế, người xem, đầu hàng, tin `seat`, mã lỗi mới, chặn trường lạ, snapshot bỏ trường bằng 0), `room.ts` (viết lại cho 4 ghế; bỏ trận theo người; người xem; seed mới mỗi trận), `engine.ts` (squad online không bot), `net-client.ts` (n xe, xe mình đứng đầu, API mới), `runtime.ts` (chỉ đổi cách xác định đội mình). Giao diện online 2v2 để P3d.
-- Test mới: `tests/tank-clash/squad-room.test.mjs` (9 ca), `tests/tank-clash/squad-netcode.test.mjs` (4 ca), thêm vào `test:tank-clash`. Thử làm hỏng code 5 chỗ: test bắt 3; 2 chỗ còn lại là kiểm tra thừa (giải thích ở đặc tả).
-- Lần đo đầu: 2v2 ở RTT 150 tải xuống 21,1 KB/s, vượt trần 20 KB/s → giảm cỡ snapshot, không nới test. Sau sửa: 2v2 cao nhất 19,3 KB/s (sát trần); 1v1 9,8–10,7 KB/s.
-- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 53/53); `npm run test:tank-clash-server` 4/4; `npm run test:tank-clash-ui` 3/3 (`CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`).
-- **Chưa làm / rủi ro:** P3c (hàng chờ, tổ đội), P3d (giao diện sảnh/HUD/kết quả 2v2 online, test 4 WebSocket, test UI 4 trang). 2v2 có hiệu chỉnh xe mình khi đang đánh (tới 11 lần/trận, tối đa ~21 px; 1v1 là 0), chưa chơi thật. Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
-
-## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — rút gọn SESSION-HANDOFF
-
-- `docs/SESSION-HANDOFF.md`: 8,7 KB → 3,3 KB. Mô tả từng module thay bằng bảng trạng thái + đường dẫn tài liệu; giữ sổ tay kỹ thuật và danh sách còn yếu. Bản cũ chép nguyên văn sang `docs/archive/SESSION-HANDOFF-2026-11-03.md`.
-- Sửa thông tin cũ sai: `main` giờ là `508d4ff` (PR #14, có Tank Clash P3a); NR4 (`5bc450f`) **đã có trong main** (kiểm bằng `git merge-base --is-ancestor`), bản cũ ghi "chưa merge"; đường dẫn Chromium thống nhất `/opt/pw-browsers/chromium` (đã kiểm tồn tại).
-- Test: chỉ đổi tài liệu, không chạy test code.
-
-## 03/11/2026 · nhánh `ccr-8c56f166-kqc9na` — rút gọn PLAN Tank Clash và lưu trữ nhật ký cũ
-
-- Mục đích: giảm token đọc đầu phiên.
-- `docs/tank-clash/PLAN.md`: 51,7 KB → 14,2 KB (v1.4 rút gọn). Giữ nguyên số mục §1–§9 để dẫn chiếu trong `P3-SPEC.md`, `P2-review.md` vẫn đúng; §10–§12 mới (việc tiếp theo, mã nguồn/chạy/test, quy tắc tiếp nối) thay cho §10–§15 cũ. Bản v1.3 đầy đủ chép nguyên văn sang `docs/archive/tank-clash-PLAN-v1.3.md`.
-- `docs/WORKLOG.md`: 16,9 KB → khoảng 5 KB; 5 mục cũ (02–03/11, đến hết P3 đặc tả) chuyển nguyên văn sang `docs/archive/WORKLOG-2026-11.md` (đã so `diff` với bản gốc: khớp từng dòng). Thêm quy tắc: chỉ giữ vài mục gần nhất ở đây.
-- Sửa dẫn chiếu §15 cũ ở `docs/tank-clash/README.md`, `PVP-BACKLOG.md`, `P3-SPEC.md`, `docs/SESSION-HANDOFF.md`.
-- Test: chỉ đổi tài liệu, không chạy test code.
-
-## 03/11/2026 · nhánh `ccr-e38a635d-qyei9d` — Tank Clash P3a: sân 2v2 ngẫu nhiên + 2v2 với bot
-
-- Chủ dự án duyệt đặc tả P3: (1) sân to, chướng ngại ngẫu nhiên từng trận; (2) hàng chờ công khai bắt đăng nhập; (3) cho đầu hàng; (4) chế độ cục bộ 1 người + 1 bot đồng đội vs 2 bot; làm luôn.
-- Đã làm P3a (chi tiết ở `docs/tank-clash/P3-SPEC.md` §13):
-  - `src/games/tank-clash/maps.ts` (mới): sân 1040×624, bộ sinh theo seed (mulberry32), nửa phải = nửa trái xoay 180°, kiểm tra tự động (không có đường bắn thẳng giữa khu xuất phát, không khu kín, đường chính ≥ 48 px, quanh điểm xuất phát 60 px trống, đối xứng), sinh lại khi không đạt, bố cục dự phòng.
-  - `engine.ts`: chế độ `squad` 4 xe `a/a2/b/b2`, kích thước sân theo state (`s.width/height`), đổi làn đồng đội mỗi hiệp, `forfeitTank()` (bỏ trận theo người, cả đội bỏ → thua, cả hai đội cùng nhịp → hủy), `surrender()`, `endReason`; bot cho mọi xe (địch gần nhất có tầm nhìn, giãn cách đồng đội, lệch nhịp bắn); lưới tìm đường có cache. Duel 1v1 không đổi hành vi (test cũ qua nguyên).
-  - `runtime.ts` + CSS: thẻ "03 / Đồng đội 2v2", HUD hai đội, ●/▲ + BOT trên sân, vòng sáng xe mình, nhãn tự phóng to theo màn hình, nút "Đầu hàng" trong màn tạm dừng, màn kết quả có mã sân. Nhãn bản build "P3a".
-  - `net-client.ts`: chỉ đổi giới hạn sân sang theo state. `scripts/export-tank-review.mjs`: đổi tiêu đề.
-- Lỗi tự tìm khi chụp màn hình rồi sửa: (1) bot đứng im ở điểm xuất phát (36/300 lượt bot trên 100 seed) do lưới tìm đường 40 px thô hơn bố cục 52 px → ô 20 px cho sân 2v2, có test hồi quy (đã xác nhận test hỏng với lưới cũ); (2) nhãn xe không đọc được ở 844×390 → phóng to theo kích thước hiển thị. Thêm cache lưới tìm đường: 0,7 → 0,3 ms/nhịp cho 3 bot.
-- Test mới: `tests/tank-clash/squad.test.mjs` (10 ca: bố cục 60 seed hợp lệ/đối xứng/khác nhau, validator, trận 4 xe, friendly fire, hòa cùng nhịp, bỏ trận, đầu hàng, bot đánh hết trận, bot ra khỏi điểm xuất phát) và `tests/tank-clash/squad-ui.test.ts` (2 trang Chromium 1280×760 và 844×390: vào trận, lái, tạm dừng → đầu hàng → kết quả → đấu lại với seed mới).
-- Đã chạy: `npm run lint` sạch; `npm run build` OK; `npm run test:bundle` OK; `npm run test:fast` qua (gồm `test:tank-clash` 40/40, mất khoảng 11 giây); `npm run test:tank-clash-server` 4/4; `npm run test:tank-clash-ui` 3/3 (với `CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`). Đã xem ảnh 1280×760, 844×390, 390×844.
-- **Chưa làm / rủi ro:** P3b–P3d (online 2v2, tổ đội, hàng chờ, UI online). Trên điện thoại nằm ngang xe chỉ khoảng 13 px (đánh đổi của sân to); độ khó bot và kích thước sân là [PLACEHOLDER], chưa chơi thử bằng tay trên thiết bị thật. Chưa chạy `test:smoke`/`test:games`/`test:modals` (không đổi launcher).
-
+Lịch sử trước đó: [archive/WORKLOG-2026-11.md](archive/WORKLOG-2026-11.md).

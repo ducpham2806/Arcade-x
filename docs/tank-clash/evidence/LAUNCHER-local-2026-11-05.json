@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-05",
+  "applicationCommit": "39d68f6d38f0f5c06cc527cdeaef08876aa1197d",
+  "platform": "macOS / Node 24.22.2 / Google Chrome",
+  "typecheck": "passed after completing the test bridge interface; reward/save bridge calls throw in the fixture",
+  "build": "passed",
+  "bundleBudget": "passed",
+  "checks": [
+    {
+      "check": "fast",
+      "passed": true
+    },
+    {
+      "check": "room-server",
+      "passed": true,
+      "cases": 18
+    },
+    {
+      "check": "tank-ui",
+      "passed": true,
+      "cases": 13
+    },
+    {
+      "check": "adapter-fixture-final",
+      "passed": true,
+      "cases": 2
+    },
+    {
+      "check": "all-games",
+      "passed": true,
+      "cases": 24
+    },
+    {
+      "check": "desktop-motion",
+      "passed": true,
+      "cases": 48
+    },
+    {
+      "check": "motion-vfx-polish",
+      "passed": true,
+      "cases": 25
+    },
+    {
+      "check": "launcher-smoke",
+      "passed": true,
+      "cases": 7
+    },
+    {
+      "check": "offline",
+      "passed": true,
+      "cases": 4
+    },
+    {
+      "check": "modal-frame",
+      "passed": true,
+      "cases": 22
+    },
+    {
+      "check": "neon-feel",
+      "passed": true,
+      "cases": 7
+    },
+    {
+      "check": "test:blossom-ui",
+      "passed": true,
+      "cases": 55
+    },
+    {
+      "check": "test:battleship-ui",
+      "passed": true,
+      "cases": 2
+    },
+    {
+      "check": "test:word-chain-ui",
+      "passed": true,
+      "cases": 4
+    }
+  ],
+  "idleRendersPerSecond": 3.5,
+  "productionAuthReadOnlyProbe": {
+    "settings": 200,
+    "invalidToken": 403,
+    "sqlOrDataWrites": false
+  },
+  "finalFixtureSha256": "9970601b72c93fa55b56d7c2abcd527cba8b85f7fe6e1acd8c5da42662a0e459",
+  "pending": [
+    "GitHub push and full Linux CI",
+    "main merge",
+    "Render production Auth promotion",
+    "Netlify production deployment",
+    "real devices/two networks/Render soak"
+  ],
+  "blocker": "Mac locked; owner must unlock it for authenticated GitHub Desktop push and Render browser setup",
+  "scope": "Local verification only; production has not been changed or released by this work"
+}

@@ -1,12 +1,10 @@
-# ArcadeX · 2.12.x
+# ArcadeX · 2.12.2
 
-Launcher mini-game dạng PWA (React 19 + Vite + Supabase) với 23 game, chơi được offline và đồng bộ tài khoản. Quy tắc giao diện và trải nghiệm trong game nằm ở `AGENTS.md`.
+PWA launcher 24 mini-game, React 19 + Vite + TypeScript + Supabase; hỗ trợ offline và đồng bộ tài khoản. Tank Clash có sân tập, bot và online 1v1/2v2; cấu hình phát hành ở [LAUNCHER-RELEASE](docs/tank-clash/LAUNCHER-RELEASE.md).
 
-Hướng dẫn cho Claude Code nằm ở `CLAUDE.md`. Thư mục `.claude/` chứa 19 agent và 11 skill (đánh giá game, level, cân bằng, QA, hiệu năng, UX…). Chúng được lấy từ Claude Code Game Studios và chỉnh cho web; nguồn và giấy phép MIT ghi ở `.claude/CCGS-NOTICE.md`.
+## Bắt đầu
 
-## Chạy và build
-
-Dùng Node.js 24 (`.nvmrc`).
+Node **24** (`.nvmrc`):
 
 ```bash
 npm ci
@@ -15,61 +13,24 @@ npm run lint       # tsc --noEmit
 npm run build      # dist/
 ```
 
-Muốn kết nối backend riêng: sao chép `.env.example` thành `.env.local`, điền URL và publishable key của project Supabase. Không dùng mật khẩu database hoặc service-role key trong frontend. Các flag `VITE_*` của commerce mặc định tắt. SQL migrations và Edge Functions trong `supabase/` là backend đã triển khai, giữ để tham khảo hoặc cài mới; không chạy lại migrations lên project đang dùng.
+Backend riêng: sao chép `.env.example` → `.env.local`, điền URL/publishable key. Không đưa database password/service-role key vào frontend. Không chạy lại migrations lên project đang dùng; quy tắc tại [AGENTS.md](AGENTS.md).
 
-Netlify build bằng `npm run build`; deploy preview chạy thêm `lint` và `build:snake-preview`. Cấu hình Vercel nằm ở `vercel.json`.
+## Đọc theo mục đích
 
-## Cấu trúc
-
-| Thư mục | Nội dung |
+| Cần biết | Đọc |
 |---|---|
-| `src/App.tsx`, `src/launcher/` | Khung launcher, thư viện game, carousel |
-| `src/context/` | `GameContext` (chia slice: `useGameSession`, `useLauncherUi`, `useLibrary`, `useAudioSettings`, `useProgression`, `useSocial`), `PlayerContext`, `InventoryContext`, `AuthContext` |
-| `src/services/storage/` | `StorageService` (localStorage) chia theo domain, dữ liệu mặc định trong `catalog/` |
-| `src/services/supabase/` | `SupabaseService`: chat, đồng bộ cloud, bảng xếp hạng, bạn bè |
-| `src/games/` | Mỗi game một thư mục; `registry.ts` đăng ký, `gamePackages.tsx` tải gói theo nhu cầu, `packageAssets.json` liệt kê asset từng gói |
-| `src/games/duel/` | AI cờ, và trọng tài + phòng đấu phía server cho Chess/Xiangqi/Caro (chưa deploy, xem `docs/DUEL-SERVER.md`) |
-| `src/commerce/`, `server/commerce/`, `shared/` | Thuê game, thanh toán, duyệt admin (đang tắt bằng flag; thứ tự bật ở `docs/COMMERCE-ROLLOUT.md`) |
-| `supabase/` | Migrations, Edge Functions (`battleship-room`, `cosmic-verify`; `duel-room` và `word-chain-room` chưa deploy), SQL Battleship, duel, Nối Từ và mạng xã hội |
-| `public/` | Asset tĩnh: art launcher, asset game, từ điển Word Cross (`games/word-cross/lexicon.v1.json`) |
-| `standalone/` | Game build sẵn nhúng vào launcher (Chronicles Realms) |
-| `preview/` | Bản preview riêng (Snake Legend, gallery Dungeon) |
-| `art/` | Art nguồn: `launcher/`, `dungeon-titan/source-v5\|v6`, `block-breaker/boss-v6`, `gemini/` (ảnh Gemini của Blocker, Mummy Escape, Chess và bản đồ cắt sprite, xem `art/gemini/README.md`) |
-| `review/` | Trang duyệt tĩnh: gallery art toàn bộ game, `demos/` (blocker, chess, mummy-escape) |
-| `scripts/`, `tests/`, `docs/` | Công cụ build/export, kiểm thử, tài liệu thiết kế từng game |
+| Bắt đầu phiên | [AGENTS](AGENTS.md) → [bàn giao](docs/SESSION-HANDOFF.md) + mục mới nhất [WORKLOG](docs/WORKLOG.md) |
+| Việc cần làm | [Kế hoạch chi tiết](docs/PROJECT-PLAN.md); [quyết định chờ](docs/PENDING-DECISIONS.md) |
+| Đúng tài liệu của module | [INDEX](docs/INDEX.md), không nạp toàn bộ `docs/`/`.claude/` |
+| Test/preview và giới hạn đã biết | [TESTING](docs/TESTING.md); `package.json`, `.github/workflows/ci.yml` là nguồn lệnh |
+| Claude Code | [CLAUDE.md](CLAUDE.md); nguồn/giấy phép [CCGS-NOTICE](.claude/CCGS-NOTICE.md) |
 
-Cosmic Defend giữ các engine `legacy-*` có chủ đích: engine hiện tại xây trên chúng và `cosmic-verify` vẫn replay vé phiên bản cũ.
+## Mã nguồn
 
-## Kiểm thử
+- Launcher: `src/App.tsx`, `src/launcher/`; context chia slice ở `src/context/`.
+- Lưu local/cloud: `src/services/storage/`, `src/services/supabase/`.
+- Game: `src/games/<id>/`; registry, lazy packages và asset manifest trong `src/games/`; asset ở `public/`, art nguồn ở `art/`.
+- Backend: `supabase/`; commerce: `src/commerce/`, `server/commerce/`, `shared/`; room WS Tank: `server/tank-clash-room/`.
+- Standalone: `standalone/chronicles-realms/`, `public/standalone/`; preview/review: `preview/`, `review/`; công cụ/test: `scripts/`, `tests/`.
 
-CI (`.github/workflows/ci.yml`) chạy trên mọi PR: `lint` → `build` → `test:bundle` → `test:fast` → `test:perf` → `test:smoke` → `test:games` → `test:neon-feel` → `test:offline` → `test:modals` → `test:blossom-ui`, rồi kiểm tra không còn file sinh ra bị bỏ lại.
-
-| Lệnh | Phạm vi |
-|---|---|
-| `npm run test:fast` | Các bộ không cần trình duyệt hay Docker: readability, cấu trúc agent/skill (`test:claude`), tương thích save (`test:storage`), engine 8 game (`test:engines`), engine Blossom Blast (`test:blossom-engine`), duel AI và duel server (`test:duel-server`), Nối Từ (`test:word-chain`: luật, từ điển, bot, máy chủ phòng, schema PGlite, Edge Function), sync, commerce, subscriptions, battleship, social, artwork, cosmic, startup/PWA, boom, eat, dungeon, full-release |
-| `npm run test:smoke` | Luồng launcher trên bản build: yêu thích, chi tiết game, âm thanh, chat, vào/thoát game, Word Cross |
-| `npm run test:games` | Mở cả 23 game, chạm/nhấn phím vài giây, không lỗi JS, thoát về thư viện |
-| `npm run test:offline` | Tắt mạng sau khi service worker precache: tải lại, mở modal, chơi game đã cache |
-| `npm run test:modals` | Khung modal theo `AGENTS.md` ở điện thoại/tablet/desktop, không đổi kích thước khi chuyển tab; cấm bottom sheet ngắn trong mã nguồn |
-| `npm run test:blossom-ui` | Blossom Blast trên dev server: hướng dẫn, chuẩn bị màn, kết quả, lưu, sprite, bố cục màn chơi ở 320×568 đến 1280×760 (8 bộ, 55 test) |
-| `npm run test:battleship-ui` | Battleship trên dev server: chạm đúng ô trên bàn phối cảnh ở điện thoại và desktop, nút xoay cạnh tàu |
-| `npm run test:word-chain-ui` | Nối Từ: trận luyện với bot trong launcher (gõ có dấu, gõ lại khi sai, kết quả) và chơi online 3 người, ghép trận qua phòng thử 4 người |
-| `npm run test:perf` | Launcher đứng yên không vượt 20 lượt render/giây |
-| `npm run test:bundle` | Không chunk nào > 500 kB, JS tải đầu ≤ 400 kB gzip |
-| `npm run analyze:bundle`, `npm run perf:first-load` | Báo cáo bundle và dung lượng lần tải đầu |
-| `npm run test:sql` | Mọi migration và bộ SQL (gồm subscription/commerce) trên PostgreSQL trong tiến trình, không cần Docker; nằm trong `test:fast` |
-| `npm run test:supabase` | SQL fixtures; cần Docker, chạy trên database test riêng, không kết nối production |
-
-`test:perf`, `test:smoke`, `test:offline` cần `npm run build` trước và Chromium (`npx playwright install chromium`, hoặc đặt `CHROMIUM_EXECUTABLE`). Một số bộ Playwright cũ (`tests/launcher`, `tests/auth/entry`, `tests/blossom/launcher`, `tests/blossom/branding-integration`) chờ màn đăng nhập `#auth-entry-screen` không còn hiện, nên đang lệch so với giao diện hiện tại và fail cả trên bản gốc 2.12.2. Ca đầu của `tests/blossom/branding-integration` còn lỗi vì `import.meta.env` không có khi chạy ngoài Vite; `tests/blossom/standalone` cần file `../blossom-blast-review.html` nằm ngoài repo.
-
-`tests/storage/*-golden.json` ghi lại hành vi của `StorageService` và `SupabaseService`; chỉ cập nhật bằng `--update` khi cố ý đổi hành vi lưu trữ.
-
-## Bản duyệt và file sinh ra
-
-- `npm run preview:blossom`, `preview:rainbow`, `preview:launcher`, `preview:eat`, `preview:battleship`, `preview:word-chain` (phòng thử Nối Từ 4 người trên một máy): bản duyệt từng phần.
-- `npm run export:dungeon-review`: sinh `dungeon-titan-equipment-v6-3-playtest.html` một file, chạy offline (không lưu trong git).
-- `blossom-review.html`, `eat-review.html` ở thư mục gốc là trang entry cho dev server (`/blossom-review.html`).
-
-## Lịch sử
-
-Ghi chú phát hành 2.12.0 ở `docs/RELEASE-2.12.0.md`, kèm mã SHA-256 các file nguồn lúc đó trong `docs/RELEASE-2.12.0-SOURCE-MANIFEST.json`. Các đường dẫn đã dọn trong lần đóng gói trước nằm ở `docs/CLEANUP.json`.
+Netlify tự build/deploy từ `main`; cấu hình ở `netlify.toml`, Vercel ở `vercel.json`. Chi tiết triển khai đọc runbook đúng module qua INDEX. Release cũ: [2.12.0](docs/RELEASE-2.12.0.md), manifest và cleanup giữ trong `docs/`.

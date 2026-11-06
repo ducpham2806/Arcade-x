@@ -160,7 +160,9 @@
   #game-wrapper-viewport > header > div:last-child { gap:4px; }
 }
 @media (prefers-reduced-motion:reduce) {
-  .arcade-app *, .arcade-app *::before, .arcade-app *::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important; }
+  /* Reduce launcher decoration only. Games own their motion policy (CSS, sprites and
+     Canvas); shortening every descendant animation also erases gameplay feedback. */
+  .arcade-launcher *, .arcade-launcher *::before, .arcade-launcher *::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important; }
   .arcade-cartridge:hover,.arcade-cartridge:hover .game-artwork { transform:none; }
 }
 .chess-piece-holder { width:88%;height:88%;pointer-events:none; }

@@ -11,8 +11,10 @@ export function useBattleAudio(view:SoundView|null,key:string,seat:Seat,control:
  useEffect(()=>{const visibility=()=>{setHidden(document.hidden);if(document.hidden){sound.configure(false);setStatus(sound.status);}};document.addEventListener('visibilitychange',visibility);return()=>document.removeEventListener('visibilitychange',visibility);},[sound]);
  useEffect(()=>{sound.activate();return()=>sound.dispose();},[sound]);
  useEffect(()=>{const cues=tracker.current.update(view,key,seat,control,options.now??Date.now(),allowed,options.reduced);for(const cue of cues)sound.emit(cue);},[view,key,seat,control,allowed,options.now,options.reduced,sound]);
- const gesture=()=>{sound.configure(live.current.allowed);void sound.unlock().then(()=>setStatus(sound.status));};
+ // The sound button owns its gesture: a capture-phase unlock must not change a mute click
+ // into a resume click between pointerdown and click.
+ const gesture=(event?:React.SyntheticEvent)=>{if(event?.target instanceof Element&&event.target.closest('[data-battleship-audio]'))return;sound.configure(live.current.allowed);void sound.unlock().then(()=>setStatus(sound.status));};
  const toggle=()=>{if(options.isMuted)return;if(!localMuted&&status==='suspended'){sound.configure(!options.paused&&options.active!==false&&!document.hidden);void sound.unlock().then(()=>setStatus(sound.status));return;}const next=!localMuted;setLocalMuted(next);try{localStorage.setItem(preference,next?'1':'0');}catch{}sound.configure(!next&&!options.paused&&options.active!==false&&!document.hidden);void sound.unlock().then(()=>setStatus(sound.status));};
- const button=<button className="bs-icon" type="button" aria-label={options.isMuted?'Âm thanh đã tắt ở sảnh Arcade-x':localMuted?'Bật âm thanh':status==='suspended'?'Tiếp tục âm thanh':'Tắt âm thanh'} title={options.isMuted?'Bật âm thanh trong cài đặt Arcade-x':status==='unavailable'?'Trình duyệt không hỗ trợ âm thanh':undefined} aria-pressed={!options.isMuted&&!localMuted} disabled={options.isMuted} data-audio-state={status} onClick={toggle}>{options.isMuted||localMuted?'🔇':'🔊'}</button>;
- return {gesture,button};
+ const button=<button data-battleship-audio="true" className="bs-icon" type="button" aria-label={options.isMuted?'Âm thanh đã tắt ở sảnh Arcade-x':localMuted?'Bật âm thanh':status==='suspended'?'Tiếp tục âm thanh':'Tắt âm thanh'} title={options.isMuted?'Bật âm thanh trong cài đặt Arcade-x':status==='unavailable'?'Trình duyệt không hỗ trợ âm thanh':undefined} aria-pressed={!options.isMuted&&!localMuted} disabled={options.isMuted} data-audio-state={status} onClick={toggle}>{options.isMuted||localMuted?'🔇':'🔊'}</button>;
+ return {gesture,button,radar:()=>sound.emit({event:'radar'})};
 }

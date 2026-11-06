@@ -6,6 +6,7 @@ const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
+const assert = require('node:assert/strict');
 
 const PORT = 4324;
 const outDir = process.argv.find(a => a.startsWith('--outDir='))?.split('=')[1];
@@ -21,13 +22,19 @@ const only = process.argv.find(a => a.startsWith('--only='))?.split('=')[1]?.spl
   const failures = [];
   let passed = 0;
   try {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 860 } });
+    const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, serviceWorkers: 'block' });
+    // Test all bundled engines, not whichever subset a live catalog happens to publish.
+    // Never create anonymous test accounts or write game sessions to production.
+    await context.route('**/*', route => ['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort());
+    const page = await context.newPage();
     const errors = [];
     page.on('pageerror', e => errors.push(String(e).split('\n')[0]));
     await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'networkidle' });
     await page.locator('#game-library').waitFor({ timeout: 15000 });
     const ids = (await page.locator('[id^="btn-play-"]:not([id^="btn-play-ai-"]):not([id^="btn-play-recent-"])').evaluateAll(els => els.map(e => e.id.slice('btn-play-'.length))))
       .filter(id => !only || only.includes(id));
+    const bundled = Object.keys(JSON.parse(fs.readFileSync('src/games/packageAssets.json'))).filter(id => !only || only.includes(id));
+    assert.deepEqual([...ids].sort(), bundled.sort(), 'smoke must cover every bundled engine; do not silently skip unpublished catalog rows');
     for (const id of ids) {
       errors.length = 0;
       const started = Date.now();
