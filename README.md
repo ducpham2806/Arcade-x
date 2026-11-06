@@ -19,10 +19,12 @@ Backend riêng: sao chép `.env.example` → `.env.local`, điền URL/publishab
 
 | Cần biết | Đọc |
 |---|---|
-| Bắt đầu phiên | [AGENTS](AGENTS.md) → [bàn giao](docs/SESSION-HANDOFF.md) + mục mới nhất [WORKLOG](docs/WORKLOG.md) |
-| Việc cần làm | [Kế hoạch chi tiết](docs/PROJECT-PLAN.md); [quyết định chờ](docs/PENDING-DECISIONS.md) |
+| Bắt đầu phiên | [AGENTS](AGENTS.md) → [bàn giao](docs/SESSION-HANDOFF.md) → một thẻ task trong plan |
+| Việc cần làm | [Roadmap/thẻ việc](docs/PROJECT-PLAN.md); [quyết định chờ](docs/PENDING-DECISIONS.md) |
 | Đúng tài liệu của module | [INDEX](docs/INDEX.md), không nạp toàn bộ `docs/`/`.claude/` |
 | Test/preview và giới hạn đã biết | [TESTING](docs/TESTING.md); `package.json`, `.github/workflows/ci.yml` là nguồn lệnh |
+| Nhật ký / bàn giao / thu gọn | [WORKLOG](docs/WORKLOG.md), [COMPLETED](docs/COMPLETED.md), [WORKFLOW](docs/WORKFLOW.md) |
+| Game Studio / cấu hình làm việc | [Studio](docs/studio/INDEX.md), [project.md](project.md) |
 | Claude Code | [CLAUDE.md](CLAUDE.md); nguồn/giấy phép [CCGS-NOTICE](.claude/CCGS-NOTICE.md) |
 
 ## Mã nguồn

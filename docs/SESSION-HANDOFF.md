@@ -1,19 +1,21 @@
-# Bàn giao hiện tại · 05/11/2026
+# Bàn giao · 06/11/2026
 
-Mốc đã kiểm: `main@affc5e8` (PR #15, P3b/P3c), CI [41727993592](https://github.com/ducpham2806/Arcade-x/actions/runs/41727993592) qua. Đây là bằng chứng CI ngày 04/11 theo giờ Việt Nam; chưa kiểm trạng thái backend/hosting trực tiếp. Đầu phiên dùng `git log -1`/`git status` để xác định checkout hiện tại.
+**Nguồn gameplay:** `main@c705100` (PR #16 đã merge, xác minh qua GitHub). **Đợt tài liệu:** `codex/docs-game-studio-handoff`; xem `git status`/`git log -1` để biết mốc checkout thực tế. Không có gameplay đang code trong đợt này.
 
-| Mảng | Hiện trạng / việc kế tiếp |
-|---|---|
-| Nền tảng | 24 game trong code; M0–M8, Neon NR1–NR4 đã merge. Commerce vẫn tắt; adapter thật chưa đủ. |
-| Tank Clash | Chủ dự án đã duyệt phát hành bot + online tài khoản ArcadeX; adapter/icon/catalog game 24 đã có. Đang CI/merge/deploy trên `codex/tank-clash-launcher-release`; [LAUNCHER-RELEASE](tank-clash/LAUNCHER-RELEASE.md). TC2 tải/hai mạng vẫn còn; chưa thưởng/DB result. |
-| Nối Từ | Bot/offline và UI online có code; `online-config.json` tắt. Catalog migration, server/scheduler theo bàn giao chưa triển khai; phải xác minh môi trường trước làm. |
-| Duel | Trọng tài server có code/test; Chess/Xiangqi/Caro còn đường online cũ, cần deploy và nối UI sau flag. |
-| Chất lượng | Test cũ lệch auth; Battleship cần đo điện thoại, Nối Từ cần Telex/VNI; banner có vệt đen; Block Breaker thiếu ảnh gốc, Blossom thiếu art phụ. |
+**DOC-01 DONE:** cập nhật roadmap, nhật ký và quy trình thu gọn; cài đủ Game Studio Agent từ `c5dac462` (116 skill, 21 vai trò, 4 rules). Chi tiết cài ở [studio/INSTALLATION](studio/INSTALLATION.md). Không có “bộ nhớ model” đảm bảo ngoài file dự án.
 
-**Đợt hiện tại 05/11:** `codex/tank-clash-launcher-release`, worktree riêng vì thư mục gốc được chuyển về main trong lúc làm. Đã duyệt merge main + Netlify và online public, giữ một Render Free; không hỏi lại phê duyệt này. Mốc backend cũ `3950abb` vẫn staging cho tới khi chuyển cấu hình theo [LAUNCHER-RELEASE](tank-clash/LAUNCHER-RELEASE.md). Kiểm chứng hiện tại ở mục mới nhất [WORKLOG](WORKLOG.md).
+## Bước tiếp theo
 
-**Tiếp theo:** Mac đã mở khóa, nhánh đã push/PR #16; sửa thứ tự cài WS trước Typecheck sau CI 42022618828 lỗi môi trường, job CI được cấp 30 phút để chạy đủ các suite browser (không đổi test), chờ CI trên commit cuối → merge main → kiểm Netlify/Render, icon/chơi bot/online Auth đúng project. Không SQL production, thêm chi phí hoặc guest/wildcard. Sau phát hành vẫn phải đo TC2 hai thiết bị/hai mạng/tải backend đích; không coi owner duyệt là bằng chứng các phép đo này.
+1. Chọn **TC-R0** tại [plans/TANK-CLASH](plans/TANK-CLASH.md): đọc release/runbook đúng mục, xác minh commit frontend/backend đang Live và bot/online/Auth. Chưa làm kiểm tra deployment trong đợt docs.
+2. Sau đó TC-R1: nhiều tài khoản, hai thiết bị/hai mạng, tải ≥30 phút trên Render. Phép đo local cũ không thay nghiệm thu này.
+3. Thứ tự tiếp: Nối Từ → Duel → Snake → QA/polish. Chỉ mở [PROJECT-PLAN](PROJECT-PLAN.md) nếu đổi ưu tiên.
 
-**Lưu ý kỹ thuật:** CSS riêng game (`tc-`, `nt-`, `wc-`); catalog server chọn game trong `launcher_games`; Tank Clash là bản miễn phí bổ sung từ bundle khi catalog cũ chưa có dòng, server maintenance/premium vẫn ưu tiên. Dev dùng `LOCAL_REVIEW_GAME_IDS`. Đổi số game cần xem `tests/{integration/full-release.mjs,artwork/catalog.mjs,readability/contrast.mjs}`. Phòng online dùng CAS/receipt/presence 90 s; đang lặp 3 bộ (xem `TECH-DEBT.md`). Tank dùng WS riêng. Cosmic `legacy-*` vẫn được engine/replay sử dụng.
+## Giữ lại để không làm sai
 
-Tra lệnh/cấu trúc: [README](../README.md); tra đúng module: [INDEX](INDEX.md). Lịch sử: mục mới nhất [WORKLOG](WORKLOG.md), chi tiết cũ `archive/`; chỉ đọc khi truy vết.
+- Tank bot/1v1/2v2/catalog đã merge. Không còn task “chờ merge PR #16”. Render từng deploy thủ công; trạng thái đang Live phải kiểm lại. Giữ một Free/cap16, không chi phí thêm.
+- P2 staging cũ có wire khác P3. Chỉ port cải tiến còn thiếu, không merge nguyên nhánh.
+- Nối Từ online flag tắt; Duel UI chưa dùng hết trọng tài mới; Snake còn preview. Commerce checkout tắt; không migration production.
+- Lượt audit 06/11: lint/build/bundle/fast và 18 WS/ops qua; full browser không chạy lại trong lượt đó. Doc check của DOC-01 ghi ở WORKLOG; không suy thành nghiệm thu thiết bị.
+- `deliverables/` có artifact local từ trước; không đưa vào commit tài liệu.
+
+**Đọc tối thiểu:** AGENTS → file này → một thẻ plans. Khi cần công nghệ đọc [project](../project.md); skill qua [studio/INDEX](studio/INDEX.md). Trước chuyển việc: tóm tắt task xong, thu gọn log và checkpoint theo [WORKFLOW](WORKFLOW.md).

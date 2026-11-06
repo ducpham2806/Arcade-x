@@ -1,5 +1,7 @@
 # Rainbow Blocks · Bản duyệt 13/10/2026
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 Được xây trên source đã dọn gần nhất, dùng GDD v1.0, 5 wireframe và bộ SVG `rainbow_blocks_assets.zip` người dùng cung cấp. Bản source đã hợp nhất; không publish Netlify hoặc thay đổi database production.
 
 ## Đã thực hiện

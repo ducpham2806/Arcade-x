@@ -1,0 +1,56 @@
+# ============================================================================
+# GAME STUDIO AGENT — PROJECT CONFIGURATION (`project.yaml`)
+# Nguồn cấu hình trung tâm cho toàn bộ Agents, Subagents và 38 Skills
+# ============================================================================
+
+project:
+  name: "My Game Project"
+  version: "0.1.0"
+  stage: "concept" # concept | prototype | technical-setup | vertical-slice | production | alpha-beta | release
+
+engine:
+  # Chọn 1 trong các giá trị: godot4 | unity | unreal5 | roblox | web
+  type: "godot4"
+  version: "4.3"
+  language: "gdscript" # gdscript | csharp | cpp | luau | typescript
+  code_root: "src"     # src (Godot) | Assets/Scripts (Unity) | Source (Unreal) | src (Roblox/Rojo)
+  assets_root: "assets"
+
+modes:
+  # Mức độ chặt chẽ của quy trình Studio:
+  # - minimal: Tốc độ làm prototype/jam (1 trang brief, ưu tiên ra code chạy được, vẫn bắt buộc kiểm tra hiển thị trực quan)
+  # - standard: Cân bằng (5 mục GDD cốt lõi, review tinh gọn, kiểm thử tiêu chuẩn)
+  # - full: Chuẩn Studio chuyên nghiệp (đầy đủ 8 mục GDD, 3 Giám đốc duyệt, kiểm thử toàn diện)
+  rigor: "minimal"
+
+  # Cấu hình chi tiết (tự động suy ra từ rigor nếu không chỉnh riêng):
+  workflow: "minimal"          # minimal | standard | full
+  docs:
+    density: "terse"           # terse | balanced | thorough
+  qa:
+    level: "minimal"           # minimal | standard | full
+  story_granularity: "coarse"  # coarse | standard | fine
+  review_mode: "solo"          # solo | lean | full
+  automation: "collaborative"  # collaborative (hỏi trước khi ghi) | guided | autonomous
+
+# Cho phép nâng mức độ chặt chẽ riêng cho từng hệ thống quan trọng (ví dụ: combat, economy)
+system_overrides:
+  combat:
+    workflow: "standard"
+    qa_level: "standard"
+  economy:
+    workflow: "standard"
+
+# Kiểm soát nghiêm ngặt bằng chứng kiểm thử trước khi đóng Story (/story-done)
+testing:
+  strict:
+    logic: true        # Bắt buộc có unit test cho công thức tính toán (sát thương, kinh tế)
+    integration: false # Cảnh báo nếu thiếu integration test ở chế độ minimal
+    visual: true       # LUÔN BẮT BUỘC: Phải chạy game và lưu ảnh chụp thực tế vào production/qa/evidence/
+    ui: true           # LUÔN BẮT BUỘC: Kiểm tra giao diện không tràn lề/lệch khung hình
+    config: true       # Kiểm tra JSON/Resource hợp lệ
+
+performance_targets:
+  target_fps: 60
+  frame_budget_ms: 16.6
+  resolution_base: "1920x1080"

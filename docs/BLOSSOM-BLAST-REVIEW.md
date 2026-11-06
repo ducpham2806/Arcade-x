@@ -1,5 +1,7 @@
 # Đánh giá Blossom Blast: Nature's story (01/11/2026)
 
+> **Mốc tài liệu lịch sử:** các trạng thái/giới hạn bên dưới thuộc thời điểm báo cáo. Hiện trạng 06/11/2026 và việc tiếp theo ở [PROJECT-PLAN](PROJECT-PLAN.md); PR #16 đã merge vào main c705100. Không dùng câu “chưa merge/deploy” cũ để suy ra trạng thái hiện tại; production vẫn cần xác minh trực tiếp.
+
 Game `hex-match` (`src/games/hex-match/`, khoảng 12.500 dòng gồm mã và dữ liệu). Đây là bản đánh giá đầu tiên chạy bằng skill `/game-review`.
 
 ## Nguồn đánh giá
