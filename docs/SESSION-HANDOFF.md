@@ -9,7 +9,7 @@
 - Bản sửa local: identity riêng listener + authEpoch hủy restore cũ. 5/5 regression qua (4fail trước sửa); TypeScript/build/bundle qua, fast qua (exit0). UI fixture AuthProvider thật đã thấy A→guest→B. Chưa merge/deploy sửa Auth.
 - Đầu vào tiếp: [BUG-AUTH-CROSS-TAB](qa/BUG-AUTH-CROSS-TAB.md) → src/services/auth.ts + tests/auth/cross-tab.mjs. Local fast/commit đã xong; push và chạy CI đầy đủ trước merge code.
 - B thật đã xác nhận khác A; tab game nhận B, mã phòng A cũ không còn, B tạo phòng mới qua. Race logout cần retest sau phát hành. IAB tab1/2 giữ phiên cho chủ dự án; không tự logout. Quan sát bảng kết quả2hiệp nhưng chưa đủ TC-R1.
-- GitHub check verify c705100 success, run42174413262. Netlify deploy ID/commit dashboard còn thiếu; bundle source đã byte-match. Chrome native bị chuyển cửa sổ/timeout, không đọc project riêng khác.
+- GitHub verify c705100 success, run42174413262. Netlify dashboard07/11 xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75 lúc06/11 13:26 UTC+7; bundle đã byte-match. PR#17 đã mở, chờ CI đầy đủ trước merge/phát hành sửa Auth.
 - Chủ dự án cho phép public báo cáo TC-R0/metadata Render-Supabase. [Báo cáo release](tank-clash/TC-R0-2026-11-06.md) giữ mốc06/11. Blueprint cũ vẫn paused, không sync ghi đè service main.
 
 ## Giữ lại để không làm sai

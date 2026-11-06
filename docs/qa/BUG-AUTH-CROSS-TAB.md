@@ -29,4 +29,4 @@ AuthService.listen so sánh event với arcadex_current_user trong localStorage 
 
 ## Bước tiếp
 
-Xong fast/local → commit/push nhánh TC-R0, CI đầy đủ trước merge code theo AGENTS; chưa tự phát hành sửa Auth. Sau phát hành mới xác minh lại logout/đổi2account trên host thật. Còn định danh Netlify deploy riêng; GitHub status không có Netlify context, không coi pending với statuses rỗng là CI fail.
+Fast/local/commit/push xong, PR#17 đã mở; CI đầy đủ trước merge code theo AGENTS. Sau phát hành xác minh lại logout/đổi2account trên host thật. Dashboard Netlify đã xác nhận bản Published main/c705100, deploy6aed73038b5150c7c4541f75; bằng chứng chi tiết ở báo cáo TC-R0.

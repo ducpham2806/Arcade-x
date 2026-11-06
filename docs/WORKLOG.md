@@ -4,7 +4,7 @@ Nhật ký chính duy nhất. Giữ ≤3 mục gần nhất, kết quả gọn; 
 
 ## 07/11/2026 · TC-R0 / AUTH-XTAB ACTIVE · codex/tank-clash-release-verification
 
-- GitHub verify c705100 success (run42174413262). Native Chrome bị chuyển cửa sổ/timeout; chưa lấy thêm Netlify deploy ID, không đổi dịch vụ.
+- GitHub verify c705100 success (run42174413262). Netlify dashboard xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75 lúc06/11 13:26 UTC+7. PR#17 đã mở, CI đầy đủ đang chạy.
 - Tái hiện logout xuyên tab: tab điều khiển thành khách, Tank về menu nhưng EntryScreen tab game còn hồ sơ A. [Bug/bằng chứng](qa/BUG-AUTH-CROSS-TAB.md).
 - Sửa AuthService.listen giữ identity riêng mỗi tab, hủy restore cũ khi identity đổi; 4/5 regression mới fail trước sửa, 5/5 qua sau sửa; TypeScript/build/bundle qua, fast qua (exit0). Browser fixture AuthProvider thật xác nhận A→guest→B, không thay nghiệm thu2account thật.
 - Thêm test:auth-session vào fast. B thật khác A, tab game nhận B, mã phòng A cũ không còn, tạo phòng B qua. Bản sửa chưa merge/deploy; cần retest race sau phát hành. Audit06/11 chuyển nguyên văn vào archive/WORKLOG-2026-11-06-merge-audit-summary.md.

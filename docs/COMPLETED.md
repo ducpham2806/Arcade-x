@@ -7,7 +7,7 @@
 - Nhánh codex/tank-clash-release-verification: sửa listener Auth giữ identity riêng, hủy restore cũ; thêm test:auth-session vào fast.
 - Red/green:4/5 fail trước sửa,5/5 qua sau sửa; lint/build/bundle/fast qua; UI AuthProvider thật với fixture A→guest→B qua.
 - Production hai account thật: B khác A, tab game nhận B, phòng A cũ không còn, tạo phòng B qua. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
-- Chưa phát hành sửa Auth; race logout cần retest sau merge/deploy. TC-R0 còn metadata frontend; TC-R1 chưa đạt.
+- Netlify dashboard xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75. Sửa Auth ở PR#17 chưa phát hành; race logout cần retest sau merge/deploy. TC-R1 chưa đạt.
 
 ## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
 
