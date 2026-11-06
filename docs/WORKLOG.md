@@ -2,12 +2,19 @@
 
 Nhật ký chính duy nhất. Giữ ≤3 mục gần nhất, kết quả gọn; trước đổi việc tóm tắt vào [COMPLETED](COMPLETED.md), chuyển chi tiết nguyên văn sang archive theo [WORKFLOW](WORKFLOW.md).
 
-## 06/11/2026 · TC-R0 WAITING · codex/tank-clash-release-verification
+## 07/11/2026 · TC-R0 / AUTH-XTAB ACTIVE · codex/tank-clash-release-verification
 
-- Kiểm public frontend: bốn JS tải đầu trùng byte dist, icon/banner/Tank bot 1v1 chạy, Online khách mở login. Catalog cloud tải xong còn23 game, Nối Từ không thấy; để WC-R0.
-- Render dashboard Live3950abb/nhánh staging cũ; env đã lưu production nhưng Live review/config vẫn200/Auth staging. Health200/P3, metrics404; WS origin đúng101/token giả AUTH_FAILED, origin lạ/null/thiếu403.
-- Chrome bị chuyển tab rồi timeout; chưa lưu settings/deploy. Chưa có đăng nhập thật, chưa nghiệm thu online production. Cần tiếp deploy main và kiểm account sau khi browser ổn định.
-- [Bằng chứng và điểm tiếp tục](tank-clash/TC-R0-2026-11-06.md); cập nhật plan/bàn giao, giữ task WAITING. Không đổi gameplay/DB/chi phí. Mục05/11 chuyển nguyên văn sang archive/WORKLOG-2026-11-05-launcher-summary.md.
+- GitHub verify c705100 success (run42174413262). Native Chrome bị chuyển cửa sổ/timeout; chưa lấy thêm Netlify deploy ID, không đổi dịch vụ.
+- Tái hiện logout xuyên tab: tab điều khiển thành khách, Tank về menu nhưng EntryScreen tab game còn hồ sơ A. [Bug/bằng chứng](qa/BUG-AUTH-CROSS-TAB.md).
+- Sửa AuthService.listen giữ identity riêng mỗi tab, hủy restore cũ khi identity đổi; 4/5 regression mới fail trước sửa, 5/5 qua sau sửa; TypeScript/build/bundle qua, fast qua (exit0). Browser fixture AuthProvider thật xác nhận A→guest→B, không thay nghiệm thu2account thật.
+- Thêm test:auth-session vào fast. B thật khác A, tab game nhận B, mã phòng A cũ không còn, tạo phòng B qua. Bản sửa chưa merge/deploy; cần retest race sau phát hành. Audit06/11 chuyển nguyên văn vào archive/WORKLOG-2026-11-06-merge-audit-summary.md.
+
+## 06/11/2026 · TC-R0 WAITING ca cuối · codex/tank-clash-release-verification
+
+- Chốt lệch frontend/main và Render/staging3950abb; đã chuyển service main/build theo render.yaml, manual deploy c705100 Live14:54, Free/cap16, preflight Auth production. Không đổi key/DB/chi phí.
+- Health200/P3/instance mới; review/config/metrics404, origin lạ/null/thiếu403, token giả AUTH_FAILED. Account thật tạo/rời1v1, tạo2v2/exit đều dọn phòng; logout sau exit→online mở login. Không ghi thông tin account/token.
+- Chủ dự án cho phép công khai metadata TC-R0; báo cáo trước deploy xuất a30b880 sau auto-review từng chặn. Browser chọn nhầm cửa sổ ngoài phạm vi bị chặn; mở đúng Render theo người dùng, deploy sau đó thành công.
+- [Bằng chứng/bước tiếp](tank-clash/TC-R0-2026-11-06.md). Còn đổi2account/logout khi giữ ghế, metadata frontend; TC-R1 mạng/tải thật chưa làm. Blueprint cũ vẫn paused, không sync ghi đè. Doc/link/budget kiểm lại trước commit.
 
 ## 06/11/2026 · DOC-01 · codex/docs-game-studio-handoff
 
@@ -16,9 +23,3 @@ Nhật ký chính duy nhất. Giữ ≤3 mục gần nhất, kết quả gọn; 
 - Archive nguyên văn plan/bàn giao/log trước chỉnh; gắn cảnh báo lịch sử vào các báo cáo dễ gây nhầm. Không đổi code game hoặc dịch vụ.
 - Kiểm chứng: 24 đầu vào Markdown/link/budget qua, WORKLOG 3 mục; 297 blob khớp nguồn; quick_validate 117/117 skill; test:claude 19 agent/11 skill cũ qua; git diff --check qua. Validator tổng upstream lỗi đường dẫn router cả ở nguồn, đã ghi giới hạn; không chạy lại gameplay CI cho đợt docs. Chủ dự án cho phép publish thư viện private vào repo public.
 - Tiếp: TC-R0 kiểm bản chạy thật; còn mạng/thiết bị, Nối Từ/Duel, Snake, QA và commerce theo plan.
-
-## 06/11/2026 · MERGE-AUDIT · main c705100
-
-- Kiểm đủ lịch sử/24 nhánh remote và PR; không có PR mở hoặc PR đóng chưa merge được GitHub search trả về. Xác nhận PR #16 merged, fast-forward local main từ affc5e8 thêm 13 commit; không merge mới trên remote.
-- Ba nhánh khác tổ tiên: docs tương đương, P3 triển khai song song, P2 staging cần port sang wire P3. WIP local P3d đã được bản hoàn chỉnh thay thế.
-- Node 24.22.2: lint/build/bundle/fast qua; WS/ops 18/18 qua với loopback. Không chạy lại full browser/kiểm deploy. Artifact JSON audit ở deliverables local không phải checkpoint phiên.

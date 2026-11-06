@@ -2,9 +2,10 @@
 
 Mốc 06/11/2026, main c705100. **Đã có:** bot, private 1v1/2v2, party/queue, spectator, rematch, account adapter và catalog. **Chưa đồng nghĩa:** đã deploy đúng head, nghiệm thu tải/thiết bị, có reward/DB result. Giữ wire `tank-clash.p3.v1`, online không thêm bot, Free/cap16/không phí thêm. Scope sản phẩm được duyệt trong [LAUNCHER-RELEASE](../tank-clash/LAUNCHER-RELEASE.md).
 
-## TC-R0 · WAITING · xác minh bản phát hành đang chạy
+## TC-R0 · ACTIVE · xác minh bản phát hành đang chạy
 
-- Đã kiểm 06/11: bundle frontend trùng build local, bot và login gate qua; Render Live vẫn 3950abb/Auth staging, review200. Cần cập nhật backend và đăng nhập thật; [bằng chứng/điểm tiếp tục](../tank-clash/TC-R0-2026-11-06.md). Chrome bị thao tác đồng thời rồi timeout, chưa đổi settings/deploy.
+- 06/11: đã deploy c705100 lên Render Free/main; health200, review/config/metrics404, origin/token âm qua. Account thật tạo/rời1v1, tạo2v2/exit dọn phòng và logout→online bị chặn qua. 07/11 đổi2account và mã A cũ đã kiểm; còn phát hành/retest race Auth và deploy ID Netlify; [bằng chứng](../tank-clash/TC-R0-2026-11-06.md). Không deploy lại vì ghi chú cũ3950abb.
+- Bug07/11: logout xuyên tab hạ quyền Tank nhưng EntryScreen còn hồ sơ cũ; [AUTH-XTAB](../qa/BUG-AUTH-CROSS-TAB.md) đang sửa/test local, chưa merge/deploy.
 - Đầu vào: release ở trên và [TC2-RUNBOOK](../tank-clash/TC2-RUNBOOK.md), chỉ mục deploy/health/Auth/rollback.
 - File đích để đối chiếu: `render.yaml`, `server/tank-clash-room/{server,config}.mjs`, `src/games/tank-clash/index.tsx`, `src/launcher/catalog.ts`.
 - [ ] Đọc commit/deploy frontend và Render thực tế; ghi bằng chứng mới. Nếu chưa đúng head, chuẩn bị/thực hiện bước phát hành trong quyền đã duyệt; không suy trạng thái từ tên hostname “staging”.

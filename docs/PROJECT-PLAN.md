@@ -4,7 +4,7 @@ Mốc nguồn đã xác minh: `main@c705100`, PR #16 đã merge; checkout đã �
 
 ## Trọng tâm và thứ tự
 
-**DOC-01 đã xong** trên nhánh tài liệu 9eff18c. **Hiện tại TC-R0 WAITING:** frontend/bot/login gate đã kiểm; Render vẫn bản staging cũ, cần hoàn tất deploy và phiên thật. Xem thẻ Tank. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**DOC-01 đã xong** trên nhánh tài liệu 9eff18c. **Hiện tại TC-R0 ACTIVE:** Render/main đã Live, Auth thật/create/leave/exit/logout cơ bản qua; B thật/mã phòng A cũ đã kiểm. Sửa Auth xuyên tab qua local; còn CI/phát hành/retest và metadata Netlify. Xem thẻ Tank. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|

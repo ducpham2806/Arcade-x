@@ -2,6 +2,21 @@
 
 Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## AUTH-XTAB phần sửa nguồn / QA B · 07/11/2026
+
+- Nhánh codex/tank-clash-release-verification: sửa listener Auth giữ identity riêng, hủy restore cũ; thêm test:auth-session vào fast.
+- Red/green:4/5 fail trước sửa,5/5 qua sau sửa; lint/build/bundle/fast qua; UI AuthProvider thật với fixture A→guest→B qua.
+- Production hai account thật: B khác A, tab game nhận B, phòng A cũ không còn, tạo phòng B qua. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
+- Chưa phát hành sửa Auth; race logout cần retest sau merge/deploy. TC-R0 còn metadata frontend; TC-R1 chưa đạt.
+
+## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
+
+- Đã phát hiện và sửa Render còn staging3950abb; service main/c705100 đã Live14:54, Free/cap16/Node24, registered-free đúng ArcadeX.
+- Health/TLS/origin/token âm qua; review/config/metrics public404. Không đổi SQL/key/chi phí.
+- Account thật tạo/rời1v1, tạo2v2/exit dọn phòng, logout sau exit chặn online lại; không bắt đầu trận nhiều người.
+- Bằng chứng: [TC-R0 report](tank-clash/TC-R0-2026-11-06.md). Toàn TC-R0 chưaDONE: còn phát hành/retest lỗi Auth phát hiện07/11 và metadata deploy frontend; TC-R1 chưa làm.
+- Giữ Blueprint cũ paused, không sync ghi đè service main; lần sau tiếp QA còn thiếu, không deploy lại vô cớ.
+
 ## DOC-01 · 06/11/2026 · chuẩn hóa đầu vào phiên
 
 - Nhánh `codex/docs-game-studio-handoff`, nền gameplay `c705100`.
