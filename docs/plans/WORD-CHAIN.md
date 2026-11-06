@@ -6,6 +6,8 @@ Mốc 06/11/2026. Có bot/offline, UI/core phòng server, schema/Edge/test. `src
 
 ## WC-R0 · READY · xác minh catalog và chuẩn bị staging
 
+- Audit07/11: source/test đã có trong main và nhánh hiện tại; RPC catalog công khai không trả word-chain, fallback chỉ DEV; online vẫn tắt. [Bằng chứng](../qa/WC-R0-2026-11-07.md). Chưa kiểm history/staging hoặc thay DB.
+
 - File đích: `supabase/migrations/20261102090000_word_chain_catalog.sql`, `src/launcher/catalog.ts`, registry và package game.
 - [ ] Đọc catalog/migration history đích; thử riêng migration trên staging, không chạy lại cả bộ lên production.
 - [ ] Kiểm không trùng ID/quyền, bot/offline/mở/thoát và game cũ giữ nguyên. Chuẩn bị rollback; production theo quyền hiện hành, không coi roadmap là quyền SQL.

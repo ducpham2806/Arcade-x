@@ -4,7 +4,7 @@ Mốc nguồn đã xác minh: `main@c705100`, PR #16 đã merge; checkout đã �
 
 ## Trọng tâm và thứ tự
 
-**DOC-01 đã xong** trên nhánh tài liệu 9eff18c. **Hiện tại TC-R0 ACTIVE:** Render/main đã Live; B thật/mã phòng A cũ đã kiểm; Netlify Published main/c705100 đã xác nhận dashboard. Sửa Auth xuyên tab qua local, PR#17 chờ CI/phát hành/retest. Xem thẻ Tank. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**DOC-01 đã xong** trên nhánh tài liệu 9eff18c. **Hiện tại TC-R0 ACTIVE:** Render/main đã Live; B thật/mã A cũ và Netlify main/c705100 đã kiểm. PR#17 sửa Auth qua local; đang sửa dependency gây lỗi Netlify Preview trước CI/merge/retest. Audit Nối Từ: source có trong main, catalog public chưa trả game. Xem thẻ Tank/Nối Từ. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|

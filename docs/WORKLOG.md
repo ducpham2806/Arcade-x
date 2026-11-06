@@ -2,6 +2,13 @@
 
 Nhật ký chính duy nhất. Giữ ≤3 mục gần nhất, kết quả gọn; trước đổi việc tóm tắt vào [COMPLETED](COMPLETED.md), chuyển chi tiết nguyên văn sang archive theo [WORKFLOW](WORKFLOW.md).
 
+## 07/11/2026 · NETLIFY-BUILD ACTIVE / WC-R0 audit · codex/tank-clash-release-verification
+
+- Chủ dự án báo Netlify Preview lỗi TS2307; checkout sạch tái hiện thiếu ws trong nested server dependencies. Thêm deps:tank-clash dùng chung CI và Netlify trước lint/build, giữ đầy đủ kiểm tra; chuỗi preview gồm Snake đã exit0 sau sửa.
+- [Báo cáo build](qa/NETLIFY-BUILD-2026-11-07.md); tiếp push/kiểm deploy Netlify và CI head mới trước merge PR#17. CI cũ đang chạy không thay kết quả mới.
+- [Nối Từ](qa/WC-R0-2026-11-07.md) đã có source/test trong main/nhánh; RPC public23mục không trả word-chain, fallback chỉ DEV/online flagfalse. Chưa thay catalog/DB/online; không phải thiếu merge game.
+- DOC-01 đã tóm tắt ở COMPLETED; chuyển mục log nguyên văn vào [archive](archive/WORKLOG-2026-11-06-DOC-01.md) để giữ≤3mục.
+
 ## 07/11/2026 · TC-R0 / AUTH-XTAB ACTIVE · codex/tank-clash-release-verification
 
 - GitHub verify c705100 success (run42174413262). Netlify dashboard xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75 lúc06/11 13:26 UTC+7. PR#17 đã mở, CI đầy đủ đang chạy.
@@ -15,11 +22,3 @@ Nhật ký chính duy nhất. Giữ ≤3 mục gần nhất, kết quả gọn; 
 - Health200/P3/instance mới; review/config/metrics404, origin lạ/null/thiếu403, token giả AUTH_FAILED. Account thật tạo/rời1v1, tạo2v2/exit đều dọn phòng; logout sau exit→online mở login. Không ghi thông tin account/token.
 - Chủ dự án cho phép công khai metadata TC-R0; báo cáo trước deploy xuất a30b880 sau auto-review từng chặn. Browser chọn nhầm cửa sổ ngoài phạm vi bị chặn; mở đúng Render theo người dùng, deploy sau đó thành công.
 - [Bằng chứng/bước tiếp](tank-clash/TC-R0-2026-11-06.md). Còn đổi2account/logout khi giữ ghế, metadata frontend; TC-R1 mạng/tải thật chưa làm. Blueprint cũ vẫn paused, không sync ghi đè. Doc/link/budget kiểm lại trước commit.
-
-## 06/11/2026 · DOC-01 · codex/docs-game-studio-handoff
-
-- Lập lại PROJECT-PLAN và 7 thẻ tiếp tục theo game/module; thêm project.md, COMPLETED, WORKFLOW, mẫu TASK. Sửa bàn giao hết trạng thái chờ merge PR #16; phân biệt code/merge/deploy/nghiệm thu.
-- Cài Game Studio `c5dac462` đầy đủ 116 skill, 21 vai trò, 4 rules; 297 file đối chiếu byte/blob. Một đầu mối discovery, thư viện chỉ nạp theo nhu cầu; hướng dẫn/manifest ở studio/*.md.
-- Archive nguyên văn plan/bàn giao/log trước chỉnh; gắn cảnh báo lịch sử vào các báo cáo dễ gây nhầm. Không đổi code game hoặc dịch vụ.
-- Kiểm chứng: 24 đầu vào Markdown/link/budget qua, WORKLOG 3 mục; 297 blob khớp nguồn; quick_validate 117/117 skill; test:claude 19 agent/11 skill cũ qua; git diff --check qua. Validator tổng upstream lỗi đường dẫn router cả ở nguồn, đã ghi giới hạn; không chạy lại gameplay CI cho đợt docs. Chủ dự án cho phép publish thư viện private vào repo public.
-- Tiếp: TC-R0 kiểm bản chạy thật; còn mạng/thiết bị, Nối Từ/Duel, Snake, QA và commerce theo plan.

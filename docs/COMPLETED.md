@@ -9,6 +9,11 @@
 - Production hai account thật: B khác A, tab game nhận B, phòng A cũ không còn, tạo phòng B qua. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
 - Netlify dashboard xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75. Sửa Auth ở PR#17 chưa phát hành; race logout cần retest sau merge/deploy. TC-R1 chưa đạt.
 
+## WC-R0 phần xác minh nhánh/catalog · 07/11/2026
+
+- Nối Từ đã có source/test trong main c705100 và nhánh TC-R0; không bỏ sót merge game. Catalog public trả23mục, không trả word-chain; fallback chỉ DEV, Netlify Preview cũng production mode.
+- [Audit](qa/WC-R0-2026-11-07.md) giữ bằng chứng và giới hạn: chưa đọc migration history/staging, chưa thay DB hoặc bật online. Tiếp theo thẻ WORD-CHAIN/quyết định#7/#8.
+
 ## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
 
 - Đã phát hiện và sửa Render còn staging3950abb; service main/c705100 đã Live14:54, Free/cap16/Node24, registered-free đúng ArcadeX.

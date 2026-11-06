@@ -4,6 +4,7 @@
   "version": "2.12.2",
   "type": "module",
   "scripts": {
+    "deps:tank-clash": "npm ci --prefix server/tank-clash-room --ignore-scripts && npm ci --prefix server/tank-clash-spike --ignore-scripts",
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "node scripts/build-duel-worker.mjs && vite build",
     "preview": "vite preview",
