@@ -2,8 +2,9 @@
 
 Mốc 06/11/2026, main c705100. **Đã có:** bot, private 1v1/2v2, party/queue, spectator, rematch, account adapter và catalog. **Chưa đồng nghĩa:** đã deploy đúng head, nghiệm thu tải/thiết bị, có reward/DB result. Giữ wire `tank-clash.p3.v1`, online không thêm bot, Free/cap16/không phí thêm. Scope sản phẩm được duyệt trong [LAUNCHER-RELEASE](../tank-clash/LAUNCHER-RELEASE.md).
 
-## TC-R0 · READY · xác minh bản phát hành đang chạy
+## TC-R0 · WAITING · xác minh bản phát hành đang chạy
 
+- Đã kiểm 06/11: bundle frontend trùng build local, bot và login gate qua; Render Live vẫn 3950abb/Auth staging, review200. Cần cập nhật backend và đăng nhập thật; [bằng chứng/điểm tiếp tục](../tank-clash/TC-R0-2026-11-06.md). Chrome bị thao tác đồng thời rồi timeout, chưa đổi settings/deploy.
 - Đầu vào: release ở trên và [TC2-RUNBOOK](../tank-clash/TC2-RUNBOOK.md), chỉ mục deploy/health/Auth/rollback.
 - File đích để đối chiếu: `render.yaml`, `server/tank-clash-room/{server,config}.mjs`, `src/games/tank-clash/index.tsx`, `src/launcher/catalog.ts`.
 - [ ] Đọc commit/deploy frontend và Render thực tế; ghi bằng chứng mới. Nếu chưa đúng head, chuẩn bị/thực hiện bước phát hành trong quyền đã duyệt; không suy trạng thái từ tên hostname “staging”.

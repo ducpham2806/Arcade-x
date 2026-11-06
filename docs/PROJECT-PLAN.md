@@ -4,7 +4,7 @@ Mốc nguồn đã xác minh: `main@c705100`, PR #16 đã merge; checkout đã �
 
 ## Trọng tâm và thứ tự
 
-**Hiện tại DOC-01:** chuẩn hóa tài liệu + cài thư viện Studio. Đầu việc gameplay tiếp theo đề xuất **TC-R0**; chưa bắt đầu. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**DOC-01 đã xong** trên nhánh tài liệu 9eff18c. **Hiện tại TC-R0 WAITING:** frontend/bot/login gate đã kiểm; Render vẫn bản staging cũ, cần hoàn tất deploy và phiên thật. Xem thẻ Tank. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
