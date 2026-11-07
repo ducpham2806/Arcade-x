@@ -4,7 +4,16 @@ Mốc 06/11/2026. Có bot/offline, UI/core phòng server, schema/Edge/test. `src
 
 **Đầu vào Markdown:** [WORD-CHAIN-SERVER](../WORD-CHAIN-SERVER.md), phần triển khai/schema/tick; [PENDING-DECISIONS](../PENDING-DECISIONS.md) #7/#8. Chỉ đọc spec luật khi đổi luật.
 
-## WC-R0 · READY · xác minh catalog và chuẩn bị staging
+## WC-L0 · ACTIVE · ra sảnh với bot và artwork · 07/11/2026
+
+- Chủ dự án yêu cầu public game trong sảnh, icon/banner. Phát hành free/offline từ bundle giống Tank; giữ online=false và ưu tiên maintenance/premium của server; không migration production.
+- File đích: catalog/repository, registry/FeaturedCarousel, art pipeline/masters, packageAssets và test catalog/offline/UI.
+- ImageGen:2master phong cách khối chữ ivory/amber trên nền indigo; icon512 và banner1280×640, URL có hash, lưu prompt/provenance Markdown cạnh master. Không đưa toàn ảnh vào JS đầu trang.
+- [ ] Catalog cloud cũ vẫn hiện đúng1game, mở/bot/favorite/recent/offline; không bypass policy server.
+- [ ] Icon/banner thực tế PC/mobile, chữ dấu Việt đúng; build/bundle/fast và full CI trước merge/phát hành, kiểm Netlify production.
+- Game_Studio_Agent main vẫn c5dac462,297blob/116skill/21role/4rules đã khớp; giữ một discovery entrypoint, đọc theo nhiệm vụ.
+
+## WC-R0 · READY · catalog/schema staging sau release bundle
 
 - Audit07/11: source/test đã có trong main và nhánh hiện tại; RPC catalog công khai không trả word-chain, fallback chỉ DEV; online vẫn tắt. [Bằng chứng](../qa/WC-R0-2026-11-07.md). Chưa kiểm history/staging hoặc thay DB.
 

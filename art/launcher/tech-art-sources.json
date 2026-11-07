@@ -15,7 +15,7 @@
   },
   "neon-runner": {
     "master": "art/launcher/tech-art-20261021/neon-runner.png",
-    "sourceFileName": "Neo’s Luminous Rooftop Leap.png",
+    "sourceFileName": "Neo\u2019s Luminous Rooftop Leap.png",
     "sourceLibraryFileId": "libfile_7c0ee11adcb4819182a122e80ce2280e",
     "sourceCreatedAt": "2026-10-21T11:09:13.097225+00:00",
     "sourceSHA256": "670a85dab13057f58a3b1bdbcb6817f521d2cc9f30d99a9864dc25fc57e04380"
@@ -36,7 +36,7 @@
   },
   "boom-buddies": {
     "master": "art/launcher/tech-art-20261021/boom-buddies.png",
-    "sourceFileName": "Pip’s Garden Bomb Escape.png",
+    "sourceFileName": "Pip\u2019s Garden Bomb Escape.png",
     "sourceLibraryFileId": "libfile_8046dc3bb31c8191a70b55e0eacec013",
     "sourceCreatedAt": "2026-10-21T11:08:58.975074+00:00",
     "sourceSHA256": "a439f35cc43b6234ce4a86cfbefa4db0354c8e14f547875a5fef4c5d8d5afb29"
@@ -50,7 +50,7 @@
   },
   "blocker": {
     "master": "art/gemini/blocker/source/icon-crystal-frame.jpg",
-    "sourceFileName": "Xếp Gạch Crystal Jewel Blast icon (Gemini)",
+    "sourceFileName": "X\u1ebfp G\u1ea1ch Crystal Jewel Blast icon (Gemini)",
     "sourceLibraryFileId": "gemini-upload",
     "sourceSHA256": "87bf7b0f4be7309ae076c1fb1a702ac481d3fedead4774ef194cd1bbc70452b0"
   },
@@ -72,5 +72,14 @@
     "sourceFileName": "Blossom Blast flower and Bibi (composed from Gemini art)",
     "sourceLibraryFileId": "gemini-upload",
     "sourceSHA256": "9f18a943baf4705ccb6bdb387d33807c7dc8d724b98b197f1c39966ef11fcebc"
+  },
+  "word-chain": {
+    "master": "art/launcher/word-chain/icon-master.png",
+    "sourceFileName": "word-chain-icon-imagegen-2026-11-07.png",
+    "sourceLibraryFileId": "openai-imagegen-exec-27c324c1-13ac-4c6e-8479-c9ec5039a6c7",
+    "sourceSHA256": "9ec3539fbd0cff51fdd210272029483c69822b5e6cb63e1b826322ef23d312fc",
+    "bannerMaster": "art/launcher/word-chain/banner-master.png",
+    "bannerSHA256": "a06c2d636f01f69df494d78c3de47a9826da0c0471e73c7e95889c8348cdff00",
+    "provider": "OpenAI ImageGen built-in"
   }
 }

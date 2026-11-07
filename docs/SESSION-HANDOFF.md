@@ -1,6 +1,6 @@
-# Bàn giao · 07/11/2026 · sau PR#17
+# Bàn giao · 07/11/2026 · WC-L0 ACTIVE
 
-**Frontend/source:** main1131927. **Backend:** Render c705100, không đổi server. **Nhánh checkpoint:** codex/tank-clash-release-verification; kiểm git status/log. DOC-01, sửa Netlify và sửa nguồn Auth đã tóm tắt ở COMPLETED.
+**Nguồn:** main1131927; checkpoint9a6c97f. **Nhánh:** codex/word-chain-launcher-release. WC-L0 được chủ dự án duyệt: Nối Từ free/bot/offline vào sảnh +icon/banner; giữ online=false, không SQL production. Code/art, lint/build/bundle/fast và CUA desktop/phone qua; [báo cáo](qa/WC-L0-2026-11-07.md). Tiếp commit/push→full CI/Preview→merge/deploy→kiểm production. Game_Studio_Agent main vẫn c5dac462,297file đã đủ. Việc cũ tóm tắt COMPLETED.
 
 ## Đã xong
 

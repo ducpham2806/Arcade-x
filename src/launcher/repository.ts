@@ -1,7 +1,7 @@
 import { SYNC } from '../services/syncPolicy';
 import {accessPreviewEnabled} from '../commerce/api';
 import { supabase } from '../services/supabaseClient';
-import { bundledCatalog, parseCatalog, isLocalReviewGame, isDeviceLibraryGame, type Catalog, type CatalogGame } from './catalog';
+import { bundledCatalog, parseCatalog, isLocalReviewGame, isDeviceLibraryGame, isBundledFreeGame, type Catalog, type CatalogGame } from './catalog';
 const cacheKey='launcher_catalog_v1';
 export function cachedCatalog(): Catalog {
   try { return parseCatalog(JSON.parse(localStorage.getItem(cacheKey)||'null')) || bundledCatalog; } catch { return bundledCatalog; }
@@ -32,7 +32,7 @@ export async function checkAccess(game: CatalogGame): Promise<{allowed:boolean;r
     return {allowed:false,reason:'connection'};
   }
   if(game.availability!=='published')return {allowed:false,reason:'unavailable'};
-  if(game.id==='tank-clash'&&game.deviceOnly&&game.accessModel==='free')return {allowed:true,reason:'bundled_free'};
+  if(isBundledFreeGame(game.id)&&game.deviceOnly&&game.accessModel==='free')return {allowed:true,reason:'bundled_free'};
   if(isLocalReviewGame(game.id)&&game.accessModel==='free'&&game.supportsOffline)return {allowed:true,reason:'local_review'};
   if(!navigator.onLine)return {allowed:game.accessModel==='free' && game.supportsOffline,reason:'offline'};
   try {

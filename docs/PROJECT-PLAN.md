@@ -4,7 +4,7 @@ Mốc nguồn: main1131927, PR#17 đã merge sau full CI success trên b644da2. 
 
 ## Trọng tâm và thứ tự
 
-**DOC-01/NETLIFY-BUILD đã xong**, vào main qua PR#17. **TC-R0 WAITING:** logout Auth sau release qua; chủ dự án để ca A/mã phòng B cũ sau. Nối Từ: source/test và CI UI có, catalog public chưa trả game; online flagfalse. Xem Tank/Nối Từ. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**WC-L0 ACTIVE:** chủ dự án yêu cầu đưa Nối Từ ra sảnh, làm icon/banner; phát hành bot/offline qua bundle, không SQL production/online. DOC-01/NETLIFY-BUILD đã xong trong PR#17. TC-R0 chờ ca A do chủ dự án để sau. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|

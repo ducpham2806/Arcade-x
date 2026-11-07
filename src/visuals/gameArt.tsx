@@ -1,4 +1,5 @@
 import rasterIcons from './rasterIcons.json';
+import rasterBanners from './rasterBanners.json';
 import React, { useId } from 'react';
 import boomPip from '../../public/boom/tiles/png/characters/pip_idle_front.png';
 import boomBum from '../../public/boom/tiles/png/characters/bum_front.png';
@@ -283,11 +284,15 @@ export function NativeGameArtwork({gameId,className='',variant='banner'}:{gameId
 export const GAME_SPLASH_ART: Record<string,string> = {blocker:'/games/blocker/art/splash.webp','mummy-escape':'/games/mummy-escape/art/splash.webp',chess:'/games/chess/art/splash.webp','caro-gomoku':'/games/caro-gomoku/art/splash.webp','cyber-slice':'/games/cyber-slice/art/arena.webp'};
 // Games whose banner still comes from the code-drawn artwork; icons use rasterIcons when present.
 const NATIVE_BANNERS = new Set(['blocker']);
+export function gameArtworkSource(gameId:string,variant:'banner'|'icon'){
+ const id=canonicalArtId(gameId);
+ return (variant==='icon'?rasterIcons[id as keyof typeof rasterIcons]:rasterBanners[id as keyof typeof rasterBanners])||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`;
+}
 export function GameArtwork({gameId,className='',variant='banner',src}:{gameId:string;className?:string;variant?:'banner'|'icon';src?:string}) {
  const id=canonicalArtId(gameId);
  const raster=variant==='icon'?id in rasterIcons:!NATIVE_BANNERS.has(id);
  if (!src && !raster && (id === 'chess' || id === 'mummy-escape' || id === 'blocker')) return <NativeGameArtwork gameId={id} className={className} variant={variant}/>;
- return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={src||variant==='icon'&&rasterIcons[id as keyof typeof rasterIcons]||`/game-art/${variant==='icon'?'icons':'banners'}/${id}.webp`} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
+ return <img className={`game-artwork ${className}`} data-art-game={id} data-art-variant={variant} src={src||gameArtworkSource(id,variant)} alt="" decoding="async" style={{width:'100%',height:'100%',objectFit:'cover'}}/>;
 }
 export function GameIcon({gameId,src}:{gameId:string;src?:string}) {return <GameArtwork gameId={gameId} variant="icon" src={src}/>;}
 

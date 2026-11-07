@@ -1,11 +1,12 @@
 import React,{useEffect,useRef,useState} from 'react';
 import {ChevronLeft,ChevronRight,Pause,Play} from 'lucide-react';
 import type {CatalogGame} from './catalog';
-import {GameArtwork} from '../visuals/gameArt';
+import {GameArtwork,gameArtworkSource} from '../visuals/gameArt';
 export const FEATURED_INTERVAL=15_000;
-export const NEW_GAME_IDS=['tank-clash','neon-runner','battleship','boom-buddies','brick-breaker','rainbow-blocks'];
+export const NEW_GAME_IDS=['word-chain','tank-clash','neon-runner','battleship','boom-buddies','brick-breaker','rainbow-blocks'];
 const priority=[...NEW_GAME_IDS,'hex-match','car-escape','tile-2048','word-cross','blocker'];
 const copy:Record<string,{eyebrow:string;title:string;accent:string;body:string}>={
+ 'word-chain':{eyebrow:'GAME MỚI · NỐI TỪ',title:'Nối một từ.',accent:'Mở một cuộc vui.',body:'Luyện nối từ tiếng Việt cùng 1–3 bot. Chọn mức Dễ hoặc Khó và giữ mạch từ lâu nhất có thể.'},
  'tank-clash':{eyebrow:'GAME MỚI · TANK CLASH',title:'Đọc góc bắn.',accent:'Làm chủ đấu trường.',body:'Luyện cùng bot hoặc mời bạn đấu online 1v1, 2v2. Một cú bật tường có thể đổi cả trận đấu.'},
  'neon-runner':{eyebrow:'GAME MỚI · NEON RUN',title:'Bước qua bóng tối.',accent:'Thắp sáng Luma.',body:'40 màn qua năm thế giới. Cùng Néo và Pip mang ánh sáng trở về.'},
  'battleship':{eyebrow:'GAME MỚI · BATTLESHIP',title:'Khóa một tọa độ.',accent:'Đánh chìm hạm đội.',body:'Đặt tàu, đọc dấu bắn và thử sức trong 30 giây mỗi lượt. Tìm trận online 1vs1, lập đội 2vs2 hoặc luyện tập với bot.'},
@@ -21,7 +22,7 @@ const copy:Record<string,{eyebrow:string;title:string;accent:string;body:string}
 export function FeaturedCarousel({games,onPlay,onDetail}:{games:CatalogGame[];onPlay:(id:string)=>void;onDetail:(id:string)=>void}){
  const available=games.filter(g=>g.availability==='published'&&g.accessModel==='free');
  const ordered=[...priority.map(id=>available.find(g=>g.id===id)).filter(Boolean),...available.filter(g=>!priority.includes(g.id))] as CatalogGame[];
- const slides=ordered.slice(0,Math.max(5,Math.min(6,ordered.length)));
+ const slides=ordered.slice(0,Math.max(5,Math.min(7,ordered.length)));
  const [index,setIndex]=useState(0),[animate,setAnimate]=useState(true),[paused,setPaused]=useState(false),[interacting,setInteracting]=useState(false),[hidden,setHidden]=useState(document.hidden);
  const count=slides.length,active=index%Math.max(1,count),busy=useRef(false);
  const signature=slides.map(g=>g.id).join(',');
@@ -35,7 +36,7 @@ export function FeaturedCarousel({games,onPlay,onDetail}:{games:CatalogGame[];on
   <div className="featured-viewport"><div className={`featured-track ${animate?'is-animated':''}`} style={{transform:`translateX(-${index*100}%)`}}>
    {[...slides,slides[0]].map((game,i)=>{const c=copy[game.id]||{eyebrow:'HÔM NAY CHƠI GÌ?',title:'Chơi một chút.',accent:'Vui cả ngày.',body:game.shortDesc};return <div key={`${game.id}-${i}`} className={`launcher-welcome featured-slide featured-${game.id}`} role="group" aria-roledescription="slide" aria-label={`${i%count+1} / ${count}: ${game.title}`} aria-hidden={i!==index} inert={i!==index}>
     <div className="featured-copy"><p className="launcher-eyebrow">{c.eyebrow}</p><h1>{c.title}<br/><span>{c.accent}</span></h1><p>{c.body}</p><button className="launcher-primary" onClick={()=>onPlay(game.id)}><Play size={18} fill="currentColor"/>Chơi ngay</button></div>
-    <div className="welcome-game"><div className="welcome-sticker">{NEW_GAME_IDS.includes(game.id)?'VỪA CẬP BẾN ✦':'GỢI Ý CHO BẠN'}</div><button className="welcome-art" onClick={()=>onPlay(game.id)} aria-label={`Mở game nổi bật ${game.title}`}><GameArtwork gameId={game.id} variant="icon"/></button><div className="welcome-caption"><div><span>{game.category==='Puzzle'?'GIẢI ĐỐ':'KHÁM PHÁ'}</span><h2>{game.title}</h2></div><button id={i===index?'btn-launch-featured':undefined} aria-label={`Chơi game nổi bật ${game.title}`} className="launcher-icon" onClick={()=>onPlay(game.id)}><Play size={22} fill="currentColor"/></button></div></div>
+    <div className="welcome-game"><div className="welcome-sticker">{NEW_GAME_IDS.includes(game.id)?'VỪA CẬP BẾN ✦':'GỢI Ý CHO BẠN'}</div><button className="welcome-art" onClick={()=>onPlay(game.id)} aria-label={`Mở game nổi bật ${game.title}`}><picture className="featured-art-picture">{game.id==='word-chain'&&<source media="(max-width:639px)" srcSet={gameArtworkSource(game.id,'icon')}/>}<GameArtwork gameId={game.id} variant={game.id==='word-chain'?'banner':'icon'}/></picture></button><div className="welcome-caption"><div><span>{game.category==='Puzzle'?'GIẢI ĐỐ':'KHÁM PHÁ'}</span><h2>{game.title}</h2></div><button id={i===index?'btn-launch-featured':undefined} aria-label={`Chơi game nổi bật ${game.title}`} className="launcher-icon" onClick={()=>onPlay(game.id)}><Play size={22} fill="currentColor"/></button></div></div>
    </div>;})}
   </div></div>
   <div className="featured-controls"><div className="featured-dots" aria-label="Chọn slide">{slides.map((game,i)=><button key={game.id} aria-label={`Slide ${i+1}: ${game.title}`} aria-current={active===i?'true':undefined} onClick={()=>go(i)}><span/></button>)}</div><div className="featured-arrows"><button aria-label={paused?'Tiếp tục chuyển banner':'Tạm dừng chuyển banner'} aria-pressed={paused} onClick={()=>setPaused(p=>!p)}>{paused?<Play size={14}/>:<Pause size={14}/>}</button><button aria-label="Banner trước" onClick={()=>go(active===0?count-1:active-1)}><ChevronLeft size={18}/></button><button aria-label="Banner tiếp" onClick={()=>go(index+1)}><ChevronRight size={18}/></button></div></div>

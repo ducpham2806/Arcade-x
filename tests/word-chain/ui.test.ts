@@ -7,10 +7,24 @@ for(const [name,viewport] of [['phone',{width:390,height:844}],['desktop',{width
 test(`practice match with a bot plays to the end (${name})`,async({page})=>{
  test.setTimeout(150000);const errors:string[]=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.setViewportSize(viewport);
+ await page.route('**/*',route=>['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname)?route.continue():route.abort());
  // Seed 6: the player goes first and the opener is "con người".
  await page.addInitScript(()=>{(globalThis as {__WORD_CHAIN_TEST_SEED__?:number}).__WORD_CHAIN_TEST_SEED__=6;});
- await page.goto('/');await page.locator('#btn-play-word-chain').click();
+ await page.goto('/');
+ await page.getByRole('button',{name:'Slide 1: Nối Từ Đối Kháng',exact:true}).click();
+ await page.getByRole('button',{name:'Tạm dừng chuyển banner',exact:true}).click();
+ await page.getByRole('textbox',{name:'Tìm trò chơi',exact:true}).fill('Nối Từ');
+ const card=page.locator('#game-card-word-chain');await expect(card).toHaveCount(1);
+ await expect(card).toContainText('Luyện với 1–3 bot');
+ await expect.poll(()=>card.locator('img').evaluate((img:HTMLImageElement)=>img.complete&&img.naturalWidth===512)).toBe(true);
+ await expect.poll(()=>page.locator('.featured-word-chain img').first().evaluate((img:HTMLImageElement)=>img.complete&&img.naturalWidth>0)).toBe(true);
+ await expect.poll(()=>page.locator('.featured-word-chain img').first().evaluate((img:HTMLImageElement)=>img.currentSrc)).toContain(name==='phone'?'/icons/word-chain.techart-':'/banners/word-chain.techart-');
+ if(await page.locator('#btn-dismiss-pwa-prompt').isVisible())await page.locator('#btn-dismiss-pwa-prompt').click();
+ await page.screenshot({path:`test-results/word-chain-${name}-launcher.png`,fullPage:true});
+ await page.locator('#btn-play-word-chain').click();
  await page.locator('.nt-home').waitFor({timeout:30000});
+ await expect(page.getByTestId('nt-match')).toHaveCount(0);
+ await expect(page.locator('.nt-home')).toContainText('Đấu online sắp có');
  await page.getByTestId('nt-practice').click();await page.getByRole('button',{name:'1 bot'}).click();await page.getByTestId('nt-start-practice').click();
  await expect(page.locator('.nt-ready h2')).toHaveText('Chuẩn bị');
  await page.getByTestId('nt-ready').click();

@@ -50,8 +50,8 @@ export function WordChainGame({bridge,isPaused=false,isMuted=false,roomClient}:G
     <button className="nt-primary" onClick={()=>setScreen({kind:'setup'})}>Luyện với bot</button><button onClick={()=>setScreen({kind:'home'})}>Quay lại</button>
    </div>:<div className="nt-menu">
     <button className="nt-primary" data-testid="nt-practice" onClick={()=>setScreen({kind:'setup'})}>LUYỆN VỚI BOT</button>
-    <button data-testid="nt-match" onClick={()=>setScreen({kind:'online',mode:'match'})}>GHÉP TRẬN<small>2–4 người</small></button>
-    <div className="nt-pair"><button data-testid="nt-create" onClick={()=>setScreen({kind:'online',mode:'create'})}>TẠO PHÒNG</button><button data-testid="nt-join" onClick={()=>setScreen({kind:'online',mode:'join'})}>NHẬP MÃ</button></div>
+    {canOnline?<><button data-testid="nt-match" onClick={()=>setScreen({kind:'online',mode:'match'})}>GHÉP TRẬN<small>2–4 người</small></button>
+    <div className="nt-pair"><button data-testid="nt-create" onClick={()=>setScreen({kind:'online',mode:'create'})}>TẠO PHÒNG</button><button data-testid="nt-join" onClick={()=>setScreen({kind:'online',mode:'join'})}>NHẬP MÃ</button></div></>:<p className="nt-note">Đấu online sắp có. Thử sức cùng bot trước nhé.</p>}
     <button className="nt-link" onClick={()=>setHelp(true)}>Cách chơi</button>
    </div>}
    <p className="nt-credit">Từ điển {lex.words.length.toLocaleString('vi-VN')} từ: Wiktionary (CC BY-SA 4.0), qua which-dialect</p>

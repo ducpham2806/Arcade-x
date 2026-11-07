@@ -220,19 +220,25 @@
     "sha256": "b1dae609c0a512c85e1e6653e131a8a9699db8194dfe42c7ae5ca5ef60d62f9f"
   },
   {
-    "id": "word-chain",
-    "icon": "/game-art/icons/word-chain.webp",
-    "banner": "/game-art/banners/word-chain.webp",
-    "iconBytes": 18600,
-    "bannerBytes": 34898,
-    "sha256": "bc5444ce4667f511299f0997a39f4ca10df11ba6147d768393916b7968fc8881"
-  },
-  {
     "id": "tank-clash",
     "icon": "/game-art/icons/tank-clash.webp",
     "banner": "/game-art/banners/tank-clash.webp",
     "iconBytes": 13870,
     "bannerBytes": 29354,
     "sha256": "1d92a07341d678d287f9137ae844d90f180b220c0d8e25a6255a27e5ae1ed4ed"
+  },
+  {
+    "id": "word-chain",
+    "icon": "/game-art/icons/word-chain.techart-9656442ecd8e.webp",
+    "banner": "/game-art/banners/word-chain.techart-65ba825dddda.webp",
+    "iconBytes": 22188,
+    "bannerBytes": 29700,
+    "sha256": "9656442ecd8e8c07ece85388d442453c0b596a15b41a8b4dea56615c539a838f",
+    "sourceType": "imagegen",
+    "sourceFileName": "word-chain-icon-imagegen-2026-11-07.png",
+    "sourceLibraryFileId": "openai-imagegen-exec-27c324c1-13ac-4c6e-8479-c9ec5039a6c7",
+    "sourceSHA256": "9ec3539fbd0cff51fdd210272029483c69822b5e6cb63e1b826322ef23d312fc",
+    "bannerSHA256": "65ba825ddddabfa8777597f97476ee28af9964e837d56cb050cdf10115f4cdd7",
+    "sourceBannerSHA256": "a06c2d636f01f69df494d78c3de47a9826da0c0471e73c7e95889c8348cdff00"
   }
 ]
