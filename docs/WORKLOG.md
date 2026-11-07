@@ -2,6 +2,14 @@
 
 Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release giữ [nguyên văn](archive/WORKLOG-2026-11-07-before-release-close.md); DOC-01 ở [archive riêng](archive/WORKLOG-2026-11-06-DOC-01.md). Tóm tắt kết quả ở COMPLETED, quy trình ở WORKFLOW.
 
+## 07/11/2026 · WC-PLAN / SN-PLAN DONE tài liệu · codex/word-chain-launcher-release
+
+- Chủ dự án yêu cầu plan phòng/ghép trận/PK Nối Từ và phần còn thiếu của Rắn. Đối chiếu source5a64fef, core/Edge/UI và live-save QA; dùng playbook game-production-scrum, không nạp lại cả thư viện.
+- [Nối Từ](word-chain/ONLINE-PLAN.md): ON1staging/tắt thưởng pilot→phòng riêng→FIFO→PK/đầu hàng→mạng/Auth/IME→nghiệm thu. Điểm thưởng chỉ có ref chống lặp cần gate; đầu hàng đã qua leave/server forfeit, cần kiểm toàn luồng thay vì nối thêm lệnh trùng. Không triển khai backend từ yêu cầu lập plan.
+- [Snake](snake/CONTINUATION-PLAN.md): baseline/bundle→UI chơi-lưu-reload/JWT thật→thiết bị→R01/art/audio/playtest→candidate/phát hành. Cloud core và icon/banner đã có, không làm lại; chưa public.
+- Build preview/test:snake-preview local qua; chunk game1,92MB raw/~1,35MB gzip là gap đóng gói public, chưa chạy toàn bộ suite/thiết bị/live trong lượt lập plan. [Số đo](qa/SNAKE-PLAN-BASELINE-2026-11-07.md).
+- Đã cập nhật thẻ/roadmap/bàn giao, giữ tài liệu chi tiết đọc theo task. TC-R0 do chủ dự án để sau, log giữ [nguyên văn](archive/WORKLOG-2026-11-07-TC-R0-deferred.md). WC-L0 vẫn ACTIVE: Preview5a64fef success,CI23 fail suffix desktop. Thêm focus/caret/value assertions trước gõ, cần full CI head mới.
+
 ## 07/11/2026 · WC-L0 ACTIVE · codex/word-chain-launcher-release
 
 - Chủ dự án yêu cầu đưa Nối Từ ra sảnh với icon/banner. Chọn bundled-free bot/offline như Tank, giữ online=false và policy maintenance/premium server; không SQL production.
@@ -15,9 +23,3 @@ Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release
 - Preview b644da2 success; full CI run42311533962 success; PR#17 merge main1131927. Production deploy6aee682dc2bd2dba16385690 Published,4bundle JS đầu trùng byte build đã kiểm. [Báo cáo](qa/NETLIFY-BUILD-2026-11-07.md).
 - [Nối Từ](qa/WC-R0-2026-11-07.md) có source/test trong main/nhánh, CI engine/UI qua. Catalog public23mục không trả word-chain; fallback chỉ DEV, online flagfalse. Chưa thay catalog/DB/online; không thiếu merge game.
 - DOC-01/thư viện116skill/21role/4rules đã vào main cùng PR#17. Checkpoint sau release cập nhật ở nhánh hiện tại, không thay runtime.
-
-## 07/11/2026 · TC-R0 WAITING ca A sau release
-
-- Auth xuyên tab: 4/5 fail trước sửa,5/5 qua sau sửa; AuthProvider fixture A→guest→B qua; sửa đã phát hành1131927. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
-- Hai account thật trước release: B khác A, tab nhận B, mã A cũ không còn, phòng B tạo được. Sau release: cả2tab bundle mới/B thật, tạo phòng9FNNVT→logout tab kia→tab game về thư viện→Online mở login, không còn B/Welcome cũ. Health200/ok.
-- Chủ dự án chọn “Để kiểm ca này sau” với đăng nhập lại A/kiểm mã B cũ sau release; giữ WAITING, không đánh TC-R0 DONE. Không lưu định danh/password/JWT; các tab mới còn guest. TC-R1 nhiều thiết bị/mạng/soak chưa đạt.

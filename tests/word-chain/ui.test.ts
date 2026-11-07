@@ -46,7 +46,13 @@ test(`practice match with a bot plays to the end (${name})`,async({page})=>{
  await expect(input).toBeEnabled({timeout:8000});
  await expect(page.locator('.nt-tile.hot')).toHaveText('người');
  await expect(input).toHaveValue('người ');
- await input.pressSequentially('xyzq');await input.press('Enter');
+ // Turn activation fills the prefix, then focuses/places the caret on the next frame.
+ // Wait for that user-visible state before typing the suffix on a busy CI runner.
+ await expect(input).toBeFocused();
+ await expect.poll(()=>input.evaluate((el:HTMLInputElement)=>el.selectionStart===el.value.length&&el.selectionEnd===el.value.length)).toBe(true);
+ await input.pressSequentially('xyzq');
+ await expect(input).toHaveValue('người xyzq');
+ await input.press('Enter');
  await expect(page.locator('.nt-feedback')).toContainText('không có trong từ điển');
  await expect(input).toBeEnabled();
  const reply=words.find(w=>w.startsWith('người ')&&words.some(x=>x.startsWith(w.split(' ')[1]+' ')))!;

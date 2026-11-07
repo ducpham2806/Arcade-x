@@ -1,23 +1,30 @@
-# Snake Legend — hoàn tất preview trước quyết định phát hành
+# Snake Legend — hoàn tất preview trước phát hành
 
-Mốc 06/11/2026. PR #12 đã tích hợp journey, cloud progress/session, boss/props/audio. Một số đoạn SNAKE_PREVIEW mô tả checkpoint cũ: không làm lại cloud hydrate chỉ vì đọc đoạn lịch sử đó. Snake chưa vào catalog/bundle công khai trong phạm vi tích hợp.
+Mốc 07/11/2026 · nguồn đối chiếu `5a64fef`. PR#12 đã merge journey/cloud progress/session/boss/props/audio. Snake là preview R01, chưa nằm trong catalog public. Đừng làm lại cloud hydrate từ ghi chú lịch sử.
 
-**Đầu vào:** [SNAKE_LIVE_SAVE_QA](../SNAKE_LIVE_SAVE_QA.md), mục Remaining gates; [SNAKE_CLOUD_PROGRESS](../SNAKE_CLOUD_PROGRESS.md) khi sửa save; chỉ mở đúng tài liệu journey/boss/props/audio khi chạm phần đó.
-**File đích:** `src/games/snake-legend/`, `src/preview/snake/`, entry preview/launcher wrapper và scripts/tests `snake/`; game standalone có thể nằm `public/standalone/`, chỉ sửa qua nguồn/pipeline theo AGENTS.
+## SN-PLAN · DONE tài liệu · 07/11/2026
 
-## SN-R0 · READY chuẩn bị / WAITING account live · end-to-end launcher
+Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CONTINUATION-PLAN.md). Chi tiết chỉ mở đúng mục task. Plan chưa cấp quyền đưa Snake ra sảnh hoặc bật reward/backend production.
 
-- [ ] Đối chiếu vị trí entry hiện hành; đăng nhập → chơi/thắng → save → reload/restore account; lỗi mạng/lost-ack/retry, đổi account/logout và conflict giữa thiết bị.
-- [ ] JWT hết hạn theo thời gian thực từ issuer đang deploy; token fixture không thay bằng chứng này. Không bật shared rewards chỉ để test qua.
-- [ ] Giữ Gold/Gem riêng, preview isolation và xác nhận không xuất hiện trong catalog production khi chưa có quyết định phát hành.
-- **Xong:** báo cáo `.md` ghi nguồn/build/backend/ca test thật, phần fixture và phần live tách rõ; fixture account được dọn theo runbook.
+| Task | Trạng thái / phụ thuộc | Kết quả cần đạt |
+|---|---|---|
+| SN-R0a | READY | Baseline preview/route/flags, suite Snake và số đo bundle hiện tại |
+| SN-R0b | BACKLOG sau R0a; cần account live | UI đăng nhập→thắng→save→reload, lỗi mạng/lost-ack, account isolation, JWT hết hạn thật |
+| SN-R1a | BACKLOG sau R0a; cần thiết bị | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
+| SN-R1b | BACKLOG sau R0b; cần người chơi | Đủ10màn R01,Nhện Mẹ/props,art/animation/audio và human playtest |
+| SN-R2a | BACKLOG sau R0/R1 | Bundle/lazy assets, chính sách account/save/reward, candidate catalog/rollback |
+| SN-R2b | BACKLOG sau quyết định phát hành | CI/merge/deploy và pilot production thật |
 
-## SN-R1 · WAITING thiết bị/duyệt art · chất lượng chơi
+## Bằng chứng đã có và giới hạn
 
-- [ ] Android/iOS/Safari thật: điều khiển, safe-area/dọc/ngang, save khi ẩn/thoát, FPS/memory/audio mute và cleanup.
-- [ ] Review authored character animation/art/audio còn thiếu so với mục tiêu đã duyệt; gameplay boss, props, journey và độ khó cần người chơi thật. Không mặc định “có audio” = audio sản xuất đã nghiệm thu.
-- Kiểm theo phần đổi: `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, build preview, lint/build/bundle.
+[Live-save QA](../SNAKE_LIVE_SAVE_QA.md) đã kiểm Auth/engine/replay/service thật: thắng/lưu, retry sau lost-ack không nhận lặp, restore mới, đọc offline/retry, refresh và signout. Wrapper React đã nối Auth owner/save session; timeout30giây có hủy. Gold/Gem riêng, adapter chưa phát thưởng launcher. Có sẵn icon/banner/master/manifest, chưa cần vẽ lại.
 
-## SN-R2 · BACKLOG · phát hành
+Runner không chạy renderer/full launcher DOM. JWT expiry thật, điện thoại thật, production art/audio/animation và M2human playtest chưa đạt. Các game public CI xanh không chứng minh toàn bộ suite Snake đã chạy. Production build không tự gồm route preview.
 
-Sau SN-R0/R1: chốt catalog/quyền/reward/backend verifier, rollout và rollback; cập nhật regression catalog/art/readability nếu thêm game. Có plan không tự cấp quyền bật feature/reward production. Bước tiếp đầu tiên SN-R0, không mở toàn bộ bộ GDD/art.
+Kiểm local07/11: build preview +test:snake-preview qua, chunk game1,92MB raw/~1,35MB gzip. [Bằng chứng](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). Cần tối ưu trước public, SN-R0a chưa hoàn tất toàn suite/route/flags.
+
+**File đích:** `src/games/snake-legend/` (wrapper,src,integration), `src/preview/snake/`, `vite.snake-preview.config.ts`, scripts/tests Snake, art nguồn. Output sinh chỉ sửa qua pipeline.
+
+**Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
+
+**Tiếp theo:** sau ưu tiên online Nối Từ, làm SN-R0a rồi SN-R0b. Chứng minh chơi→lưu→reload qua UI thật trước; chưa thêm map/boss/shop. Báo cáo phải phân biệt code/merge/deploy/nghiệm thu và ca chưa có thiết bị/người chơi.

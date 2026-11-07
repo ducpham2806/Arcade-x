@@ -7,7 +7,6 @@
 - Tái hiện TS2307 thiếu nested ws trên checkout sạch; dùng deps:tank-clash chung CI/Netlify trước lint/build, giữ Snake preview và mọi test.
 - Local chuỗi preview exit0, Netlify Preview success; full CI b644da2 success, PR#17 merge main1131927. [Báo cáo](qa/NETLIFY-BUILD-2026-11-07.md).
 - Production deploy6aee682dc2bd2dba16385690 Published,4bundle đầu trùng byte build đã kiểm; không đổi DB/server wire/chi phí.
-- Bộ tài liệu/116skill/21role/4rules đã vào main cùng PR#17. Checkpoint sau release tiếp tục ở nhánh TC-R0; còn QA account A và catalog Nối Từ.
 
 ## AUTH-XTAB phần sửa nguồn / logout release · 07/11/2026
 
@@ -15,6 +14,11 @@
 - Red/green:4/5 fail trước sửa,5/5 qua sau sửa; lint/build/bundle/fast qua; UI AuthProvider thật với fixture A→guest→B qua.
 - Production hai account thật: B khác A, tab game nhận B, phòng A cũ không còn, tạo phòng B qua. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
 - PR#17 đã merge/phát hành1131927. Hai tab bundle mới/B thật: tạo phòng→logout tab kia→về thư viện→Online hiện login, không còn hồ sơ B. Chủ dự án để ca đăng nhập A/mã B cũ sau; TC-R0 còn WAITING, TC-R1 chưa đạt.
+
+## WC-PLAN / SN-PLAN · DONE tài liệu · 07/11/2026
+
+- Nhánh codex/word-chain-launcher-release; đối chiếu source5a64fef và báo cáo live-save. [Nối Từ](word-chain/ONLINE-PLAN.md): staging/reward gate→phòng riêng→ghép trận→PK→mạng/Auth→nghiệm thu. [Snake](snake/CONTINUATION-PLAN.md): baseline→UI/save thật→thiết bị/nội dung→candidate phát hành.
+- Đã phân biệt core có sẵn với gap, chia task/file/AC/bằng chứng/ước lượng; thẻ gọn và roadmap ưu tiên cập nhật. Không deploy backend, SQL production hay bật flag từ plan; WC-L0 chờ CI/deploy riêng.
 
 ## WC-L0 phần art/catalog/local QA · 07/11/2026
 
@@ -42,7 +46,6 @@
 - Quy trình bắt buộc đóng/tóm tắt trước đổi việc; archive giữ nguyên chi tiết; budget ký tự có checker.
 - Cài toàn bộ Game Studio Agent `c5dac462`: 116 skill, 21 vai trò, 4 rules; 297 blob đối chiếu nguồn. Chỉ một skill đầu mối tự discovery để giảm metadata đầu vào.
 - Kiểm tra/giới hạn ở [log DOC-01 lưu trữ](archive/WORKLOG-2026-11-06-DOC-01.md); phần cài tài liệu không đổi gameplay/runtime/schema. Đã merge qua PR#17.
-- Tiếp: TC-R0; hướng dẫn Studio ở `studio/INSTALLATION.md`.
 
 ## MERGE-AUDIT · 06/11/2026 · main c705100
 
@@ -63,5 +66,4 @@
 
 - Snake: hành trình, cloud progress/session, boss/props/audio đã được tích hợp nguồn; vẫn giới hạn preview, chưa đủ release sign-off. [Bằng chứng live-save](SNAKE_LIVE_SAVE_QA.md), [thẻ tiếp tục](plans/SNAKE.md).
 - Launcher M0–M8, Neon NR1–NR4, các đợt Boom/Cosmic/Eat/Block/Blossom/Rainbow đã có trong nguồn; không mặc định coi ghi chú “chưa merge” ở báo cáo cũ là hiện trạng.
-- Nội dung đã có và khoảng trống phải tái xác minh được tổng hợp ở [GAME-POLISH](plans/GAME-POLISH.md). Không có lỗi tái hiện thì không viết lại game.
 - Nối Từ/Duel/commerce có core/test, chưa hoàn tất triển khai sản phẩm; xem đúng thẻ. Không tóm tắt chúng thành “đã xong online/payment”.

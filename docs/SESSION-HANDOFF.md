@@ -1,23 +1,21 @@
-# Bàn giao · 07/11/2026 · WC-L0 ACTIVE
+# Bàn giao · 07/11/2026
 
-**Nguồn:** main1131927; checkpoint9a6c97f. **Nhánh:** codex/word-chain-launcher-release. WC-L0 được chủ dự án duyệt: Nối Từ free/bot/offline vào sảnh +icon/banner; giữ online=false, không SQL production. Code/art, lint/build/bundle/fast và CUA desktop/phone qua; [báo cáo](qa/WC-L0-2026-11-07.md). Tiếp commit/push→full CI/Preview→merge/deploy→kiểm production. Game_Studio_Agent main vẫn c5dac462,297file đã đủ. Việc cũ tóm tắt COMPLETED.
+**Nguồn:** main1131927; nhánh `codex/word-chain-launcher-release`, head5a64fef/PR#18. **Hiện tại WC-L0 ACTIVE:** bot/offline Nối Từ ra sảnh +icon/banner, online=false, không SQL production. Preview head5a64fef success/deploy6aeeb1639973bd8b2a56d893; CI23/run42341160368 fail bước nhập suffix desktop (4/5WC UI qua). Bổ sung focus/caret/value assertions trước nhập, cần CI head mới. Local lint/build/bundle/fast,36check engine và CUA desktop/phone/bot/controls320–390 qua. [Bằng chứng](qa/WC-L0-2026-11-07.md). Tiếp: CI xanh→merge→kiểm Netlify production; không dùng CI22/headb0 làm proof head mới.
 
-- PR#18: b0e0c44 Preview success và offline check mới qua; phát hiện thêm clipping controls320px. Đã sửa≤399px/2hàng, CUA320/360/375/390 qua; regression mới cần full CI trên head kế tiếp. Chủ dự án vừa yêu cầu plan online Nối Từ và Snake; checkpoint sửa hiện tại rồi lập plan theo source, chưa triển khai backend.
+## Yêu cầu mới đã lập plan
 
-## Đã xong
+Chủ dự án yêu cầu tiếp phần phòng/ghép trận/PK Nối Từ và plan Snake. **WC-PLAN/SN-PLAN DONE tài liệu**, chưa triển khai online/Snake. Chi tiết nằm dưới thẻ module, chỉ mở mục task cần:
 
-- PR#17 merge sau full CI b644da2 success/run42311533962, gồm Nối Từ/Tank UI và generated clean. Thư viện116skill/21role/4rules + roadmap Markdown đã vào main.
-- Netlify thiếu ws của browser fixture: thêm deps:tank-clash dùng chung CI/production/preview trước lint/build, không bỏ test. Checkout sạch red/green qua; Preview success; production1131927 Published/deploy6aee682dc2bd2dba16385690.4bundle đầu byte-match. [Báo cáo](qa/NETLIFY-BUILD-2026-11-07.md).
-- Auth listener giữ identity riêng, hủy restore cũ;5regression qua. Sau release,2tab bundle mới/B thật: tạo phòng→logout tab kia→về thư viện→Online mở login, không còn hồ sơ B. [Bằng chứng](qa/BUG-AUTH-CROSS-TAB.md).
-- Nối Từ có source/test trong main; CI engine/UI qua. RPC public23mục không trả word-chain; fallback chỉ DEV, online flagfalse. [Audit](qa/WC-R0-2026-11-07.md). Không thiếu merge game; chưa thay DB/catalog/online.
+- [Nối Từ](plans/WORD-CHAIN.md): ON1staging/Auth/tick/tắt thưởng pilot→phòng riêng2account→FIFO2–4→PK→mạng/Auth/IME→nghiệm thu. Core/UI/schema đã có; chặn thưởng lặp bền vững, kiểm bỏ cuộc qua leave/server forfeit và retry, không thêm lệnh trùng. Không bật online production từ plan.
+- [Snake](plans/SNAKE.md): R0abaseline/bundle→R0bUI chơi/lưu/reload+JWT thật→thiết bị→R01/art/audio/playtest→candidate. Cloud core và icon/banner đã có; live runner chưa kiểm renderer/DOM, expiry thật và điện thoại. Chưa vào catalog public.
+- Sau WC-L0 ưu tiên online Nối Từ, rồi Snake. Game_Studio_Agent c5dac462,297blob/116skill/21role/4rules đủ và đã merge PR#17; không cần cài lại.
 
-## Còn dở / bước tiếp
+## Đã phát hành / còn chờ
 
-- **TC-R0 WAITING:** chủ dự án chọn “Để kiểm ca này sau” với đăng nhập lại A sau release. Khi sẵn sàng: A phải khác B, kiểm mã phòng B9FNNVT không còn/không tiếp quản ghế và tab nhận đúng A; không hỏi password/JWT.2account/mã A cũ đã qua trước release không thay ca còn thiếu. Tab thử hiện guest; không tự đăng nhập hộ.
-- TC-R1 cần≥10trận mỗi format/2thiết bị/2mạng/soak30phút, chưa đạt. P2 wire cũ chỉ port sang P3 theo TC-R2, không merge nguyên nhánh.
-- Nối Từ tiếp WC-R0: history/catalog staging, thử migration/rollback; thời điểm catalog/online theo quyết định#8/#7. Không SQL production. Duel còn UI, Snake preview, commerce tắt.
+- PR#17/main1131927: Netlify nested ws dependencies +Auth cross-tab fix, full CI42311533962 success. Production deploy6aee682dc2bd2dba16385690 Published,4bundle byte-match. [Build report](qa/NETLIFY-BUILD-2026-11-07.md).
+- **TC-R0 WAITING:** user chọn để ca A sau. Hai tab production B/logout qua; lần sau A khác B kiểm phòng B9FNNVT không còn/không tiếp quản ghế. Không tự hỏi/login lại. TC-R1≥10trận/format,2thiết bị/2mạng/soak30phút chưa làm; TC-R2 chỉ port P2 sang P3, không merge nguyên nhánh.
+- Render c705100 Live/Free/cap16/registered-free, Blueprint cũ paused; không sync/deploy vô cớ. Không thay SQL/key/chi phí, commerce tắt.
 
-## Giữ lại
+## Tiếp quản
 
-- Render một Free/cap16/registered-free; Blueprint cũ paused, không Sync hay redeploy server vô cớ. Không chi phí thêm/khóa mới. Chủ dự án đã cho public thư viện và metadata báo cáo TC-R0.
-- deliverables/ là artifact local cũ, không commit. Đọc AGENTS→bàn giao→một thẻ plans; chỉ nạp skill cần. Trước đổi việc: COMPLETED, WORKLOG≤3, archive nguyên văn, doc checker theo WORKFLOW.
+WORKLOG≤3mục; phần TC cũ lưu nguyên văn trong archive, kết quả gọn tại COMPLETED. `deliverables/` là artifact local cũ, không commit. Local preview4323/session25526 đã dừng sau QA. Đọc AGENTS→bàn giao→một thẻ; doc checker trước commit. Plan đã commit local; push cùng fixture focus/caret rồi chờ CI head mới.
