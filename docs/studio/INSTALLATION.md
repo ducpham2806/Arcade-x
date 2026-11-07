@@ -29,6 +29,8 @@ Tất cả đầu vào điều phối đang dùng là `.md`. YAML/JSON/scripts/�
 
 ## Kiểm tra và cập nhật
 
+Ngày07/11/2026, yêu cầu xác nhận lại của chủ dự án: GitHub compare c5dac462→main trả identical/ahead0/behind0; doc checker297blob/116skill/21role/4rules qua. Không có bản nguồn mới cần cài chồng. Toàn bộ định nghĩa agent/subagent và skill đã có trên đĩa; dùng playbook theo task, không khởi chạy21tiến trình hay nạp mọi nội dung vào mỗi phiên.
+
 `python3 scripts/check-docs.py` kiểm entrypoint/link/budget/nhật ký/số lượng/file nguồn đã cài. `npm run test:claude` kiểm adapter ArcadeX cũ. Validator tổng upstream hiện lỗi thiếu `router/references/routing-table.md` cả tại repo nguồn nguyên gốc và bản cài; đây là lỗi đường dẫn của validator, không phải kiểm chứng đã qua. Validator skill chuẩn đã kiểm 117/117 manifest hợp lệ; không coi đó là kiểm nghiệm tất cả ví dụ/script với ArcadeX. Mọi skill chọn dùng vẫn cần kiểm API/version theo source/lockfile hiện hành.
 
 Khi cập nhật thư viện: lấy commit đích rõ → đọc diff các skill/rules dùng thực tế → chạy installer vào thư mục tạm → so nguồn/collision → thay snapshot và manifest có chủ đích → kiểm docs/skill → ghi WORKLOG/COMPLETED. Không tự pull/cài dependency/chạy script upstream trong mọi phiên. Giữ `.claude/CCGS-NOTICE.md` và các notice/license đi kèm nguồn.

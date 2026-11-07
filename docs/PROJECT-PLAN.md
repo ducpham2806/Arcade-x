@@ -1,17 +1,17 @@
-# Kế hoạch tiếp tục ArcadeX · 06/11/2026
+# Kế hoạch tiếp tục ArcadeX · 07/11/2026
 
-Mốc nguồn đã xác minh: `main@c705100`, PR #16 đã merge; checkout đã đồng bộ. Lint/build/bundle/fast và 18 WS/ops qua ở lượt audit 06/11 trên Node 24. Không suy ra Netlify/Render hiện tại hoặc nghiệm thu thiết bị từ kết quả này. Đây là roadmap, không tự bật backend/commerce hay thay luật gameplay.
+Mốc nguồn: main1131927, PR#17 đã merge sau full CI success trên b644da2. Netlify1131927 Published và bundle byte-match; Render vẫn c705100 (server không đổi). Đây là roadmap, không tự bật backend/commerce hay thay luật gameplay; CI không thay nghiệm thu nhiều thiết bị.
 
 ## Trọng tâm và thứ tự
 
-**DOC-01 đã xong** trên nhánh tài liệu 9eff18c. **Hiện tại TC-R0 ACTIVE:** Render/main đã Live; B thật/mã A cũ và Netlify main/c705100 đã kiểm. PR#17 sửa Auth qua local; đang sửa dependency gây lỗi Netlify Preview trước CI/merge/retest. Audit Nối Từ: source có trong main, catalog public chưa trả game. Xem thẻ Tank/Nối Từ. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**WC-L0 ACTIVE / WC-PLAN + SN-PLAN DONE tài liệu:** chủ dự án yêu cầu đưa Nối Từ ra sảnh, làm icon/banner; phát hành bot/offline qua bundle, không SQL production/online. DOC-01/NETLIFY-BUILD đã xong trong PR#17. TC-R0 chờ ca A do chủ dự án để sau. Theo yêu cầu07/11, sau release ưu tiên online Nối Từ rồi hoàn tất Snake; đã lập plan chi tiết theo source, chưa triển khai backend. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
-| 1 | Tank Clash | TC-R0 xác minh bản đang chạy; TC-R1 mạng/tải thật; TC-R2 chuyển phần chống lỗi P2 sang P3. READY; nghiệm thu nhiều thiết bị còn WAITING | [Tank](plans/TANK-CLASH.md) |
-| 2 | Nối Từ | WC-R0 xác minh catalog; WC-R1 staging server/scheduler; WC-R2 bàn phím/multi-account. Online trong source đang tắt | [Nối Từ](plans/WORD-CHAIN.md) |
+| 1 | Nối Từ | WC-L0 CI/deploy; sau đó ON1 staging/reward gate→ON2phòng riêng→ON3ghép trận→ON4PK→ON5mạng/Auth→ON6nghiệm thu | [Nối Từ](plans/WORD-CHAIN.md) |
+| 2 | Snake Legend | R0a baseline→R0b UI/save/Auth thật→R1thiết bị/nội dung→R2candidate/phát hành khi được chọn | [Snake](plans/SNAKE.md) |
+| Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
-| 4 | Snake Legend | SN-R0 nghiệm thu account/save trên launcher preview; SN-R1 thiết bị/art/audio; SN-R2 quyết định phát hành. Chưa đưa ra catalog công khai | [Snake](plans/SNAKE.md) |
 | 5 | Battleship và game đã tích hợp | GP-R0 xác minh lại khoảng trống QA từ báo cáo cũ; GP-R1 polish theo lỗi tái hiện; GP-R2 Rainbow/Chronicles chỉ khi chọn mở phạm vi | [QA và hoàn thiện game](plans/GAME-POLISH.md) |
 | Riêng | Commerce/thuê game | CM1→CM4: staging quyền → DB/admin → payment → restore/pilot. WAITING runtime/provider/admin; giữ checkout tắt | [Commerce](plans/COMMERCE.md) |
 | Duy trì | Test/art/docs/nợ kỹ thuật | MT1 test cũ, MT2 banner/art, MT3 phòng dùng chung, MT4 dung lượng Git. Không rewrite/LFS khi chưa duyệt | [Bảo trì](plans/MAINTENANCE.md) |

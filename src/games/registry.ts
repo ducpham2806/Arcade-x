@@ -104,8 +104,8 @@ export const GAME_REGISTRY: Record<string, GameMetadata> = {
   'word-chain': {
     id: 'word-chain',
     title: 'Nối Từ Đối Kháng',
-    shortDesc: 'Đấu trí nối từ tiếng Việt 2–4 người, ai bí từ hay hết giờ thì bị loại',
-    description: 'Lần lượt gõ một từ 2 âm tiết bắt đầu bằng âm tiết cuối của từ trước: con mèo → mèo con → con người. Từ phải có trong từ điển 17.522 từ và chưa ai dùng; gõ sai được gõ lại. Mỗi lượt 30 giây, rút còn 20 rồi 15 giây ở các vòng sau. Hết giờ là bị loại, người cuối cùng thắng. Luyện với 1–3 bot Dễ hoặc Khó; phòng online 2–4 người qua ghép trận hoặc mã phòng.',
+    shortDesc: 'Nối từ tiếng Việt · Luyện với 1–3 bot Dễ hoặc Khó',
+    description: 'Lần lượt gõ một từ 2 âm tiết bắt đầu bằng âm tiết cuối của từ trước: con mèo → mèo con → con người. Từ phải có trong từ điển 17.522 từ và chưa ai dùng; gõ sai được gõ lại. Mỗi lượt 30 giây, rút còn 20 rồi 15 giây ở các vòng sau. Hết giờ là bị loại, người cuối cùng thắng. Chơi miễn phí cùng 1–3 bot Dễ hoặc Khó. Đấu online sắp có.',
     category: 'Multiplayer',
     difficulty: 'Trung Bình',
     icon: '🔤',

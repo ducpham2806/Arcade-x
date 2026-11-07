@@ -1,6 +1,6 @@
 # Máy chủ phòng Nối Từ (word-chain)
 
-**Trạng thái:** máy chủ, giao diện online và test đã có, **chưa triển khai**. Trong game, các nút Ghép trận, Tạo phòng và Nhập mã vẫn báo "đang chờ bật máy chủ" vì `src/games/word-chain/online-config.json` đang `enabled: false`. Luyện với bot chơi được ngay, kể cả khi offline.
+**Cập nhật 07/11/2026:** core/UI/test đã có nhưng online chưa triển khai/nghiệm thu; flag false thì các nút online ẩn, bot/offline dùng được. [Plan tiếp tục](word-chain/ONLINE-PLAN.md) là thứ tự hiện hành; WC-L0 đưa game ra sảnh bằng bundled catalog, không cần chạy migration production.
 
 ## Cách hoạt động
 
@@ -28,13 +28,13 @@ Mỗi người chỉ được ở một phòng đang mở. Rời phòng (hoặc 
 
 Test Edge cũng kiểm tra bản code đã chép trùng với `src/`.
 
-## Triển khai (chủ dự án làm)
+## Mẫu triển khai staging (đối chiếu plan hiện hành)
 
 1. Áp `supabase/word-chain/schema.sql` lên **project staging** trước, rồi chạy lại `npm run test:word-chain`. Không áp thẳng lên production `whjatkhhupeqfngakmee` khi chưa thử.
 2. Chạy `npm run prepare:word-chain-server`, rồi deploy `supabase/functions/word-chain-room` với `verify_jwt` mặc định. Biến môi trường `SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY` do Supabase cấp.
 3. Tạo secret `wc_room_service_key` trong Vault của database, thay URL trong `supabase/word-chain/scheduler.sql`, rồi chạy file này.
-4. Áp `supabase/migrations/20261102090000_word_chain_catalog.sql` để game hiện trong danh mục production.
-5. Đặt `enabled: true` trong `src/games/word-chain/online-config.json`, build lại, rồi thử với 2–4 tài khoản thật.
+4. Nếu cần thử migration catalog, chỉ thử riêng trên staging. Không chạy SQL/script lên production theo AGENTS; bundled catalog đã giải quyết hiển thị game.
+5. Chỉ bật online trong build thử đúng staging sau khi chặn thưởng chung và đạt gate ON1; thử 2–4 tài khoản thật theo plan. Giữ production online=false tới cutover được duyệt.
 
 ## Giao diện online (WC4)
 

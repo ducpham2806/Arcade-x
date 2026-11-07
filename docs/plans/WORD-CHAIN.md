@@ -1,28 +1,35 @@
-# Nối Từ — catalog và online
+# Nối Từ — ra sảnh và hoàn tất online
 
-Mốc 06/11/2026. Có bot/offline, UI/core phòng server, schema/Edge/test. `src/games/word-chain/online-config.json` đang `enabled:false`. Trạng thái migration/catalog production chưa xác minh; game có trong registry không chứng minh DB đích đã cập nhật.
+Mốc 07/11/2026 · nguồn `5a64fef` · nhánh `codex/word-chain-launcher-release`. Bot/offline, UI/core phòng, schema/Edge/test đã có. Online flag false; backend online chưa nghiệm thu. Không viết lại phòng từ đầu, không chạy SQL production.
 
-**Đầu vào Markdown:** [WORD-CHAIN-SERVER](../WORD-CHAIN-SERVER.md), phần triển khai/schema/tick; [PENDING-DECISIONS](../PENDING-DECISIONS.md) #7/#8. Chỉ đọc spec luật khi đổi luật.
+## WC-L0 · ACTIVE · phát hành bot/offline và artwork
 
-## WC-R0 · READY · xác minh catalog và chuẩn bị staging
+Chủ dự án đã duyệt đưa game ra sảnh với icon/banner. PR#18 có bundled-free, policy server giữ ưu tiên;2master ImageGen, icon512/banner1280×640, URL hash/offline package. Local lint/build/bundle/fast, engine36check và CUA desktop/phone qua, gồm controls320/360/375/390. [Báo cáo](../qa/WC-L0-2026-11-07.md).
 
-- Audit07/11: source/test đã có trong main và nhánh hiện tại; RPC catalog công khai không trả word-chain, fallback chỉ DEV; online vẫn tắt. [Bằng chứng](../qa/WC-R0-2026-11-07.md). Chưa kiểm history/staging hoặc thay DB.
+- Preview5a64fef success; CI23/run42341160368 fail nhập suffix desktop,4/5WC UI qua (narrow/phone/private/queue). Bổ sung focus/caret/value assertions; cần full CI head mới trước merge/production.
+- Giữ online=false, không SQL/catalog production. Game_Studio_Agent vẫn đủ116skill/21role/297blob; đọc theo nhiệm vụ.
 
-- File đích: `supabase/migrations/20261102090000_word_chain_catalog.sql`, `src/launcher/catalog.ts`, registry và package game.
-- [ ] Đọc catalog/migration history đích; thử riêng migration trên staging, không chạy lại cả bộ lên production.
-- [ ] Kiểm không trùng ID/quyền, bot/offline/mở/thoát và game cũ giữ nguyên. Chuẩn bị rollback; production theo quyền hiện hành, không coi roadmap là quyền SQL.
-- **Xong:** báo cáo `.md` có project/mốc nguồn/SQL test/kết quả catalog; production chưa đổi ghi riêng.
+## WC-PLAN · DONE tài liệu · 07/11/2026
 
-## WC-R1 · READY phần chuẩn bị / WAITING triển khai được chọn
+Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.md). Plan dựa source5a64fef; là lịch triển khai, chưa phải bằng chứng server đã deploy. Mỗi phiên chỉ đọc mục task đang làm.
 
-- File đích: `supabase/functions/word-chain-room/`, `supabase/word-chain/`, script prepare, `src/games/word-chain/online-client.ts`, online-config.
-- [ ] Schema staging → test → deploy function → Vault/scheduler tick; xác nhận quyền server và phòng không treo. Không lộ secret trong báo cáo.
-- [ ] Bật online trong build thử; 2–4 account tạo/join/queue, host bắt đầu sớm/tự bắt đầu, sai từ/retry/idempotency, drop/reload/elimination/result/rematch.
-- **Xong:** mọi client cùng lượt/kết quả; client không tự ghi phòng; scheduler giải quyết phòng bỏ dở; có đường tắt flag và rollback.
+| Task | Trạng thái / phụ thuộc | Kết quả cần đạt |
+|---|---|---|
+| WC-ON1 | READY chuẩn bị local; staging theo môi trường | Auth/schema/Edge/tick thật; pilot tắt thưởng chung; không lộ secret |
+| WC-ON2 | BACKLOG sau ON1 | Hai account tạo/join mã/start; full/wrong/closed/retry/host leave |
+| WC-ON3 | BACKLOG sau ON2 | FIFO2–4người,20giây từ người thứ2, cancel/race/one-seat |
+| WC-ON4 | BACKLOG sau ON3 | PK server-authoritative, đầu hàng, kết quả, tái đấu |
+| WC-ON5 | BACKLOG sau ON4 | Mạng/reload/Exit/Auth/account swap/IME và mobile |
+| WC-ON6 | BACKLOG sau ON5 | ≥10trận mỗi format,2thiết bị/2mạng,soak30phút, cutover/rollback |
 
-## WC-R2 · WAITING thiết bị · bàn phím và nghiệm thu
+**Khoảng trống cụ thể:** online `submitScore` chỉ có ref chặn lặp trong một mount; phải tắt thưởng pilot và có receipt bền vững trước mở thưởng. Xác nhận bỏ cuộc hiện qua `onExit`→leave, server đã tính forfeit dù callback riêng rỗng; kiểm toàn luồng/retry, không thêm lệnh trùng. Resume key theo UID đã có nhưng cần kiểm Exit launcher, response cũ, logout/đổi account bằng phiên thật.
 
-- [ ] Telex/VNI trên desktop/điện thoại; không mất dấu hoặc submit lúc IME composing; focus/modal/bàn phím dọc/ngang.
-- [ ] Rà từ thiếu/không phù hợp bằng nguồn từ điển và builder; không sửa nội dung chỉ từ giả định.
-- Kiểm: `test:word-chain`, `test:word-chain-ui`, `test:sql`; smoke/game/offline khi đổi launcher. Tài khoản/mạng thật tách khỏi HTTP fixture.
-- Đầu việc đầu tiên: WC-R0 kiểm catalog hiện tại; sau đó triển khai thử theo #7, không bật production từ plan này.
+**File đích:** `src/games/word-chain/{OnlineRoom,MatchView,online-client,online-platform,server,rules}.ts(x)`, `supabase/functions/word-chain-room/`, `supabase/word-chain/`, scripts package và `tests/word-chain/`. Hợp đồng/AC/ước lượng/bằng chứng từng task trong plan chi tiết. [Runbook backend](../WORD-CHAIN-SERVER.md) chỉ mở khi làm ON1; ưu tiên AGENTS hiện hành.
+
+**Kiểm:** `test:word-chain`, `test:word-chain-ui`, `test:sql`, generated clean; full CI trước merge. Fixture/PGlite không thay nhiều account/Edge/tick/thiết bị thật. Kết quả server và biên nhận bền vững cần có trước XP/coin; không tự thêm bot vào queue người thật.
+
+## Phạm vi cũ được sắp lại
+
+WC-R0 catalog: WC-L0 giải quyết hiển thị bằng bundle; migration/history staging chỉ khi backend cần, không là điều kiện để game hiện sảnh. WC-R1 chuyển thành ON1–ON4; WC-R2 thành ON5–ON6. Quyết định#7 online chưa hoàn tất, #8 public bot đã duyệt; xem [PENDING-DECISIONS](../PENDING-DECISIONS.md).
+
+**Tiếp theo:** đóng WC-L0 sau CI/deploy; bắt đầu ON1 rồi lát cắt hai người tạo phòng→nhập mã→PK→thoát. Chưa bật online production từ plan này.

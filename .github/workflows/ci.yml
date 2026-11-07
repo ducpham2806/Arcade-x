@@ -60,3 +60,11 @@ jobs:
         run: npm run test:tank-clash-ui
       - name: Generated files are not left behind
         run: git diff --exit-code && test -z "$(git status --porcelain)"
+      - name: Keep Word Chain desktop and phone visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: word-chain-ui-evidence
+          path: test-results/word-chain-*.png
+          if-no-files-found: ignore
+          retention-days: 7

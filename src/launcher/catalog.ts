@@ -1,11 +1,13 @@
 import { ALL_GAMES_LIST, GAME_REGISTRY } from '../games/registry';
 import type { GameMetadata } from '../types';
 export type CatalogGame = GameMetadata & { availability: 'published' | 'maintenance'; accessModel: 'free' | 'premium'; supportsOffline: boolean; featured: boolean; sortOrder: number; deviceOnly?: boolean };
-export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker','word-chain'];
-export const isDeviceLibraryGame=(id:string)=>id==='tank-clash'||isLocalReviewGame(id);
+export const BUNDLED_FREE_GAME_IDS=['word-chain','tank-clash'];
+export const isBundledFreeGame=(id:string)=>BUNDLED_FREE_GAME_IDS.includes(id);
+export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker'];
+export const isDeviceLibraryGame=(id:string)=>isBundledFreeGame(id)||isLocalReviewGame(id);
 export const isLocalReviewGame=(id:string)=>import.meta.env.DEV&&LOCAL_REVIEW_GAME_IDS.includes(id);
 export type Catalog = { schemaVersion: 1; games: CatalogGame[]; commerceEnabled: boolean; support: { enabled: boolean; bankName?: string; account?: string; beneficiary?: string; message?: string } };
-export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,...(game.id==='tank-clash'?{deviceOnly:true}:{}),availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:['tank-clash','battleship','boom-buddies','brick-breaker','rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };
+export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,...(isBundledFreeGame(game.id)?{deviceOnly:true}:{}),availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:['word-chain','tank-clash','battleship','boom-buddies','brick-breaker','rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };
 // Database metadata can select a bundled engine, never execute remote JavaScript.
 export function parseCatalog(raw: any): Catalog | null {
   if (raw?.schemaVersion !== 1 || !Array.isArray(raw.games)) return null;
@@ -19,7 +21,12 @@ export function parseCatalog(raw: any): Catalog | null {
       category:['Arcade','Puzzle','Action','Reflex','Multiplayer'].includes(row.category)?row.category:base.category,
       availability:row.status,accessModel:row.access_model,supportsOffline:row.supports_offline===true,featured:row.featured===true,sortOrder:Number.isFinite(row.sort_order)?row.sort_order:100}];
   }).sort((a:CatalogGame,b:CatalogGame)=>a.sortOrder-b.sortOrder || a.id.localeCompare(b.id));
-  if(!seen.has('tank-clash'))games.unshift({...GAME_REGISTRY['tank-clash'],availability:'published',accessModel:'free',supportsOffline:true,featured:true,sortOrder:-1,deviceOnly:true});
+  // Add approved free releases absent from an older cloud catalog. Explicit rows
+  // retain their access/maintenance policy and never receive the device bypass.
+  games.unshift(...BUNDLED_FREE_GAME_IDS.filter(id=>!seen.has(id)).map((id,i)=>{
+    seen.add(id);
+    return {...GAME_REGISTRY[id],availability:'published' as const,accessModel:'free' as const,supportsOffline:true,featured:true,sortOrder:i-BUNDLED_FREE_GAME_IDS.length,deviceOnly:true};
+  }));
   // Reviewed new games are available in the local preview without publishing server catalog rows.
   if(import.meta.env.DEV) for(const id of LOCAL_REVIEW_GAME_IDS) if(!seen.has(id)) games.push({...GAME_REGISTRY[id],availability:'published',accessModel:'free',supportsOffline:true,featured:true,sortOrder:999});
   const support=raw.support;
