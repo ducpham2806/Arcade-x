@@ -1,13 +1,13 @@
 # Nhật ký công việc
 
-Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release giữ [nguyên văn](archive/WORKLOG-2026-11-07-before-release-close.md); DOC-01 ở [archive riêng](archive/WORKLOG-2026-11-06-DOC-01.md). Tóm tắt kết quả ở COMPLETED, quy trình ở WORKFLOW.
+Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release giữ [nguyên văn](archive/WORKLOG-2026-11-07-before-release-close.md); DOC-01 ở [archive riêng](archive/WORKLOG-2026-11-06-DOC-01.md). Tóm tắt ở COMPLETED; checkpoint trước pilot giữ [nguyên văn](archive/WORKLOG-2026-11-08-before-staging-pilot.md), quy trình ở WORKFLOW.
 
-## 07/11/2026 · WC-ON1/ON2 WAITING staging, WC-LEX code/CI qua · codex/word-chain-online
+## 08/11/2026 · WC-ON1–ON4 pilot2account đã kiểm · codex/word-chain-online
 
-- Chủ dự án yêu cầu phòng riêng/vào PK trước, sau đó matchmaking và tăng từ điển. Nhánh từ checkpoint19afc84/main3f943d9; chưa merge/deploy online production, không SQL production.
-- Client tái hiện response muộn hồi sinh room sau close; sửa epoch/abort/giữ request khi mất ACK, rời/hủy chờ xác nhận, cleanup owner/unmount;9regression qua. Pilot online bỏ submitScore. Full CI27/codehead36801d4success:7UI Nối Từ, offline34.512,13UI Tank/generated clean; artifactUI/offline có thật, ảnh CI26 đã xem.
-- Từ điển34.512mục (+16.990), nguồn viwiktionary/Kaikki có checksum, gồm ví dụ nguyên cụm2âm tiết, không n-gram. V2nén tiền tố khoảng329KB, giữ budget400KB/v1/openers; browser/Edge có revision guard. [Nguồn](../public/games/word-chain/SOURCES.md).
-- Sau chủ dự án mở khóa: schema staging RunSuccess, Edge deploy/CORSlocalhost4335 đã lưu; HTTPS preflight204, bad origin403, publicRPCdenied. Legacy JWT vẫn ON/chờ xác nhận; cron và2account thật chưa kiểm. URLdatahash/cleanup preview đã qua local50check/lint/build/bundle/buildercheck và CI27. PR19chưa merge; checkpoint sau36801d4chỉ Markdown. [Báo cáo](qa/WC-ONLINE-2026-11-07.md); tiếp privatePK trước matchmaking thật khi có xác nhận.
+- User duyệt JWT riêng staging và2tester; đã lưu/reload OFF đúng function. Schema/Edge/CORS/cron10giây active/hash_ready qua; thiếu/badbearer401, tickgiả/browser403. Không hỏi lại quyền đã có.
+- PhòngSUKT6K: tạo4ghế/join/start2/ready, server nhận2đáp án, B bỏ cuộc→A thắng/rời.77YYHF kiểm host transfer, ghế cuối rời/closed code. Queue hủy/tìm lại/trả ghế/resetcountdown20s qua, timeout đúng hai bên,2phiếu tái đấu tạo trận mới.
+- Cả hai tab đã đóng; cron tự đóngNS8MXF sau hạn rematch,3responseHTTP200/no timeout. Lượt đã timeout trước mốc đóng nên không nhận chứng minh no-client turn. [QA hiện tại](qa/WC-STAGING-2026-11-08.md); ảnh staging inline chưa có artifact local.
+- CI28/head001d9c5success;34.512từ/50check,7UI/13Tank/offline/generated clean. Config.toml ghi setting đã duyệt; kiểm CI checkpoint mới trên PR19 trước merge. Chưa merge/phát hành từ mới/online, còn3–4account/2mạng/thiết bị/soak. Log/COMPLETED trước checkpoint giữ nguyên văn trong archive.
 
 ## 07/11/2026 · WC-PLAN / SN-PLAN DONE tài liệu · codex/word-chain-launcher-release
 

@@ -15,10 +15,10 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 
 | Task | Trạng thái / phụ thuộc | Kết quả cần đạt |
 |---|---|---|
-| WC-ON1 | WAITING xác nhận JWT setting/tick staging | Schema/Edge/CORS đã cài; Auth/tick thật còn kiểm; pilot tắt thưởng |
-| WC-ON2 | WAITING hai tester và nền ON1 | Hai account tạo/join mã/start; full/wrong/closed/retry/host leave |
-| WC-ON3 | BACKLOG sau ON2 | FIFO2–4người,20giây từ người thứ2, cancel/race/one-seat |
-| WC-ON4 | BACKLOG sau ON3 | PK server-authoritative, đầu hàng, kết quả, tái đấu |
+| WC-ON1 | ĐÃ KIỂM staging pilot | Auth/schema/Edge/CORS/cron; tự đóng room vắng client, thưởng tắt; chưa no-client turn |
+| WC-ON2 | ĐÃ KIỂM hai account | Tạo/join/start2/cap4, mã sai/đóng, host transfer/rời; full/race có fixture |
+| WC-ON3 | PILOT2account qua, còn3/4 | Hủy/tìm lại/trả ghế/resetcountdown20s qua; FIFO/one-seat có fixture |
+| WC-ON4 | PILOT2account qua, còn3/4 | Server nhận từ, đầu hàng/timeout/kết quả, đủ phiếu tái đấu qua |
 | WC-ON5 | BACKLOG sau ON4 | Mạng/reload/Exit/Auth/account swap/IME và mobile |
 | WC-ON6 | BACKLOG sau ON5 | ≥10trận mỗi format,2thiết bị/2mạng,soak30phút, cutover/rollback |
 
@@ -32,8 +32,8 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 
 WC-R0 catalog: WC-L0 giải quyết hiển thị bằng bundle; migration/history staging chỉ khi backend cần, không là điều kiện để game hiện sảnh. WC-R1 chuyển thành ON1–ON4; WC-R2 thành ON5–ON6. Quyết định#7 online chưa hoàn tất, #8 public bot đã duyệt; xem [PENDING-DECISIONS](../PENDING-DECISIONS.md).
 
-**Tiếp theo đề xuất:** ON1 rồi lát cắt hai người tạo phòng→nhập mã→PK→thoát. Chưa bật online production từ plan này.
+**Tiếp theo:** ON5/ON6,3/4account và no-client turn timeout riêng. Lát cắt phòng riêng/PK/matchmaking2account đã qua staging, không đồng nghĩa release online production.
 
 ## Yêu cầu triển khai · 07/11/2026
 
-Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking; nhánh `codex/word-chain-online`, PR19, nền3f943d9+19afc84. ON1/ON2 WAITING xác nhận JWT setting và2tester; ON3 nghiệm thu thật sau phòng riêng. WC-LEX đã code34.512từ, nguồn/checksum/giấy phép, giữ mọi từ cũ/3.011opener; URLhash/revision đồng bộ browser/Edge,50check local và full CI27/codehead36801d4qua. Staging đã áp schema/deploy Edge/CORS, cron chưa cài. [Báo cáo](../qa/WC-ONLINE-2026-11-07.md). Chưa merge/phát hành bộ từ mới; online production=false, không SQL production.
+Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking; PR19, nền3f943d9+19afc84. WC-LEX34.512từ/nguồn/checksum/giấy phép, giữ từ cũ/3.011opener; URLhash/revision và50check/CI28qua. Staging schema/Edge/CORS/JWT handlerAuth/cron đã cài theo quyền user; hai account đã kiểm phòng riêng trước rồi queue/PK/rematch. [QA mới nhất](../qa/WC-STAGING-2026-11-08.md), [nguồn](../qa/WC-ONLINE-2026-11-07.md). Chưa merge/phát hành bộ từ mới; online production=false, không SQL production.

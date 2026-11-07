@@ -1,6 +1,6 @@
 # Máy chủ phòng Nối Từ (word-chain)
 
-**Cập nhật 07/11/2026:** core/UI/test đã có nhưng online chưa triển khai/nghiệm thu; flag false thì các nút online ẩn, bot/offline dùng được. [Plan tiếp tục](word-chain/ONLINE-PLAN.md) là thứ tự hiện hành; WC-L0 đưa game ra sảnh bằng bundled catalog, không cần chạy migration production.
+**Cập nhật 08/11/2026:** schema/Edge/CORS/Auth và cron đã cài staging; hai account đã kiểm phòng riêng/PK và ghép trận. [Bằng chứng/giới hạn](qa/WC-STAGING-2026-11-08.md). Production online=false; bot/offline dùng được. [Plan tiếp tục](word-chain/ONLINE-PLAN.md); không SQL production.
 
 ## Cách hoạt động
 
@@ -12,7 +12,7 @@ Máy chủ làm trọng tài, theo mẫu Battleship và Duel. Trình duyệt kh�
 | Phòng 2–4 ghế: tạo phòng có mã, vào bằng mã, ghép trận, chủ phòng bắt đầu sớm, ghép trận tự bắt đầu 20 giây sau khi có người thứ hai, CAS theo version, biên nhận chống gửi lặp, vắng 90 giây thì bị loại, rời phòng, tái đấu bằng bỏ phiếu 60 giây, biểu cảm | `src/games/word-chain/server.ts` |
 | Edge Function: xác thực tài khoản (không nhận tài khoản ẩn danh), lấy tên từ tài khoản, hạn mức request, kiểm tra từ bằng cùng từ điển | `supabase/functions/word-chain-room/` (`npm run prepare:word-chain-server` chép code từ `src/` và từ điển từ `public/`) |
 | SQL: schema riêng chỉ `service_role` gọi được, `wc_room_create/read/by_code/cas/touch/match/due/rate` | `supabase/word-chain/schema.sql` |
-| Lịch gọi `tick` mỗi 10 giây (mẫu, chưa áp) | `supabase/word-chain/scheduler.sql` |
+| Lịch `tick` mỗi 10 giây, đã áp staging; chỉ POST khi có room đến hạn | `supabase/word-chain/scheduler.sql` |
 
 Ghép trận: dưới một khoá chung cho hàng đợi, người chơi vào ghế trống đầu tiên của phòng công khai cũ nhất. Phòng đó phải chưa quá 10 phút, còn chỗ, và có người hoạt động trong 90 giây qua. Nếu không có phòng như vậy thì tạo phòng mới. Gửi lại yêu cầu sẽ nhận lại đúng phòng cũ.
 
@@ -21,20 +21,22 @@ Mỗi người chỉ được ở một phòng đang mở. Rời phòng (hoặc 
 ## Kiểm thử
 
 `npm run test:word-chain` (nằm trong `test:fast`) chạy:
+
 - luật trận;
 - phòng với bộ lưu trong bộ nhớ;
 - schema trên PGlite: quyền, CAS, chống ghi đè khi vắng mặt, heartbeat, ghép trận 4 ghế, hàng đợi hẹn giờ, hạn mức;
 - Edge Function chạy end to end qua schema thật, với Auth và PostgREST giả.
+- client lifecycle/retry/mất ACK/leave; tổng50check hiện tại. Fixture không thay nhiều tài khoản hoặc thiết bị thật.
 
 Test Edge cũng kiểm tra bản code đã chép trùng với `src/`.
 
 ## Mẫu triển khai staging (đối chiếu plan hiện hành)
 
-1. Áp `supabase/word-chain/schema.sql` lên **project staging** trước, rồi chạy lại `npm run test:word-chain`. Không áp thẳng lên production `whjatkhhupeqfngakmee` khi chưa thử.
-2. Chạy `npm run prepare:word-chain-server`, rồi deploy `supabase/functions/word-chain-room` với `verify_jwt` mặc định. Biến môi trường `SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY` do Supabase cấp.
-3. Tạo secret `wc_room_service_key` trong Vault của database, thay URL trong `supabase/word-chain/scheduler.sql`, rồi chạy file này.
+1. Áp `supabase/word-chain/schema.sql` lên **staging khqipuipeawzlkqmdzdg**; kiểm quyền và `npm run test:word-chain`. Không chạy SQL/script production `whjatkhhupeqfngakmee` theo AGENTS.
+2. Chạy `npm run prepare:word-chain-server`, deploy `word-chain-room`; có thể dùng `build:word-chain-edge` tạo artifact một file cho dashboard. Handler xác minh registered user qua Auth.getUser; `supabase/config.toml` đặt `verify_jwt=false` tương ứng. User đã duyệt và dashboard staging đã lưu/reload OFF; không tự áp sang môi trường khác. Giữ biến server do Supabase cấp ở server.
+3. WORD_CHAIN_ALLOWED_ORIGINS phải là danh sách exact origin, không wildcard; pilot chỉ127.0.0.1/localhost:4335. Thay public URL staging trong scheduler.sql rồi áp: script tự sinh token tick riêng trong Vault, DB giữ SHA256. Không dùng `wc_room_service_key`, không copy service-role key vào cron/browser. Không đọc/xuất giá trị Vault khi kiểm; chỉ kiểm hash_ready, job active và phản hồi HTTP.
 4. Nếu cần thử migration catalog, chỉ thử riêng trên staging. Không chạy SQL/script lên production theo AGENTS; bundled catalog đã giải quyết hiển thị game.
-5. Chỉ bật online trong build thử đúng staging sau khi chặn thưởng chung và đạt gate ON1; thử 2–4 tài khoản thật theo plan. Giữ production online=false tới cutover được duyệt.
+5. Build thử phải dùng URL/key/Auth cùng staging; `preview:word-chain-staging` giữ session RAM riêng từng tab, không reload khi đang giữ tester login. Online pilot không thưởng chung. Thử2–4account theo plan; hai account đã qua,3/4 và thiết bị/mạng thật còn thiếu. Giữ production online=false tới cutover được duyệt.
 
 ## Giao diện online (WC4)
 

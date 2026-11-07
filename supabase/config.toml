@@ -28,3 +28,8 @@ enable_anonymous_sign_ins = true
 # Cosmic handler also checks auth.getUser and ticket ownership.
 [functions.cosmic-verify]
 verify_jwt = true
+
+# Word Chain verifies registered users via Auth.getUser and cron with a tick-only token.
+# Approved/applied on khqipuipeawzlkqmdzdg staging; no production deployment implied.
+[functions.word-chain-room]
+verify_jwt = false
