@@ -21,10 +21,20 @@ await test('browser roles cannot read rooms or call the persistence functions', 
   for (const role of ['anon', 'authenticated']) {
     await db.exec(`set role ${role}`);
     await assert.rejects(db.query('select * from wc_private.rooms'), /permission denied/);
+    await assert.rejects(db.query('select * from wc_private.scheduler_auth'), /permission denied/);
+    await assert.rejects(db.query("select public.wc_room_tick_authorized('x')"), /permission denied/);
     await assert.rejects(db.query("select public.wc_room_read('x')"), /permission denied/);
     await assert.rejects(db.query("select public.wc_room_match('u','{}'::jsonb,'n',0)"), /permission denied/);
     await db.exec('reset role');
   }
+});
+await test('scheduler authorization matches only the stored hash under the service role',async()=>{
+ await db.query('insert into wc_private.scheduler_auth(token_hash) values ($1)',['a'.repeat(64)]);
+ await db.exec('set role service_role');
+ assert.equal(await call('wc_room_tick_authorized','a'.repeat(64)),true);
+ assert.equal(await call('wc_room_tick_authorized','b'.repeat(64)),false);
+ await assert.rejects(db.query('delete from wc_private.scheduler_auth'),/permission denied/);
+ await db.exec('reset role');
 });
 await test('create is idempotent per request id, validates capacity, one active room per identity', async () => {
   const a = room('r1', 'ann', 'ABC234');

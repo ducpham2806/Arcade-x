@@ -15,8 +15,8 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 
 | Task | Trạng thái / phụ thuộc | Kết quả cần đạt |
 |---|---|---|
-| WC-ON1 | READY chuẩn bị local; staging theo môi trường | Auth/schema/Edge/tick thật; pilot tắt thưởng chung; không lộ secret |
-| WC-ON2 | BACKLOG sau ON1 | Hai account tạo/join mã/start; full/wrong/closed/retry/host leave |
+| WC-ON1 | ACTIVE chuẩn bị/staging | Auth/schema/Edge/tick thật; pilot tắt thưởng chung; không lộ secret |
+| WC-ON2 | ACTIVE hoàn thiện sau nền ON1 | Hai account tạo/join mã/start; full/wrong/closed/retry/host leave |
 | WC-ON3 | BACKLOG sau ON2 | FIFO2–4người,20giây từ người thứ2, cancel/race/one-seat |
 | WC-ON4 | BACKLOG sau ON3 | PK server-authoritative, đầu hàng, kết quả, tái đấu |
 | WC-ON5 | BACKLOG sau ON4 | Mạng/reload/Exit/Auth/account swap/IME và mobile |
@@ -33,3 +33,7 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 WC-R0 catalog: WC-L0 giải quyết hiển thị bằng bundle; migration/history staging chỉ khi backend cần, không là điều kiện để game hiện sảnh. WC-R1 chuyển thành ON1–ON4; WC-R2 thành ON5–ON6. Quyết định#7 online chưa hoàn tất, #8 public bot đã duyệt; xem [PENDING-DECISIONS](../PENDING-DECISIONS.md).
 
 **Tiếp theo đề xuất:** ON1 rồi lát cắt hai người tạo phòng→nhập mã→PK→thoát. Chưa bật online production từ plan này.
+
+## Yêu cầu triển khai · 07/11/2026
+
+Chủ dự án yêu cầu làm phòng riêng/vào PK trước, sau đó matchmaking; mở rộng từ điển vì thiếu từ. Nhánh `codex/word-chain-online`, nền3f943d9+checkpoint19afc84. ON1/ON2 ACTIVE; ON3 sau khi lát cắt phòng riêng đã kiểm. Bổ sung WC-LEX: nguồn có giấy phép, checksum/provenance, giữ từ cũ và luật2âm tiết, đồng bộ browser/Edge, test số lượng/từ thực tế/Unicode/offline. Chưa triển khai online production hoặc SQL production.

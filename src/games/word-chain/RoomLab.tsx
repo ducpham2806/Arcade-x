@@ -58,22 +58,22 @@ export function localTransport(server:WordChainRoomServer,uid:string,name:string
  }};
 }
 const PLAYERS=[{uid:'lab-an',name:'An'},{uid:'lab-binh',name:'Bình'},{uid:'lab-chi',name:'Chi'},{uid:'lab-dung',name:'Dũng'}];
-const bridge={submitScore:async()=>({isNewHighScore:false,expEarned:0,coinsEarned:0})} as unknown as GameComponentProps['bridge'];
 
 export function RoomLab(){
  const [lex,setLex]=useState<Lexicon|null>(null),[active,setActive]=useState(0);
+ const [rewardCalls,setRewardCalls]=useState(0);
+ const bridge=useMemo(()=>({submitScore:async()=>{setRewardCalls(n=>n+1);return {isNewHighScore:false,expEarned:0,coinsEarned:0};}} as unknown as GameComponentProps['bridge']),[]);
  useEffect(()=>{void loadLexicon().then(setLex);},[]);
  const server=useMemo(()=>lex?new WordChainRoomServer(new LocalRoomStore(),lex):null,[lex]);
  // The scheduler: settle deadlines once a second, like pg_cron calling `tick`.
  useEffect(()=>{if(!server)return;const t=setInterval(()=>void server.tick(Date.now()),1000);return()=>clearInterval(t);},[server]);
- const clients=useMemo(()=>server?PLAYERS.map(p=>new WordChainClient(localTransport(server,p.uid,p.name))):[],[server]);
  if(!server)return <div className="nt-lab-loading">Đang mở từ điển…</div>;
- return <div className="nt-lab">
+ return <div className="nt-lab" data-reward-calls={rewardCalls}>
   <header className="nt-lab-head"><b>Nối Từ · Phòng thử 4 người</b><span>Máy chủ phòng thật chạy trong trình duyệt. Mỗi ô là một người chơi: một người Tạo phòng rồi những người khác Nhập mã, hoặc tất cả bấm Ghép trận.</span>
    <nav>{PLAYERS.map((p,i)=><button key={p.uid} aria-pressed={active===i} onClick={()=>setActive(i)}>{p.name}</button>)}</nav></header>
   <div className="nt-lab-panes">{PLAYERS.map((p,i)=><section key={p.uid} className={`nt-lab-pane ${active===i?'active':''}`} aria-label={`Người chơi ${p.name}`} data-player={p.name}>
    <div className="nt-lab-name">{p.name}</div>
-   <WordChainGame bridge={bridge} isPaused={false} isMuted onGameOver={()=>{}} onRestart={()=>{}} roomClient={async()=>({client:clients[i]})}/>
+   <WordChainGame bridge={bridge} isPaused={false} isMuted onGameOver={()=>{}} onRestart={()=>{}} roomClient={async()=>({client:new WordChainClient(localTransport(server,p.uid,p.name))})}/>
   </section>)}</div>
  </div>;
 }

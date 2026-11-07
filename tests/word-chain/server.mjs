@@ -9,7 +9,7 @@ let checks = 0;
 const test = async (name, run) => {await run(); checks++; console.log('PASS', name);};
 const {outputFiles} = await build({stdin: {contents: "export * from './src/games/word-chain/server.ts'; export * from './src/games/word-chain/rules.ts'; export {buildLexicon} from './src/games/word-chain/lexicon.ts'; export {wordKey} from './src/games/word-chain/normalize.ts';", resolveDir: process.cwd(), loader: 'ts'}, bundle: true, write: false, platform: 'node', format: 'esm', logLevel: 'silent'});
 const W = await import('data:text/javascript;base64,' + Buffer.from(outputFiles[0].text).toString('base64'));
-const lex = W.buildLexicon(JSON.parse(readFileSync('public/games/word-chain/words.v1.json', 'utf8')));
+const lex = W.buildLexicon(JSON.parse(readFileSync('public/games/word-chain/words.v2.json', 'utf8')));
 const T0 = 1_000_000, SEATS = ['P1', 'P2', 'P3', 'P4'];
 
 export class MemoryStore {

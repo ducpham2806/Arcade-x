@@ -32,7 +32,7 @@
     "export:tank-staging": "node scripts/export-tank-staging-review.mjs",
     "test:tank-clash-ui": "playwright test tests/tank-clash/online-ui.test.ts tests/tank-clash/squad-ui.test.ts tests/tank-clash/squad-online-ui.test.ts tests/tank-clash/staging-review.test.ts tests/tank-clash/launcher-ui.test.ts",
     "dev:tank-server": "node server/tank-clash-room/server.mjs",
-    "test:word-chain": "node tests/word-chain/rules.mjs && node tests/word-chain/server.mjs && node tests/word-chain/schema.mjs && node tests/word-chain/edge-room.mjs",
+    "test:word-chain": "node tests/word-chain/rules.mjs && node tests/word-chain/server.mjs && node tests/word-chain/schema.mjs && node tests/word-chain/edge-room.mjs && node tests/word-chain/client.mjs",
     "test:word-chain-ui": "playwright test tests/word-chain/ui.test.ts tests/word-chain/online.test.ts",
     "test:blossom-ui": "playwright test tests/blossom/learning.test.ts tests/blossom/preparation-v7.test.ts tests/blossom/presentation-v6.test.ts tests/blossom/review-v4.test.ts tests/blossom/sprites-v8.test.ts tests/blossom/tutorial-flow.test.ts tests/blossom/ui.test.ts tests/blossom/layout-v9.test.ts",
     "audit:blossom-seeds": "node scripts/run-blossom-seed-audit.mjs",
@@ -95,7 +95,9 @@
     "test:snake-props": "node tests/snake/story-props.mjs",
     "build:snake-props": "python3 scripts/build-snake-props.py",
     "test:snake-audio": "node tests/snake/audio.mjs",
-    "build:snake-audio": "python3 scripts/build-snake-audio.py"
+    "build:snake-audio": "python3 scripts/build-snake-audio.py",
+    "preview:word-chain-staging": "node scripts/word-chain-staging-preview.mjs && node scripts/word-chain-staging-server.mjs",
+    "build:word-chain-edge": "node scripts/word-chain-build-edge.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

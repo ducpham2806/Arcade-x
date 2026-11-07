@@ -14,6 +14,7 @@ export class PostgresWordChainStore implements RoomStore {
     return response.json();
   }
   takeRequest(uid: string, kind: 'read' | 'write') {return this.rpc<boolean>('wc_room_rate', {p_uid: uid, p_kind: kind});}
+  authorizeTick(hash: string) {return this.rpc<boolean>('wc_room_tick_authorized', {p_hash: hash});}
   create(room: Room) {return this.rpc<Room>('wc_room_create', {p_room: room});}
   read(id: string) {return this.rpc<Room | null>('wc_room_read', {p_id: id});}
   byCode(code: string) {return this.rpc<Room | null>('wc_room_by_code', {p_code: code});}

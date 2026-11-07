@@ -2,6 +2,13 @@
 
 Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release giữ [nguyên văn](archive/WORKLOG-2026-11-07-before-release-close.md); DOC-01 ở [archive riêng](archive/WORKLOG-2026-11-06-DOC-01.md). Tóm tắt kết quả ở COMPLETED, quy trình ở WORKFLOW.
 
+## 07/11/2026 · WC-ON1/ON2 ACTIVE, WC-LEX · codex/word-chain-online
+
+- Chủ dự án yêu cầu phòng riêng/vào PK trước, sau đó matchmaking và tăng từ điển. Nhánh từ checkpoint19afc84/main3f943d9; chưa merge/deploy online production, không SQL production.
+- Client đã tái hiện response muộn hồi sinh room sau close; sửa epoch/abort/giữ request khi mất ACK, rời/hủy chờ xác nhận, cleanup owner/unmount;9regression client qua. Pilot online bỏ submitScore; thêm kiểm UIhost transfer/kết quả/re-entry/cancel đang chờ CI.
+- Từ điển34.512mục (+16.990), nguồn viwiktionary/Kaikki có checksum, gồm ví dụ nguyên cụm2âm tiết, không n-gram. V2nén tiền tố khoảng329KB, giữ budget400KB/v1/openers; browser/Edge có revision guard. [Nguồn](../public/games/word-chain/SOURCES.md).
+- Staging khqipuipeawzlkqmdzdg Healthy, chủ dự án đã đăng nhập; SQL đọc cho rooms/RPC đều NULL. Chưa cài schema/Edge/tick; Mac đang khóa, đã nhờ mở khóa. [Báo cáo](qa/WC-ONLINE-2026-11-07.md); tiếp local checks→commit/push/CI và staging khi truy cập được.
+
 ## 07/11/2026 · WC-PLAN / SN-PLAN DONE tài liệu · codex/word-chain-launcher-release
 
 - Chủ dự án yêu cầu plan phòng/ghép trận/PK Nối Từ và phần còn thiếu của Rắn. Đối chiếu source5a64fef, core/Edge/UI và live-save QA; dùng playbook game-production-scrum, không nạp lại cả thư viện.
@@ -16,10 +23,3 @@ Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release
 - CI23fail nhập suffix desktop; fixture chờ focus/caret và assert value, không nới kiểm từ/kết quả. Full CI24/head5882adf success/run42342747871; PR18 merge3f943d9. Netlify6aeebb61665214227ba314ef Published;4JS+2ảnh byte-match.
 - CUA production24game/7slide, artwork/menu bot, nhập “cấm địa” nhận/bot “địa giới”, exit gỡ game và recent đúng. [Báo cáo](qa/WC-L0-2026-11-07.md); CI24ảnh bị suite sau dọn nên không ZIP, cần bảo trì upload. Không claim online/thiết bị thật. Log trước publish giữ [nguyên văn](archive/WORKLOG-2026-11-07-WC-L0-prepublish.md).
 - Hai plan đã vào PR18; tiếp WC-ON1 theo plan, chưa bắt đầu backend. Game Studio đủ297blob/116skill/21role/4rules, không cài lại.
-
-## 07/11/2026 · NETLIFY-BUILD DONE / WC-R0 audit · codex/tank-clash-release-verification
-
-- Tái hiện TS2307 thiếu ws trong nested server dependencies trên checkout sạch. Dùng deps:tank-clash chung CI/Netlify trước lint/build, giữ test/Snake preview; local exit0.
-- Preview b644da2 success; full CI run42311533962 success; PR#17 merge main1131927. Production deploy6aee682dc2bd2dba16385690 Published,4bundle JS đầu trùng byte build đã kiểm. [Báo cáo](qa/NETLIFY-BUILD-2026-11-07.md).
-- [Nối Từ](qa/WC-R0-2026-11-07.md) có source/test trong main/nhánh, CI engine/UI qua. Catalog public23mục không trả word-chain; fallback chỉ DEV, online flagfalse. Chưa thay catalog/DB/online; không thiếu merge game.
-- DOC-01/thư viện116skill/21role/4rules đã vào main cùng PR#17. Checkpoint sau release cập nhật ở nhánh hiện tại, không thay runtime.
