@@ -20,11 +20,12 @@
 - Nhánh codex/word-chain-launcher-release; đối chiếu source5a64fef và báo cáo live-save. [Nối Từ](word-chain/ONLINE-PLAN.md): staging/reward gate→phòng riêng→ghép trận→PK→mạng/Auth→nghiệm thu. [Snake](snake/CONTINUATION-PLAN.md): baseline→UI/save thật→thiết bị/nội dung→candidate phát hành.
 - Đã phân biệt core có sẵn với gap, chia task/file/AC/bằng chứng/ước lượng; thẻ gọn và roadmap ưu tiên cập nhật. Không deploy backend, SQL production hay bật flag từ plan; WC-L0 chờ CI/deploy riêng.
 
-## WC-L0 phần art/catalog/local QA · 07/11/2026
+## WC-L0 · DONE bot/offline ra sảnh · 07/11/2026
 
-- Nhánh codex/word-chain-launcher-release/PR#18: bundled-free bot/offline, policy server giữ ưu tiên;2master ImageGen, icon512/banner1280×640, hash/package/provenance đồng bộ.
-- Local lint/build/bundle/fast, engine36check/artwork qua; CUA PC/phone kiểm bot/từ sai-đúng/favorite/recent/exit. Sửa clipping7controls ở≤399px, bounds320/360/375/390 qua.
-- b0e0c44 Preview success và offline check qua; sửa narrow cần CI head mới. [Báo cáo](qa/WC-L0-2026-11-07.md). Chưa merge/phát hành WC-L0; checkpoint trước chuyển sang lập plan online/Snake theo yêu cầu mới.
+- Nhánh codex/word-chain-launcher-release/PR18: bundled-free, policy server giữ ưu tiên;2master ImageGen, icon512/banner1280×640, hash/package/prompt đồng bộ. Giữ online=false, không SQL production.
+- Local lint/build/bundle/fast,36check engine và CUA PC/phone/controls320–390 qua. CI23fail nhập suffix desktop; fixture thêm focus/caret/value, giữ mọi assert. Full CI24/head5882adf success, Word Chain5/5/Tank13/13/generated clean qua.
+- Merge3f943d9; Netlify6aeebb61665214227ba314ef Published. CUA production thấy24game/7slide, menu bot, “cấm địa” nhận/bot nối, exit gỡ game;4JS+2ảnh byte-match. [Báo cáo](qa/WC-L0-2026-11-07.md).
+- CI24không có ZIP ảnh vì suite sau dọn output; đã ghi giới hạn, cần bảo trì upload. Không thay proof bằng ảnh jobfail. Online/multi-account/thiết bị thật chưa đạt; tiếp WC-ON1, hai plan đã merge PR18, checkpoint sau release ở nhánh.
 
 ## WC-R0 phần xác minh nhánh/catalog · 07/11/2026
 

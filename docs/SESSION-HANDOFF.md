@@ -1,21 +1,19 @@
-# Bàn giao · 07/11/2026
+# Bàn giao · 07/11/2026 · plan tiếp tục đã sẵn sàng
 
-**Nguồn:** main1131927; nhánh `codex/word-chain-launcher-release`, head5a64fef/PR#18. **Hiện tại WC-L0 ACTIVE:** bot/offline Nối Từ ra sảnh +icon/banner, online=false, không SQL production. Preview head5a64fef success/deploy6aeeb1639973bd8b2a56d893; CI23/run42341160368 fail bước nhập suffix desktop (4/5WC UI qua). Bổ sung focus/caret/value assertions trước nhập, cần CI head mới. Local lint/build/bundle/fast,36check engine và CUA desktop/phone/bot/controls320–390 qua. [Bằng chứng](qa/WC-L0-2026-11-07.md). Tiếp: CI xanh→merge→kiểm Netlify production; không dùng CI22/headb0 làm proof head mới.
+**Nguồn:** main`3f943d9`/PR18; nhánh `codex/word-chain-launcher-release`. **WC-L0 DONE bot/offline:** full CI24/head5882adf success/run42342747871, Word Chain5/5/Tank13/13/generated clean qua. Netlify deploy6aeebb61665214227ba314ef Published;4JS+2ảnh byte-match. CUA production24game/7slide/icon/banner/menu bot, “cấm địa” nhận/bot nối và exit gỡ game. [Bằng chứng/giới hạn](qa/WC-L0-2026-11-07.md). Online=false, không SQL production/server đổi.
 
-## Yêu cầu mới đã lập plan
+## Tiếp theo theo yêu cầu chủ dự án
 
-Chủ dự án yêu cầu tiếp phần phòng/ghép trận/PK Nối Từ và plan Snake. **WC-PLAN/SN-PLAN DONE tài liệu**, chưa triển khai online/Snake. Chi tiết nằm dưới thẻ module, chỉ mở mục task cần:
+**WC-PLAN/SN-PLAN DONE tài liệu**, hai plan đã vào PR18; checkpoint QA/bàn giao sau release commit/push nhánh, không mặc định đã vào main. Chỉ đọc một thẻ rồi đúng mục task chi tiết, không nạp cả thư viện:
 
-- [Nối Từ](plans/WORD-CHAIN.md): ON1staging/Auth/tick/tắt thưởng pilot→phòng riêng2account→FIFO2–4→PK→mạng/Auth/IME→nghiệm thu. Core/UI/schema đã có; chặn thưởng lặp bền vững, kiểm bỏ cuộc qua leave/server forfeit và retry, không thêm lệnh trùng. Không bật online production từ plan.
-- [Snake](plans/SNAKE.md): R0abaseline/bundle→R0bUI chơi/lưu/reload+JWT thật→thiết bị→R01/art/audio/playtest→candidate. Cloud core và icon/banner đã có; live runner chưa kiểm renderer/DOM, expiry thật và điện thoại. Chưa vào catalog public.
-- Sau WC-L0 ưu tiên online Nối Từ, rồi Snake. Game_Studio_Agent c5dac462,297blob/116skill/21role/4rules đủ và đã merge PR#17; không cần cài lại.
+- [Nối Từ](plans/WORD-CHAIN.md): **WC-ON1 READY chuẩn bị**, chưa bắt đầu backend. Staging/Auth/schema/Edge/tick/tắt thưởng pilot→phòng riêng2account→FIFO2–4→PK→mạng/Auth/IME→nghiệm thu. Core/UI có sẵn; cần receipt thưởng bền vững. Đầu hàng đã qua leave/server forfeit, kiểm ACK/retry, không thêm lệnh trùng. Không bật online production từ plan.
+- [Snake](plans/SNAKE.md): R0abaseline/route/flags/bundle→R0bUI chơi/lưu/reload+JWT thật→thiết bị→R01/art/audio/playtest→candidate.7suite Snake local+build qua; chunk game1,92MB raw/~1,35MB gzip cần tối ưu. Cloud core và icon/banner có rồi; live runner chưa kiểm renderer/DOM/expiry thật/điện thoại; chưa public.
+- Ưu tiên online Nối Từ rồi Snake. Game_Studio_Agent c5dac462,297blob/116skill/21role/4rules đủ, đã merge PR17, không cài lại. Chọn1–3playbook khi làm.
 
-## Đã phát hành / còn chờ
+## Giữ lại / chưa nghiệm thu
 
-- PR#17/main1131927: Netlify nested ws dependencies +Auth cross-tab fix, full CI42311533962 success. Production deploy6aee682dc2bd2dba16385690 Published,4bundle byte-match. [Build report](qa/NETLIFY-BUILD-2026-11-07.md).
-- **TC-R0 WAITING:** user chọn để ca A sau. Hai tab production B/logout qua; lần sau A khác B kiểm phòng B9FNNVT không còn/không tiếp quản ghế. Không tự hỏi/login lại. TC-R1≥10trận/format,2thiết bị/2mạng/soak30phút chưa làm; TC-R2 chỉ port P2 sang P3, không merge nguyên nhánh.
-- Render c705100 Live/Free/cap16/registered-free, Blueprint cũ paused; không sync/deploy vô cớ. Không thay SQL/key/chi phí, commerce tắt.
+- TC-R0 ca A/mã B9FNNVT sau release do chủ dự án để sau; không tự hỏi/login lại. Hai tab B/logout đã qua1131927. TC-R1≥10trận/format,2thiết bị/2mạng/soak30phút chưa làm; TC-R2 chỉ port P2 sang P3, không merge nguyên nhánh.
+- Render c705100/Free/cap16/registered-free, Blueprint cũ paused; không sync/deploy vô cớ. Không thay SQL/key/chi phí, commerce tắt.
+- CI24không có ZIP ảnh do Tank suite dọn `test-results` trước upload; test và CUA vẫn qua, ghi giới hạn, cần bảo trì upload sau từng suite. Không claim artifact đủ8ảnh.
 
-## Tiếp quản
-
-WORKLOG≤3mục; phần TC cũ lưu nguyên văn trong archive, kết quả gọn tại COMPLETED. `deliverables/` là artifact local cũ, không commit. Local preview4323/session25526 đã dừng sau QA. Đọc AGENTS→bàn giao→một thẻ; doc checker trước commit. Plan đã commit local; push cùng fixture focus/caret rồi chờ CI head mới.
+WORKLOG≤3mục, chi tiết trước publish/TC giữ nguyên văn ở archive; COMPLETED tóm tắt. `deliverables/` là artifact local cũ, không commit. Preview4323 và tab kiểm đã dừng/đóng. Đọc AGENTS→bàn giao→một thẻ; doc checker trước commit.

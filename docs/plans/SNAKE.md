@@ -21,7 +21,7 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 
 Runner không chạy renderer/full launcher DOM. JWT expiry thật, điện thoại thật, production art/audio/animation và M2human playtest chưa đạt. Các game public CI xanh không chứng minh toàn bộ suite Snake đã chạy. Production build không tự gồm route preview.
 
-Kiểm local07/11: build preview +test:snake-preview qua, chunk game1,92MB raw/~1,35MB gzip. [Bằng chứng](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). Cần tối ưu trước public, SN-R0a chưa hoàn tất toàn suite/route/flags.
+Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~1,35MB gzip. [Bằng chứng](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). Cần tối ưu trước public, SN-R0a còn route/flags runtime và graph tải đầu.
 
 **File đích:** `src/games/snake-legend/` (wrapper,src,integration), `src/preview/snake/`, `vite.snake-preview.config.ts`, scripts/tests Snake, art nguồn. Output sinh chỉ sửa qua pipeline.
 
