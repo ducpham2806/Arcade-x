@@ -2,12 +2,12 @@
 
 Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release giữ [nguyên văn](archive/WORKLOG-2026-11-07-before-release-close.md); DOC-01 ở [archive riêng](archive/WORKLOG-2026-11-06-DOC-01.md). Tóm tắt kết quả ở COMPLETED, quy trình ở WORKFLOW.
 
-## 07/11/2026 · WC-ON1/ON2 ACTIVE, WC-LEX · codex/word-chain-online
+## 07/11/2026 · WC-ON1/ON2 WAITING staging, WC-LEX code/CI qua · codex/word-chain-online
 
 - Chủ dự án yêu cầu phòng riêng/vào PK trước, sau đó matchmaking và tăng từ điển. Nhánh từ checkpoint19afc84/main3f943d9; chưa merge/deploy online production, không SQL production.
-- Client đã tái hiện response muộn hồi sinh room sau close; sửa epoch/abort/giữ request khi mất ACK, rời/hủy chờ xác nhận, cleanup owner/unmount;9regression client qua. Pilot online bỏ submitScore; CI26/head32cbbd0success/7UI gồm host transfer/kết quả/re-entry/cancel, offline34.512qua; ảnh UI/offline đã có và đã xem.
+- Client tái hiện response muộn hồi sinh room sau close; sửa epoch/abort/giữ request khi mất ACK, rời/hủy chờ xác nhận, cleanup owner/unmount;9regression qua. Pilot online bỏ submitScore. Full CI27/codehead36801d4success:7UI Nối Từ, offline34.512,13UI Tank/generated clean; artifactUI/offline có thật, ảnh CI26 đã xem.
 - Từ điển34.512mục (+16.990), nguồn viwiktionary/Kaikki có checksum, gồm ví dụ nguyên cụm2âm tiết, không n-gram. V2nén tiền tố khoảng329KB, giữ budget400KB/v1/openers; browser/Edge có revision guard. [Nguồn](../public/games/word-chain/SOURCES.md).
-- Sau chủ dự án mở khóa: schema staging RunSuccess, Edge deploy/CORSlocalhost4335 đã lưu; HTTPS preflight204, bad origin403, publicRPCdenied. Legacy JWT vẫn ON/chờ xác nhận, cron và2account thật chưa kiểm. WIP URLdatahash/cleanup preview cần headCI mới; PR19chưa merge. [Báo cáo](qa/WC-ONLINE-2026-11-07.md); tiếp checks/push và privatePK trước matchmaking thật.
+- Sau chủ dự án mở khóa: schema staging RunSuccess, Edge deploy/CORSlocalhost4335 đã lưu; HTTPS preflight204, bad origin403, publicRPCdenied. Legacy JWT vẫn ON/chờ xác nhận; cron và2account thật chưa kiểm. URLdatahash/cleanup preview đã qua local50check/lint/build/bundle/buildercheck và CI27. PR19chưa merge; checkpoint sau36801d4chỉ Markdown. [Báo cáo](qa/WC-ONLINE-2026-11-07.md); tiếp privatePK trước matchmaking thật khi có xác nhận.
 
 ## 07/11/2026 · WC-PLAN / SN-PLAN DONE tài liệu · codex/word-chain-launcher-release
 

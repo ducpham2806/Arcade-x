@@ -15,14 +15,14 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 
 | Task | Trạng thái / phụ thuộc | Kết quả cần đạt |
 |---|---|---|
-| WC-ON1 | ACTIVE chuẩn bị/staging | Auth/schema/Edge/tick thật; pilot tắt thưởng chung; không lộ secret |
-| WC-ON2 | ACTIVE hoàn thiện sau nền ON1 | Hai account tạo/join mã/start; full/wrong/closed/retry/host leave |
+| WC-ON1 | WAITING xác nhận JWT setting/tick staging | Schema/Edge/CORS đã cài; Auth/tick thật còn kiểm; pilot tắt thưởng |
+| WC-ON2 | WAITING hai tester và nền ON1 | Hai account tạo/join mã/start; full/wrong/closed/retry/host leave |
 | WC-ON3 | BACKLOG sau ON2 | FIFO2–4người,20giây từ người thứ2, cancel/race/one-seat |
 | WC-ON4 | BACKLOG sau ON3 | PK server-authoritative, đầu hàng, kết quả, tái đấu |
 | WC-ON5 | BACKLOG sau ON4 | Mạng/reload/Exit/Auth/account swap/IME và mobile |
 | WC-ON6 | BACKLOG sau ON5 | ≥10trận mỗi format,2thiết bị/2mạng,soak30phút, cutover/rollback |
 
-**Khoảng trống cụ thể:** online `submitScore` chỉ có ref chặn lặp trong một mount; phải tắt thưởng pilot và có receipt bền vững trước mở thưởng. Xác nhận bỏ cuộc hiện qua `onExit`→leave, server đã tính forfeit dù callback riêng rỗng; kiểm toàn luồng/retry, không thêm lệnh trùng. Resume key theo UID đã có nhưng cần kiểm Exit launcher, response cũ, logout/đổi account bằng phiên thật.
+**Khoảng trống cụ thể:** pilot đã bỏ online `submitScore`; cần receipt bền vững trước mở thưởng. Bỏ cuộc qua `onExit`→leave/server forfeit đã có regression UI, không thêm lệnh trùng. Đã sửa cleanup/response muộn/mất ACK, còn kiểm Exit launcher, logout/đổi account bằng phiên thật.
 
 **File đích:** `src/games/word-chain/{OnlineRoom,MatchView,online-client,online-platform,server,rules}.ts(x)`, `supabase/functions/word-chain-room/`, `supabase/word-chain/`, scripts package và `tests/word-chain/`. Hợp đồng/AC/ước lượng/bằng chứng từng task trong plan chi tiết. [Runbook backend](../WORD-CHAIN-SERVER.md) chỉ mở khi làm ON1; ưu tiên AGENTS hiện hành.
 
@@ -36,4 +36,4 @@ WC-R0 catalog: WC-L0 giải quyết hiển thị bằng bundle; migration/histor
 
 ## Yêu cầu triển khai · 07/11/2026
 
-Chủ dự án yêu cầu làm phòng riêng/vào PK trước, sau đó matchmaking; mở rộng từ điển vì thiếu từ. Nhánh `codex/word-chain-online`, nền3f943d9+checkpoint19afc84. ON1/ON2 ACTIVE; ON3 sau khi lát cắt phòng riêng đã kiểm. Bổ sung WC-LEX: nguồn có giấy phép, checksum/provenance, giữ từ cũ và luật2âm tiết, đồng bộ browser/Edge, test số lượng/từ thực tế/Unicode/offline. Chưa triển khai online production hoặc SQL production.
+Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking; nhánh `codex/word-chain-online`, PR19, nền3f943d9+19afc84. ON1/ON2 WAITING xác nhận JWT setting và2tester; ON3 nghiệm thu thật sau phòng riêng. WC-LEX đã code34.512từ, nguồn/checksum/giấy phép, giữ mọi từ cũ/3.011opener; URLhash/revision đồng bộ browser/Edge,50check local và full CI27/codehead36801d4qua. Staging đã áp schema/deploy Edge/CORS, cron chưa cài. [Báo cáo](../qa/WC-ONLINE-2026-11-07.md). Chưa merge/phát hành bộ từ mới; online production=false, không SQL production.

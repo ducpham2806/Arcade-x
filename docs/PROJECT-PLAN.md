@@ -4,7 +4,7 @@ Mốc nguồn: main3f943d9, PR#18 đã merge sau full CI24/head5882adf success. 
 
 ## Trọng tâm và thứ tự
 
-**WC-ON1/ON2/WC-LEX ACTIVE:** chủ dự án yêu cầu phòng riêng/PK trước→matchmaking, tăng từ điển. WC-L0/plan trước đã xong. chủ dự án yêu cầu đưa Nối Từ ra sảnh, làm icon/banner; đã phát hành bot/offline qua bundle và kiểm production, không SQL production/online. DOC-01/NETLIFY-BUILD đã xong trong PR#17. TC-R0 chờ ca A do chủ dự án để sau. Theo yêu cầu07/11, sau release ưu tiên online Nối Từ rồi hoàn tất Snake; đã lập plan chi tiết theo source, chưa triển khai backend. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**WC-ON1/ON2 WAITING staging; WC-LEX code/CI qua:** phòng riêng/PK trước→matchmaking. PR19/codehead36801d4full CI27success,34.512từ và sửa lifecycle/retry; staging đã áp schema/deploy Edge/CORS, còn JWT setting/cron/2tester thật. Chưa merge/phát hành bộ từ mới hoặc online. WC-L0 bot/offline/icon/banner đã Published và kiểm production. DOC-01/NETLIFY-BUILD xong trong PR17; TC-R0 ca A do chủ dự án để sau. Sau Nối Từ tiếp Snake theo plan hiện có. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|

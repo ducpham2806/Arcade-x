@@ -37,4 +37,4 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 
 ## 07/11/2026 · Nối Từ online/từ điển
 
-Chủ dự án yêu cầu triển khai phòng riêng/vào PK trước, tiếp matchmaking; tăng từ điển. Đã trả lời “Đã mở staging”, CUA xác nhận projectkhqipuipeawzlkqmdzdg/Healthy. Cho phép chuẩn bị/triển khai và nghiệm thu staging theo plan; giữ cấm SQL/script production của AGENTS. Online pilot không thưởng chung, không tự coi fixture/lab là nhiều tài khoản thật. Mac khóa sau bước đọc schema, chờ mở khóa; không hỏi lại quyền public bot/thư viện hay tài khoản Render.
+Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking và tăng từ điển; đã trả lời “Đã mở staging”, “Đã mở khóa”. Stagingkhqipuipeawzlkqmdzdg/Healthy đã áp schema/deploy Edge/CORS. Quyền triển khai staging đã có; giữ cấm SQL/script production. Pilot không thưởng chung, fixture/lab không thay account thật. Còn chờ trả lời riêng về tắt legacy JWT gateway cho function này (handler vẫn xác thực Auth.getUser) và đăng nhập2tester trong tablocalhost4335#A/#B. Không hỏi lại quyền public bot/thư viện/Render.
