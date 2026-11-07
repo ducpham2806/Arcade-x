@@ -1,19 +1,21 @@
-# Bàn giao · 07/11/2026
+# Bàn giao · 07/11/2026 · sau PR#17
 
-**Gameplay đang phát hành:** main c705100. **Nhánh:** codex/tank-clash-release-verification, PR#17; kiểm git status/log trước sửa. DOC-01 và QA/sửa nguồn Auth đã tóm tắt ở COMPLETED.
+**Frontend/source:** main1131927. **Backend:** Render c705100, không đổi server. **Nhánh checkpoint:** codex/tank-clash-release-verification; kiểm git status/log. DOC-01, sửa Netlify và sửa nguồn Auth đã tóm tắt ở COMPLETED.
 
-## Hiện tại · sửa Netlify để tiếp tục TC-R0
+## Đã xong
 
-- Chủ dự án báo preview lỗi TS2307 thiếu ws trong server/tank-clash-room/node_modules khi lint. CI cài dependency server trước lint nhưng Netlify chưa có. [Bằng chứng/sửa](qa/NETLIFY-BUILD-2026-11-07.md).
-- Sửa deps:tank-clash dùng chung CI và Netlify production/preview; giữ lint, build và Snake preview. Checkout sạch tái hiện đúng lỗi; sau sửa lint/build/Snake preview exit0. Tiếp: commit/push, kiểm build Netlify mới + full CI trước merge. Không dùng CI head cũ thay cho head mới.
-- Auth xuyên tab: listener giữ identity riêng, authEpoch hủy restore cũ; regression5/5 (4fail trước sửa), lint/build/bundle/fast qua; UI AuthProvider fixture A→guest→B qua. Chưa merge/deploy. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
-- Account B thật khác A; tab game nhận B, mã A cũ không còn, B tạo phòng mới qua. Race logout cần retest sau phát hành. Giữ phiên cho chủ dự án; không tự logout khi chưa vào ca. Quan sát bảng kết quả2hiệp không đủ TC-R1.
-- Netlify dashboard07/11 xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75 lúc06/11 13:26 UTC+7. Render main/c705100 Live06/11, Free/cap16/registered-free; health/origin/token/review404 đã qua. Không deploy lại server vô cớ; Blueprint cũ paused.
-- Nối Từ có source+test trong main/nhánh, không bị bỏ sót merge. RPC catalog công khai trả23mục, không có word-chain; fallback chỉ DEV, online flagfalse. [Audit](qa/WC-R0-2026-11-07.md). Chưa sửa DB; WC-R0 staging/history còn dở.
+- PR#17 merge sau full CI b644da2 success/run42311533962, gồm Nối Từ/Tank UI và generated clean. Thư viện116skill/21role/4rules + roadmap Markdown đã vào main.
+- Netlify thiếu ws của browser fixture: thêm deps:tank-clash dùng chung CI/production/preview trước lint/build, không bỏ test. Checkout sạch red/green qua; Preview success; production1131927 Published/deploy6aee682dc2bd2dba16385690.4bundle đầu byte-match. [Báo cáo](qa/NETLIFY-BUILD-2026-11-07.md).
+- Auth listener giữ identity riêng, hủy restore cũ;5regression qua. Sau release,2tab bundle mới/B thật: tạo phòng→logout tab kia→về thư viện→Online mở login, không còn hồ sơ B. [Bằng chứng](qa/BUG-AUTH-CROSS-TAB.md).
+- Nối Từ có source/test trong main; CI engine/UI qua. RPC public23mục không trả word-chain; fallback chỉ DEV, online flagfalse. [Audit](qa/WC-R0-2026-11-07.md). Không thiếu merge game; chưa thay DB/catalog/online.
 
-## Giới hạn và quy tắc giữ lại
+## Còn dở / bước tiếp
 
-- Chủ dự án cho phép public thư viện Game Studio và metadata báo cáo TC-R0. Không lưu định danh tài khoản/token/secret.
-- TC-R1 ≥10trận mỗi format/2thiết bị/2mạng/soak30phút chưa đạt. P2 wire cũ: chỉ port phần thiếu sang P3, không merge nguyên nhánh.
-- Duel UI còn tích hợp, Snake preview, commerce tắt; không SQL production/chi phí thêm. deliverables/ local không commit.
-- Đọc tối thiểu: AGENTS → bàn giao → một thẻ plans; Studio chỉ nạp skill cần. Trước đổi việc: COMPLETED, WORKLOG≤3, archive nguyên văn và doc checker theo WORKFLOW.
+- **TC-R0 WAITING:** chủ dự án chọn “Để kiểm ca này sau” với đăng nhập lại A sau release. Khi sẵn sàng: A phải khác B, kiểm mã phòng B9FNNVT không còn/không tiếp quản ghế và tab nhận đúng A; không hỏi password/JWT.2account/mã A cũ đã qua trước release không thay ca còn thiếu. Tab thử hiện guest; không tự đăng nhập hộ.
+- TC-R1 cần≥10trận mỗi format/2thiết bị/2mạng/soak30phút, chưa đạt. P2 wire cũ chỉ port sang P3 theo TC-R2, không merge nguyên nhánh.
+- Nối Từ tiếp WC-R0: history/catalog staging, thử migration/rollback; thời điểm catalog/online theo quyết định#8/#7. Không SQL production. Duel còn UI, Snake preview, commerce tắt.
+
+## Giữ lại
+
+- Render một Free/cap16/registered-free; Blueprint cũ paused, không Sync hay redeploy server vô cớ. Không chi phí thêm/khóa mới. Chủ dự án đã cho public thư viện và metadata báo cáo TC-R0.
+- deliverables/ là artifact local cũ, không commit. Đọc AGENTS→bàn giao→một thẻ plans; chỉ nạp skill cần. Trước đổi việc: COMPLETED, WORKLOG≤3, archive nguyên văn, doc checker theo WORKFLOW.

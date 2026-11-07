@@ -1,24 +1,22 @@
 # Nhật ký công việc
 
-Nhật ký chính duy nhất. Giữ ≤3 mục gần nhất, kết quả gọn; trước đổi việc tóm tắt vào [COMPLETED](COMPLETED.md), chuyển chi tiết nguyên văn sang archive theo [WORKFLOW](WORKFLOW.md).
+Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release giữ [nguyên văn](archive/WORKLOG-2026-11-07-before-release-close.md); DOC-01 ở [archive riêng](archive/WORKLOG-2026-11-06-DOC-01.md). Tóm tắt kết quả ở COMPLETED, quy trình ở WORKFLOW.
 
-## 07/11/2026 · NETLIFY-BUILD ACTIVE / WC-R0 audit · codex/tank-clash-release-verification
+## 07/11/2026 · NETLIFY-BUILD DONE / WC-R0 audit · codex/tank-clash-release-verification
 
-- Chủ dự án báo Netlify Preview lỗi TS2307; checkout sạch tái hiện thiếu ws trong nested server dependencies. Thêm deps:tank-clash dùng chung CI và Netlify trước lint/build, giữ đầy đủ kiểm tra; chuỗi preview gồm Snake đã exit0 sau sửa.
-- [Báo cáo build](qa/NETLIFY-BUILD-2026-11-07.md); tiếp push/kiểm deploy Netlify và CI head mới trước merge PR#17. CI cũ đang chạy không thay kết quả mới.
-- [Nối Từ](qa/WC-R0-2026-11-07.md) đã có source/test trong main/nhánh; RPC public23mục không trả word-chain, fallback chỉ DEV/online flagfalse. Chưa thay catalog/DB/online; không phải thiếu merge game.
-- DOC-01 đã tóm tắt ở COMPLETED; chuyển mục log nguyên văn vào [archive](archive/WORKLOG-2026-11-06-DOC-01.md) để giữ≤3mục.
+- Tái hiện TS2307 thiếu ws trong nested server dependencies trên checkout sạch. Dùng deps:tank-clash chung CI/Netlify trước lint/build, giữ test/Snake preview; local exit0.
+- Preview b644da2 success; full CI run42311533962 success; PR#17 merge main1131927. Production deploy6aee682dc2bd2dba16385690 Published,4bundle JS đầu trùng byte build đã kiểm. [Báo cáo](qa/NETLIFY-BUILD-2026-11-07.md).
+- [Nối Từ](qa/WC-R0-2026-11-07.md) có source/test trong main/nhánh, CI engine/UI qua. Catalog public23mục không trả word-chain; fallback chỉ DEV, online flagfalse. Chưa thay catalog/DB/online; không thiếu merge game.
+- DOC-01/thư viện116skill/21role/4rules đã vào main cùng PR#17. Checkpoint sau release cập nhật ở nhánh hiện tại, không thay runtime.
 
-## 07/11/2026 · TC-R0 / AUTH-XTAB ACTIVE · codex/tank-clash-release-verification
+## 07/11/2026 · TC-R0 WAITING ca A sau release
 
-- GitHub verify c705100 success (run42174413262). Netlify dashboard xác nhận Published main/c705100, deploy6aed73038b5150c7c4541f75 lúc06/11 13:26 UTC+7. PR#17 đã mở, CI đầy đủ đang chạy.
-- Tái hiện logout xuyên tab: tab điều khiển thành khách, Tank về menu nhưng EntryScreen tab game còn hồ sơ A. [Bug/bằng chứng](qa/BUG-AUTH-CROSS-TAB.md).
-- Sửa AuthService.listen giữ identity riêng mỗi tab, hủy restore cũ khi identity đổi; 4/5 regression mới fail trước sửa, 5/5 qua sau sửa; TypeScript/build/bundle qua, fast qua (exit0). Browser fixture AuthProvider thật xác nhận A→guest→B, không thay nghiệm thu2account thật.
-- Thêm test:auth-session vào fast. B thật khác A, tab game nhận B, mã phòng A cũ không còn, tạo phòng B qua. Bản sửa chưa merge/deploy; cần retest race sau phát hành. Audit06/11 chuyển nguyên văn vào archive/WORKLOG-2026-11-06-merge-audit-summary.md.
+- Auth xuyên tab: 4/5 fail trước sửa,5/5 qua sau sửa; AuthProvider fixture A→guest→B qua; sửa đã phát hành1131927. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
+- Hai account thật trước release: B khác A, tab nhận B, mã A cũ không còn, phòng B tạo được. Sau release: cả2tab bundle mới/B thật, tạo phòng9FNNVT→logout tab kia→tab game về thư viện→Online mở login, không còn B/Welcome cũ. Health200/ok.
+- Chủ dự án chọn “Để kiểm ca này sau” với đăng nhập lại A/kiểm mã B cũ sau release; giữ WAITING, không đánh TC-R0 DONE. Không lưu định danh/password/JWT; các tab mới còn guest. TC-R1 nhiều thiết bị/mạng/soak chưa đạt.
 
-## 06/11/2026 · TC-R0 WAITING ca cuối · codex/tank-clash-release-verification
+## 06/11/2026 · Render deploy đã xác minh
 
-- Chốt lệch frontend/main và Render/staging3950abb; đã chuyển service main/build theo render.yaml, manual deploy c705100 Live14:54, Free/cap16, preflight Auth production. Không đổi key/DB/chi phí.
-- Health200/P3/instance mới; review/config/metrics404, origin lạ/null/thiếu403, token giả AUTH_FAILED. Account thật tạo/rời1v1, tạo2v2/exit đều dọn phòng; logout sau exit→online mở login. Không ghi thông tin account/token.
-- Chủ dự án cho phép công khai metadata TC-R0; báo cáo trước deploy xuất a30b880 sau auto-review từng chặn. Browser chọn nhầm cửa sổ ngoài phạm vi bị chặn; mở đúng Render theo người dùng, deploy sau đó thành công.
-- [Bằng chứng/bước tiếp](tank-clash/TC-R0-2026-11-06.md). Còn đổi2account/logout khi giữ ghế, metadata frontend; TC-R1 mạng/tải thật chưa làm. Blueprint cũ vẫn paused, không sync ghi đè. Doc/link/budget kiểm lại trước commit.
+- Render từ staging3950abb đã chuyển main/c705100 và Live14:54, Free/cap16/registered-free/Node24. Không đổi key/DB/chi phí; Blueprint cũ paused, không Sync ghi đè.
+- Health/TLS/P3 qua; review/config/metrics404, origin lạ/null/thiếu403, token giả AUTH_FAILED. Account thật tạo/rời1v1, tạo2v2/exit dọn phòng; logout sau exit chặn online.
+- Chủ dự án cho public metadata TC-R0; các bước auto-review trước quyền cụ thể và bằng chứng lịch sử giữ trong [archive](archive/WORKLOG-2026-11-07-before-release-close.md). [Báo cáo cập nhật](tank-clash/TC-R0-2026-11-06.md) phân biệt mốc06/11 và07/11.

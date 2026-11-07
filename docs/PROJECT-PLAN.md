@@ -1,14 +1,14 @@
 # Kế hoạch tiếp tục ArcadeX · 06/11/2026
 
-Mốc nguồn đã xác minh: `main@c705100`, PR #16 đã merge; checkout đã đồng bộ. Lint/build/bundle/fast và 18 WS/ops qua ở lượt audit 06/11 trên Node 24. Không suy ra Netlify/Render hiện tại hoặc nghiệm thu thiết bị từ kết quả này. Đây là roadmap, không tự bật backend/commerce hay thay luật gameplay.
+Mốc nguồn: main1131927, PR#17 đã merge sau full CI success trên b644da2. Netlify1131927 Published và bundle byte-match; Render vẫn c705100 (server không đổi). Đây là roadmap, không tự bật backend/commerce hay thay luật gameplay; CI không thay nghiệm thu nhiều thiết bị.
 
 ## Trọng tâm và thứ tự
 
-**DOC-01 đã xong** trên nhánh tài liệu 9eff18c. **Hiện tại TC-R0 ACTIVE:** Render/main đã Live; B thật/mã A cũ và Netlify main/c705100 đã kiểm. PR#17 sửa Auth qua local; đang sửa dependency gây lỗi Netlify Preview trước CI/merge/retest. Audit Nối Từ: source có trong main, catalog public chưa trả game. Xem thẻ Tank/Nối Từ. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**DOC-01/NETLIFY-BUILD đã xong**, vào main qua PR#17. **TC-R0 WAITING:** logout Auth sau release qua; chủ dự án để ca A/mã phòng B cũ sau. Nối Từ: source/test và CI UI có, catalog public chưa trả game; online flagfalse. Xem Tank/Nối Từ. Khi đổi việc, đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
-| 1 | Tank Clash | TC-R0 xác minh bản đang chạy; TC-R1 mạng/tải thật; TC-R2 chuyển phần chống lỗi P2 sang P3. READY; nghiệm thu nhiều thiết bị còn WAITING | [Tank](plans/TANK-CLASH.md) |
+| 1 | Tank Clash | TC-R0 chờ ca A/mã B cũ do chủ dự án để sau; TC-R1 mạng/tải thật; TC-R2 port chống lỗi P2 sang P3 | [Tank](plans/TANK-CLASH.md) |
 | 2 | Nối Từ | WC-R0 xác minh catalog; WC-R1 staging server/scheduler; WC-R2 bàn phím/multi-account. Online trong source đang tắt | [Nối Từ](plans/WORD-CHAIN.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
 | 4 | Snake Legend | SN-R0 nghiệm thu account/save trên launcher preview; SN-R1 thiết bị/art/audio; SN-R2 quyết định phát hành. Chưa đưa ra catalog công khai | [Snake](plans/SNAKE.md) |

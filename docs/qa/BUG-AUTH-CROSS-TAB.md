@@ -1,6 +1,6 @@
 # AUTH-XTAB · 07/11/2026 · hồ sơ cũ sau logout/đổi account xuyên tab
 
-Trạng thái: **đã sửa nguồn, kiểm local qua; chưa merge/deploy bản sửa**. Phát hiện khi làm TC-R0 trên production c705100. Không ghi email/UUID/token thật; gọi tài khoản đang dùng là A, tài khoản kế tiếp là B.
+Trạng thái: **đã merge/phát hành, retest logout trên production qua**; ca đăng nhập A sau release còn chờ theo lựa chọn chủ dự án. Phát hiện ở production c705100; sửa phát hành main1131927 qua PR#17. Không ghi email/UUID/token thật; gọi tài khoản đang dùng là A, tài khoản kế tiếp là B.
 
 ## Tái hiện thực tế
 
@@ -29,4 +29,9 @@ AuthService.listen so sánh event với arcadex_current_user trong localStorage 
 
 ## Bước tiếp
 
-Fast/local/commit/push xong, PR#17 đã mở; CI đầy đủ trước merge code theo AGENTS. Sau phát hành xác minh lại logout/đổi2account trên host thật. Dashboard Netlify đã xác nhận bản Published main/c705100, deploy6aed73038b5150c7c4541f75; bằng chứng chi tiết ở báo cáo TC-R0.
+Full CI run42311533962 success trước merge PR#17; production1131927 Published/deploy6aee682dc2bd2dba16385690, bundle mới index-rWU2dYT6.js đã byte-match build local.
+
+- Hai tab production mới đều tải bundle mới; hồ sơ B thật xác nhận đúng ở cả hai. B tạo phòng1v1 9FNNVT và đang giữ ghế.
+- Logout B ở tab điều khiển: tab game tự về thư viện, mất màn phòng. Vào Tank→Online lại hiện Email/mật khẩu/Đăng nhập, không còn email B hay “Chào mừng trở lại”. Regression logout production PASS.
+- Health sau ca200/ok; không dùng health suy ra room đã xóa vì response không trả room count. Muốn xác minh mã9FNNVT không còn cần account hợp lệ khác.
+- Chủ dự án chọn **“Để kiểm ca này sau”** khi được đề nghị đăng nhập A sau release. Chưa kiểm A→join mã B cũ trên bản mới; không đánh TC-R0 DONE. Hai account/mã A cũ đã qua trước bản sửa không thay ca còn thiếu này.

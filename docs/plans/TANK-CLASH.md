@@ -1,14 +1,14 @@
 # Tank Clash — tiếp tục từ P3 đã merge
 
-Mốc 06/11/2026, main c705100. **Đã có:** bot, private 1v1/2v2, party/queue, spectator, rematch, account adapter và catalog. **Chưa đồng nghĩa:** đã deploy đúng head, nghiệm thu tải/thiết bị, có reward/DB result. Giữ wire `tank-clash.p3.v1`, online không thêm bot, Free/cap16/không phí thêm. Scope sản phẩm được duyệt trong [LAUNCHER-RELEASE](../tank-clash/LAUNCHER-RELEASE.md).
+Mốc07/11/2026: frontend/source main1131927, Render c705100. **Đã có:** bot, private1v1/2v2, party/queue, spectator, rematch, account adapter/catalog. **Chưa đồng nghĩa:** nghiệm thu tải/thiết bị hay reward/DB result. Giữ wire tank-clash.p3.v1, online không thêm bot, Free/cap16/không phí thêm. Scope ở [LAUNCHER-RELEASE](../tank-clash/LAUNCHER-RELEASE.md).
 
-## TC-R0 · ACTIVE · xác minh bản phát hành đang chạy
+## TC-R0 · WAITING · ca A sau release được chủ dự án để sau
 
-- 06/11: đã deploy c705100 lên Render Free/main; health200, review/config/metrics404, origin/token âm qua. Account thật tạo/rời1v1, tạo2v2/exit dọn phòng và logout→online bị chặn qua. 07/11 đổi2account và mã A cũ đã kiểm; còn phát hành/retest race Auth và deploy ID Netlify; [bằng chứng](../tank-clash/TC-R0-2026-11-06.md). Không deploy lại vì ghi chú cũ3950abb.
-- Bug07/11: logout xuyên tab hạ quyền Tank nhưng EntryScreen còn hồ sơ cũ; [AUTH-XTAB](../qa/BUG-AUTH-CROSS-TAB.md) sửa/test local qua, PR#17 chờ CI/merge/deploy/retest. Netlify Published main/c705100 đã xác nhận dashboard07/11; đang sửa [Preview build thiếu ws](../qa/NETLIFY-BUILD-2026-11-07.md) trước merge.
+- Render c705100 đã Live06/11; health200/review404/origin-token âm và create/leave/exit qua. Netlify1131927 Published07/11,4bundle byte-match, full CI qua trước merge PR#17. [Bằng chứng](../tank-clash/TC-R0-2026-11-06.md). Server không đổi, không redeploy vì ghi chú cũ3950abb.
+- [AUTH-XTAB](../qa/BUG-AUTH-CROSS-TAB.md) đã phát hành/retest logout khi B giữ ghế: tab về thư viện, Online mở login, không hồ sơ cũ. Chủ dự án để đăng nhập lại A/kiểm mã B9FNNVT sau; giữ WAITING. [Netlify build thiếu ws](../qa/NETLIFY-BUILD-2026-11-07.md) đã sửa và Published.
 - Đầu vào: release ở trên và [TC2-RUNBOOK](../tank-clash/TC2-RUNBOOK.md), chỉ mục deploy/health/Auth/rollback.
 - File đích để đối chiếu: `render.yaml`, `server/tank-clash-room/{server,config}.mjs`, `src/games/tank-clash/index.tsx`, `src/launcher/catalog.ts`.
-- [ ] Đọc commit/deploy frontend và Render thực tế; ghi bằng chứng mới. Nếu chưa đúng head, chuẩn bị/thực hiện bước phát hành trong quyền đã duyệt; không suy trạng thái từ tên hostname “staging”.
+- [x] Commit/deploy frontend và Render thực tế đã xác minh; bằng chứng phân biệt1131927/c705100, không suy từ hostname “staging”.
 - [ ] Kiểm icon, chơi bot, login online từ sảnh, logout/đổi tài khoản/exit giải phóng ghế; WSS cố định; Auth đúng project. Health/TLS/origin/token giả; review/metrics public phải tắt theo profile production.
 - **Xong khi:** báo cáo `.md` ghi commit/backend mode/thời gian/ca pass-fail và giới hạn; không lưu JWT/secret. Chưa đăng nhập thật thì ghi thiếu, không đánh DONE.
 
