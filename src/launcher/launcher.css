@@ -89,6 +89,7 @@
 .featured-word-chain .welcome-art .game-artwork{object-position:right center}
 .featured-art-picture{display:block;width:100%;height:100%}
 @media(max-width:639px){.featured-word-chain .welcome-art{aspect-ratio:1}}
+@media(max-width:399px){.featured-slide.launcher-welcome{padding-bottom:88px}.featured-controls{display:grid;grid-template-columns:1fr;justify-items:center;gap:4px;bottom:10px}}
 .featured-boom-buddies.launcher-welcome{background:linear-gradient(120deg,#fff3da,#edf2d1);border-color:#d4b178}
 .featured-brick-breaker.launcher-welcome{background:linear-gradient(120deg,#e1f6ec,#e9e5fb);border-color:#89baaf}
 .featured-boom-buddies .featured-copy h1 span{color:#934510}

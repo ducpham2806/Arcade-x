@@ -11,7 +11,11 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 | 5 | Có xử lý lịch sử Git/art bằng rewrite hay LFS không | TD3 (tùy chọn) | Đo dung lượng trước; con số cũ 114 MB không còn là số đo hiện tại |
 | 6 | Có cho popup xác nhận/kết quả kích thước nhỏ ngoại lệ modal không | Chỉ khi đổi quy tắc | Chưa duyệt; giữ `AGENTS.md` hiện hành |
 | 7 | Môi trường/lịch bật Nối Từ online sau thử staging | WC2 | `WORD-CHAIN-SERVER.md` |
-| 8 | Thời điểm áp catalog Nối Từ lên production | WC1 | `supabase/migrations/20261102090000_word_chain_catalog.sql` |
+
+## Đã quyết · 07/11/2026
+
+- #8 (đưa game ra sảnh): chủ dự án yêu cầu phát hành Nối Từ, tạo icon/banner; triển khai WC-L0 dạng bundled-free/bot/offline tương tự Tank, giữ online=false. PR#18 đang kiểm trước merge. Không hỏi lại quyền public sảnh; SQL production không thuộc phạm vi này, row DB/staging và backend online tiếp tục theo thẻ WORD-CHAIN/#7.
+- Thư viện được xác nhận là Game_Studio_Agent đã gửi; snapshot c5dac462 vẫn khớp main và đủ297file/116skill/21role/4rules, không phải repo mới.
 
 ## Đã quyết / xác minh · 06/11/2026
 

@@ -16,6 +16,12 @@
 - Production hai account thật: B khác A, tab game nhận B, phòng A cũ không còn, tạo phòng B qua. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
 - PR#17 đã merge/phát hành1131927. Hai tab bundle mới/B thật: tạo phòng→logout tab kia→về thư viện→Online hiện login, không còn hồ sơ B. Chủ dự án để ca đăng nhập A/mã B cũ sau; TC-R0 còn WAITING, TC-R1 chưa đạt.
 
+## WC-L0 phần art/catalog/local QA · 07/11/2026
+
+- Nhánh codex/word-chain-launcher-release/PR#18: bundled-free bot/offline, policy server giữ ưu tiên;2master ImageGen, icon512/banner1280×640, hash/package/provenance đồng bộ.
+- Local lint/build/bundle/fast, engine36check/artwork qua; CUA PC/phone kiểm bot/từ sai-đúng/favorite/recent/exit. Sửa clipping7controls ở≤399px, bounds320/360/375/390 qua.
+- b0e0c44 Preview success và offline check qua; sửa narrow cần CI head mới. [Báo cáo](qa/WC-L0-2026-11-07.md). Chưa merge/phát hành WC-L0; checkpoint trước chuyển sang lập plan online/Snake theo yêu cầu mới.
+
 ## WC-R0 phần xác minh nhánh/catalog · 07/11/2026
 
 - Nối Từ đã có source/test trong main c705100 và nhánh TC-R0; không bỏ sót merge game. Catalog public trả23mục, không trả word-chain; fallback chỉ DEV, Netlify Preview cũng production mode.

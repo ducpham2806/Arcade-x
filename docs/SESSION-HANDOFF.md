@@ -2,6 +2,8 @@
 
 **Nguồn:** main1131927; checkpoint9a6c97f. **Nhánh:** codex/word-chain-launcher-release. WC-L0 được chủ dự án duyệt: Nối Từ free/bot/offline vào sảnh +icon/banner; giữ online=false, không SQL production. Code/art, lint/build/bundle/fast và CUA desktop/phone qua; [báo cáo](qa/WC-L0-2026-11-07.md). Tiếp commit/push→full CI/Preview→merge/deploy→kiểm production. Game_Studio_Agent main vẫn c5dac462,297file đã đủ. Việc cũ tóm tắt COMPLETED.
 
+- PR#18: b0e0c44 Preview success và offline check mới qua; phát hiện thêm clipping controls320px. Đã sửa≤399px/2hàng, CUA320/360/375/390 qua; regression mới cần full CI trên head kế tiếp. Chủ dự án vừa yêu cầu plan online Nối Từ và Snake; checkpoint sửa hiện tại rồi lập plan theo source, chưa triển khai backend.
+
 ## Đã xong
 
 - PR#17 merge sau full CI b644da2 success/run42311533962, gồm Nối Từ/Tank UI và generated clean. Thư viện116skill/21role/4rules + roadmap Markdown đã vào main.
