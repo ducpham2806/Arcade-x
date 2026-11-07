@@ -14,7 +14,7 @@ Giữ2âm tiết chữ Việt/NFC; bỏ tên riêng, chữ viết tắt và mụ
 
 Dedup theo `wordKey` dùng chung browser/Edge: vị trí dấu “hoà/hòa”, Unicode tổ hợp và chữ hoa không tạo từ trùng. Giữ toàn bộ từ/mở màn cũ. Mục mới bổ sung sau nền xếp tần suất, không đưa từ hiếm thành opener hoặc làm bot Dễ chỉ chọn từ khó.
 
-V2 dùng chuỗi phân cách `|`, token `~âm_tiết_cuối` khi lặp âm tiết đầu ngay trước và opener là chỉ số. Decoder khôi phục nguyên thứ tự/từ; giữ file dưới400.000byte, không nới budget. `revision` SHA256 của danh sách từ giúp Edge từ chối client lệch từ điển trước khi tạo phòng/ghi lượt. Bản này khoảng329KB raw; bot, UI, offline package và Edge cùng dữ liệu v2.
+V2 dùng chuỗi phân cách `|`, token `~âm_tiết_cuối` khi lặp âm tiết đầu ngay trước và opener là chỉ số. Decoder khôi phục nguyên thứ tự/từ; giữ file dưới400.000byte, không nới budget. `revision` SHA256 của danh sách từ giúp Edge từ chối client lệch từ điển trước khi tạo phòng/ghi lượt. Bản này khoảng329KB raw; bot, UI, offline package và Edge cùng dữ liệu v2. Runtime URL có hash của revision và module lexicon-version.ts được sinh cùng package, để cập nhật từ không kẹt cache của URL cũ. Alias v2 giữ cho build/Edge, v1 giữ cho client cũ.
 
 ## Tái tạo
 

@@ -44,7 +44,7 @@ function StagingReview(){
   const client=new WordChainClient(httpRoomTransport(`${config.url}/functions/v1/word-chain-room`,config.key,async()=>{
    const {data:{session}}=await auth.auth.getSession();return identity.current===uid&&session?.user.id===uid&&!session.user.is_anonymous?session.access_token:null;
   },fetch,getLexicon()?.revision));room.current=client;
-  return {client,resumeKey:`arcadex:word-chain:staging:${uid}`};
+  return {client,resumeKey:`arcadex:word-chain:staging:${uid}`,dispose:()=>{if(room.current===client)room.current=null;}};
  }
  return <div className="wc-staging">
   <header><strong>Nối Từ · staging</strong><span>PK thử nghiệm · không cộng XP/xu</span>{owner&&<button disabled={busy} onClick={()=>void logout()}>Đăng xuất</button>}</header>

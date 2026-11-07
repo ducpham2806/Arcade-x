@@ -5,9 +5,9 @@ Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release
 ## 07/11/2026 · WC-ON1/ON2 ACTIVE, WC-LEX · codex/word-chain-online
 
 - Chủ dự án yêu cầu phòng riêng/vào PK trước, sau đó matchmaking và tăng từ điển. Nhánh từ checkpoint19afc84/main3f943d9; chưa merge/deploy online production, không SQL production.
-- Client đã tái hiện response muộn hồi sinh room sau close; sửa epoch/abort/giữ request khi mất ACK, rời/hủy chờ xác nhận, cleanup owner/unmount;9regression client qua. Pilot online bỏ submitScore; thêm kiểm UIhost transfer/kết quả/re-entry/cancel đang chờ CI.
+- Client đã tái hiện response muộn hồi sinh room sau close; sửa epoch/abort/giữ request khi mất ACK, rời/hủy chờ xác nhận, cleanup owner/unmount;9regression client qua. Pilot online bỏ submitScore; CI26/head32cbbd0success/7UI gồm host transfer/kết quả/re-entry/cancel, offline34.512qua; ảnh UI/offline đã có và đã xem.
 - Từ điển34.512mục (+16.990), nguồn viwiktionary/Kaikki có checksum, gồm ví dụ nguyên cụm2âm tiết, không n-gram. V2nén tiền tố khoảng329KB, giữ budget400KB/v1/openers; browser/Edge có revision guard. [Nguồn](../public/games/word-chain/SOURCES.md).
-- Staging khqipuipeawzlkqmdzdg Healthy, chủ dự án đã đăng nhập; SQL đọc cho rooms/RPC đều NULL. Chưa cài schema/Edge/tick; Mac đang khóa, đã nhờ mở khóa. [Báo cáo](qa/WC-ONLINE-2026-11-07.md); tiếp local checks→commit/push/CI và staging khi truy cập được.
+- Sau chủ dự án mở khóa: schema staging RunSuccess, Edge deploy/CORSlocalhost4335 đã lưu; HTTPS preflight204, bad origin403, publicRPCdenied. Legacy JWT vẫn ON/chờ xác nhận, cron và2account thật chưa kiểm. WIP URLdatahash/cleanup preview cần headCI mới; PR19chưa merge. [Báo cáo](qa/WC-ONLINE-2026-11-07.md); tiếp checks/push và privatePK trước matchmaking thật.
 
 ## 07/11/2026 · WC-PLAN / SN-PLAN DONE tài liệu · codex/word-chain-launcher-release
 

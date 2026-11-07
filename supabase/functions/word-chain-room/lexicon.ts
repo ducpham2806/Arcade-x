@@ -2,8 +2,9 @@
 // fetched once, then indexed by word key and by first syllable for live checks and bots.
 import {syllableKey,wordKey} from './normalize.ts';
 import type {Dictionary} from './rules.ts';
+import {LEXICON_URL,LEXICON_REVISION} from './lexicon-version.ts';
 
-export const LEXICON_URL = '/games/word-chain/words.v2.json';
+export {LEXICON_URL};
 export type LexiconData = {version: number; revision?: string; source: string; license: string; count: number; words: string[]; openers: string[]};
 export type PackedLexiconData = {version: 2; codec?: 'prefix'; revision?: string; source: string; license: string; count: number; words: string; openers: number[]};
 export function decodeLexiconData(raw: LexiconData | PackedLexiconData): LexiconData {
@@ -42,7 +43,7 @@ export function buildLexicon(raw: LexiconData | PackedLexiconData): Lexicon {
 let task: Promise<Lexicon> | null = null, loaded: Lexicon | null = null;
 export function loadLexicon(): Promise<Lexicon> {
   return task ??= fetch(LEXICON_URL).then(r => {if (!r.ok) throw new Error(`Từ điển: HTTP ${r.status}`); return r.json();})
-    .then((data: LexiconData) => loaded = buildLexicon(data))
+    .then((data: LexiconData) => {if(data.revision!==LEXICON_REVISION)throw new Error('Từ điển không khớp phiên bản game.');return loaded = buildLexicon(data);})
     .catch(e => {task = null; throw e;});
 }
 export const getLexicon = () => loaded;
