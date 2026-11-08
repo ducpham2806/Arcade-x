@@ -4,11 +4,11 @@ Mốc nguồn: main3f943d9, PR#18 đã merge sau full CI24/head5882adf success. 
 
 ## Trọng tâm và thứ tự
 
-**WC-ON1–ON4 pilot2account staging đã kiểm; WC-LEX code/CI qua:** PR19/core36801d4/CI28checkpoint001d9c5success,34.512từ/lifecycle/retry. Staging Auth/schema/Edge/CORS/cron đã cài; phòng riêng/PK trước, sau đó hủy/queue20s/timeout/rematch qua. Tiếp ON5/ON6 và3/4account, thiết bị/mạng/soak; chưa merge/phát hành từ mới/online. WC-L0 bot/offline/icon/banner đã Published. DOC-01/NETLIFY-BUILD xong PR17; TC-R0 ca A do user để sau. Sau Nối Từ tiếp Snake; đóng/tóm tắt theo [WORKFLOW](WORKFLOW.md).
+**WC-PUBLIC ACTIVE theo yêu cầu08/11:** user yêu cầu merge/public, bỏ gate3/4người. PR19 merge256620c sau CI29/headfde7810success; Netlify tự build, bộ từ34.512 đã merge. Backend production đã cài/probe theo gói user duyệt; PR20flagtrue đang sửa guard offline và chờ CI head mới. Pilot2account/staging đã qua; các manualcase khác chưa kiểm ghi riêng. WC-L0 bot/art Published; TC-R0 ca A user để sau. Sau Nối Từ tiếp Snake; [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
-| 1 | Nối Từ | WC-L0 Published; ON1–4pilot2account qua staging, tiếp ON5mạng/Auth/IME→3/4account/ON6thiết bị/soak→cutover được duyệt | [Nối Từ](plans/WORD-CHAIN.md) |
+| 1 | Nối Từ | WC-PUBLIC backendprod→flagtrue/CI→merge/Published; user bỏ gate3/4, manualQA còn lại ghi giới hạn | [Nối Từ](plans/WORD-CHAIN.md) |
 | 2 | Snake Legend | R0a baseline→R0b UI/save/Auth thật→R1thiết bị/nội dung→R2candidate/phát hành khi được chọn | [Snake](plans/SNAKE.md) |
 | Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |

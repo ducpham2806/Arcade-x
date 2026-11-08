@@ -30,6 +30,6 @@ enable_anonymous_sign_ins = true
 verify_jwt = true
 
 # Word Chain verifies registered users via Auth.getUser and cron with a tick-only token.
-# Approved/applied on khqipuipeawzlkqmdzdg staging; no production deployment implied.
+# Per-project deployment approval and evidence: docs/word-chain/PUBLIC-RELEASE-2026-11-08.md.
 [functions.word-chain-room]
 verify_jwt = false

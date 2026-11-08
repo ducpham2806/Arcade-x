@@ -10,7 +10,7 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 | 4 | Lịch/môi trường triển khai Duel + cutover UI | DU1 | `DUEL-SERVER.md` |
 | 5 | Có xử lý lịch sử Git/art bằng rewrite hay LFS không | TD3 (tùy chọn) | Đo dung lượng trước; con số cũ 114 MB không còn là số đo hiện tại |
 | 6 | Có cho popup xác nhận/kết quả kích thước nhỏ ngoại lệ modal không | Chỉ khi đổi quy tắc | Chưa duyệt; giữ `AGENTS.md` hiện hành |
-| 7 | Staging đã được yêu cầu triển khai07/11; cutover online public chờ gate và quyền môi trường | WC-ON1–ON6 | `WORD-CHAIN-SERVER.md` |
+| 7 | Public/merge được yêu cầu08/11, bỏ gate3/4; đã duyệt gói SQL/JWT đúng production | WC-PUBLIC | `word-chain/PUBLIC-RELEASE-2026-11-08.md` |
 
 ## Đã quyết · 07/11/2026
 
@@ -38,3 +38,7 @@ Giữ ID cũ để dẫn chiếu. Đây là sổ quyết định duy nhất; khi
 ## 07/11/2026 · Nối Từ online/từ điển
 
 Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking và tăng từ điển; đã duyệt staging, mở khóa, cho phép legacyJWT OFF riêngword-chain-room và xác nhận2tester. Đã lưu/reload setting, cài cron và kiểm pilot2account; các tab game đã đóng. Không hỏi lại quyền JWT hoặc các xác nhận đã có. Pilot không thưởng chung; chưa nghiệm thu3/4account/thiết bị/mạng/soak hoặc cutover public. Giữ cấm SQL/script production; quyền public bot/thư viện/Render đã quyết trước, không hỏi lại.
+
+## Đã quyết · 08/11/2026 · public Nối Từ
+
+User yêu cầu merge/public, bỏ nghiệm thu3/4người; PR19 merge256620c sau CI29. Sau khi xem gói/file/SHA và lý do AGENTS/CUA, user trả lời “Cho phép gói Nối Từ production”: schema + cron/token Vault riêng, functionword-chain-room, CORS đúngarcade-x.netlify.app và legacyJWT OFF riêngfunction tạiwhjatkhhupeqfngakmee. Đây là exception hẹp WC-PUBLIC, không áp dụng script production khác. Gói đã áp và probe thành công; PR20 chờ CI sửa offline rồi merge. Không hỏi lại quyền này.

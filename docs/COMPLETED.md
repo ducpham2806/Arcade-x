@@ -27,7 +27,7 @@
 
 ## WC-ON1–ON4 phần pilot hai tài khoản · đã kiểm staging · 07–08/11/2026
 
-- Nhánh codex/word-chain-online/PR19, core36801d4; CI28/head001d9c5success. Chưa merge/phát hành production.
+- Nhánh codex/word-chain-online/PR19, core36801d4; CI29/headfde7810success. PR19 đã merge256620c theo user08/11; chưa bật online production.
 - User duyệt JWT riêng function OFF; schema/Edge/CORS/cron10giây đã cài và xác nhận active/hash_ready. Sau đổi, thiếu/badbearer401, tickgiả/browser403; không lộ secret.
 - Hai account thật tạo/join/start2/cap4/ready/PK;2đáp án được nhận, B bỏ cuộc→A thắng/rời. Host leave→B thành chủ; ghế cuối rời→mã phòng đóng bị từ chối.
 - Queue hủy/tìm lại/trả ghế/countdown20s qua; hết giờ cho kết quả đúng hai bên, đủ2phiếu tái đấu tạo trận mới. Đóng cả hai tab→cron tự đóng phòng hết rematch, HTTP200; turn timeout không client chưa chứng minh.

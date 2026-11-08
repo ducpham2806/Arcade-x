@@ -37,8 +37,14 @@ test(`practice match with a bot plays to the end (${name})`,async({page})=>{
  await page.screenshot({path:`test-results/word-chain-${name}-launcher.png`,fullPage:true});
  await page.locator('#btn-play-word-chain').click();
  await page.locator('.nt-home').waitFor({timeout:30000});
- await expect(page.getByTestId('nt-match')).toHaveCount(0);
- await expect(page.locator('.nt-home')).toContainText('Đấu online sắp có');
+ await expect(page.getByTestId('nt-match')).toBeVisible();
+ await expect(page.getByTestId('nt-create')).toBeVisible();
+ await expect(page.getByTestId('nt-join')).toBeVisible();
+ // Public entry must still refuse a guest before creating any online chair.
+ await page.getByTestId('nt-create').click();
+ await expect(page.locator('.nt-home')).toContainText('Đăng nhập tài khoản Arcade-x từ sảnh để chơi online.');
+ await page.locator('.nt-home').getByRole('button',{name:'Quay lại',exact:true}).click();
+ await expect(page.getByTestId('nt-create')).toBeVisible();
  await page.getByTestId('nt-practice').click();await page.getByRole('button',{name:'1 bot'}).click();await page.getByTestId('nt-start-practice').click();
  await expect(page.locator('.nt-ready h2')).toHaveText('Chuẩn bị');
  await page.getByTestId('nt-ready').click();

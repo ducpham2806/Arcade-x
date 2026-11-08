@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: word-chain-offline-evidence
-          path: test-results/word-chain-offline.png
+          path: test-results/word-chain-offline*.png
           if-no-files-found: ignore
           retention-days: 7
       - name: Modal frame (AGENTS.md sizing)
