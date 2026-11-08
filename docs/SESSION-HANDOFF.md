@@ -12,7 +12,7 @@ Tank `/health` bốn lần timeout dù TCP/TLS thành công. Dashboard hết phi
 
 - Tank: hạn chờ handshake 75s lần đầu/10s khi nối lại, bỏ callback socket cũ và dọn timer/queue. Repro đỏ trước sửa; 3 regression mới, 69 Tank checks + launcher và 18 WS/ops loopback qua.
 - Nối Từ: giữ mã lỗi gateway; thông báo 503 tiếng Việt; giữ mutation ID khi thử lại; xóa notice mạng cũ khi phiên hết hiệu lực, hướng dẫn vào lại/tạo phòng. 52 checks và toàn bộ 9 UI qua, gồm bot phone/desktop. Hai ảnh lỗi đã xem, giữ local theo báo cáo; duyệt egress ảnh chưa cho phép public. Lint/build/bundle qua trên Node24.
-- PR21 head6b4b558/CI34 là checkpoint Tank đầu; phải chạy CI đúng head mới sau push phần Nối Từ. Không dùng CI cũ chứng minh bản sửa mới. `deliverables/` cũ không commit.
+- PR21 đã push cả hai bản sửa; full CI đúng head mới cần qua trước merge. CI34 chỉ kiểm checkpoint Tank đầu, không dùng làm bằng chứng cho phần Nối Từ mới. `deliverables/` cũ không commit.
 
 ## Bối cảnh giữ nguyên
 
