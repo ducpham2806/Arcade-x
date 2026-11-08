@@ -1,39 +1,44 @@
 # Nối Từ · phát hành online công khai · 08/11/2026
 
-**ACTIVE · backend production đã cài/probe; PR20 chờ CI sửa guard offline trước merge flagtrue.** User yêu cầu merge và phát hành online, không cần nghiệm thu3–4người nữa. Đây là waiver ca thật, không ghi chúng đã qua; giữ nguyên fixture và mọi kiểm tra CI. Thưởng online vẫn tắt; bot/offline và save giữ tương thích.
+**DONE phát hành:** phòng riêng/nhập mã/PK/ghép trận và34.512từ tại https://arcade-x.netlify.app/. PR20 merge086d6ac, NetlifyPublished đúngSHA, đã kiểm tạo/rời phòng và vào/hủy queue bằng phiên registered thật. User bỏ gate nghiệm thu3–4người; không nhận đã qua, giữ fixture/CI. Online chưa thưởng XP/xu; bot/offline/save giữ tương thích.
 
-## Mốc đã làm
+## Nguồn, CI và Netlify
 
-- PR19 đã merge main`256620c93c9aa22141f72786352168052f8caf40` sau full CI29/headfde7810success. Netlify tự build; chưa xác nhận Published cho mốc này. Main hiện vẫn online=false; bộ từ34.512 và client phòng đã merge.
-- Nhánh tiếp `codex/word-chain-public-release`: bật online-config=true, kiểm tên function, UI phone/desktop bắt buộc thấy3entry online nhưng guest phải nhận yêu cầu đăng nhập trước khi tạo ghế; sau đó bot vẫn chơi hết trận. Không bỏ/nới assert hoặc tắt fixture4người.
-- Local Node24 lint,50check Word Chain, launcher regression, build/bundle đã exit0. Full CI của bản bật flag cần qua trước merge.
-- Production Auth/config của launcher dùng `https://whjatkhhupeqfngakmee.supabase.co`; room client tự dùng cùng URL/key/UID. Không dùng Auth hoặc DB staging cho người chơi public.
-- Probe OPTIONS endpoint production `word-chain-room` trả404NOT_FOUND. CUA đọc dashboard đúng projectArcade-x/whjatkhhupeqfngakmee, orgNam A Uniform/Free,Healthy; chưa ghi SQL hoặc deploy function production.
+- [PR19](https://github.com/ducpham2806/Arcade-x/pull/19): headfde7810/full CI29 success, merge256620c93c9aa22141f72786352168052f8caf40. Client phòng và từ điển đã merge; Netlify6aefbb84f938d9fb0842e6a4 Published ở mốc này.
+- [PR20](https://github.com/ducpham2806/Arcade-x/pull/20): nhánhcodex/word-chain-public-release, head970a9416d859fd5b2b332d7513c5aeb2ed7ebf95; [full CI32](https://github.com/ducpham2806/Arcade-x/actions/runs/42429931818) **success**, job128576372469. Merge **086d6ac4619f77bad8470d09f9c0bf0c7f17df23**.
+- CI32:50logic/schema/Edge/client checks,7offline,7WordChainUI,13TankUI, toàn bộ build/bundle/fast/motion/generated clean. Đã xem ảnh menu3nút khóa offline và botready trong artifact13596604240; UIartifact13597566803. Không bỏ test4ghế.
+- CI31/head ea4fc66 trước đó fail assertion offline cũ “online rooms exposed before release”. Đã sửa contract public:3nút hiện nhưng disabled offline/thông báo rõ, bot vẫn chơi; reconnect mở lại nút, platform guard offline trước Auth. CI32 kiểm đúng head sửa. Lịch sử nguyên văn [ở đây](../archive/WC-PUBLIC-2026-11-08-before-release-close.md).
+- CUA dashboard Netlify đã thấy **Currently published Production / main@086d6ac / Release public Nối Từ rooms and matchmaking**, [deploy6af00f400397c396a118ca39](https://app.netlify.com/projects/arcade-x/deploys/6af00f400397c396a118ca39). Không dùng báo cáo release cũ làm bằng chứng Published hiện tại.
 
-## Gói backend cụ thể đã chuẩn bị, chưa áp
+## Quyền và artifact backend đã áp
 
-1. [Schema](../../supabase/word-chain/schema.sql), đã PGlite/staging kiểm: chỉ wc_private và public.wc_room_*; RLS/service-only, CAS/one-seat/rate/receipt. Artifact `/private/tmp/word-chain-production-schema.sql`,12.310byte, SHA256`17116490a6ebd87118fccf8244f2f733b65dfc86baaa1da5d11fa78f03add814`, BEGIN/COMMIT bao quanh nguồn.
-2. `build:word-chain-edge` tạo `/private/tmp/word-chain-room-index.ts`,487.451byte, SHA256`aeafa014767d50b2da523682e91f35f5f95d5abc5cc0a5f1c4c30de7c6a752d8`. Deploy riêng `word-chain-room` production, dùng env server Supabase cung cấp. Legacy JWT OFF; handler vẫn Auth.getUser/registered-only, tick dùng credential riêng.
-3. WORD_CHAIN_ALLOWED_ORIGINS chỉ`https://arcade-x.netlify.app`. Không wildcard; không mở localhost hoặc staging trong production.
-4. [Scheduler](../../supabase/word-chain/scheduler.sql), thay public projectURL đúng production. Artifact `/private/tmp/word-chain-production-scheduler.sql`,2.202byte, SHA256`d55f1f7da51743b3ac845673247a4260c30fd23b518a9d1175ea48791d3b162b`; transaction và guard từ chối Vault projectURL khác nếu đã có. Script sinh token riêng trong Vault, chỉ lưu hash ở wc_private, cron10giây chỉ POST khi có room đến hạn. Không đọc/copy service-role key hoặc token ra ngoài.
+User08/11 trả lời **“Cho phép gói Nối Từ production”** sau review file/SHA cho đúng projectwhjatkhhupeqfngakmee: schema, cron/token Vault riêng, functionword-chain-room, CORS chỉhttps://arcade-x.netlify.app, legacyJWT OFF. Handler vẫn Auth.getUser/registered-only. Đây là exception hẹp WC-PUBLIC đối với AGENTS, không cho phép SQL production khác; không hỏi lại quyền đã dùng.
 
-**Quyền đã có:** user08/11 trả lời “Cho phép gói Nối Từ production” cho đúng schema/cron/token Vault, function, CORS và legacyJWT OFF ở whjatkhhupeqfngakmee. Đây là exception hẹp cho WC-PUBLIC đối với AGENTS cấm SQL production; không mở quyền script production khác. Xác nhận CUA đổi lớp JWT production đã có trong cùng gói. Không hỏi lại. Chưa áp backend tại checkpoint chuẩn bị này; ghi kết quả thực sau thao tác.
+| Artifact đã review và áp | Byte | SHA256 |
+|---|---:|---|
+| word-chain-production-schema.sql (BEGIN/COMMIT từ schema.sql) | 12.310 | `17116490a6ebd87118fccf8244f2f733b65dfc86baaa1da5d11fa78f03add814` |
+| word-chain-room-index.ts (build:word-chain-edge) | 487.451 | `aeafa014767d50b2da523682e91f35f5f95d5abc5cc0a5f1c4c30de7c6a752d8` |
+| word-chain-production-scheduler.sql (URL production + transaction/guard) | 2.202 | `d55f1f7da51743b3ac845673247a4260c30fd23b518a9d1175ea48791d3b162b` |
 
-## Thứ tự cutover khi được xác nhận
+Nguồn: [schema](../../supabase/word-chain/schema.sql), [scheduler](../../supabase/word-chain/scheduler.sql), supabase/functions/word-chain-room. Artifact dựng ở/private/tmp, không phải đầu vào phiên bền vững. Schema chỉwc_private/public.wc_room_*, service-only/CAS/one-seat/rate/receipt. Scheduler tự sinh token trong Vault/DB chỉhash, không copy service-role key vào cron/browser. Không đọc/xuất secret; không đổi save/Auth/commerce.
 
-Áp schema→deploy artifact/handlerAuth/CORS→cài cron→đọc job/hash_ready/role denial và probe Auth/CORS thật→full CI của flagtrue→merge release→Netlify Published đúng SHA→kiểm asset dictionary byte/revision và UI sảnh/guest/registered nếu còn phiên thật. Không mở flag public trước backend sẵn sàng.
+## Bằng chứng backend production08/11
 
-## Giới hạn và rollback
+- Trước cutover endpoint404. Đúng dashboardArcade-x/whjatkhhupeqfngakmee/Nam A Uniform/Free/Healthy; schema transaction query2f5bbaf5-d489-4e78-8508-fb075006bb14 trả **Success. No rows returned**.
+- Edgeartifact đúng đầu/cuối/tên đã deploy; Details lưu legacyJWT OFF, reload xác nhận OFF/Save disabled. WORD_CHAIN_ALLOWED_ORIGINS Save thành công, chỉhttps://arcade-x.netlify.app; không wildcard/localhost/staging.
+- Scheduler query392a5dfb-5346-43b6-9b6a-7f0c0e3e76bf trảjob3; audit5f8d83a8-9c15-48d2-8085-d91fb85838d1:word-chain-room-timeouts/10seconds/active=true/hash_ready=true.
+- Smoke tick thật dùng Vault header nội bộ, không xuất token: request25, HTTP200/timed_out=false/{updated:0,serverNow:1794097340202}, response2026-11-08T00:22:17.403772Z. Không có room tới hạn lúc probe; không coi updated0 là đã kiểm turn timeout.
+- HTTPS probes: publicpreflight204/exactACAO; originlạ403ORIGIN_DENIED; thiếu/sai bearer401UNAUTHORIZED; tickgiả và browser-origin tick403UNAUTHORIZED_TICK. Publickey gọiwc_room_read/wc_room_tick_authorized đều401/42501.
+- Dictionarypublic `/games/word-chain/words.v2-4809405e0579.json`:200/34.512/byte-match; SHA256`b88db3f2d250b1a705e7b1b6aaf1746397841959509560821acdee93818ed773`. Giữ toàn bộ từ cũ/3.011opener, v1 không đổi; v2prefixpacked328.672byte trong budget400KB.
 
-Pilot2account thật đã qua ở [QA staging](../qa/WC-STAGING-2026-11-08.md). User bỏ gate3/4người; không báo đã kiểm.2thiết bị/2mạng/soak, IME/expiredAuth/reconnect và no-client turn timeout riêng chưa nghiệm thu; ghi rõ sau phát hành, không giả dữ liệu/thành tích.
+## Giao diện public08/11
 
-Rollback: tắt online-config và deploy lại launcher; bot tiếp tục hoạt động. Nếu cần dừng tick, cron.alter_job theo mẫu cuối scheduler.sql. Giữ dữ liệu phòng/receipt để truy vết; không DROP/DELETE hoặc đổi schema save/Auth/commerce trong gói này.
+Chrome profilexuan duc, URLhttps://arcade-x.netlify.app/: sảnh có icon/banner Nối Từ; mở menu thấy LUYỆN VỚI BOT/GHÉP TRẬN/TẠO PHÒNG/NHẬP MÃ và34.512từ. Lần mở đầu hiện lỗi tải game, thử lại chưa được; hard reload rồi mở từ sảnh thành công. Chưa xác định nguyên nhân; không tuyên bố đã sửa lỗi cache.
 
-## Kết quả production đang xác minh
+Phiên registered sẵn có: chọn2ghế→tạo **X9FL8R,1/2** (chủ phòng/ghế trống/cầnít nhất2người), screenshot inline đã xem; Rời phòng→menu. Ghép trận→**1/4,đang ghép người chơi**→Hủy tìm trận→menu. Không giữ phòng/queue thử sau kiểm. Không đổi mật khẩu, không đọc token, không tạo giả user/đáp án. Không có account thứhai trong smoke production này; PK2account đã kiểm staging, guest guard kiểm trong CI32.
 
-- Schema production đã áp bằng transaction artifact đã duyệt; CUA xác minh đúng whjatkhhupeqfngakmee và SQL Editor query2f5bbaf5-d489-4e78-8508-fb075006bb14 trả **Success. No rows returned**. Chưa deploy function/cron hoặc bật flag public tại mốc này.
-- Function productionword-chain-room đã deploy qua dashboard bằng artifactaeafa…/487.451byte, quan sát đầu/cuối code và tên. Details lưu legacyJWT OFF, reload xác nhận OFF/Savechangesdisabled. WORD_CHAIN_ALLOWED_ORIGINS đã Save và customsecret xuất hiện, giá trị chỉhttps://arcade-x.netlify.app. Cron còn chờ áp tại mốc này.
-- Scheduler production transaction đã áp, SQLquery392a5dfb-5346-43b6-9b6a-7f0c0e3e76bf trả schedule3. Cần đọc lại jobactive/hash_ready và smoke tick/HTTP để nghiệm thu backend.
-- Audit cron production: job3/word-chain-room-timeouts/10seconds/active=true/hash_ready=true. Smoke tick nội bộ dùng Vault token, không xuất token: request25 trả200/timed_out=false/updated0. Probe productionpreflight204/CORSđúng, originlạ403, thiếu/badbearer401, tickgiả/browser403 đều qua.
-- Public RPCwc_room_read/wc_room_tick_authorized đều401/42501 với public key; bảng/RPC không mở cho browser. File dictionarypublic200/34.512từ byte-match SHA256b88db3f2d250b1a705e7b1b6aaf1746397841959509560821acdee93818ed773.
-- CI31/head ea4fc66 dừng ở assertion offline cũ “online rooms exposed before release”; bot/dictionary trước đó vẫn tải được. Đã thay bằng contract public:3nút hiện nhưng disabled khi offline, thông báo kết nối, bot vẫn chơi, nút mở lại sau reconnect. Thêm guard offline trước Auth và lưu cả ảnh menu/bot offline; giữ mọi assert bot và toàn bộ fixture4người. Cần full CI head sửa này trước mergePR20.
+## Phần còn lại và rollback
+
+[Pilot2account thật](../qa/WC-STAGING-2026-11-08.md) đã qua phòng/PK/queue/timeout/rematch/host transfer. Đóng2tab→cron đóng phòng hết rematch; no-client turn timeout riêng chưa chứng minh. User bỏ gate3/4người, không báo đã kiểm. ON5/ON6 còn2thiết bị/2mạng/soak/IME/expiredAuth/reconnect bằng phiên thật. Online chưa XP/xu, cần receipt bền vững trước mở thưởng.
+
+Rollback: tắt online-config và deploy lại launcher, bot vẫn hoạt động; dừng tick bằng cron.alter_job theo mẫu scheduler nếu được yêu cầu. Giữ room/receipt, không DROP/DELETE. Checkpoint codex/word-chain-release-handoff chỉ ghi bằng chứng/tóm tắt sau phát hành; runtime đã ở main086d6ac, không triển khai lại backend để chốt docs.

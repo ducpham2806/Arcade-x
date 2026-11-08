@@ -1,21 +1,13 @@
-# Bàn giao · 08/11/2026 · WC-PUBLIC ACTIVE
+# Bàn giao · 08/11/2026 · WC-PUBLIC đã phát hành
 
-**User mới nhất:** yêu cầu merge và phát hành online công khai, bỏ gate nghiệm thu3–4người. Không hỏi lại quyền merge/public hoặc bắt chạy ca thật3/4. Giữ CI/fixture; các ca chưa kiểm vẫn ghi chưa kiểm.
+**Đã xong:** phòng riêng/nhập mã/PK/ghép trận Nối Từ và kho 34.512 từ đã merge, public tại https://arcade-x.netlify.app/. PR19 merge256620c sau full CI29; PR20 head970a941 qua full CI32 (run42429931818), merge **086d6ac**. Netlify deploy6af00f400397c396a118ca39 đã quan sát **Currently published / main@086d6ac**. Không chờ merge hoặc bật flag nữa.
 
-PR19 đã merge main256620c sau full CI29/headfde7810success; Netlify tự build, chưa xác nhận Published. Bộ từ34.512/client đã merge, main online=false. Nhánh mới `codex/word-chain-public-release` bật flagtrue, thêm UIassert3entryhiện/guestphảilogin rồi bot chơi; local Node24 lint/50check/launcher/build/bundle qua. CI31 đã fail kiểm offline cũ; xem bước dưới. `deliverables/` cũ không commit.
+**Production đã kiểm 08/11:** Chrome xuan duc mở game, đủ3 entry online/34.512 từ; dùng phiên registered sẵn có tạo phòng X9FL8R (1/2), rời về menu; vào queue (1/4), hủy về menu. Không còn giữ phòng/hàng chờ thử. Lần mở đầu lỗi tải game, hard reload rồi mở lại thành công; chưa xác định nguyên nhân, chưa gọi là đã sửa lỗi cache. [Bằng chứng release](word-chain/PUBLIC-RELEASE-2026-11-08.md).
 
-## Bước cần làm ngay
+Backend whjatkhhupeqfngakmee đã cài đúng gói user duyệt: schema/Edge, handler Auth.getUser registered-only, legacyJWT OFF riêng word-chain-room, CORS chỉarcade-x.netlify.app, cronjob3/10s/Vault hash_ready. Tick thật200/updated0; CORS/Auth/tick giả/publicRPC denial đúng; dictionarypublic byte-match. Exception SQL/JWT chỉ gói này; không tự mở quyền production khác, không hỏi lại việc đã duyệt.
 
-PR20/nhánhrelease, codehead ea4fc66 CI31FAILED assertion offline cũ trước-release; đã sửa source menu3nút disabled khi offline/re-enable khi online, guardplatform và testoffline7check/2ảnh. Cần commit/push→fullCI head mới trước mergeflagtrue. Backend production **đã sẵn sàng**, không hỏi permission lại: user08/11 đã duyệt exception hẹp schema/cron/Vault/function/CORS/JWT OFF ởwhjatkhhupeqfngakmee; không mở quyền script production khác.
+**Giới hạn giữ nguyên:** user bỏ gate nghiệm thu thật3–4người, không nói đã qua; fixture4ghế/CI vẫn giữ. Staging2account đã kiểm phòng/PK/host transfer/queue/countdown20s/timeout/rematch; đóng tab→cron đóng phòng hết rematch. Chưa no-client turn timeout,2thiết bị/2mạng/soak/reconnect/IME/expiredAuth bằng phiên thật. Online chưa thưởng XP/xu; phải có receipt bền vững trước mở thưởng. Không tự thêm bot vào queue.
 
-Productionschema transactionSuccess, Edgeartifactaeafa…/487.451byte deploy, JWTlegacyOFFsave/reload, CORS chỉarcade-x.netlify.app. Cronjob3/10s/active/hash_readytrue; smokeVaulttickrequest25HTTP200/updated0/no timeout. ProbeCORS204, originlạ403, thiếu/saiAuth401, tickgiả/browser403, publicRPC401/42501. Dictionarypublic200/34.512 byte-match; chưa xác nhậnflagtruePublished. [Gói + bằng chứng](word-chain/PUBLIC-RELEASE-2026-11-08.md). CIxanh→mergePR20→NetlifyPublished đúngSHA→kiểm UIpublic/guest và phiên registered nếu có; ghi giới hạn, không bắtkiểm3/4.
+**Tiếp theo:** WC-ON5/ON6 là backlog QA; thứ tự roadmap tiếp [Snake](plans/SNAKE.md), bắt đầu R0a baseline/bundle rồi R0b UI/save/Auth thật. Chưa bắt đầu task Snake trong checkpoint này. TC-R0 ca A/mã B cũ user để sau; Renderc705100/Free/cap16/Blueprintpaused, không deploy vô cớ; commerce tắt.
 
-Stagingkhqipuipeawzlkqmdzdg đã có schema/Edge/CORSlocalhost4335, handlerAuth/cron10s/token riêng Vault; user đã duyệt staging, không hỏi lại. [QA08](qa/WC-STAGING-2026-11-08.md):2account thật phòng riêng/PK/host transfer/closedcode, queue/hủy/20s/timeout/rematch qua. Đóng hai tab→cron đóng phòng hết rematch/HTTP200. Chưa chứng minh no-client turn timeout;3/4người chưa kiểm và đã được user bỏ gate. Các tab đóng, RAMAuth không còn.
-
-Online pilot không thưởng XP/xu; receipt bền vững cần trước mở thưởng.2thiết bị/2mạng/soak/reconnect/IME/expiredAuth chưa kiểm, ghi giới hạn khi public. Từ cũ/3.011opener vàsave giữ nguyên; V2<400KB/URLhash/34.512mục.
-
-## Giữ bối cảnh
-
-- Sau Nối Từ tiếp [Snake](plans/SNAKE.md): bundle1,92MB raw/~1,35MB gzip/UI/save/Auth thật/thiết bị còn thiếu;7suite local trước qua, chưa public.
-- TC-R0 ca A/mã B cũ user để sau; không hỏi lại. Renderc705100/Free/cap16/Blueprintpaused, không sync/deploy vô cớ. Commerce tắt.
-- Studio c5dac462 đủ297blob/116skill/21role; không cài/nạp lại toàn bộ. WORKLOG≤3, COMPLETED tóm tắt/archive nguyên văn; doc checker trước commit. Chrome kiểm profilexuan duc, tab production mở riêng; tránh cửa sổ công việc khác.
+Checkpoint tài liệu: codex/word-chain-release-handoff trên main086d6ac, chỉ cập nhật bằng chứng/bàn giao; không đổi runtime. deliverables/ cũ không commit. Studio c5dac462 đủ297blob/116skill/21role; không cài/nạp lại toàn bộ. WORKLOG≤3, COMPLETED/archive giữ lịch sử; chạy doc checker trước commit.
