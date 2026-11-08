@@ -41,4 +41,4 @@ Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking và tăng từ
 
 ## Đã quyết · 08/11/2026 · public Nối Từ
 
-User yêu cầu merge/public, bỏ nghiệm thu3/4người; PR19 merge256620c sau CI29. Sau khi xem gói/file/SHA và lý do AGENTS/CUA, user trả lời “Cho phép gói Nối Từ production”: schema + cron/token Vault riêng, functionword-chain-room, CORS đúngarcade-x.netlify.app và legacyJWT OFF riêngfunction tạiwhjatkhhupeqfngakmee. Đây là exception hẹp WC-PUBLIC, không áp dụng script production khác. Không hỏi lại quyền này.
+User yêu cầu merge/public, bỏ nghiệm thu3/4người; PR19 merge256620c sau CI29. Sau khi xem gói/file/SHA và lý do AGENTS/CUA, user trả lời “Cho phép gói Nối Từ production”: schema + cron/token Vault riêng, functionword-chain-room, CORS đúngarcade-x.netlify.app và legacyJWT OFF riêngfunction tạiwhjatkhhupeqfngakmee. Đây là exception hẹp WC-PUBLIC, không áp dụng script production khác. Gói đã áp và probe thành công; PR20 chờ CI sửa offline rồi merge. Không hỏi lại quyền này.

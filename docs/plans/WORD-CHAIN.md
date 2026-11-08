@@ -1,6 +1,6 @@
 # Nối Từ — ra sảnh và hoàn tất online
 
-Mốc08/11/2026: PR19 đã merge256620c; nhánh `codex/word-chain-public-release` chuẩn bị online=true. Staging2account qua, main hiện online=false; backend production đang cài theo exception user đã duyệt riêng. Không viết lại phòng từ đầu.
+Mốc08/11/2026: PR19 đã merge256620c; nhánh `codex/word-chain-public-release` chuẩn bị online=true. Staging2account qua, main hiện online=false; backend production đã cài/probe theo exception user duyệt; flagtrue chờ CI và mergePR20. Không viết lại phòng từ đầu.
 
 ## WC-L0 · DONE · phát hành bot/offline và artwork
 
@@ -35,7 +35,7 @@ WC-R0 catalog: WC-L0 giải quyết hiển thị bằng bundle; migration/histor
 
 **Tiếp theo:** ON5/ON6,3/4account và no-client turn timeout riêng. Lát cắt phòng riêng/PK/matchmaking2account đã qua staging, không đồng nghĩa release online production.
 
-**Yêu cầu mới08/11 ưu tiên:** user yêu cầu merge và public ngay, không cần nghiệm thu3/4người. PR19 đã merge sau CI29; tiếp [gói WC-PUBLIC](../word-chain/PUBLIC-RELEASE-2026-11-08.md). Không coi3/4 đã qua, không bỏ fixture/CI. Production endpoint đang404; phải cài đúng backend trước merge flagtrue. User đã xác nhận riêng gói SQL/JWT production trong cùng08/11; áp đúng phạm vi ở releaseplan, không hỏi lại.
+**Yêu cầu mới08/11 ưu tiên:** user yêu cầu merge và public ngay, không cần nghiệm thu3/4người. PR19 đã merge sau CI29; tiếp [gói WC-PUBLIC](../word-chain/PUBLIC-RELEASE-2026-11-08.md). Không coi3/4 đã qua, không bỏ fixture/CI. Production backend đã cài/probe, PR20chờ CI sửa guard offline trước mergeflagtrue. User đã xác nhận riêng gói SQL/JWT production trong cùng08/11; áp đúng phạm vi ở releaseplan, không hỏi lại.
 
 ## Yêu cầu triển khai · 07/11/2026
 

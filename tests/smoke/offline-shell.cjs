@@ -77,14 +77,27 @@ const outDir = process.argv.find(a => a.startsWith('--outDir='))?.split('=')[1];
     await page.locator('#btn-play-word-chain').click();
     await page.locator('.nt-home').waitFor({ timeout: 15000 });
     if (!(await page.locator('.nt-credit').innerText()).includes('34.512')) throw new Error('Word Chain lexicon missing offline');
-    if (await page.getByTestId('nt-match').count()) throw new Error('online rooms exposed before release');
+    for (const id of ['nt-match','nt-create','nt-join']) {
+      const button=page.getByTestId(id);
+      if (await button.count()!==1||!(await button.isDisabled())) throw new Error(`${id} must be disabled while offline`);
+    }
+    if (!(await page.locator('.nt-home').innerText()).includes('Đang offline.')) throw new Error('offline room entry lacks a clear network message');
+    await page.screenshot({ path: 'test-results/word-chain-offline.png' });
     await page.getByTestId('nt-practice').click();
     await page.getByRole('button', { name: '1 bot', exact: true }).click();
     await page.getByTestId('nt-start-practice').click();
     await page.locator('.nt-ready').waitFor({ timeout: 10000 });
-    await page.screenshot({ path: 'test-results/word-chain-offline.png' });
+    await page.screenshot({ path: 'test-results/word-chain-offline-bot.png' });
     console.log('PASS Word Chain starts a bot match offline with its Vietnamese lexicon');
-    console.log('offline shell: 6 checks passed');
+    await exitGame();
+    await page.locator('#btn-play-word-chain').click();
+    await page.locator('.nt-home').waitFor({ timeout: 15000 });
+    await context.setOffline(false);
+    await page.waitForFunction(()=>['nt-match','nt-create','nt-join'].every(id=>{
+      const button=document.querySelector(`[data-testid="${id}"]`);return button&&!button.disabled;
+    }),null,{timeout:10000});
+    console.log('PASS public room controls re-enable when the network returns');
+    console.log('offline shell: 7 checks passed');
   } catch (e) {
     console.error('FAIL:', e.message.split('\n')[0]);
     process.exitCode = 1;

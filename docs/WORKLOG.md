@@ -6,8 +6,8 @@ Nhật ký chính duy nhất; giữ≤3mục. Chi tiết trước chốt release
 
 - User yêu cầu merge/public và bỏ nghiệm thu3–4người. PR19 merge256620c sau full CI29/headfde7810success; Netlify build tự động, Published chưa xác nhận.
 - Bật flag ở nhánh release, UI regression đổi từ onlineẩn sang3entryhiện/guestbịyêucầulogin; bot vẫn phải qua. Local lint/50check/launcher/build/bundle qua. Không tắt test4người hoặc nới assert.
-- Productionword-chain-room OPTIONS404; dashboard đúng whjatkhhupeqfngakmee/Healthy. Chuẩn bị schema/Edge/cron artifact có SHA, CORS public exact; chưa áp. [Gói review](word-chain/PUBLIC-RELEASE-2026-11-08.md); user đã xác nhận “Cho phép gói Nối Từ production”, exception hẹp cho đúng gói/project; chưa áp tại checkpoint chuẩn bị.
-- Log/COMPLETED trước release giữ nguyên văn trong archive08/11-before-public-online; pilot2account đã tóm tắt. Chỉ merge flagtrue sau backend thật sẵn sàng và CI đúng head qua.
+- Production ban đầu404; đã áp schema/Edge/handlerAuth/CORS và cronjob3/10s. Smoke tick200, CORS/Auth/role denial đúng; dictionarypublic34.512byte-match. [Gói review](word-chain/PUBLIC-RELEASE-2026-11-08.md); user đã xác nhận “Cho phép gói Nối Từ production”, exception hẹp cho đúng gói/project; chưa áp tại checkpoint chuẩn bị.
+- Log/COMPLETED trước release giữ nguyên văn trong archive08/11-before-public-online; pilot2account đã tóm tắt. CI31failassertofflinecũ; sửa3nút tự khóa/mở theo mạng, giữ bot và thêm reconnect. Chờ fullCI head sửa trước mergePR20; backend đã sẵn sàng.
 
 ## 08/11/2026 · WC-ON1–ON4 pilot2account đã kiểm · codex/word-chain-online
 

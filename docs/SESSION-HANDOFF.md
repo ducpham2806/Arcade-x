@@ -2,11 +2,13 @@
 
 **User mới nhất:** yêu cầu merge và phát hành online công khai, bỏ gate nghiệm thu3–4người. Không hỏi lại quyền merge/public hoặc bắt chạy ca thật3/4. Giữ CI/fixture; các ca chưa kiểm vẫn ghi chưa kiểm.
 
-PR19 đã merge main256620c sau full CI29/headfde7810success; Netlify tự build, chưa xác nhận Published. Bộ từ34.512/client đã merge, main online=false. Nhánh mới `codex/word-chain-public-release` bật flagtrue, thêm UIassert3entryhiện/guestphảilogin rồi bot chơi; local Node24 lint/50check/launcher/build/bundle qua. Full CI release chưa có. `deliverables/` cũ không commit.
+PR19 đã merge main256620c sau full CI29/headfde7810success; Netlify tự build, chưa xác nhận Published. Bộ từ34.512/client đã merge, main online=false. Nhánh mới `codex/word-chain-public-release` bật flagtrue, thêm UIassert3entryhiện/guestphảilogin rồi bot chơi; local Node24 lint/50check/launcher/build/bundle qua. CI31 đã fail kiểm offline cũ; xem bước dưới. `deliverables/` cũ không commit.
 
 ## Bước cần làm ngay
 
-Đọc [thẻ Nối Từ](plans/WORD-CHAIN.md) rồi [gói public cụ thể](word-chain/PUBLIC-RELEASE-2026-11-08.md). Launcher Auth productionwhjatkhhupeqfngakmee; endpointword-chain-room OPTIONS404. Dashboard đúng productionArcade-x/Healthy đã đọc, chưa ghi. Schema/Edge/cron artifact có SHA đã chuẩn bị; user08/11 đã trả lời “Cho phép gói Nối Từ production”: exception hẹp schema/cron/token Vault, function/CORS và legacyJWT OFF đúng whjatkhhupeqfngakmee. Không hỏi lại; không mở quyền script production khác. Chưa áp backend tại checkpoint chuẩn bị. Backend sẵn sàng→CIflagtrue→merge→Published/kiểm public.
+PR20/nhánhrelease, codehead ea4fc66 CI31FAILED assertion offline cũ trước-release; đã sửa source menu3nút disabled khi offline/re-enable khi online, guardplatform và testoffline7check/2ảnh. Cần commit/push→fullCI head mới trước mergeflagtrue. Backend production **đã sẵn sàng**, không hỏi permission lại: user08/11 đã duyệt exception hẹp schema/cron/Vault/function/CORS/JWT OFF ởwhjatkhhupeqfngakmee; không mở quyền script production khác.
+
+Productionschema transactionSuccess, Edgeartifactaeafa…/487.451byte deploy, JWTlegacyOFFsave/reload, CORS chỉarcade-x.netlify.app. Cronjob3/10s/active/hash_readytrue; smokeVaulttickrequest25HTTP200/updated0/no timeout. ProbeCORS204, originlạ403, thiếu/saiAuth401, tickgiả/browser403, publicRPC401/42501. Dictionarypublic200/34.512 byte-match; chưa xác nhậnflagtruePublished. [Gói + bằng chứng](word-chain/PUBLIC-RELEASE-2026-11-08.md). CIxanh→mergePR20→NetlifyPublished đúngSHA→kiểm UIpublic/guest và phiên registered nếu có; ghi giới hạn, không bắtkiểm3/4.
 
 Stagingkhqipuipeawzlkqmdzdg đã có schema/Edge/CORSlocalhost4335, handlerAuth/cron10s/token riêng Vault; user đã duyệt staging, không hỏi lại. [QA08](qa/WC-STAGING-2026-11-08.md):2account thật phòng riêng/PK/host transfer/closedcode, queue/hủy/20s/timeout/rematch qua. Đóng hai tab→cron đóng phòng hết rematch/HTTP200. Chưa chứng minh no-client turn timeout;3/4người chưa kiểm và đã được user bỏ gate. Các tab đóng, RAMAuth không còn.
 

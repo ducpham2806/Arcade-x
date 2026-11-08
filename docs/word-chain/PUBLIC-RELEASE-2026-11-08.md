@@ -1,6 +1,6 @@
 # Nối Từ · phát hành online công khai · 08/11/2026
 
-**ACTIVE.** User yêu cầu merge và phát hành online, không cần nghiệm thu3–4người nữa. Đây là waiver ca thật, không ghi chúng đã qua; giữ nguyên fixture và mọi kiểm tra CI. Thưởng online vẫn tắt; bot/offline và save giữ tương thích.
+**ACTIVE · backend production đã cài/probe; PR20 chờ CI sửa guard offline trước merge flagtrue.** User yêu cầu merge và phát hành online, không cần nghiệm thu3–4người nữa. Đây là waiver ca thật, không ghi chúng đã qua; giữ nguyên fixture và mọi kiểm tra CI. Thưởng online vẫn tắt; bot/offline và save giữ tương thích.
 
 ## Mốc đã làm
 
@@ -28,3 +28,12 @@
 Pilot2account thật đã qua ở [QA staging](../qa/WC-STAGING-2026-11-08.md). User bỏ gate3/4người; không báo đã kiểm.2thiết bị/2mạng/soak, IME/expiredAuth/reconnect và no-client turn timeout riêng chưa nghiệm thu; ghi rõ sau phát hành, không giả dữ liệu/thành tích.
 
 Rollback: tắt online-config và deploy lại launcher; bot tiếp tục hoạt động. Nếu cần dừng tick, cron.alter_job theo mẫu cuối scheduler.sql. Giữ dữ liệu phòng/receipt để truy vết; không DROP/DELETE hoặc đổi schema save/Auth/commerce trong gói này.
+
+## Kết quả production đang xác minh
+
+- Schema production đã áp bằng transaction artifact đã duyệt; CUA xác minh đúng whjatkhhupeqfngakmee và SQL Editor query2f5bbaf5-d489-4e78-8508-fb075006bb14 trả **Success. No rows returned**. Chưa deploy function/cron hoặc bật flag public tại mốc này.
+- Function productionword-chain-room đã deploy qua dashboard bằng artifactaeafa…/487.451byte, quan sát đầu/cuối code và tên. Details lưu legacyJWT OFF, reload xác nhận OFF/Savechangesdisabled. WORD_CHAIN_ALLOWED_ORIGINS đã Save và customsecret xuất hiện, giá trị chỉhttps://arcade-x.netlify.app. Cron còn chờ áp tại mốc này.
+- Scheduler production transaction đã áp, SQLquery392a5dfb-5346-43b6-9b6a-7f0c0e3e76bf trả schedule3. Cần đọc lại jobactive/hash_ready và smoke tick/HTTP để nghiệm thu backend.
+- Audit cron production: job3/word-chain-room-timeouts/10seconds/active=true/hash_ready=true. Smoke tick nội bộ dùng Vault token, không xuất token: request25 trả200/timed_out=false/updated0. Probe productionpreflight204/CORSđúng, originlạ403, thiếu/badbearer401, tickgiả/browser403 đều qua.
+- Public RPCwc_room_read/wc_room_tick_authorized đều401/42501 với public key; bảng/RPC không mở cho browser. File dictionarypublic200/34.512từ byte-match SHA256b88db3f2d250b1a705e7b1b6aaf1746397841959509560821acdee93818ed773.
+- CI31/head ea4fc66 dừng ở assertion offline cũ “online rooms exposed before release”; bot/dictionary trước đó vẫn tải được. Đã thay bằng contract public:3nút hiện nhưng disabled khi offline, thông báo kết nối, bot vẫn chơi, nút mở lại sau reconnect. Thêm guard offline trước Auth và lưu cả ảnh menu/bot offline; giữ mọi assert bot và toàn bộ fixture4người. Cần full CI head sửa này trước mergePR20.

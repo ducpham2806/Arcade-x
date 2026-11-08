@@ -4,7 +4,7 @@ Mốc nguồn: main3f943d9, PR#18 đã merge sau full CI24/head5882adf success. 
 
 ## Trọng tâm và thứ tự
 
-**WC-PUBLIC ACTIVE theo yêu cầu08/11:** user yêu cầu merge/public, bỏ gate3/4người. PR19 merge256620c sau CI29/headfde7810success; Netlify tự build, bộ từ34.512 đã merge. Chuẩn bị backend production/flagtrue trên nhánh release; endpointprod404, cần exception SQL/JWT cụ thể trước áp. Pilot2account/staging đã qua; các manualcase khác chưa kiểm ghi riêng. WC-L0 bot/art Published; TC-R0 ca A user để sau. Sau Nối Từ tiếp Snake; [WORKFLOW](WORKFLOW.md).
+**WC-PUBLIC ACTIVE theo yêu cầu08/11:** user yêu cầu merge/public, bỏ gate3/4người. PR19 merge256620c sau CI29/headfde7810success; Netlify tự build, bộ từ34.512 đã merge. Backend production đã cài/probe theo gói user duyệt; PR20flagtrue đang sửa guard offline và chờ CI head mới. Pilot2account/staging đã qua; các manualcase khác chưa kiểm ghi riêng. WC-L0 bot/art Published; TC-R0 ca A user để sau. Sau Nối Từ tiếp Snake; [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|

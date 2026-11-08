@@ -5,6 +5,7 @@ import {WordChainClient,httpRoomTransport} from './online-client';
 /** Real room client against the deployed word-chain-room Edge Function (registered accounts only). */
 export async function platformWordChainClient(){
  if(!WORD_CHAIN_ONLINE)throw new Error('Phòng online đang chờ bật máy chủ. Anh vẫn có thể luyện với bot.');
+ if(typeof navigator!=='undefined'&&navigator.onLine===false)throw new Error('Đang offline. Kết nối mạng để chơi online.');
  const {supabase,supabasePublicConfig}=await import('../../services/supabaseClient');
  if(!supabase)throw new Error('Chưa kết nối máy chủ.');
  const {data,error}=await supabase.auth.getUser();
