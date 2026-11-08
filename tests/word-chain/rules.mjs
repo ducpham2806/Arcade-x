@@ -7,8 +7,8 @@ import {join} from 'node:path';
 import assert from 'node:assert/strict';
 const out=mkdtempSync(join(tmpdir(),'word-chain-'));const req=createRequire(import.meta.url);
 for(const f of ['rules','lexicon','bot','normalize'])await build({entryPoints:[`src/games/word-chain/${f}.ts`],bundle:true,platform:'node',format:'cjs',outfile:join(out,f+'.cjs'),logLevel:'silent'});
-const R=req(join(out,'rules.cjs')),{buildLexicon}=req(join(out,'lexicon.cjs')),{botMove}=req(join(out,'bot.cjs')),N=req(join(out,'normalize.cjs'));
-const data=JSON.parse(readFileSync('public/games/word-chain/words.v1.json','utf8'));const lex=buildLexicon(data);
+const R=req(join(out,'rules.cjs')),{buildLexicon,decodeLexiconData}=req(join(out,'lexicon.cjs')),{botMove}=req(join(out,'bot.cjs')),N=req(join(out,'normalize.cjs'));
+const data=decodeLexiconData(JSON.parse(readFileSync('public/games/word-chain/words.v2.json','utf8')));const lex=buildLexicon(data);
 let checks=0;const test=(name,fn)=>{fn();checks++;console.log('PASS',name);};
 const two=[{seat:'P1',name:'An'},{seat:'P2',name:'Bình'}],four=[...two,{seat:'P3',name:'Chi'},{seat:'P4',name:'Dũng'}];
 const ready=(m,t=1000)=>{for(const p of m.players)m=R.setReady(m,p.seat,true,t,lex);return m;};
@@ -17,10 +17,24 @@ const playing=(players=two,seed=7)=>R.advanceTime(ready(R.createMatch(players,0,
 const answer=m=>{const used=new Set(m.words.map(x=>x.key)),fresh=lex.startingWith(R.need(m)).filter(w=>!used.has(N.wordKey(w)));return fresh.find(w=>lex.startingWith(w.split(' ')[1]).some(x=>!used.has(N.wordKey(x))&&x!==w))??fresh[0];};
 
 test('dictionary: NFC, two syllables, unique keys, size budget, no blocked words',()=>{
- assert.equal(data.license,'CC BY-SA 4.0');assert.ok(data.words.length>15000&&data.openers.length>1000);
+ assert.equal(data.license,'CC BY-SA 4.0');assert.ok(data.words.length>=34512&&data.openers.length>1000);
  const keys=new Set();for(const w of data.words){assert.equal(w,w.normalize('NFC'));assert.equal(w.split(' ').length,2,w);const k=N.wordKey(w);assert.ok(k,w);assert.ok(!keys.has(k),'duplicate '+w);keys.add(k);}
  for(const bad of ['địt','lồn','cặc','đéo','buồi'])assert.ok(!data.words.some(w=>w.split(' ').includes(bad)),bad);
- assert.ok(statSync('public/games/word-chain/words.v1.json').size<400_000);
+ assert.ok(statSync('public/games/word-chain/words.v2.json').size<400_000);
+});
+test('expanded lexicon preserves all legacy answers and opening seeds',()=>{
+ const old=JSON.parse(readFileSync('public/games/word-chain/words.v1.json','utf8'));
+ for(const w of old.words)assert.ok(lex.has(N.wordKey(w)),w);
+ assert.deepEqual(data.openers,old.openers);
+ assert.throws(()=>decodeLexiconData({version:2,count:2,words:'con mèo',openers:[0]}));
+ assert.throws(()=>decodeLexiconData({version:2,count:1,words:'con mèo',openers:[1]}));
+});
+test('attested everyday answers absent from the old lexicon can be played',()=>{
+ for(const word of ['bàn học','lá bài','nghĩ thầm','nhảy xổ','trắng mắt','quạt gió'])assert.ok(lex.has(N.wordKey(word)),word);
+ const base=playing(two,7),m={...base,words:[{...base.words[0],word:'cái bàn',key:N.wordKey('cái bàn')}]};
+ const result=R.submitWord(m,m.turn,'BÀN HỌC',5000,lex);
+ assert.equal(result.result.ok,true);assert.equal(result.match.words.at(-1).word,'bàn học');
+ assert.throws(()=>decodeLexiconData({version:2,codec:'prefix',count:1,words:'~mèo',openers:[0]}));
 });
 test('openers are common nouns that always have replies',()=>{for(const o of data.openers){assert.ok(keys(o));assert.ok(lex.startingWith(o.split(' ')[1]).length>=12,o);}function keys(o){return lex.has(N.wordKey(o));}});
 test('tone placement and case do not matter',()=>{

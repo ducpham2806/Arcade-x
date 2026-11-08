@@ -1,8 +1,9 @@
 import {test,expect} from '@playwright/test';
 import {readFileSync} from 'node:fs';
+import {decodeLexiconData} from '../../src/games/word-chain/lexicon';
 // Practice match in the real launcher: ready check, 3-2-1, a rejected word that can be retyped,
 // an accepted word typed with Vietnamese diacritics, then the match ends with a result screen.
-const words:string[]=JSON.parse(readFileSync('public/games/word-chain/words.v1.json','utf8')).words;
+const words:string[]=decodeLexiconData(JSON.parse(readFileSync('public/games/word-chain/words.v2.json','utf8'))).words;
 test('seven featured slides keep every control inside 320–375px phone banners',async({page})=>{
  await page.setViewportSize({width:320,height:740});
  await page.route('**/*',route=>['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname)?route.continue():route.abort());

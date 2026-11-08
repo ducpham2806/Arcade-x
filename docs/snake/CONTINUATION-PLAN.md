@@ -11,7 +11,7 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Giới hạn:** runner live không chạy renderer/full launcher DOM. JWT hết hạn theo thời gian thực, điện thoại thật, art/animation/audio sản xuất và human playtest vẫn chưa được nghiệm thu. Root CI của các game public không tự bao phủ toàn bộ suite Snake. Preview build/route không đồng nghĩa đã phát hành.
 
-**Kiểm thêm khi lập plan:** build preview và `test:snake-preview`07/11 qua; chunk game1.916.911byte raw/~1,35MB gzip, vượt mức500KB dùng cho public. [Số đo và giới hạn](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). SN-R0a còn kiểm toàn suite/route/flags và graph tải đầu; không đánh DONE từ hai lệnh này.
+**Kiểm thêm khi lập plan:** build preview, preview package và6suite cloud/session/journey/boss/props/audio local07/11 qua; chunk game1.916.911byte raw/~1,35MB gzip, vượt mức500KB dùng cho public. [Số đo và giới hạn](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). SN-R0a còn route/flags runtime và graph tải đầu; không đánh DONE từ hai lệnh này.
 
 ## Việc còn thiếu và thứ tự
 

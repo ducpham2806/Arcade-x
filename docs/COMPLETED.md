@@ -17,19 +17,21 @@
 
 ## WC-PLAN / SN-PLAN · DONE tài liệu · 07/11/2026
 
-- Nhánh codex/word-chain-launcher-release; đối chiếu source5a64fef và báo cáo live-save. [Nối Từ](word-chain/ONLINE-PLAN.md): staging/reward gate→phòng riêng→ghép trận→PK→mạng/Auth→nghiệm thu. [Snake](snake/CONTINUATION-PLAN.md): baseline→UI/save thật→thiết bị/nội dung→candidate phát hành.
-- Đã phân biệt core có sẵn với gap, chia task/file/AC/bằng chứng/ước lượng; thẻ gọn và roadmap ưu tiên cập nhật. Không deploy backend, SQL production hay bật flag từ plan; WC-L0 chờ CI/deploy riêng.
+- Nhánh codex/word-chain-launcher-release, nguồn5a64fef: [Nối Từ](word-chain/ONLINE-PLAN.md) staging→phòng→queue→PK→mạng/Auth→nghiệm thu; [Snake](snake/CONTINUATION-PLAN.md) baseline→UI/save→thiết bị/nội dung→release. Có task/file/AC/bằng chứng/ước lượng; lập plan không tự deploy hay bật flag.
 
-## WC-L0 phần art/catalog/local QA · 07/11/2026
+## WC-L0 · DONE bot/offline ra sảnh · 07/11/2026
 
-- Nhánh codex/word-chain-launcher-release/PR#18: bundled-free bot/offline, policy server giữ ưu tiên;2master ImageGen, icon512/banner1280×640, hash/package/provenance đồng bộ.
-- Local lint/build/bundle/fast, engine36check/artwork qua; CUA PC/phone kiểm bot/từ sai-đúng/favorite/recent/exit. Sửa clipping7controls ở≤399px, bounds320/360/375/390 qua.
-- b0e0c44 Preview success và offline check qua; sửa narrow cần CI head mới. [Báo cáo](qa/WC-L0-2026-11-07.md). Chưa merge/phát hành WC-L0; checkpoint trước chuyển sang lập plan online/Snake theo yêu cầu mới.
+- PR18/main3f943d9: bundled-free/policy server, icon512/banner1280×640 từ2master ImageGen, hash/offline package. Online=false, không SQL production.
+- Full CI24/head5882adf success,5UI Nối Từ/13Tank/generated clean; CUA PC/phone320–390 qua. Netlify6aeebb61665214227ba314ef Published,4JS+2ảnh byte-match; bot “cấm địa”→“địa giới”, exit qua. [QA](qa/WC-L0-2026-11-07.md).
+- Audit WC-R0 xác nhận source đã ở main, catalog thiếu game; WC-L0 xử lý bằng bundled entry. CI24ảnh bị dọn, đã sửa upload trong PR19/CI26–28. Lịch sử chi tiết giữ [nguyên văn](archive/COMPLETED-2026-11-08-before-word-chain-pilot.md).
 
-## WC-R0 phần xác minh nhánh/catalog · 07/11/2026
+## WC-ON1–ON4 phần pilot hai tài khoản · đã kiểm staging · 07–08/11/2026
 
-- Nối Từ đã có source/test trong main c705100 và nhánh TC-R0; không bỏ sót merge game. Catalog public trả23mục, không trả word-chain; fallback chỉ DEV, Netlify Preview cũng production mode.
-- [Audit](qa/WC-R0-2026-11-07.md) giữ bằng chứng và giới hạn: chưa đọc migration history/staging, chưa thay DB hoặc bật online. Tiếp theo thẻ WORD-CHAIN/quyết định#7/#8.
+- Nhánh codex/word-chain-online/PR19, core36801d4; CI28/head001d9c5success. Chưa merge/phát hành production.
+- User duyệt JWT riêng function OFF; schema/Edge/CORS/cron10giây đã cài và xác nhận active/hash_ready. Sau đổi, thiếu/badbearer401, tickgiả/browser403; không lộ secret.
+- Hai account thật tạo/join/start2/cap4/ready/PK;2đáp án được nhận, B bỏ cuộc→A thắng/rời. Host leave→B thành chủ; ghế cuối rời→mã phòng đóng bị từ chối.
+- Queue hủy/tìm lại/trả ghế/countdown20s qua; hết giờ cho kết quả đúng hai bên, đủ2phiếu tái đấu tạo trận mới. Đóng cả hai tab→cron tự đóng phòng hết rematch, HTTP200; turn timeout không client chưa chứng minh.
+- Không thưởng chung/SQLproduction. Chưa3/4account,2thiết bị/2mạng/soak; tiếp ON5/ON6. [QA](qa/WC-STAGING-2026-11-08.md); lịch sử trước checkpoint ở archive.
 
 ## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
 

@@ -1,6 +1,6 @@
 # Nối Từ — kế hoạch phòng, ghép trận và PK
 
-Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · nguồn code `5a64fef`. Đây là kế hoạch được yêu cầu, chưa phải triển khai backend. WC-L0 đưa bot/offline ra sảnh đang chờ full CI/merge; online vẫn tắt. Đọc [thẻ công việc](../plans/WORD-CHAIN.md) để lấy trạng thái mới nhất; chỉ mở mục dưới đây của task đang làm.
+Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · nguồn code `5a64fef`. Đây là kế hoạch được yêu cầu, chưa phải triển khai backend. WC-L0 đã merge3f943d9/Published sau full CI24/head5882adf; bot/offline ra sảnh đã kiểm, online vẫn tắt. Đọc [thẻ công việc](../plans/WORD-CHAIN.md) để lấy trạng thái mới nhất; chỉ mở mục dưới đây của task đang làm.
 
 ## Kết quả cần đạt
 

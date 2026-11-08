@@ -161,6 +161,21 @@ begin
  return used <= case when p_kind = 'read' then 150 else 60 end;
 end;$$;
 
+-- Cron uses a tick-only credential generated inside Vault, never the service-role key.
+create table if not exists wc_private.scheduler_auth(
+ singleton boolean primary key default true check(singleton),
+ token_hash text not null check(token_hash ~ '^[0-9a-f]{64}$')
+);
+alter table wc_private.scheduler_auth enable row level security;
+revoke all on wc_private.scheduler_auth from public, anon, authenticated;
+grant select on wc_private.scheduler_auth to service_role;
+create or replace function public.wc_room_tick_authorized(p_hash text) returns boolean
+ language sql security invoker set search_path='' as $$
+ select exists(select 1 from wc_private.scheduler_auth where token_hash=p_hash);
+$$;
+
+revoke all on function public.wc_room_tick_authorized(text) from public, anon, authenticated;
+grant execute on function public.wc_room_tick_authorized(text) to service_role;
 revoke all on function public.wc_room_read(text), public.wc_room_by_code(text), public.wc_room_create(jsonb),
  public.wc_room_cas(integer,jsonb), public.wc_room_touch(text,text,bigint), public.wc_room_match(text,jsonb,text,bigint),
  public.wc_room_due(bigint), public.wc_room_rate(text,text) from public, anon, authenticated;

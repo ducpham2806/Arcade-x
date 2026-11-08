@@ -5,12 +5,13 @@ const root = 'supabase/functions/word-chain-room/';
 export const STAGED = [
   ['src/games/word-chain/normalize.ts', 'normalize.ts', []],
   ['src/games/word-chain/rules.ts', 'rules.ts', [["from './normalize'", "from './normalize.ts'"]]],
-  ['src/games/word-chain/lexicon.ts', 'lexicon.ts', [["from './normalize'", "from './normalize.ts'"], ["from './rules'", "from './rules.ts'"]]],
+  ['src/games/word-chain/lexicon.ts', 'lexicon.ts', [["from './normalize'", "from './normalize.ts'"], ["from './rules'", "from './rules.ts'"], ["from './lexicon-version'", "from './lexicon-version.ts'"]]],
+  ['src/games/word-chain/lexicon-version.ts', 'lexicon-version.ts', []],
   ['src/games/word-chain/server.ts', 'server.ts', [["from './rules'", "from './rules.ts'"]]],
 ];
 export const staged = (from, rewrites) => rewrites.reduce((s, [a, b]) => {if (!s.includes(a)) throw new Error(`${from}: missing ${a}`); return s.replace(a, b);}, readFileSync(from, 'utf8'));
 if (import.meta.url === `file://${process.argv[1]}`) {
   for (const [from, to, rewrites] of STAGED) writeFileSync(root + to, staged(from, rewrites));
-  copyFileSync('public/games/word-chain/words.v1.json', root + 'words.v1.json');
+  copyFileSync('public/games/word-chain/words.v2.json', root + 'words.v2.json');
   console.log('Staged word-chain-room Edge sources and dictionary. No deployment performed.');
 }

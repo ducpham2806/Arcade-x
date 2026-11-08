@@ -5,7 +5,7 @@ import {botMove,type BotLevel} from './bot';
 import {getLexicon,loadLexicon,type Lexicon} from './lexicon';
 import {advanceTime,createMatch,forfeit,setReady,standings,submitWord,type Match,type Seat} from './rules';
 import {WordChainSound} from './sound';
-import onlineConfig from './online-config.json';
+import {WORD_CHAIN_ONLINE} from './config';
 import {OnlineRoom,type OnlineMode} from './OnlineRoom';
 import type {WordChainClient} from './online-client';
 import './word-chain.css';
@@ -14,25 +14,42 @@ const BOTS=[{name:'Mèo Mun',avatar:'🐱'},{name:'Cú Bông',avatar:'🦉'},{na
 const seeded=(seed:number)=>{let x=seed>>>0;return()=>{x+=0x6D2B79F5;let t=Math.imul(x^(x>>>15),1|x);t^=t+Math.imul(t^(t>>>7),61|t);return((t^(t>>>14))>>>0)/4294967296;};};
 // Automated UI tests pin the match seed (turn order, opener, bot choices) through this global.
 const testSeed=()=>(globalThis as {__WORD_CHAIN_TEST_SEED__?:number}).__WORD_CHAIN_TEST_SEED__;
+type OnlineConnection={client:WordChainClient;resumeKey?:string;dispose?:()=>void};
 type Screen={kind:'home'}|{kind:'setup'}|{kind:'practice';bots:number;level:BotLevel;seed:number}|{kind:'online';mode:OnlineMode};
 
 /** `roomClient` lets the review lab inject a local room server; normally the deployed one is used. */
-export function WordChainGame({bridge,isPaused=false,isMuted=false,roomClient}:GameComponentProps&{roomClient?:()=>Promise<{client:WordChainClient;resumeKey?:string}>}){
+export function WordChainGame({bridge,isPaused=false,isMuted=false,roomClient}:GameComponentProps&{roomClient?:()=>Promise<OnlineConnection>}){
  const [lex,setLex]=useState<Lexicon|null>(getLexicon()),[error,setError]=useState('');
  const [screen,setScreen]=useState<Screen>({kind:'home'}),[bots,setBots]=useState(2),[level,setLevel]=useState<BotLevel>('easy'),[help,setHelp]=useState(false);
- const [online,setOnline]=useState<{client:WordChainClient;resumeKey?:string}|null>(null),[onlineError,setOnlineError]=useState('');
+ const [online,setOnline]=useState<OnlineConnection|null>(null),[onlineError,setOnlineError]=useState('');
  const muted=useRef(isMuted);muted.current=isMuted;
- const canOnline=onlineConfig.enabled||!!roomClient;
- // Opening an online screen connects lazily (account check, Edge Function client).
- useEffect(()=>{if(screen.kind!=='online'||online||!canOnline)return;setOnlineError('');
-  (roomClient?roomClient():import('./online-platform').then(p=>p.platformWordChainClient())).then(setOnline).catch(e=>setOnlineError(e instanceof Error?e.message:'Không kết nối được phòng online.'));},[screen.kind]);
+ const canOnline=WORD_CHAIN_ONLINE||!!roomClient;
+ // Own one connection per online visit; discard late account/connection results.
+ useEffect(()=>{
+  if(screen.kind!=='online'||!canOnline){setOnline(null);return;}
+  let active=true,connection:OnlineConnection|null=null;setOnlineError('');setOnline(null);
+  (roomClient?roomClient():import('./online-platform').then(p=>p.platformWordChainClient())).then(runtime=>{
+   if(!active){runtime.dispose?.();runtime.client.close();return;}
+   connection=runtime;setOnline(runtime);
+  }).catch(e=>{if(active)setOnlineError(e instanceof Error?e.message:'Không kết nối được phòng online.');});
+  return()=>{
+   active=false;
+   if(connection){const runtime=connection;
+    // Launcher Exit/unmount also releases a connected chair. Network failure keeps
+    // the resume key and lets the authoritative 90-second absence rule settle it.
+    void runtime.client.leave().then(left=>{
+     if(left&&runtime.resumeKey)try{localStorage.removeItem(runtime.resumeKey);}catch{/* optional */}
+    }).finally(()=>{runtime.dispose?.();runtime.client.close();});
+   }
+  };
+ },[screen.kind]);
  const sound=useRef<WordChainSound|null>(null);sound.current??=new WordChainSound(()=>muted.current);
  useEffect(()=>()=>sound.current?.dispose(),[]);
  useEffect(()=>{if(!lex)loadLexicon().then(setLex).catch(()=>setError('Không tải được từ điển. Kiểm tra kết nối rồi thử lại.'));},[lex]);
  if(!lex)return <div className="nt-game nt-loading"><div className="nt-logo"><span>NỐI</span><span>TỪ</span></div><p>{error||'Đang mở từ điển…'}</p>{error&&<button className="nt-primary" onClick={()=>{setError('');setLex(null);loadLexicon().then(setLex).catch(()=>setError('Vẫn chưa tải được từ điển.'));}}>Thử lại</button>}</div>;
  if(screen.kind==='practice')return <div className="nt-game"><Practice key={screen.seed} lex={lex} bots={screen.bots} level={screen.level} seed={screen.seed} sound={sound.current} bridge={bridge} isPaused={isPaused}
   onExit={()=>setScreen({kind:'home'})} onRematch={()=>setScreen({...screen,seed:Date.now()})}/></div>;
- if(screen.kind==='online'&&online)return <div className="nt-game"><OnlineRoom key={screen.mode} client={online.client} resumeKey={online.resumeKey} mode={screen.mode} lex={lex} sound={sound.current} bridge={bridge} onExit={()=>setScreen({kind:'home'})}/></div>;
+ if(screen.kind==='online'&&online)return <div className="nt-game"><OnlineRoom key={screen.mode} client={online.client} resumeKey={online.resumeKey} mode={screen.mode} lex={lex} sound={sound.current} onExit={()=>setScreen({kind:'home'})}/></div>;
  return <div className="nt-game nt-home">
   <div className="nt-home-inner">
    <div className="nt-logo" aria-label="Nối Từ"><span>NỐI</span><span>TỪ</span></div>
@@ -54,7 +71,7 @@ export function WordChainGame({bridge,isPaused=false,isMuted=false,roomClient}:G
     <div className="nt-pair"><button data-testid="nt-create" onClick={()=>setScreen({kind:'online',mode:'create'})}>TẠO PHÒNG</button><button data-testid="nt-join" onClick={()=>setScreen({kind:'online',mode:'join'})}>NHẬP MÃ</button></div></>:<p className="nt-note">Đấu online sắp có. Thử sức cùng bot trước nhé.</p>}
     <button className="nt-link" onClick={()=>setHelp(true)}>Cách chơi</button>
    </div>}
-   <p className="nt-credit">Từ điển {lex.words.length.toLocaleString('vi-VN')} từ: Wiktionary (CC BY-SA 4.0), qua which-dialect</p>
+   <p className="nt-credit">Từ điển {lex.words.length.toLocaleString('vi-VN')} từ: Wiktionary (CC BY-SA 4.0), qua Kaikki/which-dialect</p>
   </div>
   {help&&<Help onClose={()=>setHelp(false)}/>}
  </div>;
