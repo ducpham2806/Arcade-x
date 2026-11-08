@@ -1,4 +1,6 @@
-# Bàn giao · 08/11/2026 · WC-PUBLIC đã phát hành
+# Bàn giao · 08/11/2026 · ONLINE-ERROR ACTIVE
+
+**Đang làm:** user báo cả Nối Từ403/409 và Tank WebSocket/kẹt kết nối qua ảnh. Nhánh codex/fix-online-room-errors. CORS Nối Từ probe204 đúngorigin; đang lấy response để phân biệt lỗi membership/version/từ điển. Tank /health timeout25/20/15s, DNS/TCP/TLS qua nhưng khôngfirstbyte; chưa kết luận dịch vụ. Sửa clientwatchdog75s/10s + guardcallback,3regression/69Tank/18WS/lint/build/bundle qua; chưaCI/deploy. [Bug đang kiểm](qa/ONLINE-ERROR-2026-11-08.md).
 
 **Đã xong:** phòng riêng/nhập mã/PK/ghép trận Nối Từ và kho 34.512 từ đã merge, public tại https://arcade-x.netlify.app/. PR19 merge256620c sau full CI29; PR20 head970a941 qua full CI32 (run42429931818), merge **086d6ac**. Netlify deploy6af00f400397c396a118ca39 đã quan sát **Currently published / main@086d6ac**. Không chờ merge hoặc bật flag nữa.
 
