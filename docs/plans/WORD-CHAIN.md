@@ -1,6 +1,6 @@
 # Nối Từ — ra sảnh và hoàn tất online
 
-Mốc 07/11/2026 · runtime `5a64fef`, merge `3f943d9` · nhánh `codex/word-chain-launcher-release`. Bot/offline, UI/core phòng, schema/Edge/test đã có. Online flag false; backend online chưa nghiệm thu. Không viết lại phòng từ đầu, không chạy SQL production.
+Mốc08/11/2026: PR19 đã merge256620c; nhánh `codex/word-chain-public-release` chuẩn bị online=true. Staging2account qua, main hiện online=false; backend production đang cài theo exception user đã duyệt riêng. Không viết lại phòng từ đầu.
 
 ## WC-L0 · DONE · phát hành bot/offline và artwork
 
@@ -17,10 +17,11 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 |---|---|---|
 | WC-ON1 | ĐÃ KIỂM staging pilot | Auth/schema/Edge/CORS/cron; tự đóng room vắng client, thưởng tắt; chưa no-client turn |
 | WC-ON2 | ĐÃ KIỂM hai account | Tạo/join/start2/cap4, mã sai/đóng, host transfer/rời; full/race có fixture |
-| WC-ON3 | PILOT2account qua, còn3/4 | Hủy/tìm lại/trả ghế/resetcountdown20s qua; FIFO/one-seat có fixture |
-| WC-ON4 | PILOT2account qua, còn3/4 | Server nhận từ, đầu hàng/timeout/kết quả, đủ phiếu tái đấu qua |
+| WC-ON3 | PILOT2account qua; user bỏ gate3/4 | Hủy/tìm lại/trả ghế/resetcountdown20s qua; FIFO/one-seat có fixture |
+| WC-ON4 | PILOT2account qua; user bỏ gate3/4 | Server nhận từ, đầu hàng/timeout/kết quả, đủ phiếu tái đấu qua |
 | WC-ON5 | BACKLOG sau ON4 | Mạng/reload/Exit/Auth/account swap/IME và mobile |
 | WC-ON6 | BACKLOG sau ON5 | ≥10trận mỗi format,2thiết bị/2mạng,soak30phút, cutover/rollback |
+| WC-PUBLIC | ACTIVE theo yêu cầu08/11 | PR19 đã merge256620c; chuẩn bị backend production/flagtrue/CI/phát hành |
 
 **Khoảng trống cụ thể:** pilot đã bỏ online `submitScore`; cần receipt bền vững trước mở thưởng. Bỏ cuộc qua `onExit`→leave/server forfeit đã có regression UI, không thêm lệnh trùng. Đã sửa cleanup/response muộn/mất ACK, còn kiểm Exit launcher, logout/đổi account bằng phiên thật.
 
@@ -33,6 +34,8 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 WC-R0 catalog: WC-L0 giải quyết hiển thị bằng bundle; migration/history staging chỉ khi backend cần, không là điều kiện để game hiện sảnh. WC-R1 chuyển thành ON1–ON4; WC-R2 thành ON5–ON6. Quyết định#7 online chưa hoàn tất, #8 public bot đã duyệt; xem [PENDING-DECISIONS](../PENDING-DECISIONS.md).
 
 **Tiếp theo:** ON5/ON6,3/4account và no-client turn timeout riêng. Lát cắt phòng riêng/PK/matchmaking2account đã qua staging, không đồng nghĩa release online production.
+
+**Yêu cầu mới08/11 ưu tiên:** user yêu cầu merge và public ngay, không cần nghiệm thu3/4người. PR19 đã merge sau CI29; tiếp [gói WC-PUBLIC](../word-chain/PUBLIC-RELEASE-2026-11-08.md). Không coi3/4 đã qua, không bỏ fixture/CI. Production endpoint đang404; phải cài đúng backend trước merge flagtrue. User đã xác nhận riêng gói SQL/JWT production trong cùng08/11; áp đúng phạm vi ở releaseplan, không hỏi lại.
 
 ## Yêu cầu triển khai · 07/11/2026
 

@@ -20,8 +20,10 @@ for(const id of ['tank-clash','word-chain']){
 assert.ok(parseCatalog({schemaVersion:1,games:[{id:'tank-clash',engine_key:'evil',status:'published',access_model:'free'}]}).games.some(g=>g.id==='tank-clash'&&g.deviceOnly));
 const repeated=parseCatalog({schemaVersion:1,games:[{id:'word-chain',engine_key:'word-chain',status:'published',access_model:'free'},{id:'word-chain',engine_key:'word-chain',status:'published',access_model:'free'}]});
 assert.equal(repeated.games.filter(g=>g.id==='word-chain').length,1);assert.equal(repeated.games.find(g=>g.id==='word-chain').deviceOnly,undefined);
-assert.equal(JSON.parse((await import('node:fs')).readFileSync('src/games/word-chain/online-config.json','utf8')).enabled,false);
+const wordChainOnline=JSON.parse((await import('node:fs')).readFileSync('src/games/word-chain/online-config.json','utf8'));
+assert.equal(wordChainOnline.enabled,true,'owner-approved public Word Chain online entry is enabled');
+assert.equal(wordChainOnline.functionName,'word-chain-room');
 const favoriteStorage=new Map();global.localStorage={getItem:k=>favoriteStorage.get(k)??null,setItem:(k,v)=>favoriteStorage.set(k,v)};
 assert.equal(isDeviceLibraryGame('word-chain'),true);assert.equal(isDeviceLibraryGame('chess'),false);
 enqueueFavorite('fixture-owner','word-chain',true);await flushFavorites('fixture-owner');assert.deepEqual(pendingFavorites('fixture-owner'),[],'device favorite never uploads a game missing from the server');
-console.log('PASS production catalog includes Word Chain/Tank Clash once, free offline entry, server policy precedence and online-off gate');
+console.log('PASS production catalog includes Word Chain/Tank Clash once, free offline entry, server policy precedence and approved online entry');
