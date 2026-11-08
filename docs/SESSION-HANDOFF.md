@@ -1,15 +1,23 @@
 # Bàn giao · 08/11/2026 · ONLINE-ERROR ACTIVE
 
-**Đang làm:** user báo cả Nối Từ403/409 và Tank WebSocket/kẹt kết nối qua ảnh. Nhánh codex/fix-online-room-errors. CORS Nối Từ probe204 đúngorigin; đang lấy response để phân biệt lỗi membership/version/từ điển. Tank /health timeout25/20/15s, DNS/TCP/TLS qua nhưng khôngfirstbyte; chưa kết luận dịch vụ. Sửa clientwatchdog75s/10s + guardcallback,3regression/69Tank/18WS/lint/build/bundle qua; chưaCI/deploy. [Bug đang kiểm](qa/ONLINE-ERROR-2026-11-08.md).
+## Việc đang làm
 
-**Đã xong:** phòng riêng/nhập mã/PK/ghép trận Nối Từ và kho 34.512 từ đã merge, public tại https://arcade-x.netlify.app/. PR19 merge256620c sau full CI29; PR20 head970a941 qua full CI32 (run42429931818), merge **086d6ac**. Netlify deploy6af00f400397c396a118ca39 đã quan sát **Currently published / main@086d6ac**. Không chờ merge hoặc bật flag nữa.
+User báo cả Nối Từ 403/409 và Tank kẹt kết nối. Nhánh `codex/fix-online-room-errors`, [PR21 nháp](https://github.com/ducpham2806/Arcade-x/pull/21); bản sửa chưa merge/deploy. [Báo cáo và bước tiếp](qa/ONLINE-ERROR-2026-11-08.md).
 
-**Production đã kiểm 08/11:** Chrome xuan duc mở game, đủ3 entry online/34.512 từ; dùng phiên registered sẵn có tạo phòng X9FL8R (1/2), rời về menu; vào queue (1/4), hủy về menu. Không còn giữ phòng/hàng chờ thử. Lần mở đầu lỗi tải game, hard reload rồi mở lại thành công; chưa xác định nguyên nhân, chưa gọi là đã sửa lỗi cache. [Bằng chứng release](word-chain/PUBLIC-RELEASE-2026-11-08.md).
+Public hai account tạo/vào AJEV5P thành công; sau đó bắt được 503 `SUPABASE_EDGE_RUNTIME_SERVICE_DEGRADED`, rồi 403 `NOT_MEMBER`. Ghế chủ phòng mất, chưa phân biệt chắc do hết hạn ready hay vắng mặt. Đã dọn phòng thử. 409 trong ảnh cũ chưa có body để phân loại; không kết luận mọi 409 là bình thường hoặc CORS cấu hình sai.
 
-Backend whjatkhhupeqfngakmee đã cài đúng gói user duyệt: schema/Edge, handler Auth.getUser registered-only, legacyJWT OFF riêng word-chain-room, CORS chỉarcade-x.netlify.app, cronjob3/10s/Vault hash_ready. Tick thật200/updated0; CORS/Auth/tick giả/publicRPC denial đúng; dictionarypublic byte-match. Exception SQL/JWT chỉ gói này; không tự mở quyền production khác, không hỏi lại việc đã duyệt.
+Tank `/health` bốn lần timeout dù TCP/TLS thành công. Dashboard hết phiên: GitHub chỉ liên kết deploy; Google hiện tại dẫn sang Create account nên dừng trước tạo. Đã hỏi user mở service bằng **tài khoản Render cũ** tại dashboard.render.com/web/srv-dbm1r9t6e07s73asmulg. Chờ đọc event/log/health để xử lý đúng nguyên nhân; chưa khôi phục dịch vụ, không đổi gói/env/SQL.
 
-**Giới hạn giữ nguyên:** user bỏ gate nghiệm thu thật3–4người, không nói đã qua; fixture4ghế/CI vẫn giữ. Staging2account đã kiểm phòng/PK/host transfer/queue/countdown20s/timeout/rematch; đóng tab→cron đóng phòng hết rematch. Chưa no-client turn timeout,2thiết bị/2mạng/soak/reconnect/IME/expiredAuth bằng phiên thật. Online chưa thưởng XP/xu; phải có receipt bền vững trước mở thưởng. Không tự thêm bot vào queue.
+## Mã nguồn và kiểm tra
 
-**Tiếp theo:** WC-ON5/ON6 là backlog QA; thứ tự roadmap tiếp [Snake](plans/SNAKE.md), bắt đầu R0a baseline/bundle rồi R0b UI/save/Auth thật. Chưa bắt đầu task Snake trong checkpoint này. TC-R0 ca A/mã B cũ user để sau; Renderc705100/Free/cap16/Blueprintpaused, không deploy vô cớ; commerce tắt.
+- Tank: hạn chờ handshake 75s lần đầu/10s khi nối lại, bỏ callback socket cũ và dọn timer/queue. Repro đỏ trước sửa; 3 regression mới, 69 Tank checks + launcher và 18 WS/ops loopback qua.
+- Nối Từ: giữ mã lỗi gateway; thông báo 503 tiếng Việt; giữ mutation ID khi thử lại; xóa notice mạng cũ khi phiên hết hiệu lực, hướng dẫn vào lại/tạo phòng. 52 checks và toàn bộ 9 UI qua, gồm bot phone/desktop. Hai ảnh lỗi đã xem, giữ local theo báo cáo; duyệt egress ảnh chưa cho phép public. Lint/build/bundle qua trên Node24.
+- PR21 head6b4b558/CI34 là checkpoint Tank đầu; phải chạy CI đúng head mới sau push phần Nối Từ. Không dùng CI cũ chứng minh bản sửa mới. `deliverables/` cũ không commit.
 
-Checkpoint tài liệu: codex/word-chain-release-handoff trên main086d6ac, chỉ cập nhật bằng chứng/bàn giao; không đổi runtime. deliverables/ cũ không commit. Studio c5dac462 đủ297blob/116skill/21role; không cài/nạp lại toàn bộ. WORKLOG≤3, COMPLETED/archive giữ lịch sử; chạy doc checker trước commit.
+## Bối cảnh giữ nguyên
+
+WC-PUBLIC đã phát hành: PR19/CI29, PR20 head970a941/CI32, merge **086d6ac**; Netlify6af00f400397c396a118ca39 Published. [Gói backend đã duyệt và áp](word-chain/PUBLIC-RELEASE-2026-11-08.md) là exception hẹp ở whjatkhhupeqfngakmee; không hỏi lại hoặc mở rộng SQL/JWT. Không dùng smoke trước incident chứng minh backend hiện khỏe.
+
+User bỏ gate thật 3–4 người; fixture vẫn giữ. ON5/ON6 còn thiết bị/mạng/soak/IME/Auth/no-client turn; online chưa XP/xu, cần receipt bền vững. Sau incident tiếp Snake theo roadmap, chưa bắt đầu. TC-R0 ca A/mã B cũ user để sau; Render c705100/Free/cap16, Blueprint paused; commerce tắt.
+
+Studio c5dac462 đủ 116 skill/21 vai trò/297 blob; chỉ nạp theo task. WORKLOG tối đa 3 mục, COMPLETED/archive giữ lịch sử; doc checker trước commit.

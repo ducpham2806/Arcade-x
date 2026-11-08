@@ -4,10 +4,10 @@ Nhật ký chính duy nhất, giữ≤3mục. Trước chốt public đã lưu [
 
 ## 08/11/2026 · ONLINE-ERROR ACTIVE · codex/fix-online-room-errors
 
-- User gửi ảnh, xác nhận cả Nối Từ403/409 và TankWebSocket/kẹt kết nối. Chưa có responsebody của request Nối Từ; không kết luận mọi409 là hỏng server. CORSprobe204 đúngpublicorigin.
-- Tankhealth3lần timeout25/20/15s, DNS/TCP/TLS thành công nhưng không cófirstbyte; chưa xác định Render/service/networkedge. Dashboard chưa đọc; Chrome đổi cửa sổ, đã hỏi user giữ tab lỗi trước5phút.
-- Tái hiện clientTank không có hạn chờhandshake: testđỏ sau75s vẫnconnecting. Thêm watchdog75s cho coldstart/10s reconnect, chặn callbacksocketcũ và dọn timer/queue khi đóng.3regression xanh,69Tankchecks+launcher/18WSops/lint qua. Chưa deploy bản sửa, chưa gọi backend đã khôi phục.
-- [Bug đang kiểm](qa/ONLINE-ERROR-2026-11-08.md); log trước task giữ [nguyên văn](archive/WORKLOG-2026-11-08-before-online-error.md). Không chạy ca3/4người hoặcTCaccountA userđểsau.
+- Public hai account tạo/vào AJEV5P qua; sau đó 503 gateway `SUPABASE_EDGE_RUNTIME_SERVICE_DEGRADED` và 403 `NOT_MEMBER`. 409 cũ chưa có body, không kết luận sai Auth/CORS. Phòng thử đã dọn.
+- Tank health bốn lần timeout dù TLS qua. Dashboard hết phiên; Google dẫn Create account, đã dừng trước tạo và hỏi user mở tài khoản Render cũ. Chưa đọc service/log hoặc khôi phục backend.
+- Tank: watchdog 75s/10s, bỏ event socket cũ; 3 regression/69 Tank/18 WS qua. Nối Từ: giữ mã gateway, thông báo 503, bỏ notice mạng cũ sau mất phiên; 52 checks và toàn bộ 9 UI qua, ảnh đã xem. Lint/build/bundle qua. PR21 nháp; CI34 chỉ head Tank đầu, phần Nối Từ cần CI đúng head mới. Chưa merge/deploy.
+- [Bằng chứng](qa/ONLINE-ERROR-2026-11-08.md), [log trước task nguyên văn](archive/WORKLOG-2026-11-08-before-online-error.md). Không đổi SQL/env/gói; không mở lại TC account A hay kiểm thật 3/4 người.
 
 ## 08/11/2026 · WC-PUBLIC DONE phát hành · codex/word-chain-release-handoff
 

@@ -1,14 +1,21 @@
 import {test,expect,type Page} from '@playwright/test';
 import {execFileSync} from 'node:child_process';
-import {readFileSync} from 'node:fs';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {buildSync} from 'esbuild';
 import {decodeLexiconData} from '../../src/games/word-chain/lexicon';
 import path from 'node:path';
 // Online play through the review lab: real WordChainGame UIs (one per player) on the real room
 // server with an in-browser store. Private room by code, ready check, words synced to every
 // player, leaving mid-match, and matchmaking with the 20 s auto start.
 const LAB=path.resolve('test-results/word-chain-room-lab.html');
+const ERRORS=path.resolve('test-results/word-chain-errors.html');
 const words:string[]=decodeLexiconData(JSON.parse(readFileSync('public/games/word-chain/words.v2.json','utf8'))).words;
-test.beforeAll(()=>{execFileSync(process.execPath,['scripts/word-chain-preview.mjs',LAB],{stdio:'ignore'});});
+test.beforeAll(()=>{
+ execFileSync(process.execPath,['scripts/word-chain-preview.mjs',LAB],{stdio:'ignore'});
+ const bundle=buildSync({entryPoints:['tests/word-chain/error-fixture.tsx'],bundle:true,write:false,format:'iife',platform:'browser',minify:true,jsx:'automatic',define:{'process.env.NODE_ENV':'"production"','import.meta.env':'{}'},outfile:'errors.js'});
+ const js=bundle.outputFiles.find(f=>f.path.endsWith('.js'))!.text,css=bundle.outputFiles.find(f=>f.path.endsWith('.css'))!.text;
+ writeFileSync(ERRORS,`<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nối Từ · kiểm phục hồi lỗi</title><style>html,body,#root{margin:0;height:100%;background:#17112e}${css}</style><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></html>`);
+});
 const pane=(page:Page,name:string)=>page.locator(`.nt-lab-pane[data-player="${name}"]`);
 async function open(page:Page){await page.setViewportSize({width:1600,height:900});await page.goto('file://'+LAB);await expect(page.locator('.nt-lab-pane .nt-home')).toHaveCount(4,{timeout:15000});}
 
@@ -96,4 +103,26 @@ test('matchmaking cancel releases the chair and allows a new queue visit',async(
  await an.getByTestId('nt-match').click();await expect(an.locator('.nt-seats li.on')).toHaveCount(2);
  await expect(binh.locator('.nt-queue')).toContainText('tự bắt đầu sau');
  for(const p of [an,binh]){await p.getByRole('button',{name:'Hủy tìm trận',exact:true}).click();await expect(p.locator('.nt-menu')).toBeVisible();}
+});
+
+// New error screenshots stay outside the public CI artifact glob; publication review is pending.
+test('temporary provider outage keeps a retry action and can recover into the room',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('file://'+ERRORS+'?scenario=503');
+ await page.getByTestId('nt-create-room').click();
+ await expect(page.getByRole('status')).toContainText('Máy chủ phòng đang tạm gián đoạn');
+ await expect(page.getByRole('button',{name:'Thử lại',exact:true})).toBeEnabled();
+ await page.screenshot({path:'test-results/local-online-errors/word-chain-service-outage.png',animations:'disabled'});
+ await page.getByRole('button',{name:'Thử lại',exact:true}).click();
+ await expect(page.getByTestId('nt-room-code')).toHaveText('TEST22');
+ await expect(page.getByText('Máy chủ phòng đang tạm gián đoạn',{exact:false})).toHaveCount(0);
+});
+
+test('membership expiry after network loss clears the old outage notice and permits a new room',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('file://'+ERRORS+'?scenario=expired');
+ await page.getByTestId('nt-create-room').click();await expect(page.getByTestId('nt-room-code')).toHaveText('TEST22');
+ await expect(page.getByRole('status')).toContainText('Mất kết nối',{timeout:6000});
+ await expect(page.getByRole('alert')).toContainText('Phiên trong phòng đã kết thúc',{timeout:6000});
+ await expect(page.getByText('Mất kết nối. Kiểm tra mạng rồi thử lại.',{exact:true})).toHaveCount(0);
+ await page.screenshot({path:'test-results/local-online-errors/word-chain-membership-recovery.png',animations:'disabled'});
+ await page.getByTestId('nt-create-room').click();await expect(page.getByTestId('nt-room-code')).toHaveText('TEST22');
 });

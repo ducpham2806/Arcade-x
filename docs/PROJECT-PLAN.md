@@ -4,12 +4,14 @@ Mốc nguồn main086d6ac: PR19/PR20 đã merge sau full CI29/CI32; Netlify đú
 
 ## Trọng tâm và thứ tự
 
+**ONLINE-ERROR ACTIVE08/11:** ưu tiên lỗi Nối Từ503/mất phiên và Tankkẹtkết nối trước Snake. [Triage/PR21](qa/ONLINE-ERROR-2026-11-08.md); sửa client đã kiểm local, chưa deploy; cần đúng phiên Render để xác định service.
+
 **WC-PUBLIC DONE phát hành08/11:** phòng riêng/nhập mã/PK/ghép trận và34.512từ đã public. User bỏ gate3/4người, giữ CI/fixture; ON5/ON6 còn QA mạng/Auth/thiết bị. [Bằng chứng](word-chain/PUBLIC-RELEASE-2026-11-08.md). Thứ tự tiếp theo là Snake; TC-R0 ca A user để sau. [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
-| Duy trì | Nối Từ | WC-PUBLIC đã phát hành; ON5/ON6 backlog QA, user bỏ gate3/4 | [Nối Từ](plans/WORD-CHAIN.md) |
-| 1 | Snake Legend | R0a baseline→R0b UI/save/Auth thật→R1thiết bị/nội dung→R2candidate/phát hành khi được chọn | [Snake](plans/SNAKE.md) |
+| 1 | Nối Từ / incident online | ONLINE-ERROR đang triage; WC-PUBLIC đã phát hành, ON5/ON6 còn QA | [Nối Từ](plans/WORD-CHAIN.md) |
+| 2 | Snake Legend | R0a baseline→R0b UI/save/Auth thật→R1thiết bị/nội dung→R2candidate/phát hành khi được chọn | [Snake](plans/SNAKE.md) |
 | Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
 | 5 | Battleship và game đã tích hợp | GP-R0 xác minh lại khoảng trống QA từ báo cáo cũ; GP-R1 polish theo lỗi tái hiện; GP-R2 Rainbow/Chronicles chỉ khi chọn mở phạm vi | [QA và hoàn thiện game](plans/GAME-POLISH.md) |

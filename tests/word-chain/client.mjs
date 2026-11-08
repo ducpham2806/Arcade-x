@@ -64,4 +64,29 @@ await test('transport accepts a lifecycle abort signal',async()=>{
  const t=httpRoomTransport('https://edge.example','public-key',async()=> 'token',async(_url,init)=>{signal=init.signal;controller.abort();throw new Error('aborted');});
  await assert.rejects(t.request({type:'match',requestId:'a'},controller.signal));assert.equal(signal.aborted,true);
 });
+await test('provider 503 retains its code and exact mutation ID for a safe retry',async()=>{
+ const calls=[];
+ const transport=httpRoomTransport('https://edge.example','public-key',async()=> 'fixture-token',async(_url,init)=>{
+  calls.push(JSON.parse(init.body));
+  return calls.length===1?Response.json({code:'SUPABASE_EDGE_RUNTIME_SERVICE_DEGRADED',message:'Service is temporarily unavailable'},{status:503}):Response.json(snapshot());
+ });
+ const c=new WordChainClient(transport,()=>1000,()=> 'same-request-id');
+ assert.equal(await c.create(2),false);
+ assert.equal(c.lastErrorCode,'SUPABASE_EDGE_RUNTIME_SERVICE_DEGRADED');
+ assert.match(c.notice,/Máy chủ phòng đang tạm gián đoạn/);assert.ok(c.pending);
+ assert.equal(await c.retry(),true);assert.deepEqual(calls[0],calls[1]);assert.equal(c.notice,'');
+});
+await test('expired membership clears the stale network notice and gives a way back into a room',async()=>{
+ for(const code of ['NOT_MEMBER','LEFT_ROOM','NOT_FOUND']){
+  let calls=0;
+  const c=new WordChainClient({request:async()=>{
+   if(++calls===1)return snapshot();
+   if(calls===2)throw new RoomTransportError('NETWORK','Mất kết nối.',true);
+   throw new RoomTransportError(code,'Bạn không có quyền vào phòng này.');
+  }},()=>1000,()=> 'request-a');
+  await c.create(2);await c.refresh();assert.equal(c.notice,'Mất kết nối.');
+  await c.refresh();assert.equal(c.snapshot,null);assert.equal(c.notice,'');
+  assert.equal(c.lastErrorCode,code);assert.match(c.error,/Phiên trong phòng đã kết thúc/);
+ }
+});
 console.log(`${checks} Word Chain client checks passed`);
