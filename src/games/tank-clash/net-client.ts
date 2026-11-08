@@ -205,6 +205,7 @@ export type NetSession = ReturnType<typeof createNetSession>;
 export function connectTankRoom(url: string, options: { name?: string; token?: () => string | undefined; onChange?: (kind: string) => void; storage?: Storage | null }) {
   let ws: WebSocket | null = null, closed = false, retry = 0, queue: ClientMessage[] = [];
   let retryTimer: ReturnType<typeof setTimeout> | undefined, pingTimer: ReturnType<typeof setInterval> | undefined;
+  let connectTimer: ReturnType<typeof setTimeout> | undefined, opened = false;
   const store = options.storage === undefined ? (() => { try { return sessionStorage; } catch { return null; } })() : options.storage;
   const session = createNetSession({ now: () => performance.now(), name: options.name, token: options.token,
     send: msg => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg)); else if (msg.type !== 'input' && msg.type !== 'ping') queue.push(msg); },
@@ -214,10 +215,29 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
     } });
   try { const saved = JSON.parse(store?.getItem('tank-clash.seat') ?? 'null'); if (saved?.code && saved?.resumeToken) session.restore(saved); } catch { /* ignore */ }
   let status: 'connecting' | 'open' | 'reconnecting' | 'closed' = 'connecting';
+  function disconnected(socket: WebSocket) {
+    if (ws !== socket) return;
+    clearTimeout(connectTimer); clearInterval(pingTimer); ws = null;
+    if (closed) { status = 'closed'; options.onChange?.('status'); return; }
+    const fatal = session.error?.fatal && session.error.code !== 'RESUME_INVALID';
+    if (fatal) { status = 'closed'; options.onChange?.('status'); return; }
+    status = 'reconnecting'; options.onChange?.('status');
+    retryTimer = setTimeout(open, Math.min(4000, 500 * 2 ** retry++));
+  }
   function open() {
+    if (closed) return;
     clearTimeout(retryTimer); status = retry ? 'reconnecting' : 'connecting'; options.onChange?.('status');
     const socket = new WebSocket(url); ws = socket;
+    // A sleeping Free instance may need a minute initially. Later handshakes must
+    // finish inside the seat hold window. Some failed upgrades never emit close.
+    connectTimer = setTimeout(() => {
+      if (closed || ws !== socket) return;
+      disconnected(socket);
+      try { socket.close(); } catch { /* a failed handshake is already disconnected */ }
+    }, opened ? 10_000 : 75_000);
     socket.onopen = () => {
+      if (closed || ws !== socket) return;
+      clearTimeout(connectTimer); opened = true;
       retry = 0; status = 'open'; options.onChange?.('status');
       const wasSeated = !!(session.code && session.resumeToken);
       const waiting = queue; queue = [];
@@ -226,19 +246,11 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
       for (const m of waiting) socket.send(JSON.stringify(m));
       clearInterval(pingTimer); pingTimer = setInterval(() => session.ping(), 1000);
     };
-    socket.onmessage = e => { try { session.receive(JSON.parse(String(e.data))); } catch { /* malformed server frame */ } };
-    socket.onclose = () => {
-      clearInterval(pingTimer); if (ws !== socket) return; ws = null;
-      if (closed) { status = 'closed'; options.onChange?.('status'); return; }
-      const fatal = session.error?.fatal && session.error.code !== 'RESUME_INVALID';
-      if (fatal) { status = 'closed'; options.onChange?.('status'); return; }
-      // Retry inside the 20 s hold window: 0.5, 1, 2, 4, 4, 4 ... seconds.
-      status = 'reconnecting'; options.onChange?.('status');
-      retryTimer = setTimeout(open, Math.min(4000, 500 * 2 ** retry++));
-    };
+    socket.onmessage = e => { if (closed || ws !== socket) return; try { session.receive(JSON.parse(String(e.data))); } catch { /* malformed server frame */ } };
+    socket.onclose = () => disconnected(socket);
     socket.onerror = () => {};
   }
   open();
   return { session, get status() { return status; },
-    close() { closed = true; clearTimeout(retryTimer); clearInterval(pingTimer); try { ws?.close(); } catch { /* ignore */ } ws = null; } };
+    close() { closed = true; status = 'closed'; clearTimeout(retryTimer); clearTimeout(connectTimer); clearInterval(pingTimer); queue = []; const socket = ws; ws = null; try { socket?.close(); } catch { /* ignore */ } } };
 }

@@ -31,7 +31,7 @@ export function httpRoomTransport(url: string, publishableKey: string, token: ()
         const response = await fetcher(url, {method: 'POST', signal: controller.signal, headers: {apikey: publishableKey, Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json',...(revision?{'x-word-chain-lexicon':revision}:{})}, body: JSON.stringify(body)});
         let result: any;
         try {result = await response.json();} catch {throw new RoomTransportError('INVALID_RESPONSE', 'Không đọc được phản hồi. Hãy đồng bộ lại.', true);}
-        if (!response.ok) throw new RoomTransportError(result.error || 'HTTP_ERROR', result.message || (response.status === 401 ? 'Phiên đăng nhập đã hết hạn.' : response.status === 429 ? 'Thao tác quá nhanh. Hãy chờ một chút.' : 'Không thể thực hiện thao tác.'), response.status >= 500);
+        if (!response.ok) throw new RoomTransportError(result.error || result.code || 'HTTP_ERROR', response.status === 503 ? 'Máy chủ phòng đang tạm gián đoạn. Chờ một chút rồi thử lại.' : result.message || (response.status === 401 ? 'Phiên đăng nhập đã hết hạn.' : response.status === 429 ? 'Thao tác quá nhanh. Hãy chờ một chút.' : 'Không thể thực hiện thao tác.'), response.status >= 500);
         if (!result || typeof result.id !== 'string' || !Number.isInteger(result.version) || !SEATS.includes(result.seat) || 'members' in result || 'receipts' in result)
           throw new RoomTransportError('INVALID_RESPONSE', 'Trạng thái phòng không hợp lệ.', true);
         return result as RoomSnapshot;
@@ -92,7 +92,7 @@ export class WordChainClient {
       if(!this.current(epoch))return false;
       const message = e instanceof Error ? e.message : 'Không thể kết nối.';
       this.lastErrorCode = e instanceof RoomTransportError ? e.code : 'UNKNOWN';
-      if (e instanceof RoomTransportError && !e.uncertain) {this.pending = null; this.error = message;} else this.notice = message;
+      if (e instanceof RoomTransportError && !e.uncertain) {this.pending = null; this.notice = ''; this.error = message;} else this.notice = message;
       return false;
     } finally {
       if(this.current(epoch)){this.busy=false;this.inFlight=null;this.emit();}
@@ -136,7 +136,10 @@ export class WordChainClient {
     } catch (e) {
       if(!this.current(epoch))return false;
       this.lastErrorCode=e instanceof RoomTransportError?e.code:'UNKNOWN';
-      if (e instanceof RoomTransportError && ['NOT_MEMBER', 'LEFT_ROOM', 'NOT_FOUND'].includes(e.code)) {this.snapshot = null; this.error = e.message;}
+      if (e instanceof RoomTransportError && ['NOT_MEMBER', 'LEFT_ROOM', 'NOT_FOUND'].includes(e.code)) {
+        this.snapshot = null; this.notice = '';
+        this.error = 'Phiên trong phòng đã kết thúc hoặc hết thời gian chờ. Anh có thể vào lại bằng mã hoặc tạo phòng mới.';
+      }
       else this.notice = e instanceof Error ? e.message : 'Mất kết nối.';
       return false;
     } finally {if(this.current(epoch)){this.busy=false;this.inFlight=null;this.emit();}}

@@ -1,14 +1,16 @@
-# Kế hoạch tiếp tục ArcadeX · 07/11/2026
+# Kế hoạch tiếp tục ArcadeX · 08/11/2026
 
-Mốc nguồn: main3f943d9, PR#18 đã merge sau full CI24/head5882adf success. Netlify3f943d9 Published và bundle byte-match; Render vẫn c705100 (server không đổi). Đây là roadmap, không tự bật backend/commerce hay thay luật gameplay; CI không thay nghiệm thu nhiều thiết bị.
+Mốc nguồn main086d6ac: PR19/PR20 đã merge sau full CI29/CI32; Netlify đúng086d6ac Published, phòng/queue production đã kiểm. Render vẫn c705100 (server không đổi). Roadmap không tự mở commerce, thưởng hoặc quyền production mới.
 
 ## Trọng tâm và thứ tự
 
-**WC-PUBLIC ACTIVE theo yêu cầu08/11:** user yêu cầu merge/public, bỏ gate3/4người. PR19 merge256620c sau CI29/headfde7810success; Netlify tự build, bộ từ34.512 đã merge. Backend production đã cài/probe theo gói user duyệt; PR20flagtrue đang sửa guard offline và chờ CI head mới. Pilot2account/staging đã qua; các manualcase khác chưa kiểm ghi riêng. WC-L0 bot/art Published; TC-R0 ca A user để sau. Sau Nối Từ tiếp Snake; [WORKFLOW](WORKFLOW.md).
+**ONLINE-ERROR ACTIVE08/11:** ưu tiên lỗi Nối Từ503/mất phiên và Tankkẹtkết nối trước Snake. [Triage/PR21](qa/ONLINE-ERROR-2026-11-08.md); sửa client đã kiểm local, chưa deploy; cần đúng phiên Render để xác định service.
+
+**WC-PUBLIC DONE phát hành08/11:** phòng riêng/nhập mã/PK/ghép trận và34.512từ đã public. User bỏ gate3/4người, giữ CI/fixture; ON5/ON6 còn QA mạng/Auth/thiết bị. [Bằng chứng](word-chain/PUBLIC-RELEASE-2026-11-08.md). Thứ tự tiếp theo là Snake; TC-R0 ca A user để sau. [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
-| 1 | Nối Từ | WC-PUBLIC backendprod→flagtrue/CI→merge/Published; user bỏ gate3/4, manualQA còn lại ghi giới hạn | [Nối Từ](plans/WORD-CHAIN.md) |
+| 1 | Nối Từ / incident online | ONLINE-ERROR đang triage; WC-PUBLIC đã phát hành, ON5/ON6 còn QA | [Nối Từ](plans/WORD-CHAIN.md) |
 | 2 | Snake Legend | R0a baseline→R0b UI/save/Auth thật→R1thiết bị/nội dung→R2candidate/phát hành khi được chọn | [Snake](plans/SNAKE.md) |
 | Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |

@@ -25,13 +25,14 @@
 - Full CI24/head5882adf success,5UI Nối Từ/13Tank/generated clean; CUA PC/phone320–390 qua. Netlify6aeebb61665214227ba314ef Published,4JS+2ảnh byte-match; bot “cấm địa”→“địa giới”, exit qua. [QA](qa/WC-L0-2026-11-07.md).
 - Audit WC-R0 xác nhận source đã ở main, catalog thiếu game; WC-L0 xử lý bằng bundled entry. CI24ảnh bị dọn, đã sửa upload trong PR19/CI26–28. Lịch sử chi tiết giữ [nguyên văn](archive/COMPLETED-2026-11-08-before-word-chain-pilot.md).
 
-## WC-ON1–ON4 phần pilot hai tài khoản · đã kiểm staging · 07–08/11/2026
+## WC-ON1–ON4 / WC-PUBLIC · đã pilot và phát hành · 08/11/2026
 
-- Nhánh codex/word-chain-online/PR19, core36801d4; CI29/headfde7810success. PR19 đã merge256620c theo user08/11; chưa bật online production.
-- User duyệt JWT riêng function OFF; schema/Edge/CORS/cron10giây đã cài và xác nhận active/hash_ready. Sau đổi, thiếu/badbearer401, tickgiả/browser403; không lộ secret.
-- Hai account thật tạo/join/start2/cap4/ready/PK;2đáp án được nhận, B bỏ cuộc→A thắng/rời. Host leave→B thành chủ; ghế cuối rời→mã phòng đóng bị từ chối.
-- Queue hủy/tìm lại/trả ghế/countdown20s qua; hết giờ cho kết quả đúng hai bên, đủ2phiếu tái đấu tạo trận mới. Đóng cả hai tab→cron tự đóng phòng hết rematch, HTTP200; turn timeout không client chưa chứng minh.
-- Không thưởng chung/SQLproduction. Chưa3/4account,2thiết bị/2mạng/soak; tiếp ON5/ON6. [QA](qa/WC-STAGING-2026-11-08.md); lịch sử trước checkpoint ở archive.
+- Nhánh codex/word-chain-online→codex/word-chain-public-release: PR19 merge256620c/CI29; PR20 head970a941/full CI32 success, merge086d6ac. Netlify6af00f400397c396a118ca39 Published/main086d6ac đã đọc live;34.512từ public byte-match.
+- Staging2account thật qua tạo/join/start2/cap4/PK, đầu hàng/kết quả, host transfer/mã đóng, queue/hủy/reset20s/timeout/2phiếu rematch; cron đóng phòng hết rematch khi đóng tab. [QA](qa/WC-STAGING-2026-11-08.md).
+- User duyệt gói production riêng: schema/Edge/handlerAuth, CORS exact, legacyJWT OFF, cron10s/Vault. Đã áp và probe Auth/CORS/tick/RPC denial; tick thật200. Không lộ secret, không thay save/Auth/commerce.
+- Public registered thật: tạo X9FL8R1/2→rời; queue1/4→hủy về menu. Lần đầu lỗi tải game, hard reload rồi mở được, nguyên nhân chưa xác định. [Bằng chứng cuối](word-chain/PUBLIC-RELEASE-2026-11-08.md).
+- User bỏ gate3/4người, không nhận đã kiểm; ON5/ON6 (2thiết bị/2mạng/soak/Auth/IME/no-client turn) còn backlog. Online không XP/xu, cần receipt bền vững trước mở thưởng.
+- Checkpoint codex/word-chain-release-handoff chỉ tài liệu; lịch sử [nguyên văn](archive/COMPLETED-2026-11-08-before-public-release-close.md). Tiếp Snake theo roadmap, chưa bắt đầu.
 
 ## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
 
@@ -41,13 +42,10 @@
 - Bằng chứng: [TC-R0 report](tank-clash/TC-R0-2026-11-06.md). Cập nhật07/11: Netlify/Auth đã phát hành, logout retest qua; còn ca A/mã B cũ được chủ dự án để sau. TC-R1 chưa làm.
 - Giữ Blueprint cũ paused, không sync ghi đè service main; lần sau tiếp QA còn thiếu, không deploy lại vô cớ.
 
-## DOC-01 · 06/11/2026 · chuẩn hóa đầu vào phiên
+## DOC-01 · DONE · 06/11/2026
 
-- Nhánh `codex/docs-game-studio-handoff`, nền gameplay `c705100`.
-- Roadmap chia thẻ theo game; project.md; một nhật ký chính WORKLOG; bàn giao ngắn và mẫu task.
-- Quy trình bắt buộc đóng/tóm tắt trước đổi việc; archive giữ nguyên chi tiết; budget ký tự có checker.
-- Cài toàn bộ Game Studio Agent `c5dac462`: 116 skill, 21 vai trò, 4 rules; 297 blob đối chiếu nguồn. Chỉ một skill đầu mối tự discovery để giảm metadata đầu vào.
-- Kiểm tra/giới hạn ở [log DOC-01 lưu trữ](archive/WORKLOG-2026-11-06-DOC-01.md); phần cài tài liệu không đổi gameplay/runtime/schema. Đã merge qua PR#17.
+- codex/docs-game-studio-handoff→PR17: thẻ game/project.md/một WORKLOG/bàn giao ngắn, thu gọn trước đổi việc và checker budget.
+- Studio c5dac462:116skill/21role/4rules/297blob; discovery theo task, không nạp cả thư viện. [Chi tiết](archive/WORKLOG-2026-11-06-DOC-01.md). Không đổi runtime/schema.
 
 ## MERGE-AUDIT · 06/11/2026 · main c705100
 
@@ -68,4 +66,4 @@
 
 - Snake: hành trình, cloud progress/session, boss/props/audio đã được tích hợp nguồn; vẫn giới hạn preview, chưa đủ release sign-off. [Bằng chứng live-save](SNAKE_LIVE_SAVE_QA.md), [thẻ tiếp tục](plans/SNAKE.md).
 - Launcher M0–M8, Neon NR1–NR4, các đợt Boom/Cosmic/Eat/Block/Blossom/Rainbow đã có trong nguồn; không mặc định coi ghi chú “chưa merge” ở báo cáo cũ là hiện trạng.
-- Nối Từ/Duel/commerce có core/test, chưa hoàn tất triển khai sản phẩm; xem đúng thẻ. Không tóm tắt chúng thành “đã xong online/payment”.
+- Nối Từ đã public phần phòng/PK/queue, còn ON5/ON6; Duel/commerce chưa hoàn tất triển khai, xem đúng thẻ; payment vẫn tắt.
