@@ -9,7 +9,7 @@ Chủ dự án yêu cầu plan chi tiết, thêm vị trí quảng cáo Google v
 | Đợt | Nhóm | Bước tiếp theo | Thẻ / chi tiết |
 |---|---|---|---|
 | 0 | Nguồn và QA | BASE-01 bàn giao; QA-ENV cho HTTP fixture/offline runner; ONLINE-V1 xác minh sau PR #21 | [Plan chi tiết](CONTINUATION-2026-11-11.md), [bảo trì](plans/MAINTENANCE.md) |
-| 1 | Quảng cáo Google | AD-01 nội dung/domain/account; AD-02 slot policy/mock trong lúc chờ Google | [ADS](plans/ADS.md), [vị trí](ads/PLACEMENTS.md) |
+| 1 | Quảng cáo Google | AD-01b đã code nội dung (chờ owner); L1/L2 preview local; AD-02a loader còn READY, account/site Ready chờ Google | [ADS](plans/ADS.md), [vị trí](ads/PLACEMENTS.md) |
 | 2 | Snake Legend | R0a baseline → R0b UI/save/Auth → R1 thiết bị/nội dung → R2 candidate/release | [Snake](plans/SNAKE.md) |
 | 3 | Nối Từ/Tank | WC-ON5/ON6, TC-R1 mạng/soak; TC-R2 port P2 còn thiếu | [Nối Từ](plans/WORD-CHAIN.md), [Tank](plans/TANK-CLASH.md) |
 | 4 | Chess/Xiangqi/Caro | DU-R0 staging → DU-R1 từng game → DU-R2 account thật | [Duel](plans/DUEL.md) |

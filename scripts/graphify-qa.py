@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Build a scoped, local AST graph for QA; never dispatch semantic/LLM work."""
+"""Build a scoped, local AST graph for QA or an explicit module scope; never dispatch semantic/LLM work."""
+import argparse
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,13 @@ SCOPES = (
     'src/context/AuthContext.tsx', 'playwright.config.ts',
     'scripts/export-tank-review.mjs', 'scripts/word-chain-preview.mjs',
 )
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--include', action='append', help='Override QA scope with repeatable repo-relative paths')
+selected = parser.parse_args().include
+if selected:
+    SCOPES = tuple(selected)
+    if any(Path(p).is_absolute() or '..' in Path(p).parts or not (ROOT / p).exists() for p in SCOPES):
+        raise SystemExit('Scope paths must exist inside this repository.')
 CODE = {'.ts', '.tsx', '.js', '.mjs', '.cjs', '.py'}
 
 
@@ -52,4 +60,4 @@ version = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=T
 (out / 'QA-SCOPE.json').write_text(json.dumps({'source_commit': version, 'working_tree_changes': subprocess.run(
     ['git', 'diff', '--quiet'], cwd=ROOT).returncode != 0, 'scope': SCOPES,
     'mode': 'local AST only; no LLM; no source upload', 'query_budget': 700}, indent=2) + '\n')
-print('QA graph ready. Query with --budget 700 --depth 1; read only the referenced source ranges.')
+print('Scoped graph ready. Query with --budget 700 --depth 1; read only the referenced source ranges.')

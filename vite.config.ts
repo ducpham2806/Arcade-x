@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'node:fs';
 import {defineConfig} from 'vite';
+import {sitePagesPlugin} from './scripts/site-pages.mjs';
 import {VitePWA} from 'vite-plugin-pwa';
 import {GAME_ASSET_CACHE} from './src/games/packageCache';
 
@@ -10,6 +11,7 @@ export default defineConfig(() => {
   const shellFiles = new Set<string>();
   return {
     plugins: [
+      sitePagesPlugin(),
       react(),
       tailwindcss(),
       { name: 'launcher-shell-only', generateBundle(_options, bundle) {
@@ -91,12 +93,12 @@ export default defineConfig(() => {
         },
         workbox: {
           // Keep installation small: games and artwork are cached on demand.
-          globPatterns: ['index.html', 'assets/*.{js,css,png,svg,webp,woff,woff2}'],
+          globPatterns: ['index.html', 'huong-dan/**/*.html', 'thong-tin/**/*.html', 'assets/*.{js,css,png,svg,webp,woff,woff2}'],
           manifestTransforms: [async entries => ({ manifest: entries.filter(entry => !entry.url.startsWith('assets/') || shellFiles.has(entry.url)), warnings: [] })],
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/preview\/snake(?:\/|$)/, /^\/chronicles-realms\//, /^\/standalone\//],
+          navigateFallbackDenylist: [/^\/(?:huong-dan|thong-tin)(?:\/|$)/, /^\/preview\/snake(?:\/|$)/, /^\/chronicles-realms\//, /^\/standalone\//],
           runtimeCaching: [
             ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'games/word-cross', 'games/word-chain', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
