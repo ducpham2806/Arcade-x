@@ -1,4 +1,5 @@
 import React,{useEffect,useMemo,useState} from 'react';
+import {AdPlacementPreview} from '../ads/AdPlacementPreview';
 import {Search,Play,ArrowUpRight,Heart,Grid2X2,X,Gamepad2,CloudOff} from 'lucide-react';
 import { useGameSession, useLibrary } from '../context/GameContext';
 import {usePlayer} from '../context/PlayerContext';
@@ -29,12 +30,14 @@ const GameCatalogView:React.FC=()=>{
   {storeOpen&&<StoreModal onClose={()=>setStoreOpen(false)}/>}
   <FeaturedCarousel games={catalog.games} onPlay={launchGame} onDetail={openGameDetail}/>
   <div className="launcher-benefits"><span><Gamepad2 size={17}/>Chọn game và chơi ngay</span><span><Heart size={17}/>Lưu những trò bạn thích</span><span><CloudOff size={17}/>Game đơn hỗ trợ chơi offline</span></div>
+  <p className="launcher-intro">Một ván giải đố nhẹ nhàng, một thử thách phản xạ hoặc một trận cùng bạn bè. Chọn trò phù hợp với nhịp của bạn; <a href="/huong-dan/">đọc hướng dẫn chơi</a> nếu muốn làm quen trước ván đầu.</p>
+  <AdPlacementPreview slot="L1" blocked={storeOpen}/>
   {recent.length>0&&<section id="recent-games" className="launcher-recents" aria-labelledby="heading-recently-played"><div className="launcher-section-title"><h2 id="heading-recently-played">Chơi gần đây</h2><span>Quay lại trò bạn thích</span></div><div>{recent.map(game=><button key={game!.id} id={`btn-play-recent-${game!.id}`} onClick={()=>launchGame(game!.id)}><div><GameArtwork gameId={game!.id} variant="icon"/></div><span>{game!.title}</span><ArrowUpRight size={19}/></button>)}</div></section>}
   <section id="game-library" className="launcher-library" aria-labelledby="heading-game-library">
    <div className="launcher-section-title"><div><p className="launcher-eyebrow">TÌM NIỀM VUI MỚI</p><h2 id="heading-game-library">Thư viện game <span>({filtered.length})</span></h2></div><label className="launcher-search"><Search size={19}/><input id="input-search-games" aria-label="Tìm trò chơi" placeholder="Bạn muốn chơi gì?" value={query} onChange={e=>setQuery(e.target.value)}/>{query&&<button aria-label="Xóa tìm kiếm" onClick={()=>setQuery('')}><X size={17}/></button>}</label></div>
    <div className="launcher-categories" aria-label="Thể loại game">{categories.map(([id,label])=><button id={`btn-filter-${id.toLowerCase().replace(/\s+/g,'-')}`} key={id} aria-pressed={category===id} aria-label={id==='Tất Cả'?'Tất Cả Game':label} onClick={()=>setCategory(id)}>{id==='Yêu Thích'&&<Heart size={15}/>} {label}</button>)}</div>
    {source==='device'&&<p className="launcher-local-note">Thư viện trên thiết bị <button onClick={()=>void refresh()}>Làm mới</button></p>}
-   {filtered.length?<div className="cartridge-grid">{filtered.map(game=><LazyGameCard key={game.id} game={game} personalHighScore={profile.stats.highScores[game.id]||0} isFav={favorites.includes(game.id)} onOpenDetail={openGameDetail} onToggleFavorite={toggleFavorite} onLaunchGame={launchGame}/>)}</div>:<div className="launcher-empty"><Search size={34}/><h3>{category==='Yêu Thích'?'Chưa có trò chơi yêu thích':'Không tìm thấy trò chơi phù hợp'}</h3><p>{category==='Yêu Thích'?'Chạm vào trái tim trên thẻ game để lưu vào đây.':'Thử từ khóa khác hoặc xem lại toàn bộ thư viện.'}</p><button id="btn-show-all-games" className="launcher-primary" onClick={reset}>Xem tất cả game</button></div>}
+   {filtered.length?<div className="cartridge-grid">{filtered.map((game,index)=><React.Fragment key={game.id}><LazyGameCard game={game} personalHighScore={profile.stats.highScores[game.id]||0} isFav={favorites.includes(game.id)} onOpenDetail={openGameDetail} onToggleFavorite={toggleFavorite} onLaunchGame={launchGame}/>{index===7&&filtered.length>8&&category==='Tất Cả'&&!query.trim()&&<AdPlacementPreview slot="L2" blocked={storeOpen}/>}</React.Fragment>)}</div>:<div className="launcher-empty"><Search size={34}/><h3>{category==='Yêu Thích'?'Chưa có trò chơi yêu thích':'Không tìm thấy trò chơi phù hợp'}</h3><p>{category==='Yêu Thích'?'Chạm vào trái tim trên thẻ game để lưu vào đây.':'Thử từ khóa khác hoặc xem lại toàn bộ thư viện.'}</p><button id="btn-show-all-games" className="launcher-primary" onClick={reset}>Xem tất cả game</button></div>}
   </section>
  </div>;
 };

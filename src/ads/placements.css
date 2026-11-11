@@ -1,0 +1,10 @@
+.arcade-launcher .launcher-intro {margin:20px 0;color:var(--launcher-text-muted,#536153);max-width:68ch;line-height:1.7}
+.arcade-launcher .launcher-intro a {color:inherit;text-decoration:underline;text-underline-offset:3px}
+.arcade-launcher .ad-placement-preview {grid-column:1 / -1;border:1px dashed #81977e;border-radius:12px;background:#eff3eb;color:#40513c;text-align:center;padding:22px 12px;margin:24px 0;min-width:0;overflow-wrap:anywhere}
+.arcade-launcher .ad-placement-preview span {font-size:10px;letter-spacing:.12em}
+.arcade-launcher .ad-placement-preview p {margin:10px 0 0;font-size:14px}
+.arcade-launcher .ad-placement-l1 {display:none}
+.arcade-launcher .ad-placement-l2 {min-height:180px;align-content:center}
+.arcade-launcher .launcher-info-links {display:flex;flex-wrap:wrap;justify-content:center;gap:12px 24px;margin:16px auto 0}
+.arcade-launcher .launcher-info-links a {text-decoration:underline;text-underline-offset:3px}
+@media(min-width:768px){.arcade-launcher .ad-placement-l1{display:block;min-height:120px;align-content:center}.arcade-launcher .ad-placement-l2{display:none}}

@@ -1,1 +1,4 @@
+# Existing static pages take precedence; unknown content paths must not become the SPA.
+/huong-dan/* /404.html 404
+/thong-tin/* /404.html 404
 /* /index.html 200

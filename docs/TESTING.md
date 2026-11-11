@@ -43,3 +43,7 @@ Playwright tự chạy thêm server tĩnh loopback cho đúng bốn fixture tron
 `npm run test:browser-harness` kiểm raw HTTP với context riêng, query encoding, whitelist404 và trạng thái offline qua reload. Traffic offline do Playwright chặn; helper chỉ gọi Chromium Network.overrideNetworkState khi navigator.onLine lệch, không thay property/event. Probe URL không cache phải fail khi offline và thành công khi online. `test:offline` vẫn kiểm service worker/gói game/từ điển/nút phòng như trước. Không xóa assertion để thích nghi môi trường.
 
 [Graphify theo task](GRAPHIFY.md) giúp tìm phạm vi đọc; cache/graph không commit. Bằng chứng và giới hạn của đợt này ở [QA-ENV](qa/QA-ENV-2026-11-11.md).
+
+## Public content và vị trí quảng cáo preview
+
+Chạy npm run test:ads cho renderer/link nội bộ và launcher preview320–1440px; npm run build rồi npm run test:ads-production để kiểm HTML build, production query không bật preview và service worker mở nội dung offline. Các test không tải Google. Dev /?ads-preview=1 dùng duyệt bố cục L1/L2; chưa là SDK/provider/consent hoặc bằng chứng site Ready. Nội dung nguồn ở content/site/*.md và các thư mục con, output dist không sửa tay. SITE_URL là HTTPS origin trong môi trường build (không dùng URL preview thay domain owner); bỏ trống thì không sinh canonical/sitemap. Rule404 Netlify cần kiểm trên deploy sau khi được duyệt.

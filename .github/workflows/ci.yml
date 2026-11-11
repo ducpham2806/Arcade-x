@@ -38,6 +38,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser fixture transport and offline emulation across reload
         run: npm run test:browser-harness
+      - name: Public content and ad placement preview (no live advertising)
+        run: npm run test:ads && npm run test:ads-production
       - name: Launcher idle render budget
         run: npm run test:perf
       - name: Launcher smoke flows

@@ -1,6 +1,6 @@
 # Quảng cáo Google — readiness trước bật thật
 
-Ngày 11/11/2026. Chủ dự án yêu cầu thêm vị trí kiếm tiền, xác nhận chưa có AdSense/site Ready. Commerce hoãn; ads là module riêng. [Plan](../ads/GOOGLE-ADS-PLAN.md), [vị trí](../ads/PLACEMENTS.md), [mock](../../review/ads-placement-proposal.html).
+Ngày 11/11/2026. Chủ dự án yêu cầu thêm vị trí kiếm tiền, xác nhận chưa có AdSense/site Ready. Commerce hoãn; ads là module riêng. [Plan](../ads/GOOGLE-ADS-PLAN.md), [vị trí](../ads/PLACEMENTS.md), [mock](../../review/ads-placement-proposal.html). [Readiness code/giới hạn](../ads/READINESS-2026-11-11.md), nhánh codex/ads-readiness-display-slots từ QA882e12e; chưa merge/deploy.
 
 ## Lựa chọn
 
@@ -9,9 +9,9 @@ Giai đoạn 1 dùng AdSense display manual ngoài gameplay. Không mua traffic 
 | Task | Trạng thái / phụ thuộc | File đích và điều kiện xong |
 |---|---|---|
 | AD-01a account/domain | WAITING owner | Chọn domain, tạo/thêm site và xác minh; lưu status Google thật, không bịa publisher ID |
-| AD-01b nội dung | READY | About/Contact/Privacy, guide HTML public hữu ích, art/license, robots/canonical; liên hệ owner xác nhận |
+| AD-01b nội dung | CODE local; owner/license/domain WAITING | 10 trang HTML từ Markdown, robots và SITE_URL cho canonical/sitemap đã code; còn owner xác nhận contact/chủ thể, dữ liệu/asset/domain và review deploy |
 | AD-02a policy/loader | READY sau chốt layout | src/ads/config.ts, policy.ts, loader.ts, AdProvider/AdSlot.tsx: flag off, consent/context gates, StrictMode single-flight; lỗi ads không cản chơi |
-| AD-02b slots | READY cùng AD-02a | GameCatalog/CSS: desktop L1, mobile L2 sau tám card; G1 sau khi có guide. Ảnh 320–1440px, không che nút/điều hướng |
+| AD-02b slots | PREVIEW local; runtime chờ AD-02a | GameCatalog/CSS có L1 desktop/L2 sau tám card, dev ?ads-preview=1; production tắt cứng. G1/Google provider chưa làm. Kiểm 320–1440px |
 | AD-03 bật thật | WAITING site Ready, ID, CMP, lịch phát hành | Publisher/unit đúng owner, verification/ads.txt theo phương thức chọn, consent phù hợp; một slot pilot; không live ads trong CI/preview |
 | AD-04 đo | Sau AD-03 | AdSense RPM/revenue/viewability và game entry/performance; thêm vị trí sau 7–14 ngày dữ liệu, không hứa doanh thu |
 | AD-05 H5 | BACKLOG, quyền Google và scope user | Natural break solo/opt-in rewarded, pause/mute/resume đúng callback; không giữa PvP, không thưởng click display; XP/xu chung chờ receipt |

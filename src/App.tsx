@@ -169,6 +169,9 @@ const AppContent: React.FC = () => {
                   <span>Chọn game & chơi ngay</span>
                 </div>
               </div>
+              <nav className="launcher-info-links" aria-label="Thông tin ArcadeX">
+                <a href="/huong-dan/">Hướng dẫn chơi</a><a href="/thong-tin/gioi-thieu/">Giới thiệu</a><a href="/thong-tin/lien-he/">Liên hệ</a><a href="/thong-tin/quyen-rieng-tu/">Quyền riêng tư</a><a href="/thong-tin/noi-dung/">Nội dung và hình ảnh</a>
+              </nav>
             </footer>
           </motion.div>
         )}

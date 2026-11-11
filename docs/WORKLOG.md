@@ -2,6 +2,12 @@
 
 Một nhật ký chính, tối đa ba mục; [bản trước lượt plan11/11](archive/WORKLOG-2026-11-11-before-continuation-plan.md) giữ nguyên văn ba mục08/11. Quy trình ở WORKFLOW, kết quả bền vững ở COMPLETED.
 
+## 11/11/2026 · ADS-CONTENT/PREVIEW DONE local · codex/ads-readiness-display-slots
+
+- Từ QA882e12e/PR23, chưa merge/deploy. Có10 trang HTML nguồn Markdown, link launcher, PWA offline/404/canonical theo domain; L1/L2 dev preview, production tắt cứng. AD-01b còn owner/license/domain, AD-02a/G1/SDK/CMP chưa làm; không ads thật/SQL/commerce.
+- Graphify scope launcher/ads177node/328edge, query symbol/contextcall gọn; không LLM/upload. Rà license tìm được nguồn hai từ điển và Blossom, chưa đủ inventory24game.
+- Cuối unit2/2, browser3/3, production HTML/offline/gate qua; launcher7/7, game24/24, offline7/7, motion48/48+VFX25/25, lint/build/bundle/startup/storage/structure/docs/diff qua. Motion lượt đầu47/48, giữ log đỏ; không nới test. [Report](ads/READINESS-2026-11-11.md). Egress vẫn revision1/trống, Render CONNECT403; ONLINE-V1 chờ mạng/account thật.
+
 ## 11/11/2026 · QA-ENV DONE local / ONLINE-V1 WAITING / GRAPHIFY · codex/qa-env-online-v1-graphify
 
 - User cho làm tiếp, yêu cầu Graphify và đầu vào gọn. Nhánh mới từ plan7aae308 (PR22 còn nháp), main9061bfd; chưa merge/deploy.

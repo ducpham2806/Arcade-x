@@ -29,3 +29,14 @@ Chỉ đọc các đoạn source được trả về bằng source_file/source_l
 Đầu phiên vẫn đọc AGENTS → SESSION-HANDOFF → đúng một task card. Sau phần xong: WORKLOG ngắn, COMPLETED/bàn giao cập nhật, chi tiết vào report/archive. Không cat toàn graph/report hoặc cả thư viện skill để bắt đầu phiên.
 
 Graph này chỉ dành QA. Với Snake hoặc module khác, chọn scope tương ứng trước khi query; kết quả rỗng ở graph QA không chứng minh module đó không có code.
+
+## Đổi scope sang module khác
+
+Script giữ tên cũ để tương thích QA; dùng --include lặp để thay toàn bộ SCOPES, chỉ nhận đường dẫn có thật trong repo. Ví dụ lượt ads:
+
+```bash
+GRAPHIFY_BIN=/workspace/.tools/graphify/bin/graphify python3 scripts/graphify-qa.py --include src/App.tsx --include src/components/GameCatalog.tsx --include src/launcher --include src/ads --include scripts/site-pages.mjs --include tests/ads --include vite.config.ts
+graphify query 'AdPlacementPreview' --seed 'AdPlacementPreview()' --context call --budget 700 --depth 1
+```
+
+QA-SCOPE.json vẫn là tên metadata nhưng scope phản ánh lựa chọn mới. Query theo file có thể trả đủ cạnh và vượt budget; chuyển sang symbol seed + --context call trước tăng budget. Lượt ads177node/328edge, query cuối chỉ hai node/một cạnh; test inline thiếu symbol thì rg đúng file.
