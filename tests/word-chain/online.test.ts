@@ -1,3 +1,4 @@
+import { reviewURL } from '../helpers/review-url';
 import {test,expect,type Page} from '@playwright/test';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync} from 'node:fs';
@@ -17,7 +18,7 @@ test.beforeAll(()=>{
  writeFileSync(ERRORS,`<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nối Từ · kiểm phục hồi lỗi</title><style>html,body,#root{margin:0;height:100%;background:#17112e}${css}</style><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></html>`);
 });
 const pane=(page:Page,name:string)=>page.locator(`.nt-lab-pane[data-player="${name}"]`);
-async function open(page:Page){await page.setViewportSize({width:1600,height:900});await page.goto('file://'+LAB);await expect(page.locator('.nt-lab-pane .nt-home')).toHaveCount(4,{timeout:15000});}
+async function open(page:Page){await page.setViewportSize({width:1600,height:900});await page.goto(reviewURL(test.info(), LAB));await expect(page.locator('.nt-lab-pane .nt-home')).toHaveCount(4,{timeout:15000});}
 
 test('private room: code join, ready check, synced chain, leaving mid-match',async({page})=>{
  test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(String(e)));
@@ -107,7 +108,7 @@ test('matchmaking cancel releases the chair and allows a new queue visit',async(
 
 // New error screenshots stay outside the public CI artifact glob; publication review is pending.
 test('temporary provider outage keeps a retry action and can recover into the room',async({page})=>{
- await page.setViewportSize({width:390,height:844});await page.goto('file://'+ERRORS+'?scenario=503');
+ await page.setViewportSize({width:390,height:844});await page.goto(reviewURL(test.info(), ERRORS, { scenario: '503' }));
  await page.getByTestId('nt-create-room').click();
  await expect(page.getByRole('status')).toContainText('Máy chủ phòng đang tạm gián đoạn');
  await expect(page.getByRole('button',{name:'Thử lại',exact:true})).toBeEnabled();
@@ -118,7 +119,7 @@ test('temporary provider outage keeps a retry action and can recover into the ro
 });
 
 test('membership expiry after network loss clears the old outage notice and permits a new room',async({page})=>{
- await page.setViewportSize({width:390,height:844});await page.goto('file://'+ERRORS+'?scenario=expired');
+ await page.setViewportSize({width:390,height:844});await page.goto(reviewURL(test.info(), ERRORS, { scenario: 'expired' }));
  await page.getByTestId('nt-create-room').click();await expect(page.getByTestId('nt-room-code')).toHaveText('TEST22');
  await expect(page.getByRole('status')).toContainText('Mất kết nối',{timeout:6000});
  await expect(page.getByRole('alert')).toContainText('Phiên trong phòng đã kết thúc',{timeout:6000});

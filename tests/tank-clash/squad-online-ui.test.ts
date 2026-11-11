@@ -1,3 +1,4 @@
+import { reviewURL } from '../helpers/review-url';
 import { test, expect, type Page, type Browser, type BrowserContext } from '@playwright/test';
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
 import path from 'node:path';
@@ -18,7 +19,7 @@ test.afterEach(async () => { await Promise.all(contexts.splice(0).map(c => c.clo
 async function open(browser: Browser, name: string, viewport = { width: 1280, height: 760 }) {
   const context = await browser.newContext({ viewport }); contexts.push(context);
   const page = await context.newPage(); page.on('pageerror', e => errors.push(e.message));
-  await page.goto(`file://${PREVIEW}?server=ws://127.0.0.1:${PORT}/tank`);
+  await page.goto(reviewURL(test.info(), PREVIEW, { server: `ws://127.0.0.1:${PORT}/tank` }));
   await page.locator('.tc-card-online').click(); await page.locator('.tc-name').fill(name);
   return page;
 }
@@ -26,7 +27,7 @@ async function restore(browser: Browser, name: string, saved: string) {
   const context=await browser.newContext({viewport:{width:1280,height:760}});contexts.push(context);
   await context.addInitScript(saved=>sessionStorage.setItem('tank-clash.seat',saved),saved);
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(`file://${PREVIEW}?server=ws://127.0.0.1:${PORT}/tank`);await page.locator('.tc-card-online').click();return page;
+  await page.goto(reviewURL(test.info(), PREVIEW, { server: `ws://127.0.0.1:${PORT}/tank` }));await page.locator('.tc-card-online').click();return page;
 }
 
 const roomCode = async (p: Page) => (await p.locator('.tc-roomcode').innerText()).replace(' ', '');
@@ -168,7 +169,7 @@ test('failed queue cancellation stays online; retry cancels before local bot pra
  await context.routeWebSocket(`ws://127.0.0.1:${PORT}/tank`,socket=>{const backend=socket.connectToServer();socket.onMessage(data=>{
   if(JSON.parse(String(data)).type==='unqueue'&&reject){reject=false;socket.send(JSON.stringify({type:'error',code:'WRONG_PHASE',message:'Chưa hủy được, thử lại.',fatal:false}));}else backend.send(data);
  });});
- const p=await context.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(`file://${PREVIEW}?server=ws://127.0.0.1:${PORT}/tank`);await p.locator('.tc-card-online').click();await p.locator('.tc-name').fill('Thử hủy');await p.clock.install();
+ const p=await context.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(reviewURL(test.info(), PREVIEW, { server: `ws://127.0.0.1:${PORT}/tank` }));await p.locator('.tc-card-online').click();await p.locator('.tc-name').fill('Thử hủy');await p.clock.install();
  await p.getByRole('button',{name:'Tìm trận 2v2',exact:true}).click();await expect(p.locator('.tc-queue-wait')).toBeVisible();await p.clock.fastForward(61000);await p.getByRole('button',{name:'Luyện với bot',exact:true}).click();await p.clock.runFor(200);
  await expect(p.locator('.tc-net-status')).toContainText('Chưa hủy được');await expect(p.locator('.tc-queue-wait')).toBeVisible();
  await p.getByRole('button',{name:'Luyện với bot',exact:true}).click();await p.clock.resume();await expect(p.locator('.tc-mode')).toHaveText('2v2 VỚI BOT · HIỆP 1');await expect.poll(async()=>(await(await fetch(`http://127.0.0.1:${PORT}/health`)).json()).queued).toBe(0);

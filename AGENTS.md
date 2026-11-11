@@ -2,6 +2,7 @@
 
 ## Đọc và làm việc
 - Đầu phiên: đọc `docs/SESSION-HANDOFF.md`, sau đó đúng một thẻ việc trong `docs/plans/` qua `docs/PROJECT-PLAN.md`. Chỉ đọc mục mới nhất `docs/WORKLOG.md` nếu cần bằng chứng gần nhất; không mặc định nạp toàn bộ INDEX, plan chi tiết, archive hay thư viện skill.
+- User yêu cầu Graphify: khi hỏi quan hệ code, dùng graph AST theo task và query có seed/budget trước; chỉ đọc đoạn source được chỉ tới. Xem `docs/GRAPHIFY.md`; graph/cache không phải đầu vào để cat toàn bộ, graph cũ phải cập nhật, parser thiếu thì tìm kiếm hẹp.
 - Mọi đầu vào hướng dẫn/session, cấu hình làm việc, plan, task, nhật ký và bàn giao phải là `.md`; cấu hình làm việc ở `project.md`. Dữ liệu/config runtime, mã nguồn và artifact máy đọc giữ định dạng gốc; chỉ mở khi nhiệm vụ cần.
 - Dùng duy nhất `docs/WORKLOG.md` làm nhật ký chính. Trước chuyển việc: tóm tắt task xong (kết quả, quyết định, kiểm tra, giới hạn, bước tiếp) vào `docs/COMPLETED.md`; thu gọn log còn tối đa 3 mục; giữ chi tiết nguyên văn trong `docs/archive/`; cập nhật bàn giao rồi mới bắt đầu việc mới. Quy trình/budget: `docs/WORKFLOW.md`.
 - Mọi phần hoàn tất ghi ngày, nhánh, việc/file, kiểm tra thật và phần còn dở; commit cùng thay đổi. Phân biệt đã code/merge/deploy/nghiệm thu; không dùng báo cáo cũ chứng minh production hiện tại. Trả lời tiếng Việt.

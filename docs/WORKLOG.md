@@ -2,6 +2,12 @@
 
 Một nhật ký chính, tối đa ba mục; [bản trước lượt plan11/11](archive/WORKLOG-2026-11-11-before-continuation-plan.md) giữ nguyên văn ba mục08/11. Quy trình ở WORKFLOW, kết quả bền vững ở COMPLETED.
 
+## 11/11/2026 · QA-ENV DONE local / ONLINE-V1 WAITING / GRAPHIFY · codex/qa-env-online-v1-graphify
+
+- User cho làm tiếp, yêu cầu Graphify và đầu vào gọn. Nhánh mới từ plan7aae308 (PR22 còn nháp), main9061bfd; chưa merge/deploy.
+- Graphify đã cài pin0.9.106; AST-only67file→704node/1715edge, cập nhật8file→710node/1743edge. Đã query có seed/budget; có script cache và hướng dẫn đầu vào ngắn. Không LLM/cloud, chưa đo tỷ lệ tiết kiệm token.
+- QA red/green: Tank1v1 file:// đỏ trước; regression navigator sau reload đỏ trước,2/2 xanh sau sửa bằng API Chromium thật và probe request không cache. Offline7/7 và WS/ops18/18 qua. Cuối24/24UI+harness qua; raw HTTP giữ byte để tránh Viteparse5, whitelist4file; configrelease3010/4327 thêm2/2 qua. Lint/build/bundle/docs/structure/diff qua, ảnh đã xem; giữ assertion và gameplay. ONLINE-V1 proxyCONNECT403 trước Render; chờ egress/account, không kết luận outage. [Report](qa/QA-ENV-2026-11-11.md).
+
 ## 11/11/2026 · PLAN-ADS / MERGE-AUDIT · codex/continuation-plan-google-ads-20261111
 
 - User yêu cầu xác minh main, plan chi tiết phần dở và vị trí Google ads; commerce làm sau, chưa có AdSense/site Ready.

@@ -4,6 +4,7 @@
 
 AGENTS (nếu chưa tự nạp) → [SESSION-HANDOFF](SESSION-HANDOFF.md) → một thẻ `plans/*.md` trong [PROJECT-PLAN](PROJECT-PLAN.md). Không cần đọc cả file chỉ mục này hoặc toàn bộ WORKLOG mỗi phiên.
 
+- Graphify và ngữ cảnh code theo task: [GRAPHIFY](GRAPHIFY.md).
 - Cách đóng/tóm tắt trước đổi task: [WORKFLOW](WORKFLOW.md).
 - Thành quả đã thu gọn: [COMPLETED](COMPLETED.md); nhật ký chính: [WORKLOG](WORKLOG.md).
 - Công nghệ/cấu hình làm việc: [project.md](../project.md).
