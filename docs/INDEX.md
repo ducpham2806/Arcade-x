@@ -13,6 +13,8 @@ AGENTS (nếu chưa tự nạp) → [SESSION-HANDOFF](SESSION-HANDOFF.md) → m�
 
 | Nhiệm vụ | Tài liệu đầu vào tiếp theo |
 |---|---|
+| Quảng cáo Google | [ADS](plans/ADS.md) → [Google plan](ads/GOOGLE-ADS-PLAN.md), [vị trí](ads/PLACEMENTS.md), [mock](../review/ads-placement-proposal.html) |
+| Plan chi tiết / phần chưa merge | [CONTINUATION](CONTINUATION-2026-11-11.md), [merge audit](qa/MERGE-AUDIT-2026-11-11.md) |
 | Lập kế hoạch tổng thể | [PROJECT-PLAN](PROJECT-PLAN.md); IDs/quyết định ở [PENDING-DECISIONS](PENDING-DECISIONS.md), việc chủ dự án ở [OWNER-TODO](OWNER-TODO.md) |
 | Tank P3d | [P3-SPEC](tank-clash/P3-SPEC.md) §7–§9; [PLAN](tank-clash/PLAN.md) §10–§12 khi cần hosting/kiến trúc; [README](tank-clash/README.md) để chạy |
 | Tank network/thiết kế | `tank-clash/P3-review.md` (mốc cục bộ mới nhất), `tank-clash/P2-review.md` (lịch sử), `GDD-v1.md`; ý tưởng sau MVP: `PVP-BACKLOG.md` |

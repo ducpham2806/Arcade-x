@@ -23,6 +23,7 @@ Cần lịch 2–4 người/tài khoản, hai thiết bị và hai mạng. Chu�
 ## TC-R2 · READY · port phần P2 còn thiếu, sau TC-R0
 
 Nhánh cũ `feat/tank-clash-p2-staging-readiness@bdc6f85` dùng `tank-clash.p2.v2`; main dùng P3. Auth/ops đã có bản mới. Không merge nguyên nhánh.
+- PR21/main9061bfd đã thêm handshake deadline75s/10s và loại callback socket cũ; không port lại hai phần này.
 - Đối chiếu `protocol.ts`, `room.ts`, `net-client.ts`; chỉ port phần còn thiếu: epoch match/round chống dữ liệu cũ, control command receipt/ack/retry, timeout/giới hạn queue/reconnect và endpoint-bound resume.
 - [ ] Thiết kế tương thích client/server; nếu đổi wire, đổi version và kế hoạch deploy đồng bộ/rollback. Không phát frontend mới khiến server đang chạy từ chối.
 - [ ] Test snapshot/input cũ, duplicate command, reconnect quá hạn, storage khác endpoint, token refresh; giữ 1v1/2v2/party/queue/spectator. Full CI trước merge.

@@ -1,6 +1,8 @@
 # Commerce — luồng riêng, chưa nhận tiền
 
-Mốc 06/11/2026. Có core checkout/order/review/reconciliation và test; chưa có deployed HTTP endpoint/DB/provider adapter hoàn chỉnh. Checkout vẫn tắt. Không nằm trên đường bắt buộc để thử Tank miễn phí.
+**Hoãn theo yêu cầu chủ dự án ngày11/11/2026.** CM1–CM4 giữ để tham khảo; không bắt đầu, không bật flag/provider/payment trong plan hiện tại.
+
+Mốc nguồn 06/11/2026. Có core checkout/order/review/reconciliation và test; chưa có deployed HTTP endpoint/DB/provider adapter hoàn chỉnh. Checkout vẫn tắt. Không nằm trên đường bắt buộc để thử Tank miễn phí.
 
 **Đầu vào:** [COMMERCE-ROLLOUT](../COMMERCE-ROLLOUT.md), [server README](../../server/commerce/README.md); trước live payment bắt buộc [SECURITY-RECOVERY](../operations/SECURITY-RECOVERY.md). Quyết định còn thiếu #1/#2/#3 tại [PENDING-DECISIONS](../PENDING-DECISIONS.md).
 **File đích:** `server/commerce/`, schema subscriptions, client access/checkout thực tế và tests/subscriptions; đối chiếu import trước sửa.

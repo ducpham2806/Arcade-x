@@ -41,3 +41,11 @@ Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking và tăng từ
 ## Đã quyết · 08/11/2026 · public Nối Từ
 
 User yêu cầu merge/public, bỏ nghiệm thu3/4người; PR19 merge256620c sau CI29. Sau khi xem gói/file/SHA và lý do AGENTS/CUA, user trả lời “Cho phép gói Nối Từ production”: schema + cron/token Vault riêng, functionword-chain-room, CORS đúngarcade-x.netlify.app và legacyJWT OFF riêngfunction tạiwhjatkhhupeqfngakmee. Đây là exception hẹp WC-PUBLIC, không áp dụng script production khác. Gói đã áp và probe thành công; PR20/full CI32 success đã merge086d6ac, NetlifyPublished; public tạo/rời phòng và vào/hủy queue qua. #7 đã quyết và WC-PUBLIC đã phát hành; không hỏi lại quyền này.
+
+
+## Đã quyết · 11/11/2026 · plan tiếp tục và quảng cáo
+
+- Chủ dự án yêu cầu plan chi tiết cho phần dở, **commerce làm sau**. Giữ các flag đang tắt, không mở runtime/payment/thuê game trong đợt này.
+- Yêu cầu thêm vị trí quảng cáo Google để kiếm tiền; xác nhận chưa có AdSense hoặc site chưa được duyệt. Chuẩn bị readiness và slot mock; chưa có quyền/ID để phục vụ ads thật. [ADS](plans/ADS.md).
+- Main9061bfd/PR21 đã merge/phát hành; [audit](qa/MERGE-AUDIT-2026-11-11.md) phân loại nhánh còn lại. Đây không phải yêu cầu merge nguyên các nhánh P2/P3 song song.
+- Domain đăng ký, contact công khai và Google approval còn đầu vào owner; lựa chọn H5/rewarded và thời điểm bật live chưa chốt. Không cần chốt admin/provider commerce lúc này.

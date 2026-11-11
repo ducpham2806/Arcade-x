@@ -17,8 +17,12 @@ LIMITS = {
 LINK = re.compile(r'\[[^\]]*\]\(([^)]+)\)')
 errors = []
 cards = sorted((ROOT / 'docs/plans').glob('*.md'))
-if len(cards) != 7:
-    errors.append(f'Expected 7 module cards; found {len(cards)}')
+expected_cards = {
+    'ADS', 'COMMERCE', 'DUEL', 'GAME-POLISH', 'MAINTENANCE',
+    'SNAKE', 'TANK-CLASH', 'WORD-CHAIN',
+}
+if {card.stem for card in cards} != expected_cards:
+    errors.append('Module cards differ from the required eight: ' + ', '.join(sorted(expected_cards)))
 for card in cards:
     LIMITS[card.relative_to(ROOT).as_posix()] = 6500
 
@@ -28,6 +32,8 @@ inputs += [ROOT / name for name in (
     'docs/templates/TASK.md', 'docs/studio/INDEX.md',
     'docs/studio/INSTALLATION.md', 'docs/OWNER-TODO.md',
     'docs/PENDING-DECISIONS.md', 'docs/TESTING.md',
+    'docs/CONTINUATION-2026-11-11.md', 'docs/ads/GOOGLE-ADS-PLAN.md',
+    'docs/ads/PLACEMENTS.md', 'docs/qa/MERGE-AUDIT-2026-11-11.md',
     '.agents/skills/arcadex-studio/SKILL.md',
 )]
 for file in inputs:
