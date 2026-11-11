@@ -11,6 +11,7 @@ import { PlayerProvider } from './context/PlayerContext';
 import { InventoryProvider } from './context/InventoryContext';
 import { GameProvider, useGameSession, useLauncherUi } from './context/GameContext';
 import { Header } from './components/Header';
+import {LauncherAdProvider} from './ads/LauncherAdProvider';
 import { GameCatalog } from './components/GameCatalog';
 import { NonIntrusiveToastManager } from './components/common/NonIntrusiveToastManager';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
@@ -106,6 +107,7 @@ const AppContent: React.FC = () => {
   }, [setActiveModal]);
 
   return (
+    <LauncherAdProvider blocked={showSplash || showDiscardConfirmModal}>
     <div className={`${!activeGameId ? "launcher-light " : ""}arcade-app relative w-full min-h-screen bg-[#050505] text-slate-200 overflow-x-hidden selection:bg-indigo-500 selection:text-white`}>
       {showSplash && !activeGameId && <SplashScreen onComplete={() => setShowSplash(false)}/>}
 
@@ -224,6 +226,7 @@ const AppContent: React.FC = () => {
       {/* Mounted from the first open on, so tabs and drafts survive closing the panel. */}
       {chatMounted && <div className="platform-ui"><Suspense fallback={null}><GlobalChat isOpen={isChatOpen} onToggle={toggleChat} onOpenShare={() => setActiveModal('share')} /></Suspense></div>}
     </div>
+    </LauncherAdProvider>
   );
 };
 

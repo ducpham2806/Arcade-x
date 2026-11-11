@@ -40,3 +40,5 @@ graphify query 'AdPlacementPreview' --seed 'AdPlacementPreview()' --context call
 ```
 
 QA-SCOPE.json vẫn là tên metadata nhưng scope phản ánh lựa chọn mới. Query theo file có thể trả đủ cạnh và vượt budget; chuyển sang symbol seed + --context call trước tăng budget. Lượt ads177node/328edge, query cuối chỉ hai node/một cạnh; test inline thiếu symbol thì rg đúng file.
+
+AD-02a đổi scope sang src/ads, App/GameCatalog/GameContext/ForceUpdate/LauncherContext và tests/ads:238node/399edge. Query AdSlot() + contextcall/budget700 chỉ6node/6edge; không đọc toàn graph. Cache được refresh sau đổi thứ tự loader và trước commit; nguồn/cache vẫn không thay kiểm browser.

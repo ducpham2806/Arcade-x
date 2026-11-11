@@ -16,7 +16,7 @@
     "test:auth": "playwright test tests/auth",
     "test:qc": "playwright test",
     "test:ads-production": "node tests/ads/production.cjs",
-    "test:ads": "node --test tests/ads/site-pages.test.mjs && playwright test tests/ads/placements.test.ts",
+    "test:ads": "node --test tests/ads/site-pages.test.mjs && playwright test tests/ads/placements.test.ts tests/ads/runtime.test.ts",
     "test:browser-harness": "playwright test tests/helpers/browser-harness.test.ts",
     "test:fast": "npm run -s test:readability && npm run -s test:claude && npm run -s test:storage && npm run -s test:auth-session && npm run -s test:engines && npm run -s test:blossom-engine && npm run -s test:sync && npm run -s test:commerce && npm run -s test:sql && npm run -s test:subscriptions && npm run -s test:battleship && npm run -s test:duel && npm run -s test:duel-server && npm run -s test:social && npm run -s test:artwork && npm run -s test:cosmic-levels && npm run -s test:startup && npm run -s test:boom-art && npm run -s test:boom-pip && npm run -s test:eat && npm run -s test:full-release && npm run -s test:dungeon && npm run -s test:neon && npm run -s test:word-chain && npm run -s test:tank-clash",
     "test:pwa": "node tests/qc/manual/pwa.cjs",

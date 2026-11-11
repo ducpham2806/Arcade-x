@@ -10,6 +10,7 @@ const origin = 'http://127.0.0.1:4325';
   let browser;
   try {
     for (let n=0;n<80;n++) { try { if ((await fetch(origin)).ok) break; } catch {} await new Promise(resolve=>setTimeout(resolve,100)); }
+    assert.equal(fs.existsSync('dist/tests/ads'),false,'local fake harness must not ship');
     const {sitePages} = await import('../../scripts/site-pages.mjs');
     for (const [route] of sitePages()) {
       const response = await fetch(origin+route);

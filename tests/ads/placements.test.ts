@@ -60,3 +60,17 @@ test('direct public pages return real HTML and unknown content paths return 404'
   expect(html).not.toContain('/src/main.tsx');
   expect((await request.get('/huong-dan/missing/')).status()).toBe(404);
 });
+
+
+test('launcher preview yields to splash and the force-update modal', async ({page}) => {
+  await page.goto('/?ads-preview=1');
+  await expect(page.locator('[data-ad-preview="L1"]')).toBeVisible();
+  await page.evaluate(() => {window.__arcadex_sw_update_pending=true;window.dispatchEvent(new Event('arcadex:pwa_need_refresh'));});
+  await expect(page.locator('#force-update-modal-overlay')).toBeVisible();
+  await expect(page.locator('[data-ad-preview]')).toHaveCount(0);
+  await page.evaluate(() => {window.__arcadex_sw_update_pending=false;window.dispatchEvent(new Event('arcadex:pwa_need_refresh'));});
+  await expect(page.locator('[data-ad-preview="L1"]')).toBeVisible();
+  await page.evaluate(() => window.dispatchEvent(new Event('arcadex:trigger_splash')));
+  await expect(page.locator('[data-ad-preview]')).toHaveCount(0);
+  await expect(page.locator('[data-ad-preview="L1"]')).toBeVisible({timeout:15000});
+});
