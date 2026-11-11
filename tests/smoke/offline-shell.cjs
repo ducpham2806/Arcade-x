@@ -6,6 +6,7 @@ const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
 const { existsSync } = require('node:fs');
 const path = require('node:path');
+const { setOffline, syncNetworkState } = require('../helpers/network-state.cjs');
 
 const PORT = 4322;
 const outDir = process.argv.find(a => a.startsWith('--outDir='))?.split('=')[1];
@@ -58,8 +59,14 @@ const outDir = process.argv.find(a => a.startsWith('--outDir='))?.split('=')[1];
     await exitGame();
     console.log('PASS Word Chain package and Vietnamese lexicon cached online');
     await page.waitForTimeout(1500);
-    await context.setOffline(true);
+    await setOffline(context, page, true);
     await page.reload({ waitUntil: 'domcontentloaded' });
+    await syncNetworkState(page, true);
+    const uncachedReachedNetwork = await page.evaluate(async () => {
+      try { return (await fetch('/__qa-offline-probe?nonce=' + crypto.randomUUID(), { cache: 'no-store' })).ok; }
+      catch { return false; }
+    });
+    if (uncachedReachedNetwork) throw new Error('offline runner still has network access');
     await page.locator('#game-library').waitFor({ timeout: 15000 });
     console.log('PASS launcher reloads offline');
     await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
@@ -92,7 +99,7 @@ const outDir = process.argv.find(a => a.startsWith('--outDir='))?.split('=')[1];
     await exitGame();
     await page.locator('#btn-play-word-chain').click();
     await page.locator('.nt-home').waitFor({ timeout: 15000 });
-    await context.setOffline(false);
+    await setOffline(context, page, false);
     await page.waitForFunction(()=>['nt-match','nt-create','nt-join'].every(id=>{
       const button=document.querySelector(`[data-testid="${id}"]`);return button&&!button.disabled;
     }),null,{timeout:10000});

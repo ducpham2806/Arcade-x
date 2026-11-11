@@ -34,3 +34,12 @@ Tài liệu/Studio: `python3 scripts/check-docs.py` kiểm link, budget, Markdow
 - `npm run export:dungeon-review`: sinh `dungeon-titan-equipment-v6-3-playtest.html` một file, chạy offline (không lưu trong git).
 - `blossom-review.html`, `eat-review.html` ở thư mục gốc là trang entry cho dev server (`/blossom-review.html`).
 
+
+
+## QA fixture HTTP và offline (11/11/2026)
+
+Playwright tự chạy thêm server tĩnh loopback cho đúng bốn fixture trong tests/helpers/review-server.mjs. Origin mặc định http://127.0.0.1:4326, đổi bằng QC_REVIEW_BASE_URL; URL test lấy từ metadata.reviewBaseURL, tách khỏi application baseURL3000/3010. Không dùng file:// hoặc đưa HTML bundle qua Vite parser. Server trả nguyên byte, không liệt kê hay phục vụ file tùy ý trong repo.
+
+`npm run test:browser-harness` kiểm raw HTTP với context riêng, query encoding, whitelist404 và trạng thái offline qua reload. Traffic offline do Playwright chặn; helper chỉ gọi Chromium Network.overrideNetworkState khi navigator.onLine lệch, không thay property/event. Probe URL không cache phải fail khi offline và thành công khi online. `test:offline` vẫn kiểm service worker/gói game/từ điển/nút phòng như trước. Không xóa assertion để thích nghi môi trường.
+
+[Graphify theo task](GRAPHIFY.md) giúp tìm phạm vi đọc; cache/graph không commit. Bằng chứng và giới hạn của đợt này ở [QA-ENV](qa/QA-ENV-2026-11-11.md).

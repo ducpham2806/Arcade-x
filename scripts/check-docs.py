@@ -32,7 +32,7 @@ inputs += [ROOT / name for name in (
     'docs/templates/TASK.md', 'docs/studio/INDEX.md',
     'docs/studio/INSTALLATION.md', 'docs/OWNER-TODO.md',
     'docs/PENDING-DECISIONS.md', 'docs/TESTING.md',
-    'docs/CONTINUATION-2026-11-11.md', 'docs/ads/GOOGLE-ADS-PLAN.md',
+    'docs/GRAPHIFY.md', 'docs/CONTINUATION-2026-11-11.md', 'docs/ads/GOOGLE-ADS-PLAN.md',
     'docs/ads/PLACEMENTS.md', 'docs/qa/MERGE-AUDIT-2026-11-11.md',
     '.agents/skills/arcadex-studio/SKILL.md',
 )]

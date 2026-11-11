@@ -13,3 +13,8 @@ Mốc 06/11/2026; chỉ mở mục phù hợp nhiệm vụ. Luật đầu vào/t
 **Kiểm theo phạm vi:** test cũ đúng suite; art → artwork/bundle + browser; phòng chung → 3 bộ server/schema/UI; docs → `python3 scripts/check-docs.py` và `npm run test:claude`. Không chạy lại full game CI cho sửa prose thuần; không coi doc check là nghiệm thu gameplay.
 
 **Tài liệu đầu vào:** [TESTING](../TESTING.md) cho test, [GAME-ARTWORK](../GAME-ARTWORK.md) và pipeline cho art, [TECH-DEBT](../TECH-DEBT.md) cho phòng chung. Mỗi phần hoàn tất phải thu gọn/checkpoint trước task kế tiếp; không nạp log nguồn Studio vào mỗi phiên.
+
+
+## QA-ENV / Graphify · 11/11/2026 · DONE local, chưa merge
+
+User cho triển khai bước0. Graphify AST/query cục bộ đã dùng, đầu vào theo [GRAPHIFY](../GRAPHIFY.md). Fixture HTTP tĩnh và regression offline đã có; 24/24UI+harness,7/7offline,18/18WS và2/2configrelease qua; giữ nguyên gameplay/assertion. [Bằng chứng](../qa/QA-ENV-2026-11-11.md). ONLINE-V1 chờ egress và account thật; không đánh đạt từ loopback.

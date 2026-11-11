@@ -1,3 +1,4 @@
+import { reviewURL } from '../helpers/review-url';
 import { test, expect, type Page } from '@playwright/test';
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
 import path from 'node:path';
@@ -15,7 +16,7 @@ test.afterAll(() => { server?.kill(); });
 const state = (page: Page) => page.evaluate(() => (window as unknown as { __tankClash: { snapshot(): { tanks: { id: string; x: number; y: number; hp: number }[]; round: number } } }).__tankClash.snapshot());
 async function open(page: Page, name: string) {
   await page.setViewportSize({ width: 1280, height: 760 });
-  await page.goto(`file://${PREVIEW}?server=ws://127.0.0.1:${PORT}/tank`);
+  await page.goto(reviewURL(test.info(), PREVIEW, { server: `ws://127.0.0.1:${PORT}/tank` }));
   await page.getByRole('button', { name: /Phòng riêng/ }).click();
   await page.locator('.tc-name').fill(name);
 }

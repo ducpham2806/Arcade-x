@@ -1,3 +1,4 @@
+import { reviewURL } from '../helpers/review-url';
 import { test, expect, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
@@ -11,7 +12,7 @@ for (const viewport of [{ width: 1280, height: 760 }, { width: 844, height: 390 
   test(`2v2 with bots at ${viewport.width}×${viewport.height}: start, play, surrender, rematch`, async ({ page }) => {
     const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
     await page.setViewportSize(viewport);
-    await page.goto(`file://${PREVIEW}`);
+    await page.goto(reviewURL(test.info(), PREVIEW));
     await page.getByRole('button', { name: /Bạn \+ 1 bot vs 2 bot/ }).click();
     await expect(page.locator('.tc-overlay')).toBeHidden();
     await expect(page.locator('.tc-mode')).toHaveText('2v2 VỚI BOT · HIỆP 1');

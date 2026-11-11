@@ -36,6 +36,8 @@ jobs:
         run: npm run test:tank-clash-server
       - name: Install Chromium for browser checks
         run: npx playwright install --with-deps chromium
+      - name: Browser fixture transport and offline emulation across reload
+        run: npm run test:browser-harness
       - name: Launcher idle render budget
         run: npm run test:perf
       - name: Launcher smoke flows
