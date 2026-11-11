@@ -1,31 +1,33 @@
-# Kế hoạch tiếp tục ArcadeX · 08/11/2026
+# Kế hoạch tiếp tục ArcadeX · 11/11/2026
 
-Mốc nguồn main086d6ac: PR19/PR20 đã merge sau full CI29/CI32; Netlify đúng086d6ac Published, phòng/queue production đã kiểm. Render vẫn c705100 (server không đổi). Roadmap không tự mở commerce, thưởng hoặc quyền production mới.
+Nguồn main **9061bfd**: PR #21 đã merge và Netlify production ready đúng SHA; CI #36 xanh trên head PR. [Merge audit](qa/MERGE-AUDIT-2026-11-11.md) xác nhận 28/31 head là tổ tiên main, còn một docs tương đương, một P3 song song và nhánh Tank P2 cần port chọn lọc. Không merge nguyên P2 vào P3.
 
-## Trọng tâm và thứ tự
+## Phạm vi mới
 
-**ONLINE-ERROR ACTIVE08/11:** ưu tiên lỗi Nối Từ503/mất phiên và Tankkẹtkết nối trước Snake. [Triage/PR21](qa/ONLINE-ERROR-2026-11-08.md); sửa client đã kiểm local, chưa deploy; cần đúng phiên Render để xác định service.
+Chủ dự án yêu cầu plan chi tiết, thêm vị trí quảng cáo Google và **hoãn commerce** (11/11). Chưa có AdSense/site Ready. [Plan thực hiện đầy đủ](CONTINUATION-2026-11-11.md) có task, file đích, AC, test, ước lượng và thứ tự. Quảng cáo thật chưa tích hợp; chuẩn bị nội dung và mock trước.
 
-**WC-PUBLIC DONE phát hành08/11:** phòng riêng/nhập mã/PK/ghép trận và34.512từ đã public. User bỏ gate3/4người, giữ CI/fixture; ON5/ON6 còn QA mạng/Auth/thiết bị. [Bằng chứng](word-chain/PUBLIC-RELEASE-2026-11-08.md). Thứ tự tiếp theo là Snake; TC-R0 ca A user để sau. [WORKFLOW](WORKFLOW.md).
-
-| Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
+| Đợt | Nhóm | Bước tiếp theo | Thẻ / chi tiết |
 |---|---|---|---|
-| 1 | Nối Từ / incident online | ONLINE-ERROR đang triage; WC-PUBLIC đã phát hành, ON5/ON6 còn QA | [Nối Từ](plans/WORD-CHAIN.md) |
-| 2 | Snake Legend | R0a baseline→R0b UI/save/Auth thật→R1thiết bị/nội dung→R2candidate/phát hành khi được chọn | [Snake](plans/SNAKE.md) |
-| Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
-| 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
-| 5 | Battleship và game đã tích hợp | GP-R0 xác minh lại khoảng trống QA từ báo cáo cũ; GP-R1 polish theo lỗi tái hiện; GP-R2 Rainbow/Chronicles chỉ khi chọn mở phạm vi | [QA và hoàn thiện game](plans/GAME-POLISH.md) |
-| Riêng | Commerce/thuê game | CM1→CM4: staging quyền → DB/admin → payment → restore/pilot. WAITING runtime/provider/admin; giữ checkout tắt | [Commerce](plans/COMMERCE.md) |
-| Duy trì | Test/art/docs/nợ kỹ thuật | MT1 test cũ, MT2 banner/art, MT3 phòng dùng chung, MT4 dung lượng Git. Không rewrite/LFS khi chưa duyệt | [Bảo trì](plans/MAINTENANCE.md) |
+| 0 | Nguồn và QA | BASE-01 bàn giao; QA-ENV cho HTTP fixture/offline runner; ONLINE-V1 xác minh sau PR #21 | [Plan chi tiết](CONTINUATION-2026-11-11.md), [bảo trì](plans/MAINTENANCE.md) |
+| 1 | Quảng cáo Google | AD-01 nội dung/domain/account; AD-02 slot policy/mock trong lúc chờ Google | [ADS](plans/ADS.md), [vị trí](ads/PLACEMENTS.md) |
+| 2 | Snake Legend | R0a baseline → R0b UI/save/Auth → R1 thiết bị/nội dung → R2 candidate/release | [Snake](plans/SNAKE.md) |
+| 3 | Nối Từ/Tank | WC-ON5/ON6, TC-R1 mạng/soak; TC-R2 port P2 còn thiếu | [Nối Từ](plans/WORD-CHAIN.md), [Tank](plans/TANK-CLASH.md) |
+| 4 | Chess/Xiangqi/Caro | DU-R0 staging → DU-R1 từng game → DU-R2 account thật | [Duel](plans/DUEL.md) |
+| 5 | Game và nền tảng | GP-R0 xác minh → GP-R1 sửa từng lỗi; MT1/MT2; MT3/MT4 theo lợi ích | [Game polish](plans/GAME-POLISH.md), [bảo trì](plans/MAINTENANCE.md) |
+| Theo Google/owner | Ads thật | AD-03 pilot một slot → AD-04 đo; H5 AD-05 riêng | [Google Ads plan](ads/GOOGLE-ADS-PLAN.md) |
+| Hoãn | Commerce | CM1–CM4 để sau; không bật checkout/payment/thuê game | [Commerce](plans/COMMERCE.md) |
 
-Làm một task có bằng chứng rồi mới chuyển task khác. Có thể xử lý việc tài liệu/test độc lập khi chờ người chơi hoặc dịch vụ; không tự chuyển ưu tiên gameplay chỉ vì task chờ.
+Lỗi đang chặn chơi hoặc mất dữ liệu ưu tiên xử lý ngay, không đợi hết một đợt. Có thể tiếp task local độc lập khi chờ thiết bị/Google, không tự bỏ nghiệm thu thật. Ca Tank account A/mã B cũ user để sau vẫn deferred; gate Nối Từ người thật 3–4 người đã được bỏ, không hỏi lại.
 
-## Phần đã đóng, không làm lại
+## Những phần không làm lại
 
-- Nền tảng launcher và các đợt game trước đã vào main; Tank P3b/P3c/P3d, adapter sảnh, sửa motion PC và polish Battleship/Dungeon cũng đã merge qua PR #16.
-- Audit 24 nhánh remote: 21 là tổ tiên main; một nhánh docs có patch tương đương; một nhánh P3 là triển khai song song; nhánh P2 staging còn phần cần port. Không merge lẫn hai wire P2/P3.
-- Tóm tắt bền vững ở [COMPLETED](COMPLETED.md), nhật ký chính [WORKLOG](WORKLOG.md). Plan cũ giữ tại [archive](archive/PROJECT-PLAN-2026-11-05.md), chỉ đọc để truy vết.
+- Tank P3b/P3c/P3d, adapter sảnh, motion và polish Battleship/Dungeon đã merge PR16; game thứ24 đã có trong launcher.
+- Nối Từ public phòng/PK/queue, từ điển34.512 từ và bot/offline đã phát hành. Online flag=true, không còn chờ “bật máy chủ”.
+- PR #21 đã phát hành: handshake watchdog/stale socket Tank; mutation ID/gateway code/notice membership Nối Từ. ONLINE-V1 là kiểm sau sửa, không viết lại patch.
+- Snake journey/cloud/session/boss/props/audio có nguồn; chưa catalog public. Các báo cáo “chưa merge” cũ không dùng làm hiện trạng.
 
-## Điều kiện chung để đóng việc
+## Gate đóng task
 
-Bối cảnh/file đích rõ; tiêu chí task đạt; test phù hợp trên đúng nguồn; thay đổi hiển thị đã quan sát bản chạy; giới hạn thiết bị/mạng/deploy ghi riêng. Full CI trước merge code theo AGENTS. Không đánh dấu game hoàn tất chỉ vì một task hoặc build đã qua. Quyết định chờ ở [PENDING-DECISIONS](PENDING-DECISIONS.md); không hỏi lại các quyết định đã duyệt ở đó.
+Task có file/AC rõ; logic/integration đúng phạm vi, UI được chạy và quan sát, bằng chứng gắn SHA/môi trường/ngày và giới hạn. Full CI trước merge code; chỉ merge/publish khi owner yêu cầu. Không lấy mock/loopback thay account/mạng/thiết bị thật. Quảng cáo cần Google/site approval riêng, không coi plan hoặc slot placeholder là đã kiếm tiền.
+
+[WORKFLOW](WORKFLOW.md), [COMPLETED](COMPLETED.md), [WORKLOG](WORKLOG.md), [quyết định](PENDING-DECISIONS.md). Plan cũ giữ trong archive trước checkpoint11/11.

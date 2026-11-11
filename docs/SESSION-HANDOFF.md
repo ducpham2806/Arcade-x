@@ -1,23 +1,24 @@
-# Bàn giao · 08/11/2026 · ONLINE-ERROR ACTIVE
+# Bàn giao · 11/11/2026 · PLAN-ADS
 
-## Việc đang làm
+## Mốc nguồn đã xác minh
 
-User báo cả Nối Từ 403/409 và Tank kẹt kết nối. Nhánh `codex/fix-online-room-errors`, [PR21 nháp](https://github.com/ducpham2806/Arcade-x/pull/21); bản sửa chưa merge/deploy. [Báo cáo và bước tiếp](qa/ONLINE-ERROR-2026-11-08.md).
+Main **9061bfd** đã merge PR #21; CI #36 xanh trên head 47649f9. Netlify production6af075593632a228f5ca3102 ready/published đúng9061bfd, xác minh API trong chat 11/11. Ghi chú08/11 “PR #21 còn nháp/chưa deploy” đã cũ, nguyên văn giữ ở archive. Health/WSS backend thật ngày 11/11 chưa xác minh vì proxy chặn Render; không coi frontend deploy là bằng chứng backend khỏe.
 
-Public hai account tạo/vào AJEV5P thành công; sau đó bắt được 503 `SUPABASE_EDGE_RUNTIME_SERVICE_DEGRADED`, rồi 403 `NOT_MEMBER`. Ghế chủ phòng mất, chưa phân biệt chắc do hết hạn ready hay vắng mặt. Đã dọn phòng thử. 409 trong ảnh cũ chưa có body để phân loại; không kết luận mọi 409 là bình thường hoặc CORS cấu hình sai.
+Checkout môi trường gốc `work@affc5e8` chậm 38 commit; không reset hoặc xóa bun.lock có sẵn. [Audit nhánh](qa/MERGE-AUDIT-2026-11-11.md):28/31 head nằm trong main; docs tương đương, P3 song song không merge lại; P2 bdc6f85 cần port chọn lọc sang P3.
 
-Tank `/health` bốn lần timeout dù TCP/TLS thành công. Dashboard hết phiên: GitHub chỉ liên kết deploy; Google hiện tại dẫn sang Create account nên dừng trước tạo. Đã hỏi user mở service bằng **tài khoản Render cũ** tại dashboard.render.com/web/srv-dbm1r9t6e07s73asmulg. Chờ đọc event/log/health để xử lý đúng nguyên nhân; chưa khôi phục dịch vụ, không đổi gói/env/SQL.
+## Yêu cầu hiện tại
 
-## Mã nguồn và kiểm tra
+User yêu cầu plan chi tiết phần dở, hoãn commerce và thêm vị trí quảng cáo Google; xác nhận chưa có AdSense/site Ready. Nhánh `codex/continuation-plan-google-ads-20261111` từ main; chỉ tài liệu, checker và mock review, chưa đổi runtime/SQL/ads thật.
 
-- Tank: hạn chờ handshake 75s lần đầu/10s khi nối lại, bỏ callback socket cũ và dọn timer/queue. Repro đỏ trước sửa; 3 regression mới, 69 Tank checks + launcher và 18 WS/ops loopback qua.
-- Nối Từ: giữ mã lỗi gateway; thông báo 503 tiếng Việt; giữ mutation ID khi thử lại; xóa notice mạng cũ khi phiên hết hiệu lực, hướng dẫn vào lại/tạo phòng. 52 checks và toàn bộ 9 UI qua, gồm bot phone/desktop. Hai ảnh lỗi đã xem, giữ local theo báo cáo; duyệt egress ảnh chưa cho phép public. Lint/build/bundle qua trên Node24.
-- PR21 đã push cả hai bản sửa; full CI đúng head mới cần qua trước merge. CI34 chỉ kiểm checkpoint Tank đầu, không dùng làm bằng chứng cho phần Nối Từ mới. `deliverables/` cũ không commit.
+[PROJECT-PLAN](PROJECT-PLAN.md) → [plan đầy đủ](CONTINUATION-2026-11-11.md), [ADS](plans/ADS.md), [vị trí](ads/PLACEMENTS.md). BASE/QA/online → ads readiness/mock → Snake → online hardening/QA → Duel → polish. Chờ Google không chặn Snake. Ads display ngoài game, mặc định off; H5/rewarded là bước riêng cần quyền Google.
 
-## Bối cảnh giữ nguyên
+## Điểm tiếp tục
 
-WC-PUBLIC đã phát hành: PR19/CI29, PR20 head970a941/CI32, merge **086d6ac**; Netlify6af00f400397c396a118ca39 Published. [Gói backend đã duyệt và áp](word-chain/PUBLIC-RELEASE-2026-11-08.md) là exception hẹp ở whjatkhhupeqfngakmee; không hỏi lại hoặc mở rộng SQL/JWT. Không dùng smoke trước incident chứng minh backend hiện khỏe.
+- QA-ENV:15UI bị chặn file://; offline navigator đổi false→reload→true trên browser môi trường. Giữ assert, kiểm HTTP fixture/browser thật trước quy lỗi app.
+- ONLINE-V1: xác minh sau PR #21 bằng đúng backend/account; patch đã phát hành, không làm lại. Nối Từ ON5/ON6 còn Auth/IME/mạng/soak; online XP/xu tắt.
+- Snake: source/save/journey đã có; chưa public. Tiếp SN-R0a→R0b UI chơi/lưu/reload/Auth; chunk~1,35MBgzip cần tối ưu.
+- Tank: P3 đủ source/sảnh, còn TC-R1 thiết bị/mạng/soak; TC-R2 epoch/control receipt/endpoint resume. Watchdog75s/10s và stale callback đã có.
+- Duel chưa cutover UI. Commerce **hoãn**; không bật flag, thêm provider hoặc nhận tiền.
+- Giữ quyết định cũ: ca Tank account A/mã B để sau; không mở lại gate thật3–4 người Nối Từ; Render Free/cap16, không phí mới, production SQL ngoài exception hẹp vẫn cấm.
 
-User bỏ gate thật 3–4 người; fixture vẫn giữ. ON5/ON6 còn thiết bị/mạng/soak/IME/Auth/no-client turn; online chưa XP/xu, cần receipt bền vững. Sau incident tiếp Snake theo roadmap, chưa bắt đầu. TC-R0 ca A/mã B cũ user để sau; Render c705100/Free/cap16, Blueprint paused; commerce tắt.
-
-Studio c5dac462 đủ 116 skill/21 vai trò/297 blob; chỉ nạp theo task. WORKLOG tối đa 3 mục, COMPLETED/archive giữ lịch sử; doc checker trước commit.
+Kiểm của lượt plan ghi trong WORKLOG; chưa chạy gameplay release mới. Tài liệu archive/COMPLETED giữ bằng chứng lịch sử, không dùng để tuyên bố nghiệm thu toàn bộ game.
