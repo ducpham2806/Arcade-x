@@ -8,3 +8,7 @@
 .arcade-launcher .launcher-info-links {display:flex;flex-wrap:wrap;justify-content:center;gap:12px 24px;margin:16px auto 0}
 .arcade-launcher .launcher-info-links a {text-decoration:underline;text-underline-offset:3px}
 @media(min-width:768px){.arcade-launcher .ad-placement-l1{display:block;min-height:120px;align-content:center}.arcade-launcher .ad-placement-l2{display:none}}
+.arcade-launcher .ad-display-slot {grid-column:1 / -1;width:100%;min-width:0;min-height:140px;margin:24px 0;overflow:hidden}
+.arcade-launcher .ad-display-slot>span {display:block;font-size:11px;color:#536153;margin-bottom:8px}
+.arcade-launcher .ad-display-slot>ins {min-height:120px}
+@media(max-width:767px){.arcade-launcher .ad-display-slot{min-height:200px}.arcade-launcher .ad-display-slot>ins{min-height:180px}}

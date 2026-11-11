@@ -14,6 +14,7 @@
 - [ ] Chọn domain đang kiểm soát để đăng ký: site hiện tại hoặc domain riêng nếu đã có. Không cần mua domain chỉ vì plan.
 - [ ] Tạo AdSense/thêm site/xác minh bằng tài khoản của anh; tự nhập thông tin cá nhân, thanh toán và KYC khi Google yêu cầu. Không gửi mật khẩu hoặc giấy tờ qua chat.
 - [ ] Review About/Contact/Privacy mới, xác nhận chủ thể/contact riêng, thời hạn/quy trình dữ liệu và quyền sử dụng asset; hiện contact dùng GitHub Issues công khai. Chốt domain để đặt SITE_URL build rồi kiểm canonical/sitemap.
+- [ ] Chọn/cấu hình CMP phù hợp traffic và review integration, quyền riêng tư, Auto ads off; env Build chỉ production. App hiện giữ consent unknown dù có flag/ID, không tự bật ads.
 - [ ] Khi site Ready, cung cấp publisher ID/ad unit ID công khai và chọn thời điểm bật pilot. [ADS](plans/ADS.md) chuẩn bị slot mock trước; chưa cần ID để lập layout.
 - [ ] H5 interstitial/rewarded chỉ khi chọn sau; display approval không tự cấp quyền H5.
 
