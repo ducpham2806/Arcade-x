@@ -49,7 +49,11 @@ test('cross-tab logout/account switch rejects the old late snapshot',async({page
  await fixture.install(context);await loginSnake(page,a);fixture.holdReads(true);await openSnakeJourney(page);await expect.poll(()=>fixture.calls.state).toBe(1);
  const account=await context.newPage();await account.goto('/preview/snake/');await account.getByRole('button',{name:'Đổi tài khoản'}).click();
  await expect(page.getByRole('button',{name:'Đăng nhập để chơi thử'})).toBeVisible();
- await loginSnake(account,b);await expect(page.getByRole('button',{name:'Chơi bản preview'})).toBeVisible();await openSnakeJourney(page);await expect.poll(()=>fixture.calls.state).toBe(2);
+ await loginSnake(account,b);
+ // Return to the original tab as a player would, without reloading or resolving its held read.
+ await page.bringToFront();
+ await expect(page.getByRole('button',{name:'Chơi bản preview'})).toBeVisible();
+ await openSnakeJourney(page);await expect.poll(()=>fixture.calls.state).toBe(2);
  fixture.releaseRead();await expect(page.locator('[role="status"]').filter({hasText:'Snake Gold 0'})).toBeVisible();
  await expect(page.locator('.journey-best')).toContainText('Một thử thách mới');await expect(page.locator('.snake-journey [data-level="1"]')).toBeDisabled();
  await page.screenshot({path:info.outputPath('account-b-isolated.png')});expect(fixture.snapshots.has(b.id)).toBe(false);expect(fixture.calls.commits).toBe(0);await account.close();
