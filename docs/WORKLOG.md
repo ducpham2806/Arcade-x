@@ -1,6 +1,13 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa ba mục; [bản trước lượt plan11/11](archive/WORKLOG-2026-11-11-before-continuation-plan.md) giữ nguyên văn ba mục08/11. Quy trình ở WORKFLOW, kết quả bền vững ở COMPLETED.
+Một nhật ký chính, tối đa ba mục. [Log trước SN-R1b](archive/WORKLOG-2026-11-12-before-snake-r1b.md). Quy trình ở WORKFLOW, kết quả bền vững ở COMPLETED.
+
+## 12/11/2026 · SN-R1b kiểm nội dung local · codex/snake-r1b-content-review
+
+- Từ bad1d56, tiếp phần nội dung sau SN-R1a local. Suite journey dùng Engine thật đi hết 10 màn, lưu và đọc lại 28/30 sao, 10 receipt và ngọc R01. Kiểm rơi cầu, lượt mới qua đủ ba cầu, Nhện Mẹ 6 hit/3 pha.
+- Chrome preview dùng Auth/Edge fixture kiểm 1-7 rơi nước, chơi lại qua ba cầu, lưu một lần và mở 1-8. Nghe thử báo đã phát.
+- Xem 16 cảnh renderer desktop và khung dọc/ngang. Sửa nút Bắt đầu ở 568×320 bị cắt sát mép khi cuộn. Ca layout chạy lại đạt toàn bộ, giữ tỷ lệ hiện 100%. Typecheck, build/budget, 6 suite Snake, 10 UI và 3 guard qua.
+- Còn human playtest, duyệt art/animation/audio, thiết bị thật và live save/JWT. [Báo cáo và bước tiếp](qa/SNAKE-R1B-2026-11-12.md).
 
 ## 12/11/2026 · SN-R1a local fixes · codex/snake-r1a-controls-runtime
 
@@ -14,10 +21,3 @@ Một nhật ký chính, tối đa ba mục; [bản trước lượt plan11/11](
 - Connector đọc Edge ACTIVE/v2/verify_jwt/digest khớp, không SQL/deploy/actor/grant. Snapshot private ngoài git; replay reference vẫn Auth/store local, không chứng minh DB/JWT/flags thật. Đã xem saved-result/actions/restore screenshots, card cuộn tới CTA đầy đủ.
 - Thêm CLI live dùng existing fixture, preflight thiếu binding exit2 trước network; toàn path live chưa chạy. Network revision1 chưa allow Supabase/không binding; câu hỏi fixture còn chờ. PR27/79cf133: CI43 success, cả snake_ui/verify; CI job riêng lưu evidence; [report](qa/SNAKE-R0B-2026-11-12.md)/[runbook](snake/UI-SAVE-RUNBOOK.md). R0b LIVE WAITING, không public/rewards/commerce/ads thật/merge/deploy.
 - Graphify703node/1608edge localAST, seed/contextcall/budget700; query3/2 và6/6, inline parser thiếu dùng rg hẹp; không nạp assets/base64, không LLM/upload. [Log trước nguyên văn](archive/WORKLOG-2026-11-12-before-snake-r0b.md).
-
-## 12/11/2026 · SN-R0a DONE baseline local · codex/snake-r0a-baseline
-
-- Từ1f4bfc9/PR25, CI41 success.6suite local + package/master art qua; profile mới,4viewport guest/login/reload/bounds và rootSW qua. FixS3 CTA glyph bằng lucide SVG, đã xem ảnh390/1440. Build/lint/bundle/structure/docs/diff qua; thêm baseline vào CI và giữ evidence trước các suite dọn output.
-- Game1.916.911byte raw/1.346.381gzip,92,22% literal nhúng; landing JS909.386/245.671 ước tính (không tính CSS/ảnh), public gatefalse. Không Snake public, không đổi engine/save/GoldGem/SQL/rewards. [Report](qa/SNAKE-R0A-2026-11-12.md).
-- Graphify local579node/1355edge; query có seed/budget, không LLM/upload. Backendflags/live/device/R0b chưa kiểm; môi trường revision1/hosttrống, không chạy --live. [Log trước](archive/WORKLOG-2026-11-12-before-snake-r0a.md) giữ nguyên văn.
-

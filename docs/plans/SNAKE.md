@@ -1,6 +1,6 @@
 # Snake Legend — hoàn tất preview trước phát hành
 
-Mốc12/11/2026 · R0b từ8690fb9/PR26, CI42 parent success. [SN-R0a](../qa/SNAKE-R0A-2026-11-12.md) và [UI-save R0b local](../qa/SNAKE-R0B-2026-11-12.md) đã kiểm; chưa merge/deploy. Nguồn engine tương đương `5a64fef`. PR#12 đã merge journey/cloud progress/session/boss/props/audio. Snake là preview R01, chưa nằm trong catalog public. Đừng làm lại cloud hydrate từ ghi chú lịch sử.
+Mốc 12/11/2026 · SN-R1b từ bad1d56. [SN-R0a](../qa/SNAKE-R0A-2026-11-12.md) và [UI-save R0b local](../qa/SNAKE-R0B-2026-11-12.md) đã kiểm; chưa merge/deploy. Nguồn engine tương đương `5a64fef`. PR#12 đã merge journey/cloud progress/session/boss/props/audio. Snake là preview R01, chưa nằm trong catalog public. Đừng làm lại cloud hydrate từ ghi chú lịch sử.
 
 ## SN-PLAN · DONE tài liệu · 07/11/2026
 
@@ -11,7 +11,7 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 | SN-R0a | DONE baseline local12/11 | 7suite +5nhóm browser guest/route/SW, profile và art master; backend flags/live chưa kiểm lại, để R0b |
 | SN-R0b | LOCAL UI đã kiểm; LIVE WAITING mạng/fixture/grant | 6ca UI gồm win/save/new-device/offline/lost-ack/isolation/concurrency/fixture expiry; còn backend thật và JWT issuer expiry |
 | SN-R1a | LOCAL fixes/coverage12/11; WAITING thiết bị thật | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
-| SN-R1b | BACKLOG sau R0b; cần người chơi | Đủ10màn R01,Nhện Mẹ/props,art/animation/audio và human playtest |
+| SN-R1b | LOCAL 10 màn và renderer đã kiểm; M2 WAITING | Duyệt art, animation, audio và lượt người mới trên thiết bị thật |
 | SN-R2a | BACKLOG sau R0/R1 | Bundle/lazy assets, chính sách account/save/reward, candidate catalog/rollback |
 | SN-R2b | BACKLOG sau quyết định phát hành | CI/merge/deploy và pilot production thật |
 
@@ -27,4 +27,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** user cho làm phần không cần live, nghiệm thu thật để sau. [R1a local](../qa/SNAKE-R1A-2026-11-12.md) đã sửa audio race/pagehide/layout/cutout/Dash;10ca UI qua, thiết bị/FPS/heap/human chưa đạt. Hoàn tất phần live SN-R0b khi có mạng/fixture được cấp. Preflight mới không login nếu thiếu binding; live UI chỉ happy/restore và optional issuer expiry, fault/concurrency DB thật vẫn cần kiểm. Edge metadata ACTIVE/v2/verify_jwt đọc lại được, digest khớp; flags/DB/grant chưa đọc lại. Chưa thêm map/boss/shop; không suy live từ fixture hoặc đóng toàn R0b. Báo cáo phải phân biệt code/merge/deploy/nghiệm thu và ca chưa có thiết bị/người chơi.
+**Tiếp theo:** [SN-R1b local](../qa/SNAKE-R1B-2026-11-12.md) có 10 lượt thắng qua Engine, save 28/30 sao, 16 cảnh renderer và fix CTA 568×320. Còn M2, art/animation/audio, SN-R1a thiết bị thật và SN-R0b live. Chạy phần live theo [runbook](../snake/UI-SAVE-RUNBOOK.md) khi có môi trường thử và fixture hợp lệ. Sau các gate, SN-R2a tách payload/budget và chốt điều kiện phát hành. Giữ Snake ở preview.

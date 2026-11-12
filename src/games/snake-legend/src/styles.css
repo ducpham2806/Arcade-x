@@ -42,6 +42,7 @@
 .snake-app .dash span{display:flex;justify-content:center;align-items:center}
 @media(max-height:580px) and (min-aspect-ratio:6/5){
  .snake-app,.snake-app.story-app{grid-template-rows:44px 36px minmax(0,1fr)}
+ .snake-app.story-app .overlay-card button{scroll-margin-block:4px}
  .snake-app .arenas>button>div{display:flex;align-items:center;gap:6px;white-space:nowrap}
  .snake-app .level-stars{font-size:8px;line-height:1;letter-spacing:0}
  .snake-app .play-column{grid-template-columns:minmax(0,1fr) 168px}

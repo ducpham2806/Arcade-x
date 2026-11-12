@@ -51,7 +51,9 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** thao tác hoàn thành được màn trên điện thoại thật, không kẹt input/cắt UI; không tăng tài nguyên qua nhiều lần vào/thoát. Browser giả lập chỉ là bổ sung, chưa đủ đóng gate thiết bị.
 
-### SN-R1b · BACKLOG sau R0b · hoàn tất R01 và nghiệm thu nội dung · 1–2 ngày + lượt chơi
+### SN-R1b · LOCAL 10 màn đã kiểm, M2 và duyệt nội dung chờ · hoàn tất R01 và nghiệm thu nội dung · 1–2 ngày + lượt chơi
+
+[QA 12/11](../qa/SNAKE-R1B-2026-11-12.md) xác nhận 10 lượt thắng mô phỏng qua Engine, save/restore 28 sao, và render 16 cảnh. Kiểm tiếp với người mới và thiết bị thật theo checklist dưới đây.
 
 **File:** journey/boss/props/audio modules và assets nguồn; dùng đúng tài liệu phần được sửa.
 

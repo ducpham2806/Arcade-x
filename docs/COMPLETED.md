@@ -2,6 +2,11 @@
 
 Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPLETED-2026-11-11-before-continuation-plan.md). “Đã merge/phát hành” không đồng nghĩa nghiệm thu toàn bộ thiết bị.
 
+## SN-R1b · kiểm nội dung local · 12/11/2026
+
+- `codex/snake-r1b-content-review` từ bad1d56. Suite journey kiểm 10 màn bằng Engine thật, lưu/đọc 28/30 sao, ngọc R01 và 10 receipt. Qua ba cầu sau ca rơi nước, thắng Nhện Mẹ đủ 6 hit và 3 pha.
+- Đã xem 16 cảnh renderer, sửa CTA 568×320 bị cắt sát mép khi cuộn. Còn M2, duyệt art/audio, thiết bị và live. [QA SN-R1b](qa/SNAKE-R1B-2026-11-12.md). [Tóm tắt cũ nguyên văn](archive/COMPLETED-2026-11-12-before-snake-r1b.md).
+
 ## SN-R1a · local fixes đã kiểm; thiết bị WAITING · 12/11/2026
 
 - Nhánh codex/snake-r1a-controls-runtime từ79cf133/PR27CI43 success; checkpoint ad7aa50. Sửa audio late resume/stale failure/decode retry, shared Controls pagehide/rotation, landscape cắt Dash và safe area riêng Snake, thay glyph bằng SVG; không physics/digest/save/wallet/SQL/flags.
