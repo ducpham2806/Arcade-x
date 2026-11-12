@@ -1,19 +1,19 @@
-# Bàn giao · 11/11/2026 · AD-02a DONE core local
+# Bàn giao · 12/11/2026 · SN-R0a DONE baseline local
 
-## Nguồn và giới hạn
+## Nguồn
 
-Nhánh codex/ads-policy-loader từ482b8ed/PR24 (CI40 success), xếp trên QA882e12e/PR23 và plan7aae308/PR22. Main9061bfd, chưa merge/deploy các nhánh này. User cho làm tiếp, dùng Graphify/nhật ký/đầu vào gọn; commerce hoãn. Repo gốc work@affc5e8/bun.lock giữ nguyên. Không SDK ads thật đang chạy, không SQL/backend/env release.
+Nhánh codex/snake-r0a-baseline từ1f4bfc9/PR25 (CI41 success), trên PR24/23/22. Chưa merge/deploy. User cho Snake tiếp, giữ Graphify/nhật ký/đầu vào gọn. Repo gốc work@affc5e8 và bun.lock giữ nguyên. Commerce/ads thật tắt, Snake chưa public; không SQL/live fixture/reward flags.
 
-## Đã làm và kiểm
+## Đã kiểm và sửa
 
-AD-02a config/policy/AdProvider/AdSlot/SDK loader + adapter: app flag off, consent unknown; không lấy quyền từ query/login/storage. Env riêng lẻ không đủ request. L1/L2 nối runtime nhưng default không có khung; preview chỉ dev. SDK append cùng lượt eligible, shared promise/client/document, terminal lỗi/timeout; budget một request/document, StrictMode/abort/late result, no-fill giữ reserve. Gate game/modal/chat/splash/discard/force-update/loading/notice/empty/offline/hidden; G1 chưa gắn.
+6suite Snake local+package qua; thêm master hash/dimensions, profile build và browser route. Guest /preview/snake/ ở320/390/844×390/1440 reload/login form/bounds/art qua, không tải engine/wrapper. RootSW giữ canonical preview, không worker thứhai. FixS3 glyphCTA thành SVG lucide, đã xem ảnh trước-sau390/1440. CI mới bao phủ local/preview/profile/runtime và upload trước dọn evidence.
 
-Cuối2renderer+18browser, production10HTML/PWA/0requestGoogle, lint/build/bundle/perf/launcher7/7/offline7/7 qua; storage/startup/readability/structure/docs qua.293,5kB gzip, idle3,9/s≤20. Game24/24 và motion48/48+25/25 kiểm trước sửa SDK cuối; fullCI mới chưa có kết quả, chưa thiết bị/CMP/real fill. Regression khởi tạo SDK redfalse→greentrue đã giữ log. [Report](ads/POLICY-LOADER-2026-11-11.md).
+Landing JS909.386raw/245.671gzip ước tính, CSS451.682/53.357, art243.250byte; game1.916.911/1.346.381,92,22%literal nhúng. Public gatefalse500×1024; không lấy CI xanh làm quyền public. Lint/build/bundle/structure/docs/diff qua. [Report mới](qa/SNAKE-R0A-2026-11-12.md), log/ảnh trong /workspace/arcadex-snake-r0a-evidence-2026-11-12.
 
-Graphify0.9.106 localAST scope ads/context/tests238node/399edge, query AdSlot symbol+contextcall700 trả6node/6edge; không LLM/upload, không đọc graph/archive rộng. [GRAPHIFY](GRAPHIFY.md).
+Graphify0.9.106 localAST scope Snake/preview/tests/profile, seed/contextcall/budget700; entry/config không symbol thì rg hẹp, không nạp assets/base64/archive rộng. Xem GRAPHIFY. CI nhánh mới chưa có kết quả; CI41 chỉ của parent.
 
 ## Bước tiếp
 
-Đọc một thẻ theo PROJECT-PLAN: AD-03 chỉ sau owner account/site Ready/domain/ID/license/CMP/CSP/deploy context. Cần integration CMP thật cấp snapshot, privacy và profile Google/CMP; env preview/CI giữoff. G1 còn sau. Có thể chuyển [Snake](plans/SNAKE.md) trong lúc chờ; không lấy checkpoint cũ làm bằng chứng release mới.
+Đọc [SNAKE](plans/SNAKE.md) rồi đúng mục SN-R0b: cần UI registered login→Play→win→ack→reload/new context, lost-ack/account isolation/JWT thật. Node fixtures/guest browser chưa thay nghiệm thu đó. Backend feature/reward/testActor flags chưa đọc lại; cờ false trong báo cáo07/11 không chứng minh hiện tại. Endpoint wrapper dùng public Supabase/snake-complete, timeout30s. Chưa tìm generator legacy art/audio và build-backend.mjs trong tracked scripts; giữ output và khôi phục pipeline trước sửa các phần này.
 
-ONLINE-V1 vẫn WAITING: status mới revision1/host trống, chưa probe lại Render vì chưa mở host; lần trước CONNECT403 trước backend. User nói sẽ mở egress site/Render/Supabase; khi có hiệu lực và hai phiên account mới kiểm health/SHA/profile/WSS và room/queue thật. Không suy PASS từ mock, không nâng gói. Giữ ca Tank A/mãB sau; Nối Từ bỏ gate3–4người như đã chốt.
+Status mạng hôm12/11 vẫn revision1/hosttrống; user nói sẽ mở egress, chưa thấy hiệu lực. Không tự tạo actor/chạy --live/SQL/grant; cần runbook tương tác và dọn đúng fixture. SN-R1 cần thiết bị/playtest; SN-R2 dùng profile tách payload khỏi JS sau các gate. Không thêm map/boss/shop trước UI-save. ONLINE-V1 vẫn chờ mạng/account. Ads AD02a core đã kiểm ở PR25; AD03 còn siteReady/ID/CMP/domain/license/CSP, G1 chưa gắn.

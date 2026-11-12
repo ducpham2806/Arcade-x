@@ -28,6 +28,16 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+      - name: Snake local suites and preview baseline (no live backend)
+        run: npm run test:snake-local && npm run build:snake-preview && npm run test:snake-preview && npm run analyze:snake-preview
+      - name: Preserve Snake build profile before browser suites clear output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-build-profile
+          path: test-results/snake-baseline/build-profile.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Bundle budget (no chunk > 500 kB, first-load JS <= 400 kB gzip)
         run: npm run test:bundle
       - name: Fast test suites (no browser, no Docker)
@@ -40,6 +50,16 @@ jobs:
         run: npm run test:browser-harness
       - name: Public content and ad placement preview (no live advertising)
         run: npm run test:ads && npm run test:ads-production
+      - name: Snake guest preview route, Auth entry, responsive layout and parent service worker
+        run: npm run test:snake-preview-runtime
+      - name: Preserve Snake route and layout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-preview-runtime-evidence
+          path: test-results/snake-baseline/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Launcher idle render budget
         run: npm run test:perf
       - name: Launcher smoke flows

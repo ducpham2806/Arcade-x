@@ -28,9 +28,14 @@ assert(html.includes('/preview/snake/assets/'),'Preview asset paths survive deep
 assert(!html.includes('registerSW'),'Preview must not register a second worker');
 const art=JSON.parse(fs.readFileSync('art/launcher/snake-legend/manifest.json','utf8'));
 for(const [name,spec] of Object.entries(art.assets)){
+ const master=fs.readFileSync(path.join('art/launcher/snake-legend',spec.source));
+ assert.equal(createHash('sha256').update(master).digest('hex'),spec.sourceSha256,`${name} master hash changed`);
+ assert(master.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])),`${name} master is PNG`);
+ assert.deepEqual([master.readUInt32BE(16),master.readUInt32BE(20)],spec.sourceSize,`${name} master dimensions changed`);
+
  const bytes=fs.readFileSync(`src/preview/snake/art/${name}.webp`);
  assert.equal(createHash('sha256').update(bytes).digest('hex'),spec.sha256);
  assert(bytes.length<=spec.budgetBytes,`${name} exceeds mobile byte budget`);
  assert(Object.values(manifest).some(v=>v.file.endsWith('.webp')&&v.src?.endsWith(`/${name}.webp`)),`${name} must be emitted`);
 }
-console.log(JSON.stringify({status:'PASS',checks:['lazy engine','lazy wrapper','catalog exclusion','production exclusion','deep-link assets','no duplicate service worker','original icon/banner hashes and budgets'],initialChunks:initial.size,gameBytes:fs.statSync(path.join(root,game[1].file)).size}));
+console.log(JSON.stringify({status:'PASS',checks:['lazy engine','lazy wrapper','catalog exclusion','production exclusion','deep-link assets','no duplicate service worker','original master hashes/dimensions and runtime icon/banner hashes/budgets'],initialChunks:initial.size,gameBytes:fs.statSync(path.join(root,game[1].file)).size}));

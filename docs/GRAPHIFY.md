@@ -42,3 +42,5 @@ graphify query 'AdPlacementPreview' --seed 'AdPlacementPreview()' --context call
 QA-SCOPE.json vẫn là tên metadata nhưng scope phản ánh lựa chọn mới. Query theo file có thể trả đủ cạnh và vượt budget; chuyển sang symbol seed + --context call trước tăng budget. Lượt ads177node/328edge, query cuối chỉ hai node/một cạnh; test inline thiếu symbol thì rg đúng file.
 
 AD-02a đổi scope sang src/ads, App/GameCatalog/GameContext/ForceUpdate/LauncherContext và tests/ads:238node/399edge. Query AdSlot() + contextcall/budget700 chỉ6node/6edge; không đọc toàn graph. Cache được refresh sau đổi thứ tự loader và trước commit; nguồn/cache vẫn không thay kiểm browser.
+
+SN-R0a: scope Snake engine/integration + preview + tests/snake + vite.snake-preview.config.ts + scripts/snake-preview-baseline.mjs/test-snake-live.mjs,579node/1355edge. Query SnakeLegendPreview() --context call --budget700 --depth1 trả7node/8edge; inferred method calls đối chiếu source binding. Ba entry/config không symbol dùng rg hẹp. Asset base64 lớn chỉ parse AST tại máy, không cat payload. Cache được refresh khi sửa SVG/master checks và sau commit.
