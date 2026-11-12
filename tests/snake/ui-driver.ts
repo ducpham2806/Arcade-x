@@ -14,7 +14,7 @@ export async function observeEngine(page:Page){
   const modulePath='/src/games/snake-legend/src/core.ts';
   const {Engine}=await import(modulePath);
   const original=Engine.prototype.step;const ids=new WeakMap<object,number>();let serial=0;
-  Engine.prototype.step=function(input){const result=original.call(this,input);if(!ids.has(this))ids.set(this,++serial);(window as any).__snakeUiProbe={engineId:ids.get(this),status:this.status,pos:{...this.pos},tick:this.tick,time:this.time,hearts:this.hearts,score:this.score,guide:this.arena.story?.guide};return result;};
+  Engine.prototype.step=function(input){const result=original.call(this,input);if(!ids.has(this))ids.set(this,++serial);(window as any).__snakeUiProbe={engineId:ids.get(this),status:this.status,pos:{...this.pos},tick:this.tick,time:this.time,hearts:this.hearts,score:this.score,guide:this.arena.story?.guide,input:{...input},dashing:this.dashing,energy:this.energy};return result;};
  });
 }
 export async function openFirstLevel(page:Page){

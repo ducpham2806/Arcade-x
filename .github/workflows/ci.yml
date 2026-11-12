@@ -21,7 +21,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Snake registered UI save, faults, account isolation and competing clears (local fixtures)
+      - name: Snake UI save, touch/layout, resource cleanup and recovery (local fixtures)
         run: npm run test:snake-ui
       - name: Preserve Snake UI fixture evidence
         if: always()
@@ -47,6 +47,8 @@ jobs:
       - run: npm ci
       - name: Install room server dependencies before typechecking browser fixtures
         run: npm run deps:tank-clash
+      - name: Markdown handoff budgets, task links and pinned Studio sources
+        run: python3 scripts/check-docs.py
       - name: Typecheck
         run: npm run lint
       - name: Build

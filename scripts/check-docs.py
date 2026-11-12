@@ -33,7 +33,8 @@ inputs += [ROOT / name for name in (
     'docs/studio/INSTALLATION.md', 'docs/OWNER-TODO.md',
     'docs/PENDING-DECISIONS.md', 'docs/TESTING.md',
     'docs/GRAPHIFY.md', 'docs/CONTINUATION-2026-11-11.md', 'docs/ads/GOOGLE-ADS-PLAN.md',
-    'docs/ads/PLACEMENTS.md', 'docs/ads/READINESS-2026-11-11.md', 'docs/ads/POLICY-LOADER-2026-11-11.md', 'docs/qa/MERGE-AUDIT-2026-11-11.md', 'docs/qa/SNAKE-R0A-2026-11-12.md',
+    'docs/ads/PLACEMENTS.md', 'docs/ads/READINESS-2026-11-11.md', 'docs/ads/POLICY-LOADER-2026-11-11.md', 'docs/qa/MERGE-AUDIT-2026-11-11.md', 'docs/qa/SNAKE-R0A-2026-11-12.md', 'docs/qa/SNAKE-R0B-2026-11-12.md',
+    'docs/qa/SNAKE-R1A-2026-11-12.md', 'docs/snake/UI-SAVE-RUNBOOK.md',
     '.agents/skills/arcadex-studio/SKILL.md',
 )]
 for file in inputs:

@@ -2,9 +2,15 @@
 
 Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPLETED-2026-11-11-before-continuation-plan.md). “Đã merge/phát hành” không đồng nghĩa nghiệm thu toàn bộ thiết bị.
 
+## SN-R1a · local fixes đã kiểm; thiết bị WAITING · 12/11/2026
+
+- Nhánh codex/snake-r1a-controls-runtime từ79cf133/PR27CI43 success; checkpoint ad7aa50. Sửa audio late resume/stale failure/decode retry, shared Controls pagehide/rotation, landscape cắt Dash và safe area riêng Snake, thay glyph bằng SVG; không physics/digest/save/wallet/SQL/flags.
+- 10UI (239,1s,0skip/flaky)/3guard,6suite local/audio race, lint,root/preview build/package/bundle và5nhóm guest/SW qua.3vòng resource1RAF/1RO/9listener/1AudioContext→0 sau exit;5viewport/native CDP input/insets/rotation, ảnh đã xem. Không heap/60FPS/thiết bị thật claim.
+- CI Snake mở rộng4ca controls. Graphify642/1462, query3/2 budget700,0LLM/upload; log/COMPLETED cũ giữ trong archive trước R1a. [Report và việc kiểm sau](qa/SNAKE-R1A-2026-11-12.md). Chưa merge/deploy/public; R0b live và R1 thiết bị/human vẫn WAITING theo user, không tự mở commerce/ads/reward.
+
 ## SN-R0b · DONE local UI coverage; LIVE WAITING · 12/11/2026
 
-- Nhánh codex/snake-r0b-ui-save từ8690fb9/PR26, parent CI42 success.6ca browser UI đã qua: thắng/lưu/restore stars/best/unlock, offline, lostACK/idempotency, account isolation, cạnh tranh2context/lateACK, fixture expiry không remount. Không sửa engine/save/private hoặc shared wallet; chưa có lỗi product cần sửa.
+- Nhánh codex/snake-r0b-ui-save từ8690fb9/PR26, parent CI42 success; PR27/79cf133 CI43 success (verify+snake_ui).6ca browser UI đã qua: thắng/lưu/restore stars/best/unlock, offline, lostACK/idempotency, account isolation, cạnh tranh2context/lateACK, fixture expiry không remount. Không sửa engine/save/private hoặc shared wallet; chưa có lỗi product cần sửa.
 - Thêm fixture replay bằng public Engine, driver pointer/frame thật, live runner riêng có preflight/UID guard/no-secret traces, CI job/artifact riêng.3guard, typecheck,6suite Snake cũ/structure/diff qua; snapshot verifier private đối chiếu cùng6ca qua (3,2phút), không skip/flaky; không đưa source server vào git.
 - Metadata Edge đọc ACTIVE/v2/verify_jwt/digest khớp; DB flags/grant/RLS/JWT thật chưa xác nhận. Live runner path chưa chạy vì network/binding chưa có. Không đóng toàn R0b, không merge/deploy/public/reward. [Bằng chứng/giới hạn](qa/SNAKE-R0B-2026-11-12.md), [runbook bước live](snake/UI-SAVE-RUNBOOK.md); archive giữ log trước checkpoint.
 - Graphify scope nhỏ703node/1608edge, seed/contextcall/budget700,0LLM/upload; đã xem ảnh saved/actions/restore. Tiếp live UI/JWT/fault/concurrency và cleanup đúng fixture khi đủ điều kiện, không chuyển thêm map/boss/shop.
@@ -24,35 +30,6 @@ Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPL
 - Graphify238node/399edge localAST, query6node/6edge; archive log/COMPLETED nguyên văn trước checkpoint. [Thiết kế, bằng chứng, gate còn lại](ads/POLICY-LOADER-2026-11-11.md); [checkpoint cũ](archive/COMPLETED-2026-11-11-before-ad-policy.md).
 - AD-03 chờ account/site Ready/domain/ID/CMP/license/CSP; G1 chưa gắn. ONLINE-V1 vẫn policyrevision1/host trống và thiếu account thật. Có thể tiếp Snake theo plan trong lúc chờ Google/mạng.
 
-## ADS-CONTENT/PREVIEW · DONE local · 11/11/2026
+## Các mốc trước
 
-- Nhánh codex/ads-readiness-display-slots từ QA882e12e/PR23; chưa merge/deploy. Có10 trang HTML nguồn Markdown, link launcher và PWA offline; robots/404, canonical/sitemap chỉ khi SITE_URL thật.
-- L1 desktop/L2 mobile sau8card chỉ dev ?ads-preview=1; production không bật được, không Google SDK/ads thật. AD-02a xem mục mới; G1/CMP còn sau; AD-01b còn owner/domain/license gate.
-- Unit2/2, browser3/3, production/offline qua; launcher7/7/game24/24/offline7/7, motion48/48+25/25VFX, lint/build/bundle/startup/storage/docs/structure/diff qua. Giữ log motion đỏ lượt đầu; chưa thiết bị thật/CDN/fullCI.
-- Graphify theo scope mới177node/328edge, query2node/1edge; rà nguồn license còn thiếu inventory24game. [Report và bước tiếp](ads/READINESS-2026-11-11.md); [kết quả cũ nguyên văn](archive/COMPLETED-2026-11-11-before-ads-readiness.md).
-
-## QA-ENV · DONE local · 11/11/2026
-
-- Nhánh codex/qa-env-online-v1-graphify từ plan7aae308, chưa merge/deploy. Thay file:// bằng server fixture HTTP loopback/raw byte, whitelist bốn file, cấu hình origin riêng và cwd root.
-- Red/green: navigator lệch sau reload và Vite parse5 từ chối HTML bundle đã tái hiện; dùng API Chromium thật, Playwright vẫn chặn traffic và probe không cache kiểm offline/online. Giữ assertion/gameplay.
-- Cuối:24/24UI+harness, offline7/7, WS/ops18/18, configrelease2/2; lint/build/bundle/doc/structure/diff qua. Đã xem ảnh; [báo cáo](qa/QA-ENV-2026-11-11.md).
-- Graphify/query/cache và đầu vào ngắn đã dùng; ONLINE-V1 chưa đạt vì egress/account thật, không suy từ loopback. FullCI trước merge vẫn cần.
-
-## GRAPHIFY · DONE local · 11/11/2026
-
-- Pin graphifyy0.9.106, AST-only theo scope QA, không LLM/cloud/hook; build67file→704node/1715edge, refresh8file→710node/1743edge.
-- Đã dùng query có seed/budget để lần fixture/transport/server; có giới hạn parser cho inline/config, kiểm source trực tiếp khi graph thiếu.
-- scripts/graphify-qa.py tái tạo cache, docs/GRAPHIFY hướng dẫn ngắn; AGENTS/INDEX giữ graph-first theo task, không nạp report rộng. Chưa đo tỷ lệ token tiết kiệm; Graphify LLM token0.
-- [Bằng chứng QA đang chạy](qa/QA-ENV-2026-11-11.md). Graph không thay test hoặc chứng minh production.
-
-## PLAN-ADS / MERGE-AUDIT · 11/11/2026
-
-- Main9061bfd/PR21 đã merge, CI36 xanh trên head47649f9; Netlify ready đúng main, sửa ghi chú bàn giao cũ.
-- 28/31 head là tổ tiên main; docs patch tương đương, P3 song song, TankP2 còn port chọn lọc. Không merge lẫn P2/P3.
-- User hoãn commerce và yêu cầu Google ads; chưa có AdSense/site Ready. Có plan/task/AC/test và vị trí L1/L2/G1, mock review không SDK.
-- Không đổi runtime, SQL, payment hoặc phục vụ ads thật. Plan là đầu vào thi công, không đánh dấu các task gameplay/ads triển khai xong.
-- Kiểm của lượt này ở WORKLOG; bước tiếp QA-ENV/ONLINE-V1 và ads readiness, rồi Snake theo roadmap.
-
-## Các mốc đã phát hành và module trước
-
-NETLIFY-BUILD/PR17, AUTH-XTAB, WC-L0/PR18 và WC-PUBLIC đã phát hành theo các SHA/bằng chứng trong [checkpoint trước ads](archive/COMPLETED-2026-11-11-before-ads-readiness.md). User bỏ gate3–4người Nối Từ, ON5/ON6 và ca Tank accountA/mãB cũ còn sau; không coi việc merge/public là nghiệm thu mọi thiết bị. Snake còn preview, Duel chưa cutover, commerce hoãn. Bản archive giữ nguyên từng kết quả/giới hạn, không cần đọc lại khi task khác không liên quan.
+Ads content/preview, QA-ENV, Graphify, audit main và các mốc đã phát hành giữ nguyên văn trong [checkpoint trước R1a](archive/COMPLETED-2026-11-12-before-snake-r1a.md). AD03/site/CMP/license và ONLINE-V1 vẫn còn các gate riêng; commerce hoãn. Không dùng kết quả lịch sử chứng minh production hiện tại.

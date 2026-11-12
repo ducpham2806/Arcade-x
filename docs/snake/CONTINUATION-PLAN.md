@@ -27,7 +27,7 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** báo cáo baseline `.md` có SHA/lệnh/kết quả/build sizes và route thực tế. Giữ Snake ngoài catalog public, giữ save format và Gold/Gem riêng.
 
-### SN-R0b · BACKLOG sau R0a · chơi và lưu qua launcher thật · 1–2 ngày + thời gian JWT
+### SN-R0b · local UI đã kiểm12/11; LIVE WAITING · chơi và lưu qua launcher thật · 1–2 ngày + thời gian JWT
 
 **File:** preview wrapper, `integration/`, `src/save-hooks.ts` và cloud/session tests theo vị trí được R0a xác nhận; mở [runbook live](../SNAKE_LIVE_SAVE_QA.md) khi chạy.
 
@@ -39,9 +39,11 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** ảnh/video UI và bằng chứng service của các ca trên cùng build; restore mới và lỗi có thông báo phục hồi rõ. Tách `fixture passed`/`live passed`/`chưa kiểm` trong báo cáo.
 
-### SN-R1a · BACKLOG sau R0a; có thể chuẩn bị trước R0b · điều khiển và thiết bị · 1–2 ngày + thiết bị
+### SN-R1a · local fixes đã kiểm12/11; thiết bị thật WAITING · điều khiển và thiết bị · 1–2 ngày + thiết bị
 
 **File:** input/app/render/styles và wrapper trong `src/games/snake-legend/`; chỉ mở module cần sửa.
+
+[Report local12/11](../qa/SNAKE-R1A-2026-11-12.md): sửa audio resume race, pagehide/rotation input, landscape/cutout và Dash SVG;10ca UI qua. User để nghiệm thu thiết bị/backend thật sau; các tiêu chí dưới vẫn giữ.
 
 - Android Chrome, iPhone Safari và desktop: chạm/vuốt/Dash/Pause, thao tác nhanh, safe area, dọc-ngang, phóng nền/khôi phục, audio mute và quyền phát âm thanh.
 - Rời game/reopen, đổi tab, màn hình khóa: đồng hồ/trạng thái/save theo hợp đồng; không nhân input listener, render loop hoặc audio node.

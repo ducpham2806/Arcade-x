@@ -9,7 +9,7 @@ export const SOUND_EVENTS={
 } as const;
 export type SoundEvent=keyof typeof SOUND_EVENTS;
 export class GameAudio{
- private context?:AudioContext;private master?:GainNode;private buffers=new Map<string,AudioBuffer>();private loading?:Promise<void>;private voices:{event:SoundEvent;source:AudioBufferSourceNode;gain:GainNode;priority:number;serial:number}[]=[];private last=new Map<SoundEvent,number>();private serial=0;private disposed=false;private paused=true;private muted=false;private previewEpoch=0;
+ private context?:AudioContext;private master?:GainNode;private buffers=new Map<string,AudioBuffer>();private loading?:Promise<void>;private voices:{event:SoundEvent;source:AudioBufferSourceNode;gain:GainNode;priority:number;serial:number}[]=[];private last=new Map<SoundEvent,number>();private serial=0;private disposed=false;private paused=true;private muted=false;private previewEpoch=0;private unlockEpoch=-1;
  enabled=false;volume=.45;private hostVolume=1;ready=false;error='';
  constructor(private create:()=>AudioContext=()=>{const Constructor=window.AudioContext||(window as unknown as {webkitAudioContext:typeof AudioContext}).webkitAudioContext;return new Constructor();}){}
  get activeVoices(){return this.voices.length;}
@@ -20,12 +20,17 @@ export class GameAudio{
  setMuted(value:boolean){this.muted=value;if(value)this.stop();this.applyVolume();}
  setPaused(value:boolean){this.paused=value;if(value){this.stop();void this.context?.suspend().catch(()=>{});}}
  private applyVolume(){if(this.context&&this.master)this.master.gain.setTargetAtTime(this.muted?0:this.volume*this.hostVolume,this.context.currentTime,.015);}
- async unlock(){if(this.disposed||!this.enabled||this.muted)return false;try{
+ async unlock(){if(this.disposed||!this.enabled||this.muted)return false;const epoch=this.previewEpoch;this.unlockEpoch=epoch;try{
   const c=this.context??=this.create();if(!this.master){this.master=c.createGain();this.master.gain.value=this.volume*this.hostVolume;this.master.connect(c.destination);}
   // Call resume synchronously inside the initiating gesture, before any decode/HTTP await.
-  const resumed=c.resume();this.loading??=Promise.allSettled(Object.entries(AUDIO_BANK).filter(([id])=>!this.buffers.has(id)).map(async([id,base64])=>{const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));const buffer=await c.decodeAudioData(bytes.buffer);if(!this.disposed)this.buffers.set(id,buffer);})).then(results=>{if(results.some(r=>r.status==='rejected'))throw Error('Audio decode failed');});
-  await Promise.all([resumed,this.loading]);if(this.disposed||!this.enabled||this.muted)return false;this.ready=c.state==='running';this.error=this.ready?'':'Trình duyệt chưa cho phát âm thanh; bấm Nghe thử, Bắt đầu hoặc Tiếp tục.';return this.ready;
- }catch{if(!this.disposed){this.ready=false;this.loading=undefined;this.error='Chưa phát được âm thanh. Có thể thử Nghe thử lại; game vẫn chơi bình thường.';}return false;}}
+  const resumed=c.resume();this.loading??=Promise.allSettled(Object.entries(AUDIO_BANK).filter(([id])=>!this.buffers.has(id)).map(async([id,base64])=>{const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));const buffer=await c.decodeAudioData(bytes.buffer);if(!this.disposed)this.buffers.set(id,buffer);})).then(results=>{if(results.some(r=>r.status==='rejected')){this.loading=undefined;throw Error('Audio decode failed');}});
+  await Promise.all([resumed,this.loading]);if(this.disposed)return false;
+  if(epoch!==this.previewEpoch||!this.enabled||this.muted){
+   // A delayed resume must not wake a cancelled gesture. A newer gesture still owns its resume.
+   if(this.unlockEpoch!==this.previewEpoch||!this.enabled||this.muted){this.ready=false;await c.suspend().catch(()=>{});}return false;
+  }
+  this.ready=c.state==='running';this.error=this.ready?'':'Trình duyệt chưa cho phát âm thanh; bấm Nghe thử, Bắt đầu hoặc Tiếp tục.';return this.ready;
+ }catch{if(!this.disposed&&epoch===this.previewEpoch){this.ready=false;this.error='Chưa phát được âm thanh. Có thể thử Nghe thử lại; game vẫn chơi bình thường.';}return false;}}
  emit(event:SoundEvent){return this.play(event,false);}
  async preview(){const epoch=this.previewEpoch;const ready=await this.unlock();return ready&&epoch===this.previewEpoch?this.play('preview',true):false;}
  private play(event:SoundEvent,menuPreview:boolean){const c=this.context,def=SOUND_EVENTS[event];if(this.disposed||!this.enabled||this.paused&&!menuPreview||this.muted||this.volume*this.hostVolume<=0||!this.ready||!c||c.state!=='running')return false;const buffer=this.buffers.get(def.asset);if(!buffer)return false;const now=c.currentTime;if(now-(this.last.get(event)??-Infinity)<def.cooldown)return false;
