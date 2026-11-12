@@ -2,6 +2,13 @@
 
 Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPLETED-2026-11-11-before-continuation-plan.md). “Đã merge/phát hành” không đồng nghĩa nghiệm thu toàn bộ thiết bị.
 
+## SN-R0b · DONE local UI coverage; LIVE WAITING · 12/11/2026
+
+- Nhánh codex/snake-r0b-ui-save từ8690fb9/PR26, parent CI42 success.6ca browser UI đã qua: thắng/lưu/restore stars/best/unlock, offline, lostACK/idempotency, account isolation, cạnh tranh2context/lateACK, fixture expiry không remount. Không sửa engine/save/private hoặc shared wallet; chưa có lỗi product cần sửa.
+- Thêm fixture replay bằng public Engine, driver pointer/frame thật, live runner riêng có preflight/UID guard/no-secret traces, CI job/artifact riêng.3guard, typecheck,6suite Snake cũ/structure/diff qua; snapshot verifier private đối chiếu cùng6ca qua (3,2phút), không skip/flaky; không đưa source server vào git.
+- Metadata Edge đọc ACTIVE/v2/verify_jwt/digest khớp; DB flags/grant/RLS/JWT thật chưa xác nhận. Live runner path chưa chạy vì network/binding chưa có. Không đóng toàn R0b, không merge/deploy/public/reward. [Bằng chứng/giới hạn](qa/SNAKE-R0B-2026-11-12.md), [runbook bước live](snake/UI-SAVE-RUNBOOK.md); archive giữ log trước checkpoint.
+- Graphify scope nhỏ703node/1608edge, seed/contextcall/budget700,0LLM/upload; đã xem ảnh saved/actions/restore. Tiếp live UI/JWT/fault/concurrency và cleanup đúng fixture khi đủ điều kiện, không chuyển thêm map/boss/shop.
+
 ## SN-R0a · DONE baseline local · 12/11/2026
 
 - Nhánh codex/snake-r0a-baseline từ1f4bfc9/PR25, CI41 parent success. Sáu suite fixture + package qua; master PNG hash/dimensions/WebP budget được kiểm. Không đổi engine/save/private wallet, không public/catalog/reward.

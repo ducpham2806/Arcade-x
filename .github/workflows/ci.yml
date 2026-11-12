@@ -10,6 +10,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  snake_ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Snake registered UI save, faults, account isolation and competing clears (local fixtures)
+        run: npm run test:snake-ui
+      - name: Preserve Snake UI fixture evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-ui-fixture-evidence
+          path: |
+            test-results/snake-ui/
+            test-results/qc-results.json
+          if-no-files-found: ignore
+          retention-days: 7
   verify:
     runs-on: ubuntu-latest
     # Includes all-game motion plus per-game browser suites on the hosted Linux runner.
