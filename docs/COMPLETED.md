@@ -2,6 +2,11 @@
 
 Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPLETED-2026-11-11-before-continuation-plan.md). “Đã merge/phát hành” không đồng nghĩa nghiệm thu toàn bộ thiết bị.
 
+## SN-R2a · ứng viên catalog local · 12/11/2026
+
+- `codex/snake-catalog-candidate` từ 3a3db28. Một thẻ game, gói 36 tệp theo yêu cầu. Chrome đã tải, reload offline, chơi, thử tiếng, thoát và tách save khách/tài khoản. Build mặc định 24 game.
+- Còn nghiệm thu thiết bị, staging và quyết định phát hành. [QA](qa/SNAKE-CATALOG-2026-11-12.md). [Tóm tắt trước ứng viên](archive/COMPLETED-2026-11-12-before-snake-catalog.md).
+
 ## SN-R2a · gói preview local · 12/11/2026
 
 - Nhánh `codex/snake-r2a-preview-assets` từ 2f82945. Tách 20 media nguyên byte, game JS 151.769 byte thay cho 1.917.496. Preview qua budget JS.

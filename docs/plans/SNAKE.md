@@ -1,6 +1,6 @@
 # Snake Legend — hoàn tất preview trước phát hành
 
-Mốc 12/11/2026 · SN-R2a gói preview từ 2f82945. [SN-R0a](../qa/SNAKE-R0A-2026-11-12.md) và [UI-save R0b local](../qa/SNAKE-R0B-2026-11-12.md) đã kiểm; chưa merge/deploy. Nguồn engine tương đương `5a64fef`. PR#12 đã merge journey/cloud progress/session/boss/props/audio. Snake là preview R01, chưa nằm trong catalog public. Đừng làm lại cloud hydrate từ ghi chú lịch sử.
+Mốc 12/11/2026 · SN-R2a ứng viên catalog từ 3a3db28. [SN-R0a](../qa/SNAKE-R0A-2026-11-12.md) và [UI-save R0b local](../qa/SNAKE-R0B-2026-11-12.md) đã kiểm; chưa merge/deploy. Nguồn engine tương đương `5a64fef`. PR#12 đã merge journey/cloud progress/session/boss/props/audio. Snake là preview R01, chưa nằm trong catalog public. Đừng làm lại cloud hydrate từ ghi chú lịch sử.
 
 ## SN-PLAN · DONE tài liệu · 07/11/2026
 
@@ -12,7 +12,7 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 | SN-R0b | LOCAL UI đã kiểm; LIVE WAITING mạng/fixture/grant | 6ca UI gồm win/save/new-device/offline/lost-ack/isolation/concurrency/fixture expiry; còn backend thật và JWT issuer expiry |
 | SN-R1a | LOCAL fixes/coverage12/11; WAITING thiết bị thật | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
 | SN-R1b | LOCAL 10 màn và renderer đã kiểm; M2 WAITING | Duyệt art, animation, audio và lượt người mới trên thiết bị thật |
-| SN-R2a | LOCAL gói preview qua budget | Tích hợp catalog/rollback sau nghiệm thu và quyết định phát hành |
+| SN-R2a | LOCAL ứng viên catalog và gói offline đã kiểm | Nghiệm thu thật và quyết định đưa lên sảnh public |
 | SN-R2b | BACKLOG sau quyết định phát hành | CI/merge/deploy và pilot production thật |
 
 ## Bằng chứng đã có và giới hạn
@@ -27,4 +27,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** [SN-R1b](../qa/SNAKE-R1B-2026-11-12.md) đã kiểm 10 màn và save 28 sao. [SN-R2a](../qa/SNAKE-R2A-2026-11-12.md) đã tách ảnh và âm thanh, game JS 151.769 byte và preview đạt budget. Chủ dự án nghiệm thu sau. Còn M2, Android/iPhone, art/audio và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Khi được chọn phát hành, nối media vào gói offline/candidate catalog, chạy full CI và pilot theo SN-R2b.
+**Tiếp theo:** [Ứng viên catalog](../qa/SNAKE-CATALOG-2026-11-12.md) đã kiểm thẻ, tải gói, mở offline và save trên thiết bị theo owner. Mở bằng `npm run build:snake-catalog` và `npm run preview:snake-catalog`. Còn M2, Android/iPhone, duyệt art/audio và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Sau quyết định phát hành, chốt phạm vi public, chạy full CI và pilot SN-R2b.

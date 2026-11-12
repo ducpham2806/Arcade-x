@@ -5,13 +5,17 @@ import fs from 'node:fs';
 import {defineConfig} from 'vite';
 import {sitePagesPlugin} from './scripts/site-pages.mjs';
 import { launcherVendorChunk } from './scripts/launcher-vendor-chunks';
+import { snakePreviewMedia } from './scripts/snake-preview-media';
+import { snakeCatalogPackage } from './scripts/snake-catalog-package';
 import {VitePWA} from 'vite-plugin-pwa';
-import {GAME_ASSET_CACHE} from './src/games/packageCache';
+import {GAME_ASSET_CACHE,GAME_CODE_CACHE} from './src/games/packageCache';
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+  const snakeCatalog = mode === 'snake-catalog';
   const shellFiles = new Set<string>();
   return {
     plugins: [
+      ...(snakeCatalog ? [snakePreviewMedia(), snakeCatalogPackage()] : []),
       sitePagesPlugin(),
       react(),
       tailwindcss(),
@@ -101,6 +105,16 @@ export default defineConfig(() => {
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/(?:huong-dan|thong-tin)(?:\/|$)/, /^\/preview\/snake(?:\/|$)/, /^\/chronicles-realms\//, /^\/standalone\//],
           runtimeCaching: [
+            ...(snakeCatalog ? [{
+              urlPattern: ({url,sameOrigin}) => sameOrigin && /^\/assets\/snake-[^/]+\.(?:png|webp|wav)$/.test(url.pathname),
+              handler: 'CacheFirst' as const,
+              options: { cacheName: GAME_ASSET_CACHE, matchOptions: { ignoreVary: true }, cacheableResponse: { statuses: [200] } },
+            }, {
+              // Hashed same-origin files carry the same bytes in a download, module import or preload.
+              urlPattern: ({url,sameOrigin}) => sameOrigin && /^\/assets\/[^/]+-[A-Za-z0-9_-]{8}\.(?:js|css)$/.test(url.pathname),
+              handler: 'CacheFirst' as const,
+              options: { cacheName: GAME_CODE_CACHE, matchOptions: { ignoreVary: true }, cacheableResponse: { statuses: [200] } },
+            }] : []),
             ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'games/word-cross', 'games/word-chain', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
               handler: 'CacheFirst' as const,
@@ -157,7 +171,7 @@ export default defineConfig(() => {
               urlPattern: /\.(?:js|css)$/i,
               handler: 'StaleWhileRevalidate',
               options: {
-                cacheName: 'static-resources-cache',
+                cacheName: GAME_CODE_CACHE,
                 expiration: {
                   maxEntries: 80,
                   maxAgeSeconds: 60 * 60 * 24 * 30,
@@ -172,6 +186,7 @@ export default defineConfig(() => {
       }),
     ],
     build: {
+      ...(snakeCatalog ? {outDir:'test-results/snake-catalog-build',manifest:true} : {}),
       rollupOptions: {
         output: {
           // Long-lived vendor chunks: a release that only changes app code keeps these cached.
@@ -182,6 +197,7 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        ...(snakeCatalog ? {'./snake-legend/catalog-entry':path.resolve(__dirname,'src/games/snake-legend/catalog-entry-enabled.ts')} : {}),
       },
     },
     server: {

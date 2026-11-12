@@ -64,9 +64,9 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** checklist từng màn/boss/props và báo cáo người chơi/art/audio có bằng chứng; không còn lỗi chặn tiến trình. Sửa đổi cân bằng có chủ đích và giữ tương thích save.
 
-### SN-R2a · LOCAL gói preview đạt budget · sẵn sàng tích hợp catalog · 1–2 ngày
+### SN-R2a · LOCAL ứng viên catalog và gói offline · sẵn sàng tích hợp catalog · 1–2 ngày
 
-[QA 12/11](../qa/SNAKE-R2A-2026-11-12.md) ghi nhận game JS còn 151.769 byte, ảnh/WAV tách theo nhu cầu và preview đạt ngân sách JS. Chủ dự án sẽ nghiệm thu sau. Các mục catalog và pilot dưới đây vẫn chờ quyết định phát hành.
+[QA 12/11](../qa/SNAKE-R2A-2026-11-12.md) ghi nhận game JS còn 151.769 byte, ảnh/WAV tách theo nhu cầu và preview đạt ngân sách JS. Chủ dự án sẽ nghiệm thu sau. Đã kiểm [ứng viên catalog local](../qa/SNAKE-CATALOG-2026-11-12.md), gồm tải gói theo yêu cầu và mở lại khi tắt mạng. Catalog public và pilot vẫn chờ quyết định phát hành.
 
 **File:** package/entry Snake, registry/catalog/repository nếu được chọn phát hành, art manifests/build pipeline và regression.
 

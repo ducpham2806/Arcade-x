@@ -33,6 +33,16 @@ jobs:
             test-results/qc-results.json
           if-no-files-found: ignore
           retention-days: 7
+      - name: Snake catalog candidate and offline package
+        run: npm run build && npm run build:snake-catalog && npm run test:snake-catalog
+      - name: Preserve Snake catalog candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-catalog-fixture-evidence
+          path: test-results/snake-catalog/
+          if-no-files-found: ignore
+          retention-days: 7
   verify:
     runs-on: ubuntu-latest
     # Includes all-game motion plus per-game browser suites on the hosted Linux runner.

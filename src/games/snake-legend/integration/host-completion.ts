@@ -6,6 +6,7 @@ import type {SaveHooks,SaveStatus} from '../src/save-hooks';
 import type {Input} from '../src/core';
 import type {Clear,StorageLike} from '../src/story-save';
 import type {VerifiedResult} from './verified-result';
+import {snakeAccountStorage} from './storage-scope';
 
 export type StartRequest={actorId:string;levelId:string;requestId:string};
 export type SaveCapability={actorId:string;currentActor:()=>string|null;
@@ -24,10 +25,9 @@ export class HostCompletion implements SaveHooks{
   if(!UUID.test(cap.actorId)||!Number.isSafeInteger(cap.minimumRevision??0)||(cap.minimumRevision??0)<0)throw Error('Invalid save capability');
   const ms=cap.timeoutMs??10000;if(!Number.isFinite(ms)||ms<1||ms>60000)throw Error('Invalid timeout');
   this.lastRevision=cap.minimumRevision??0;
-  this.storage={getItem:k=>store.getItem(this.scopedKey(k)),setItem:(k,v)=>store.setItem(this.scopedKey(k),v)};
+  this.storage=snakeAccountStorage(store,cap.actorId);
   this.outbox=new VerifiedOutbox(store,cap.actorId,async(p,s)=>{this.requireCurrent();const ack=await cap.complete(p,s);this.requireCurrent();return ack;},ms);
  }
- scopedKey(key:string){return 'snake-legend:account:'+this.cap.actorId+':'+key;}
  private current(){return !this.stopped&&this.cap.currentActor()===this.cap.actorId;}
  private requireCurrent(){if(!this.current())throw Error('Tài khoản đã thay đổi. Kết quả cũ được giữ để thử lại đúng tài khoản.');}
  private emit(){if(!this.stopped)for(const f of this.listeners)f();}

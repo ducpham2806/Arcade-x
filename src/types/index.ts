@@ -487,8 +487,10 @@ export interface GameAchievementDef {
 }
 
 export interface GameMetadata {
-  /** Optional imported artwork for a controlled preview; does not register a game. */
+  /** Optional imported icon and banner. */
   artwork?: { icon: string; banner: string };
+  offlinePackage?: string;
+  launcherScores?: boolean;
   id: string;
   title: string;
   shortDesc: string;

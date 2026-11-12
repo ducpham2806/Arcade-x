@@ -3,10 +3,10 @@ import type {StorageLike} from './story-save';
 import {mountGame as mountLab} from './lab-app';
 import {mountStory} from './story-app';
 import {mountJourney,type JourneyChoice,type JourneyArt} from './journey';
-export function mountGame(root:HTMLElement,options:{createSaveSession?:SaveSessionFactory;artwork?:JourneyArt}={}){
+export function mountGame(root:HTMLElement,options:{createSaveSession?:SaveSessionFactory;artwork?:JourneyArt;storage?:StorageLike}={}){
  let hostPaused=false,hostMuted=false,hostVolume:number|undefined,destroyed=false;
  let active:ReturnType<typeof mountStory>|ReturnType<typeof mountLab>|ReturnType<typeof mountJourney>;
- let rawStore:StorageLike;try{rawStore=window.localStorage;}catch{rawStore={getItem(){throw Error('storage blocked');},setItem(){throw Error('storage blocked');}};}
+ let rawStore:StorageLike;try{rawStore=options.storage??window.localStorage;}catch{rawStore={getItem(){throw Error('storage blocked');},setItem(){throw Error('storage blocked');}};}
  const completion=options.createSaveSession?.(rawStore),store=completion?.storage??rawStore;
  function applyHost(){active.setHostPaused(hostPaused);if('setMuted'in active)active.setMuted(hostMuted);if(hostVolume!==undefined&&'setHostVolume'in active)active.setHostVolume(hostVolume);}
  function showStory(choice:JourneyChoice={level:0,resume:true}){if(destroyed)return;active?.destroy();active=mountStory(root,showLab,completion,{levelIndex:choice.level,resumeCheckpoint:choice.resume,onJourney:showJourney});applyHost();}

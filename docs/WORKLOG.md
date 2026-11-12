@@ -1,6 +1,12 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa ba mục. [Log trước SN-R2a](archive/WORKLOG-2026-11-12-before-snake-r2a.md). Quy trình ở WORKFLOW, kết quả bền vững ở COMPLETED.
+Một nhật ký chính, tối đa ba mục. [Log trước ứng viên catalog](archive/WORKLOG-2026-11-12-before-snake-catalog.md). Quy trình ở WORKFLOW, kết quả bền vững ở COMPLETED.
+
+## 12/11/2026 · SN-R2a ứng viên catalog local · codex/snake-catalog-candidate
+
+- Từ 3a3db28, chủ dự án duyệt preview và cho tiếp. Mode ứng viên có một thẻ Rắn Săn Mồi, yêu thích/gần đây/thoát, save khách và tài khoản riêng. Build mặc định vẫn 24 game.
+- Gói tải theo yêu cầu gồm 16 tệp mã/CSS, 20 media. Sửa danh sách sinh trước pass CSS và cache tệp hash khi mở module offline. Chrome kiểm tải, tắt mạng, reload, vào màn và nghe thử. Thông báo offline không che joystick/Dash.
+- [QA và cách mở](qa/SNAKE-CATALOG-2026-11-12.md). Còn thiết bị thật, playtest người mới, staging save/JWT và quyết định phát hành.
 
 ## 12/11/2026 · SN-R2a gói preview local · codex/snake-r2a-preview-assets
 
@@ -14,9 +20,3 @@ Một nhật ký chính, tối đa ba mục. [Log trước SN-R2a](archive/WORKL
 - Chrome preview dùng Auth/Edge fixture kiểm 1-7 rơi nước, chơi lại qua ba cầu, lưu một lần và mở 1-8. Nghe thử báo đã phát.
 - Xem 16 cảnh renderer desktop và khung dọc/ngang. Sửa nút Bắt đầu ở 568×320 bị cắt sát mép khi cuộn. Ca layout chạy lại đạt toàn bộ, giữ tỷ lệ hiện 100%. Typecheck, build/budget, 6 suite Snake, 10 UI và 3 guard qua.
 - Còn human playtest, duyệt art/animation/audio, thiết bị thật và live save/JWT. [Báo cáo và bước tiếp](qa/SNAKE-R1B-2026-11-12.md).
-
-## 12/11/2026 · SN-R1a local fixes · codex/snake-r1a-controls-runtime
-
-- User cho làm phần không cần live, test thật sau; từ79cf133/PR27CI43 success. Checkpoint ad7aa50 và archive trước chuyển task. Red audio resume muộn/stale rejection, lab pagehide và Dash cắt ở844×390 đã sửa; thêm orientation clear, safe-area riêng Snake, dock landscape2cột/Dash SVG. Không đổi engine/save/wallet/SQL/flags.
-- 10UI/3guard,6suite local/audio race, lint,root/preview build/package/bundle và5nhóm guest/SW qua.3vòng play/exit:RAF/RO/listener/audio1/1/9/1→0;5viewport+native inset/touch/rotation qua, đã xem ảnh trước/sau. Render p95 16,8–33,4ms ở headless, không suy60FPS/heap/thiết bị thật. CI Snake bao gồm controls mới; verify thêm check-docs budget/link.
-- Graphify642/1462, seed/contextcall/budget700,0LLM/upload; không nạp payload lớn. [Report/giới hạn](qa/SNAKE-R1A-2026-11-12.md); user giữ nghiệm thu điện thoại/live/human sau, R1a/R0b chưa DONE toàn bộ. Chưa merge/deploy/public/commerce/ads thật. [Log trước nguyên văn](archive/WORKLOG-2026-11-12-before-snake-r1a.md).
