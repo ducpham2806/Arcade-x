@@ -48,7 +48,11 @@ test('cross-tab logout/account switch rejects the old late snapshot',async({page
  fixture.snapshots.set(a.id,{revision:7,levels:{'1-1':{stars:[true,true,true],bestScore:999,bestTime:12}},secrets:[],wallet:{snake_gold:999,snake_gem:7}});
  await fixture.install(context);await loginSnake(page,a);fixture.holdReads(true);await openSnakeJourney(page);await expect.poll(()=>fixture.calls.state).toBe(1);
  const account=await context.newPage();await account.goto('/preview/snake/');await account.getByRole('button',{name:'Đổi tài khoản'}).click();
- await expect(page.getByRole('button',{name:'Đăng nhập để chơi thử'})).toBeVisible();
+ const guestButton={name:'Đăng nhập để chơi thử'};
+ await expect(account.getByRole('button',guestButton)).toBeVisible();
+ await page.bringToFront();
+ await expect(page.getByRole('button',guestButton)).toBeVisible();
+ await account.bringToFront();
  await loginSnake(account,b);
  // Return to the original tab as a player would, without reloading or resolving its held read.
  await page.bringToFront();
