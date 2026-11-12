@@ -103,7 +103,9 @@
     "test:snake-audio": "node tests/snake/audio.mjs",
     "build:snake-audio": "python3 scripts/build-snake-audio.py",
     "preview:word-chain-staging": "node scripts/word-chain-staging-preview.mjs && node scripts/word-chain-staging-server.mjs",
-    "build:word-chain-edge": "node scripts/word-chain-build-edge.mjs"
+    "build:word-chain-edge": "node scripts/word-chain-build-edge.mjs",
+    "test:snake-ui": "node --test tests/snake/ui-live-guard.mjs && playwright test tests/snake/ui-save.test.ts --output=test-results/snake-ui",
+    "test:snake-ui-live": "node scripts/test-snake-ui-live.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

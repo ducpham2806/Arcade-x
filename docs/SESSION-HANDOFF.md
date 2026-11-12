@@ -1,19 +1,17 @@
-# Bàn giao · 12/11/2026 · SN-R0a DONE baseline local
+# Bàn giao · 12/11/2026 · SN-R0b local UI
 
-## Nguồn
+Nhánh `codex/snake-r0b-ui-save` từ8690fb9/PR26 (parent CI42 success), stack trên PR25/24/23/22. Chưa merge/deploy; repo gốc work@affc5e8/bun.lock giữ nguyên. User yêu cầu Graphify/nhật ký/đầu vào gọn; commerce/ads thật tắt, Snake chưa public. Không SQL/grant/fixture mới/reward flags.
 
-Nhánh codex/snake-r0a-baseline từ1f4bfc9/PR25 (CI41 success), trên PR24/23/22. Chưa merge/deploy. User cho Snake tiếp, giữ Graphify/nhật ký/đầu vào gọn. Repo gốc work@affc5e8 và bun.lock giữ nguyên. Commerce/ads thật tắt, Snake chưa public; không SQL/live fixture/reward flags.
+## Kết quả và nguồn
 
-## Đã kiểm và sửa
+Đọc đúng [SNAKE](plans/SNAKE.md), [report R0b](qa/SNAKE-R0B-2026-11-12.md) khi cần chi tiết. Sáu ca registered UI local: pointer win→saved→reload/new context/stars/best/unlock, offline pending→retry, lostACK→reload/idempotent, cross-tab account isolation, hai context cạnh tranh/revision, fixture expiry refresh giữ engine. Public-engine6/6 (3,3phút) và reference-v2 cùng6/6 (3,2phút), không skip/flaky. Ba guard live qua. Typecheck,6suite Snake cũ, structure/diff qua. Không sửa product/save/wallet/engine; thêm tests/driver/fixture, CLI live có guard và CI job riêng giữ evidence. Full CI nhánh mới cần theo dõi trước merge.
 
-6suite Snake local+package qua; thêm master hash/dimensions, profile build và browser route. Guest /preview/snake/ ở320/390/844×390/1440 reload/login form/bounds/art qua, không tải engine/wrapper. RootSW giữ canonical preview, không worker thứhai. FixS3 glyphCTA thành SVG lucide, đã xem ảnh trước-sau390/1440. CI mới bao phủ local/preview/profile/runtime và upload trước dọn evidence.
+Bản Edge snake-complete đọc chỉ qua connector ACTIVE/v2/verify_jwt, engine digest khớp. Snapshot verifier giữ ngoài git, dùng optional reference replay với Auth/store local; không là DB/JWT/live proof. [Runbook UI](snake/UI-SAVE-RUNBOOK.md) live opt-in dùng disposable fixture đã cấp, kiểm UID/state rỗng; không traces/credentials output/SQL, cần operator cleanup. Live path chưa chạy.
 
-Landing JS909.386raw/245.671gzip ước tính, CSS451.682/53.357, art243.250byte; game1.916.911/1.346.381,92,22%literal nhúng. Public gatefalse500×1024; không lấy CI xanh làm quyền public. Lint/build/bundle/structure/docs/diff qua. [Report mới](qa/SNAKE-R0A-2026-11-12.md), log/ảnh trong /workspace/arcadex-snake-r0a-evidence-2026-11-12.
+## Tiếp theo
 
-Graphify0.9.106 localAST scope Snake/preview/tests/profile, seed/contextcall/budget700; entry/config không symbol thì rg hẹp, không nạp assets/base64/archive rộng. Xem GRAPHIFY. CI nhánh mới chưa có kết quả; CI41 chỉ của parent.
+**R0b còn LIVE WAITING**: môi trường network revision1/host Supabase chưa allow, binding fixture/grant chưa có; câu hỏi fixture đang chờ. Không gửi password/token vào chat. Có binding thì preflight, UI live happy/new-device, rồi fault/concurrency trên DB thật, issuer JWT expiry và cleanup readback. Runner mới chỉ happy/restore + optional expiry, không đóng các ca live còn lại. Không tự tạo actor/chạy runner live cũ chỉ vì user nói tiếp tục.
 
-## Bước tiếp
+R1: thiết bị/playtest10màn/art/audio; R2: tách embedded payload sau gate. R0a game1.916.911raw/1.346.381gzip,92,22%literal; public gatefalse. Canonical /preview/snake/, alias không slash khác trên Vite preview. Generator legacy art/audio/backend còn thiếu, giữ output. ONLINE-V1 vẫn chờ mạng/account; AD03 chờ Google/site/CMP/domain/license, G1 chưa gắn.
 
-Đọc [SNAKE](plans/SNAKE.md) rồi đúng mục SN-R0b: cần UI registered login→Play→win→ack→reload/new context, lost-ack/account isolation/JWT thật. Node fixtures/guest browser chưa thay nghiệm thu đó. Backend feature/reward/testActor flags chưa đọc lại; cờ false trong báo cáo07/11 không chứng minh hiện tại. Endpoint wrapper dùng public Supabase/snake-complete, timeout30s. Chưa tìm generator legacy art/audio và build-backend.mjs trong tracked scripts; giữ output và khôi phục pipeline trước sửa các phần này.
-
-Status mạng hôm12/11 vẫn revision1/hosttrống; user nói sẽ mở egress, chưa thấy hiệu lực. Không tự tạo actor/chạy --live/SQL/grant; cần runbook tương tác và dọn đúng fixture. SN-R1 cần thiết bị/playtest; SN-R2 dùng profile tách payload khỏi JS sau các gate. Không thêm map/boss/shop trước UI-save. ONLINE-V1 vẫn chờ mạng/account. Ads AD02a core đã kiểm ở PR25; AD03 còn siteReady/ID/CMP/domain/license/CSP, G1 chưa gắn.
+Graphify0.9.106 AST-only scope Snake/preview/Auth/wrapper/tests/live-script,703node/1608edge; seed/contextcall/budget700/depth1, query3node/2edge hoặc mount6/6. Inline test không symbol dùng rg hẹp; không nạp payload/base64/archive rộng. Evidence ngoài git `/workspace/arcadex-snake-r0b-evidence-2026-11-12/`, log `/tmp/snake-r0b-*`.
