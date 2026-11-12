@@ -2,6 +2,12 @@
 
 Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPLETED-2026-11-11-before-continuation-plan.md). “Đã merge/phát hành” không đồng nghĩa nghiệm thu toàn bộ thiết bị.
 
+## SN-R1a · local fixes đã kiểm; thiết bị WAITING · 12/11/2026
+
+- Nhánh codex/snake-r1a-controls-runtime từ79cf133/PR27CI43 success; checkpoint ad7aa50. Sửa audio late resume/stale failure/decode retry, shared Controls pagehide/rotation, landscape cắt Dash và safe area riêng Snake, thay glyph bằng SVG; không physics/digest/save/wallet/SQL/flags.
+- 10UI (239,1s,0skip/flaky)/3guard,6suite local/audio race, lint,root/preview build/package/bundle và5nhóm guest/SW qua.3vòng resource1RAF/1RO/9listener/1AudioContext→0 sau exit;5viewport/native CDP input/insets/rotation, ảnh đã xem. Không heap/60FPS/thiết bị thật claim.
+- CI Snake mở rộng4ca controls. Graphify642/1462, query3/2 budget700,0LLM/upload; log/COMPLETED cũ giữ trong archive trước R1a. [Report và việc kiểm sau](qa/SNAKE-R1A-2026-11-12.md). Chưa merge/deploy/public; R0b live và R1 thiết bị/human vẫn WAITING theo user, không tự mở commerce/ads/reward.
+
 ## SN-R0b · DONE local UI coverage; LIVE WAITING · 12/11/2026
 
 - Nhánh codex/snake-r0b-ui-save từ8690fb9/PR26, parent CI42 success; PR27/79cf133 CI43 success (verify+snake_ui).6ca browser UI đã qua: thắng/lưu/restore stars/best/unlock, offline, lostACK/idempotency, account isolation, cạnh tranh2context/lateACK, fixture expiry không remount. Không sửa engine/save/private hoặc shared wallet; chưa có lỗi product cần sửa.

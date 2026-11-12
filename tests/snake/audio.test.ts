@@ -15,6 +15,27 @@ class Context{currentTime=0;state='suspended';sampleRate=48000;destination={};re
  resume(){this.resumeCalls++;this.state='running';return Promise.resolve();}suspend(){this.state='suspended';return Promise.resolve();}close(){this.closeCalls++;this.state='closed';return Promise.resolve();}
  decodeAudioData(bytes:ArrayBuffer){this.decodeCalls++;const b=new DataView(bytes),length=Math.ceil((bytes.byteLength-44)/2/b.getUint32(24,true)*this.sampleRate),buffer={length,numberOfChannels:1};if(this.failOnce){this.failOnce=false;return Promise.reject(Error('fixture decode failure'));}if(this.hold)return new Promise<any>(resolve=>this.deferred.push(()=>resolve(buffer)));return Promise.resolve(buffer);}
 }
+// A mobile browser may resolve resume() after the page has already paused/closed its menu.
+class LateResumeContext extends Context{
+ resumes:(()=>void)[]=[];rejects:(()=>void)[]=[];
+ resume(){this.resumeCalls++;return new Promise<void>((resolve,reject)=>{this.resumes.push(()=>{this.state='running';resolve();});this.rejects.push(()=>reject(Error('fixture resume failure')));});}
+}
+for(const cancel of ['pause','disable','mute'] as const){
+ const late=new LateResumeContext(),audio=new GameAudio(()=>late as any);audio.setEnabled(true);const opening=audio.preview();
+ if(cancel==='pause')audio.setPaused(true);else if(cancel==='disable')audio.setEnabled(false);else audio.setMuted(true);
+ late.resumes[0]();assert.equal(await opening,false);assert.equal(late.state,'suspended',`late resume must not wake audio after ${cancel}`);assert.equal(audio.ready,false);audio.destroy();
+}
+// A cancelled old resume cannot suspend a newer valid menu gesture, in either resolution order.
+for(const order of [[0,1],[1,0]]){
+ const late=new LateResumeContext(),audio=new GameAudio(()=>late as any);audio.setEnabled(true);const old=audio.preview();audio.setPaused(true);const fresh=audio.preview();
+ for(const i of order){late.resumes[i]();await Promise.resolve();}
+ assert.deepEqual(await Promise.all([old,fresh]),[false,true]);assert.equal(late.state,'running');assert.equal(audio.ready,true);assert.equal(audio.activeVoices,1);audio.destroy();
+}
+// Cancelling both intents must keep audio asleep even if the older resume resolves last.
+const both=new LateResumeContext(),cancelled=new GameAudio(()=>both as any);cancelled.setEnabled(true);const old=cancelled.preview();cancelled.setPaused(true);const fresh=cancelled.preview();cancelled.setPaused(true);both.resumes[1]();both.resumes[0]();assert.deepEqual(await Promise.all([old,fresh]),[false,false]);assert.equal(both.state,'suspended');cancelled.destroy();
+const staleFailure=new LateResumeContext(),latest=new GameAudio(()=>staleFailure as any);latest.setEnabled(true);const rejectedOld=latest.preview();latest.setPaused(true);const acceptedNew=latest.preview();staleFailure.resumes[1]();assert.equal(await acceptedNew,true);staleFailure.rejects[0]();assert.equal(await rejectedOld,false);assert.equal(latest.ready,true,'stale rejection must not invalidate newer audio');assert.equal(latest.error,'');latest.destroy();
+class FailedResume extends Context{first=true;resume(){if(this.first){this.first=false;return Promise.reject(Error('fixture policy rejection'));}return super.resume();}}
+const policy=new FailedResume();policy.hold=true;const decoding=new GameAudio(()=>policy as any);decoding.setEnabled(true);assert.equal(await decoding.unlock(),false);const resumeRetry=decoding.unlock();assert.equal(policy.decodeCalls,14,'resume rejection must retain the in-flight decode bank');for(const release of policy.deferred)release();assert.equal(await resumeRetry,true);decoding.destroy();
 const context=new Context();let creates=0;const mixer=new GameAudio(()=>{creates++;return context as any;});assert.equal(await mixer.unlock(),false);assert.equal(creates,0,'opt-in never constructs audio automatically');
 mixer.setEnabled(true);const opening=mixer.unlock();assert.equal(context.resumeCalls,1,'resume invoked before awaiting decode');assert.equal(await opening,true);await mixer.unlock();assert.equal(context.decodeCalls,14);assert.equal(context.gains[0].connections,1,'bus stays connected exactly once');assert.equal(mixer.emit('dash'),false,'gameplay paused');
 assert.equal(await mixer.preview(),true,'explicit menu preview works while game is paused');mixer.stop();mixer.setPaused(false);assert(mixer.emit('dash'));assert(!mixer.emit('dash'),'cooldown');context.currentTime+=.46;assert(mixer.emit('dash'));assert.equal(mixer.activeVoices,1,'per-event voice cap');assert(context.sources[1].stopped);mixer.stop();
@@ -33,4 +54,4 @@ const player=new Engine(STORY_LEVELS[0]);let dashEvents=0;for(let i=0;i<20;i++){
 const boss=new Engine(STORY_LEVELS[9]),enc=boss.encounters!;enc.state='recovery';enc.timer=1;let before=readAudioSnapshot(boss);boss.step({x:1,y:0,dash:false});assert.deepEqual(audioEvents(before,readAudioSnapshot(boss)),['bossWeak']);assert.deepEqual(audioEvents(readAudioSnapshot(boss),readAudioSnapshot(boss)),[]);
 enc.state='hurt';enc.timer=1;enc.hits=2;enc.totalHits=2;before=readAudioSnapshot(boss);boss.step({x:1,y:0,dash:false});assert.deepEqual(audioEvents(before,readAudioSnapshot(boss)),['bossPhase']);
 const base=readAudioSnapshot(player);assert.deepEqual(audioEvents(base,{...base,hearts:base.hearts-1,bossState:'weak',dashing:true}),['damage']);assert.deepEqual(audioEvents(base,{...base,status:'won',goal:true}),['win']);assert.deepEqual(audioEvents({...base,dashing:false},{...base,dashing:true,collected:base.collected+1}),['eat','dash']);
-console.log(JSON.stringify({status:'PASS',checks:['PCM source/hash/peak/memory budgets','opt-in gesture unlock','single bus/decode cache','explicit paused preview','cooldown and per-event limits','4-voice priority ceiling','mute/volume/pause teardown','late decode cancellation','failed-buffer-only retry','engine Dash edge and boss transitions','engine immutability'],assets:14,newBytes,decodedBytes48k,maxSourcePeak:peak,worstCaseMixPeak:MAX_SFX_VOICES*.8*peak}));
+console.log(JSON.stringify({status:'PASS',checks:['PCM source/hash/peak/memory budgets','opt-in gesture unlock','single bus/decode cache','explicit paused preview','cooldown and per-event limits','4-voice priority ceiling','mute/volume/pause teardown','late decode/resume cancellation and stale rejection isolation','resume retry retains in-flight decode bank','failed-buffer-only retry','engine Dash edge and boss transitions','engine immutability'],assets:14,newBytes,decodedBytes48k,maxSourcePeak:peak,worstCaseMixPeak:MAX_SFX_VOICES*.8*peak}));
