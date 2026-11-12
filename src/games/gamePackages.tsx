@@ -1,7 +1,7 @@
 import { lazy, type ComponentType } from 'react';
 import type { GameComponentProps } from '../types';
 import { startupAssets } from './startupAssets';
-import { GAME_ASSET_CACHE } from './packageCache';
+import { GAME_ASSET_CACHE, OFFLINE_PACKAGE_CODE_CACHE } from './packageCache';
 
 type GameModule = { default: ComponentType<GameComponentProps> };
 const loaders = new Map<string, () => Promise<GameModule>>();
@@ -35,16 +35,16 @@ function withAbort<T>(task: Promise<T>, signal: AbortSignal): Promise<T> {
     task.then(resolve, reject).finally(() => signal.removeEventListener('abort', abort));
   });
 }
-async function fetchAsset(url: string, signal: AbortSignal) {
+async function fetchAsset(url: string, signal: AbortSignal, requiredCache?: Cache) {
   check(signal);
-  if (downloaded.has(url)) return;
-  const storage = await assetCache();
+  if (!requiredCache && downloaded.has(url)) return;
+  const storage = requiredCache ?? await assetCache();
   check(signal);
   try {
     const hit = await storage?.match(url);
     if (hit?.ok && !(hit.headers.get('Content-Type')?.includes('text/html') && !url.endsWith('.html'))) { downloaded.add(url); return; }
     if (hit) await storage?.delete(url);
-  } catch { /* Cache may be disabled. */ }
+  } catch (error) { if (requiredCache) throw error; }
   check(signal);
   const controller = new AbortController();
   const abort = () => controller.abort();
@@ -57,17 +57,17 @@ async function fetchAsset(url: string, signal: AbortSignal) {
     await response.arrayBuffer();
     check(signal);
     // Storage failures must not block a successfully downloaded game.
-    try { if (storage && saved) await storage.put(url, saved); } catch { /* HTTP cache remains usable. */ }
+    try { if (storage && saved) await storage.put(url, saved); } catch (error) { if (requiredCache) throw error; }
     downloaded.add(url);
   } finally { clearTimeout(timeout); signal.removeEventListener('abort', abort); }
 }
-async function pool(urls: string[], parallel: number, signal: AbortSignal, onComplete: () => void = () => {}, tolerateErrors = false) {
+async function pool(urls: string[], parallel: number, signal: AbortSignal, onComplete: () => void = () => {}, tolerateErrors = false, requiredCache?: Cache) {
   let cursor = 0;
   await Promise.all(Array.from({ length: Math.min(parallel, urls.length) }, async () => {
     while (cursor < urls.length) {
       check(signal);
       const url = urls[cursor++];
-      try { await fetchAsset(url, signal); } catch (error) { if (!tolerateErrors || signal.aborted) throw error; }
+      try { await fetchAsset(url, signal, requiredCache); } catch (error) { if (!tolerateErrors || signal.aborted) throw error; }
       onComplete();
     }
   }));
@@ -119,4 +119,29 @@ export async function prepareGamePackage(id: string, signal: AbortSignal, report
     if (id !== 'neon-runner' && id !== 'brick-breaker') warmRemaining(urls.filter(url => !startup.includes(url)), signal);
   } catch (error) { group.abort(); throw error; }
   finally { clearTimeout(timeout); signal.removeEventListener('abort', abort); }
+}
+
+
+export async function downloadOfflinePackage(manifestUrl: string, signal: AbortSignal, report: (done: number, total: number) => void) {
+  if (!navigator.serviceWorker?.controller || typeof caches === 'undefined') {
+    throw new Error('Tải lại trang để ArcadeX có thể lưu gói ngoại tuyến.');
+  }
+  const response = await fetch(manifestUrl, { signal, cache: 'no-store' });
+  if (!response.ok) throw new Error('Chưa tải được danh sách tài nguyên.');
+  const manifest: { code?: unknown; media?: unknown } | null = await response.json();
+  const valid = (files: unknown, pattern: RegExp): files is string[] =>
+    Array.isArray(files) && files.length > 0 && files.every(file => typeof file === 'string' && pattern.test(file));
+  if (!valid(manifest?.code, /^\/assets\/[\w.-]+\.(js|css)$/) ||
+      !valid(manifest?.media, /^\/assets\/[\w.-]+\.(png|webp|wav)$/)) {
+    throw new Error('Danh sách tài nguyên chưa hợp lệ.');
+  }
+  const code = [...new Set(manifest.code)];
+  const media = [...new Set(manifest.media)];
+  const [codeCache, mediaCache] = await Promise.all([caches.open(OFFLINE_PACKAGE_CODE_CACHE), caches.open(GAME_ASSET_CACHE)]);
+  let done = 0;
+  const total = code.length + media.length;
+  const completed = () => report(++done, total);
+  await pool(code, 4, signal, completed, false, codeCache);
+  await pool(media, 4, signal, completed, false, mediaCache);
+  check(signal);
 }

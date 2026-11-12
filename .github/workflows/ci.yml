@@ -10,6 +10,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  snake_ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Snake UI save, touch/layout, resource cleanup and recovery (local fixtures)
+        run: npm run test:snake-ui
+      - name: Preserve Snake UI fixture evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-ui-fixture-evidence
+          path: |
+            test-results/snake-ui/
+            test-results/qc-results.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Snake production catalog, rollback build and offline package
+        run: npm run build && npm run build:snake-disabled && npm run test:snake-catalog
+      - name: Preserve Snake catalog candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-catalog-fixture-evidence
+          path: test-results/snake-catalog/
+          if-no-files-found: ignore
+          retention-days: 7
   verify:
     runs-on: ubuntu-latest
     # Includes all-game motion plus per-game browser suites on the hosted Linux runner.
@@ -24,10 +57,22 @@ jobs:
       - run: npm ci
       - name: Install room server dependencies before typechecking browser fixtures
         run: npm run deps:tank-clash
+      - name: Markdown handoff budgets, task links and pinned Studio sources
+        run: python3 scripts/check-docs.py
       - name: Typecheck
         run: npm run lint
       - name: Build
         run: npm run build
+      - name: Snake local suites and preview baseline (no live backend)
+        run: npm run test:snake-local && npm run build:snake-preview && npm run test:snake-preview && npm run analyze:snake-preview
+      - name: Preserve Snake build profile before browser suites clear output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-build-profile
+          path: test-results/snake-baseline/build-profile.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Bundle budget (no chunk > 500 kB, first-load JS <= 400 kB gzip)
         run: npm run test:bundle
       - name: Fast test suites (no browser, no Docker)
@@ -36,6 +81,16 @@ jobs:
         run: npm run test:tank-clash-server
       - name: Install Chromium for browser checks
         run: npx playwright install --with-deps chromium
+      - name: Snake guest preview route, Auth entry, responsive layout and parent service worker
+        run: npm run test:snake-preview-runtime
+      - name: Preserve Snake route and layout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-preview-runtime-evidence
+          path: test-results/snake-baseline/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Launcher idle render budget
         run: npm run test:perf
       - name: Launcher smoke flows

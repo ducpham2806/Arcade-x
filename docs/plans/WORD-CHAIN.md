@@ -19,7 +19,7 @@ Theo yêu cầu mới: [plan phòng/ghép trận/PK](../word-chain/ONLINE-PLAN.m
 | WC-ON2 | ĐÃ KIỂM hai account | Tạo/join/start2/cap4, mã sai/đóng, host transfer/rời; full/race có fixture |
 | WC-ON3 | PILOT2account qua; user bỏ gate3/4 | Hủy/tìm lại/trả ghế/resetcountdown20s qua; FIFO/one-seat có fixture |
 | WC-ON4 | PILOT2account qua; user bỏ gate3/4 | Server nhận từ, đầu hàng/timeout/kết quả, đủ phiếu tái đấu qua |
-| WC-ON5 | ACTIVE triage lỗi08/11 | Mạng/reload/Exit/Auth/account swap/IME và mobile |
+| WC-ON5 | BACKLOG tiếpQA; lát cắt lỗi08/11 đã phát hành | Mạng/reload/Exit/Auth/account swap/IME và mobile |
 | WC-ON6 | BACKLOG sau ON5 | ≥10trận mỗi format,2thiết bị/2mạng,soak30phút, cutover/rollback |
 | WC-PUBLIC | DONE phát hành08/11 | Backend/flagtrue/CI32/merge086d6ac/NetlifyPublished; public tạo-rời phòng, vào-hủy queue qua |
 
@@ -41,6 +41,8 @@ WC-R0 catalog: WC-L0 giải quyết hiển thị bằng bundle; migration/histor
 
 Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking; PR19, nền3f943d9+19afc84. WC-LEX34.512từ/nguồn/checksum/giấy phép, giữ từ cũ/3.011opener; URLhash/revision và50check/CI28qua. Staging schema/Edge/CORS/JWT handlerAuth/cron đã cài theo quyền user; hai account đã kiểm phòng riêng trước rồi queue/PK/rematch. [QA mới nhất](../qa/WC-STAGING-2026-11-08.md), [nguồn](../qa/WC-ONLINE-2026-11-07.md). Sau pilot đã merge/phát hành bộ từ mới và online trong WC-PUBLIC08/11; giữ cấm SQL production ngoài exception đúng gói đã duyệt.
 
-## ONLINE-ERROR · ACTIVE · 08/11/2026
+## ONLINE-ERROR · đã phát hành client · 08/11/2026
 
-User báo cả Nối Từ403/409 và Tank kẹt kết nối; ưu tiên [triage](../qa/ONLINE-ERROR-2026-11-08.md) trước Snake. Chưa có responsebody Nối Từ; không gọi mọi409 là lỗi server. Tank có sửa clientwatchdog/latecallbacks, regression local qua; dịch vụRender chưa xác định, chưa deploy. Giữ quyền production hẹp, không đổi SQL/env vô cớ.
+PR21/fullCI36head47649f9success đã merge9061bfd, NetlifyPublished và2bundlebyte-match. NốiTừ đã xử lý503gateway/mấtmembership,9UI/52check qua; public mới tạo/rờiSSQT7U qua.409cũ thiếubody, chưa phân loại. [Báo cáo](../qa/ONLINE-ERROR-2026-11-08.md).
+
+Tank client deadline/latecallbacks cũng đã phát hành; user giữRenderFree sau lỗi không tự thức khi ngủ. Đã khôi phục thủ công đúngbackendc705100, health/WSS vàroomMB7CU8 qua, đã rời. Không coi cold start đã sửa ổn định; không nâng gói/SyncBlueprint/keep-alive từ quyết định này. ON5/ON6 cònQA, user bỏ gate thật3/4người.

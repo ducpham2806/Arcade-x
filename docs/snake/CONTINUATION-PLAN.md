@@ -11,11 +11,11 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Giới hạn:** runner live không chạy renderer/full launcher DOM. JWT hết hạn theo thời gian thực, điện thoại thật, art/animation/audio sản xuất và human playtest vẫn chưa được nghiệm thu. Root CI của các game public không tự bao phủ toàn bộ suite Snake. Preview build/route không đồng nghĩa đã phát hành.
 
-**Kiểm thêm khi lập plan:** build preview, preview package và6suite cloud/session/journey/boss/props/audio local07/11 qua; chunk game1.916.911byte raw/~1,35MB gzip, vượt mức500KB dùng cho public. [Số đo và giới hạn](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). SN-R0a còn route/flags runtime và graph tải đầu; không đánh DONE từ hai lệnh này.
+**Kiểm thêm khi lập plan:** build preview, preview package và6suite cloud/session/journey/boss/props/audio local07/11 qua; chunk game1.916.911byte raw/~1,35MB gzip, vượt mức500KB dùng cho public. [Số đo và giới hạn](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). SN-R0a đã bổ sung baseline12/11: [route/flags/graph mới](../qa/SNAKE-R0A-2026-11-12.md); chỉ DONE baseline local, chưa live R0b.
 
 ## Việc còn thiếu và thứ tự
 
-### SN-R0a · READY · khóa baseline preview và đo gói build · 0,5 ngày
+### SN-R0a · DONE baseline local12/11 · khóa baseline preview và đo gói build · 0,5 ngày
 
 **File:** `src/preview/snake/`, `src/games/snake-legend/SnakeLegendPreview.tsx`, `vite.snake-preview.config.ts`, scripts/tests Snake và metadata art.
 
@@ -23,9 +23,11 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 2. Chạy suite Snake hiện có; ghi lỗi thật nếu có. Đo chunk lớn nhất, gzip, tải đầu và asset tải theo yêu cầu; không dùng số của checkpoint cũ làm số hiện tại.
 3. Chốt danh sách file nguồn/generator; không sửa tay `public/standalone/` hay output sinh. Đối chiếu icon/banner đã có với metadata.
 
+**Đã có:** [baseline12/11](../qa/SNAKE-R0A-2026-11-12.md), CI parent41 success, CI nhánh mới còn cần. Backend flags/deploy/live/device vẫn chưa kiểm lại.
+
 **Đạt khi:** báo cáo baseline `.md` có SHA/lệnh/kết quả/build sizes và route thực tế. Giữ Snake ngoài catalog public, giữ save format và Gold/Gem riêng.
 
-### SN-R0b · BACKLOG sau R0a · chơi và lưu qua launcher thật · 1–2 ngày + thời gian JWT
+### SN-R0b · local UI đã kiểm12/11; LIVE WAITING · chơi và lưu qua launcher thật · 1–2 ngày + thời gian JWT
 
 **File:** preview wrapper, `integration/`, `src/save-hooks.ts` và cloud/session tests theo vị trí được R0a xác nhận; mở [runbook live](../SNAKE_LIVE_SAVE_QA.md) khi chạy.
 
@@ -37,9 +39,11 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** ảnh/video UI và bằng chứng service của các ca trên cùng build; restore mới và lỗi có thông báo phục hồi rõ. Tách `fixture passed`/`live passed`/`chưa kiểm` trong báo cáo.
 
-### SN-R1a · BACKLOG sau R0a; có thể chuẩn bị trước R0b · điều khiển và thiết bị · 1–2 ngày + thiết bị
+### SN-R1a · local fixes đã kiểm12/11; thiết bị thật WAITING · điều khiển và thiết bị · 1–2 ngày + thiết bị
 
 **File:** input/app/render/styles và wrapper trong `src/games/snake-legend/`; chỉ mở module cần sửa.
+
+[Report local12/11](../qa/SNAKE-R1A-2026-11-12.md): sửa audio resume race, pagehide/rotation input, landscape/cutout và Dash SVG;10ca UI qua. User để nghiệm thu thiết bị/backend thật sau; các tiêu chí dưới vẫn giữ.
 
 - Android Chrome, iPhone Safari và desktop: chạm/vuốt/Dash/Pause, thao tác nhanh, safe area, dọc-ngang, phóng nền/khôi phục, audio mute và quyền phát âm thanh.
 - Rời game/reopen, đổi tab, màn hình khóa: đồng hồ/trạng thái/save theo hợp đồng; không nhân input listener, render loop hoặc audio node.
@@ -47,7 +51,9 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** thao tác hoàn thành được màn trên điện thoại thật, không kẹt input/cắt UI; không tăng tài nguyên qua nhiều lần vào/thoát. Browser giả lập chỉ là bổ sung, chưa đủ đóng gate thiết bị.
 
-### SN-R1b · BACKLOG sau R0b · hoàn tất R01 và nghiệm thu nội dung · 1–2 ngày + lượt chơi
+### SN-R1b · LOCAL 10 màn đã kiểm, M2 và duyệt nội dung chờ · hoàn tất R01 và nghiệm thu nội dung · 1–2 ngày + lượt chơi
+
+[QA 12/11](../qa/SNAKE-R1B-2026-11-12.md) xác nhận 10 lượt thắng mô phỏng qua Engine, save/restore 28 sao, và render 16 cảnh. Kiểm tiếp với người mới và thiết bị thật theo checklist dưới đây.
 
 **File:** journey/boss/props/audio modules và assets nguồn; dùng đúng tài liệu phần được sửa.
 
@@ -58,7 +64,9 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** checklist từng màn/boss/props và báo cáo người chơi/art/audio có bằng chứng; không còn lỗi chặn tiến trình. Sửa đổi cân bằng có chủ đích và giữ tương thích save.
 
-### SN-R2a · BACKLOG sau R0/R1 · sẵn sàng tích hợp catalog · 1–2 ngày
+### SN-R2a · LOCAL ứng viên catalog và gói offline · sẵn sàng tích hợp catalog · 1–2 ngày
+
+[QA 12/11](../qa/SNAKE-R2A-2026-11-12.md) ghi nhận game JS còn 151.769 byte, ảnh/WAV tách theo nhu cầu và preview đạt ngân sách JS. Chủ dự án sẽ nghiệm thu sau. Đã kiểm [ứng viên catalog local](../qa/SNAKE-CATALOG-2026-11-12.md), gồm tải gói theo yêu cầu và mở lại khi tắt mạng. Catalog public và pilot vẫn chờ quyết định phát hành.
 
 **File:** package/entry Snake, registry/catalog/repository nếu được chọn phát hành, art manifests/build pipeline và regression.
 
@@ -69,9 +77,9 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** candidate có đủ kiểm tra/asset/budget, backend và chính sách rõ; báo cáo go/no-go phân biệt code/merge/deploy/nghiệm thu. Rollback không làm mất save; reward/commerce không tự bật.
 
-### SN-R2b · BACKLOG sau quyết định phát hành · pilot và nghiệm thu production
+### SN-R2b · ACTIVE chủ dự án duyệt phát hành 13/11 · pilot và nghiệm thu production
 
-Full CI trên head tích hợp, deploy theo quyền hiện hành, kiểm launcher production và tiến trình mới/cũ trên thiết bị thật. Theo dõi save fail/timeout, crash và tải asset, dừng rollout khi lỗi mất tiến trình/nhầm account. Nếu chưa đủ thiết bị hoặc tài khoản thì WAITING, không đánh DONE từ build xanh.
+[Báo cáo phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md). Full CI trên head tích hợp, deploy theo quyền hiện hành, kiểm launcher production và tiến trình mới/cũ trên thiết bị thật. Theo dõi save fail/timeout, crash và tải asset, dừng rollout khi lỗi mất tiến trình/nhầm account. Nếu chưa đủ thiết bị hoặc tài khoản thì WAITING, không đánh DONE từ build xanh.
 
 ## Bộ kiểm tra cần chạy
 

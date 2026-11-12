@@ -3,13 +3,18 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'node:fs';
 import {defineConfig} from 'vite';
+import { launcherVendorChunk } from './scripts/launcher-vendor-chunks';
+import { snakePreviewMedia } from './scripts/snake-preview-media';
+import { snakeCatalogPackage } from './scripts/snake-catalog-package';
 import {VitePWA} from 'vite-plugin-pwa';
-import {GAME_ASSET_CACHE} from './src/games/packageCache';
+import {GAME_ASSET_CACHE,OFFLINE_PACKAGE_CODE_CACHE} from './src/games/packageCache';
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+  const snakeCatalog = mode === 'production' || mode === 'snake-catalog';
   const shellFiles = new Set<string>();
   return {
     plugins: [
+      ...(snakeCatalog ? [snakePreviewMedia(), snakeCatalogPackage()] : []),
       react(),
       tailwindcss(),
       { name: 'launcher-shell-only', generateBundle(_options, bundle) {
@@ -92,12 +97,23 @@ export default defineConfig(() => {
         workbox: {
           // Keep installation small: games and artwork are cached on demand.
           globPatterns: ['index.html', 'assets/*.{js,css,png,svg,webp,woff,woff2}'],
+          ...(snakeCatalog ? { importScripts: ['/snake-offline-code.js'] } : {}),
           manifestTransforms: [async entries => ({ manifest: entries.filter(entry => !entry.url.startsWith('assets/') || shellFiles.has(entry.url)), warnings: [] })],
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/preview\/snake(?:\/|$)/, /^\/chronicles-realms\//, /^\/standalone\//],
           runtimeCaching: [
+            ...(snakeCatalog ? [{
+              urlPattern: ({url,sameOrigin}) => sameOrigin && /^\/assets\/snake-[^/]+\.(?:png|webp|wav)$/.test(url.pathname),
+              handler: 'CacheFirst' as const,
+              options: { cacheName: GAME_ASSET_CACHE, matchOptions: { ignoreVary: true }, cacheableResponse: { statuses: [200] } },
+            }, {
+              // Hashed same-origin files carry the same bytes in a download, module import or preload.
+              urlPattern: ({url,sameOrigin}) => sameOrigin && (globalThis as typeof globalThis & {snakeOfflineCode?: Set<string>}).snakeOfflineCode?.has(url.pathname) === true,
+              handler: 'CacheFirst' as const,
+              options: { cacheName: OFFLINE_PACKAGE_CODE_CACHE, matchOptions: { ignoreVary: true }, cacheableResponse: { statuses: [200] } },
+            }] : []),
             ...['blossom', 'boom', 'rainbow_blocks_assets', 'games/cosmic-defense', 'games/battleship', 'games/dungeon-tap', 'games/word-cross', 'games/word-chain', 'standalone/neon-run', 'game-art', 'chronicles-realms/assets'].map(prefix => ({
               urlPattern: new RegExp('/' + prefix + '/.*\\.(?:png|svg|webp|json|ttf)$', 'i'),
               handler: 'CacheFirst' as const,
@@ -169,22 +185,20 @@ export default defineConfig(() => {
       }),
     ],
     build: {
+      ...(snakeCatalog ? {manifest:true} : {}),
+      ...(mode === 'snake-catalog' ? {outDir:'test-results/snake-catalog-build'} : {}),
+      ...(mode === 'snake-disabled' ? {outDir:'test-results/snake-disabled-build'} : {}),
       rollupOptions: {
         output: {
           // Long-lived vendor chunks: a release that only changes app code keeps these cached.
-          manualChunks(id: string) {
-            if (!id.includes('/node_modules/')) return undefined;
-            if (/\/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor-react';
-            if (/\/node_modules\/(@supabase|iceberg-js)\//.test(id)) return 'vendor-supabase';
-            if (/\/node_modules\/(motion|framer-motion|motion-dom|motion-utils)\//.test(id)) return 'vendor-motion';
-            return undefined;
-          },
+          manualChunks: launcherVendorChunk,
         },
       },
     },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        ...(snakeCatalog ? {'./snake-legend/catalog-entry':path.resolve(__dirname,'src/games/snake-legend/catalog-entry-enabled.ts')} : {}),
       },
     },
     server: {

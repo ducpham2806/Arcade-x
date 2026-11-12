@@ -41,3 +41,7 @@ Chủ dự án yêu cầu phòng riêng/PK trước→matchmaking và tăng từ
 ## Đã quyết · 08/11/2026 · public Nối Từ
 
 User yêu cầu merge/public, bỏ nghiệm thu3/4người; PR19 merge256620c sau CI29. Sau khi xem gói/file/SHA và lý do AGENTS/CUA, user trả lời “Cho phép gói Nối Từ production”: schema + cron/token Vault riêng, functionword-chain-room, CORS đúngarcade-x.netlify.app và legacyJWT OFF riêngfunction tạiwhjatkhhupeqfngakmee. Đây là exception hẹp WC-PUBLIC, không áp dụng script production khác. Gói đã áp và probe thành công; PR20/full CI32 success đã merge086d6ac, NetlifyPublished; public tạo/rời phòng và vào/hủy queue qua. #7 đã quyết và WC-PUBLIC đã phát hành; không hỏi lại quyền này.
+
+## Đã quyết · 08/11/2026 · Render Free sau incident
+
+#9: user chọn **“Giữ Free, chưa nâng gói”** sau khi xem lựa chọn0,5CPU/512MB7USD/tháng. Đã phục hồi Tank thủ công bằng redeploy đúngc705100, giữFree/Auth/cap16. Cold start tái lỗi sau nhiều giờ ngủ/HTTP180s nên không gọi đã sửa vĩnh viễn. Không hỏi nâng gói lại hoặc tạo keep-alive định kỳ từ quyết định này. [Bằng chứng và runbook giới hạn](qa/ONLINE-ERROR-2026-11-08.md). PR21 đã merge9061bfd/NetlifyPublished sauCI36; gói frontend không thaySQL/backendAuth/commerce.

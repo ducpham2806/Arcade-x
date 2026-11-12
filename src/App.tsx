@@ -209,7 +209,7 @@ const AppContent: React.FC = () => {
       {!activeGameId && <MobileNav />}
 
       {/* Offline Status Indicator */}
-      <div className="platform-ui"><OfflineIndicator /></div>
+      {!GAME_REGISTRY[activeGameId ?? '']?.offlinePackage && <div className="platform-ui"><OfflineIndicator /></div>}
 
       {/* PWA Prompt */}
       {activeModal !== 'auth' && !activeGameId && <div className="platform-ui"><PWAInstallPrompt /></div>}
