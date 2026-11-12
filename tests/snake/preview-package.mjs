@@ -39,3 +39,32 @@ for(const [name,spec] of Object.entries(art.assets)){
  assert(Object.values(manifest).some(v=>v.file.endsWith('.webp')&&v.src?.endsWith(`/${name}.webp`)),`${name} must be emitted`);
 }
 console.log(JSON.stringify({status:'PASS',checks:['lazy engine','lazy wrapper','catalog exclusion','production exclusion','deep-link assets','no duplicate service worker','original master hashes/dimensions and runtime icon/banner hashes/budgets'],initialChunks:initial.size,gameBytes:fs.statSync(path.join(root,game[1].file)).size}));
+
+const previewFiles=fs.readdirSync(path.join(root,'assets'));
+const media=new Set();
+function verifyMedia(name, extension, base64) {
+ const file=previewFiles.find(value=>value.startsWith(`snake-${name}-`)&&value.endsWith('.'+extension));
+ assert(file,`${name} must be a hashed resource`);
+ assert(!productionFiles.includes(file),`${name} must stay out of the production build`);
+ assert(fs.readFileSync(path.join(root,'assets',file)).equals(Buffer.from(base64,'base64')),`${name} bytes differ from source`);
+ media.add(file);
+}
+const sourceRoot='src/games/snake-legend/src/';
+const imageSource=fs.readFileSync(sourceRoot+'assets.ts','utf8');
+for(const [,name,extension,base64] of imageSource.matchAll(/"([a-z0-9_]+)":\{"image":"data:image\/(png|webp);base64,([A-Za-z0-9+/=]+)"/g))verifyMedia(name,extension,base64);
+const props=fs.readFileSync(sourceRoot+'story-prop-assets.ts','utf8').match(/"data:image\/webp;base64,([A-Za-z0-9+/=]+)"/);
+assert(props,'Props generator must supply its atlas');
+verifyMedia('r01_props','webp',props[1]);
+for(const source of ['audio-assets.ts','audio-feedback-assets.ts']){
+ for(const [,name,base64] of fs.readFileSync(sourceRoot+source,'utf8').matchAll(/"(sfx_[a-z0-9_]+)":\s*"(UklGR[A-Za-z0-9+/=]+)"/g))verifyMedia(name,'wav',base64);
+}
+assert.equal(media.size,20,'Expected 6 atlases and 14 WAVs');
+assert.deepEqual(new Set(game[1].assets?.filter(file=>file.startsWith('assets/snake-')).map(file=>path.basename(file))),media,'Game manifest must track its external media');
+for(const key of initial)assert(!(manifest[key].assets??[]).some(file=>file.startsWith('assets/snake-')),'Initial manifest graph must exclude game media');
+const gameText=fs.readFileSync(path.join(root,game[1].file),'utf8');
+for(const file of media)assert(gameText.includes(file),`${file} must be referenced by Snake gameplay`);
+assert(!/data:image\/[^"' ]+;base64,|["']UklGR[A-Za-z0-9+/=]{128,}["']/.test(gameText),'Gameplay JS must not embed images or WAVs');
+for(const file of previewFiles.filter(value=>value.endsWith('.js'))){
+ assert(fs.statSync(path.join(root,'assets',file)).size<=500*1024,`${file} exceeds the 500 KiB chunk budget`);
+}
+console.log(JSON.stringify({status:'PASS',checks:['byte-identical external media','no inline game media','500 KiB JS budget'],media:media.size}));

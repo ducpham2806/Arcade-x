@@ -2,6 +2,11 @@
 
 Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPLETED-2026-11-11-before-continuation-plan.md). “Đã merge/phát hành” không đồng nghĩa nghiệm thu toàn bộ thiết bị.
 
+## SN-R2a · gói preview local · 12/11/2026
+
+- Nhánh `codex/snake-r2a-preview-assets` từ 2f82945. Tách 20 media nguyên byte, game JS 151.769 byte thay cho 1.917.496. Preview qua budget JS.
+- Đã kiểm Chrome render khi ảnh chậm, retry/hủy audio và HTML standalone offline. Còn nghiệm thu thật và ứng viên catalog. [QA](qa/SNAKE-R2A-2026-11-12.md). [Tóm tắt trước lượt này](archive/COMPLETED-2026-11-12-before-snake-r2a.md).
+
 ## SN-R1b · kiểm nội dung local · 12/11/2026
 
 - `codex/snake-r1b-content-review` từ bad1d56. Suite journey kiểm 10 màn bằng Engine thật, lưu/đọc 28/30 sao, ngọc R01 và 10 receipt. Qua ba cầu sau ca rơi nước, thắng Nhện Mẹ đủ 6 hit và 3 pha.

@@ -10,7 +10,7 @@ Chủ dự án yêu cầu plan chi tiết, thêm vị trí quảng cáo Google v
 |---|---|---|---|
 | 0 | Nguồn và QA | BASE-01 bàn giao; QA-ENV cho HTTP fixture/offline runner; ONLINE-V1 xác minh sau PR #21 | [Plan chi tiết](CONTINUATION-2026-11-11.md), [bảo trì](plans/MAINTENANCE.md) |
 | 1 | Quảng cáo Google | AD-01b đã code nội dung (chờ owner); L1/L2 preview local; AD-02a core đã kiểm local; CMP/account/site Ready chờ AD-03 | [ADS](plans/ADS.md), [vị trí](ads/PLACEMENTS.md) |
-| 2 | Rắn Săn Mồi | R0b/R1a local và 10 màn R01 đã kiểm. Còn live, thiết bị, M2 và duyệt art/audio | [SNAKE](plans/SNAKE.md), [baseline](qa/SNAKE-R0A-2026-11-12.md) |
+| 2 | Rắn Săn Mồi | Gói preview đạt budget, 10 màn R01 đã kiểm local. Chủ dự án nghiệm thu sau | [SNAKE](plans/SNAKE.md), [baseline](qa/SNAKE-R0A-2026-11-12.md) |
 | 3 | Nối Từ/Tank | WC-ON5/ON6, TC-R1 mạng/soak; TC-R2 port P2 còn thiếu | [Nối Từ](plans/WORD-CHAIN.md), [Tank](plans/TANK-CLASH.md) |
 | 4 | Chess/Xiangqi/Caro | DU-R0 staging → DU-R1 từng game → DU-R2 account thật | [Duel](plans/DUEL.md) |
 | 5 | Game và nền tảng | GP-R0 xác minh → GP-R1 sửa từng lỗi; MT1/MT2; MT3/MT4 theo lợi ích | [Game polish](plans/GAME-POLISH.md), [bảo trì](plans/MAINTENANCE.md) |

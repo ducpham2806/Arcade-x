@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'node:fs';
 import {defineConfig} from 'vite';
 import {sitePagesPlugin} from './scripts/site-pages.mjs';
+import { launcherVendorChunk } from './scripts/launcher-vendor-chunks';
 import {VitePWA} from 'vite-plugin-pwa';
 import {GAME_ASSET_CACHE} from './src/games/packageCache';
 
@@ -174,13 +175,7 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           // Long-lived vendor chunks: a release that only changes app code keeps these cached.
-          manualChunks(id: string) {
-            if (!id.includes('/node_modules/')) return undefined;
-            if (/\/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor-react';
-            if (/\/node_modules\/(@supabase|iceberg-js)\//.test(id)) return 'vendor-supabase';
-            if (/\/node_modules\/(motion|framer-motion|motion-dom|motion-utils)\//.test(id)) return 'vendor-motion';
-            return undefined;
-          },
+          manualChunks: launcherVendorChunk,
         },
       },
     },

@@ -28,6 +28,9 @@ export function readSnakePreviewProfile(root = 'dist/preview/snake') {
   });
   const gameSize=measure(game[1].file);
   const allEmbedded=embedded.reduce((sum,value)=>sum+value.embeddedLiteralBytes,0);
+  const media=fs.readdirSync(path.join(root,'assets'))
+    .filter(file=>/^snake-.*\.(png|webp|wav)$/.test(file))
+    .map(file=>measure('assets/'+file));
   return {
     sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
     snakeTree:execFileSync('git',['rev-parse','HEAD:src/games/snake-legend'],{encoding:'utf8'}).trim(),
@@ -36,7 +39,7 @@ export function readSnakePreviewProfile(root = 'dist/preview/snake') {
     entry:measure(entry[1].file),initialChunks:chunks.filter(value=>value.initial),
     initialCss:[...new Set([...initial].flatMap(key=>manifest[key].css||[]))].map(measure),
     game:{...gameSize,css:(game[1].css||[]).map(measure),embeddedLiteralBytes:allEmbedded,embeddedShare:allEmbedded/gameSize.raw},
-    embedded,largestChunks:[...chunks].sort((a,b)=>b.raw-a.raw).slice(0,5),chunks,
+    embedded,media,largestChunks:[...chunks].sort((a,b)=>b.raw-a.raw).slice(0,5),chunks,
     publicChunkGate:{maxRawBytes:500*1024,ready:chunks.every(value=>value.raw<=500*1024),previewOnly:true},
   };
 }

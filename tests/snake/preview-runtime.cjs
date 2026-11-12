@@ -3,6 +3,7 @@ const {spawn}=require('node:child_process');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const {gzipSync}=require('node:zlib');
+const checkPreviewMedia=require('./preview-media.cjs');
 const PORT=4342,origin=`http://127.0.0.1:${PORT}`;
 const evidence='test-results/snake-baseline';
 (async()=>{
@@ -41,6 +42,7 @@ const evidence='test-results/snake-baseline';
    assert.ok(!scripts.some(value=>value.file.includes('GameWrapper-')),'guest must not load wrapper');
    assert.equal(await page.evaluate(async()=>(await navigator.serviceWorker.getRegistrations()).length),0,'preview must not install a second worker');
    report.views.push({viewport,stage:'guest landing: networkidle + decoded art + 2s observation',scripts:scripts.map(value=>({...value})),scriptRaw:scripts.reduce((sum,value)=>sum+value.raw,0),gzipEstimate:scripts.reduce((sum,value)=>sum+value.gzipEstimate,0)});
+   assert(report.views.at(-1).gzipEstimate<=400*1024,'Guest landing exceeds the 400 KiB JS budget');
    await page.screenshot({path:`${evidence}/landing-${viewport.width}x${viewport.height}.png`,fullPage:true});
    await page.reload({waitUntil:'networkidle'});await page.locator('#snake-preview-title').waitFor();
    await button.click();await page.locator('input[type=password]').waitFor();
@@ -59,7 +61,10 @@ const evidence='test-results/snake-baseline';
   const workers=await page.evaluate(async()=>(await navigator.serviceWorker.getRegistrations()).map(value=>value.active?.scriptURL));
   assert.equal(workers.length,1);assert.equal(new URL(workers[0]).pathname,'/sw.js');
   report.checks.push('root service worker preserves deep preview route without a duplicate registration');
-  await context.close();report.status='PASS';console.log(JSON.stringify({status:report.status,checks:report.checks,initialJs:report.views.map(({viewport,scriptRaw,gzipEstimate})=>({viewport,scriptRaw,gzipEstimate}))}));
+  await context.close();
+  report.media=await checkPreviewMedia(browser,origin,evidence);
+  report.checks.push('built registered preview stages media, renders during delay, retries one WAV and aborts on exit');
+  report.status='PASS';console.log(JSON.stringify({status:report.status,checks:report.checks,initialJs:report.views.map(({viewport,scriptRaw,gzipEstimate})=>({viewport,scriptRaw,gzipEstimate}))}));
  }finally{
   await browser?.close();server.kill();fs.writeFileSync(`${evidence}/runtime-profile.json`,JSON.stringify(report,null,2)+'\n');
  }
