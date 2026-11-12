@@ -11,17 +11,19 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Giới hạn:** runner live không chạy renderer/full launcher DOM. JWT hết hạn theo thời gian thực, điện thoại thật, art/animation/audio sản xuất và human playtest vẫn chưa được nghiệm thu. Root CI của các game public không tự bao phủ toàn bộ suite Snake. Preview build/route không đồng nghĩa đã phát hành.
 
-**Kiểm thêm khi lập plan:** build preview, preview package và6suite cloud/session/journey/boss/props/audio local07/11 qua; chunk game1.916.911byte raw/~1,35MB gzip, vượt mức500KB dùng cho public. [Số đo và giới hạn](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). SN-R0a còn route/flags runtime và graph tải đầu; không đánh DONE từ hai lệnh này.
+**Kiểm thêm khi lập plan:** build preview, preview package và6suite cloud/session/journey/boss/props/audio local07/11 qua; chunk game1.916.911byte raw/~1,35MB gzip, vượt mức500KB dùng cho public. [Số đo và giới hạn](../qa/SNAKE-PLAN-BASELINE-2026-11-07.md). SN-R0a đã bổ sung baseline12/11: [route/flags/graph mới](../qa/SNAKE-R0A-2026-11-12.md); chỉ DONE baseline local, chưa live R0b.
 
 ## Việc còn thiếu và thứ tự
 
-### SN-R0a · READY · khóa baseline preview và đo gói build · 0,5 ngày
+### SN-R0a · DONE baseline local12/11 · khóa baseline preview và đo gói build · 0,5 ngày
 
 **File:** `src/preview/snake/`, `src/games/snake-legend/SnakeLegendPreview.tsx`, `vite.snake-preview.config.ts`, scripts/tests Snake và metadata art.
 
 1. Build preview từ SHA mới; xác nhận entry `/preview/snake/`, Auth binding, endpoint và cờ feature/reward của môi trường thử. Production Netlify hiện không tự thêm preview route như deploy-preview.
 2. Chạy suite Snake hiện có; ghi lỗi thật nếu có. Đo chunk lớn nhất, gzip, tải đầu và asset tải theo yêu cầu; không dùng số của checkpoint cũ làm số hiện tại.
 3. Chốt danh sách file nguồn/generator; không sửa tay `public/standalone/` hay output sinh. Đối chiếu icon/banner đã có với metadata.
+
+**Đã có:** [baseline12/11](../qa/SNAKE-R0A-2026-11-12.md), CI parent41 success, CI nhánh mới còn cần. Backend flags/deploy/live/device vẫn chưa kiểm lại.
 
 **Đạt khi:** báo cáo baseline `.md` có SHA/lệnh/kết quả/build sizes và route thực tế. Giữ Snake ngoài catalog public, giữ save format và Gold/Gem riêng.
 

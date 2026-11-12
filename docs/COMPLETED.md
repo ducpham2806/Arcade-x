@@ -2,6 +2,13 @@
 
 Nguồn dài trước checkpoint11/11 được [lưu nguyên văn](archive/COMPLETED-2026-11-11-before-continuation-plan.md). “Đã merge/phát hành” không đồng nghĩa nghiệm thu toàn bộ thiết bị.
 
+## SN-R0a · DONE baseline local · 12/11/2026
+
+- Nhánh codex/snake-r0a-baseline từ1f4bfc9/PR25, CI41 parent success. Sáu suite fixture + package qua; master PNG hash/dimensions/WebP budget được kiểm. Không đổi engine/save/private wallet, không public/catalog/reward.
+- Thêm profile graph/byte và browser loopback:4viewport guest→login entry/reload/layout, rootSW giữ canonical preview/một worker qua. Fix glyph CTA thành SVG đã xem trước-sau; metadata/art giữ nguyên.
+- JS landing909.386byte raw/245.671gzip ước tính; CSS451.682/53.357, hai ảnh243.250byte. Game1.916.911/1.346.381,92,22% literal nhúng; public gatefalse. Build/lint/bundle/structure/docs/diff qua; CI thêm Snake local/artifact/runtime và lưu evidence.
+- GraphifyAST579node/1355edge, seed/budget,0LLM/upload. [Baseline/nguồn/generator/giới hạn](qa/SNAKE-R0A-2026-11-12.md). Chưa real account/save/JWT/device/10level playthrough hoặc deploy; backendflags chưa đọc lại. Tiếp SN-R0b khi mạng/account/grant sẵn sàng.
+
 ## AD-02a · DONE core local · 11/11/2026
 
 - Nhánh codex/ads-policy-loader từ482b8ed/PR24 (CI40 success); chưa merge/deploy. Có config/policy/AdProvider/AdSlot và SDK loader/Google adapter, app off + consent unknown; bật env cũng chưa cấp consent. Không SQL/commerce.
