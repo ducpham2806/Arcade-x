@@ -2,22 +2,23 @@
 
 Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## NETLIFY-BUILD · DONE · 07/11/2026
+## NETLIFY-BUILD / AUTH-XTAB · đã phát hành · 07/11/2026
 
-- Tái hiện TS2307 thiếu nested ws trên checkout sạch; dùng deps:tank-clash chung CI/Netlify trước lint/build, giữ Snake preview và mọi test.
-- Local chuỗi preview exit0, Netlify Preview success; full CI b644da2 success, PR#17 merge main1131927. [Báo cáo](qa/NETLIFY-BUILD-2026-11-07.md).
-- Production deploy6aee682dc2bd2dba16385690 Published,4bundle đầu trùng byte build đã kiểm; không đổi DB/server wire/chi phí.
-
-## AUTH-XTAB phần sửa nguồn / logout release · 07/11/2026
-
-- Nhánh codex/tank-clash-release-verification: sửa listener Auth giữ identity riêng, hủy restore cũ; thêm test:auth-session vào fast.
-- Red/green:4/5 fail trước sửa,5/5 qua sau sửa; lint/build/bundle/fast qua; UI AuthProvider thật với fixture A→guest→B qua.
-- Production hai account thật: B khác A, tab game nhận B, phòng A cũ không còn, tạo phòng B qua. [Chi tiết](qa/BUG-AUTH-CROSS-TAB.md).
-- PR#17 đã merge/phát hành1131927. Hai tab bundle mới/B thật: tạo phòng→logout tab kia→về thư viện→Online hiện login, không còn hồ sơ B. Chủ dự án để ca đăng nhập A/mã B cũ sau; TC-R0 còn WAITING, TC-R1 chưa đạt.
+- PR17/main1131927: deps:tank-clash trước lint/build sửa TS2307 nestedws; fullCIb644da2, NetlifyPublished/4bundlebyte-match. [BuildQA](qa/NETLIFY-BUILD-2026-11-07.md).
+- Auth giữ identity riêng, hủy restore cũ;5regression và fixture A→guest→B qua. Production B tạo phòng, logout xuyên tab→về thư viện/login; [QA](qa/BUG-AUTH-CROSS-TAB.md). Ca đăng nhậpA/mãB cũ user để sau, TC-R0 vẫn thiếu ca này.
 
 ## WC-PLAN / SN-PLAN · DONE tài liệu · 07/11/2026
 
-- Nhánh codex/word-chain-launcher-release, nguồn5a64fef: [Nối Từ](word-chain/ONLINE-PLAN.md) staging→phòng→queue→PK→mạng/Auth→nghiệm thu; [Snake](snake/CONTINUATION-PLAN.md) baseline→UI/save→thiết bị/nội dung→release. Có task/file/AC/bằng chứng/ước lượng; lập plan không tự deploy hay bật flag.
+- Nhánh codex/word-chain-launcher-release/nguồn5a64fef: [NốiTừ](word-chain/ONLINE-PLAN.md) staging→phòng→queue→PK→mạng/Auth; [Snake](snake/CONTINUATION-PLAN.md) baseline→UI/save→thiết bị/nội dung→release. Có task/file/AC; plan không tự cấp quyền deploy.
+
+## ONLINE-ERROR · đã phát hành, Free phục hồi thủ công · 08/11/2026
+
+- codex/fix-online-room-errors/PR21: fullCI36head47649f9success→merge9061bfd; Netlify6af075593632a228f5ca3102 Published,2bundlepublic byte-match.
+- Tank giới hạn handshake75s/10s/lateevents; NốiTừ giữ gatewaycode/mutationID503 và bỏ notice mạng cũ sau mấtmembership. Local52WordChain/9UI/69Tank/18WS qua, toànCI36 qua.
+- Public mới: NốiTừ tạo/rờiSSQT7U; Tank tự nối lại sau phục hồi, nhậnMB7CU8 rồi Rời phòng→menu. Hồi chiều hai account thật đã vàoMFSSFS đúnghai đội.
+- RenderFree sau nhiều giờ nghỉ không tự thức dù HTTP180s. User chọn “Giữ Free, chưa nâng gói”; redeploy đúngc705100/dep-dbo7ke3rjlhs73aktsj0 Live20:35GMT+7, health200/WSSopen. **Khôi phục thủ công, chưa sửa ổn định cold start**; không nâng gói/SyncBlueprint/keep-alive từ quyết định này.
+- 409cũ thiếubody, ON5/ON6 cònQA, user bỏ gate thật3/4. [Báo cáo](qa/ONLINE-ERROR-2026-11-08.md); checkpointdocs codex/online-error-release-verification. Chưa bắt đầu Snake; ảnhfixture chỉlocal.
+- Lịch sử tóm tắt trước thu gọn giữ [nguyên văn](archive/COMPLETED-2026-11-08-before-online-error-release-close.md).
 
 ## WC-L0 · DONE bot/offline ra sảnh · 07/11/2026
 
@@ -25,14 +26,12 @@
 - Full CI24/head5882adf success,5UI Nối Từ/13Tank/generated clean; CUA PC/phone320–390 qua. Netlify6aeebb61665214227ba314ef Published,4JS+2ảnh byte-match; bot “cấm địa”→“địa giới”, exit qua. [QA](qa/WC-L0-2026-11-07.md).
 - Audit WC-R0 xác nhận source đã ở main, catalog thiếu game; WC-L0 xử lý bằng bundled entry. CI24ảnh bị dọn, đã sửa upload trong PR19/CI26–28. Lịch sử chi tiết giữ [nguyên văn](archive/COMPLETED-2026-11-08-before-word-chain-pilot.md).
 
-## WC-ON1–ON4 / WC-PUBLIC · đã pilot và phát hành · 08/11/2026
+## WC-ON1–ON4 / WC-PUBLIC · pilot và phát hành · 08/11/2026
 
-- Nhánh codex/word-chain-online→codex/word-chain-public-release: PR19 merge256620c/CI29; PR20 head970a941/full CI32 success, merge086d6ac. Netlify6af00f400397c396a118ca39 Published/main086d6ac đã đọc live;34.512từ public byte-match.
-- Staging2account thật qua tạo/join/start2/cap4/PK, đầu hàng/kết quả, host transfer/mã đóng, queue/hủy/reset20s/timeout/2phiếu rematch; cron đóng phòng hết rematch khi đóng tab. [QA](qa/WC-STAGING-2026-11-08.md).
-- User duyệt gói production riêng: schema/Edge/handlerAuth, CORS exact, legacyJWT OFF, cron10s/Vault. Đã áp và probe Auth/CORS/tick/RPC denial; tick thật200. Không lộ secret, không thay save/Auth/commerce.
-- Public registered thật: tạo X9FL8R1/2→rời; queue1/4→hủy về menu. Lần đầu lỗi tải game, hard reload rồi mở được, nguyên nhân chưa xác định. [Bằng chứng cuối](word-chain/PUBLIC-RELEASE-2026-11-08.md).
-- User bỏ gate3/4người, không nhận đã kiểm; ON5/ON6 (2thiết bị/2mạng/soak/Auth/IME/no-client turn) còn backlog. Online không XP/xu, cần receipt bền vững trước mở thưởng.
-- Checkpoint codex/word-chain-release-handoff chỉ tài liệu; lịch sử [nguyên văn](archive/COMPLETED-2026-11-08-before-public-release-close.md). Tiếp Snake theo roadmap, chưa bắt đầu.
+- PR19/CI29→merge256620c; PR20/head970a941/CI32→merge086d6ac. NetlifyPublished,34.512từ publicbyte-match. Mốc này trước incident mới ở mụcONLINE-ERROR.
+- Staging2account qua phòng/PK/hosttransfer/mãđóng, queue/hủy/reset20s/timeout/2phiếu rematch; cron đóng phòng hết rematch khi đóngtab. [QA](qa/WC-STAGING-2026-11-08.md).
+- User duyệt exception production riêng: schema/Edge/handlerAuth/CORSexact/legacyJWT OFF/cronVault. Đã áp/probeAuth/CORS/tick/RPCdenial; tick200. PublicX9FL8R tạo-rời vàqueue-hủy qua; [release](word-chain/PUBLIC-RELEASE-2026-11-08.md).
+- Không đổi save/Auth/commerce; online chưaXP/xu, cầnreceipt bền vững. User bỏ gate thật3/4; ON5/ON6 cònQA. Chi tiết cũ giữ trong archive trước đóngONLINE-ERROR.
 
 ## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
 

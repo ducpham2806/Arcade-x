@@ -2,12 +2,12 @@
 
 Nhật ký chính duy nhất, giữ≤3mục. Trước chốt public đã lưu [nguyên văn](archive/WORKLOG-2026-11-08-before-public-release-close.md); các mốc cũ liên kết trong archive đó. Quy trình ở WORKFLOW; tóm tắt bền vững ở COMPLETED.
 
-## 08/11/2026 · ONLINE-ERROR ACTIVE · codex/fix-online-room-errors
+## 08/11/2026 · ONLINE-ERROR phát hành / Free phục hồi thủ công · codex/online-error-release-verification
 
-- Public hai account tạo/vào AJEV5P qua; sau đó 503 gateway `SUPABASE_EDGE_RUNTIME_SERVICE_DEGRADED` và 403 `NOT_MEMBER`. 409 cũ chưa có body, không kết luận sai Auth/CORS. Phòng thử đã dọn.
-- Tank health bốn lần timeout dù TLS qua. Dashboard hết phiên; Google dẫn Create account, đã dừng trước tạo và hỏi user mở tài khoản Render cũ. Chưa đọc service/log hoặc khôi phục backend.
-- Tank: watchdog 75s/10s, bỏ event socket cũ; 3 regression/69 Tank/18 WS qua. Nối Từ: giữ mã gateway, thông báo 503, bỏ notice mạng cũ sau mất phiên; 52 checks và toàn bộ 9 UI qua, ảnh đã xem. Lint/build/bundle qua. PR21 nháp; CI34 chỉ head Tank đầu, phần Nối Từ cần CI đúng head mới. Chưa merge/deploy.
-- [Bằng chứng](qa/ONLINE-ERROR-2026-11-08.md), [log trước task nguyên văn](archive/WORKLOG-2026-11-08-before-online-error.md). Không đổi SQL/env/gói; không mở lại TC account A hay kiểm thật 3/4 người.
+- PR21/head47649f9 fullCI36success→merge9061bfd; Netlify6af075593632a228f5ca3102 Published đúngSHA, hai bundlepublic byte-match. ClientTank deadline/lateevents và NốiTừ503/mấtmembership đã phát hành; local52WordChain/9UI/69Tank/18WS qua.
+- Sau update ở sảnh, NốiTừ tạo/rờiSSQT7U qua. Tank hồi chiều hai account vàoMFSSFS; sau nhiều giờ ngủ lại timeout180s, robots báo đang ngủ. User chọn “Giữ Free, chưa nâng gói”.
+- Redeploy đúngc705100 lần cuối dep-dbo7ke3rjlhs73aktsj0 Live20:35GMT+7; health200/~0,45s/WSSopen~0,29s. Client mới tự nối lại nhậnMB7CU8, đã Rời phòng→menu. Đây là phục hồi thủ công, chưa sửa ổn định cold start.
+- [Bằng chứng/giới hạn](qa/ONLINE-ERROR-2026-11-08.md).409cũ chưa cóbody; ON5/ON6 cònQA. Ảnhfixture chỉlocal; không đổiSQL/gói/Auth/commerce. Log trước đóng giữ [nguyên văn](archive/WORKLOG-2026-11-08-before-online-error-release-close.md); chưa bắt đầu Snake.
 
 ## 08/11/2026 · WC-PUBLIC DONE phát hành · codex/word-chain-release-handoff
 
