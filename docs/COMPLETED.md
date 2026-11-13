@@ -11,6 +11,13 @@
 
 - Nhánh codex/word-chain-launcher-release/nguồn5a64fef: [NốiTừ](word-chain/ONLINE-PLAN.md) staging→phòng→queue→PK→mạng/Auth; [Snake](snake/CONTINUATION-PLAN.md) baseline→UI/save→thiết bị/nội dung→release. Có task/file/AC; plan không tự cấp quyền deploy.
 
+## SN-R2b · đã phát hành R01 · 13/11/2026
+
+- `codex/snake-public-release`, PR #29, CI #47 qua, main `19af480`, Netlify Published.
+- R01 miễn phí, 10 màn, icon/banner đã duyệt. Lưu riêng theo người chơi trên thiết bị.
+- Public Chrome qua tải gói, reload offline, màn 1/âm thanh/thoát. JS game và 20 media khớp build.
+- Còn nghiệm thu Android/iPhone, người mới chơi và live save/JWT. [QA phát hành](qa/SNAKE-PUBLIC-2026-11-13.md).
+
 ## SN-R2a · ứng viên Snake local · 12/11/2026
 
 - Nhánh codex/snake-catalog-candidate tại 4432a0e. Kiểm 10 màn, lazy media, gói offline 36 tệp, favorite/recent, save khách và tài khoản riêng. [QA](qa/SNAKE-CATALOG-2026-11-12.md). SN-R2b thực hiện từ main ngày 13/11.

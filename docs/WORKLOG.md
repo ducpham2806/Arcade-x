@@ -2,10 +2,10 @@
 
 Một nhật ký chính, tối đa ba mục. [Log trước lượt phát hành Snake](archive/WORKLOG-2026-11-13-before-snake-public.md). Xem WORKFLOW và COMPLETED.
 
-## 13/11/2026 · SN-R2b đang phát hành · codex/snake-public-release
+## 13/11/2026 · SN-R2b đã phát hành · codex/snake-public-release
 
 - Chủ dự án yêu cầu merge main và deploy Netlify. Tách Snake từ ứng viên 4432a0e sang nhánh dựa trên main9061bfd. R01 miễn phí, lưu trên thiết bị theo owner, không dùng cloud save hay thưởng chung ở bản sảnh.
-- Build production và rollback, Chrome card/tải gói/retry/reload offline/ảnh/âm thanh/đổi account đã qua. Ẩn công cụ QA trong game public. Chờ CI trên PR trước khi merge. [Báo cáo](qa/SNAKE-PUBLIC-2026-11-13.md).
+- Build production và rollback, Chrome card/tải gói/retry/reload offline/ảnh/âm thanh/đổi account đã qua. Ẩn công cụ QA trong game public. PR #29, CI #47 success ở `a215da6` sau sửa đọc phiên cũ xuyên tab. Merge `19af480`, Netlify Published 14:59 GMT+7. Chrome public qua tải gói/reload offline/màn 1/thoát, JS game và 20 media khớp SHA-256. Còn nghiệm thu thiết bị và lưu cloud thật. [Báo cáo](qa/SNAKE-PUBLIC-2026-11-13.md).
 
 ## 08/11/2026 · ONLINE-ERROR phát hành / Free phục hồi thủ công · codex/online-error-release-verification
 

@@ -1,6 +1,6 @@
-# Snake Legend — hoàn tất preview trước phát hành
+# Snake Legend — R01 đã phát hành
 
-Mốc 12/11/2026 · SN-R2a ứng viên catalog từ 3a3db28. [SN-R0a](../qa/SNAKE-R0A-2026-11-12.md) và [UI-save R0b local](../qa/SNAKE-R0B-2026-11-12.md) đã kiểm; chưa merge/deploy. Nguồn engine tương đương `5a64fef`. PR#12 đã merge journey/cloud progress/session/boss/props/audio. SN-R2b đang đưa R01 vào sảnh theo yêu cầu chủ dự án 13/11. Đừng làm lại cloud hydrate từ ghi chú lịch sử.
+Mốc 12/11/2026 · SN-R2a ứng viên catalog từ 3a3db28. [SN-R0a](../qa/SNAKE-R0A-2026-11-12.md) và [UI-save R0b local](../qa/SNAKE-R0B-2026-11-12.md) đã kiểm; chưa merge/deploy. Nguồn engine tương đương `5a64fef`. PR#12 đã merge journey/cloud progress/session/boss/props/audio. SN-R2b đã đưa R01 vào sảnh ngày 13/11. Đừng làm lại cloud hydrate từ ghi chú lịch sử.
 
 ## SN-PLAN · DONE tài liệu · 07/11/2026
 
@@ -13,7 +13,7 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 | SN-R1a | LOCAL fixes/coverage12/11; WAITING thiết bị thật | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
 | SN-R1b | LOCAL 10 màn và renderer đã kiểm; M2 WAITING | Duyệt art, animation, audio và lượt người mới trên thiết bị thật |
 | SN-R2a | LOCAL ứng viên catalog và gói offline đã kiểm | Nghiệm thu thật và quyết định đưa lên sảnh public |
-| SN-R2b | ACTIVE chủ dự án yêu cầu phát hành 13/11 | CI/merge/Netlify và smoke public |
+| SN-R2b | DONE phát hành 13/11 | CI #47, main 19af480, Netlify Published, smoke public và offline qua |
 
 ## Bằng chứng đã có và giới hạn
 
@@ -27,4 +27,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** [SN-R2b](../qa/SNAKE-PUBLIC-2026-11-13.md) chốt CI, merge, Netlify Published và kiểm bản public. Phạm vi R01 offline-first lưu trên thiết bị theo owner. Còn M2, Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md).
+**Tiếp theo:** [SN-R2b](../qa/SNAKE-PUBLIC-2026-11-13.md) đã phát hành, có bằng chứng CI, merge và chơi offline trên site công khai. Phạm vi R01 offline-first lưu trên thiết bị theo owner. Còn M2, Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md).

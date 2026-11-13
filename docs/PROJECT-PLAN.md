@@ -11,7 +11,7 @@ Mốc nguồn main9061bfd: PR21 đã merge sau fullCI36; Netlify Published đún
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
 | Duy trì | Nối Từ / incident online | Client đã phát hành, Tank giữFree/phục hồi thủ công; ON5/ON6 cònQA | [Nối Từ](plans/WORD-CHAIN.md) |
-| 1 | Snake Legend | SN-R2b đang phát hành R01 offline-first. Live save và thiết bị thật theo dõi riêng | [Snake](plans/SNAKE.md) |
+| 1 | Snake Legend | SN-R2b đã phát hành R01 offline-first. Còn nghiệm thu thiết bị, người mới chơi và live save | [Snake](plans/SNAKE.md) |
 | Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
 | 5 | Battleship và game đã tích hợp | GP-R0 xác minh lại khoảng trống QA từ báo cáo cũ; GP-R1 polish theo lỗi tái hiện; GP-R2 Rainbow/Chronicles chỉ khi chọn mở phạm vi | [QA và hoàn thiện game](plans/GAME-POLISH.md) |

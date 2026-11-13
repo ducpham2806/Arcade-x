@@ -77,9 +77,9 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** candidate có đủ kiểm tra/asset/budget, backend và chính sách rõ; báo cáo go/no-go phân biệt code/merge/deploy/nghiệm thu. Rollback không làm mất save; reward/commerce không tự bật.
 
-### SN-R2b · ACTIVE chủ dự án duyệt phát hành 13/11 · pilot và nghiệm thu production
+### SN-R2b · DONE phát hành 13/11 · còn nghiệm thu thiết bị thật
 
-[Báo cáo phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md). Full CI trên head tích hợp, deploy theo quyền hiện hành, kiểm launcher production và tiến trình mới/cũ trên thiết bị thật. Theo dõi save fail/timeout, crash và tải asset, dừng rollout khi lỗi mất tiến trình/nhầm account. Nếu chưa đủ thiết bị hoặc tài khoản thì WAITING, không đánh DONE từ build xanh.
+[Báo cáo phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md). CI #47 qua, main 19af480 đã Published. Chrome public qua tải gói, reload offline, chơi màn 1 và thoát. Nghiệm thu thiết bị thật và người mới chơi tiếp tục ở SN-R1a/M2. Kiểm live save/JWT theo SN-R0b.
 
 ## Bộ kiểm tra cần chạy
 
