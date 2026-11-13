@@ -80,7 +80,14 @@
     "analyze:bundle": "node scripts/analyze-bundle.mjs",
     "test:bundle": "node scripts/analyze-bundle.mjs --budget",
     "perf:first-load": "node tests/perf/first-load-bytes.cjs",
+    "build:snake-disabled": "vite build --mode snake-disabled",
+    "build:snake-catalog": "node scripts/build-duel-worker.mjs && vite build --mode snake-catalog",
+    "preview:snake-catalog": "vite preview --mode snake-catalog --host 127.0.0.1 --port 4343 --strictPort",
+    "test:snake-catalog": "node tests/snake/catalog.cjs",
     "build:snake-preview": "vite build --config vite.snake-preview.config.ts",
+    "analyze:snake-preview": "node scripts/snake-preview-baseline.mjs",
+    "test:snake-preview-runtime": "node tests/snake/preview-runtime.cjs",
+    "test:snake-local": "npm run test:snake-cloud && npm run test:snake-session && npm run test:snake-journey && npm run test:snake-boss && npm run test:snake-props && npm run test:snake-audio",
     "test:snake-preview": "node tests/snake/preview-package.mjs",
     "test:neon": "node scripts/neon/tune-levels.mjs --check && node tests/neon/routes.cjs && node tests/neon/web.cjs",
     "test:neon-feel": "node tests/neon/feel.cjs",
@@ -97,7 +104,10 @@
     "test:snake-audio": "node tests/snake/audio.mjs",
     "build:snake-audio": "python3 scripts/build-snake-audio.py",
     "preview:word-chain-staging": "node scripts/word-chain-staging-preview.mjs && node scripts/word-chain-staging-server.mjs",
-    "build:word-chain-edge": "node scripts/word-chain-build-edge.mjs"
+    "build:word-chain-edge": "node scripts/word-chain-build-edge.mjs",
+    "test:snake-ui": "node --test tests/snake/ui-live-guard.mjs && playwright test tests/snake/ui-save.test.ts tests/snake/ui-controls.test.ts --output=test-results/snake-ui",
+    "test:snake-ui-live": "node scripts/test-snake-ui-live.mjs",
+    "test:snake-controls": "playwright test tests/snake/ui-controls.test.ts --output=test-results/snake-controls"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

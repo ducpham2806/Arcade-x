@@ -50,10 +50,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const switching = () => { if (alive) setLoading(true); };
     window.addEventListener('arcadex:account_switching', switching);
     void AuthService.initialize().then(result => { if (alive) apply(result); });
-    const unsubscribe = AuthService.listen(() => {
+    const unsubscribe = AuthService.listen(session => {
       if (!alive) return;
       setLoading(true);
-      void AuthService.restoreSession().then(result => { if (alive) apply(result); });
+      void AuthService.restoreSession(session).then(result => { if (alive) apply(result); });
     });
     return () => { alive = false; unsubscribe(); window.removeEventListener('arcadex:auth_recovery', recovered); window.removeEventListener('arcadex:account_switching', switching); };
   }, [apply]);

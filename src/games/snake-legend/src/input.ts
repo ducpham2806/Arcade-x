@@ -14,6 +14,8 @@ export class Controls {
   window.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||e.target instanceof HTMLSelectElement||e.target instanceof HTMLTextAreaElement)return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD','Space','Escape'].includes(e.code)){e.preventDefault();if(e.code==='Escape'){if(!e.repeat)onToggle();return;}this.keys.add(e.code);}},{signal});
   window.addEventListener('keyup',e=>this.keys.delete(e.code),{signal});
   window.addEventListener('blur',()=>{this.clear();onPause();},{signal});
+  window.addEventListener('pagehide',()=>{this.clear();onPause();},{signal});
+  window.addEventListener('orientationchange',()=>{this.clear();onPause();},{signal});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){this.clear();onPause();}},{signal});
  }
  read():Input{const k=this.keys,x=Number(k.has('KeyD')||k.has('ArrowRight'))-Number(k.has('KeyA')||k.has('ArrowLeft')),y=Number(k.has('KeyS')||k.has('ArrowDown'))-Number(k.has('KeyW')||k.has('ArrowUp'));return {x:x||y?x:this.stick.x,y:x||y?y:this.stick.y,steering:x||y?1:this.sensitivity,dash:k.has('Space')||this.dashPointer!==null};}

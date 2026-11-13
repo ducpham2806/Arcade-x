@@ -1,7 +1,9 @@
 import { ALL_GAMES_LIST, GAME_REGISTRY } from '../games/registry';
 import type { GameMetadata } from '../types';
+import { SNAKE_GAME_ID } from '../games/snake-legend/catalog-mode';
 export type CatalogGame = GameMetadata & { availability: 'published' | 'maintenance'; accessModel: 'free' | 'premium'; supportsOffline: boolean; featured: boolean; sortOrder: number; deviceOnly?: boolean };
-export const BUNDLED_FREE_GAME_IDS=['word-chain','tank-clash'];
+const snakeCatalogBuild=!!GAME_REGISTRY[SNAKE_GAME_ID]?.offlinePackage;
+export const BUNDLED_FREE_GAME_IDS=snakeCatalogBuild?[SNAKE_GAME_ID,'word-chain','tank-clash']:['word-chain','tank-clash'];
 export const isBundledFreeGame=(id:string)=>BUNDLED_FREE_GAME_IDS.includes(id);
 export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker'];
 export const isDeviceLibraryGame=(id:string)=>isBundledFreeGame(id)||isLocalReviewGame(id);
@@ -14,7 +16,7 @@ export function parseCatalog(raw: any): Catalog | null {
   const seen = new Set<string>();
   const games: CatalogGame[] = raw.games.flatMap((row: any) => {
     const base = GAME_REGISTRY[row?.engine_key];
-    if (!base || row.id !== base.id || seen.has(row.id) || !['published','maintenance'].includes(row.status) || !['free','premium'].includes(row.access_model)) return [];
+    if (!base || (snakeCatalogBuild && base.id===SNAKE_GAME_ID) || row.id !== base.id || seen.has(row.id) || !['published','maintenance'].includes(row.status) || !['free','premium'].includes(row.access_model)) return [];
     seen.add(row.id);
     return [{...base,title:['hex-match','neon-runner'].includes(base.id)?base.title:typeof row.title==='string'?row.title.slice(0,100):base.title,
       shortDesc:['hex-match','neon-runner'].includes(base.id)?base.shortDesc:typeof row.short_description==='string'?row.short_description.slice(0,500):base.shortDesc,

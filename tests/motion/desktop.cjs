@@ -4,7 +4,7 @@
 const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
-const ids = Object.keys(JSON.parse(fs.readFileSync('src/games/packageAssets.json'))).sort();
+const ids = require('../helpers/bundled-game-ids.cjs')().sort();
 const only = process.argv.find(v=>v.startsWith('--only='))?.slice(7).split(',');
 const modes = process.argv.includes('--reduce-only') ? ['reduce'] : ['no-preference', 'reduce'];
 const PORT = 4330, report = [], failures = [];
@@ -39,6 +39,10 @@ async function authoredAnimations(page) {
   });
 }
 async function startCanvasGame(page,id) {
+  if(id==='snake-legend'){
+    await page.locator('.journey-play').click();
+    await page.locator('.story-app .overlay [data-action="primary"]').click();
+  }
   if(id==='tank-clash')await page.locator('[data-action="training"]').click();
   if(id==='rainbow-blocks')await page.locator('#rb-play').click();
   if(id==='cosmic-defense')await page.locator('#cd-quick-play').click();
@@ -72,7 +76,7 @@ async function startCanvasGame(page,id) {
      await page.waitForTimeout(450); // launcher entrance/lazy save gate must settle before attaching a probe
      const css=await probe(page,'#game-viewport-stage');
      assert.equal(css.duration,'2s',id+': launcher CSS truncates gameplay animation');assert.equal(css.pseudoDuration,'2s',id+': launcher CSS truncates pseudo animation');assert.equal(css.iterations,'infinite');assert.ok(css.advanced&&css.changed,id+': animation must visibly progress, not just exist '+JSON.stringify(css));
-     const continuous=['tank-clash','rainbow-blocks','cosmic-defense','cyber-slice','eat-em-all','neon-runner','brick-breaker','boom-buddies'].includes(id);
+     const continuous=['snake-legend','tank-clash','rainbow-blocks','cosmic-defense','cyber-slice','eat-em-all','neon-runner','brick-breaker','boom-buddies'].includes(id);
      let painting=null;
      if(continuous){
       await startCanvasGame(page,id);await page.waitForTimeout(600);

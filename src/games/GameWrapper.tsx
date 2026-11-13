@@ -607,9 +607,11 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-400" title="Kỷ lục">
-              <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
-              <strong className="text-yellow-400 font-mono">{(highScore || 0).toLocaleString()}</strong>
+            <div className="flex items-center gap-1.5 text-xs text-slate-400" title={gameMeta.launcherScores !== false ? "Kỷ lục" : undefined}>
+              {gameMeta.launcherScores !== false && <>
+                <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
+                <strong className="text-yellow-400 font-mono">{(highScore || 0).toLocaleString()}</strong>
+              </>}
               <span id="game-save-status-slot" className="min-w-0 flex"/>
             </div>
           </div>

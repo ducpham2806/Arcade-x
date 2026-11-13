@@ -24,7 +24,10 @@ async function tab(t, initial = 'owner-a') {
   const writeOwner = id => id ? values.set('arcadex_current_user', JSON.stringify({ id, provider: 'supabase', isGuest: false })) : values.delete('arcadex_current_user');
   writeOwner(initial);
   const previous = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
-  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: k => values.get(k) ?? null } });
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
+    getItem: k => values.get(k) ?? null,
+    removeItem: k => values.delete(k),
+  } });
   let listener;
   const fixture = { sdk: { auth: {
     onAuthStateChange: fn => { listener = fn; return { data: { subscription: { unsubscribe: () => { listener = undefined; } } } }; },
@@ -72,4 +75,24 @@ test('external logout invalidates an older restore before it can reactivate the 
   a.writeOwner(null); a.emit('SIGNED_OUT');
   finish({ data: { session: session('owner-a') }, error: null });
   assert.equal((await pending).cancelled, true);
+});
+
+test('cross-tab sign-out uses the event even while the SDK still reports the old session', async t => {
+  const a = await tab(t);
+  a.stop();
+  let getSessionCalls = 0;
+  a.fixture.sdk.auth.getSession = async () => {
+    getSessionCalls++;
+    return { data: { session: session('owner-a') }, error: null };
+  };
+  let restore;
+  const stop = a.AuthService.listen(eventSession => {
+    restore = a.AuthService.restoreSession(eventSession);
+  });
+  t.after(stop);
+  a.emit('SIGNED_OUT');
+  assert.ok(restore, 'sign-out must start a restore');
+  assert.equal((await restore).success, true);
+  assert.equal(getSessionCalls, 0);
+  assert.equal(a.AuthService.getCurrentUser(), null);
 });

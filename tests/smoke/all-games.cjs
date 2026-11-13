@@ -7,6 +7,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
+const bundledGameIds = require('../helpers/bundled-game-ids.cjs');
 
 const PORT = 4324;
 const outDir = process.argv.find(a => a.startsWith('--outDir='))?.split('=')[1];
@@ -33,7 +34,7 @@ const only = process.argv.find(a => a.startsWith('--only='))?.split('=')[1]?.spl
     await page.locator('#game-library').waitFor({ timeout: 15000 });
     const ids = (await page.locator('[id^="btn-play-"]:not([id^="btn-play-ai-"]):not([id^="btn-play-recent-"])').evaluateAll(els => els.map(e => e.id.slice('btn-play-'.length))))
       .filter(id => !only || only.includes(id));
-    const bundled = Object.keys(JSON.parse(fs.readFileSync('src/games/packageAssets.json'))).filter(id => !only || only.includes(id));
+    const bundled = bundledGameIds(outDir).filter(id => !only || only.includes(id));
     assert.deepEqual([...ids].sort(), bundled.sort(), 'smoke must cover every bundled engine; do not silently skip unpublished catalog rows');
     for (const id of ids) {
       errors.length = 0;

@@ -1,4 +1,5 @@
 import { packageLazy } from './gamePackages';
+import { snakeCatalogEntries } from './snake-legend/catalog-entry';
 const TankClashGame = packageLazy('tank-clash', () => import('./tank-clash'));
 const BattleshipGame = packageLazy('battleship', () => import('./battleship')); 
 import { BLOSSOM_TITLE } from './hex-match/blossom/branding';
@@ -48,6 +49,7 @@ const WordChainGame = packageLazy('word-chain', () => import('./word-chain').the
 import { WORD_CHAIN_ACHIEVEMENTS, WORD_CHAIN_DROP_RATES, WORD_CHAIN_CONTROLS } from './word-chain/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
+  ...snakeCatalogEntries,
   'tank-clash': {
     id:'tank-clash', title:'Tank Clash', shortDesc:'Xe tăng bắn bật tường · Luyện bot và online 1v1, 2v2',
     description:'Đọc góc bắn, dùng tường để đưa đạn tới đối thủ và đỡ đạn bằng khiên. Học qua năm bài ngắn, luyện 1v1 hoặc đồng đội 2v2 với bot, tạo phòng và tìm trận online bằng tài khoản ArcadeX. Miễn phí; chưa có thưởng hoặc bảng xếp hạng.',

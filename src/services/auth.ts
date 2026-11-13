@@ -145,19 +145,23 @@ export class AuthService {
     if (!startup) startup = this.restoreSession();
     return startup;
   }
-  public static async restoreSession(): Promise<AuthResult> {
+  public static async restoreSession(sessionFromEvent?: Session | null): Promise<AuthResult> {
     const epoch = authEpoch;
     try {
       const recovery = await initializeRecovery();
       if (recovery.status !== 'idle') return { success: true };
       if (!supabase) { await activateSession(null, epoch); return { success: true }; }
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      try { const result = await activateSession(data.session, epoch); const message = takeAuthCallbackMessage(); return message ? { ...result, message } : result; }
+      let session = sessionFromEvent;
+      if (session === undefined) {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        session = data.session;
+      }
+      try { const result = await activateSession(session, epoch); const message = takeAuthCallbackMessage(); return message ? { ...result, message } : result; }
       catch (error) { return { success: false, error: errorText(error), requiresRestore: true }; }
     } catch (error) { return epoch !== authEpoch ? { success: false, cancelled: true } : { success: false, error: errorText(error), requiresRestore: true }; }
   }
-  public static listen(callback: () => void): () => void {
+  public static listen(callback: (session?: Session | null) => void): () => void {
     // Keep the identity this tab observed. Another tab may rewrite USER_KEY
     // before the SDK delivers its broadcast, while our React state is still old.
     let observedId = this.getCurrentUser()?.id;
@@ -170,9 +174,10 @@ export class AuthService {
       if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && nextId !== previousId
         || event === 'SIGNED_OUT' && previousId) {
         // An in-flight restore for the former identity must not win this switch.
-        authEpoch++;
+        const epoch = ++authEpoch;
         // Never await Supabase calls inside the auth callback (the SDK holds its lock).
-        setTimeout(callback, 0);
+        // The event can arrive before another tab's storage changes become visible here.
+        setTimeout(() => { if (epoch === authEpoch) callback(event === 'SIGNED_OUT' ? null : session); }, 0);
       }
     });
     return () => subscription?.data.subscription.unsubscribe();

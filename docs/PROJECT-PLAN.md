@@ -1,17 +1,17 @@
 # Kế hoạch tiếp tục ArcadeX · 08/11/2026
 
-Mốc nguồn main086d6ac: PR19/PR20 đã merge sau full CI29/CI32; Netlify đúng086d6ac Published, phòng/queue production đã kiểm. Render vẫn c705100 (server không đổi). Roadmap không tự mở commerce, thưởng hoặc quyền production mới.
+Mốc nguồn main9061bfd: PR21 đã merge sau fullCI36; Netlify Published đúngSHA và bundlebyte-match. Render vẫn c705100, đã redeploy phục hồi; user giữFree với giới hạn cold start. Roadmap không tự mở commerce, thưởng hoặc quyền production mới.
 
 ## Trọng tâm và thứ tự
 
-**ONLINE-ERROR ACTIVE08/11:** ưu tiên lỗi Nối Từ503/mất phiên và Tankkẹtkết nối trước Snake. [Triage/PR21](qa/ONLINE-ERROR-2026-11-08.md); sửa client đã kiểm local, chưa deploy; cần đúng phiên Render để xác định service.
+**ONLINE-ERROR đã phát hành08/11:** client hai game đã merge/public. TankFree đã phục hồi thủ công, chưa đảm bảo tự thức dậy sau ngủ; user đã chọn giữFree, không hỏi nâng gói lại. [Báo cáo/bước vận hành](qa/ONLINE-ERROR-2026-11-08.md). Checkpoint online đã đóng, chủ dự án yêu cầu phát hành Snake ngày 13/11.
 
 **WC-PUBLIC DONE phát hành08/11:** phòng riêng/nhập mã/PK/ghép trận và34.512từ đã public. User bỏ gate3/4người, giữ CI/fixture; ON5/ON6 còn QA mạng/Auth/thiết bị. [Bằng chứng](word-chain/PUBLIC-RELEASE-2026-11-08.md). Thứ tự tiếp theo là Snake; TC-R0 ca A user để sau. [WORKFLOW](WORKFLOW.md).
 
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
-| 1 | Nối Từ / incident online | ONLINE-ERROR đang triage; WC-PUBLIC đã phát hành, ON5/ON6 còn QA | [Nối Từ](plans/WORD-CHAIN.md) |
-| 2 | Snake Legend | R0a baseline→R0b UI/save/Auth thật→R1thiết bị/nội dung→R2candidate/phát hành khi được chọn | [Snake](plans/SNAKE.md) |
+| Duy trì | Nối Từ / incident online | Client đã phát hành, Tank giữFree/phục hồi thủ công; ON5/ON6 cònQA | [Nối Từ](plans/WORD-CHAIN.md) |
+| 1 | Snake Legend | SN-R2b đang phát hành R01 offline-first. Live save và thiết bị thật theo dõi riêng | [Snake](plans/SNAKE.md) |
 | Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
 | 5 | Battleship và game đã tích hợp | GP-R0 xác minh lại khoảng trống QA từ báo cáo cũ; GP-R1 polish theo lỗi tái hiện; GP-R2 Rainbow/Chronicles chỉ khi chọn mở phạm vi | [QA và hoàn thiện game](plans/GAME-POLISH.md) |
