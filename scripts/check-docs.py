@@ -29,6 +29,7 @@ inputs += [ROOT / name for name in (
     'docs/studio/INSTALLATION.md', 'docs/OWNER-TODO.md',
     'docs/PENDING-DECISIONS.md', 'docs/TESTING.md',
     '.agents/skills/arcadex-studio/SKILL.md',
+    '.agents/skills/arcadex-graphify/SKILL.md', 'docs/studio/GRAPHIFY.md',
 )]
 for file in inputs:
     if not file.is_file() or file.suffix != '.md':

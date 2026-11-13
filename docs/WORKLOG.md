@@ -1,22 +1,20 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa ba mục. [Log trước lượt phát hành Snake](archive/WORKLOG-2026-11-13-before-snake-public.md). Xem WORKFLOW và COMPLETED.
+Một nhật ký chính, tối đa ba mục. [Bản nguyên văn trước sửa Snake Auth](archive/WORKLOG-2026-11-13-before-snake-auth.md). Xem WORKFLOW và COMPLETED.
+
+## 13/11/2026 · SN-AUTH-XTAB sửa local · codex/fix-snake-cross-tab-auth
+
+- Nguồn c5b95a4/PR30 CI49success; trace CI48 xác nhận eventB tới trước SDK storage mới, bind playerB mang JWT anonymous và bị42501. Ràng buộc6RPC restore với token từ cùng Session, header riêng từng request; giữ epoch/save/protocol.
+- Tạo unit realPostgREST và browser lag chỉ khóa SDKstorage của tab cũ. Source trước sửa tái hiện đỏ; sau sửa Auth7/7 và hai ca cross-tab qua17,9s, ảnhB ví0/màn2khóa đã xem. Test không tăngtimeout. Bằng chứng/kiểm tích hợp: [QA](qa/SNAKE-AUTH-XTAB-2026-11-13.md).
+- Storage golden, sync14/14,6suite Snake local và typecheck qua. Bộ UI cuối11/11 qua214,7s/3guard, khôngskip/flaky; lượt đầu cóVitereload dobuild đã giữtrace. Production/preview/rollback/catalog/bundle291,8kBgzip qua. Dùng save-systems/game-qa-playtest, review độc lập QA/Technical Director; graph46services cập nhật483node/1288edge. Chưa merge/deploy, không backend/SQL/reward. CI nhánh mới và Netlify/thiết bị/liveJWT còn riêng.
+
+## 13/11/2026 · DOC-02 Studio/Graphify · codex/studio-graphify-workflow
+
+- Theo yêu cầu chủ dự án, lưu hai repo trong AGENTS/project/skill đầu mối; mỗi task chọn skill/vai trò và graph đúng module. [Nguồn/cài đặt](studio/GRAPHIFY.md).
+- So297tệp Studio với head357b1a1: khớp toàn bộ. Cài Graphify0.9.108/pin52cb282 trong venv riêng; AST46file services cho484node/1291edge; query session/restore/storage budget900/depth2 qua, không LLM. CLI/graph ngoài git, tái lập theo tài liệu.
+- Kiểm docs/link/budget/297blob và npm test:claude qua; không chạy full gameplay cho thay đổi hướng dẫn. Main19af480 đã merge PR29; CI48 còn lỗi cross-tab UI, Netlify chưa xác minh. Chưa sửa Auth hoặc deploy. Bàn giao giữ đúng bước tiếp.
 
 ## 13/11/2026 · SN-R2b đang phát hành · codex/snake-public-release
 
 - Chủ dự án yêu cầu merge main và deploy Netlify. Tách Snake từ ứng viên 4432a0e sang nhánh dựa trên main9061bfd. R01 miễn phí, lưu trên thiết bị theo owner, không dùng cloud save hay thưởng chung ở bản sảnh.
 - Build production và rollback, Chrome card/tải gói/retry/reload offline/ảnh/âm thanh/đổi account đã qua. Ẩn công cụ QA trong game public. Chờ CI trên PR trước khi merge. [Báo cáo](qa/SNAKE-PUBLIC-2026-11-13.md).
-
-## 08/11/2026 · ONLINE-ERROR phát hành / Free phục hồi thủ công · codex/online-error-release-verification
-
-- PR21/head47649f9 fullCI36success→merge9061bfd; Netlify6af075593632a228f5ca3102 Published đúngSHA, hai bundlepublic byte-match. ClientTank deadline/lateevents và NốiTừ503/mấtmembership đã phát hành; local52WordChain/9UI/69Tank/18WS qua.
-- Sau update ở sảnh, NốiTừ tạo/rờiSSQT7U qua. Tank hồi chiều hai account vàoMFSSFS; sau nhiều giờ ngủ lại timeout180s, robots báo đang ngủ. User chọn “Giữ Free, chưa nâng gói”.
-- Redeploy đúngc705100 lần cuối dep-dbo7ke3rjlhs73aktsj0 Live20:35GMT+7; health200/~0,45s/WSSopen~0,29s. Client mới tự nối lại nhậnMB7CU8, đã Rời phòng→menu. Đây là phục hồi thủ công, chưa sửa ổn định cold start.
-- [Bằng chứng/giới hạn](qa/ONLINE-ERROR-2026-11-08.md).409cũ chưa cóbody; ON5/ON6 cònQA. Ảnhfixture chỉlocal; không đổiSQL/gói/Auth/commerce. Log trước đóng giữ [nguyên văn](archive/WORKLOG-2026-11-08-before-online-error-release-close.md).
-
-## 08/11/2026 · WC-PUBLIC DONE phát hành · codex/word-chain-release-handoff
-
-- PR19 merge256620c/CI29; PR20 head970a941/full CI32 success, merge086d6ac. Netlify6af00f400397c396a118ca39 hiện Published/main086d6ac, đã đọc dashboard thật.
-- Backend production áp đúng gói schema/Edge/CORS/Auth/cron/Vault được user duyệt; tick200, denial probes đúng, dictionarypublic34.512 byte-match. Không đọc/xuất secret.
-- Public Chrome với phiên registered: tạo phòng X9FL8R 1/2→rời, queue1/4→hủy, đều về menu. Lần tải đầu lỗi, hard reload rồi mở được; nguyên nhân chưa xác định. CI32 giữ fixture,7offline/7WordChainUI/13TankUI và50logiccheck.
-- User bỏ gate3/4người; chưa2thiết bị/2mạng/soak/Auth/IME/no-client turn. Thưởng online tắt. [Báo cáo cuối](word-chain/PUBLIC-RELEASE-2026-11-08.md); checkpoint này chỉ docs, chưa bắt đầu Snake.

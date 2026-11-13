@@ -43,7 +43,8 @@ test('lost acknowledgement survives reload and retries the same ticket without a
  expect(fixture.calls.commits).toBe(1);expect(fixture.snapshots.get(user.id)?.revision).toBe(1);expect([...fixture.tickets.keys()]).toEqual([ticket]);expect(await pendingSnake(page,user.id)).toBe(0);
 });
 
-test('cross-tab logout/account switch rejects the old late snapshot',async({page,context},info)=>{
+for(const lagSessionStorage of [false,true]){
+test('cross-tab logout/account switch rejects the old late snapshot'+(lagSessionStorage?' with lagging SDK storage':''),async({page,context},info)=>{
  const fixture=await snakeUiFixture(),a=fixture.user('switchA'),b=fixture.user('switchB');
  fixture.snapshots.set(a.id,{revision:7,levels:{'1-1':{stars:[true,true,true],bestScore:999,bestTime:12}},secrets:[],wallet:{snake_gold:999,snake_gem:7}});
  await fixture.install(context);await loginSnake(page,a);fixture.holdReads(true);await openSnakeJourney(page);await expect.poll(()=>fixture.calls.state).toBe(1);
@@ -52,16 +53,34 @@ test('cross-tab logout/account switch rejects the old late snapshot',async({page
  await expect(account.getByRole('button',guestButton)).toBeVisible();
  await page.bringToFront();
  await expect(page.getByRole('button',guestButton)).toBeVisible();
+ if(lagSessionStorage){
+  // Reproduce CI48: the broadcast event reaches this tab before its SDK reads the new session.
+  // Keep shared writes and the login tab untouched; only this tab's session reads lag.
+  await expect.poll(()=>page.evaluate(()=>{
+   const key=Object.keys(localStorage).find(k=>/^sb-.*-auth-token$/.test(k));
+   return key?JSON.parse(localStorage.getItem(key)||'null')?.user?.is_anonymous:false;
+  })).toBe(true);
+  await page.evaluate(()=>{
+   const key=Object.keys(localStorage).find(k=>/^sb-.*-auth-token$/.test(k))!;
+   const stale=localStorage.getItem(key),getItem=Storage.prototype.getItem;
+   Storage.prototype.getItem=function(k){return this===localStorage&&k===key?stale:getItem.call(this,k);};
+   (window as any).__restoreAuthSessionReads=()=>{Storage.prototype.getItem=getItem;};
+  });
+ }
  await account.bringToFront();
  await loginSnake(account,b);
  // Return to the original tab as a player would, without reloading or resolving its held read.
  await page.bringToFront();
  await expect(page.getByRole('button',{name:'Chơi bản preview'})).toBeVisible();
+ // The broadcast restore may finish before B completes its display-name setup.
+ await expect(page.locator('.snake-preview-page footer')).toContainText(new RegExp(b.name+'|'+b.email.split('@')[0]));
+ if(lagSessionStorage)await page.evaluate(()=>(window as any).__restoreAuthSessionReads());
  await openSnakeJourney(page);await expect.poll(()=>fixture.calls.state).toBe(2);
  fixture.releaseRead();await expect(page.locator('[role="status"]').filter({hasText:'Snake Gold 0'})).toBeVisible();
  await expect(page.locator('.journey-best')).toContainText('Một thử thách mới');await expect(page.locator('.snake-journey [data-level="1"]')).toBeDisabled();
  await page.screenshot({path:info.outputPath('account-b-isolated.png')});expect(fixture.snapshots.has(b.id)).toBe(false);expect(fixture.calls.commits).toBe(0);await account.close();
 });
+}
 
 
 test('two device contexts merge competing clears and a late acknowledgement cannot roll back newer state',async({page,context,browser},info)=>{
