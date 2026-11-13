@@ -1,6 +1,6 @@
 # SN-UI-BADGE · ứng viên sửa giao diện · 13/11/2026
 
-Nhánh `codex/fix-hosting-badge-safe-area`, từ `ec65ea9`/PR32; source sản phẩm đang public vẫn là `8320385`. [Bug và AC](../../production/qa/bugs/BUG-NETLIFY-BADGE-MOBILE.md). Đây là kiểm ứng viên, chưa phải xác nhận production đã sửa.
+Nhánh `codex/fix-hosting-badge-safe-area`, [PR33](https://github.com/ducpham2806/Arcade-x/pull/33) gồm checkpoint PR32, từ `ec65ea9`; source sản phẩm đang public vẫn là `8320385`. [Bug và AC](../../production/qa/bugs/BUG-NETLIFY-BADGE-MOBILE.md). Đây là kiểm ứng viên, chưa phải xác nhận production đã sửa.
 
 ## Nguyên nhân và thay đổi
 
@@ -26,4 +26,4 @@ Evidence ngoài git: `/workspace/tooling/hosting-badge-fix-evidence/`, gồm red
 
 Dùng `game-ui-ux`, `input-systems`, `game-qa-playtest`, vai trò Technical Director/QA. AST local components37file/230node/440edge; query GameDetailModal depth1/budget900 trả4node/5edge. Sau thay đổi, refresh services cùng scope/output:47file/485node/1289edge; query installHostingSafeArea depth1/budget900 trả2node/1edge. App/CSS ngoài phạm vi quan hệ đã tra hẹp và xác minh bằng browser. Graph không chứng minh hình học/deploy.
 
-Chưa fullCI nhánh, chưa merge/deploy production bản sửa. Preview hosting thật nếu có sẽ ghi riêng; synthetic contract không chứng minh Netlify hiện tại đã sửa. Android/iPhone/Safari thật, M2/người mới10màn và live DB/JWT vẫn theo [thẻ Snake](../plans/SNAKE.md).
+FullCI đúng head xem checks của PR33 trước merge; trạng thái lúc ghi local chưa có kết quả cuối. Chưa merge/deploy production bản sửa. Netlify deploy-preview6af7051f09c4af71b6c7fc43 ready đúng sourceef9f636; URL deploy-preview-33 chuyển tới app.netlify.com/edge-access, nên browser guest không vào được launcher. Không nghiệm thu HUD thật trên preview và không thay cấu hình bảo vệ/login. Log /tmp/hosting-real-preview.log; synthetic contract không chứng minh production hiện tại đã sửa. Android/iPhone/Safari thật, M2/người mới10màn và live DB/JWT vẫn theo [thẻ Snake](../plans/SNAKE.md).

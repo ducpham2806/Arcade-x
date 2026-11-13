@@ -6,7 +6,7 @@ Một nhật ký chính, tối đa ba mục. [Trước sửa badge](archive/WORK
 
 - Từec65ea9/PR32, user cho làm tiếp S3 hosting. Đo HUD thật, chừa64px theo badge/8px đệm; không sửa branding/iframe/gói. Observer không theo subtree gameplay; popup không co game thêm, hide/remove trả vùng.
 - Baseline8320385 đỏ đúng CTA; candidate hosting5/5, modal36checks kể cả tall phone1000px, catalog/offline/audio/isolation, lint/build/rollback/bundle qua. Animation50+25 và SnakeUI11/11+3guard qua, khôngretry/skip/flaky. [QA và evidence](qa/SNAKE-BADGE-2026-11-13.md).
-- game-ui-ux/input-systems/game-qa-playtest + review QA/Technical Director; giữ cap mobile/desktop theo review. Graph components37file230node440edge, services47file485node1289edge; query depth1/budget900. Chưa CI nhánh/merge/deploy, thiết bị/human/liveJWT còn riêng.
+- game-ui-ux/input-systems/game-qa-playtest + review QA/Technical Director; giữ cap mobile/desktop theo review. Graph components37file230node440edge, services47file485node1289edge; query depth1/budget900. PR33 targetmain gồmPR32; CI theo checks đúng head trướcmerge. Netlifypreview readyef9f636 nhưng edge-access chặn guest; chưa proofHUD thật/merge/deploy, thiết bị/human/liveJWT còn riêng.
 
 ## 13/11/2026 · SN-RELEASE-VERIFY · codex/snake-release-verification-20261113
 

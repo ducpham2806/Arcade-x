@@ -1,6 +1,6 @@
 # Bàn giao · 13/11/2026 · SN-UI-BADGE ứng viên
 
-User cho làm tiếp; nhánh `codex/fix-hosting-badge-safe-area` từec65ea9/PR32. [Thẻ Snake](plans/SNAKE.md), [QA sửa badge](qa/SNAKE-BADGE-2026-11-13.md). Chưa merge/deploy bản sửa; source public8320385 vẫn có S3badge.
+User cho làm tiếp; nhánh `codex/fix-hosting-badge-safe-area` từec65ea9/PR32; [PR33](https://github.com/ducpham2806/Arcade-x/pull/33) targetmain gồm cả checkpointPR32. [Thẻ Snake](plans/SNAKE.md), [QA sửa badge](qa/SNAKE-BADGE-2026-11-13.md). Chưa merge/deploy bản sửa; source public8320385 vẫn có S3badge.
 
 ## Đã làm và kiểm
 
@@ -12,7 +12,7 @@ Dùng game-ui-ux/input-systems/game-qa-playtest, review độc lập QA/Technica
 
 ## Bước kế tiếp
 
-Theo dõi fullCI đúng head của PR ứng viên và Netlify preview với HUD thật nếu có. Chỉ merge main khi chủ dự án yêu cầu; Netlify tự phát hành, sau merge phải xác nhận Published/SHA và smoke lại. Không dùng kiểm local/preview để đóng productionbug. Không cần làm lại engine/save/Auth/SQL/rewards/commerce.
+Đọc checks PR33 để xác nhận fullCI đúng head mới nhất trước merge; status CI trong checkpoint không thay lần đọc mới. Netlify preview6af7051f09c4af71b6c7fc43 ready đúngef9f636 nhưng URL chuyển edge-access, guest không vào được; chưa nghiệm thu HUD thật. Không lặp kiểm preview nếu chưa có quyền truy cập; không đổi cấu hình bảo vệ. Chỉ merge main khi chủ dự án yêu cầu; Netlify tự phát hành, sau merge phải xác nhận Published/SHA và smoke lại. Không dùng kiểm local/preview để đóng productionbug. Không cần làm lại engine/save/Auth/SQL/rewards/commerce.
 
 R01 đã public qua PR31/main8320385 sauCI50; CI51 sau merge success. Netlify6af6f590d7b4bd3516a37885 Published18:34GMT+7 đúngSHA;36resource byte-match, guest/offline/input/audio/exit qua. [QA phát hành](qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](qa/SNAKE-AUTH-XTAB-2026-11-13.md). Registered public cross-tab/liveDB/JWT còn riêng.
 

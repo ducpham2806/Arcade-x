@@ -29,4 +29,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** fullCI/preview và review SN-UI-BADGE trước quyết định merge; nghiệm thu M2/người mới/Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
+**Tiếp theo:** fullCI/review PR33 trước quyết định merge SN-UI-BADGE; preview bị edge-access chặn guest, không tự đổi bảo vệ; nghiệm thu M2/người mới/Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
