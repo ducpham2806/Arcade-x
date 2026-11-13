@@ -2,23 +2,13 @@
 
 Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## DOC-02 · Studio/Graphify · 13/11/2026
+## Snake R01 / Auth / Studio · phát hành · 13/11/2026
 
-- Nhánh `codex/studio-graphify-workflow`, nguồn19af480: lưu quyết định dùng hai repo trong AGENTS/project/skill đầu mối. [Nguồn và cách dùng](studio/GRAPHIFY.md).
-- Studio297blob khớp head357b1a1; giữ116skill/21role. Graphify0.9.108/pin52cb282 đã chạy AST46file/484node/1291edge và query budget900.
-- Kiểm docs/structure theo WORKLOG; chưa sửa cross-tab CI48, chưa xác minh Netlify. Bộ nhớ đi theo checkout; CLI/graph dựng lại theo hướng dẫn.
-
-## SN-AUTH-XTAB · sửa local · 13/11/2026
-
-- Nhánh `codex/fix-snake-cross-tab-auth` từ c5b95a4/PR30. CI48 gửi playerB bằng JWT anonymous; bind6RPC restore với token Session trên từng request.
-- Unit7/7, UI11/11 +3guard qua; storage-lag tái hiện đỏ→xanh, giữ late snapshot/wallet/owner guards. [QA và kiểm tích hợp](qa/SNAKE-AUTH-XTAB-2026-11-13.md).
-- Dùng save-systems/game-qa-playtest, reviewer QA/Technical Director, Graphify services cập nhật483node/1288edge. Chưa merge/deploy; CI nhánh mới, Netlify/thiết bị/live save còn riêng.
-
-[NETLIFY-BUILD/AUTH-XTAB cũ và WC/Snake plan giữ nguyên văn](archive/COMPLETED-2026-11-13-before-snake-auth.md).
-
-## SN-R2a · ứng viên Snake local · 12/11/2026
-
-- Nhánh codex/snake-catalog-candidate tại 4432a0e. Kiểm 10 màn, lazy media, gói offline 36 tệp, favorite/recent, save khách và tài khoản riêng. [QA](qa/SNAKE-CATALOG-2026-11-12.md). SN-R2b thực hiện từ main ngày 13/11.
+- PR29 đưaR01 vào sảnh; PR31/head1909fa6 qua fullCI50 rồi merge8320385, gồmPR30. [QA phát hành](qa/SNAKE-PUBLIC-2026-11-13.md). Netlify6af6f590d7b4bd3516a37885 Published18:34GMT+7 đúng8320385.
+- Public36tệp/3.047.410byte khớp build; guest/card/detail/download/cache/offline reload/input/audio/exit qua, không pageerror/fixture. Tâm CTA/joystick/Dash online tới được; S3badge che một phần nhãn mobile còn theo dõi.
+- Auth6RPC bind tokenSession; unit7/7,UI11/11+3guard và save/sync qua. [QA Auth](qa/SNAKE-AUTH-XTAB-2026-11-13.md). Registered public/live JWT và thiết bị/humanQA còn riêng; CI51 sau merge đang chạy khi lập checkpoint.
+- Studio116skill/21role/297blob + Graphify0.9.108 đã vào main; [nguồn/cách dùng](studio/GRAPHIFY.md). Bộ nhớ theo checkout, không nạp toàn bộ mỗi phiên.
+- Nguồn/bằng chứng local trước phát hành và tóm tắt cũ giữ [nguyên văn](archive/COMPLETED-2026-11-13-before-snake-release-close.md); không đổi engine/save/backend/rewards/commerce.
 
 ## ONLINE-ERROR · đã phát hành · 08/11/2026
 

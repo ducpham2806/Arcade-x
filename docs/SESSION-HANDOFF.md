@@ -1,13 +1,15 @@
-# Bàn giao · 13/11/2026 · SN-AUTH-XTAB sửa local
+# Bàn giao · 13/11/2026 · Snake R01/Auth đã phát hành
 
-Nhánh `codex/fix-snake-cross-tab-auth` từ PR30/c5b95a4 (CI49 success), theo yêu cầu user làm tiếp. CI48/main19af480 có event đăng nhậpB nhưng RPC bind playerB mang JWT anonymous cũ. `activateSession` nay gắn token cùng Session cho6RPC restore trên header riêng từng request; không sửa client headers chung, engine, save, epoch, rewards hoặc backend. [Báo cáo/trace/giới hạn](qa/SNAKE-AUTH-XTAB-2026-11-13.md), [thẻ Snake](plans/SNAKE.md).
+Theo yêu cầu tiếp kế hoạch: fullCI50 trên1909fa6 success cảverify/snake_ui; PR31 retargetmain và merge8320385, gồmPR30 (đã tích hợp/đóng). Tree merge khớp nguồn đã kiểm. Netlify deploy6af6f590d7b4bd3516a37885 Published18:34:34GMT+7 đúng8320385. [Báo cáo public](qa/SNAKE-PUBLIC-2026-11-13.md), [QA Auth](qa/SNAKE-AUTH-XTAB-2026-11-13.md), [thẻ Snake](plans/SNAKE.md).
 
-## Đã kiểm
+## Đã xác minh
 
-Unit realPostgREST và browser lag storage tái hiện source cũ đỏ→bản sửa xanh; Auth7/7, hai ca cross-tab qua17,9s, giữ ví/màn/late snapshot isolation. Storage golden, sync14/14,6suite Snake local, typecheck, production/preview/rollback build, root bundle291,8kB gzip và catalog/offline package qua. Đã xem ảnh trước/sau. Lượt UI đầy đủ đầu10/11 có navigation khi build ghi nguồn sinh; ca hai device chạy riêng qua56,2s. Lượt cả bộ tách riêng qua11/11 trong214,7s,3guard; không skip/flaky/retry. Docs/structure/diff qua. Không nới timeout/assertion.
+36resource/3.047.410byte public khớp build. Guest thật khôngAuthfixture: một card, art/favorite, detail390px, tải đủ16code/20media, offline reload quaSW/probe mạng thất bại, mở/chơi màn1 với input/timer, audio preview và exit/recent qua. Khôngpageerror/snake-complete. Online CTA/joystick/Dash tâmnút tới được; đã xem4ảnh.
 
-Dùng save-systems/game-qa-playtest, playbook QA/Technical Director và reviewer độc lập (không finding). Graphify services sau sửa46file/483node/1288edge; AST local, không API. [Cấu hình hai repo đã ghi nhớ](studio/GRAPHIFY.md); đầu phiên chọn1–3skill/vai trò, graph đúng scope và kiểm độ mới. CLI/cache không tự đi theo phiên khác.
+Auth6RPC dùng tokenSession theo từng request; unit7/7/UI11/11+3guard/save/sync/build/bundle qua trước merge. CI51 sau merge8320385 đang chạy khi lập checkpoint. Source client đã Published; không đổi engine/save/backend/SQL/rewards/commerce. Docs-only nhánh `codex/snake-release-verification-20261113` lưu checkpoint sau phát hành.
 
-## Bước tiếp và giới hạn
+## Tiếp theo
 
-Nhánh sửa được gửi PR dựa trên PR30; chờ đủ CI mới trước merge; chưa merge/deploy. Sửa này ràng buộc credential khi restore, không tuyên bố sửa mọi race anonymous/storage. Sau tích hợp mới xác minh Netlify Published đúngSHA và smoke public. PR29 đã merge main19af480; R01 sảnh lưu theo thiết bị/owner, cloud preview riêng. Thiết bị Android/iPhone/người mới và live save/JWT vẫn chờ. Render Tank giữFree; Nối Từ ON5/ON6 cònQA; commerce tắt. Nhật ký duy nhất WORKLOG, tối đa3mục; chi tiết cũ có archive.
+Theo dõi CI51. [Bug S3 badge Netlify](../production/qa/bugs/BUG-NETLIFY-BADGE-MOBILE.md) che phần nhãn footer/Dash khi online390px, tâmnút vẫn hoạt động; có thể polish local theoAC, không tự xóa branding/nânggói. Nghiệm thu M2/người mới10màn, Android/iPhone/Safari, FPS/heap/audio và SN-R0b live DB/JWT còn chờ; registered public cross-tab chưa kiểm bằng tài khoản thật. Đừng gọi Chromiumviewport là thiết bị thật hoặc public guest là live cloud proof.
+
+Dùng game-release-liveops/game-qa-playtest, vai trò release-lead. [Studio/Graphify](studio/GRAPHIFY.md) đã vào main: mỗi task chọn1–3skill/vai trò, graph đúngscope/độmới; graph không chứng minh deploy. CLI/cache ngoài git. Render Tank giữFree, Nối TừON5/ON6 cònQA, commerce tắt. MộtWORKLOG tối đa3mục, lịch sử nguyên văn trong archive.

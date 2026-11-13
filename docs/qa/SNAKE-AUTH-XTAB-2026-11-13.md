@@ -34,4 +34,4 @@ Dùng `save-systems`, `game-qa-playtest`, playbook QA Lead/Technical Director; r
 
 ## Trạng thái và giới hạn
 
-DONE local, chưa merge/deploy. Phạm vi là credential khi restore, không tuyên bố sửa mọi race cấp anonymous hoặc mọi đồng bộ storage. Không đổi save format/engine/replay/rewards/commerce hoặc backend flags/SQL. Full CI trên nhánh sửa cần trước merge; sau đó mới xác minh bản phát hành đúng SHA. Thiết bị thật, live save/JWT và Netlify vẫn là gate riêng.
+FullCI50 success trên1909fa6; PR31 đã merge8320385 cùng PR30. Netlify Published đúng8320385,36resource byte-match và guest/offline smoke public qua; [bằng chứng phát hành](SNAKE-PUBLIC-2026-11-13.md). CI51 sau merge đang chạy khi lập checkpoint. Phạm vi sửa là credential khi restore, không tuyên bố sửa mọi race anonymous/storage. Không đổi save format/engine/replay/rewards/commerce/backend/SQL. Registered cross-tab trên public, thiết bị thật và live save/JWT chưa kiểm trong lượt phát hành này.

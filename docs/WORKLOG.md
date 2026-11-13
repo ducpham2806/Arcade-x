@@ -1,6 +1,12 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa ba mục. [Bản nguyên văn trước sửa Snake Auth](archive/WORKLOG-2026-11-13-before-snake-auth.md). Xem WORKFLOW và COMPLETED.
+Một nhật ký chính, tối đa ba mục. [Trước đóng phát hành Snake](archive/WORKLOG-2026-11-13-before-snake-release-close.md). Xem WORKFLOW và COMPLETED.
+
+## 13/11/2026 · SN-RELEASE-VERIFY · codex/snake-release-verification-20261113
+
+- User cho tiếp kế hoạch; fullCI50/head1909fa6 success cảverify/snake_ui. PR31 retargetmain→merge8320385, gồmPR30; tree khớp nguồn đã kiểm. Netlify6af6f590d7b4bd3516a37885 Published18:34:34GMT+7 đúngSHA; đọc API thật.
+- Public36resource/3.047.410byte byte-match build;6nhóm guest/card/art/favorite/mobile detail/download/offline reload/play/input/audio/exit qua, khôngAuthfixture/pageerror/snake-complete. Online probeCTA/joystick/Dash tới được. Đã xem4ảnh; S3badge hosting che một phần nhãn mobile được ghi bug.
+- [QA/giới hạn](qa/SNAKE-PUBLIC-2026-11-13.md): Chromiumviewport không thay điện thoại/human/liveJWT; registered public chưa kiểm. Dùng game-release-liveops/game-qa-playtest và release-lead. CLItrustCA môi trường trongNSS, giữTLS. CI51 sau merge đang chạy; docs-only checkpoint kiểm docs/structure/diff, không chạy lại gameplay.
 
 ## 13/11/2026 · SN-AUTH-XTAB sửa local · codex/fix-snake-cross-tab-auth
 
@@ -13,8 +19,3 @@ Một nhật ký chính, tối đa ba mục. [Bản nguyên văn trước sửa 
 - Theo yêu cầu chủ dự án, lưu hai repo trong AGENTS/project/skill đầu mối; mỗi task chọn skill/vai trò và graph đúng module. [Nguồn/cài đặt](studio/GRAPHIFY.md).
 - So297tệp Studio với head357b1a1: khớp toàn bộ. Cài Graphify0.9.108/pin52cb282 trong venv riêng; AST46file services cho484node/1291edge; query session/restore/storage budget900/depth2 qua, không LLM. CLI/graph ngoài git, tái lập theo tài liệu.
 - Kiểm docs/link/budget/297blob và npm test:claude qua; không chạy full gameplay cho thay đổi hướng dẫn. Main19af480 đã merge PR29; CI48 còn lỗi cross-tab UI, Netlify chưa xác minh. Chưa sửa Auth hoặc deploy. Bàn giao giữ đúng bước tiếp.
-
-## 13/11/2026 · SN-R2b đang phát hành · codex/snake-public-release
-
-- Chủ dự án yêu cầu merge main và deploy Netlify. Tách Snake từ ứng viên 4432a0e sang nhánh dựa trên main9061bfd. R01 miễn phí, lưu trên thiết bị theo owner, không dùng cloud save hay thưởng chung ở bản sảnh.
-- Build production và rollback, Chrome card/tải gói/retry/reload offline/ảnh/âm thanh/đổi account đã qua. Ẩn công cụ QA trong game public. Chờ CI trên PR trước khi merge. [Báo cáo](qa/SNAKE-PUBLIC-2026-11-13.md).
