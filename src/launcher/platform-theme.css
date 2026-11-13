@@ -25,7 +25,7 @@
 .platform-ui button[aria-pressed=true]:not(.launcher-primary),.platform-ui button[aria-selected=true] {background:#e9edff;color:#3449b9;border-color:#aebbef;}
 @media(max-width:639px){
  .platform-ui.arcadex-modal-overlay,.platform-ui .arcadex-modal-overlay {padding:0;}
- .platform-ui :is(.arcadex-modal-container,.arcadex-modal-container-xl,.arcadex-modal-container-md,.arcadex-modal-container-sm) {width:100%;height:100dvh;max-height:100dvh;border-radius:0;border:0;}
+ .platform-ui :is(.arcadex-modal-container,.arcadex-modal-container-xl,.arcadex-modal-container-md,.arcadex-modal-container-sm) {width:100%;height:100%;max-height:100%;border-radius:0;border:0;}
 }
 @media(prefers-reduced-motion:reduce){.platform-ui *{scroll-behavior:auto!important;transition-duration:0s!important;animation-duration:.01ms!important;animation-iteration-count:1!important;}}
 .platform-ui [class*="bg-[#050505]"] {background-color:#fff;}

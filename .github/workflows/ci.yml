@@ -33,6 +33,21 @@ jobs:
             test-results/qc-results.json
           if-no-files-found: ignore
           retention-days: 7
+      - name: Hosting badge safe area, late insertion, popover and removal
+        run: npm run test:hosting
+        env:
+          QC_REPORT_PATH: test-results/hosting-badge-results.json
+          QC_HTML_PATH: test-results/hosting-badge-html
+      - name: Preserve hosting safe area evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosting-badge-evidence
+          path: |
+            test-results/hosting-badge/
+            test-results/hosting-badge-results.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Snake production catalog, rollback build and offline package
         run: npm run build && npm run build:snake-disabled && npm run test:snake-catalog
       - name: Preserve Snake catalog candidate evidence

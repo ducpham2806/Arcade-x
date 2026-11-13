@@ -1,15 +1,19 @@
-# Bàn giao · 13/11/2026 · Snake R01/Auth đã phát hành
+# Bàn giao · 13/11/2026 · SN-UI-BADGE ứng viên
 
-Theo yêu cầu tiếp kế hoạch: fullCI50 trên1909fa6 success cảverify/snake_ui; PR31 retargetmain và merge8320385, gồmPR30 (đã tích hợp/đóng). Tree merge khớp nguồn đã kiểm. Netlify deploy6af6f590d7b4bd3516a37885 Published18:34:34GMT+7 đúng8320385. [Báo cáo public](qa/SNAKE-PUBLIC-2026-11-13.md), [QA Auth](qa/SNAKE-AUTH-XTAB-2026-11-13.md), [thẻ Snake](plans/SNAKE.md).
+User cho làm tiếp; nhánh `codex/fix-hosting-badge-safe-area` từec65ea9/PR32. [Thẻ Snake](plans/SNAKE.md), [QA sửa badge](qa/SNAKE-BADGE-2026-11-13.md). Chưa merge/deploy bản sửa; source public8320385 vẫn có S3badge.
 
-## Đã xác minh
+## Đã làm và kiểm
 
-36resource/3.047.410byte public khớp build. Guest thật khôngAuthfixture: một card, art/favorite, detail390px, tải đủ16code/20media, offline reload quaSW/probe mạng thất bại, mở/chơi màn1 với input/timer, audio preview và exit/recent qua. Khôngpageerror/snake-complete. Online CTA/joystick/Dash tâmnút tới được; đã xem4ảnh.
+Đọc HUD thật, đo `.nl-badge` trongiframe sẵn sàng; chừa64px theo hình học/8px đệm, fallback outer bounds khi opaque. Giữ branding/iframe/link/góiFree. Observer trực tiếp body và frame, không theo subtreegame; popup không co game thêm, hide/remove trả vùng. Khung modal/game lấp vùng còn lại; giữ mobile100%, cap desktop900/800/700. Review QA/Technical Director sửa nguy cơ generic900px làm hụt tallmobile.
 
-Auth6RPC dùng tokenSession theo từng request; unit7/7/UI11/11+3guard/save/sync/build/bundle qua trước merge. FullCI51 sau merge8320385 success cảverify/snake_ui. Source client đã Published; không đổi engine/save/backend/SQL/rewards/commerce. Docs-only nhánh `codex/snake-release-verification-20261113` lưu checkpoint sau phát hành.
+Baseline8320385 đỏ đúngCTA; hosting5/5 khôngretry/skip/flaky ở320/390/844landscape/1440 +opaque. Fullstick/dashzone gồmnhãn vàCTA clear, launch/timer/exit/branding qua. Lint/build/rollback/bundle qua; catalog16code/20media/offline reload/play/audio/guest-account qua. Modal36checks gồm390×1000 và1440×1200/AppModalMummy/tabs ổn định. Animation50/50+VFX25/25 và SnakeUI11/11+3guard qua, khôngretry/skip/flaky.
 
-## Tiếp theo
+Dùng game-ui-ux/input-systems/game-qa-playtest, review độc lập QA/Technical Director. Graph components37file230node440edge/queryGameDetailModal4node5edge; refresh services47file485node1289edge/queryinstaller2node1edge; depth1/budget900. App/CSS tra hẹp. Graph/CLI/evidence ngoài git; [tái lập](studio/GRAPHIFY.md).
 
-[Bug S3 badge Netlify](../production/qa/bugs/BUG-NETLIFY-BADGE-MOBILE.md) che phần nhãn footer/Dash khi online390px, tâmnút vẫn hoạt động; có thể polish local theoAC, không tự xóa branding/nânggói. Nghiệm thu M2/người mới10màn, Android/iPhone/Safari, FPS/heap/audio và SN-R0b live DB/JWT còn chờ; registered public cross-tab chưa kiểm bằng tài khoản thật. Đừng gọi Chromiumviewport là thiết bị thật hoặc public guest là live cloud proof.
+## Bước kế tiếp
 
-Dùng game-release-liveops/game-qa-playtest, vai trò release-lead. [Studio/Graphify](studio/GRAPHIFY.md) đã vào main: mỗi task chọn1–3skill/vai trò, graph đúngscope/độmới; graph không chứng minh deploy. CLI/cache ngoài git. Render Tank giữFree, Nối TừON5/ON6 cònQA, commerce tắt. MộtWORKLOG tối đa3mục, lịch sử nguyên văn trong archive.
+Theo dõi fullCI đúng head của PR ứng viên và Netlify preview với HUD thật nếu có. Chỉ merge main khi chủ dự án yêu cầu; Netlify tự phát hành, sau merge phải xác nhận Published/SHA và smoke lại. Không dùng kiểm local/preview để đóng productionbug. Không cần làm lại engine/save/Auth/SQL/rewards/commerce.
+
+R01 đã public qua PR31/main8320385 sauCI50; CI51 sau merge success. Netlify6af6f590d7b4bd3516a37885 Published18:34GMT+7 đúngSHA;36resource byte-match, guest/offline/input/audio/exit qua. [QA phát hành](qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](qa/SNAKE-AUTH-XTAB-2026-11-13.md). Registered public cross-tab/liveDB/JWT còn riêng.
+
+M2/người mới10màn, Android/iPhone/Safari thật, FPS/heap/audio vẫn WAITING; Chromiumviewport không thay thiết bị. Studio/Graphify đã lưu trong checkout. RenderTank giữFree; NốiTừON5/ON6 cònQA; commerce tắt. MộtWORKLOG tối đa3mục, archive giữ nguyên văn.

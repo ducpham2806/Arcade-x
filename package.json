@@ -77,6 +77,7 @@
     "test:games": "node tests/smoke/all-games.cjs",
     "test:offline": "node tests/smoke/offline-shell.cjs",
     "test:modals": "node tests/ux/modal-frame.cjs",
+    "test:hosting": "playwright test -c playwright.hosting.config.ts --output=test-results/hosting-badge",
     "analyze:bundle": "node scripts/analyze-bundle.mjs",
     "test:bundle": "node scripts/analyze-bundle.mjs --budget",
     "perf:first-load": "node tests/perf/first-load-bytes.cjs",

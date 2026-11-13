@@ -15,7 +15,7 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 | SN-R2a | LOCAL ứng viên catalog và gói offline đã kiểm | Nghiệm thu thật và quyết định đưa lên sảnh public |
 | SN-R2b | DONE phát hành13/11/main8320385 | CI50→merge/Netlify Published đúngSHA,36resource byte-match và guest/offline smoke public |
 | SN-AUTH-XTAB | MERGED/PUBLISHED13/11 sau CI50 | 6RPC đúng token/owner, unit7/7/UI11/11; registered public/live JWT còn QA riêng |
-| SN-UI-BADGE | READY S3 từ public smoke | [Badge hosting](../../production/qa/bugs/BUG-NETLIFY-BADGE-MOBILE.md) chồng nhãn footer390pxonline; tâm nút còn tới được |
+| SN-UI-BADGE | LOCAL sửa13/11; WAITING CI/merge/deploy | [QA ứng viên](../qa/SNAKE-BADGE-2026-11-13.md): chừa vùng badge, hosting5/5/modal36/catalog qua; production chưa đổi |
 
 ## Bằng chứng đã có và giới hạn
 
@@ -29,4 +29,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** sửa SN-UI-BADGE local theoAC; nghiệm thu M2/người mới/Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
+**Tiếp theo:** fullCI/preview và review SN-UI-BADGE trước quyết định merge; nghiệm thu M2/người mới/Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
