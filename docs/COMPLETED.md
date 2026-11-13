@@ -8,14 +8,13 @@
 - Studio297blob khớp head357b1a1; giữ116skill/21role. Graphify0.9.108/pin52cb282 đã chạy AST46file/484node/1291edge và query budget900.
 - Kiểm docs/structure theo WORKLOG; chưa sửa cross-tab CI48, chưa xác minh Netlify. Bộ nhớ đi theo checkout; CLI/graph dựng lại theo hướng dẫn.
 
-## NETLIFY-BUILD / AUTH-XTAB · đã phát hành · 07/11/2026
+## SN-AUTH-XTAB · sửa local · 13/11/2026
 
-- PR17/main1131927: deps:tank-clash trước lint/build sửa TS2307 nestedws; fullCIb644da2, NetlifyPublished/4bundlebyte-match. [BuildQA](qa/NETLIFY-BUILD-2026-11-07.md).
-- Auth giữ identity riêng, hủy restore cũ;5regression và fixture A→guest→B qua. Production B tạo phòng, logout xuyên tab→về thư viện/login; [QA](qa/BUG-AUTH-CROSS-TAB.md). Ca đăng nhậpA/mãB cũ user để sau, TC-R0 vẫn thiếu ca này.
+- Nhánh `codex/fix-snake-cross-tab-auth` từ c5b95a4/PR30. CI48 gửi playerB bằng JWT anonymous; bind6RPC restore với token Session trên từng request.
+- Unit7/7, UI11/11 +3guard qua; storage-lag tái hiện đỏ→xanh, giữ late snapshot/wallet/owner guards. [QA và kiểm tích hợp](qa/SNAKE-AUTH-XTAB-2026-11-13.md).
+- Dùng save-systems/game-qa-playtest, reviewer QA/Technical Director, Graphify services cập nhật483node/1288edge. Chưa merge/deploy; CI nhánh mới, Netlify/thiết bị/live save còn riêng.
 
-## WC-PLAN / SN-PLAN · DONE tài liệu · 07/11/2026
-
-- Nhánh codex/word-chain-launcher-release/nguồn5a64fef: [NốiTừ](word-chain/ONLINE-PLAN.md) staging→phòng→queue→PK→mạng/Auth; [Snake](snake/CONTINUATION-PLAN.md) baseline→UI/save→thiết bị/nội dung→release. Có task/file/AC; plan không tự cấp quyền deploy.
+[NETLIFY-BUILD/AUTH-XTAB cũ và WC/Snake plan giữ nguyên văn](archive/COMPLETED-2026-11-13-before-snake-auth.md).
 
 ## SN-R2a · ứng viên Snake local · 12/11/2026
 

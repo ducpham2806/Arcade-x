@@ -1,11 +1,13 @@
-# Bàn giao · 13/11/2026 · Studio/Graphify và Snake CI48
+# Bàn giao · 13/11/2026 · SN-AUTH-XTAB sửa local
 
-Chủ dự án yêu cầu ghi nhớ và dùng [Game Studio](studio/INDEX.md) + [Graphify](studio/GRAPHIFY.md) cho dự án. Nhánh `codex/studio-graphify-workflow` từ main19af480 ghi quyết định ở AGENTS/project và skill đầu mối. Studio297file vẫn khớp upstream357b1a1; giữ snapshot đã cài116skill/21vai trò. Mỗi task mở1–3skill và vai trò đúng việc; graph local đúng scope, kiểm độ mới và query có budget. Cấu hình nằm trong repo; CLI/cache không tự đi theo phiên khác.
+Nhánh `codex/fix-snake-cross-tab-auth` từ PR30/c5b95a4 (CI49 success), theo yêu cầu user làm tiếp. CI48/main19af480 có event đăng nhậpB nhưng RPC bind playerB mang JWT anonymous cũ. `activateSession` nay gắn token cùng Session cho6RPC restore trên header riêng từng request; không sửa client headers chung, engine, save, epoch, rewards hoặc backend. [Báo cáo/trace/giới hạn](qa/SNAKE-AUTH-XTAB-2026-11-13.md), [thẻ Snake](plans/SNAKE.md).
 
-DOC-02 dùng `game-production-scrum`; đã cài Graphify0.9.108 từ pin52cb282 và chạy AST services46file/484node/1291edge, query900token/depth2. [Cách tái lập/giới hạn](studio/GRAPHIFY.md), [thẻ bảo trì](plans/MAINTENANCE.md), [nhật ký](WORKLOG.md). Đây là thiết lập công cụ, chưa sửa gameplay/Auth hay phát hành.
+## Đã kiểm
 
-## Việc tiếp theo
+Unit realPostgREST và browser lag storage tái hiện source cũ đỏ→bản sửa xanh; Auth7/7, hai ca cross-tab qua17,9s, giữ ví/màn/late snapshot isolation. Storage golden, sync14/14,6suite Snake local, typecheck, production/preview/rollback build, root bundle291,8kB gzip và catalog/offline package qua. Đã xem ảnh trước/sau. Lượt UI đầy đủ đầu10/11 có navigation khi build ghi nguồn sinh; ca hai device chạy riêng qua56,2s. Lượt cả bộ tách riêng qua11/11 trong214,7s,3guard; không skip/flaky/retry. Docs/structure/diff qua. Không nới timeout/assertion.
 
-PR29 đã merge vào main19af480 ngày13/11; CI47 trên heada215da6 success nhưng CI48 trên main failure: `verify` success, Snake UI9/10; ca đổi tài khoản xuyên tab thiếu nút “Chơi bản preview” tại tests/snake/ui-save.test.ts:59. [CI48](https://github.com/ducpham2806/Arcade-x/actions/runs/43389651390). Điều tra trace/Auth và tái hiện trước khi sửa; chưa kết luận lỗi dữ liệu hay test không ổn định. Chọn [thẻ Snake](plans/SNAKE.md), skill save-systems/game-qa-playtest và vai trò qa-lead/technical-director khi cần. Không lấy graph services thay kiểm React context/trang/test.
+Dùng save-systems/game-qa-playtest, playbook QA/Technical Director và reviewer độc lập (không finding). Graphify services sau sửa46file/483node/1288edge; AST local, không API. [Cấu hình hai repo đã ghi nhớ](studio/GRAPHIFY.md); đầu phiên chọn1–3skill/vai trò, graph đúng scope và kiểm độ mới. CLI/cache không tự đi theo phiên khác.
 
-R01 public lưu theo thiết bị/owner, cloud preview giữ riêng. [Báo cáo release](qa/SNAKE-PUBLIC-2026-11-13.md) chưa cập nhật sau merge: cần xác minh Netlify Published đúngSHA và smoke public; không gọi deploy đã kiểm. Còn người mới/Android/iPhone thật và SN-R0b live/JWT. Render Tank giữFree, Nối Từ ON5/ON6 cònQA, commerce tắt. Không merge/deploy từ lượt thiết lập này. Giữ một WORKLOG tối đa3mục, lịch sử nguyên văn trong archive.
+## Bước tiếp và giới hạn
+
+Nhánh sửa được gửi PR dựa trên PR30; chờ đủ CI mới trước merge; chưa merge/deploy. Sửa này ràng buộc credential khi restore, không tuyên bố sửa mọi race anonymous/storage. Sau tích hợp mới xác minh Netlify Published đúngSHA và smoke public. PR29 đã merge main19af480; R01 sảnh lưu theo thiết bị/owner, cloud preview riêng. Thiết bị Android/iPhone/người mới và live save/JWT vẫn chờ. Render Tank giữFree; Nối Từ ON5/ON6 cònQA; commerce tắt. Nhật ký duy nhất WORKLOG, tối đa3mục; chi tiết cũ có archive.

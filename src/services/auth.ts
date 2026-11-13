@@ -47,15 +47,10 @@ function account(user: User): UserAccount {
     avatar: user.user_metadata?.avatar || '🎮', currentTitle: 'Tân Binh Arcade',
     createdAt: new Date(user.created_at).getTime(), lastLoginAt: Date.now(), isGuest: false, provider: 'supabase' };
 }
-async function readCloud(collection: string, id: string) {
-  const { data, error } = await client().rpc('arcadex_read', { p_collection: collection, p_id: id });
-  if (error) throw error;
-  return data?.[0]?.data || null;
-}
 async function activateSession(session: Session | null, epoch = authEpoch): Promise<AuthResult> {
   if (epoch !== authEpoch) return { success: false, cancelled: true };
   const user = session?.user;
-  if (!user || user.is_anonymous) {
+  if (!session || !user || user.is_anonymous) {
     const current = AuthService.getCurrentUser();
     if (current) { rememberActiveAccount(); activateGuest(!user); }
     else if (!StorageService.loadProfile().id.startsWith('guest_')) { rememberActiveAccount(); activateGuest(!user); }
@@ -64,6 +59,16 @@ async function activateSession(session: Session | null, epoch = authEpoch): Prom
     resetCloudIdentity();
     return { success: true };
   }
+  // A cross-tab event can arrive before this tab sees the SDK's new session.
+  // Bind the entire restore to that event's token, not an implicitly re-read token.
+  // Per-request headers leave the shared client and newer sessions untouched.
+  const rpc = (name: string, params: Record<string, unknown> = {}) =>
+    client().rpc(name, params).setHeader('Authorization', `Bearer ${session.access_token}`);
+  const readCloud = async (collection: string, id: string) => {
+    const { data, error } = await rpc('arcadex_read', { p_collection: collection, p_id: id });
+    if (error) throw error;
+    return data?.[0]?.data || null;
+  };
   window.dispatchEvent(new Event('arcadex:account_switching'));
   const nextUser = account(user);
   const previousId = StorageService.loadProfile().id;
@@ -72,9 +77,9 @@ async function activateSession(session: Session | null, epoch = authEpoch): Prom
   let snapshot = cached;
   let warning: string | undefined;
   try {
-    const { error } = await client().rpc('arcadex_bind_player', { p_player_id: user.id });
+    const { error } = await rpc('arcadex_bind_player', { p_player_id: user.id });
     if (error) throw error;
-    const { data: identity, error: identityError } = await client().rpc('arcadex_get_identity');
+    const { data: identity, error: identityError } = await rpc('arcadex_get_identity');
     if (identityError) throw identityError;
     nextUser.profileCompleted = !!identity;
     if (identity) { nextUser.username = identity.display_name; nextUser.avatar = identity.avatar; }
@@ -82,7 +87,7 @@ async function activateSession(session: Session | null, epoch = authEpoch): Prom
       readCloud(`players/${user.id}/inventory_data`, 'main'),
       readCloud('players', user.id),
       readCloud(`players/${user.id}/game_sessions`, 'current'),
-      client().rpc('arcadex_read', { p_collection: `players/${user.id}/game_sessions` }).then(({ data, error }) => { if (error) throw error; return data || []; }),
+      rpc('arcadex_read', { p_collection: `players/${user.id}/game_sessions` }).then(({ data, error }) => { if (error) throw error; return data || []; }),
     ]);
     const cloud = validateSnapshot(inventory?.accountState);
     if (cloud && (!cached || cloud.savedAt > cached.savedAt)) snapshot = cloud;
