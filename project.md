@@ -9,3 +9,4 @@
 - **Nguồn/module:** `src/games/`, `src/launcher/`, `server/`, `supabase/`; nguồn asset `art/`, asset runtime `public/` và trong module.
 - **Môi trường:** Netlify frontend, một Render Free cho Tank; Supabase staging tách production. Commerce tắt. Không thêm chi phí hoặc chạy migration production theo suy diễn từ plan.
 - **Bộ kỹ năng:** `docs/studio/INDEX.md`; chọn tối thiểu skill theo công việc. 21 vai trò là tài liệu tham khảo, không phải 21 tiến trình đang chạy.
+- **Nguồn đã được chủ dự án chọn (13/11/2026):** [Game Studio](https://github.com/ducpham2806/Game_Studio_Agent) cho skill/vai trò; [Graphify](https://github.com/Graphify-Labs/graphify) cho quan hệ code. Áp dụng vào việc tiếp theo; cấu hình/tái lập ở [GRAPHIFY](docs/studio/GRAPHIFY.md), nguồn Studio ở [INSTALLATION](docs/studio/INSTALLATION.md). Đây là bộ nhớ theo checkout, cần mang nhánh/tài liệu sang phiên khác.

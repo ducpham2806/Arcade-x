@@ -2,6 +2,12 @@
 
 Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## DOC-02 · Studio/Graphify · 13/11/2026
+
+- Nhánh `codex/studio-graphify-workflow`, nguồn19af480: lưu quyết định dùng hai repo trong AGENTS/project/skill đầu mối. [Nguồn và cách dùng](studio/GRAPHIFY.md).
+- Studio297blob khớp head357b1a1; giữ116skill/21role. Graphify0.9.108/pin52cb282 đã chạy AST46file/484node/1291edge và query budget900.
+- Kiểm docs/structure theo WORKLOG; chưa sửa cross-tab CI48, chưa xác minh Netlify. Bộ nhớ đi theo checkout; CLI/graph dựng lại theo hướng dẫn.
+
 ## NETLIFY-BUILD / AUTH-XTAB · đã phát hành · 07/11/2026
 
 - PR17/main1131927: deps:tank-clash trước lint/build sửa TS2307 nestedws; fullCIb644da2, NetlifyPublished/4bundlebyte-match. [BuildQA](qa/NETLIFY-BUILD-2026-11-07.md).

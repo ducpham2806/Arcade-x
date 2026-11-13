@@ -9,6 +9,7 @@ Mốc 06/11/2026; chỉ mở mục phù hợp nhiệm vụ. Luật đầu vào/t
 | MT3 / TD1 | BACKLOG | Gộp CAS/receipt/presence/store/Edge của Battleship/Duel/Nối Từ; file trong module, schema và Edge tương ứng | Thiết kế hợp đồng trước, chuyển từng game; 3 bộ logic/schema/UI qua; giữ protocol/save. Tank WS không thuộc mẫu này |
 | MT4 / TD3 | READY đo; WAITING quyết định rewrite/LFS | Đo Git/assets thực, đề xuất shallow/cache/LFS; số đo cũ không dùng làm hiện trạng | Báo cáo `.md` số đo/phương án/ảnh hưởng; không rewrite history hoặc áp LFS khi chưa duyệt |
 | DOC-01 / TD2 | DONE tài liệu và thư viện; kiểm chứng cuối theo WORKLOG | Markdown entrypoints, task cards, một nhật ký, archive/tóm tắt trước đổi việc; Studio library theo nhu cầu | Link/budget/check nguồn và structure qua; commit cùng thay đổi; runtime giữ nguyên |
+| DOC-02 | DONE local 13/11; chờ tích hợp nhánh | Ghi quyết định dùng Game_Studio_Agent + Graphify; kiểm snapshot, skill đầu mối và hướng dẫn CLI local tại [GRAPHIFY](../studio/GRAPHIFY.md) | 297 nguồn Studio khớp; graph Auth và query thử qua; docs/adapter qua. Task cross-tab CI48 và deploy còn riêng |
 
 **Kiểm theo phạm vi:** test cũ đúng suite; art → artwork/bundle + browser; phòng chung → 3 bộ server/schema/UI; docs → `python3 scripts/check-docs.py` và `npm run test:claude`. Không chạy lại full game CI cho sửa prose thuần; không coi doc check là nghiệm thu gameplay.
 
