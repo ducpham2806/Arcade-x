@@ -1,6 +1,6 @@
 # Snake Legend — hoàn tất preview trước phát hành
 
-Mốc13/11/2026 · R01 offline-first đã phát hành; PR31/main8320385 chứa sửa Auth và cấu hình Studio/Graphify từPR30. FullCI50success, NetlifyPublished đúngSHA và smoke guest/offline public qua. [Phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](../qa/SNAKE-AUTH-XTAB-2026-11-13.md). CI51 sau merge đang chạy khi lập checkpoint. R0a/R0b local12/11 là bằng chứng trước đó; không làm lại journey/cloud/session đã có.
+Mốc13/11/2026 · R01 offline-first đã phát hành; PR31/main8320385 chứa sửa Auth và cấu hình Studio/Graphify từPR30. FullCI50success, NetlifyPublished đúngSHA và smoke guest/offline public qua. [Phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](../qa/SNAKE-AUTH-XTAB-2026-11-13.md). FullCI51 sau merge cũng success. R0a/R0b local12/11 là bằng chứng trước đó; không làm lại journey/cloud/session đã có.
 
 ## SN-PLAN · DONE tài liệu · 07/11/2026
 
@@ -29,4 +29,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** theo dõi CI51 sau merge, sửa SN-UI-BADGE local nếu tiếp tục polish; nghiệm thu M2/người mới/Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
+**Tiếp theo:** sửa SN-UI-BADGE local theoAC; nghiệm thu M2/người mới/Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.

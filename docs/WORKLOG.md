@@ -6,7 +6,7 @@ Một nhật ký chính, tối đa ba mục. [Trước đóng phát hành Snake]
 
 - User cho tiếp kế hoạch; fullCI50/head1909fa6 success cảverify/snake_ui. PR31 retargetmain→merge8320385, gồmPR30; tree khớp nguồn đã kiểm. Netlify6af6f590d7b4bd3516a37885 Published18:34:34GMT+7 đúngSHA; đọc API thật.
 - Public36resource/3.047.410byte byte-match build;6nhóm guest/card/art/favorite/mobile detail/download/offline reload/play/input/audio/exit qua, khôngAuthfixture/pageerror/snake-complete. Online probeCTA/joystick/Dash tới được. Đã xem4ảnh; S3badge hosting che một phần nhãn mobile được ghi bug.
-- [QA/giới hạn](qa/SNAKE-PUBLIC-2026-11-13.md): Chromiumviewport không thay điện thoại/human/liveJWT; registered public chưa kiểm. Dùng game-release-liveops/game-qa-playtest và release-lead. CLItrustCA môi trường trongNSS, giữTLS. CI51 sau merge đang chạy; docs-only checkpoint kiểm docs/structure/diff, không chạy lại gameplay.
+- [QA/giới hạn](qa/SNAKE-PUBLIC-2026-11-13.md): Chromiumviewport không thay điện thoại/human/liveJWT; registered public chưa kiểm. Dùng game-release-liveops/game-qa-playtest và release-lead. CLItrustCA môi trường trongNSS, giữTLS. CI51/main8320385 success cảverify/snake_ui; docs-only checkpoint kiểm docs/structure/diff, không chạy lại gameplay.
 
 ## 13/11/2026 · SN-AUTH-XTAB sửa local · codex/fix-snake-cross-tab-auth
 

@@ -26,7 +26,7 @@ PR29 đã merge main19af480. Sau sửa cross-tab Auth, PR31 gồm cả cấu hì
 
 Evidence ngoài git tại `/workspace/tooling/snake-release-live-20261113/`: `report.json` (6nhóm PASS), `asset-proofs.json`, `online-controls.json`, script tái lập và4ảnh. Log `/tmp/snake-public-live.log`, `/tmp/snake-public-online.log`. Browser lượt đầu vướng proxyCA; dùng CA do môi trường cung cấp trong NSS đúng quyền để kiểm lại, giữ xác thực TLS; không bật ignoreHTTPS/certificate-errors. Script/các file output không thay application hoặc backend.
 
-CI51 sau merge trên8320385 đang chạy khi lập checkpoint; fullCI50 đã xanh trước merge. Docs-only checkpoint ở nhánh `codex/snake-release-verification-20261113`, kiểm docs/structure/diff riêng.
+FullCI51 sau merge trên8320385 đã success cả verify/snake_ui; fullCI50 đã xanh trước merge. Docs-only checkpoint ở nhánh `codex/snake-release-verification-20261113`, kiểm docs/structure/diff riêng.
 
 ## Còn nghiệm thu
 
