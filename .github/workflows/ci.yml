@@ -33,6 +33,21 @@ jobs:
             test-results/qc-results.json
           if-no-files-found: ignore
           retention-days: 7
+      - name: Public Snake account saves, checkpoint restore and keyboard menus
+        run: npm run test:snake-player
+        env:
+          QC_REPORT_PATH: test-results/snake-player-results.json
+          QC_HTML_PATH: test-results/snake-player-html
+      - name: Preserve public Snake player evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-player-evidence
+          path: |
+            test-results/snake-player/
+            test-results/snake-player-results.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Hosting badge safe area, late insertion, popover and removal
         run: npm run test:hosting
         env:

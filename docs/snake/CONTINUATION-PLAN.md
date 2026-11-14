@@ -1,6 +1,8 @@
 # Rắn Săn Mồi — kế hoạch hoàn tất trước phát hành
 
-Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu nguồn `5a64fef` và báo cáo live 02/11. Snake Legend hiện là preview R01, chưa đăng ký trong catalog public. Đây là kế hoạch, chưa có quyết định đưa Snake ra sảnh. [Thẻ công việc](../plans/SNAKE.md) giữ trạng thái ngắn cho phiên mới.
+Cập nhật14/11/2026. R01 client đã phát hành13/11 trên main8320385 theo quyết định chủ dự án; cloud/reward không tự bật. Nhánh `codex/snake-r01-finish` sửa accountsave, keyboard và chỉ dẫn boss; [QA kỹ thuật](../qa/SNAKE-FINISH-2026-11-14.md) có lượt UI10/10màn,29sao và restore/cleanup. Chưa merge/deploy các bản sửa; chưa ký nghiệm thu toàn bộ plan. [Thẻ hiện tại](../plans/SNAKE.md), [phiếu nghiệm thu](R01-ACCEPTANCE.md).
+
+Nguồn plan gốc07/11 dựa trên5a64fef và live02/11; các số đo baseline dưới đây là lịch sử. Quyết định phát hành client13/11 thay điều kiện giữ ngoài catalog, nhưng không đóng thay gate thiết bị, người mới, art/audio hoặc liveJWT.
 
 ## Đã làm được gì
 
@@ -39,7 +41,7 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** ảnh/video UI và bằng chứng service của các ca trên cùng build; restore mới và lỗi có thông báo phục hồi rõ. Tách `fixture passed`/`live passed`/`chưa kiểm` trong báo cáo.
 
-### SN-R1a · local fixes đã kiểm12/11; thiết bị thật WAITING · điều khiển và thiết bị · 1–2 ngày + thiết bị
+### SN-R1a · local fixes đã kiểm12–14/11; thiết bị thật WAITING · điều khiển và thiết bị · 1–2 ngày + thiết bị
 
 **File:** input/app/render/styles và wrapper trong `src/games/snake-legend/`; chỉ mở module cần sửa.
 
@@ -51,9 +53,9 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** thao tác hoàn thành được màn trên điện thoại thật, không kẹt input/cắt UI; không tăng tài nguyên qua nhiều lần vào/thoát. Browser giả lập chỉ là bổ sung, chưa đủ đóng gate thiết bị.
 
-### SN-R1b · LOCAL 10 màn đã kiểm, M2 và duyệt nội dung chờ · hoàn tất R01 và nghiệm thu nội dung · 1–2 ngày + lượt chơi
+### SN-R1b · UI10/10màn đã kiểm14/11, M2 và duyệt nội dung chờ · hoàn tất R01 và nghiệm thu nội dung · 1–2 ngày + lượt chơi
 
-[QA 12/11](../qa/SNAKE-R1B-2026-11-12.md) xác nhận 10 lượt thắng mô phỏng qua Engine, save/restore 28 sao, và render 16 cảnh. Kiểm tiếp với người mới và thiết bị thật theo checklist dưới đây.
+[QA14/11](../qa/SNAKE-FINISH-2026-11-14.md) bổ sung10thắng bằng pointer/UI,29sao, boss6hit/3pha, reload và cleanup; chưa phải human playtest. [QA12/11](../qa/SNAKE-R1B-2026-11-12.md) xác nhận 10 lượt thắng mô phỏng qua Engine, save/restore 28 sao, và render 16 cảnh. Kiểm tiếp với người mới và thiết bị thật theo checklist dưới đây.
 
 **File:** journey/boss/props/audio modules và assets nguồn; dùng đúng tài liệu phần được sửa.
 
@@ -66,7 +68,7 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 ### SN-R2a · LOCAL ứng viên catalog và gói offline · sẵn sàng tích hợp catalog · 1–2 ngày
 
-[QA 12/11](../qa/SNAKE-R2A-2026-11-12.md) ghi nhận game JS còn 151.769 byte, ảnh/WAV tách theo nhu cầu và preview đạt ngân sách JS. Chủ dự án sẽ nghiệm thu sau. Đã kiểm [ứng viên catalog local](../qa/SNAKE-CATALOG-2026-11-12.md), gồm tải gói theo yêu cầu và mở lại khi tắt mạng. Catalog public và pilot vẫn chờ quyết định phát hành.
+[QA 12/11](../qa/SNAKE-R2A-2026-11-12.md) ghi nhận game JS còn 151.769 byte, ảnh/WAV tách theo nhu cầu và preview đạt ngân sách JS. Chủ dự án sẽ nghiệm thu sau. Đã kiểm [ứng viên catalog local](../qa/SNAKE-CATALOG-2026-11-12.md), gồm tải gói theo yêu cầu và mở lại khi tắt mạng. Catalog client đã public13/11; nghiệm thu pilot thực và các bản sửa14/11 vẫn chờ.
 
 **File:** package/entry Snake, registry/catalog/repository nếu được chọn phát hành, art manifests/build pipeline và regression.
 
@@ -77,7 +79,7 @@ Ngày 07/11/2026 · nhánh `codex/word-chain-launcher-release` · đối chiếu
 
 **Đạt khi:** candidate có đủ kiểm tra/asset/budget, backend và chính sách rõ; báo cáo go/no-go phân biệt code/merge/deploy/nghiệm thu. Rollback không làm mất save; reward/commerce không tự bật.
 
-### SN-R2b · ACTIVE chủ dự án duyệt phát hành 13/11 · pilot và nghiệm thu production
+### SN-R2b · client PUBLISHED13/11; nghiệm thu production WAITING
 
 [Báo cáo phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md). Full CI trên head tích hợp, deploy theo quyền hiện hành, kiểm launcher production và tiến trình mới/cũ trên thiết bị thật. Theo dõi save fail/timeout, crash và tải asset, dừng rollout khi lỗi mất tiến trình/nhầm account. Nếu chưa đủ thiết bị hoặc tài khoản thì WAITING, không đánh DONE từ build xanh.
 
@@ -87,4 +89,4 @@ Theo phần thay đổi, chạy các lệnh đã có: `test:snake-cloud`, `test:
 
 Mỗi task giữ bằng chứng `.md` trong `docs/qa/`, ghi SHA, môi trường, ca chạy thật và giới hạn. COMPLETED tóm tắt trước chuyển việc, WORKLOG≤3 mục, archive giữ chi tiết; session mới đọc bàn giao + thẻ Snake + đúng mục task này. Ước lượng là công làm việc, không tính chờ thiết bị/người chơi/JWT và không phải lịch cam kết.
 
-**Bước đầu đề xuất:** SN-R0a rồi SN-R0b. Sau kế hoạch Nối Từ, ưu tiên chứng minh chơi → lưu → reload qua giao diện thật; chưa cần thêm nội dung mới hoặc vẽ lại icon/banner.
+**Bước tiếp hiện tại:** CI/review bản hoàn thiện14/11 rồi quyết định merge/phát hành; xác nhận Published/SHA và smoke. Đóng R1a/R1b bằng thiết bị/người mới/art/audio thật và R0b theo runbook khi có disposable actor/grant. Không đánh toàn game DONE từ build/automation.

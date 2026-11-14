@@ -106,6 +106,8 @@
     "build:snake-audio": "python3 scripts/build-snake-audio.py",
     "preview:word-chain-staging": "node scripts/word-chain-staging-preview.mjs && node scripts/word-chain-staging-server.mjs",
     "build:word-chain-edge": "node scripts/word-chain-build-edge.mjs",
+    "test:snake-player": "playwright test -c playwright.snake-player.config.ts --output=test-results/snake-player",
+    "test:snake-campaign-browser": "node tests/snake/campaign-browser.mjs",
     "test:snake-ui": "node --test tests/snake/ui-live-guard.mjs && playwright test tests/snake/ui-save.test.ts tests/snake/ui-controls.test.ts --output=test-results/snake-ui",
     "test:snake-ui-live": "node scripts/test-snake-ui-live.mjs",
     "test:snake-controls": "playwright test tests/snake/ui-controls.test.ts --output=test-results/snake-controls"
