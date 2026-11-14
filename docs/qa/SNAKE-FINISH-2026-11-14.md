@@ -37,6 +37,12 @@ Evidence local đầy đủ `/workspace/tooling/snake-finish-evidence/`; bản l
 | 1-9 | 79.77 | 3 | 3 |
 | 1-10 | 83.60 | 2 | 3 |
 
+## CI56 và phép kiểm save-status Dungeon
+
+CI56/head89e6aac: snake_ui success toàn bộ12UI+3player+5hosting/catalog, desktopmotion50/50 qua; verify dừng ở1/25ca polish Dungeon (24ca khác qua). Test phát eventerror giả, autosave thật5giây phátlocal và xóa UI đúng hành vi, nên assertion đua với autosave. Local test cũ8lần qua không thay bằng chứng failureCI; không coi đây là lỗi production của Snake.
+
+Đổi test thành quota fault chỉ ở envelope Dungeon, thay đổi trạng thái bằng attack thật rồi bấm Lưu. Assert write đã thử/thất bại, thông báo còn khi lifecycle save thử lại, bytes bản lưu cũ giữ nguyên; khôi phục storage và Lưu lại phải hết lỗi. Không tăng timeout, tắt test hoặc sửa production. Lặp2viewport×2motion×3 đạt12/12(2phút), không skip/retry; CI bổ sung artifact motion-regression-evidence trước suite tiếp theo dọn output.
+
 ## Studio / Graphify / đóng mốc
 
 Dùng game-qa-playtest/game-feel/game-ui-ux và Technical Director/QA. Delegate QA tìm/sửa marker, review độc lập storage/focus không còn blocker. AST code-only/local cùngscope src/games/snake-legend sau sửa:46file/424node/1101edge. QueryshowStory contextcall/depth1/budget700→3node2edge; graph đưa tới mountStory nhưng lỗi storage được xác minh từsource+redbrowser. Graph không thay runtime hoặc deployment proof.

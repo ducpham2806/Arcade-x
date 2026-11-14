@@ -12,7 +12,7 @@ Player cuối3/3 và hosting5/5 qua; Lab prefs red→green. Sáu suite/lint/prod
 
 ## Bước tiếp
 
-Đọc CI của PR từ nhánh này, sửa failure nếu có; chỉ merge main khi user yêu cầu. Sau merge xác nhận Netlify Published/SHA rồi smoke public account/checkpoint/badge. PR32/33 đã được kế thừa; ưu tiên review ứng viên mới.
+PR34/89e6aac: CI56 snake_ui xanh; verify lỗi Dungeon synthetic-error bị autosave5s ghi đè. Đã đổi test sang quota thật/recovery và thêm artifact motion; không sửa production/timeout. Đọc CI head mới nhất, sửa failure nếu có; chỉ merge main khi user yêu cầu. Sau merge xác nhận Netlify Published/SHA rồi smoke public account/checkpoint/badge. PR32/33 đã được kế thừa; ưu tiên review ứng viên mới.
 
 Android/iPhone/Safari, người mới M2/art/animation/audio, FPS/heap thật còn WAITING. Đã hỏi user khả năng bố trí qua async, chưa coi im lặng là nghiệm thu. Live preflight exit2 WAITING_BINDINGS thiếu email/password/actorID/grant-confirmed; chưa login/ghi DB. Secret qua runtime/runbook, không chat; fixture expiry không thay JWT thật.
 

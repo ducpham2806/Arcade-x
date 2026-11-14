@@ -129,6 +129,17 @@ jobs:
         run: npm run test:games
       - name: Desktop animation isolation and Canvas loops (all games, normal and reduced motion)
         run: npm run test:animations
+      - name: Preserve motion and save-failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-regression-evidence
+          path: |
+            test-results/desktop-motion.json
+            test-results/motion-playwright/
+            test-results/qc-results.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Neon Run sound, feel and controls
         run: npm run test:neon-feel
       - name: Offline launcher shell
