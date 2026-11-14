@@ -1,6 +1,6 @@
 # S1 · Gameplay catalog dùng nhầm storage guest · 14/11/2026
 
-Nguồn trước sửa2ca0b3c, Chromium156/Node24, launcher mode snake-catalog/Auth fixture local. Source public8320385 có cùng đường gọi thiếu storage. Đã sửa ứng viên, chưa merge/deploy. [QA](../../../docs/qa/SNAKE-FINISH-2026-11-14.md).
+Nguồn trước sửa2ca0b3c, Chromium156/Node24, launcher mode snake-catalog/Auth fixture local. Source public8320385 có cùng đường gọi thiếu storage. Đã merge PR34/main533c0e7, chưa deploy vì Netlify HOLD theo user. [QA](../../../docs/qa/SNAKE-FINISH-2026-11-14.md).
 
 1. Guest có thành tích màn1. Đăng nhập tài khoản mới chưa có thành tích Snake.
 2. Hành trình hiện0màn, màn2khóa. Bắt đầu màn1.

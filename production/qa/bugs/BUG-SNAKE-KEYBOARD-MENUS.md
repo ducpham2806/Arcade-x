@@ -1,6 +1,6 @@
 # S2 · Space/menu keyboard và focus · 14/11/2026
 
-Nguồn trước sửa2ca0b3c, Chromium156/Node24, launcher Snake local. Đã sửa ứng viên, chưa merge/deploy. [QA](../../../docs/qa/SNAKE-FINISH-2026-11-14.md).
+Nguồn trước sửa2ca0b3c, Chromium156/Node24, launcher Snake local. Đã merge PR34/main533c0e7, chưa deploy vì Netlify HOLD theo user. [QA](../../../docs/qa/SNAKE-FINISH-2026-11-14.md).
 
 1. Mở Story, focus nút Bắt đầu bằng bàn phím rồi nhấn Space.
 2. Controls gọi preventDefault trên window, nên native click không phát; overlay không đóng.

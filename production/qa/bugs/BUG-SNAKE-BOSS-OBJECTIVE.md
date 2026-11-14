@@ -1,6 +1,6 @@
 # S2 · Mũi tên boss gọi tơ/cột là điểm yếu · 14/11/2026
 
-Nguồn trước sửa2ca0b3c, RendererChromium390×844. Đã sửa ứng viên, chưa merge/deploy. [QA](../../../docs/qa/SNAKE-FINISH-2026-11-14.md).
+Nguồn trước sửa2ca0b3c, RendererChromium390×844. Đã merge PR34/main533c0e7, chưa deploy vì Netlify HOLD theo user. [QA](../../../docs/qa/SNAKE-FINISH-2026-11-14.md).
 
 1. Vào boss, qua2lần húc sangpha2 và đi xa tơ trái để hiện mũi tên offscreen.
 2. Target là tơ nhưng nhãn luôn ĐIỂM YẾU. Sangpha3, targetcộtA/B cũng bị gọi như vậy; khi thiếu độ dài vẫn chỉ cột thay vì thức ăn cần thu.

@@ -1,6 +1,6 @@
 # Snake R01 · nghiệm thu bản hoàn thiện · 14/11/2026
 
-Bản kỹ thuật đang ở nhánh `codex/snake-r01-finish`, dựa trên2ca0b3c/PR33. [QA kỹ thuật](../qa/SNAKE-FINISH-2026-11-14.md), [thẻ Snake](../plans/SNAKE.md). Bản public vẫn phải xác nhận Published/SHA sau quyết định merge; không dùng một phiên bản khác để ký nghiệm thu.
+Bản kỹ thuật đã merge PR34 vào main533c0e7; Netlify HOLD theo chủ dự án. PR35/head7785d71đã quaCI60; content mới trên `codex/snake-r01-content-20261114` có [inventory](R01-CONTENT.md) và [QA](../qa/SNAKE-R01-CONTENT-2026-11-14.md), chưa merge/deploy. [QA kỹ thuật](../qa/SNAKE-FINISH-2026-11-14.md), [thẻ Snake](../plans/SNAKE.md). Bản public vẫn8320385; khi được yêu cầu phát hành phải xác nhận Published/SHA mới; không dùng một phiên bản khác để ký nghiệm thu.
 
 ## Môi trường và vai trò
 

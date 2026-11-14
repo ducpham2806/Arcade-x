@@ -31,3 +31,7 @@ Before integration: key/registration QA, identity/leg-count review at 24/48/96px
 three-loop seam review, light/dark alpha review, packed PNG atlas size <=1024x1024
 per character, no per-frame bbox resizing, reduced-motion still fallback. Retain
 raw clips and prompts, then select/finish/package with video2dsprite.
+
+## Runtime follow-up14/11/2026
+
+[Articulation rig](RUNTIME-RIG.md) adds code-authored motion on the existing master while the video route remains unavailable. Original rawclip/frame requirements above are not claimed complete by this alternate runtime implementation.

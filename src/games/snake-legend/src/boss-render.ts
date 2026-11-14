@@ -5,7 +5,7 @@ type Sprite=(id:string,position:V,size:number)=>void;
 const circle=(c:CanvasRenderingContext2D,p:V,r:number)=>{c.beginPath();c.arc(p.x,p.y,r,0,Math.PI*2);};
 const path=(c:CanvasRenderingContext2D,from:V,to:V)=>{c.beginPath();c.moveTo(from.x,from.y);c.lineTo(to.x,to.y);};
 
-export function drawBoss(c:CanvasRenderingContext2D,e:Encounters,time:number,masterArt:boolean,reducedMotion:boolean,sprite:Sprite){
+export function drawBoss(c:CanvasRenderingContext2D,e:Encounters,time:number,masterArt:boolean,reducedMotion:boolean,sprite:Sprite,character?:(p:V,size:number)=>boolean){
  const b=e.boss;if(!b)return;c.save();
  if(e.state==='telegraph'||e.state==='attack'){
   const attacking=e.state==='attack',cue=bossCue(e,0),{from,to}=e.shot;
@@ -22,7 +22,7 @@ export function drawBoss(c:CanvasRenderingContext2D,e:Encounters,time:number,mas
  c.fillStyle='#193f3c38';c.beginPath();c.ellipse(b.center.x,b.center.y+.85,2.5,1.3,0,0,Math.PI*2);c.fill();
  // The contact rim stays fixed while the cosmetic pose moves within .12u.
  c.lineWidth=.1;c.strokeStyle=e.state==='defeated'?'#829281':'#63465c';c.setLineDash([.18,.18]);circle(c,b.center,1.8);c.stroke();c.setLineDash([]);
- if(masterArt){const p=bossPose(e,time,reducedMotion);c.save();c.globalAlpha=p.opacity;c.translate(b.center.x+p.x,b.center.y+p.y);c.scale(p.scaleX,p.scaleY);sprite('spider_mother',{x:0,y:0},7.2);c.restore();}
+ if(masterArt){const p=bossPose(e,time,reducedMotion);c.save();c.globalAlpha=p.opacity;c.translate(b.center.x+p.x,b.center.y+p.y);c.scale(p.scaleX,p.scaleY);if(!character?.({x:0,y:0},7.2))sprite('spider_mother',{x:0,y:0},7.2);c.restore();}
  else{c.fillStyle=e.state==='defeated'?'#a1ad95':e.state==='hurt'?'#d9c07b':'#765073';circle(c,b.center,1.8);c.fill();}
  if(e.state==='hurt'){const remaining=Math.max(0,Math.min(1,e.timer/(.6*T.hz)));c.globalAlpha=remaining;c.strokeStyle='#fff6bf';c.lineWidth=.16;circle(c,b.weak,.9+(1-remaining)*.9);c.stroke();}
  c.restore();

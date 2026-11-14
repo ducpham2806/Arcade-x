@@ -1,4 +1,5 @@
 import {Engine,T,clamp,angleDelta,type V} from './core';
+import {drawMotherRig,drawSnakeExpression} from './character-motion';
 import {TerrainPainter} from './terrain';
 import {assetData} from './assets';
 import {drawBoss,drawBossTargets} from './boss-render';
@@ -22,6 +23,14 @@ export class Renderer {
   const c=this.ctx,a=renderAssets[sheet].atlas as Atlas,f=a.frames[id],im=this.image(sheet);
   if(!f||!im.complete||!im.naturalWidth)return false;
   const r=f.frame;c.save();c.translate(p.x,p.y);c.rotate(angle);c.drawImage(im,r.x,r.y,r.w,r.h,-f.pivot.x*size,-f.pivot.y*size,size,size*r.h/r.w);c.restore();return true;
+ }
+ private mother(e:Engine,p:V,size:number){
+  const image=this.image('a1_master');if(!image.complete||!image.naturalWidth)return false;
+  drawMotherRig(this.ctx,e.encounters!,e.time,image,assetData.a1_master.atlas.frames.spider_mother.frame,p,size,this.motion.matches);return true;
+ }
+ private head(e:Engine,p:V,size:number,angle:number){
+  const image=this.image('a1_master');if(!image.complete||!image.naturalWidth)return false;
+  drawSnakeExpression(this.ctx,e,image,assetData.a1_master.atlas.frames.head.frame,p,size,angle,this.motion.matches);return true;
  }
  private dot(p:V,radius:number,color:string){
   const c=this.ctx;c.fillStyle=color;c.beginPath();c.arc(p.x,p.y,radius,0,Math.PI*2);c.fill();
@@ -51,7 +60,7 @@ export class Renderer {
   for(const b of a.walls){c.fillStyle='#294c3c35';c.fillRect(b.x+.15,b.y+.2,b.w,b.h);if(this.masterArt&&this.terrain?.fence(b))continue;c.fillStyle='#5d8062';c.fillRect(b.x,b.y,b.w,b.h);c.strokeStyle='#426547';c.lineWidth=.12;c.strokeRect(b.x,b.y,b.w,b.h);}
   for(const b of a.spikes){c.fillStyle='#ae4958';c.fillRect(b.x-.12,b.y,b.w+.24,b.h);for(let y=b.y;y<b.y+b.h;y+=.45){c.beginPath();c.moveTo(b.x,y);c.lineTo(b.x-.28,y+.2);c.lineTo(b.x,y+.4);c.fill();}}
   for(const p of e.patrols()){c.fillStyle='#bd6272';c.strokeStyle='#793d50';c.lineWidth=.08;c.beginPath();c.arc(p.x,p.y,.42,0,Math.PI*2);c.fill();c.stroke();this.label('×',p.x,p.y+.15,'#fff0de',.48);}
-  if(encounter?.boss)drawBoss(c,encounter,e.time,bossArt,this.motion.matches,(id,p,size)=>this.sprite('a1_master',id,p,size));
+  if(encounter?.boss)drawBoss(c,encounter,e.time,bossArt,this.motion.matches,(id,p,size)=>this.sprite('a1_master',id,p,size),(p,size)=>this.mother(e,p,size));
   if(a.story){
    drawStoryProps(c,e,(id,p,size)=>this.masterArt&&this.storyProp(id,p,size),b=>this.masterArt&&(this.terrain?.fence(b)??false),this.motion.matches);
    for(const food of a.story.foods){if(!e.foodAvailable(food.id)){if(food.readyAt!==undefined&&food.readyAt-e.time>0&&food.readyAt-e.time<=.8){c.fillStyle='#926e3540';c.beginPath();c.ellipse(food.x,food.y,.7,.35,0,0,Math.PI*2);c.fill();this.label('↓',food.x,food.y-.8,'#9c712b',.5);}continue;}if(food.kind==='poison'){c.strokeStyle='#765073';c.lineWidth=.12;c.beginPath();c.moveTo(food.x,food.y-1);c.lineTo(food.x-1,food.y+.8);c.lineTo(food.x+1,food.y+.8);c.closePath();c.stroke();this.label('−2',food.x,food.y-1.3,'#65395f',.5);}const gold=food.kind==='gold';if(gold){c.strokeStyle='#ba893a';c.lineWidth=.07;c.beginPath();c.arc(food.x,food.y,.85,0,Math.PI*2);c.stroke();this.label('+3',food.x,food.y-1,'#825e20',.42);}if(!this.sprite('food',(food.kind==='poison'?'food_poison_fruit_':food.kind==='flower'?'food_flower_':food.kind==='jade'?'food_jade_shard_':gold?'food_golden_apple_':'food_apple_')+Math.floor(e.time*6)%4,food,1.15))this.dot(food,.42,foodColors[food.kind]);}
@@ -65,8 +74,8 @@ export class Renderer {
    if(!drawn)this.dot(q,tail ? .23 : .37,'#3c8f68');
   }
   const angle=e.previousHeading+angleDelta(e.previousHeading,e.heading)*alpha;
-  const headDraw=e.status==='won'?{x:head.x,y:head.y-Math.abs(Math.sin(celebrateSeconds*8))*.2}:head;
-  const drewHead=this.masterArt?this.sprite('a1_master','head',headDraw,1.35,angle):this.sprite('snake_head',e.status==='won'?'head_win_'+Math.floor(celebrateSeconds*8)%4:e.status==='lost'?'head_die_3':e.stun>0?'head_hurt_0':e.dashing?'head_dash_'+Math.floor(e.time*12)%3:'head_idle_'+Math.floor(e.time*6)%4,headDraw,1.35,angle);
+  const headDraw=e.status==='won'&&!this.motion.matches?{x:head.x,y:head.y-Math.abs(Math.sin(celebrateSeconds*8))*.2}:head;
+  const drewHead=this.masterArt?this.head(e,headDraw,1.35,angle):this.sprite('snake_head',e.status==='won'?'head_win_'+Math.floor(celebrateSeconds*8)%4:e.status==='lost'?'head_die_3':e.stun>0?'head_hurt_0':e.dashing?'head_dash_'+Math.floor(e.time*12)%3:'head_idle_'+Math.floor(e.time*6)%4,headDraw,1.35,angle);
   if(!drewHead){
    this.dot(headDraw,.47,'#1b6049');
    this.dot({x:headDraw.x+Math.cos(angle)*.26,y:headDraw.y+Math.sin(angle)*.26},.12,'#fff1b5');

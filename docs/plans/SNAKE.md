@@ -1,6 +1,6 @@
 # Snake Legend — hoàn thiện R01 và nghiệm thu
 
-Mốc14/11/2026 · R01 offline-first đã phát hành; PR31/main8320385 chứa sửa Auth và cấu hình Studio/Graphify từPR30. FullCI50success, NetlifyPublished đúngSHA và smoke guest/offline public qua. [Phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](../qa/SNAKE-AUTH-XTAB-2026-11-13.md). FullCI51 sau merge cũng success. R0a/R0b local12/11 là bằng chứng trước đó; không làm lại journey/cloud/session đã có.
+Mốc14/11/2026 · PR34/main533c0e7 đã merge sauCI57, **Netlify HOLD theo user**, site vẫn8320385. [Merge/HOLD](../qa/SNAKE-MAIN-HOLD-2026-11-14.md). R01 offline-first đã phát hành; PR31/main8320385 chứa sửa Auth và cấu hình Studio/Graphify từPR30. FullCI50success, NetlifyPublished đúngSHA và smoke guest/offline public qua. [Phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](../qa/SNAKE-AUTH-XTAB-2026-11-13.md). FullCI51 sau merge cũng success. R0a/R0b local12/11 là bằng chứng trước đó; không làm lại journey/cloud/session đã có.
 
 ## SN-PLAN · DONE tài liệu · 07/11/2026
 
@@ -15,8 +15,16 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 | SN-R2a | LOCAL ứng viên catalog và gói offline đã kiểm | Nghiệm thu thật và quyết định đưa lên sảnh public |
 | SN-R2b | PUBLISHED client13/11; nghiệm thu thật WAITING | CI50→merge/Netlify Published đúngSHA,36resource byte-match và guest/offline smoke public |
 | SN-AUTH-XTAB | MERGED/PUBLISHED13/11 sau CI50 | 6RPC đúng token/owner, unit7/7/UI11/11; registered public/live JWT còn QA riêng |
-| SN-UI-BADGE | PR33/CI55 qua; WAITING merge/deploy | [QA ứng viên](../qa/SNAKE-BADGE-2026-11-13.md): chừa vùng badge, hosting5/5/modal36/catalog qua; production chưa đổi |
-| SN-R01-FINISH | LOCAL sửa14/11; CI/review/merge còn riêng | [QA](../qa/SNAKE-FINISH-2026-11-14.md): accountsave xuyên Story/Journey/Lab, keyboard/focus, markerboss; UI10màn/restore/cleanup qua |
+| SN-UI-BADGE | MERGED qua PR34; Netlify HOLD | [QA ứng viên](../qa/SNAKE-BADGE-2026-11-13.md): chừa vùng badge, hosting5/5/modal36/catalog qua; production chưa đổi |
+| SN-R01-FINISH | MERGED main533c0e7/CI57; Netlify HOLD | [QA](../qa/SNAKE-FINISH-2026-11-14.md): accountsave xuyên Story/Journey/Lab, keyboard/focus, markerboss; UI10màn/restore/cleanup qua |
+
+## Kiểm sau merge
+
+SN-POSTMERGE-CI: CI58 Snake UI xanh, verify FAIL do baseline save của testDungeon nằm trước cửa sổ autosave. CI59/docs cùng runtime xanh; đã sửa barrier test local12/12 trên PR35, fullCI60/head7785d71cả2job success; PR35 chưa merge, giữ Netlify HOLD. [QA](../qa/SNAKE-POSTMERGE-CI-2026-11-14.md). Parent CI đã chốt trước khi tiếp content.
+
+## SN-R01-CONTENT · ứng viên local14/11
+
+User yêu cầu đầy đủ content: thêm sổ tay/lời kết10màn, kết chương/sao/bí mật/replay và Canvasrig Tiểu Xà/Nhện Mẹ trên master hiện có; chưa thêm chương mới. [Inventory](../snake/R01-CONTENT.md), [QA](../qa/SNAKE-R01-CONTENT-2026-11-14.md). Unit/build/player6/6/catalog local qua; quota guardred→green, V3UI10/10/29sao/reload/cleanup0qua. Runtime rig không thay claim authoredvideo hay nghiệm thu art/human/device; chưa merge/deploy.
 
 ## Bằng chứng đã có và giới hạn
 
@@ -30,4 +38,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** fullCI/review nhánh codex/snake-r01-finish (gồm PR33) trước quyết định merge; preview bị edge-access chặn guest, không tự đổi bảo vệ; nghiệm thu [R01/M2/thiết bị](../snake/R01-ACCEPTANCE.md) và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
+**Tiếp theo:** giữ Netlify HOLD cho tới yêu cầu phát hành; sau đó xác nhận Published/SHA và smoke bản mới; preview bị edge-access chặn guest, không tự đổi bảo vệ; nghiệm thu [R01/M2/thiết bị](../snake/R01-ACCEPTANCE.md) và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
