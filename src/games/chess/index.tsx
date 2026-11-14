@@ -1349,7 +1349,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
       </AnimatePresence>
 
       <ConnectionNotice active={!!activeRoomId} />
-      <IngameChat roomId={activeRoomId} />
+      <IngameChat roomId={activeRoomId} players={opponentInfo ? [{id:opponentInfo.uid,name:opponentInfo.name,avatar:opponentInfo.avatarUrl}] : []} />
       {activeRoomId && (moveSending || moveError) && (
         <p role="status" className="text-sm text-amber-200">
           {moveSending ? 'Đang chờ máy chủ xác nhận nước đi…' : moveError}
@@ -1487,6 +1487,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
               </header>
             }
             topPlayer={{
+              chatPlayerId: activeRoomId ? opponentInfo?.uid : undefined,
               name: isAiMode ? `Phù Thủy Hắc Ám (${aiDifficulty})` : opponentInfo?.name || 'Đối Thủ',
               avatar: isAiMode
                 ? 'https://api.dicebear.com/7.x/bottts/svg?seed=ChessMaster'

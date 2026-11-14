@@ -5,13 +5,13 @@ import type {WordChainSound} from './sound';
 
 export const SEAT_COLOR:Record<Seat,string>={P1:'#ff7a59',P2:'#2fc7a8',P3:'#ffbe3d',P4:'#a98bff'};
 export type Reward={xp?:number;coins?:number}|null;
-type Props={match:Match;me:Seat;now:number;lex:Lexicon;avatars:Record<string,string>;sound:WordChainSound;
+type Props={chatPlayers?:Record<string,string>;match:Match;me:Seat;now:number;lex:Lexicon;avatars:Record<string,string>;sound:WordChainSound;
  onReady:(ready:boolean)=>void;onSubmit:(raw:string)=>Check|Promise<Check>;onForfeit:()=>void;onExit:()=>void;onRematch?:()=>void;
  reward?:Reward;status?:React.ReactNode;subtitle?:string;rematchLabel?:string};
 
 const seconds=(ms:number)=>Math.max(0,Math.ceil(ms/1000));
 /** Shared match screen (practice and online): players, current word, chain, answer box, overlays. */
-export function MatchView({match:m,me,now,lex,avatars,sound,onReady,onSubmit,onForfeit,onExit,onRematch,reward,status,subtitle,rematchLabel}:Props){
+export function MatchView({chatPlayers,match:m,me,now,lex,avatars,sound,onReady,onSubmit,onForfeit,onExit,onRematch,reward,status,subtitle,rematchLabel}:Props){
  const mine=m.players.find(p=>p.seat===me)!,myTurn=m.phase==='turn'&&m.turn===me,left=m.deadline-now;
  const [text,setText]=useState(''),[feedback,setFeedback]=useState<{ok:boolean;text:string}|null>(null),[shake,setShake]=useState(0),[sending,setSending]=useState(false),[confirmLeave,setConfirmLeave]=useState(false);
  const [toast,setToast]=useState<string|null>(null);
@@ -19,7 +19,7 @@ export function MatchView({match:m,me,now,lex,avatars,sound,onReady,onSubmit,onF
  const name=(seat:Seat|'SYS')=>seat==='SYS'?'Hệ thống':seat===me?'Bạn':m.players.find(p=>p.seat===seat)?.name??seat;
 
  // Turn start: prefill the syllable to chain from so only the second syllable needs typing.
- useEffect(()=>{if(!myTurn){setText('');return;}if(myTurn){setText(need(m)+' ');setFeedback(null);requestAnimationFrame(()=>{const el=input.current;if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}});}},[myTurn,m.turnNumber]);
+ useEffect(()=>{if(!myTurn){setText('');return;}if(myTurn){setText(need(m)+' ');setFeedback(null);requestAnimationFrame(()=>{const el=input.current;if(el&&!document.activeElement?.closest('[data-chat-ui]')){el.focus();el.setSelectionRange(el.value.length,el.value.length);}});}},[myTurn,m.turnNumber]);
  // Events from state changes: accepted words, eliminations, phase changes.
  useEffect(()=>{const p=prev.current;prev.current=m;if(!p)return;
   for(const pl of m.players){const before=p.players.find(x=>x.seat===pl.seat);if(pl.out&&!before?.out&&pl.out.reason!=='unready'){setToast(`${name(pl.seat)} bị loại · ${pl.out.reason==='timeout'?'hết giờ':pl.out.reason==='absent'?'mất kết nối':'bỏ cuộc'}`);sound.play('out');}}
@@ -36,7 +36,7 @@ export function MatchView({match:m,me,now,lex,avatars,sound,onReady,onSubmit,onF
  async function submit(){if(!myTurn||sending||!text.trim())return;setSending(true);
   try{const r=await onSubmit(text);if(r.ok){setFeedback({ok:true,text:`"${r.word}" ✓`});sound.play('ok');setText('');}else{setFeedback({ok:false,text:REJECTION_TEXT[r.reason!](r.need!)});setShake(n=>n+1);sound.play('bad');}}
   catch(e){setFeedback({ok:false,text:e instanceof Error?e.message:'Không gửi được, thử lại.'});}
-  finally{setSending(false);requestAnimationFrame(()=>input.current?.focus());}}
+  finally{setSending(false);requestAnimationFrame(()=>{if(!document.activeElement?.closest('[data-chat-ui]'))input.current?.focus();});}}
 
  const current=m.words.at(-1),[first,second]=(current?.word??'… …').split(' ');
  const limit=m.phase==='turn'?turnMs(m.round):1,ratio=Math.max(0,Math.min(1,left/limit));
@@ -48,7 +48,7 @@ export function MatchView({match:m,me,now,lex,avatars,sound,onReady,onSubmit,onF
   {status}
   <ul className="nt-players" aria-label="Người chơi">{order.map(seat=>{const p=m.players.find(x=>x.seat===seat)!,on=active===seat;
    return <li key={seat} className={`${on?'active':''} ${p.out?'out':''}`} style={{'--c':SEAT_COLOR[seat],'--p':on?ratio:0} as React.CSSProperties} data-seat={seat}>
-    <span className="nt-avatar" aria-hidden="true">{avatars[seat]??p.name[0]}</span><span className="nt-name">{seat===me?'Bạn':p.name}</span>
+    <span className="nt-avatar" data-chat-player={chatPlayers?.[seat]} aria-hidden="true">{avatars[seat]??p.name[0]}</span><span className="nt-name">{seat===me?'Bạn':p.name}</span>
     <small>{p.out?(p.out.reason==='unready'?'Rời phòng':`Hạng ${p.out.place}`):m.phase==='ready'?(p.ready?'Sẵn sàng':'Đang chờ'):on?`${seconds(left)}s`:m.winner===seat?'Thắng':''}</small></li>;})}</ul>
   <section className="nt-stage" aria-live="polite">
    <p className="nt-prompt">{m.phase==='turn'&&mine.out&&mine.out.reason!=='unready'?<span className="nt-out-note">Bạn đã bị loại · đang xem · </span>:null}{m.phase==='turn'?(myTurn?<>Lượt của <b>Bạn</b> · nối từ <b>“{second}”</b></>:<><b>{name(m.turn!)}</b> đang nghĩ<span className="nt-dots"/></>):m.phase==='countdown'?'Từ mở màn':m.phase==='finished'?'Chuỗi từ của trận':'Từ mở màn sẽ hiện khi bắt đầu'}</p>

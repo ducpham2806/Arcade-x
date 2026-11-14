@@ -1,3 +1,4 @@
+import {useChatRoom} from '../../chat/ChatContext';
 import {Radar} from './Radar';
 import {useBattleAudio} from './useBattleAudio';
 import {TurnStatus} from './TurnStatus';
@@ -17,6 +18,7 @@ export function OnlineGame({art,onClose,connect=platformRoomClient,lab=false,isM
  useEffect(()=>{let disposed=false;mounted.current=true;setError('');connect().then(session=>{if(disposed){session.client.close();return;}resume.current=session.resumeKey;liveClient.current=session.client;setClient(session.client);if(session.resumeKey)try{const id=localStorage.getItem(session.resumeKey);if(id)void session.client.refresh(id);}catch{/* Optional resume ID only. */}}).catch(e=>{if(!disposed)setError(e.message);});return()=>{disposed=true;mounted.current=false;liveClient.current?.close();};},[connect,opening]);
  useEffect(()=>{if(!client)return;const unsub=client.subscribe(()=>{redraw(n=>n+1);if(resume.current&&(client.snapshot||(client.pending?.type==='create'||client.pending?.type==='match')))try{localStorage.setItem(resume.current,(client.pending?.type==='create'||client.pending?.type==='match')?client.pending.requestId:client.snapshot!.id);}catch{}});const timer=setInterval(()=>{redraw(n=>n+1);if(!document.hidden&&navigator.onLine)void client.refresh();},3000);const refresh=()=>{if(!document.hidden)void client.refresh();};document.addEventListener('visibilitychange',refresh);window.addEventListener('online',refresh);return()=>{unsub();clearInterval(timer);document.removeEventListener('visibilitychange',refresh);window.removeEventListener('online',refresh);};},[client]);
  const room:RoomSnapshot|null=client?.snapshot||null,v=room?.view,placement=v?.phase==='placement',battle=v?.phase==='battle',squad=room?.mode==='squad',controlSeat=room?.controlSeat||room?.seat,personalShips=v?.own.filter(s=>s.owner===room?.seat)||[];
+ useChatRoom(room&&room.status!=='closed'&&!room.left?{id:'battleship:'+room.id,selfId:room.seat,players:[],unavailable:'Hải Chiến hiện dùng kênh Game; chưa có chat riêng trong trận.'}:null);
  useEffect(()=>{if(battle)setOwn(false);if(placement){setOwn(true);setType('carrier');setHorizontal(false);}setSelected(null);},[v?.phase,room?.id]);
  useEffect(()=>{setSelected(null);},[v?.turn]);
  const finished=!!room&&(room.status==='closed'||room.left||v?.phase==='finished');

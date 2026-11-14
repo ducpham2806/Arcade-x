@@ -217,6 +217,22 @@ await test('waiting rooms expire after 10 minutes; nextDeadline mirrors the sche
   for (let t = T0 + 60000; t < T0 + W.WAITING_MS; t += 60000) await rooms.snapshot('ann', 'r1', t);
   await rooms.tick(T0 + W.WAITING_MS);
   assert.equal(store.rooms.get('r1').closeReason, 'expired');
+  await assert.rejects(rooms.command('ann','r1',store.rooms.get('r1').version,'closed-chat',{type:'chat',text:'x'},T0+W.WAITING_MS+1),e=>e.code==='NOT_PLAYING');
+});
+
+await test('chat: members only, server sender, length/rate limits, idempotent retry and stable seat identity', async () => {
+ const {rooms,store}=setup();
+ await rooms.create('ann','r1','ABC234','Ann',3,T0);await rooms.join('bob','ABC234','Bob',T0+1);
+ const before=await rooms.snapshot('ann','r1',T0+2);
+ const first=await rooms.command('ann','r1',before.version,'chat-1',{type:'chat',text:'Chào bạn'},T0+10);
+ assert.equal(first.chat.length,1);assert.equal(first.chat[0].name,'Ann');assert.equal(first.chat[0].sender,first.roster.find(p=>p.seat==='P1').chatId);
+ const retry=await rooms.command('ann','r1',before.version,'chat-1',{type:'chat',text:'Chào bạn'},T0+20);assert.equal(retry.chat.length,1);
+ await assert.rejects(rooms.command('outsider','r1',first.version,'chat-2',{type:'chat',text:'x'},T0+20),e=>e.code==='NOT_MEMBER');
+ await assert.rejects(rooms.command('ann','r1',first.version,'chat-3',{type:'chat',text:'x'},T0+20),e=>e.code==='TOO_FAST');
+ await assert.rejects(rooms.command('ann','r1',first.version,'chat-4',{type:'chat',text:'x'.repeat(501)},T0+1100),e=>e.code==='BAD_CHAT');
+ const old=(await rooms.snapshot('bob','r1',T0+30)).roster.find(p=>p.seat==='P2').chatId;
+ await cmd(rooms,'bob','r1',{type:'leave'},T0+40);const next=await rooms.join('chi','ABC234','Chi',T0+50);assert.notEqual(next.roster.find(p=>p.seat==='P2').chatId,old);
+ assert(!JSON.stringify(next).includes('members'));assert.equal(store.rooms.get('r1').chat.length,1);
 });
 
 console.log(`word-chain server: ${checks} checks passed`);

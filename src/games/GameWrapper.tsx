@@ -1,3 +1,4 @@
+import {useChat} from '../chat/ChatContext';
 import {usesLauncherUi} from './gameUiPolicy';
 import './launcherGameUi.css';
 import { GameChatBubble } from '../components/GameChatBubble';
@@ -92,6 +93,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     isChatOpen,
   } = useLauncherUi();
 
+  const chat = useChat();
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
   // Help is available on demand; package readiness is the only launch gate.
@@ -705,7 +707,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
             isDailyChallengeMode={isDailyChallengeMode}
             bridge={bridge}
             initialState={initialGameStateRef.current}
-            isPaused={isChatOpen || isPaused || showPreGameLoading || gameOverData !== null || showExitConfirm || activeModal !== 'none' || resumeCountdown !== null}
+            isPaused={(isChatOpen && !chat?.room) || isPaused || showPreGameLoading || gameOverData !== null || showExitConfirm || activeModal !== 'none' || resumeCountdown !== null}
             isMuted={isSoundMuted}
             onGameOver={handleGameOver}
             onRestart={handleRestart}

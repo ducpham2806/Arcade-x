@@ -1,6 +1,7 @@
 import { CONFIG, LESSONS, createState, step, botInput, neutral, nextLesson, aimPath, clamp, surrender } from './engine.ts';
 import type { State, Input, Tank } from './engine.ts';
 import { readableCanvasText } from '../../accessibility/canvasText';
+import type {NetSession} from './net-client.ts';
 import { connectTankRoom } from './net-client.ts';
 import { SEATS, normalizeCode } from './protocol.ts';
 import { onlineDialog, patchOnlineDialog, canSurrender } from './online-ui.ts';
@@ -8,7 +9,7 @@ import type { OnlineScreen } from './online-ui.ts';
 import { isTrustedServer, tokenFor } from './trust.ts';
 
 export type TankController = { destroy: (options?: { leaveOnline?: boolean }) => void; setPaused: (v: boolean) => void; snapshot: () => State };
-export type TankOptions = { paused?: boolean; requireAuthentication?: boolean; onAuthRequired?: () => void; inviteGameId?: string; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined;
+export type TankOptions = { onChatSession?:(session:NetSession|null)=>void;paused?: boolean; requireAuthentication?: boolean; onAuthRequired?: () => void; inviteGameId?: string; /** P2 online: room server URL (ws/wss). */ serverUrl?: string; /** Supabase access token for online rooms. */ getToken?: () => string | undefined;
   /** Staging review: keep tokens and invitations bound to this page's configured backend. */ fixedServer?: boolean;
   /** wss servers allowed to receive the token; loopback dev servers are always allowed. Others get no token (guest). */ trustedServers?: readonly string[] };
 const esc = (v: string) => v.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
@@ -86,6 +87,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
   function onNet(kind: string) {
     if (destroyed || !net) return;
     const s = net.session, phase = s.room?.phase ?? '';
+    if(kind!=='snapshot'&&kind!=='pong')options.onChatSession?.(s);
     if (pendingBots && kind === 'error') pendingBots = false; // Keep the queue visible if cancellation was refused.
     if (pendingBots && !s.queueStatus) {
       pendingBots = false; leaveOnline(false); start('squad'); return;
@@ -122,6 +124,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     const n = net;
     if (n?.session.queueStatus) n.session.unqueue();
     if (n?.session.room) n.session.leave();
+    options.onChatSession?.(null);n?.session.cancelChat();
     net = null; online = false; lastPhase = ''; lastResult = ''; pendingBots = false; seenConnections.clear(); toastUntil = 0;
     // Let leave/unqueue flush before closing; destroy also closes every pending transport.
     if (n) { leaving.add(n); setTimeout(() => { n.close(); leaving.delete(n); }, 150); }
@@ -178,7 +181,9 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
     }
   }
   on(root, 'click', ((e: MouseEvent) => { const b = (e.target as HTMLElement).closest<HTMLElement>('[data-action]'); if (b) action(b.dataset.action!); }) as EventListener);
+  on(window, 'arcadex:chat-input', (() => resetInput()) as EventListener);
   on(window, 'keydown', ((e: KeyboardEvent) => {
+    if ((e.target as HTMLElement).closest?.('[data-chat-ui]')) return;
     if (screen) {
       if (e.key === 'Tab') { const list = Array.from(dialog.querySelectorAll<HTMLElement>('button:not(:disabled),textarea,input,summary')); const visible = list.filter(el => !!el.getClientRects().length && !el.closest('[hidden]')); list.splice(0, list.length, ...visible); if (!list.length) return; if (e.shiftKey && document.activeElement === list[0]) { e.preventDefault(); list.at(-1)!.focus(); } else if (!e.shiftKey && document.activeElement === list.at(-1)) { e.preventDefault(); list[0].focus(); } }
       if (e.key === 'Escape' && (screen === 'pause' || screen === 'onlinepause' || screen === 'onlineconfirm')) action('resume');
@@ -239,7 +244,7 @@ export function mountTankClash(root: HTMLElement, options: TankOptions = {}): Ta
       q('.tc-enemy').firstChild!.textContent = room.format === '2v2' ? `${mine ? '● A' : '▲ B'} · ĐỐI THỦ ` : `${other ? other.id.toUpperCase() + ' · ' + other.name.toUpperCase() : 'ĐỐI THỦ'}${other && !other.connected ? ' (MẤT KẾT NỐI)' : ''} `;
       for (const [selector, teamId] of [['.tc-hp', mine], ['.tc-enemyhp', 1 - mine]] as const) {
         const rows = room.seats.filter(x => x.team === teamId);
-        q(selector).innerHTML = rows.map(seat => `<span class="tc-tank-hp" data-seat="${seat.id}"><span>${esc(seat.name)}${seat.id === s.seat ? ' · BẠN' : ''}</span><b>${seat.forfeited ? 'RỜI' : hp(sim.tanks.find(t => t.id === seat.id))}${!seat.connected && !seat.forfeited ? ' · MẤT MẠNG' : ''}</b></span>`).join('');
+        q(selector).innerHTML = rows.map(seat => `<span class="tc-tank-hp" data-seat="${seat.id}" data-chat-player="${seat.chatId||''}"><span>${esc(seat.name)}${seat.id === s.seat ? ' · BẠN' : ''}</span><b>${seat.forfeited ? 'RỜI' : hp(sim.tanks.find(t => t.id === seat.id))}${!seat.connected && !seat.forfeited ? ' · MẤT MẠNG' : ''}</b></span>`).join('');
       }
       q('.tc-mode').textContent = `ONLINE ${room.format} · HIỆP ${sim.round}`;
       q('.tc-task').textContent = `Phòng ${s.code} · ${spectator ? 'ĐANG XEM · Không điều khiển xe' : room.format === '2v2' ? 'Loại cả đội đối thủ để thắng hiệp' : 'Loại đối thủ để thắng hiệp'}`;

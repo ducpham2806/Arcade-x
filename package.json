@@ -22,7 +22,7 @@
     "test:blossom": "playwright test tests/blossom",
     "test:blossom-engine": "playwright test -c tests/blossom/playwright.unit.config.ts",
     "test:battleship-ui": "playwright test tests/battleship/visual.test.ts",
-    "test:tank-clash": "node --test tests/tank-clash/engine.test.mjs tests/tank-clash/room.test.mjs tests/tank-clash/netcode.test.mjs tests/tank-clash/trust.test.mjs tests/tank-clash/connection.test.mjs tests/tank-clash/squad.test.mjs tests/tank-clash/squad-room.test.mjs tests/tank-clash/squad-netcode.test.mjs tests/tank-clash/queue.test.mjs && node tests/tank-clash/launcher.mjs",
+    "test:tank-clash": "node --test tests/tank-clash/engine.test.mjs tests/tank-clash/room.test.mjs tests/tank-clash/netcode.test.mjs tests/tank-clash/trust.test.mjs tests/tank-clash/connection.test.mjs tests/tank-clash/squad.test.mjs tests/tank-clash/squad-room.test.mjs tests/tank-clash/squad-netcode.test.mjs tests/tank-clash/queue.test.mjs tests/tank-clash/chat.test.mjs && node tests/tank-clash/launcher.mjs",
     "test:tank-clash-server": "node --test tests/tank-clash/server.test.mjs tests/tank-clash/network.test.mjs tests/tank-clash/operations.test.mjs",
     "test:tank-clash-soak": "node scripts/tank-clash/soak.mjs",
     "prepare:tank-server": "node scripts/tank-clash/package.mjs",
@@ -45,7 +45,7 @@
     "test:readability": "node tests/readability/contrast.mjs && node tests/readability/dom-policy.cjs",
     "test:duel": "node tests/duel/engines.mjs && node tests/duel/ui.cjs && node tests/duel/worker.mjs",
     "test:duel-server": "node tests/duel/authoritative.mjs && node tests/duel/schema.mjs && node tests/duel/edge-room.mjs",
-    "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs",
+    "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs && node tests/social/chat-store.mjs",
     "export:artwork": "node scripts/export-game-art.mjs",
     "test:artwork": "node tests/artwork/catalog.mjs && node tests/artwork/gemini.mjs && node tests/artwork/access.mjs && node tests/artwork/chronicles.cjs",
     "test:startup": "node tests/pwa/startup.cjs && node tests/pwa/packages.cjs",
@@ -107,7 +107,9 @@
     "build:word-chain-edge": "node scripts/word-chain-build-edge.mjs",
     "test:snake-ui": "node --test tests/snake/ui-live-guard.mjs && playwright test tests/snake/ui-save.test.ts tests/snake/ui-controls.test.ts --output=test-results/snake-ui",
     "test:snake-ui-live": "node scripts/test-snake-ui-live.mjs",
-    "test:snake-controls": "playwright test tests/snake/ui-controls.test.ts --output=test-results/snake-controls"
+    "test:snake-controls": "playwright test tests/snake/ui-controls.test.ts --output=test-results/snake-controls",
+    "test:chat-ui": "playwright test tests/social/bubble-ui.test.ts",
+    "preview:chat": "node scripts/chat-preview.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

@@ -85,7 +85,7 @@ export class WordChainClient {
       const r = await this.transport.request(body,controller.signal);
       if(!this.current(epoch))return false;
       this.apply(r, sent);
-      if (body.type === 'command') this.lastResult = r.result ?? null;
+      if (body.type === 'command' && body.command.type === 'submit') this.lastResult = r.result ?? null;
       this.pending = null; this.notice = ''; this.error = ''; this.lastErrorCode = '';
       return true;
     } catch (e) {
@@ -112,7 +112,7 @@ export class WordChainClient {
       if(this.current(epoch)){this.notice=this.error||'Đang chờ đồng bộ trạng thái mới.';this.emit();}
       return false;
     }
-    this.lastResult = null;
+    if(command.type==='submit')this.lastResult = null;
     for (let attempt = 0; attempt < 3; attempt++) {
       if(!this.current(epoch)||!this.snapshot||this.pending)return false;
       const snap = this.snapshot;

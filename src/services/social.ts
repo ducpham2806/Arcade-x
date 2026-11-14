@@ -2,7 +2,7 @@ import { ensureCloudIdentity } from './supabaseClient';
 export interface SocialProfile { id:string; username:string; avatar:string; level:number; currentTitle?:string; stats?:Record<string,unknown>; bio:string; favorite:string; online:boolean; lastSeen?:string }
 export interface SocialMessage { id:string; sender:string; profile:SocialProfile|null; text:string; created_at:string }
 export interface SocialRelation { sender:string; target:string; status:'pending'|'accepted'|'blocked'; profile:SocialProfile|null }
-export interface InboxEntry { peer:string; profile:SocialProfile|null; text:string; created_at:string }
+export interface InboxEntry { sender?:string;peer:string; profile:SocialProfile|null; text:string; created_at:string }
 export async function socialAction<T=unknown>(actor:string,action:string,target='',text='',scope='global'):Promise<T>{
  const client=await ensureCloudIdentity();
  const {data,error}=await client.rpc('arcadex_social_action',{p_actor:actor,p_action:action,p_target:target,p_text:text,p_scope:scope});

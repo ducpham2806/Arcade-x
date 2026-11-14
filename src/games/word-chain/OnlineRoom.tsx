@@ -1,3 +1,4 @@
+import {useWordChainChat} from '../../chat/useWordChainChat';
 import React,{useEffect,useReducer,useState} from 'react';
 import {ConnectionNotice} from '../duel/ConnectionNotice';
 import {MatchView,SEAT_COLOR} from './MatchView';
@@ -16,6 +17,7 @@ export function OnlineRoom({client,mode,lex,sound,resumeKey,onExit}:{client:Word
  const [,render]=useReducer((n:number)=>n+1,0);
  const [capacity,setCapacity]=useState(4),[code,setCode]=useState(''),[copied,setCopied]=useState(false),[leaving,setLeaving]=useState(false);
  useEffect(()=>client.subscribe(render),[client]);
+ const chatPlayers=useWordChainChat(client);
  const s=client.snapshot,m=s?.match??null,live=!!m&&m.phase!=='finished';
  // Resume a room after a reload; queue straight away in matchmaking mode.
  useEffect(()=>{let resume:string|null=null;try{resume=resumeKey?localStorage.getItem(resumeKey):null;}catch{/* optional */}
@@ -77,7 +79,7 @@ export function OnlineRoom({client,mode,lex,sound,resumeKey,onExit}:{client:Word
   </div>;}
 
  const votes=s.rematch?.votes.length??0,inRoom=s.roster.filter(r=>r.present).length;
- return <MatchView match={m} me={s.seat} now={client.now} lex={lex} avatars={avatars} sound={sound} status={status}
+ return <MatchView chatPlayers={chatPlayers} match={m} me={s.seat} now={client.now} lex={lex} avatars={avatars} sound={sound} status={status}
   subtitle={m.phase==='turn'?undefined:`${s.public?'Ghép trận':'Phòng '+s.code} · ${m.order.length||m.players.length} người`}
   onReady={r=>void client.command({type:'ready',ready:r})}
   onSubmit={async(raw):Promise<Check>=>{await client.command({type:'submit',word:raw,turn:m.turnNumber});if(client.lastResult)return client.lastResult;throw new Error(client.error||client.notice||'Không gửi được, thử lại.');}}

@@ -25,6 +25,8 @@ test(`practice match with a bot plays to the end (${name})`,async({page})=>{
  // Seed 6: the player goes first and the opener is "con người".
  await page.addInitScript(()=>{(globalThis as {__WORD_CHAIN_TEST_SEED__?:number}).__WORD_CHAIN_TEST_SEED__=6;});
  await page.goto('/');
+ // The approved lobby chat starts compact. Collapse it through its real control before browsing a narrow catalog.
+ const chat=page.getByRole('button',{name:'Thu chat về bubble'});await expect(chat).toBeVisible();await chat.click();
  await page.getByRole('button',{name:'Slide 1: Nối Từ Đối Kháng',exact:true}).click();
  await page.getByRole('button',{name:'Tạm dừng chuyển banner',exact:true}).click();
  await page.getByRole('textbox',{name:'Tìm trò chơi',exact:true}).fill('Nối Từ');

@@ -2,14 +2,19 @@
 
 Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+
+
+## CH0–CH4 · đã code/kiểm local, chờ nghiệm thu · 15/11/2026
+
+- Nhánh codex/chat-bubble-wireframe từ064a3a5; chủ dự án duyệt wireframe14/11 và yêu cầu kiểm trước merge.
+- Host/store chat theo owner: sảnh nhỏ, bubble kéo/nhớ, thu/phóng, unread, giữ nháp, lời cạnh avatar và input PvP. GameWrapper dùng chung cho mọi game.
+- Legacy3game dùng room social; Tank/Nối Từ có transport/server local, chưa áp backend. [QA](chat/IMPLEMENTATION-QA-2026-11-15.md) ghi kiểm thật và giới hạn.
+- Chưa merge/deploy/thiết bị thật. Tiếp: chủ dự án kiểm local; staging private chat và full CI trước yêu cầu merge. [Chi tiết cũ](archive/COMPLETED-2026-11-15-before-chat-implementation.md).
+
 ## NETLIFY-BUILD / AUTH-XTAB · đã phát hành · 07/11/2026
 
 - PR17/main1131927: deps:tank-clash trước lint/build sửa TS2307 nestedws; fullCIb644da2, NetlifyPublished/4bundlebyte-match. [BuildQA](qa/NETLIFY-BUILD-2026-11-07.md).
 - Auth giữ identity riêng, hủy restore cũ;5regression và fixture A→guest→B qua. Production B tạo phòng, logout xuyên tab→về thư viện/login; [QA](qa/BUG-AUTH-CROSS-TAB.md). Ca đăng nhậpA/mãB cũ user để sau, TC-R0 vẫn thiếu ca này.
-
-## WC-PLAN / SN-PLAN · DONE tài liệu · 07/11/2026
-
-- Nhánh codex/word-chain-launcher-release/nguồn5a64fef: [NốiTừ](word-chain/ONLINE-PLAN.md) staging→phòng→queue→PK→mạng/Auth; [Snake](snake/CONTINUATION-PLAN.md) baseline→UI/save→thiết bị/nội dung→release. Có task/file/AC; plan không tự cấp quyền deploy.
 
 ## SN-R2b · đã phát hành R01 · 13/11/2026
 
@@ -17,10 +22,6 @@
 - R01 miễn phí, 10 màn, icon/banner đã duyệt. Lưu riêng theo người chơi trên thiết bị.
 - Public Chrome qua tải gói, reload offline, màn 1/âm thanh/thoát. JS game và 20 media khớp build.
 - Còn nghiệm thu Android/iPhone, người mới chơi và live save/JWT. [QA phát hành](qa/SNAKE-PUBLIC-2026-11-13.md).
-
-## SN-R2a · ứng viên Snake local · 12/11/2026
-
-- Nhánh codex/snake-catalog-candidate tại 4432a0e. Kiểm 10 màn, lazy media, gói offline 36 tệp, favorite/recent, save khách và tài khoản riêng. [QA](qa/SNAKE-CATALOG-2026-11-12.md). SN-R2b thực hiện từ main ngày 13/11.
 
 ## ONLINE-ERROR · đã phát hành · 08/11/2026
 

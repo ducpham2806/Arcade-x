@@ -1,3 +1,4 @@
+import {ChatProvider} from './chat/ChatProvider';
 import { GamePackageGate } from './components/GamePackageGate';
 import { installReadability } from './accessibility/readability.js';
 import './accessibility/readability.css';
@@ -28,7 +29,7 @@ const launcherPanels = {
   GameDetailModal: () => import('./components/GameDetailModal').then(m => ({ default: m.GameDetailModal })),
   PvpMatchHistoryModal: () => import('./components/PvpMatchHistoryModal').then(m => ({ default: m.PvpMatchHistoryModal })),
   ShareModal: () => import('./components/ShareModal').then(m => ({ default: m.ShareModal })),
-  GlobalChat: () => import('./components/GlobalChat').then(m => ({ default: m.GlobalChat })),
+  GlobalChat: () => import('./chat/ChatShell').then(m => ({ default: m.ChatShell })),
 };
 const ProfileModal = React.lazy(launcherPanels.ProfileModal);
 const SettingsModal = React.lazy(launcherPanels.SettingsModal);
@@ -65,8 +66,6 @@ const AppContent: React.FC = () => {
     setActiveModal,
     shareData,
     closeShareModal,
-    isChatOpen,
-    toggleChat,
     openChat,
   } = useLauncherUi();
 
@@ -78,8 +77,7 @@ const AppContent: React.FC = () => {
     }
   }, [launchGame]);
 
-  const [chatMounted, setChatMounted] = useState(false);
-  useEffect(() => { if (isChatOpen) setChatMounted(true); }, [isChatOpen]);
+
 
   // Warm the lazy panels once the launcher is idle so the first open is instant.
   useEffect(() => whenIdle(() => Object.values(launcherPanels).forEach(load => { void load().catch(() => {}); })), []);
@@ -218,8 +216,8 @@ const AppContent: React.FC = () => {
 
 
       {/* Real-time Global Chat Floating Window - Rendered last so it sits on top of all views */}
-      {/* Mounted from the first open on, so tabs and drafts survive closing the panel. */}
-      {chatMounted && <div className="platform-ui"><Suspense fallback={null}><GlobalChat isOpen={isChatOpen} onToggle={toggleChat} onOpenShare={() => setActiveModal('share')} /></Suspense></div>}
+      {/* Shared host; its owner-scoped feeds and drafts survive panel close. */}
+      <div className="platform-ui"><Suspense fallback={null}><GlobalChat /></Suspense></div>
     </div>
   );
 };
@@ -231,7 +229,7 @@ export function App({ reviewControls }: { reviewControls?: React.ReactNode } = {
       <PlayerProvider>
         <InventoryProvider>
           <GameProvider>
-            <AppContent />
+            <ChatProvider><AppContent /></ChatProvider>
             {reviewControls}
           </GameProvider>
         </InventoryProvider>

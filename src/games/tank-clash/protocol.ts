@@ -66,7 +66,7 @@ export const ERROR_TEXT: Record<ErrorCode, string> = {
 };
 
 export type Phase = 'lobby' | 'countdown' | 'playing' | 'finished' | 'closed';
-export type SeatView = { id: SeatId; team: number; name: string; ready: boolean; connected: boolean; host: boolean; holdMs: number | null;
+export type SeatView = { chatId?:string; id: SeatId; team: number; name: string; ready: boolean; connected: boolean; host: boolean; holdMs: number | null;
   /** Left or ran out of seat hold during the current/last match: out for the rest of it. */ forfeited: boolean };
 export type MatchResult = { matchId: string; code: string; format: Format; winner: number | null; scores: number[];
   reason: 'score' | 'forfeit' | 'surrender' | 'cancelled'; rounds: number;
@@ -75,7 +75,8 @@ export type MatchResult = { matchId: string; code: string; format: Format; winne
 export type QueueView = { waitedMs: number; size: number };
 /** `private`: made with a code. `queue`: made by the 2v2 matchmaker (no joining by code, rematch window). */
 export type RoomKind = 'private' | 'queue';
-export type RoomView = { code: string; kind: RoomKind; format: Format; phase: Phase;
+export type TankChatMessage={id:string;requestId:string;sender:string;seat:SeatId;name:string;text:string;at:number};
+export type RoomView = { chatVersion?:1;chat?:TankChatMessage[];code: string; kind: RoomKind; format: Format; phase: Phase;
   /** Party room searching for a match. */ queue: QueueView | null; /** Matched room after a result: time left to agree on a rematch. */ rematchMs: number | null; seats: SeatView[]; spectators: number; countdownMs: number | null; matchId: string | null; result: MatchResult | null };
 /** Timers are omitted while zero (the client defaults them to 0): keeps 2v2 snapshots under the bandwidth ceiling. */
 export type TankSnap = { id: string; x: number; y: number; angle: number; aim: number; hp: number; cooldown?: number; shield?: number; shieldCooldown?: number };
@@ -84,6 +85,7 @@ export type Snapshot = { tick: number; ack: number; status: State['status']; rou
   winner: number | null; roundWinner: number | null; tanks: TankSnap[]; bullets: BulletSnap[]; events: GameEvent[]; walls?: Wall[] };
 
 export type ClientMessage =
+  | {type:'chat';id:string;text:string}
   | { type: 'create'; protocol: string; format?: Format; name?: string; token?: string }
   | { type: 'join'; protocol: string; code: string; as?: 'player' | 'spectator'; name?: string; token?: string }
   | { type: 'resume'; protocol: string; code: string; resumeToken: string; token?: string }
@@ -102,6 +104,7 @@ export type ClientMessage =
   | { type: 'input'; seq: number; inputs: Input[] }
   | { type: 'ping'; at: number };
 export type ServerMessage =
+  | {type:'chat';code:string;message:TankChatMessage}
   | { type: 'joined'; code: string; role: 'player' | 'spectator'; seat: SeatId | null; resumeToken: string; nextSeq: number; serverTime: number; room: RoomView; walls?: Wall[]; snapshot?: Snapshot }
   | { type: 'room'; room: RoomView }
   /** Your seat id changed (team switch or host move); the resume token stays the same. */
@@ -134,7 +137,7 @@ function exactInput(v: unknown): v is Input {
 }
 const MESSAGE_KEYS: Record<string, string[]> = {
   create: ['protocol', 'format', 'name', 'token'], join: ['protocol', 'code', 'as', 'name', 'token'], resume: ['protocol', 'code', 'resumeToken', 'token'],
-  ready: ['ready'], leave: [], team: ['team'], move: ['seat', 'team'], surrender: [], input: ['seq', 'inputs'], ping: ['at'],
+  chat:['id','text'],ready: ['ready'], leave: [], team: ['team'], move: ['seat', 'team'], surrender: [], input: ['seq', 'inputs'], ping: ['at'],
   queue: ['protocol', 'name', 'token'], unqueue: [],
 };
 const isTeam = (v: unknown) => v === 0 || v === 1;
@@ -151,6 +154,7 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
     case 'join': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && (m.as === undefined || m.as === 'player' || m.as === 'spectator')
       && str(m.name, 64) && str(m.token, 4096) ? m as ClientMessage : null;
     case 'resume': return typeof m.protocol === 'string' && typeof m.code === 'string' && m.code.length <= 16 && typeof m.resumeToken === 'string' && m.resumeToken.length <= 128 && str(m.token, 4096) ? m as ClientMessage : null;
+    case 'chat': return typeof m.id==='string'&&/^[a-zA-Z0-9-]{8,64}$/.test(m.id)&&typeof m.text==='string'&&m.text.trim().length>0&&m.text.length<=500 ? m as ClientMessage : null;
     case 'ready': return typeof m.ready === 'boolean' ? m as ClientMessage : null;
     case 'leave': case 'surrender': case 'unqueue': return m as ClientMessage;
     case 'queue': return str(m.protocol, 64) && str(m.name, 64) && str(m.token, 4096) ? m as ClientMessage : null;

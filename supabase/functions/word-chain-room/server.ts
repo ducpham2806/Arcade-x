@@ -21,6 +21,8 @@ export type Room = {
   closeReason?: 'abandoned' | 'expired' | 'finished';
   rematch?: {votes: Seat[]; until: number};
   reactions: {seat: Seat; emoji: string; at: number}[];
+  chatMembers?: Partial<Record<Seat,string>>;
+  chat?: {id:string;sender:string;seat:Seat;name:string;text:string;at:number}[];
   /** Seats whose absence was applied; the store rejects the write if any was seen after `cutoff`. */
   expiryGuard?: {cutoff: number; seats: Seat[]};
   receipts: {id: string; actor: string; fingerprint: string; version: number}[];
@@ -41,7 +43,7 @@ export interface RoomStore {
 }
 export type Command =
   | {type: 'ready'; ready: boolean} | {type: 'submit'; word: string; turn: number}
-  | {type: 'start'} | {type: 'forfeit'} | {type: 'leave'} | {type: 'rematch'} | {type: 'react'; emoji: string};
+  | {type: 'start'} | {type: 'forfeit'} | {type: 'leave'} | {type: 'rematch'} | {type: 'react'; emoji: string} | {type:'chat';text:string};
 
 export class RoomError extends Error {constructor(public code: string, message: string) {super(message);}}
 const deny = (code: string, message: string): never => {throw new RoomError(code, message);};
@@ -64,7 +66,8 @@ export function roomView(room: Room, uid: string) {
   return {
     id: room.id, code: room.code, version: room.version, status: room.status, seat, host: room.host,
     public: room.public, capacity: room.capacity, closeReason: room.closeReason ?? null,
-    roster: SEATS.filter(s => room.members[s] || room.match?.players.some(p => p.seat === s)).map(s => ({seat: s, name: room.names[s] ?? s, present: !!room.members[s], lastSeen: room.lastSeen[s] ?? room.createdAt})),
+    roster: SEATS.filter(s => room.members[s] || room.match?.players.some(p => p.seat === s)).map(s => ({seat: s, chatId:room.chatMembers?.[s]||`${room.id}:${s}:legacy`, name: room.names[s] ?? s, present: !!room.members[s], lastSeen: room.lastSeen[s] ?? room.createdAt})),
+    chatVersion:1, chat:room.chat||[],
     autoStartAt: room.public && room.status === 'waiting' && room.pairAt ? room.pairAt + AUTOSTART_MS : null,
     rematch: room.rematch ?? null, reactions: room.reactions, match,
     connection: {ownLastSeen: room.lastSeen[seat] ?? room.createdAt, graceMs: RECONNECT_MS},
@@ -99,7 +102,7 @@ export class WordChainRoomServer {
       if (room.status !== 'waiting') deny(room.status === 'closed' ? 'ROOM_CLOSED' : 'ROOM_STARTED', room.status === 'closed' ? 'Phòng đã đóng.' : 'Trận đã bắt đầu.');
       const seat = SEATS.slice(0, room.capacity).find(s => !room.members[s]);
       if (!seat) return deny('ROOM_FULL', 'Phòng đã đủ người.');
-      let next: Room = {...room, version: room.version + 1, members: {...room.members, [seat]: uid}, names: {...room.names, [seat]: cleanName(name)}, lastSeen: {...room.lastSeen, [seat]: now}};
+      let next: Room = {...room, version: room.version + 1, members: {...room.members, [seat]: uid}, chatMembers:{...room.chatMembers,[seat]:`${room.id}:${seat}:${room.version+1}`}, names: {...room.names, [seat]: cleanName(name)}, lastSeen: {...room.lastSeen, [seat]: now}};
       if (seatsIn(next).length >= room.capacity) next = this.start(next, now);
       const saved = await this.store.cas(room.version, next);
       if (saved) return roomView(saved, uid);
@@ -156,6 +159,14 @@ export class WordChainRoomServer {
     const next: Room = {...room};
     const m = room.match, playing = m && m.phase !== 'finished';
     switch (c.type) {
+      case 'chat': {
+        if(room.status==='closed')deny('NOT_PLAYING','Phòng đã đóng.');
+        if(typeof c.text!=='string'||!c.text.trim()||c.text.length>500)deny('BAD_CHAT','Tin nhắn cần từ 1 đến 500 ký tự.');
+        const sender=room.chatMembers?.[seat]||`${room.id}:${seat}:legacy`;
+        if((room.chat||[]).some(msg=>msg.sender===sender&&now-msg.at<1000))deny('TOO_FAST','Chờ một giây trước khi gửi tiếp.');
+        next.chat=[...(room.chat||[]),{id:`${room.id}:${room.version+1}`,sender,seat,name:room.names[seat]||seat,text:c.text.trim(),at:now}].slice(-100);
+        return {next};
+      }
       case 'start':
         if (room.status !== 'waiting' || room.public) deny('NOT_WAITING', 'Phòng không ở trạng thái chờ.');
         if (seat !== room.host) deny('HOST_ONLY', 'Chỉ chủ phòng được bắt đầu.');

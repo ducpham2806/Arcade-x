@@ -117,6 +117,16 @@ jobs:
         run: npm run test:blossom-ui
       - name: Battleship perspective board, placement and taps (Playwright, dev server)
         run: npm run test:battleship-ui
+      - name: Floating chat desktop, phone, unread and input isolation
+        run: npm run test:chat-ui
+      - name: Preserve chat UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chat-ui-evidence
+          path: test-results/chat-review/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Nối Từ practice match (Playwright, dev server)
         run: npm run test:word-chain-ui
       - name: Keep Word Chain desktop and phone visual evidence
