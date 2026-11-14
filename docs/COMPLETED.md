@@ -1,13 +1,13 @@
 # Tóm tắt công việc đã hoàn tất
 
-[Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
+[Trước sửa CI58](archive/COMPLETED-2026-11-14-before-ci58.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
 ## Snake R01 · đã merge, Netlify HOLD · 14/11/2026
 
 - PR34/head9a4f44b CI57 xanh→main533c0e7 với `[skip netlify]` theo user; Netlify vẫn8320385. [Merge/HOLD](qa/SNAKE-MAIN-HOLD-2026-11-14.md). Nhánh finish từ2ca0b3c: sửa S1accountsave cùng store xuyên Story/Journey/Lab, giữ guest/format và audio prefs. [QA](qa/SNAKE-FINISH-2026-11-14.md).
 - Sửa nativekeyboard/focus/Escape và boss marker đúng tơ/táo/cột/điểm yếu/cổng; không đổi physics/replay/rewards.
 - UI10/10thắng/29sao qua pointer/time thật, boss6hit/3pha, reload/cleanup0/pageerror0. Giữ V1driverFAIL, V2PASS, không gọi humanplaytest.
-- Player3ca và Labprefs red→green; unit6suite/lint/build/rollback/preview/bundle/catalog/storage qua; CI57 đúnghead đã qua; source merge, deployment HOLD.
+- Player3ca/Labprefs red→green; unit6suite/build/budget/catalog/storage qua; CI57 trước merge xanh. CI58 Snake xanh/verify testDungeonFAIL, CI59 cùng runtime xanh; [sửa barrier test](qa/SNAKE-POSTMERGE-CI-2026-11-14.md) đang kiểm, không xóa failure. Source merge, deployment HOLD.
 - [Phiếu nghiệm thu](snake/R01-ACCEPTANCE.md) sẵn sàng; Android/iPhone/người mới/art/audio thật cònWAITING. Livepreflight thiếu4binding, không login/ghiDB. [Trước task](archive/COMPLETED-2026-11-14-before-snake-finish.md).
 
 ## Snake R01 / Auth / Studio · phát hành · 13/11/2026

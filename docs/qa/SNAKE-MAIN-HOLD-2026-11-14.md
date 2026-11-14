@@ -6,7 +6,7 @@ Chủ dự án yêu cầu: “Merge main luôn e, khoan push netlify”. Lượt
 
 - [PR34](https://github.com/ducpham2806/Arcade-x/pull/34), head `9a4f44b83c0c1b4f22f12dd65711a28cd0841ba8`, open/ready/mergeable; đọc lại [CI57](https://github.com/ducpham2806/Arcade-x/actions/runs/43559652286), cả verify và snake_ui success trước merge.
 - Merge bằng method merge, expected_head đúng9a4f44b, tạo main `533c0e721c5a1cc46f47c8c794c59e6e73cb3335`. Commit title và body có `[skip netlify]`. Local main đã fast-forward; tree merge trùng hoàn toàn tree head đã kiểm.
-- GitHub CI58/push trên mergeSHA đang chạy tại checkpoint: run43565503273. `[skip netlify]` không yêu cầu dừng GitHub Actions; không dùng trạng thái pending này để nói đã có nghiệm thu production.
+- GitHub [CI58/push](https://github.com/ducpham2806/Arcade-x/actions/runs/43565503273) trên mergeSHA đã kết thúc: snake_ui success, verify FAIL ở baseline save của testDungeon. [Điều tra/sửa CI58](SNAKE-POSTMERGE-CI-2026-11-14.md); CI59/docs checkpoint cùng runtime success, không thay lịch sử lỗi. `[skip netlify]` không yêu cầu dừng GitHub Actions; không dùng trạng thái pending này để nói đã có nghiệm thu production.
 
 ## Netlify giữ nguyên
 

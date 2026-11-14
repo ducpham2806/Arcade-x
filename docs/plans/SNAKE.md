@@ -18,6 +18,10 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 | SN-UI-BADGE | MERGED qua PR34; Netlify HOLD | [QA ứng viên](../qa/SNAKE-BADGE-2026-11-13.md): chừa vùng badge, hosting5/5/modal36/catalog qua; production chưa đổi |
 | SN-R01-FINISH | MERGED main533c0e7/CI57; Netlify HOLD | [QA](../qa/SNAKE-FINISH-2026-11-14.md): accountsave xuyên Story/Journey/Lab, keyboard/focus, markerboss; UI10màn/restore/cleanup qua |
 
+## Kiểm sau merge
+
+SN-POSTMERGE-CI: CI58 Snake UI xanh, verify FAIL do baseline save của testDungeon nằm trước cửa sổ autosave. CI59/docs cùng runtime xanh; đã sửa barrier test local12/12 trên PR35, còn fullCI head mới; giữ Netlify HOLD. [QA](../qa/SNAKE-POSTMERGE-CI-2026-11-14.md). Chốt CI đúng head trước khi làm thêm QA.
+
 ## Bằng chứng đã có và giới hạn
 
 [Live-save QA](../SNAKE_LIVE_SAVE_QA.md) đã kiểm Auth/engine/replay/service thật: thắng/lưu, retry sau lost-ack không nhận lặp, restore mới, đọc offline/retry, refresh và signout. Wrapper React đã nối Auth owner/save session; timeout30giây có hủy. Gold/Gem riêng, adapter chưa phát thưởng launcher. Có sẵn icon/banner/master/manifest, chưa cần vẽ lại.
