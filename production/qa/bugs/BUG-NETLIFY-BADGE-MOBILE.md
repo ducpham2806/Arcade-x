@@ -1,6 +1,6 @@
 # S3 · Badge hosting chồng footer mobile · 13/11/2026
 
-Nguồn public `8320385`, Netlify deploy `6af6f590d7b4bd3516a37885`; Chromium156/Playwright1.64, viewport390×844online. Ghi nhận trong [QA phát hành Snake](../../../docs/qa/SNAKE-PUBLIC-2026-11-13.md); production vẫn còn lỗi tại checkpoint. Ứng viên local đã sửa, chờ CI/merge/deploy: [QA](../../../docs/qa/SNAKE-BADGE-2026-11-13.md).
+Nguồn public `8320385`, Netlify deploy `6af6f590d7b4bd3516a37885`; Chromium156/Playwright1.64, viewport390×844online. Ghi nhận trong [QA phát hành Snake](../../../docs/qa/SNAKE-PUBLIC-2026-11-13.md); production vẫn còn lỗi tại checkpoint. Bản sửa đã merge PR34/main533c0e7 sauCI57, deployment HOLD theo user: [QA](../../../docs/qa/SNAKE-BADGE-2026-11-13.md).
 
 ## Tái hiện / quan sát
 

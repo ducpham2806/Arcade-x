@@ -1,21 +1,21 @@
-# Bàn giao · 14/11/2026 · Snake R01 kỹ thuật
+# Bàn giao · 14/11/2026 · MERGED / NETLIFY HOLD
 
-User yêu cầu làm tiếp Snake cho xong. Nhánh `codex/snake-r01-finish` từ `2ca0b3c`/PR33, gồm bản badge đã qua CI55. [QA](qa/SNAKE-FINISH-2026-11-14.md), [thẻ Snake](plans/SNAKE.md), [phiếu nghiệm thu](snake/R01-ACCEPTANCE.md). Bản sửa chưa merge/deploy; Netlify API vừa xác nhận production vẫn `8320385`, deploy `6af6f590d7b4bd3516a37885` ready.
+**User yêu cầu merge main, khoan push Netlify.** PR34 đã merge `533c0e721c5a1cc46f47c8c794c59e6e73cb3335` từ head9a4f44b sau CI57 success cả verify/snake_ui. Tree merge trùng tree đã kiểm. Local main đã fast-forward; checkpoint docs ở nhánh `codex/snake-merge-hold-20261114`. [QA merge/HOLD](qa/SNAKE-MAIN-HOLD-2026-11-14.md), [thẻ Snake](plans/SNAKE.md).
 
-## Đã sửa và kiểm
+## Giữ Netlify
 
-S1 account save: Story/Journey/Lab dùng cùng store theo owner; giữ ưu tiên completion.storage và dữ liệu/format/key guest. Lab đổi tay giữ sound/volume. Red bắt tài khoản trống vào Story lại mở màn2 của guest; green kiểm thắng/lưu/reload, A/B/guest, checkpoint/settings. Native Space/Enter cho nút; focus/Tab/Escape theo dialog, canvas nhận phím chơi. Marker/minimap boss đúng tơ/táo/cộtA-B/điểm yếu/cổng. Không đổi simulation/digest/reward.
+Merge commit có `[skip netlify]`. Netlify API trước/sau xác nhận production vẫn deploy6af6f590d7b4bd3516a37885/source8320385 ready; không có deploy cho mergeSHA. Chưa phát hành các sửa lỗi Snake mới, không smoke bản cũ rồi gọi là nghiệm thu bản mới. CI58/GitHub push-check đang chạy tại checkpoint, không phải deploy.
 
-V2 thắng UI10/10 bằng native pointer/thời gian thật:29sao,3tim mỗi màn; boss83,6giây/6hit/3pha, tutorial2-3 qua UI; tổng593,89giây thực. Reload giữ10màn, exit đưa RAF/RO/listener/audio về0, không pageerror. V1 thua boss giữ FAIL; đã sửa cadence/tuyến lái driver, không giảm độ khó. V2 bắt đầu mới, không resume/seed progress.
+Tới khi user yêu cầu phát hành rõ: mọi commit đẩy nhánh và title PR giữ `[skip netlify]`; không trigger buildhook/deploy/publish. Đây là skip theo commit/PR, auto-deploy toàn site chưa tắt. Docs checkpoint cũng phải có cả marker commit và title PR. Đọc project.md/AGENTS trước các lần push tiếp theo.
 
-Player cuối3/3 và hosting5/5 qua; Lab prefs red→green. Sáu suite/lint/production-preview-rollback/bundle/catalog/storage qua. Public game133.731byte; initialJS301.337byte gzip. Full UI save/controls12ca và toàn repo xem CI đúng head của PR ứng viên sau push.
+## Snake đã có trong main
 
-## Bước tiếp
+Sửa S1 store theo owner xuyên Story/Journey/Lab, giữ guest/format/audio prefs; native keyboard/focus/Escape; marker/minimap boss đúng tơ/táo/cột/điểm yếu/cổng. Không đổi physics/digest/rewards. V2 UI10/10win/29sao/3tim mỗi màn, boss6hit/3pha, reload/cleanup0/pageerror0; V1 botFAIL giữ bằng chứng. [QA kỹ thuật](qa/SNAKE-FINISH-2026-11-14.md).
 
-PR34/89e6aac: CI56 snake_ui xanh; verify lỗi Dungeon synthetic-error bị autosave5s ghi đè. Đã đổi test sang quota thật/recovery và thêm artifact motion; không sửa production/timeout. Đọc CI head mới nhất, sửa failure nếu có; chỉ merge main khi user yêu cầu. Sau merge xác nhận Netlify Published/SHA rồi smoke public account/checkpoint/badge. PR32/33 đã được kế thừa; ưu tiên review ứng viên mới.
+CI57 qua UI12ca, player3, hosting5, catalog/offline và verify toàn repo; artifact snake-player-evidence/motion-regression-evidence đã có. CI56 Dungeon syntheticerror/autosave race được sửa bằng quota thật/recovery, local12lượt qua. PR32/33 đã đóng vì được kế thừa trong PR34.
 
-Android/iPhone/Safari, người mới M2/art/animation/audio, FPS/heap thật còn WAITING. Đã hỏi user khả năng bố trí qua async, chưa coi im lặng là nghiệm thu. Live preflight exit2 WAITING_BINDINGS thiếu email/password/actorID/grant-confirmed; chưa login/ghi DB. Secret qua runtime/runbook, không chat; fixture expiry không thay JWT thật.
+## Còn lại
 
-Dùng game-qa-playtest/game-feel/game-ui-ux, QA/Technical Director review độc lập. Graphify local46file/424node/1101edge; query showStory contextcall/depth1/budget700→3node/2edge. [Studio](studio/GRAPHIFY.md). Evidence local ignored ở production/qa/evidence/snake-r01-20261114; đầy đủ ở /workspace/tooling/snake-finish-evidence; CI artifact snake-player-evidence.
+Không tự triển khai trong lúc HOLD. Khi user cho phát hành: đọc lại CI/main mới nhất, deploy có chủ đích, xác nhận Published/SHA và kiểm public account/checkpoint/badge/offline. M2/người mới/art/audio và Android/iPhone/Safari/FPS/heap thật vẫn WAITING. [Phiếu nghiệm thu](snake/R01-ACCEPTANCE.md). Live preflight thiếu4binding, chưa login/ghiDB/JWT expiry thật; secret theo runbook, không chat.
 
-Preview Netlify bị edge-access, không đổi bảo vệ hoặc lặp guest test khi chưa có access. SQL production/reward/commerce theo AGENTS. [Trước task](archive/SESSION-HANDOFF-2026-11-14-before-snake-finish.md). Một WORKLOG≤3mục, archive nguyên văn.
+Dùng game-release-liveops cho merge/HOLD. Studio/Graphify đã cài; graphSnake46file424node1101edge chỉ còn làm bằng chứng nguồn trước merge, refresh khi đổi source. Lượt này chỉ docs, không dựng lại graph/gameplay. [Trước merge](archive/SESSION-HANDOFF-2026-11-14-before-main-hold.md). Một WORKLOG≤3mục, archive nguyên văn.

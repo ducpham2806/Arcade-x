@@ -1,6 +1,6 @@
 # Snake R01 · hoàn thiện kỹ thuật · 14/11/2026
 
-Nhánh `codex/snake-r01-finish`, từ2ca0b3c/PR33. Bản public vẫn8320385 tại checkpoint; chưa merge/deploy các bản sửa. [Thẻ Snake](../plans/SNAKE.md), [nghiệm thu còn lại](../snake/R01-ACCEPTANCE.md).
+Nhánh `codex/snake-r01-finish`, từ2ca0b3c/PR33. PR34 đã merge main533c0e7 sauCI57/head9a4f44b success; user yêu cầu Netlify HOLD. Bản public vẫn8320385, chưa deploy các bản sửa. [Merge/HOLD](SNAKE-MAIN-HOLD-2026-11-14.md). [Thẻ Snake](../plans/SNAKE.md), [nghiệm thu còn lại](../snake/R01-ACCEPTANCE.md).
 
 ## Lỗi đã sửa
 
