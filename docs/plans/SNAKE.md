@@ -20,7 +20,11 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 
 ## Kiểm sau merge
 
-SN-POSTMERGE-CI: CI58 Snake UI xanh, verify FAIL do baseline save của testDungeon nằm trước cửa sổ autosave. CI59/docs cùng runtime xanh; đã sửa barrier test local12/12 trên PR35, còn fullCI head mới; giữ Netlify HOLD. [QA](../qa/SNAKE-POSTMERGE-CI-2026-11-14.md). Chốt CI đúng head trước khi làm thêm QA.
+SN-POSTMERGE-CI: CI58 Snake UI xanh, verify FAIL do baseline save của testDungeon nằm trước cửa sổ autosave. CI59/docs cùng runtime xanh; đã sửa barrier test local12/12 trên PR35, fullCI60/head7785d71cả2job success; PR35 chưa merge, giữ Netlify HOLD. [QA](../qa/SNAKE-POSTMERGE-CI-2026-11-14.md). Parent CI đã chốt trước khi tiếp content.
+
+## SN-R01-CONTENT · ứng viên local14/11
+
+User yêu cầu đầy đủ content: thêm sổ tay/lời kết10màn, kết chương/sao/bí mật/replay và Canvasrig Tiểu Xà/Nhện Mẹ trên master hiện có; chưa thêm chương mới. [Inventory](../snake/R01-CONTENT.md), [QA](../qa/SNAKE-R01-CONTENT-2026-11-14.md). Unit/build/player6/6/catalog local qua; quota guardred→green, V3UI10/10/29sao/reload/cleanup0qua. Runtime rig không thay claim authoredvideo hay nghiệm thu art/human/device; chưa merge/deploy.
 
 ## Bằng chứng đã có và giới hạn
 

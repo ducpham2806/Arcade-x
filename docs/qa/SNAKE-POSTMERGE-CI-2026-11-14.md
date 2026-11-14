@@ -18,7 +18,7 @@ Bài kiểm đọc envelope `arcadex_save_v1_dungeon-tap` trong một page.evalu
 
 - Log đỏ `/tmp/dungeon-barrier-red.log`, trace/ảnh `/workspace/tooling/dungeon-barrier-evidence/red/`.
 - Green cùng kích thích `/tmp/dungeon-barrier-forced-green.log`, 1/1 PASS.
-- Bản cuối4cấu hình viewport/motion lặp3lần: **PASS12/12**, 2,1phút, không retries. Log `/tmp/dungeon-barrier-repeated.log`, output `/workspace/tooling/dungeon-barrier-evidence/repeated/`. Lint, test:claude, check-docs và diff-check qua; fullCI head mới theo PR35 sau push (chưa chốt tại checkpoint).
+- Bản cuối4cấu hình viewport/motion lặp3lần: **PASS12/12**, 2,1phút, không retries. Log `/tmp/dungeon-barrier-repeated.log`, output `/workspace/tooling/dungeon-barrier-evidence/repeated/`. Lint, test:claude, check-docs và diff-check qua; [CI60/head7785d71](https://github.com/ducpham2806/Arcade-x/actions/runs/43568595106) đã success cả verify/snake_ui. PR35 chưa merge.
 - Dùng Game Studio game-qa-playtest/performance-optimization và QA Lead. Chưa tối ưu hiệu năng hay tuyên bố FPS thật. Graphify AST đúng module Dungeon29codefile/226node/693edge tại `/workspace/tooling/dungeon-quota-graph/graphify-out/graph.json`; seedDungeonTitanCore/contextcall/budget700/depth1 trả6node/6edge. Seedpersist không match vì callback inline, phải đối chiếu source DungeonTitanCore/FantasyHUD/GameBridge/gameSaves và trace; graph không chứng minh thứ tự browser task.
 
 ## Còn lại

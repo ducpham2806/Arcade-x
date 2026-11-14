@@ -1,6 +1,6 @@
 # Rắn Săn Mồi — kế hoạch hoàn tất trước phát hành
 
-Cập nhật14/11/2026. R01 client đã phát hành13/11 trên main8320385 theo quyết định chủ dự án; cloud/reward không tự bật. Nhánh `codex/snake-r01-finish` sửa accountsave, keyboard và chỉ dẫn boss; [QA kỹ thuật](../qa/SNAKE-FINISH-2026-11-14.md) có lượt UI10/10màn,29sao và restore/cleanup. Chưa merge/deploy các bản sửa; chưa ký nghiệm thu toàn bộ plan. [Thẻ hiện tại](../plans/SNAKE.md), [phiếu nghiệm thu](R01-ACCEPTANCE.md).
+Cập nhật14/11/2026. R01 client đã phát hành13/11 trên main8320385 theo quyết định chủ dự án; cloud/reward không tự bật. PR34/main533c0e7 đã merge sửa accountsave, keyboard/boss; Netlify HOLD. Nhánh `codex/snake-r01-content-20261114` tiếp sổ tay/kết chương/rig từ parentCI60xanh; [QA kỹ thuật](../qa/SNAKE-FINISH-2026-11-14.md) có lượt UI10/10màn,29sao và restore/cleanup. Bản sửa main chưa deploy; content mới chưa merge/deploy; chưa ký nghiệm thu toàn bộ plan. [Thẻ hiện tại](../plans/SNAKE.md), [phiếu nghiệm thu](R01-ACCEPTANCE.md).
 
 Nguồn plan gốc07/11 dựa trên5a64fef và live02/11; các số đo baseline dưới đây là lịch sử. Quyết định phát hành client13/11 thay điều kiện giữ ngoài catalog, nhưng không đóng thay gate thiết bị, người mới, art/audio hoặc liveJWT.
 
@@ -57,6 +57,8 @@ Nguồn plan gốc07/11 dựa trên5a64fef và live02/11; các số đo baseline
 
 [QA14/11](../qa/SNAKE-FINISH-2026-11-14.md) bổ sung10thắng bằng pointer/UI,29sao, boss6hit/3pha, reload và cleanup; chưa phải human playtest. [QA12/11](../qa/SNAKE-R1B-2026-11-12.md) xác nhận 10 lượt thắng mô phỏng qua Engine, save/restore 28 sao, và render 16 cảnh. Kiểm tiếp với người mới và thiết bị thật theo checklist dưới đây.
 
+[Content14/11](R01-CONTENT.md) thêm lời kết/sổ tay10màn, kết chương và runtime rig master A1. Không có image-to-video; không tự nhận bộ rawclip/frame hoặc finalart đã xong. [QA content](../qa/SNAKE-R01-CONTENT-2026-11-14.md).
+
 **File:** journey/boss/props/audio modules và assets nguồn; dùng đúng tài liệu phần được sửa.
 
 - Chơi đủ 10 màn hợp lệ theo journey hiện có: mở khóa/sao/thắng-thua/chơi lại, props và boss Nhện Mẹ. Kiểm độ khó, dấu hiệu cảnh báo/va chạm và điều kiện thắng có thể hiểu từ UI.
@@ -89,4 +91,4 @@ Theo phần thay đổi, chạy các lệnh đã có: `test:snake-cloud`, `test:
 
 Mỗi task giữ bằng chứng `.md` trong `docs/qa/`, ghi SHA, môi trường, ca chạy thật và giới hạn. COMPLETED tóm tắt trước chuyển việc, WORKLOG≤3 mục, archive giữ chi tiết; session mới đọc bàn giao + thẻ Snake + đúng mục task này. Ước lượng là công làm việc, không tính chờ thiết bị/người chơi/JWT và không phải lịch cam kết.
 
-**Bước tiếp hiện tại:** CI/review bản hoàn thiện14/11 rồi quyết định merge/phát hành; xác nhận Published/SHA và smoke. Đóng R1a/R1b bằng thiết bị/người mới/art/audio thật và R0b theo runbook khi có disposable actor/grant. Không đánh toàn game DONE từ build/automation.
+**Bước tiếp hiện tại:** chốt content14/11 và CI/review đúnghead, giữ NetlifyHOLD cho tới yêu cầu phát hành; xác nhận Published/SHA và smoke. Đóng R1a/R1b bằng thiết bị/người mới/art/audio thật và R0b theo runbook khi có disposable actor/grant. Không đánh toàn game DONE từ build/automation.

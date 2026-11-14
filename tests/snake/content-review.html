@@ -1,0 +1,32 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>R01 content review</title><style>html,body{height:100%;margin:0;background:#173c36;font:14px system-ui;color:#fff4dc}header{padding:10px;min-height:32px;box-sizing:border-box}#root{height:calc(100% - 52px)}canvas{display:block;width:100%;height:100%}</style><header>QA hình ảnh · trạng thái chọn tay · không chơi thắng hay ghi account</header><main id="root"><canvas></canvas></main><script type="module">
+import {Engine} from '../../src/games/snake-legend/src/core';import {Renderer} from '../../src/games/snake-legend/src/render';import {STORY_LEVELS} from '../../src/games/snake-legend/src/story-data';
+const query=new URL(location.href).searchParams;
+if(query.has('finale')){
+ await import('../../src/games/snake-legend/src/styles.css');const {mountStory}=await import('../../src/games/snake-legend/src/story-app');const {blankCampaign,CAMPAIGN_KEY}=await import('../../src/games/snake-legend/src/story-save');
+ const progress=blankCampaign();for(let i=1;i<=9;i++)progress.levels['1-'+i]={stars:[true,true,true],bestScore:100,bestTime:30};
+ const data=new Map([[CAMPAIGN_KEY,JSON.stringify(progress)]]);let fail=true,observed;const step=Engine.prototype.step;Engine.prototype.step=function(input){observed=this;return step.call(this,input);};
+ const storage={getItem:key=>data.get(key)??null,setItem:(key,value)=>{if(fail&&key===CAMPAIGN_KEY)throw new DOMException('Fixture quota','QuotaExceededError');data.set(key,value);}};
+ window.review={ready:async()=>{},finish(){observed.status='won';observed.goalReady=true;},unblock(){fail=false;},save:()=>data.get(CAMPAIGN_KEY),journeyCalls:0};
+ const game=mountStory(document.querySelector('#root'),()=>{},undefined,{storage,levelIndex:9,resumeCheckpoint:false,onJourney(){window.review.journeyCalls++;}});window.addEventListener('pagehide',()=>{Engine.prototype.step=step;game.destroy();},{once:true});
+}else if(query.has('sizes')){
+ const {drawMotherRig,drawSnakeExpression}=await import('../../src/games/snake-legend/src/character-motion');const {assetData}=await import('../../src/games/snake-legend/src/assets');
+ const image=new Image();image.src=assetData.a1_master.image;await image.decode();const canvas=document.querySelector('canvas');canvas.width=960;canvas.height=540;canvas.style.width='960px';canvas.style.height='540px';const c=canvas.getContext('2d'),frames=assetData.a1_master.atlas.frames,e=new Engine(STORY_LEVELS[9]);
+ for(let row=0;row<2;row++){
+  c.fillStyle=row?'#173c36':'#dbe9be';c.fillRect(0,row*270,960,270);c.fillStyle=row?'#fff3d8':'#234a3b';c.font='14px system-ui';c.fillText('24 / 48 / 96 px · rig idle / head blink / reduced still',16,row*270+22);
+  for(let i=0;i<3;i++){const size=[24,48,96][i],x=80+i*300,y=row*270+45;e.tick=184;drawMotherRig(c,e.encounters,.4,image,frames.spider_mother.frame,{x,y:y+size*.3},size);drawSnakeExpression(c,e,image,frames.head.frame,{x:x+size+50,y:y+size*.5},size,0);drawMotherRig(c,e.encounters,.4,image,frames.spider_mother.frame,{x:x+size*.5,y:y+size+40},size,true);}
+ }
+ window.review={ready:async()=>{}};
+}else if(query.has('journey')){
+ await import('../../src/games/snake-legend/src/styles.css');
+ const {mountJourney}=await import('../../src/games/snake-legend/src/journey');const {blankCampaign,CAMPAIGN_KEY}=await import('../../src/games/snake-legend/src/story-save');
+ const progress=blankCampaign();if(query.has('complete'))for(let i=1;i<=10;i++)progress.levels['1-'+i]={stars:[true,true,query.has('perfect')||i!==7],bestScore:100,bestTime:30};if(query.has('perfect'))progress.secrets=['r01'];
+ const data=new Map([[CAMPAIGN_KEY,JSON.stringify(progress)]]),storage={getItem:key=>data.get(key)??null,setItem:(key,value)=>data.set(key,value)};
+ const game=mountJourney(document.querySelector('#root'),storage,choice=>window.review.choice=choice,()=>{});
+ window.review={ready:async()=>{},save:()=>data.get(CAMPAIGN_KEY),choice:null};window.addEventListener('pagehide',()=>game.destroy(),{once:true});
+}else{
+const canvas=document.querySelector('canvas'),renderer=new Renderer(canvas);renderer.masterArt=true;renderer.zoom=.8;
+const e=new Engine(STORY_LEVELS[9]);e.pos={x:27.5,y:35};e.previous[0]={...e.pos};e.body[0]={...e.pos};
+window.review={renderAt(time,state='idle'){e.tick=Math.round(time*60);e.encounters.state=state;e.encounters.timer=state==='telegraph'?28:20;e.encounters.shot={from:{...e.encounters.boss.center},to:{x:33,y:44}};renderer.draw(e,1);},async ready(){renderer.draw(e,1);await Promise.all(Object.values(renderer.images).map(image=>image.decode()));this.renderAt(0);}};
+await window.review.ready();window.addEventListener('pagehide',()=>renderer.destroy(),{once:true});
+}
+</script></html>
