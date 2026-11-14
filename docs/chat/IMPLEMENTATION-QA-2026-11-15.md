@@ -57,3 +57,6 @@ Các lượt đầu bị xung đột server/output, build trong khi preview đan
 ## Chốt phiên
 
 Đã có ảnh quan sát, kiểm tài liệu/budget và diff sạch lỗi whitespace. Implementation và bằng chứng được commit cùng nhau trên nhánh riêng. Bản local chờ chủ dự án kiểm; không merge/deploy. Full CI remote, staging private chat và thiết bị thật là bước sau nghiệm thu UI.
+
+Mốc implementation đã đối chiếu: local `b502e7c` và remote `36d4e06` có cùng tree `c32aa1d2cf3cb15fbcdf9b983e6772544c16f36b`. Git CLI thiếu credentials/SSH identity; nhánh được đưa qua GitHub connector. Metadata commit khác SHA; đối chiếu tree, không force-push nhánh. Checkpoint tài liệu có thể nằm sau mốc implementation này.
+Nhánh kiểm: [codex/chat-bubble-wireframe](https://github.com/ducpham2806/Arcade-x/tree/codex/chat-bubble-wireframe). Không tạo PR/merge/deploy production trong phiên này.

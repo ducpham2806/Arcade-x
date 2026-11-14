@@ -7,6 +7,7 @@ Một nhật ký chính, tối đa ba mục. [Log trước triển khai chat](ar
 - Chủ dự án duyệt wireframe14/11, yêu cầu code sảnh/ingame và kiểm trước merge; tiếp tục15/11. Tiếp từ thiết kế064a3a5; implementation ở commit cùng bàn giao này. Thêm host/store theo owner, khung sảnh nhỏ, bubble kéo/nhớ, thu/phóng giữ nháp, unread đúng kênh, input isolation và lời nổi cạnh avatar/HUD.
 - Caro/Chess/Xiangqi đăng ký phòng social cũ; Tank WS và Nối Từ có transport/server chat riêng, ID gửi do server ràng buộc thành viên, rate limit/dedupe và capability fallback. Chỉ sửa nguồn/SQL local; không áp production hay đổi save gameplay.
 - Chat UI3ca, Tank UI13ca, Nối Từ8ca+phone retry, fast/typecheck/build/bundle đã có kiểm local; motion50game/mode và lượt tách25/25UI qua; giữ nguyên assertion. [QA và giới hạn](chat/IMPLEMENTATION-QA-2026-11-15.md) ghi đúng lượt cuối; không nới test. Trang kiểm dùng component thật + dữ liệu thử.
+- Nhánh đã đưa qua GitHub connector: implementation localb502e7c/remote36d4e06 cùngtreec32aa1d; CLI chưa có credentials. Không force-push.
 - Chưa merge/deploy; private chat Tank/Nối Từ cần staging/backend mới trước phát hành. Còn thiết bị thật, bàn phím ảo và hai tài khoản thật. Bước tiếp: anh kiểm local rồi phản hồi; không tự mở CH5.
 
 ## 13/11/2026 · SN-R2b đã phát hành · codex/snake-public-release
