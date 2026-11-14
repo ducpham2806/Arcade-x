@@ -19,8 +19,28 @@ for(const mobile of [false,true])for(const reduced of [false,true])test(`Dungeon
  await page.getByRole('button',{name:'Vào trận',exact:true}).click();
  for(const status of ['saving','synced']){await page.evaluate(status=>window.dispatchEvent(new CustomEvent('arcadex:cloud_sync',{detail:{gameId:'dungeon-tap',status,offline:true}})),status);await expect(page.locator('#cloud-sync-status-container')).toHaveCount(0);}
  for(const status of ['local','pending','synced']){await page.evaluate(status=>window.dispatchEvent(new CustomEvent('arcadex:save-status',{detail:{gameId:'dungeon-tap',status}})),status);await expect(page.locator('#game-save-status-slot')).toBeEmpty();}
- await page.evaluate(()=>window.dispatchEvent(new CustomEvent('arcadex:save-status',{detail:{gameId:'dungeon-tap',status:'error'}})));await expect(page.locator('#game-save-status-slot')).toContainText('Chưa lưu được');
- await page.evaluate(()=>window.dispatchEvent(new CustomEvent('arcadex:save-status',{detail:{gameId:'dungeon-tap',status:'synced'}})));await expect(page.locator('#game-save-status-slot')).toBeEmpty();
+ // A synthetic error event races with the game's real 5s autosave. Exercise an
+ // actual failed envelope write, so every background retry sees the same fault.
+ await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('button',{name:'Lưu tiến trình',exact:true}).click();
+ const savedBefore=await page.evaluate(()=>localStorage.getItem('arcadex_save_v1_dungeon-tap'));expect(savedBefore).not.toBeNull();
+ await page.evaluate(()=>{
+  const original=Storage.prototype.setItem;(window as any).__dungeonWriteFaults=0;
+  Storage.prototype.setItem=function(key,value){if(this===localStorage&&key==='arcadex_save_v1_dungeon-tap'){(window as any).__dungeonWriteFaults++;throw new DOMException('Fixture quota failure','QuotaExceededError');}return original.call(this,key,value);};
+  (window as any).__restoreDungeonStorage=()=>{Storage.prototype.setItem=original;};
+ });
+ try{
+  // Change real gameplay first: otherwise save deduplication can skip the write.
+  await page.locator('.fx-main-attack').dispatchEvent('pointerdown',{pointerId:1});await page.locator('.fx-main-attack').dispatchEvent('pointerup',{pointerId:1});
+  await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('button',{name:'Lưu tiến trình',exact:true}).click();
+  await expect.poll(()=>page.evaluate(()=>(window as any).__dungeonWriteFaults)).toBeGreaterThan(0);
+  await expect(page.locator('#game-save-status-slot')).toContainText('Chưa lưu được');
+  const failed=await page.evaluate(()=>(window as any).__dungeonWriteFaults);
+  await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pagehide')));
+  await expect.poll(()=>page.evaluate(()=>(window as any).__dungeonWriteFaults)).toBeGreaterThan(failed);
+  await expect(page.locator('#game-save-status-slot')).toContainText('Chưa lưu được');
+  expect(await page.evaluate(()=>localStorage.getItem('arcadex_save_v1_dungeon-tap'))).toBe(savedBefore);
+ }finally{await page.evaluate(()=>(window as any).__restoreDungeonStorage());}
+ await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('button',{name:'Lưu tiến trình',exact:true}).click();await expect(page.locator('#game-save-status-slot')).toBeEmpty();
  const attack=page.locator('.fx-main-attack');await attack.dispatchEvent('pointerdown',{pointerId:1});await page.waitForTimeout(800);await attack.dispatchEvent('pointerup',{pointerId:1});
  await expect(page.locator('.v6-hero .dt-frame-previous')).toHaveCount(1);expect(await page.locator('.dt-actor-frame').count()).toBeLessThan(24);
  await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('button',{name:'Lưu tiến trình',exact:true}).click();await expect(page.locator('#game-save-status-slot')).toBeEmpty();

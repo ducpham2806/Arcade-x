@@ -1,13 +1,21 @@
-# Bàn giao · 13/11/2026 · SN-AUTH-XTAB sửa local
+# Bàn giao · 14/11/2026 · Snake R01 kỹ thuật
 
-Nhánh `codex/fix-snake-cross-tab-auth` từ PR30/c5b95a4 (CI49 success), theo yêu cầu user làm tiếp. CI48/main19af480 có event đăng nhậpB nhưng RPC bind playerB mang JWT anonymous cũ. `activateSession` nay gắn token cùng Session cho6RPC restore trên header riêng từng request; không sửa client headers chung, engine, save, epoch, rewards hoặc backend. [Báo cáo/trace/giới hạn](qa/SNAKE-AUTH-XTAB-2026-11-13.md), [thẻ Snake](plans/SNAKE.md).
+User yêu cầu làm tiếp Snake cho xong. Nhánh `codex/snake-r01-finish` từ `2ca0b3c`/PR33, gồm bản badge đã qua CI55. [QA](qa/SNAKE-FINISH-2026-11-14.md), [thẻ Snake](plans/SNAKE.md), [phiếu nghiệm thu](snake/R01-ACCEPTANCE.md). Bản sửa chưa merge/deploy; Netlify API vừa xác nhận production vẫn `8320385`, deploy `6af6f590d7b4bd3516a37885` ready.
 
-## Đã kiểm
+## Đã sửa và kiểm
 
-Unit realPostgREST và browser lag storage tái hiện source cũ đỏ→bản sửa xanh; Auth7/7, hai ca cross-tab qua17,9s, giữ ví/màn/late snapshot isolation. Storage golden, sync14/14,6suite Snake local, typecheck, production/preview/rollback build, root bundle291,8kB gzip và catalog/offline package qua. Đã xem ảnh trước/sau. Lượt UI đầy đủ đầu10/11 có navigation khi build ghi nguồn sinh; ca hai device chạy riêng qua56,2s. Lượt cả bộ tách riêng qua11/11 trong214,7s,3guard; không skip/flaky/retry. Docs/structure/diff qua. Không nới timeout/assertion.
+S1 account save: Story/Journey/Lab dùng cùng store theo owner; giữ ưu tiên completion.storage và dữ liệu/format/key guest. Lab đổi tay giữ sound/volume. Red bắt tài khoản trống vào Story lại mở màn2 của guest; green kiểm thắng/lưu/reload, A/B/guest, checkpoint/settings. Native Space/Enter cho nút; focus/Tab/Escape theo dialog, canvas nhận phím chơi. Marker/minimap boss đúng tơ/táo/cộtA-B/điểm yếu/cổng. Không đổi simulation/digest/reward.
 
-Dùng save-systems/game-qa-playtest, playbook QA/Technical Director và reviewer độc lập (không finding). Graphify services sau sửa46file/483node/1288edge; AST local, không API. [Cấu hình hai repo đã ghi nhớ](studio/GRAPHIFY.md); đầu phiên chọn1–3skill/vai trò, graph đúng scope và kiểm độ mới. CLI/cache không tự đi theo phiên khác.
+V2 thắng UI10/10 bằng native pointer/thời gian thật:29sao,3tim mỗi màn; boss83,6giây/6hit/3pha, tutorial2-3 qua UI; tổng593,89giây thực. Reload giữ10màn, exit đưa RAF/RO/listener/audio về0, không pageerror. V1 thua boss giữ FAIL; đã sửa cadence/tuyến lái driver, không giảm độ khó. V2 bắt đầu mới, không resume/seed progress.
 
-## Bước tiếp và giới hạn
+Player cuối3/3 và hosting5/5 qua; Lab prefs red→green. Sáu suite/lint/production-preview-rollback/bundle/catalog/storage qua. Public game133.731byte; initialJS301.337byte gzip. Full UI save/controls12ca và toàn repo xem CI đúng head của PR ứng viên sau push.
 
-Nhánh sửa được gửi PR dựa trên PR30; chờ đủ CI mới trước merge; chưa merge/deploy. Sửa này ràng buộc credential khi restore, không tuyên bố sửa mọi race anonymous/storage. Sau tích hợp mới xác minh Netlify Published đúngSHA và smoke public. PR29 đã merge main19af480; R01 sảnh lưu theo thiết bị/owner, cloud preview riêng. Thiết bị Android/iPhone/người mới và live save/JWT vẫn chờ. Render Tank giữFree; Nối Từ ON5/ON6 cònQA; commerce tắt. Nhật ký duy nhất WORKLOG, tối đa3mục; chi tiết cũ có archive.
+## Bước tiếp
+
+PR34/89e6aac: CI56 snake_ui xanh; verify lỗi Dungeon synthetic-error bị autosave5s ghi đè. Đã đổi test sang quota thật/recovery và thêm artifact motion; không sửa production/timeout. Đọc CI head mới nhất, sửa failure nếu có; chỉ merge main khi user yêu cầu. Sau merge xác nhận Netlify Published/SHA rồi smoke public account/checkpoint/badge. PR32/33 đã được kế thừa; ưu tiên review ứng viên mới.
+
+Android/iPhone/Safari, người mới M2/art/animation/audio, FPS/heap thật còn WAITING. Đã hỏi user khả năng bố trí qua async, chưa coi im lặng là nghiệm thu. Live preflight exit2 WAITING_BINDINGS thiếu email/password/actorID/grant-confirmed; chưa login/ghi DB. Secret qua runtime/runbook, không chat; fixture expiry không thay JWT thật.
+
+Dùng game-qa-playtest/game-feel/game-ui-ux, QA/Technical Director review độc lập. Graphify local46file/424node/1101edge; query showStory contextcall/depth1/budget700→3node/2edge. [Studio](studio/GRAPHIFY.md). Evidence local ignored ở production/qa/evidence/snake-r01-20261114; đầy đủ ở /workspace/tooling/snake-finish-evidence; CI artifact snake-player-evidence.
+
+Preview Netlify bị edge-access, không đổi bảo vệ hoặc lặp guest test khi chưa có access. SQL production/reward/commerce theo AGENTS. [Trước task](archive/SESSION-HANDOFF-2026-11-14-before-snake-finish.md). Một WORKLOG≤3mục, archive nguyên văn.

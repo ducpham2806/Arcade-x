@@ -1,6 +1,6 @@
-# Snake Legend — hoàn tất preview trước phát hành
+# Snake Legend — hoàn thiện R01 và nghiệm thu
 
-Mốc13/11/2026 · PR29 đã merge main19af480, R01 offline-first có trong sảnh. Netlify chưa xác minh trong lượt này. CI48 trên main lỗi cross-tab Auth; [bản sửa/regression](../qa/SNAKE-AUTH-XTAB-2026-11-13.md) đang kiểm ở nhánh từ PR30. [SN-R0a](../qa/SNAKE-R0A-2026-11-12.md) và [R0b local](../qa/SNAKE-R0B-2026-11-12.md) là bằng chứng trước đó. PR12 đã có journey/cloud/session/boss/props/audio; không làm lại từ ghi chú lịch sử.
+Mốc14/11/2026 · R01 offline-first đã phát hành; PR31/main8320385 chứa sửa Auth và cấu hình Studio/Graphify từPR30. FullCI50success, NetlifyPublished đúngSHA và smoke guest/offline public qua. [Phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](../qa/SNAKE-AUTH-XTAB-2026-11-13.md). FullCI51 sau merge cũng success. R0a/R0b local12/11 là bằng chứng trước đó; không làm lại journey/cloud/session đã có.
 
 ## SN-PLAN · DONE tài liệu · 07/11/2026
 
@@ -9,12 +9,14 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 | Task | Trạng thái / phụ thuộc | Kết quả cần đạt |
 |---|---|---|
 | SN-R0a | DONE baseline local12/11 | 7suite +5nhóm browser guest/route/SW, profile và art master; backend flags/live chưa kiểm lại, để R0b |
-| SN-R0b | LOCAL UI đã kiểm; LIVE WAITING mạng/fixture/grant | 6ca UI gồm win/save/new-device/offline/lost-ack/isolation/concurrency/fixture expiry; còn backend thật và JWT issuer expiry |
-| SN-R1a | LOCAL fixes/coverage12/11; WAITING thiết bị thật | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
-| SN-R1b | LOCAL 10 màn và renderer đã kiểm; M2 WAITING | Duyệt art, animation, audio và lượt người mới trên thiết bị thật |
+| SN-R0b | LOCAL UI đã kiểm; LIVE WAITING fixture/grant | 6ca UI gồm win/save/new-device/offline/lost-ack/isolation/concurrency/fixture expiry; còn backend thật và JWT issuer expiry |
+| SN-R1a | LOCAL fixes12–14/11; WAITING thiết bị thật | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
+| SN-R1b | UI10/10/29sao14/11; M2/art/audio thật WAITING | Duyệt art, animation, audio và lượt người mới trên thiết bị thật |
 | SN-R2a | LOCAL ứng viên catalog và gói offline đã kiểm | Nghiệm thu thật và quyết định đưa lên sảnh public |
-| SN-R2b | MERGED PR29/main19af480; WAITING Netlify | CI bản sửa cross-tab, xác minh Published đúngSHA và smoke public |
-| SN-AUTH-XTAB | DONE local13/11; WAITING CI nhánh sửa | Tái hiện CI48 bằng storage lag,6RPC đúng token/owner, giữ late-snapshot isolation; CI nhánh mới trước merge |
+| SN-R2b | PUBLISHED client13/11; nghiệm thu thật WAITING | CI50→merge/Netlify Published đúngSHA,36resource byte-match và guest/offline smoke public |
+| SN-AUTH-XTAB | MERGED/PUBLISHED13/11 sau CI50 | 6RPC đúng token/owner, unit7/7/UI11/11; registered public/live JWT còn QA riêng |
+| SN-UI-BADGE | PR33/CI55 qua; WAITING merge/deploy | [QA ứng viên](../qa/SNAKE-BADGE-2026-11-13.md): chừa vùng badge, hosting5/5/modal36/catalog qua; production chưa đổi |
+| SN-R01-FINISH | LOCAL sửa14/11; CI/review/merge còn riêng | [QA](../qa/SNAKE-FINISH-2026-11-14.md): accountsave xuyên Story/Journey/Lab, keyboard/focus, markerboss; UI10màn/restore/cleanup qua |
 
 ## Bằng chứng đã có và giới hạn
 
@@ -28,4 +30,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** đóng regression [SN-AUTH-XTAB](../qa/SNAKE-AUTH-XTAB-2026-11-13.md), kiểm CI nhánh sửa; [SN-R2b](../qa/SNAKE-PUBLIC-2026-11-13.md) đã merge PR29, còn xác minh Netlify Published và smoke public. Phạm vi R01 offline-first lưu trên thiết bị theo owner. M2, Android/iPhone và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md).
+**Tiếp theo:** fullCI/review nhánh codex/snake-r01-finish (gồm PR33) trước quyết định merge; preview bị edge-access chặn guest, không tự đổi bảo vệ; nghiệm thu [R01/M2/thiết bị](../snake/R01-ACCEPTANCE.md) và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.

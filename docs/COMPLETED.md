@@ -1,24 +1,23 @@
 # Tóm tắt công việc đã hoàn tất
 
-Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
+[Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## DOC-02 · Studio/Graphify · 13/11/2026
+## Snake R01 · kỹ thuật ứng viên · 14/11/2026
 
-- Nhánh `codex/studio-graphify-workflow`, nguồn19af480: lưu quyết định dùng hai repo trong AGENTS/project/skill đầu mối. [Nguồn và cách dùng](studio/GRAPHIFY.md).
-- Studio297blob khớp head357b1a1; giữ116skill/21role. Graphify0.9.108/pin52cb282 đã chạy AST46file/484node/1291edge và query budget900.
-- Kiểm docs/structure theo WORKLOG; chưa sửa cross-tab CI48, chưa xác minh Netlify. Bộ nhớ đi theo checkout; CLI/graph dựng lại theo hướng dẫn.
+- Nhánh codex/snake-r01-finish từ2ca0b3c/PR33: sửa S1accountsave cùng store xuyên Story/Journey/Lab, giữ guest/format và audio prefs. [QA](qa/SNAKE-FINISH-2026-11-14.md).
+- Sửa nativekeyboard/focus/Escape và boss marker đúng tơ/táo/cột/điểm yếu/cổng; không đổi physics/replay/rewards.
+- UI10/10thắng/29sao qua pointer/time thật, boss6hit/3pha, reload/cleanup0/pageerror0. Giữ V1driverFAIL, V2PASS, không gọi humanplaytest.
+- Player3ca và Labprefs red→green; unit6suite/lint/build/rollback/preview/bundle/catalog/storage qua; CI đúnghead và merge/deploy còn riêng.
+- [Phiếu nghiệm thu](snake/R01-ACCEPTANCE.md) sẵn sàng; Android/iPhone/người mới/art/audio thật cònWAITING. Livepreflight thiếu4binding, không login/ghiDB. [Trước task](archive/COMPLETED-2026-11-14-before-snake-finish.md).
 
-## SN-AUTH-XTAB · sửa local · 13/11/2026
+## Snake R01 / Auth / Studio · phát hành · 13/11/2026
 
-- Nhánh `codex/fix-snake-cross-tab-auth` từ c5b95a4/PR30. CI48 gửi playerB bằng JWT anonymous; bind6RPC restore với token Session trên từng request.
-- Unit7/7, UI11/11 +3guard qua; storage-lag tái hiện đỏ→xanh, giữ late snapshot/wallet/owner guards. [QA và kiểm tích hợp](qa/SNAKE-AUTH-XTAB-2026-11-13.md).
-- Dùng save-systems/game-qa-playtest, reviewer QA/Technical Director, Graphify services cập nhật483node/1288edge. Chưa merge/deploy; CI nhánh mới, Netlify/thiết bị/live save còn riêng.
-
-[NETLIFY-BUILD/AUTH-XTAB cũ và WC/Snake plan giữ nguyên văn](archive/COMPLETED-2026-11-13-before-snake-auth.md).
-
-## SN-R2a · ứng viên Snake local · 12/11/2026
-
-- Nhánh codex/snake-catalog-candidate tại 4432a0e. Kiểm 10 màn, lazy media, gói offline 36 tệp, favorite/recent, save khách và tài khoản riêng. [QA](qa/SNAKE-CATALOG-2026-11-12.md). SN-R2b thực hiện từ main ngày 13/11.
+- PR29 đưaR01 vào sảnh; PR31/head1909fa6 qua fullCI50 rồi merge8320385, gồmPR30. [QA phát hành](qa/SNAKE-PUBLIC-2026-11-13.md). Netlify6af6f590d7b4bd3516a37885 Published18:34GMT+7 đúng8320385.
+- Public36tệp/3.047.410byte khớp build; guest/card/detail/download/cache/offline reload/input/audio/exit qua, không pageerror/fixture. Tâm CTA/joystick/Dash online tới được; S3badge che một phần nhãn mobile còn theo dõi.
+- Badge S3: ứng viên `codex/fix-hosting-badge-safe-area` chừa vùng HUD giữ branding; hosting5/5/modal36/catalog/animation50+25/SnakeUI11+3guard qua. [QA ứng viên](qa/SNAKE-BADGE-2026-11-13.md); CI55/head2ca0b3c success cảverify/snake_ui, PR33 READY; merge/deploy còn riêng.
+- Auth6RPC bind tokenSession; unit7/7,UI11/11+3guard và save/sync qua. [QA Auth](qa/SNAKE-AUTH-XTAB-2026-11-13.md). Registered public/live JWT và thiết bị/humanQA còn riêng; FullCI51 sau merge success.
+- Studio116skill/21role/297blob + Graphify0.9.108 đã vào main; [nguồn/cách dùng](studio/GRAPHIFY.md). Bộ nhớ theo checkout, không nạp toàn bộ mỗi phiên.
+- Nguồn/bằng chứng local trước phát hành và tóm tắt cũ giữ [nguyên văn](archive/COMPLETED-2026-11-13-before-snake-release-close.md); không đổi engine/save/backend/rewards/commerce.
 
 ## ONLINE-ERROR · đã phát hành · 08/11/2026
 
@@ -51,23 +50,16 @@
 - codex/docs-game-studio-handoff→PR17: thẻ game/project.md/một WORKLOG/bàn giao ngắn, thu gọn trước đổi việc và checker budget.
 - Studio c5dac462:116skill/21role/4rules/297blob; discovery theo task, không nạp cả thư viện. [Chi tiết](archive/WORKLOG-2026-11-06-DOC-01.md). Không đổi runtime/schema.
 
-## MERGE-AUDIT · 06/11/2026 · main c705100
+## MERGE-AUDIT · 06/11/2026
 
-- PR #16 đã merge; fast-forward checkout từ affc5e8 thêm 13 commit. Không tạo merge mới trên remote.
-- Đối chiếu 24 nhánh; docs f834e3e tương đương 41d1862; WIP P3d đã có bản hoàn chỉnh 6eb394c; nhánh P3 song song không nhập lẫn implementation.
-- Riêng bdc6f85/P2 staging chưa tích hợp hết: epoch/control receipts/bounded reconnect cần chuyển sang P3; theo TC-R2.
-- Node24: lint, build, budget, fast, WS/ops 18/18 qua; không chạy lại full browser, không xác minh production hay thiết bị.
+- Mainc705100/PR16 đã tích hợp; audit24nhánh phân biệt nhánh đã có, docs tương đương và P2 cần port theoTC-R2. [Chi tiết nguyên văn](archive/COMPLETED-2026-11-14-before-snake-finish.md).
 
-## Tank Clash / Battleship / Dungeon · PR #16 và các mốc trước
+## Tank Clash / Battleship / Dungeon · các mốc trước
 
-- P3b/P3c/P3d có phòng 2v2, tổ đội/queue, spectator, surrender/rematch; adapter account/WSS/cleanup và game thứ 24 trong sảnh đã merge.
-- Motion PC không bị launcher reduced-motion tắt nhầm; Battleship căn tàu/lửa/dấu chìm/radar; Dungeon sửa chuyển động/chữ.
-- Giữ token chỉ tới WSS tin cậy, không thưởng/DB result/commerce. Quyền phát hành bot + online tài khoản và Render Free đã được duyệt.
-- Bằng chứng lịch sử: [log đầy đủ](archive/WORKLOG-2026-11-05-before-doc-refresh.md), [release local](tank-clash/evidence/LAUNCHER-local-2026-11-05.json).
-- Còn nghiệm thu host/mạng/thiết bị, art/audio và kết quả backend; xem thẻ Tank, không mở lại task merge.
+- PR16 gồm P3b/c/d, adapter Tank và motion PC/polish Battleship/Dungeon; chưa kết luận thiết bị/backend/reward. [Chi tiết nguyên văn](archive/COMPLETED-2026-11-14-before-snake-finish.md), [thẻ Tank](plans/TANK-CLASH.md).
 
 ## Snake / nền tảng / các game khác
 
-- Snake: hành trình, cloud progress/session, boss/props/audio đã được tích hợp nguồn; vẫn giới hạn preview, chưa đủ release sign-off. [Bằng chứng live-save](SNAKE_LIVE_SAVE_QA.md), [thẻ tiếp tục](plans/SNAKE.md).
+- Snake R01 đã public client; cloud preview/thiết bị/human QA còn riêng. [Live-save](SNAKE_LIVE_SAVE_QA.md), [thẻ tiếp tục](plans/SNAKE.md).
 - Launcher M0–M8, Neon NR1–NR4, các đợt Boom/Cosmic/Eat/Block/Blossom/Rainbow đã có trong nguồn; không mặc định coi ghi chú “chưa merge” ở báo cáo cũ là hiện trạng.
 - Nối Từ đã public phần phòng/PK/queue, còn ON5/ON6; Duel/commerce chưa hoàn tất triển khai, xem đúng thẻ; payment vẫn tắt.
