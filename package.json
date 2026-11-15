@@ -109,7 +109,9 @@
     "test:snake-ui-live": "node scripts/test-snake-ui-live.mjs",
     "test:snake-controls": "playwright test tests/snake/ui-controls.test.ts --output=test-results/snake-controls",
     "test:chat-ui": "playwright test tests/social/bubble-ui.test.ts",
-    "preview:chat": "node scripts/chat-preview.mjs"
+    "preview:chat": "node scripts/chat-preview.mjs",
+    "preview:chat-staging": "node scripts/chat-staging-preview.mjs",
+    "test:chat-native-ui": "playwright test --config playwright.native-chat.config.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

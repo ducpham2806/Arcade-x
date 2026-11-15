@@ -48,6 +48,12 @@ export async function createTankRoomServer({ port = 0, host = '127.0.0.1', allow
   const authorizedMetrics = req => { const given = Buffer.from(String(req.headers.authorization || '').replace(/^Bearer /, '')), expected = Buffer.from(metricsToken); return !!expected.length && given.length === expected.length && timingSafeEqual(given, expected); };
   const http = createServer((req, res) => {
     const path = String(req.url).split('?')[0];
+    // Optional, explicit public asset map for the isolated staging review process.
+    const asset = review?.assets?.get(path);
+    if (asset && ['GET', 'HEAD'].includes(req.method)) {
+      res.writeHead(200, { 'Content-Type': asset.type, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+      res.end(req.method === 'HEAD' ? undefined : asset.bytes); return;
+    }
     if (review && ['GET', 'HEAD'].includes(req.method) && ['/review', '/review/config'].includes(path)) {
       const html = path === '/review';
       res.writeHead(200, { 'Content-Type': html ? 'text/html; charset=utf-8' : 'application/json', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "frame-ancestors 'none'; base-uri 'none'" });

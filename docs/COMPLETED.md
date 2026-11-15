@@ -4,12 +4,12 @@
 
 
 
-## CH0–CH4 · đã code/kiểm local, chờ nghiệm thu · 15/11/2026
+## CH0–CH4 · code/QA local + backend staging, chờ2tester · 15/11/2026
 
-- Nhánh codex/chat-bubble-wireframe từ064a3a5; chủ dự án duyệt wireframe14/11 và yêu cầu kiểm trước merge.
-- Host/store chat theo owner: sảnh nhỏ, bubble kéo/nhớ, thu/phóng, unread, giữ nháp, lời cạnh avatar và input PvP. GameWrapper dùng chung cho mọi game.
-- Legacy3game dùng room social; Tank/Nối Từ có transport/server local, chưa áp backend. [QA](chat/IMPLEMENTATION-QA-2026-11-15.md) ghi kiểm thật và giới hạn.
-- Chưa merge/deploy/thiết bị thật. Tiếp: chủ dự án kiểm local; staging private chat và full CI trước yêu cầu merge. [Chi tiết cũ](archive/COMPLETED-2026-11-15-before-chat-implementation.md).
+- Nhánh codex/chat-bubble-wireframe; wireframe đã duyệt14/11, user yêu cầu native3game15/11.
+- Sảnh/bubble theo owner, kéo/thu/phóng/unread/nháp/input; chat riêng Tank/Nối Từ/Hải Chiến, ID/receipt/rate, speech tránh vùng chơi.
+- NativeUI3/commonUI3, Tank70/WS18, Word54, Battleship/build/lint/bundle qua. Supabase staging đã có Word4/Battleship2/schema và12probe Auth-negative.
+- Chưa positive2account, thiết bị thật, fullCI/merge/production. [QA hiện tại](chat/NATIVE-MATCH-QA-2026-11-15.md); [tóm tắt trước native](archive/COMPLETED-2026-11-15-before-native-chat-staging.md).
 
 ## NETLIFY-BUILD / AUTH-XTAB · đã phát hành · 07/11/2026
 

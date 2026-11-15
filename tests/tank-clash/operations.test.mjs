@@ -85,10 +85,11 @@ test('review is opt-in staging only; Render adds exactly its own HTTPS origin',a
  assert.deepEqual(loadServerConfig(settings).allowedOrigins,[origin,'https://arcadex-tank-staging.onrender.com']);
  assert.throws(()=>loadServerConfig({...settings,TANK_ENV:'production'}),/staging only/);
  for(const url of ['http://arcadex-tank-staging.onrender.com','https://arcadex-tank-staging.onrender.com.evil.example','https://arcadex-tank-staging.onrender.com/path'])assert.throws(()=>loadServerConfig({...settings,RENDER_EXTERNAL_URL:url}));
- const off=await createTankRoomServer();const on=await createTankRoomServer({review:{html:'<!doctype html><p>Review</p>',supabaseUrl:env.SUPABASE_URL,publishableKey:'sb_publishable_fixture'}});
+ const off=await createTankRoomServer();const on=await createTankRoomServer({review:{html:'<!doctype html><p>Review</p>',supabaseUrl:env.SUPABASE_URL,publishableKey:'sb_publishable_fixture',assets:new Map([['/games/review.json',{bytes:Buffer.from('{"staging":true}'),type:'application/json'}]])}});
  try{const base=s=>s.url.replace('ws:','http:').replace('/tank','');assert.equal((await fetch(base(off)+'/review')).status,404);assert.equal((await fetch(base(off)+'/review/config')).status,404);
   const response=await fetch(base(on)+'/review');assert.equal(response.status,200);assert.match(response.headers.get('content-type'),/text\/html/);assert.equal(response.headers.get('cache-control'),'no-store');assert.match(await response.text(),/Review/);
   assert.deepEqual(await (await fetch(base(on)+'/review/config')).json(),{supabaseUrl:env.SUPABASE_URL,publishableKey:'sb_publishable_fixture'});
+  assert.equal((await fetch(base(off)+'/games/review.json')).status,404);assert.deepEqual(await(await fetch(base(on)+'/games/review.json')).json(),{staging:true});assert.equal((await fetch(base(on)+'/games/missing.json')).status,404);assert.equal((await fetch(base(on)+'/games/%2e%2e/package.json')).status,404);
  }finally{await off.close();await on.close();}
 });
 

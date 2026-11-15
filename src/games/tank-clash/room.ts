@@ -13,13 +13,13 @@ export type Identity = { userId: string; name: string; guest: boolean };
 /** Resolve a client token to an account. Return null to reject. Guests are only for local/dev hosts. */
 export type Authenticate = (token: string | undefined, name: string | undefined) => Identity | null | Promise<Identity | null>;
 export type PeerHandle = { send: (msg: ServerMessage) => void; close?: (reason: string) => void };
-export type HostOptions = { now?: () => number; authenticate?: Authenticate; onResult?: (result: MatchResult) => void | Promise<void>;
+export type HostOptions = { wallNow?:()=>number;now?: () => number; authenticate?: Authenticate; onResult?: (result: MatchResult) => void | Promise<void>;
   randomBytes?: (n: number) => Uint8Array; log?: (event: string, data: Record<string, unknown>) => void;
   /** The public queue needs a signed-in account (owner decision Q2). true only for a local dev host without accounts. */
   guestQueue?: boolean };
 
 type Queued = { seq: number; input: Input };
-type Seat = { chatId:string;id: SeatId; userId: string; name: string; guest: boolean; peer: string | null; token: string; ready: boolean; lastSeen: number;
+type Seat = { lastChatAt?:number;chatId:string;id: SeatId; userId: string; name: string; guest: boolean; peer: string | null; token: string; ready: boolean; lastSeen: number;
   queue: Queued[]; last: Input; lastInputAt: number; seq: number; ack: number; credit: number; forfeited: boolean };
 /** Spectators watch with a public view (MVP has no hidden information). They never send input or count toward start/end. */
 type Spectator = { token: string; name: string; peer: string | null; lastSeen: number };
@@ -38,6 +38,7 @@ export const guestAuthenticate: Authenticate = (_token, name) => ({ userId: '', 
 
 export function createRoomHost(options: HostOptions = {}) {
   const now = options.now ?? (() => Date.now());
+  const wallNow=options.wallNow??(()=>Date.now());
   const randomBytes = options.randomBytes ?? ((n: number) => globalThis.crypto.getRandomValues(new Uint8Array(n)));
   const authenticate = options.authenticate ?? guestAuthenticate;
   const log = options.log ?? (() => {});
@@ -60,9 +61,9 @@ export function createRoomHost(options: HostOptions = {}) {
     }
     throw new Error('room code space exhausted');
   }
-  function view(room: Room): RoomView {
+  function view(room: Room,withChat=true): RoomView {
     const t = now();
-    return { chatVersion:1,chat:room.chat,code: room.code, kind: room.kind, format: room.format, phase: room.phase, queue: room.queued ? queueView(room.queued) : null,
+    return { chatVersion:1,chat:withChat?room.chat:[],code: room.code, kind: room.kind, format: room.format, phase: room.phase, queue: room.queued ? queueView(room.queued) : null,
       rematchMs: room.kind === 'queue' && room.phase === 'finished' && room.dissolveAt !== null ? Math.max(0, room.dissolveAt - t) : null, countdownMs: room.phase === 'countdown' ? Math.max(0, room.countdownEnd - t) : null,
       matchId: room.matchId, result: room.result, spectators: [...room.spectators.values()].filter(v => v.peer).length,
       seats: SEATS_OF[room.format].filter(id => room.seats.has(id)).map(id => { const s = room.seats.get(id)!;
@@ -72,7 +73,10 @@ export function createRoomHost(options: HostOptions = {}) {
   /** Send to every connected seat and spectator. A function gets the receiver's input ack (-1 for spectators). */
   function broadcast(room: Room, msg: ServerMessage | ((ack: number) => ServerMessage)) {
     for (const seat of room.seats.values()) if (seat.peer) send(seat.peer, typeof msg === 'function' ? msg(seat.ack) : msg);
-    for (const v of room.spectators.values()) if (v.peer) send(v.peer, typeof msg === 'function' ? msg(-1) : msg);
+    for (const v of room.spectators.values()) if (v.peer) {
+      const payload=typeof msg==='function'?msg(-1):msg;if(payload.type==='chat')continue;
+      send(v.peer,'room' in payload?{...payload,room:{...payload.room,chat:[]}}:payload);
+    }
   }
   const broadcastRoom = (room: Room) => broadcast(room, { type: 'room', room: view(room) });
   function snapshotFor(room: Room, ack: number, withWalls = false) {
@@ -80,7 +84,7 @@ export function createRoomHost(options: HostOptions = {}) {
   }
   function joinedMessage(room: Room, role: 'player' | 'spectator', seat: Seat | null, token: string): ServerMessage {
     const playing = room.phase === 'playing' && room.state;
-    return { type: 'joined', code: room.code, role, seat: seat?.id ?? null, resumeToken: token, nextSeq: seat ? seat.seq + 1 : 0, serverTime: now(), room: view(room),
+    return { type: 'joined', code: room.code, role, seat: seat?.id ?? null, resumeToken: token, nextSeq: seat ? seat.seq + 1 : 0, serverTime: now(), room: view(room,role==='player'),
       ...(playing ? { walls: room.state!.walls, snapshot: snapshotFor(room, seat?.ack ?? -1, true) } : {}) };
   }
 
@@ -439,8 +443,8 @@ export function createRoomHost(options: HostOptions = {}) {
       if (msg.type === 'input') return onInput(room, seat, msg);
       if(msg.type==='chat'){
         const existing=room.chat.find(m=>m.sender===seat.chatId&&m.requestId===msg.id);if(existing){send(peerId,{type:'chat',code:room.code,message:existing});return;}
-        if(room.chat.some(m=>m.sender===seat.chatId&&t-m.at<1000))return fail(peerId,'RATE_LIMITED');
-        room.lastActivity=t;const message={id:`${seat.chatId}:${msg.id}`,requestId:msg.id,sender:seat.chatId,seat:seat.id,name:seat.name,text:msg.text.trim(),at:t};room.chat=[...room.chat,message].slice(-100);broadcast(room,{type:'chat',code:room.code,message});return;
+        if(seat.lastChatAt!==undefined&&t-seat.lastChatAt<1000)return fail(peerId,'RATE_LIMITED');seat.lastChatAt=t;
+        room.lastActivity=t;const message={id:`${seat.chatId}:${msg.id}`,requestId:msg.id,sender:seat.chatId,seat:seat.id,name:seat.name,text:msg.text.trim(),at:wallNow()};room.chat=[...room.chat,message].slice(-100);broadcast(room,{type:'chat',code:room.code,message});return;
       }
       room.lastActivity = t;
       if (msg.type === 'ready') { if (inLobby(room)) { seat.ready = msg.ready; maybeCountdown(room); } return; }

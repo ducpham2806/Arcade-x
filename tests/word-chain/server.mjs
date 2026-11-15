@@ -230,9 +230,10 @@ await test('chat: members only, server sender, length/rate limits, idempotent re
  await assert.rejects(rooms.command('outsider','r1',first.version,'chat-2',{type:'chat',text:'x'},T0+20),e=>e.code==='NOT_MEMBER');
  await assert.rejects(rooms.command('ann','r1',first.version,'chat-3',{type:'chat',text:'x'},T0+20),e=>e.code==='TOO_FAST');
  await assert.rejects(rooms.command('ann','r1',first.version,'chat-4',{type:'chat',text:'x'.repeat(501)},T0+1100),e=>e.code==='BAD_CHAT');
+ const concurrent=await rooms.command('bob','r1',before.version,'chat-concurrent',{type:'chat',text:'Tin đồng thời'},T0+30);assert.equal(concurrent.chat.length,2);assert.deepEqual(concurrent.match,before.match,'chat rebases without changing gameplay');
  const old=(await rooms.snapshot('bob','r1',T0+30)).roster.find(p=>p.seat==='P2').chatId;
  await cmd(rooms,'bob','r1',{type:'leave'},T0+40);const next=await rooms.join('chi','ABC234','Chi',T0+50);assert.notEqual(next.roster.find(p=>p.seat==='P2').chatId,old);
- assert(!JSON.stringify(next).includes('members'));assert.equal(store.rooms.get('r1').chat.length,1);
+ assert(!JSON.stringify(next).includes('members'));assert.equal(store.rooms.get('r1').chat.length,2);
 });
 
 console.log(`word-chain server: ${checks} checks passed`);

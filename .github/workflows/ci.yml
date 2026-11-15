@@ -127,6 +127,16 @@ jobs:
           path: test-results/chat-review/
           if-no-files-found: ignore
           retention-days: 7
+      - name: Native match chat in Tank, Word Chain and Battleship (two clients, WS and PGlite)
+        run: npm run test:chat-native-ui
+      - name: Preserve native chat UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-chat-ui-evidence
+          path: test-results/chat-native/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Nối Từ practice match (Playwright, dev server)
         run: npm run test:word-chain-ui
       - name: Keep Word Chain desktop and phone visual evidence

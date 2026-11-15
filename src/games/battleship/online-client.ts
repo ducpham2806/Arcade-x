@@ -16,7 +16,7 @@ export function httpRoomTransport(url:string,publishableKey:string,token:()=>Pro
 export function requestId(){const bytes=crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;}
 /** One mutation in flight. Unknown outcomes retain the exact request/action ID for safe retry. */
 export class RoomClient{
- snapshot:RoomSnapshot|null=null;pending:RoomRequest|null=null;busy=false;notice='';lastSync=0;clockOffset=0;
+ snapshot:RoomSnapshot|null=null;pending:RoomRequest|null=null;busy=false;notice='';lastErrorCode='';lastSync=0;clockOffset=0;
  private listeners=new Set<()=>void>();private closed=false;
  constructor(private transport:RoomTransport,private clock=()=>Date.now(),private uuid=requestId){}
  subscribe(fn:()=>void){this.listeners.add(fn);return()=>{this.listeners.delete(fn);};}
@@ -24,13 +24,13 @@ export class RoomClient{
  private apply(next:RoomSnapshot,sentAt:number){if(this.snapshot?.id===next.id&&next.version<this.snapshot.version)return;this.snapshot=next;this.lastSync=this.clock();if(Number.isFinite(next.serverNow))this.clockOffset=next.serverNow!-(sentAt+this.lastSync)/2;}
  get fresh(){return this.lastSync>0&&this.clock()-this.lastSync<7000;}
  get now(){return this.clock()+this.clockOffset;}
- async submit(body:RoomRequest){if(this.busy||this.pending)return;this.pending=body;await this.retry();}
- async retry(){if(!this.pending||this.busy||this.closed)return;const body=this.pending;this.busy=true;this.emit();const sent=this.clock();try{this.apply(await this.transport.request(body),sent);this.pending=null;this.notice='';}catch(e){this.notice=e instanceof Error?e.message:'Không thể kết nối.';if(e instanceof TransportError&&!e.uncertain){this.pending=null;}}finally{this.busy=false;this.emit();}if(!this.pending&&this.snapshot&&body.type==='command'&&this.notice){const feedback=this.notice;await this.refresh();if(feedback){this.notice=feedback;this.emit();}}}
+ async submit(body:RoomRequest){if(this.busy||this.pending||this.closed)return false;this.pending=body;return this.retry();}
+ async retry(){if(!this.pending||this.busy||this.closed)return false;let accepted=false;const body=this.pending;this.busy=true;this.emit();const sent=this.clock();try{this.apply(await this.transport.request(body),sent);this.pending=null;this.notice='';this.lastErrorCode='';accepted=true;}catch(e){this.lastErrorCode=e instanceof TransportError?e.code:'NETWORK';this.notice=e instanceof Error?e.message:'Không thể kết nối.';if(e instanceof TransportError&&!e.uncertain){this.pending=null;}}finally{this.busy=false;this.emit();}if(!this.pending&&this.snapshot&&body.type==='command'&&this.notice){const feedback=this.notice;await this.refresh();if(feedback){this.notice=feedback;this.emit();}}return accepted;}
  match(){return this.submit({type:'match',requestId:this.uuid()});}
  create(mode:Mode='duel'){return this.submit({type:'create',requestId:this.uuid(),mode});}
  join(code:string,team?:Team){return this.submit({type:'join',code:code.trim().toUpperCase(),team});}
- async command(command:Command){if(!this.snapshot||!this.fresh){this.notice='Đang chờ đồng bộ trạng thái mới.';this.emit();return;}return this.submit({type:'command',roomId:this.snapshot.id,version:this.snapshot.version,actionId:this.uuid(),command});}
- async refresh(roomId=this.snapshot?.id){if(!roomId||this.busy||this.closed)return;this.busy=true;const sent=this.clock();try{this.apply(await this.transport.request({type:'snapshot',roomId}),sent);if(!this.pending)this.notice='';}catch(e){this.notice=e instanceof Error?e.message:'Mất kết nối.';}finally{this.busy=false;this.emit();}}
+ async command(command:Command){if(!this.snapshot||!this.fresh||this.closed){this.notice='Đang chờ đồng bộ trạng thái mới.';this.emit();return false;}return this.submit({type:'command',roomId:this.snapshot.id,version:this.snapshot.version,actionId:this.uuid(),command});}
+ async refresh(roomId=this.snapshot?.id){if(!roomId||this.busy||this.closed)return;this.busy=true;const sent=this.clock();try{this.apply(await this.transport.request({type:'snapshot',roomId}),sent);if(!this.pending){this.notice='';this.lastErrorCode='';}}catch(e){this.lastErrorCode=e instanceof TransportError?e.code:'NETWORK';this.notice=e instanceof Error?e.message:'Mất kết nối.';}finally{this.busy=false;this.emit();}}
  resetClosed(){if(this.busy||this.pending||this.snapshot?.status!=='closed')return;this.snapshot=null;this.lastSync=0;this.notice='';this.emit();}
  close(){this.closed=true;this.listeners.clear();}
 }

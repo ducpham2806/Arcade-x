@@ -145,7 +145,7 @@ export class WordChainRoomServer {
         return deny('EXPIRED', 'Trạng thái đã đổi theo thời gian. Hãy đồng bộ rồi thử lại.');
       }
       room = (await this.store.touch?.(id, uid, now)) ?? room;
-      if (!Number.isInteger(version) || version !== room.version) deny('VERSION_CONFLICT', 'Phòng đã thay đổi. Hãy đồng bộ trước khi thử lại.');
+      if (!Number.isInteger(version) || (command.type!=='chat'&&version !== room.version)) deny('VERSION_CONFLICT', 'Phòng đã thay đổi. Hãy đồng bộ trước khi thử lại.');
       const {next, result} = this.apply(room, seat, command, now);
       next.version = room.version + 1;
       next.receipts = [...room.receipts, {id: actionId, actor: uid, fingerprint, version: next.version}].slice(-MAX_RECEIPTS);
@@ -161,7 +161,7 @@ export class WordChainRoomServer {
     switch (c.type) {
       case 'chat': {
         if(room.status==='closed')deny('NOT_PLAYING','Phòng đã đóng.');
-        if(typeof c.text!=='string'||!c.text.trim()||c.text.length>500)deny('BAD_CHAT','Tin nhắn cần từ 1 đến 500 ký tự.');
+        if(Object.keys(c).some(k=>!['type','text'].includes(k))||typeof c.text!=='string'||!c.text.trim()||c.text.length>500)deny('BAD_CHAT','Tin nhắn cần từ 1 đến 500 ký tự.');
         const sender=room.chatMembers?.[seat]||`${room.id}:${seat}:legacy`;
         if((room.chat||[]).some(msg=>msg.sender===sender&&now-msg.at<1000))deny('TOO_FAST','Chờ một giây trước khi gửi tiếp.');
         next.chat=[...(room.chat||[]),{id:`${room.id}:${room.version+1}`,sender,seat,name:room.names[seat]||seat,text:c.text.trim(),at:now}].slice(-100);

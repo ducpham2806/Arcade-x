@@ -1,5 +1,7 @@
 # Chat bubble · bản kiểm trước merge · 15/11/2026
 
+Cập nhật native cùng ngày: xem [QA Tank/Nối Từ/Hải Chiến](NATIVE-MATCH-QA-2026-11-15.md). Báo cáo dưới giữ mốc implementation đầu; giới hạn backend/Hải Chiến đã được bước native mới thay thế.
+
 Nhánh `codex/chat-bubble-wireframe`, tiếp từ thiết kế `064a3a5`. Chủ dự án duyệt bố cục14/11, yêu cầu triển khai sảnh/ingame và kiểm trước merge; tiếp tục15/11. Trạng thái: **đã code và kiểm local; chờ chủ dự án nghiệm thu**, chưa merge hoặc deploy. Không thay backend production, không áp SQL lên production, không đổi gameplay save/golden hay commerce.
 
 ## Bản để kiểm

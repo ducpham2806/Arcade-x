@@ -2,13 +2,12 @@
 
 Một nhật ký chính, tối đa ba mục. [Log trước triển khai chat](archive/WORKLOG-2026-11-15-before-chat-implementation.md). Xem WORKFLOW và COMPLETED.
 
-## 15/11/2026 · CH1–CH4 chat bubble, chờ chủ dự án kiểm · codex/chat-bubble-wireframe
+## 15/11/2026 · CHAT native cả3game / staging, chờ2tester · codex/chat-bubble-wireframe
 
-- Chủ dự án duyệt wireframe14/11, yêu cầu code sảnh/ingame và kiểm trước merge; tiếp tục15/11. Tiếp từ thiết kế064a3a5; implementation ở commit cùng bàn giao này. Thêm host/store theo owner, khung sảnh nhỏ, bubble kéo/nhớ, thu/phóng giữ nháp, unread đúng kênh, input isolation và lời nổi cạnh avatar/HUD.
-- Caro/Chess/Xiangqi đăng ký phòng social cũ; Tank WS và Nối Từ có transport/server chat riêng, ID gửi do server ràng buộc thành viên, rate limit/dedupe và capability fallback. Chỉ sửa nguồn/SQL local; không áp production hay đổi save gameplay.
-- Chat UI3ca, Tank UI13ca, Nối Từ8ca+phone retry, fast/typecheck/build/bundle đã có kiểm local; motion50game/mode và lượt tách25/25UI qua; giữ nguyên assertion. [QA và giới hạn](chat/IMPLEMENTATION-QA-2026-11-15.md) ghi đúng lượt cuối; không nới test. Trang kiểm dùng component thật + dữ liệu thử.
-- Nhánh đã đưa qua GitHub connector: implementation localb502e7c/remote36d4e06 cùngtreec32aa1d; CLI chưa có credentials. Không force-push.
-- Chưa merge/deploy; private chat Tank/Nối Từ cần staging/backend mới trước phát hành. Còn thiết bị thật, bàn phím ảo và hai tài khoản thật. Bước tiếp: anh kiểm local rồi phản hồi; không tự mở CH5.
+- User duyệt bố cục và yêu cầu hoàn thiện Tank/Nối Từ/Hải Chiến, kiểm staging trước merge. Hải Chiến đã có chat riêng/receipt/membership/HUD; Tank sửa UTC/spectator; Word chat đồng thời không nới guard gameplay. Speech đo thật, tránh board/timer/nút, giữ unread/nháp/input chung.
+- Native UI3/3 và commonChat3/3 qua; build/lint/bundle/social, Tank70/WS18, Word54, Battleship toàn bộ qua. Ảnh native dùng Auth fixture+WS/PGlite, không là bằng chứng2account thật.
+- Đã áp SQL staging khqipuipeawzlkqmdzdg, deploy Word4/Battleship2; 12probe HTTPS/Auth-negative qua. Tank process riêng localhost4335, không đổi Render production. [QA nguồn/hash/giới hạn](chat/NATIVE-MATCH-QA-2026-11-15.md).
+- User báo đăng nhập;2tab profile xuan duc vẫn form login, đang xác định phiên để kiểm positive. Chưa merge/deploy production; còn fullCI/nghiệm thu. Mốc sync trước native local4f96eea/remote05506ec cùngtreee8dcffc; không force-push. [Log trước native](archive/WORKLOG-2026-11-15-before-native-chat-staging.md).
 
 ## 13/11/2026 · SN-R2b đã phát hành · codex/snake-public-release
 

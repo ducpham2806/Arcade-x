@@ -10,3 +10,13 @@ export function safeBubble(p:Point,width:number,height:number,boxes:Box[],size=4
  const candidates:Point[]=[];for(let y=6;y<=height-size-6;y+=size+8){candidates.push({x:6,y},{x:width-size-6,y});}for(let x=6;x<=width-size-6;x+=size+8)candidates.push({x,y:6});
  return candidates.filter(valid).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0]||null;
 }
+/** Find the nearest free space around a HUD/avatar using the caption's measured size. */
+export function speechPosition(target:Box,width:number,height:number,viewportWidth:number,viewportHeight:number,boxes:Box[]):Point|null{
+ const cx=(target.left+target.right)/2,cy=(target.top+target.bottom)/2;
+ const xs=[target.left,target.right-width,cx-width/2,target.right+8,target.left-width-8];
+ const ys=[target.top-height-8,target.bottom+8,cy-height/2];
+ for(const b of boxes){xs.push(b.left-width-8,b.right+8);ys.push(b.top-height-8,b.bottom+8);}
+ const candidates=xs.flatMap(x=>ys.map(y=>({x:Math.max(12,Math.min(viewportWidth-width-12,x)),y:Math.max(60,Math.min(viewportHeight-height-12,y))})));
+ const distance=(p:Point)=>Math.hypot(p.x+width/2-cx,p.y+height/2-cy);
+ return candidates.filter(p=>distance(p)<Math.max(280,width+80)&&!boxes.some(b=>overlaps(p,width,height,b))).sort((a,b)=>distance(a)-distance(b))[0]||null;
+}

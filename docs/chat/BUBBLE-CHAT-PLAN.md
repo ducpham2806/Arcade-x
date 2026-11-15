@@ -71,3 +71,7 @@ Poll chỉ kênh đang mở, trận hiện tại và inbox có giới hạn; kh�
 ## Bằng chứng phiên thiết kế
 
 Wireframe dùng dữ liệu mô phỏng, minh họa sảnh, Caro PvP, Tank PvP và màn điện thoại; không kết nối backend. Kết quả kiểm thực tế được ghi ở WORKLOG/COMPLETED khi đóng phiên. CH0 đã duyệt; CH1–CH4 có code local. Bước tiếp là chủ dự án kiểm bản chạy, staging private chat và QA thiết bị; CH5 chưa được mở.
+
+## Tiếp15/11 · native3game
+
+User yêu cầu hoàn thiện chat trận Tank/Nối Từ/Hải Chiến và kiểm staging trước merge. Code/QA local và hai Edge/schema staging đã có; còn positive2tester/duyệt/fullCI. [Bằng chứng hiện tại](NATIVE-MATCH-QA-2026-11-15.md). Không tự mở merge/deploy production.
