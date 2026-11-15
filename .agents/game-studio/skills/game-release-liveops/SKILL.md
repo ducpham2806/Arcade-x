@@ -1,6 +1,6 @@
 ---
 name: game-release-liveops
-description: Game release manager, build pipeline, localization, and LiveOps specialist based on Claude-Code-Game-Studios (/release-checklist, /launch-checklist, /changelog, /patch-notes, /hotfix, /day-one-patch, /localize). Manages release readiness gates, Semantic Versioning changelogs, player-facing patch notes, emergency hotfix workflows, localization string freezes, and post-launch LiveOps content. Use when preparing game builds for release, writing changelogs or patch notes, executing hotfixes, localizing game text, or planning LiveOps events.
+description: Game release manager, build pipeline, localization, and LiveOps specialist based on Claude-Code-Game-Studios 1.3 (/release-checklist, /launch-checklist, /write-changelog, /patch-notes, /hotfix, /day-one-patch, /localize). Manages release readiness gates, Semantic Versioning changelogs, player-facing patch notes, sharing a browser one-shot, emergency hotfix workflows, localization string freezes, and post-launch LiveOps content. Use when preparing game builds for release, writing changelogs or patch notes, sharing a prototype, executing hotfixes, localizing game text, or planning LiveOps events. Not for store-page uploads (steam-publish, itch-publish) or Unity build size (unity-build-size).
 ---
 # Game Release & LiveOps
 
@@ -9,7 +9,8 @@ Release Manager, Localization Lead, and LiveOps workflow skill that governs buil
 ## When to Use
 
 - Preparing a game build for alpha, beta, demo, Steam Next Fest, or full launch (`/release-checklist`, `/launch-checklist`)
-- Generating technical changelogs or player-facing patch notes (`/changelog`, `/patch-notes`)
+- Generating technical changelogs or player-facing patch notes (`/write-changelog`, formerly `/changelog`; `/patch-notes`)
+- Sharing or exporting a browser one-shot or grown web game (a `dist/` build, a hidden itch.io page or a web link)
 - Executing an emergency hotfix or day-one patch workflow (`/hotfix`, `/day-one-patch`)
 - Auditing and extracting user-facing strings for localization (`/localize`)
 - Planning post-launch seasonal events, telemetry hooks, and community updates
@@ -29,7 +30,7 @@ Verify every release gate in `production/release/` before tagging a build or pus
 3. **Platform & Store Readiness**:
    - Confirm resolution scaling (16:9, 16:10 Steam Deck, ultrawide), controller disconnect handling, audio mute-on-focus-loss, and store achievement/cloud-save hooks.
 
-### 2. Generate Changelogs & Player Patch Notes (`/changelog` & `/patch-notes`)
+### 2. Generate Changelogs & Player Patch Notes (`/write-changelog` & `/patch-notes`)
 
 Maintain two distinct communication formats from git history and completed stories:
 
@@ -39,7 +40,13 @@ Maintain two distinct communication formats from git history and completed stori
    - Explain the *design intent* behind balance buffs/nerfs (why a weapon or enemy was tuned) rather than dumping raw variable diffs.
    - Never expose internal filenames or spoilers for unannounced content.
 
-### 3. Manage Hotfix & Day-One Patch Workflows (`/hotfix` & `/day-one-patch`)
+### 3. Share a Browser Prototype
+
+1. Build `prototypes/<name>/dist/` without the tweak panel (`tune.js`) and working files (`evidence/`, notes); for a grown game, use `npm run build`.
+2. For itch.io, zip the build with `index.html` at the zip root and check it against itch.io's HTML5 limits before upload (see `itch-publish`); a hidden or draft page is the usual first share.
+3. Say plainly what the link exposes; never publish to a public page without the user's yes.
+
+### 4. Manage Hotfix & Day-One Patch Workflows (`/hotfix` & `/day-one-patch`)
 
 When an S0/S1 critical bug hits a live build:
 
@@ -48,7 +55,7 @@ When an S0/S1 critical bug hits a live build:
 3. **Regression & Smoke Verification**: Run `game-qa-playtest` smoke checks and save-file compatibility checks before deploying.
 4. **Back-Merge**: Merge the verified hotfix back into `main` immediately so the fix is not lost in future releases.
 
-### 4. Run Localization Pipeline (`/localize`)
+### 5. Run Localization Pipeline (`/localize`)
 
 Enforce localization readiness across all UI and narrative files:
 
@@ -60,3 +67,5 @@ Enforce localization readiness across all UI and narrative files:
 
 - Never test only inside the game engine editor before a release; editor runs mask missing export filter patterns (such as `.json` or `.cfg` files excluded by default export settings) and case-sensitive filesystem mismatches.
 - Never bundle experimental refactor commits into an emergency `/hotfix` branch.
+- The old command names (`/changelog`, `/settings`, `/help`) still work: say the new name once (`/write-changelog`, `/project-settings`, `/next-step`) and run it.
+- A localization freeze is enforced at write time: warn on any edit to frozen string keys during the freeze window.

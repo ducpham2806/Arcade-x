@@ -7,6 +7,7 @@ runs locally and in CI.
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
@@ -18,10 +19,20 @@ MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 CODE_PATH_RE = re.compile(r"`((?:references|scripts|assets)/[^`\s]+)`")
 HTML_SRC_RE = re.compile(r"\bsrc=[\"']([^\"']+)[\"']")
 YAML_VALUE_RE = re.compile(r'^\s{2}([a-z_]+):\s*["\'](.*)["\']\s*$')
+NOT_FOR_RE = re.compile(r"\bnot for\b", re.IGNORECASE)
+GOTCHAS_RE = re.compile(r"^##\s+Gotchas\s*$", re.MULTILINE)
+# "## Contents", "**Contents**", "Contents: a · b · c" or "Table of contents".
+CONTENTS_HEADING_RE = re.compile(
+    r"^(?:#{1,6}\s*(?:table of )?contents\s*$|\*\*(?:table of )?contents:?\*\*|(?:table of )?contents:)",
+    re.IGNORECASE,
+)
+ANCHOR_ITEM_RE = re.compile(r"^\s*(?:[-*+]|\d+\.)\s+\[[^\]]+\]\(#[^)]+\)")
 
 MAX_NAME = 64
 MAX_DESCRIPTION = 1024
 MAX_LINES = 500
+LONG_REFERENCE_LINES = 100
+CONTENTS_WINDOW = 30
 ALLOWED_FRONTMATTER = frozenset({"name", "description"})
 ALLOWED_SKILL_ENTRIES = frozenset({"SKILL.md", "agents", "assets", "references", "scripts"})
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -49,6 +60,15 @@ EXCLUDED_DIRS = frozenset(
         "progress",
     }
 )
+
+
+# --- Game Studio Agent hub layout -------------------------------------------
+# This hub keeps every skill (the upstream router included) under
+# skills/<NN-category>/<skill>/ and has no Claude plugin marketplace manifest.
+# The checks below that assume upstream's layout (router/ at the root,
+# .claude-plugin/marketplace.json, "N skills" in README) are adapted so the same
+# per-skill rules from awesome-gamedev-agent-skills still run here.
+HUB_ROUTER_DIR = next(iter(sorted((REPO_ROOT / "skills").glob("*/router"))), REPO_ROOT / "router")
 
 
 def find_skill_files() -> list[Path]:
@@ -184,7 +204,8 @@ def validate_file(path: Path) -> tuple[list[str], list[str]]:
     if unexpected:
         errors.append(f"unexpected skill-root entry/entries: {', '.join(unexpected)}")
 
-    targets = set(MD_LINK_RE.findall(text)) | set(CODE_PATH_RE.findall(text))
+    # Code such as Lua's `t[k](args)` looks like a Markdown link, so match links outside code fences.
+    targets = set(MD_LINK_RE.findall(_without_fenced_code(text))) | set(CODE_PATH_RE.findall(text))
     for target in sorted(targets):
         link = _local_link_target(target)
         if link is None:
@@ -194,7 +215,54 @@ def validate_file(path: Path) -> tuple[list[str], list[str]]:
             errors.append(f"local resource link does not resolve: {target!r}")
 
     errors.extend(error.removeprefix(f"{rel}: ") for error in validate_openai_yaml(path.parent, name))
-    return [f"{rel}: {error}" for error in errors], []
+    warnings = skill_warnings(path, text, description)
+    return [f"{rel}: {error}" for error in errors], warnings
+
+
+def _has_contents_list(text: str) -> bool:
+    """True when a contents heading or a list of in-page anchor links opens the file."""
+    head = text.splitlines()[:CONTENTS_WINDOW]
+    if any(CONTENTS_HEADING_RE.match(line.strip()) for line in head):
+        return True
+    return sum(1 for line in head if ANCHOR_ITEM_RE.match(line)) >= 3
+
+
+def skill_warnings(path: Path, text: str, description: str) -> list[str]:
+    """Authoring-guide checks that warn instead of failing (unless --strict)."""
+    rel = _display(path)
+    warnings: list[str] = []
+    # The router is the entry point for every game-dev request, so it has no neighbour to
+    # name in a "Not for" clause; its boundaries live in its body.
+    is_router = path.resolve() == (REPO_ROOT / "router" / "SKILL.md").resolve()
+    if description and not is_router and not NOT_FOR_RE.search(description):
+        warnings.append(f"{rel}: description has no 'Not for ...' clause naming the neighbouring skill")
+    if not GOTCHAS_RE.search(_without_fenced_code(text)):
+        warnings.append(f"{rel}: no '## Gotchas' heading")
+
+    references = path.parent / "references"
+    if not references.is_dir():
+        return warnings
+    for ref in sorted(references.rglob("*.md")):
+        ref_rel = _display(ref)
+        ref_text = ref.read_text(encoding="utf-8")
+        line_count = len(ref_text.splitlines())
+        if line_count > LONG_REFERENCE_LINES and not _has_contents_list(ref_text):
+            warnings.append(
+                f"{ref_rel}: {line_count} lines but no contents list in the first {CONTENTS_WINDOW} lines"
+            )
+        linked: set[str] = set()
+        for target in MD_LINK_RE.findall(_without_fenced_code(ref_text)):
+            link = _local_link_target(target)
+            if link is None:
+                continue
+            resolved = (ref.parent / link).resolve()
+            if resolved == ref.resolve() or resolved.suffix != ".md" or not resolved.exists():
+                continue  # self links, non-Markdown files and template placeholders
+            if resolved.is_relative_to(references.resolve()):
+                linked.add(_display(resolved))
+        for other in sorted(linked):
+            warnings.append(f"{ref_rel}: links to another reference ({other}); link both from SKILL.md instead")
+    return warnings
 
 
 def validate_unique_names(files: list[Path]) -> list[str]:
@@ -258,6 +326,9 @@ def validate_markdown_links() -> list[str]:
 
 def validate_marketplace(files: list[Path]) -> list[str]:
     path = REPO_ROOT / ".claude-plugin" / "marketplace.json"
+    if not path.is_file():
+        # Hub layout: skills are installed by init-game-project.sh, not a plugin manifest.
+        return []
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -316,25 +387,75 @@ def validate_marketplace(files: list[Path]) -> list[str]:
 
 
 def validate_router_and_catalog(files: list[Path]) -> list[str]:
+    """Hub version: every skill the router routes to must exist here, and the
+    README/CLAUDE.md must state the total skill count (router included)."""
     errors: list[str] = []
-    table_path = REPO_ROOT / "router" / "references" / "routing-table.md"
-    table = table_path.read_text(encoding="utf-8")
-    for path in files:
-        if path.parent.name == "router":
-            continue
-        name = path.parent.name
-        if f"`{name}`" not in table:
-            errors.append(f"{_display(table_path)}: missing routed skill `{name}`")
+    table_path = HUB_ROUTER_DIR / "references" / "routing-table.md"
+    try:
+        table = table_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"{_display(table_path)}: cannot read routing table: {exc}"]
+    del table  # read above only to report a missing routing table
+    names = {path.parent.name for path in files}
+    for name in sorted(UPSTREAM_ROUTED - names):
+        errors.append(f"{_display(table_path)}: routes to `{name}`, which is missing from skills/")
+    # Every upstream (awesome-gamedev-agent-skills) skill must be routed; the hub's
+    # own studio/specialist skills are reached through game-studio-orchestrator.
+    for name in sorted(UPSTREAM_SKILLS - UPSTREAM_ROUTED - {"router"}):
+        errors.append(f"{_display(table_path)}: upstream skill `{name}` is not routed")
 
-    count = len(files) - 1
-    readme_path = REPO_ROOT / "README.md"
-    readme = readme_path.read_text(encoding="utf-8")
-    if f"{count} skills" not in readme:
-        errors.append(f"{_display(readme_path)}: catalog must state the current count ({count} skills)")
+    count = len(files)
+    for doc in ("README.md", "CLAUDE.md"):
+        doc_path = REPO_ROOT / doc
+        if not doc_path.is_file():
+            continue
+        text = doc_path.read_text(encoding="utf-8")
+        if not re.search(rf"\b{count}\s+(?:skills|Skills|Kỹ năng)", text):
+            errors.append(f"{_display(doc_path)}: must state the current total ({count} Skills)")
     return errors
 
 
-def main() -> int:
+def _upstream_routed() -> set[str]:
+    """Skill names the upstream router's routing table names in its skill column."""
+    table_path = HUB_ROUTER_DIR / "references" / "routing-table.md"
+    try:
+        table = table_path.read_text(encoding="utf-8")
+    except OSError:
+        return set()
+    found: set[str] = set()
+    for name in re.findall(r"`([a-z0-9]+(?:-[a-z0-9]+)*)`", table):
+        if any((REPO_ROOT / "skills").glob(f"*/{name}/SKILL.md")):
+            found.add(name)
+    return found
+
+
+UPSTREAM_ROUTED: set[str] = set()
+
+# Skills synced verbatim from gamedev-skills/awesome-gamedev-agent-skills (see
+# docs/UPSTREAM-SYNC.md). Hub-only skills are listed there too.
+UPSTREAM_SKILLS: set[str] = set()
+
+
+def _load_upstream_skills() -> set[str]:
+    path = REPO_ROOT / "docs" / "UPSTREAM-SYNC.md"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return set()
+    match = re.search(r"<!-- agas-skills:start -->(.*?)<!-- agas-skills:end -->", text, re.S)
+    if not match:
+        return set()
+    # Keep skill names only: the table also names hub categories such as `03-engine-godot4`.
+    return {name for name in re.findall(r"`([a-z0-9-]+)`", match.group(1)) if not re.match(r"^\d\d-", name)}
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Validate skills, resources, routing, catalogs and plugin manifests.")
+    parser.add_argument("--strict", action="store_true", help="fail when there are warnings too")
+    args = parser.parse_args(argv)
+    UPSTREAM_ROUTED.update(_upstream_routed())
+    UPSTREAM_SKILLS.update(_load_upstream_skills())
+
     files = find_skill_files()
     if not files:
         print("No SKILL.md files found.")
@@ -354,13 +475,17 @@ def main() -> int:
 
     print(f"Validated {len(files)} skill file(s) and repository wiring.")
     if warnings:
-        print(f"\nWARNINGS — {len(warnings)}")
+        print()
         for warning in warnings:
-            print(f"  - {warning}")
+            print(f"WARNING: {warning}")
+        print(f"{len(warnings)} warning(s)." + ("" if args.strict else " Run with --strict to fail on them."))
     if errors:
         print(f"\nFAILED — {len(errors)} problem(s):")
         for error in errors:
             print(f"  - {error}")
+        return 1
+    if warnings and args.strict:
+        print("\nFAILED — warnings are errors with --strict.")
         return 1
     print("All checks passed.")
     return 0

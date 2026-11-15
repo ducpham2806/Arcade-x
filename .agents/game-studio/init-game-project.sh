@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ============================================================================
 # init-game-project.sh
-# Khởi tạo nhanh cấu trúc Game Studio Agent (21 Agents + 116 Skills + Rules + Templates)
-# cho bất kỳ dự án game mới hoặc hiện có nào trên 12 Engines:
-# (godot4, unity, unreal5, roblox, ebitengine, phaser, pixijs, threejs, bevy, pygame, love2d, defold).
+# Khởi tạo nhanh cấu trúc Game Studio Agent (21 Agents + 125 Skills + Rules + Templates)
+# cho bất kỳ dự án game mới hoặc hiện có nào trên 12 Engines + Web thuần:
+# (godot4, unity, unreal5, roblox, ebitengine, phaser, pixijs, threejs, bevy, pygame, love2d, defold, web).
 # ============================================================================
 set -euo pipefail
 
@@ -15,7 +15,7 @@ RIGOR_MODE="${3:-minimal}"
 LINK_MODE="${4:---copy}" # --copy (mặc định, độc lập hoàn toàn) hoặc --symlink (liên kết động về Hub)
 
 if [[ -z "$TARGET_DIR" ]]; then
-  echo "Cách dùng: $0 <đường_dẫn_dự_án> [godot4|unity|unreal5|roblox|ebitengine|phaser|pixijs|threejs|bevy|pygame|love2d|defold] [minimal|standard|full] [--copy|--symlink]"
+  echo "Cách dùng: $0 <đường_dẫn_dự_án> [godot4|unity|unreal5|roblox|ebitengine|phaser|pixijs|threejs|bevy|pygame|love2d|defold|web] [minimal|standard|full] [--copy|--symlink]"
   echo "Ví dụ:    $0 ~/Projects/NewGame godot4 standard"
   exit 1
 fi
@@ -62,15 +62,36 @@ else
 fi
 
 if [[ ! -f "$TARGET_DIR/project.yaml" ]]; then
+  # Mặc định theo baseline dự án mới trong docs/VERSION-SUPPORT.md (kiểm tra 2026-11-11).
+  # Dự án hiện có: sửa engine.version cho đúng phiên bản đã ghim của dự án.
+  case "$ENGINE_TYPE" in
+    godot4)     ENGINE_VERSION="4.7";     ENGINE_LANG="gdscript";   CODE_ROOT="src" ;;
+    unity)      ENGINE_VERSION="6000.3";  ENGINE_LANG="csharp";     CODE_ROOT="Assets\/Scripts" ;;
+    unreal5)    ENGINE_VERSION="5.8";     ENGINE_LANG="cpp";        CODE_ROOT="Source" ;;
+    roblox)     ENGINE_VERSION="rolling"; ENGINE_LANG="luau";       CODE_ROOT="src" ;;
+    ebitengine) ENGINE_VERSION="2.10.6";  ENGINE_LANG="go";         CODE_ROOT="." ;;
+    phaser)     ENGINE_VERSION="4.2.1";   ENGINE_LANG="typescript"; CODE_ROOT="src" ;;
+    pixijs)     ENGINE_VERSION="8.22.0";  ENGINE_LANG="typescript"; CODE_ROOT="src" ;;
+    threejs)    ENGINE_VERSION="r187";    ENGINE_LANG="typescript"; CODE_ROOT="src" ;;
+    bevy)       ENGINE_VERSION="0.20.1";  ENGINE_LANG="rust";       CODE_ROOT="src" ;;
+    pygame)     ENGINE_VERSION="2.5.8";   ENGINE_LANG="python";     CODE_ROOT="src" ;;
+    love2d)     ENGINE_VERSION="11.5";    ENGINE_LANG="lua";        CODE_ROOT="." ;;
+    defold)     ENGINE_VERSION="1.14.1";  ENGINE_LANG="lua";        CODE_ROOT="main" ;;
+    web)        ENGINE_VERSION="";        ENGINE_LANG="javascript"; CODE_ROOT="." ;;
+    *)          ENGINE_VERSION="";        ENGINE_LANG="";           CODE_ROOT="src" ;;
+  esac
   sed \
     -e "s/name: \"My Game Project\"/name: \"$PROJECT_NAME\"/" \
     -e "s/type: \"godot4\"/type: \"$ENGINE_TYPE\"/" \
+    -e "s/^  version: \"4.7\"/  version: \"$ENGINE_VERSION\"/" \
+    -e "s/^  language: \"gdscript\"/  language: \"$ENGINE_LANG\"/" \
+    -e "s/^  code_root: \"src\"/  code_root: \"$CODE_ROOT\"/" \
     -e "s/rigor: \"minimal\"/rigor: \"$RIGOR_MODE\"/" \
     "$STUDIO_HUB_DIR/project.template.yaml" > "$TARGET_DIR/project.yaml"
   echo "✅ Đã tạo project.yaml (Engine: $ENGINE_TYPE, Rigor: $RIGOR_MODE)"
 fi
 
-# 3. Đưa 21 Agents, 4 Rules và 116 Skills vào .claude/ của dự án
+# 3. Đưa 21 Agents, 4 Rules và 125 Skills vào .claude/ của dự án
 AGENT_COUNT=0
 for agent_file in "$STUDIO_HUB_DIR"/agents/*/*.md; do
   [[ -e "$agent_file" ]] || continue
@@ -109,6 +130,11 @@ for skill_dir in "$STUDIO_HUB_DIR"/skills/*/*; do
 done
 echo "✅ Đã cài đặt toàn bộ $SKILL_COUNT Skills vào .claude/skills/"
 
+# Checkout pixelfx (skill pixelfx clone vào .pixelfx/ khi cần) không được commit vào repo game
+if ! grep -qxF ".pixelfx/" "$TARGET_DIR/.gitignore" 2>/dev/null; then
+  echo ".pixelfx/" >> "$TARGET_DIR/.gitignore"
+fi
+
 # 4. Sao chép Templates và khởi tạo Session Checkpoint active.md
 mkdir -p "$TARGET_DIR/docs/templates"
 cp "$STUDIO_HUB_DIR"/templates/*.md "$TARGET_DIR/docs/templates/"
@@ -124,5 +150,5 @@ fi
 
 echo "=================================================================="
 echo "🎉 Hoàn tất! Dự án $PROJECT_NAME đã sẵn sàng với $SKILL_COUNT Skills & $AGENT_COUNT Agents."
-echo "👉 Gợi ý bắt đầu: Mở AI Agent tại $TARGET_DIR và gọi lệnh /start"
+echo "👉 Gợi ý bắt đầu: Mở AI Agent tại $TARGET_DIR và gọi /start, hoặc nói \"make me a game\" (/prototype) để có bản chơi được ngay"
 echo "=================================================================="

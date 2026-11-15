@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import {X} from 'lucide-react';
+import {useFolkDialogFocus} from './useFolkDialogFocus';
 import type { GameBridgeAPI } from '../../types';
 import {
   equipFolkSkin,
@@ -14,6 +16,7 @@ interface FolkShopModalProps {
   bridge?: GameBridgeAPI;
   onProfileChange: (next: FolkProfileSave) => void;
   onClose: () => void;
+  renderPreview?: (canvas: HTMLCanvasElement, item: SkinItemDef, tick: number) => void;
 }
 
 const CATEGORY_TABS: { id: SkinCategory; label: string; game: FolkGameKind }[] = [
@@ -130,7 +133,10 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
   bridge,
   onProfileChange,
   onClose,
+  renderPreview,
 }) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFolkDialogFocus(dialogRef,onClose);
   const tabs = CATEGORY_TABS.filter((t) => t.game === game);
   const [activeTab, setActiveTab] = useState<SkinCategory>(tabs[0].id);
   const items = FOLK_SKINS_CATALOG.filter((s) => s.category === activeTab);
@@ -155,13 +161,15 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
     const loop = () => {
       tick += 1;
       if (canvasRef.current) {
-        drawPixelPreview(canvasRef.current, selectedItem, tick);
+          (renderPreview ?? drawPixelPreview)(canvasRef.current, selectedItem, tick);
       }
-      raf = requestAnimationFrame(loop);
+      if (!reduce.matches) raf = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [selectedItem]);
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const reset = () => {cancelAnimationFrame(raf);tick=0;loop();};
+    reset();reduce.addEventListener('change',reset);
+    return () => {cancelAnimationFrame(raf);reduce.removeEventListener('change',reset);};
+  }, [selectedItem,renderPreview]);
 
   const handleBuyCandy = () => {
     const res = purchaseSkinWithCandy(profile, selectedItem.id, bridge);
@@ -182,7 +190,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
   };
 
   return (
-    <div className="fd-overlay" role="dialog" data-modal-skin="authored" aria-modal="true" aria-labelledby="fd-shop-title">
+    <div ref={dialogRef} className="fd-overlay" role="dialog" data-modal-skin="authored" aria-modal="true" aria-labelledby="fd-shop-title">
       <div className="fd-modal-shell">
         <header className="fd-modal-header">
           <div>
@@ -190,9 +198,9 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
             <p className="fd-subtitle">Đổi Kẹo Mạch Nha lấy Skin Pixel cho {game === 'o-an-quan' ? 'Ô Ăn Quan' : 'Nhảy Lò Cò'}</p>
           </div>
           <div className="fd-wallet-pill">
-            <span>🍬 {profile.candyTokens} Kẹo Mạch Nha</span>
+            <span>{profile.candyTokens} Kẹo Mạch Nha</span>
             <button type="button" className="fd-close-btn" onClick={onClose} aria-label="Đóng tiệm">
-              ✕
+              <X size={18}/>
             </button>
           </div>
         </header>
@@ -234,7 +242,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
                     disabled={profile.candyTokens < selectedItem.priceCandy}
                     onClick={handleBuyCandy}
                   >
-                    Đổi bằng 🍬 {selectedItem.priceCandy} Kẹo
+                    Đổi bằng {selectedItem.priceCandy} Kẹo
                   </button>
                 )}
               </div>
@@ -255,12 +263,12 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
                   }}
                   className={`fd-skin-card ${selectedId === item.id ? 'is-selected' : ''}`}
                 >
-                  <div className="fd-skin-swatch" style={{ background: item.palette.primary, borderColor: item.palette.accent }}>
+                  {renderPreview ? <SkinThumbnail item={item} render={renderPreview}/> : <div className="fd-skin-swatch" style={{ background: item.palette.primary, borderColor: item.palette.accent }}>
                     <span className="fd-skin-dot" style={{ background: item.palette.accent }} />
-                  </div>
+                  </div>}
                   <div className="fd-skin-name">{item.name}</div>
                   <div className="fd-skin-price">
-                    {equipped ? 'Đang dùng' : owned ? 'Đã sở hữu' : `🍬 ${item.priceCandy} Kẹo`}
+                    {equipped ? 'Đang dùng' : owned ? 'Đã sở hữu' : `${item.priceCandy} Kẹo`}
                   </div>
                 </button>
               );
@@ -271,3 +279,9 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
     </div>
   );
 };
+
+function SkinThumbnail({item,render}:{item:SkinItemDef;render:NonNullable<FolkShopModalProps['renderPreview']>}){
+  const ref=useRef<HTMLCanvasElement>(null);
+  useEffect(()=>{if(ref.current)render(ref.current,item,0);},[item,render]);
+  return <canvas className="fd-skin-thumb fd-pixel-canvas" width={180} height={108} ref={ref} aria-hidden="true"/>;
+}

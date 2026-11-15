@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "game": "o-an-quan",
+  "status": "runtime candidate; not yet played by a person",
+  "style": "Vietnamese warm pixel-style illustration; full-color masters, strict32-color target remains FD-4 review",
+  "processing": "Source copied unchanged; ImageMagick lossless WebP packaging preserves every decoded RGBA pixel. Native atlas crops happen only in engine; no generated grid assumed.",
+  "filtering": "nearest; no mipmaps",
+  "runtime_budget_bytes": 6291456,
+  "decoded_rgba_budget_bytes": 33554432,
+  "files": [
+    {
+      "path": "art/folk/oaq-v1/courtyard-master.png",
+      "role": "master",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "alpha_required": false,
+      "bytes": 2291001,
+      "sha256": "137a79c07bdb1b957fb2c61c97b9b92f90da2ad0debfa442cd5c79af0dc47773",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-1f49b54a-f6d4-4ab0-8527-1c892e70264a",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    },
+    {
+      "path": "src/games/o-an-quan/assets/courtyard.webp",
+      "role": "runtime",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "alpha_required": false,
+      "bytes": 1928300,
+      "sha256": "8fc69cd129e618199511cb0ba3fe61de6d34e97f7fea7c1567d06a1ccef7b38f",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-1f49b54a-f6d4-4ab0-8527-1c892e70264a",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    },
+    {
+      "path": "art/folk/oaq-v1/props-master.png",
+      "role": "master",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alpha_required": true,
+      "bytes": 896640,
+      "sha256": "2b6ea9cccd62ed357374b09bc9725c30cb037c11e82a1d712aedba1129b4976e",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-36a0e5c1-d55d-4435-b389-16583b3bba5d",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    },
+    {
+      "path": "src/games/o-an-quan/assets/props.webp",
+      "role": "runtime",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alpha_required": true,
+      "bytes": 678738,
+      "sha256": "153799e96c7a21594d917a4b67e2af7ba373002b1ebb9dbbb9ebd14e99aa9184",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-36a0e5c1-d55d-4435-b389-16583b3bba5d",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    },
+    {
+      "path": "art/folk/oaq-v1/hands-master.png",
+      "role": "master",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alpha_required": true,
+      "bytes": 1310013,
+      "sha256": "0a1cb0e460a3194910a6e4f48dc26f0aa4fcd8bf00d4460ed347a952a94ef384",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-51cd13b6-dcae-42c0-ae38-0d6bdf50d287",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    },
+    {
+      "path": "src/games/o-an-quan/assets/hands.webp",
+      "role": "runtime",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alpha_required": true,
+      "bytes": 972698,
+      "sha256": "6d3fe435c993804ae73142299db65bc8bc76a8ab8711183bec5d3a5578447c25",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-51cd13b6-dcae-42c0-ae38-0d6bdf50d287",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    },
+    {
+      "path": "art/folk/oaq-v1/boards-master.png",
+      "role": "master",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alpha_required": false,
+      "bytes": 2787531,
+      "sha256": "44ba9383576fd85fa14e819e8522b8f85f89043fe3a28a0fd0b71c6a03a5e15f",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-0ef317f6-5a35-4baa-ad10-0af9368db19e",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    },
+    {
+      "path": "src/games/o-an-quan/assets/boards.webp",
+      "role": "runtime",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alpha_required": false,
+      "bytes": 2054068,
+      "sha256": "1a48c3dd7147b5db6e1b493de13b8aafbb1f751b307b7db43b02a8b6371c55d1",
+      "source": {
+        "kind": "generated",
+        "tool": "OpenAI ImageGen",
+        "generation_id": "exec-0ef317f6-5a35-4baa-ad10-0af9368db19e",
+        "date": "2026-11-15"
+      },
+      "license": "OpenAI Terms of Use — generated for ArcadeX; not third-party CC0",
+      "technical_checks_passed": true
+    }
+  ],
+  "skins": {
+    "stones_pebbles": [
+      0,
+      1
+    ],
+    "stones_tamarind": [
+      2,
+      3
+    ],
+    "stones_marbles": [
+      4,
+      5
+    ],
+    "stones_ancient_coins": [
+      6,
+      7
+    ],
+    "stones_jade_dragon": [
+      8,
+      9
+    ],
+    "hand_student": [
+      0,
+      1
+    ],
+    "hand_baba": [
+      2,
+      3
+    ],
+    "hand_mandarin_robe": [
+      4,
+      5
+    ],
+    "board_terracotta": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "board_school_desk": [
+      627,
+      0,
+      627,
+      627
+    ],
+    "board_sedge_mat": [
+      0,
+      627,
+      627,
+      627
+    ],
+    "board_hue_stone": [
+      627,
+      627,
+      627,
+      627
+    ]
+  },
+  "rect_source": "src/games/o-an-quan/art.ts",
+  "pivot": "center for props/hands; full destination rectangle for surfaces",
+  "excluded": "No NLC assets or launcher icon/banner completion claim; production catalog remains gated."
+}

@@ -30,7 +30,7 @@ Skills ecosystem. It needs Node.js 22.20 or later, auto-detects your agent(s), a
 symlinks each agent's skills directory to one shared copy (`--copy` writes independent copies):
 
 ```bash
-# install the router + all 77 skills into whatever agent(s) you have
+# install the router + all 79 skills into whatever agent(s) you have
 npx skills add gamedev-skills/awesome-gamedev-agent-skills
 
 # preview without installing
@@ -40,7 +40,7 @@ npx skills add gamedev-skills/awesome-gamedev-agent-skills --list
 npx skills add gamedev-skills/awesome-gamedev-agent-skills -a cursor -g
 ```
 
-The `skills` CLI finds the catalog under `skills/` and the master [`router/`](../router) skill
+The `skills` CLI finds the catalog under `skills/` and the master [`router/`](../skills/00-orchestration-and-workflows/router) skill
 through this repo's Claude plugin marketplace manifest (`.claude-plugin/marketplace.json`). Claude
 Code users can alternatively use the native plugin commands (see [`INSTALLATION.md`](INSTALLATION.md));
 Codex is supported through the standard `.agents/skills/` layout and universal installer.
@@ -80,6 +80,12 @@ path Cline's skills page does not list, so if Cline does not show the skills, co
 
 > **Cline note.** Discovered skills are enabled by default; each skill has its own on/off toggle
 > in Cline's skills panel.
+
+> **Listing budget.** Agents preload every skill's description within a size limit and cut some
+> descriptions past it. With many skills installed, install the router plus your engine's bundle
+> rather than every skill. In Claude Code the budget is 1% of the context window; raise it with
+> `skillListingBudgetFraction` (for example `0.02`) or `SLASH_COMMAND_TOOL_CHAR_BUDGET`
+> ([docs](https://code.claude.com/docs/en/skills)).
 
 ## Compatibility boundary
 

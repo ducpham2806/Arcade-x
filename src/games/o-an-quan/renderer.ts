@@ -1,7 +1,7 @@
-import { readableCanvasText } from '../../accessibility/canvasText';
+import {drawOaqProp,drawOaqHand,STONE_FRAMES,HAND_FRAMES,BOARD_FRAMES,type OaqArtwork} from './art';
 import { getSkinById } from '../folk-duel/skins-catalog';
 import type { EquippedFolkSkins } from '../folk-duel/types';
-import { cellTotalStones, type OaqState } from './rules';
+import { type OaqState } from './rules';
 
 export interface OaqCellRect {
   idx: number;
@@ -95,7 +95,8 @@ export function renderOAnQuanBoard(
   state: OaqState,
   skins: EquippedFolkSkins,
   selectedCell: number | null,
-  previewCells: number[] = []
+  previewCells: number[] = [],
+  art?: OaqArtwork
 ) {
   ctx.imageSmoothingEnabled = false;
   const boardSkin = getSkinById(skins.oaq_board);
@@ -112,6 +113,11 @@ export function renderOAnQuanBoard(
       ctx.fillRect(gx, gy, 36, 24);
     }
   }
+  if (art?.boards) {
+    const [x,y,w,h]=BOARD_FRAMES[skins.oaq_board]??BOARD_FRAMES.board_terracotta;
+    ctx.drawImage(art.boards,x,y,w,h,0,0,BOARD_W,BOARD_H);
+  }
+  const frames = STONE_FRAMES[skins.oaq_stones] ?? STONE_FRAMES.stones_pebbles;
 
   const rects = getOaqCellRects();
 
@@ -148,7 +154,8 @@ export function renderOAnQuanBoard(
     // Vẽ quân Quan (nếu còn)
     const qSlot = r.idx === 0 ? 0 : r.idx === 6 ? 1 : null;
     if (qSlot !== null && state.quanAlive[qSlot]) {
-      drawSingleStone(ctx, r.x + r.w / 2, r.y + r.h / 2 - 14, 15, true, stoneSkin.palette);
+      if (!drawOaqProp(ctx, art?.props, frames[1], r.x + r.w / 2, r.y + r.h / 2 - 14, 40))
+        drawSingleStone(ctx, r.x + r.w / 2, r.y + r.h / 2 - 14, 15, true, stoneSkin.palette);
     }
 
     // Vẽ tối đa 12 viên Dân đại diện trong ô theo lưới xoắn ốc
@@ -161,22 +168,34 @@ export function renderOAnQuanBoard(
       const dist = Math.min(22, 6 + Math.sqrt(i) * 5.2);
       const sx = Math.round(centerX + Math.cos(angle) * dist);
       const sy = Math.round(centerY + Math.sin(angle) * dist * 0.75);
-      drawSingleStone(ctx, sx, sy, 6, false, stoneSkin.palette);
+      if (!drawOaqProp(ctx, art?.props, frames[0], sx, sy, 18))
+        drawSingleStone(ctx, sx, sy, 6, false, stoneSkin.palette);
     }
 
-    // Badge số lượng sỏi rõ nét ở góc ô
-    const totalDisplay = cellTotalStones(state, r.idx);
-    const ptsDisplay = r.isQuan && qSlot !== null && state.quanAlive[qSlot] ? `${state.cells[r.idx]}+Q` : `${totalDisplay}`;
-    ctx.fillStyle = totalDisplay > 0 ? '#1C1008' : 'rgba(28, 16, 8, 0.5)';
-    ctx.fillRect(r.x + 6, r.y + 6, r.isQuan ? 34 : 24, 18);
-    ctx.strokeStyle = boardSkin.palette.accent;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(r.x + 6, r.y + 6, r.isQuan ? 34 : 24, 18);
 
-    ctx.fillStyle = totalDisplay > 0 ? '#FDE047' : '#94A3B8';
-    ctx.font = 'bold 11px ui-monospace, monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    readableCanvasText(ctx, ptsDisplay, r.x + 6 + (r.isQuan ? 17 : 12), r.y + 15);
+    if (isSelected) drawOaqHand(ctx,art?.hands,(HAND_FRAMES[skins.oaq_hand]??HAND_FRAMES.hand_student)[0],r.x+r.w-14,r.y+r.h-18,46);
+
   }
+}
+
+/** Shop shares the exact sprites and board renderer used in a match. */
+export function renderOaqShopPreview(canvas:HTMLCanvasElement,item:import('../folk-duel/types').SkinItemDef,tick:number,art:OaqArtwork){
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ ctx.clearRect(0,0,canvas.width,canvas.height);ctx.imageSmoothingEnabled=false;
+ ctx.fillStyle='#e6d4ad';ctx.fillRect(0,0,canvas.width,canvas.height);
+ if(item.category==='oaq_stones'){
+  const frames=STONE_FRAMES[item.id]??STONE_FRAMES.stones_pebbles;
+  if(art.props){drawOaqProp(ctx,art.props,frames[0],35,65,27);drawOaqProp(ctx,art.props,frames[1],90,48+Math.sin(tick*.04)*2,59);drawOaqProp(ctx,art.props,frames[0],147,65,27);}
+  else {drawSingleStone(ctx,35,65,11,false,item.palette);drawSingleStone(ctx,90,48,21,true,item.palette);drawSingleStone(ctx,147,65,11,false,item.palette);}
+ }else if(item.category==='oaq_hand'){
+  const frames=HAND_FRAMES[item.id]??HAND_FRAMES.hand_student;
+  if(!drawOaqHand(ctx,art.hands,frames[1],62,57,82)){ctx.fillStyle=item.palette.primary;ctx.fillRect(20,20,82,68);}
+  drawOaqHand(ctx,art.hands,frames[0],122,49,70);
+ }else{
+  ctx.fillStyle=item.palette.secondary;ctx.fillRect(10,12,160,84);ctx.fillStyle=item.palette.primary;ctx.fillRect(14,16,152,76);
+  if(art.boards){const [x,y,w,h]=BOARD_FRAMES[item.id]??BOARD_FRAMES.board_terracotta;ctx.drawImage(art.boards,x,y,w,h,14,16,152,76);}
+  ctx.strokeStyle='#fff3d9';ctx.lineWidth=2;ctx.strokeRect(23,25,134,58);
+  for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(23+i*134/5,25);ctx.lineTo(23+i*134/5,83);ctx.stroke();}
+  ctx.beginPath();ctx.moveTo(23,54);ctx.lineTo(157,54);ctx.stroke();drawOaqProp(ctx,art.props,0,62,42,15);drawOaqProp(ctx,art.props,1,122,69,22);
+ }
 }
