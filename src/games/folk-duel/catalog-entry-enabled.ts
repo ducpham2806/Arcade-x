@@ -9,6 +9,7 @@ export const folkCatalogEntries: Record<string, GameMetadata> = {
   'o-an-quan': {
     id: 'o-an-quan',
     title: 'Ô Ăn Quan · Sân Đình',
+    artwork:{icon:new URL('../o-an-quan/assets/courtyard.webp',import.meta.url).href,banner:new URL('../o-an-quan/assets/courtyard.webp',import.meta.url).href},
     shortDesc: 'Bản thử nội bộ · Bot và hai người cùng máy',
     description: 'Bản chơi thử offline với bot và hai người chung máy. Tiệm Tạp Hóa dùng Kẹo Mạch Nha; các tính năng online đang được phát triển.',
     category: 'Multiplayer',

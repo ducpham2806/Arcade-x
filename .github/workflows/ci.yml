@@ -93,6 +93,14 @@ jobs:
         run: npm run lint
       - name: Folk rules, immutable previews and candy-only policy (no live backend)
         run: npm run test:folk
+      - name: Preserve Folk asset checks before other suites clear output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: folk-asset-manifest-report
+          path: test-results/folk-assets/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Build
         run: npm run build
       - name: Unreleased Folk engines excluded from production package
@@ -127,6 +135,7 @@ jobs:
           name: folk-fd0-evidence
           path: |
             test-results/folk-ui/
+            test-results/folk-assets/
             test-results/folk-ui-results.json
           if-no-files-found: ignore
           retention-days: 7

@@ -2,35 +2,33 @@
 
 ## Nguồn và phạm vi
 
-Đã cài toàn bộ repo [Game_Studio_Agent](https://github.com/ducpham2806/Game_Studio_Agent) tại commit `c5dac4629d4f61972cc16033bbc13b4ac8e16aaa`, ngày 06/11/2026: **116 skill, 21 định nghĩa vai trò, 4 rules, 6 template**, scripts/docs và tài nguyên đi kèm. Thư viện nằm `.agents/game-studio/`; [SOURCE-MANIFEST](SOURCE-MANIFEST.md) ghi đường dẫn/blob 297 file để kiểm lại.
+Theo yêu cầu chủ dự án ngày **15/11/2026**, cập nhật [Game_Studio_Agent](https://github.com/ducpham2806/Game_Studio_Agent) từ `c5dac4629d4f61972cc16033bbc13b4ac8e16aaa` lên HEAD đã kiểm `fa7b1dbb342983bc1fe76f4faa276fef099f57d3`: **125 skill, 21 vai trò, 4 rules, 7 template; 340 blob nguồn**. [SOURCE-MANIFEST](SOURCE-MANIFEST.md) ghi từng đường dẫn/blob để tái kiểm.
 
-GitHub connector xác nhận commit; bản repo local cùng commit và sạch được dùng qua `skill-installer --method git` với ánh xạ URL tạm trong tiến trình. Không dùng credential mới hoặc sửa Git config toàn máy. Chủ dự án đã cho phép đưa toàn bộ thư viện từ repo private lên ArcadeX public ngày 06/11/2026. Skill được trải phẳng từ `skills/<nhóm>/<tên>/` thành `skills/<tên>/`; file bên trong giữ nguyên byte. Các thư mục còn lại giữ nguyên. Không chạy initializer upstream lên ArcadeX.
+Nguồn clone Git sạch; đối chiếu snapshot cũ 297/297 blob trước khi thay. Cài vào thư mục tạm, so collision và byte/hash rồi thay `.agents/game-studio/`. Skill trải phẳng từ `skills/<nhóm>/<tên>/` thành `skills/<tên>/`; không collision, file bên trong giữ nguyên byte. Các thư mục nguồn khác giữ nguyên. Loại đúng **297 blob `graphify-out/` sinh/cache/build-state upstream**, không nhập graph máy khác vào dự án. Không chạy initializer, không sửa Git config toàn máy hoặc thêm credential.
 
-## Bộ nhớ giữa các phiên
+Chủ dự án đã cho phép mang thư viện từ repo private sang ArcadeX public ngày 06/11/2026. Notice/attribution hiện có và `.claude/CCGS-NOTICE.md` giữ nguyên. Snapshot mới có game-docs, image-prompt-engineer, pixelfx, ux-researcher, unity-build-size và bốn skill audit/evidence mới; tra [INDEX](INDEX.md) theo việc, không nạp cả thư viện.
 
-Đây là **bộ nhớ bằng file trong dự án**, không phải nạp vĩnh viễn 116 skill vào bộ nhớ mô hình hay cài toàn máy. Repo đi theo checkout/nhánh; cần commit/push và checkout nhánh có bộ file này ở máy/session khác.
+## Bộ nhớ và ánh xạ vào dự án
 
-Một skill đầu mối tại `.agents/skills/arcadex-studio/SKILL.md` dùng để tìm thư viện. Các skill đầy đủ ở ngoài thư mục tự discovery; agent mở đúng file qua [INDEX](INDEX.md). Cách này giữ đủ nội dung trên đĩa nhưng không tự chèn 116 mô tả vào mỗi phiên. Skill đầu mối sẽ có thể được phát hiện ở lượt tiếp theo; phiên hiện tại đã đọc trực tiếp các workflow cần dùng.
-
-21 vai trò được giữ làm playbook trong `agents/`, không tự biến thành subagent executable của Codex. Các adapter `.claude/agents`/`.claude/skills` cũ giữ nguyên; Claude dùng CLAUDE.md trỏ vào cùng thư viện. Không tự chạy 21 agent hoặc tải mọi engine khi bắt đầu việc.
-
-## Ánh xạ vào dự án hiện có
+Đây là bộ nhớ bằng file theo checkout, không cài toàn máy hoặc nạp vĩnh viễn 125 skill. Adapter `.agents/skills/arcadex-studio/SKILL.md` và `.claude/agents`/`.claude/skills` giữ nguyên. 21 vai trò là playbook, không tự khởi chạy 21 tiến trình.
 
 | Upstream gợi ý | ArcadeX dùng |
 |---|---|
-| project.yaml | [project.md](../../project.md): cấu hình người/agent đọc |
-| production/session-state/active.md | [SESSION-HANDOFF](../SESSION-HANDOFF.md): checkpoint duy nhất |
-| production/epics, stories | [PROJECT-PLAN](../PROJECT-PLAN.md), `docs/plans/*.md`, [TASK](../templates/TASK.md) khi cần task nhỏ |
-| production/qa/evidence | Báo cáo `.md` tại module/`docs/qa/` khi phát sinh, link ảnh/log đúng nguồn |
-| Skill path skills/category/name | `.agents/game-studio/skills/name/SKILL.md` |
-| Director approval / mặc định engine | Phạm vi người dùng đã giao và AGENTS; giữ engine web riêng, không thêm vòng xin duyệt hoặc migration ngoài phạm vi |
+| project.yaml | [project.md](../../project.md), cấu hình người/agent đọc |
+| production/session-state/active.md | [SESSION-HANDOFF](../SESSION-HANDOFF.md), checkpoint duy nhất |
+| epics/stories/game-docs | [PROJECT-PLAN](../PROJECT-PLAN.md), thẻ `docs/plans/`, [TASK](../templates/TASK.md) và story đúng phạm vi |
+| production/qa/evidence | Báo cáo Markdown tại module/docs/qa và ảnh/log có nguồn; stamp bằng chứng dùng Markdown theo quy tắc local |
+| skills/category/name | `.agents/game-studio/skills/name/SKILL.md` |
+| Director approval / engine mặc định | Quyền người dùng đã giao + AGENTS; giữ React/Canvas, không thêm vòng xin duyệt hoặc đổi engine |
 
-Tất cả đầu vào điều phối đang dùng là `.md`. YAML/JSON/scripts/ảnh đi kèm nguồn vẫn được bảo toàn để skill chuyên môn dùng khi cần; chúng không phải checkpoint hay plan chính. Các quy tắc engine như “luôn nhân delta”, node/HitboxComponent hoặc ObjectPoolManager phải ánh xạ vào fixed-step/Canvas/API hiện có; không áp máy móc làm sai mô phỏng.
+Mọi đầu vào điều phối đang dùng là `.md`. YAML/JSON/scripts/ảnh của nguồn vẫn bảo toàn để skill chuyên môn dùng; không biến template upstream thành checkpoint mới. Quy tắc scene, physics, ObjectPool, signal và focus phải ánh xạ sang engine web hiện có. Các chỉ dẫn mới về manifest/provenance, kiểm alpha/palette, focus/safe area và bằng chứng runtime áp dụng cho art/UI; vẫn cần chạy và quan sát game thật.
 
-## Kiểm tra và cập nhật
+## Kiểm chứng ngày 15/11/2026
 
-Ngày07/11/2026, yêu cầu xác nhận lại của chủ dự án: GitHub compare c5dac462→main trả identical/ahead0/behind0; doc checker297blob/116skill/21role/4rules qua. Không có bản nguồn mới cần cài chồng. Toàn bộ định nghĩa agent/subagent và skill đã có trên đĩa; dùng playbook theo task, không khởi chạy21tiến trình hay nạp mọi nội dung vào mỗi phiên.
+- Root `python3 scripts/check-docs.py`: pin 340 đường dẫn và Git blob hash, kiểm chính xác bộ file/125 skill/21 role/4 rules/7 template, budgets/links/nhật ký. Không nới các budget.
+- Validator upstream ở checkout nguồn sạch: **125 skill và wiring PASS**, có **9 warning** về mô tả/heading Gotchas; không gọi `--strict` là PASS.
+- Validator byte-nguyên ở bản trải phẳng: **3 lỗi tương thích đường dẫn**: docs/COMPATIBILITY và docs/INSTALLATION còn link nhóm router; validator tìm router tại root. Không sửa file nguồn để che lỗi. Kiểm per-skill qua cùng hàm validator: 125/125 hợp lệ; wiring ArcadeX do checker local và INDEX phụ trách.
+- `run-trigger-evals.py --check` offline: **FAIL 90 thiếu sót** ở cả checkout nguồn và bản cài (45 skill chưa đủ prompt should/near-miss). Không phải kết quả LLM chọn skill; không chạy judge/API hoặc tự mở issue upstream.
+- `npm run test:claude`: PASS adapter ArcadeX cũ (19 agent/11 skill adapter). `git diff --check` riêng snapshot báo 15 dòng trailing whitespace có sẵn trong nguồn ui-designer; giữ nguyên để hash khớp, không ghi toàn bộ whitespace check là PASS. Validator nguồn không thay việc kiểm API/version hiện hành hay art/gameplay runtime.
 
-`python3 scripts/check-docs.py` kiểm entrypoint/link/budget/nhật ký/số lượng/file nguồn đã cài. `npm run test:claude` kiểm adapter ArcadeX cũ. Validator tổng upstream hiện lỗi thiếu `router/references/routing-table.md` cả tại repo nguồn nguyên gốc và bản cài; đây là lỗi đường dẫn của validator, không phải kiểm chứng đã qua. Validator skill chuẩn đã kiểm 117/117 manifest hợp lệ; không coi đó là kiểm nghiệm tất cả ví dụ/script với ArcadeX. Mọi skill chọn dùng vẫn cần kiểm API/version theo source/lockfile hiện hành.
-
-Khi cập nhật thư viện: lấy commit đích rõ → đọc diff các skill/rules dùng thực tế → chạy installer vào thư mục tạm → so nguồn/collision → thay snapshot và manifest có chủ đích → kiểm docs/skill → ghi WORKLOG/COMPLETED. Không tự pull/cài dependency/chạy script upstream trong mọi phiên. Giữ `.claude/CCGS-NOTICE.md` và các notice/license đi kèm nguồn.
+Lần cập nhật sau: pin commit → đọc diff skill/rules dùng thực tế → cài tạm/so collision → thay snapshot/manifest có chủ đích → kiểm docs/skill → ghi WORKLOG/COMPLETED. Không tự pull hoặc chạy script nguồn mỗi phiên.

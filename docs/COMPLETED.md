@@ -2,12 +2,20 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## Folk FD-4A · asset/UI candidate · 15/11/2026
+
+- codex/folk-oaq-art-ui-20261115 từa4d1a9c/PR37; theo user ưu tiên asset/UI trước. Studio mới fa7b1db:340 blob đúng nguồn/125 skill; không nhập cache graph. Giới hạn upstream validator giữ rõ.
+- Bốn master,12 skin OAQ, art trong bàn/shop/HUD; home/lượt/điểm/số quân/mobile/focus/pause và copy thoát chính xác. Source/provenance/ảnh/stamp đủ; không bật online/tiền chung/catalog production.
+- 9 browser/9 unit+artguard/lint/build/package/budget/fast/catalog PASS; QA độc lập + Graphify scoped. [QA](qa/FOLK-OAQ-ART-2026-11-15.md).
+- Full CI của nhánh mới còn chờ, chưa merge/deploy; Netlify HOLD. Not yet played by a person; palette32/launcherart, FD-1 đầy đủ, Lò Cò/owner/receipt/backend còn gate riêng.
+- Bản trước task giữ [nguyên văn](archive/COMPLETED-2026-11-15-before-folk-art.md).
+
 ## Folk FD-0 · baseline local · 15/11/2026
 
 - Nhánh codex/folk-fd0-baseline-20261115 từ a55af6e: sửa build/runner/docs, OAQ reducer bất biến; hai prototype chỉ ở folk-preview.
 - Online khóa; reward chỉ Kẹo, không gọi Xu/XP/quest/loot; shop và Canvas đọc rõ. Giữ quyết định Ô Ăn Quan trước/Lò Cò sau.
 - 9 unit, 2 browser desktop/mobile, lint/build/budget/package/fast và Dungeon4 ca qua; full-release24 game giữ nguyên. [QA](qa/FOLK-FD0-2026-11-15.md).
-- GDD giữ nguyên văn, QA độc lập và Graphify scoped đã dùng. Local candidate; full CI trên PR còn chờ, chưa merge/deploy. Netlify HOLD/[skip netlify].
+- GDD giữ nguyên văn, QA độc lập và Graphify scoped đã dùng. Full CI63/head a4d1a9c success; PR37 chưa merge/deploy. Netlify HOLD/[skip netlify].
 - FD-1/2 hoàn thiện gameplay; FD-3 owner/save/receipt; FD-4 art và online còn riêng. [Bản trước FD-0 nguyên văn](archive/COMPLETED-2026-11-15-before-folk-fd0.md).
 
 ## Snake R01 · kỹ thuật ứng viên · 14/11/2026
@@ -36,20 +44,9 @@
 
 PR18/main3f943d9 đưa bot/offline ra sảnh, CI24 và public byte-match đã qua; online=false. [Chi tiết nguyên văn trước FD-0](archive/COMPLETED-2026-11-15-before-folk-fd0.md).
 
-## WC-ON1–ON4 / WC-PUBLIC · pilot và phát hành · 08/11/2026
+## Nối Từ / Tank · các mốc online trước
 
-- PR19/CI29→merge256620c; PR20/head970a941/CI32→merge086d6ac. NetlifyPublished,34.512từ publicbyte-match. Mốc này trước incident mới ở mụcONLINE-ERROR.
-- Staging2account qua phòng/PK/hosttransfer/mãđóng, queue/hủy/reset20s/timeout/2phiếu rematch; cron đóng phòng hết rematch khi đóngtab. [QA](qa/WC-STAGING-2026-11-08.md).
-- User duyệt exception production riêng: schema/Edge/handlerAuth/CORSexact/legacyJWT OFF/cronVault. Đã áp/probeAuth/CORS/tick/RPCdenial; tick200. PublicX9FL8R tạo-rời vàqueue-hủy qua; [release](word-chain/PUBLIC-RELEASE-2026-11-08.md).
-- Không đổi save/Auth/commerce; online chưaXP/xu, cầnreceipt bền vững. User bỏ gate thật3/4; ON5/ON6 cònQA. Chi tiết cũ giữ trong archive trước đóngONLINE-ERROR.
-
-## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
-
-- Đã phát hiện và sửa Render còn staging3950abb; service main/c705100 đã Live14:54, Free/cap16/Node24, registered-free đúng ArcadeX.
-- Health/TLS/origin/token âm qua; review/config/metrics public404. Không đổi SQL/key/chi phí.
-- Account thật tạo/rời1v1, tạo2v2/exit dọn phòng, logout sau exit chặn online lại; không bắt đầu trận nhiều người.
-- Bằng chứng: [TC-R0 report](tank-clash/TC-R0-2026-11-06.md). Cập nhật07/11: Netlify/Auth đã phát hành, logout retest qua; còn ca A/mã B cũ được chủ dự án để sau. TC-R1 chưa làm.
-- Giữ Blueprint cũ paused, không sync ghi đè service main; lần sau tiếp QA còn thiếu, không deploy lại vô cớ.
+WC-ON1–ON4/PR19–20 đã public phòng/PK/queue và34512 từ, staging hai account/timeout/rematch qua; user duyệt riêng schema/Edge/JWT/cron. Chưa XP/Xu/receipt; ON5/ON6 cònQA. Tank giữ Render Free c705100/cap16, Auth cơ bản và logout retest qua; chưa load/device QA, Blueprint cũ paused. [Chi tiết nguyên văn trước FD-4A](archive/COMPLETED-2026-11-15-before-folk-art.md), [thẻ Tank](plans/TANK-CLASH.md).
 
 ## Các mốc trước · đã tích hợp
 

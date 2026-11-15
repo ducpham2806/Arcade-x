@@ -55,8 +55,8 @@ if not 1 <= len(entries) <= 3:
     errors.append(f'WORKLOG: expected 1–3 entries, found {len(entries)}')
 
 studio = ROOT / '.agents/game-studio'
-for pattern, expected in [('skills/*/SKILL.md', 116), ('agents/*/*.md', 21),
-                          ('rules/*.md', 4), ('templates/*.md', 6)]:
+for pattern, expected in [('skills/*/SKILL.md', 125), ('agents/*/*.md', 21),
+                          ('rules/*.md', 4), ('templates/*.md', 7)]:
     found = len(list(studio.glob(pattern)))
     if found != expected:
         errors.append(f'Studio {pattern}: {found}, expected {expected}')
@@ -64,8 +64,13 @@ for pattern, expected in [('skills/*/SKILL.md', 116), ('agents/*/*.md', 21),
 manifest = ROOT / 'docs/studio/SOURCE-MANIFEST.md'
 rows = re.findall(r'^\| `([^`]+)` \| `([^`]+)` \| `([a-f0-9]{40})` \|$',
                   manifest.read_text(), flags=re.M)
-if len(rows) != 297 or len({row[1] for row in rows}) != 297:
-    errors.append('Studio manifest must contain 297 unique installed files')
+if len(rows) != 340 or len({row[1] for row in rows}) != 340:
+    errors.append('Studio manifest must contain 340 unique installed files')
+installed_files = {path.relative_to(ROOT).as_posix() for path in studio.rglob('*') if path.is_file()}
+if installed_files != {row[1] for row in rows}:
+    errors.append('Studio files must exactly match the pinned manifest (no stale files or generated cache)')
+if not re.search(r'Commit nguồn: `fa7b1dbb342983bc1fe76f4faa276fef099f57d3`', manifest.read_text()):
+    errors.append('Studio manifest must pin the reviewed fa7b1db source commit')
 for source, installed, expected in rows:
     path = ROOT / installed
     if not path.is_file():
@@ -80,6 +85,6 @@ if errors:
     print('\n'.join(errors))
     raise SystemExit(1)
 print(f'PASS: {len(inputs)} Markdown inputs; budgets; {len(entries)} log entries; '
-      f'116 skills / 21 roles / 4 rules / 6 templates; 297 source blobs')
+      f'125 skills / 21 roles / 4 rules / 7 templates; 340 source blobs')
 for name in ('AGENTS.md', 'docs/SESSION-HANDOFF.md', 'docs/PROJECT-PLAN.md'):
     print(f'{name}: {len((ROOT / name).read_text())}/{LIMITS[name]} characters')

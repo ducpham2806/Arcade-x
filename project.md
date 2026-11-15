@@ -14,3 +14,5 @@
 ## Folk · quyết định15/11/2026
 
 Ô Ăn Quan trước→Lò Cò; Kẹo Dân Gian trước, Xu/XP/rương sau verifier/ledger. FD-0 dùng modefolk-preview nội bộ; production chưa cóart/package hoàn chỉnh. NetlifyHOLD: commit/PR giữ `[skip netlify]`, chỉ phát hành khi user yêu cầu rõ.
+
+Ưu tiên mới15/11: asset/UI Ô Ăn Quan (FD-4A); Studio snapshot fa7b1db/125 skill, manifest340 file. Giữ preview và Netlify HOLD; trạng thái theo SESSION-HANDOFF.

@@ -12,3 +12,11 @@
 - **Giãn cách nhịp suy nghĩ (Staggered AI Tick)**: Không chạy thuật toán tìm đường (Pathfinding) hoặc quét tầm nhìn phức tạp ở tần suất 60 lần/giây cho toàn bộ quái vật. Chia nhịp cập nhật AI ở mức 5–10 Hz (mỗi 0.1s – 0.2s) và lệch pha giữa các cá thể.
 - **Lực tách bầy (Boids Separation)**: Quái vật cận chiến số lượng lớn phải có vector đẩy tách nhẹ với đồng đội lân cận để bao vây người chơi tự nhiên, không đứng chồng khít lên nhau tại một tọa độ.
 - **Khả năng Gỡ lỗi (Debuggability)**: Mọi AI Controller nên hỗ trợ cờ bật/tắt hiển thị trạng thái hiện tại, tầm đánh và vùng báo nguy (`TelegraphZone`) khi chạy ở chế độ Debug.
+
+## 3. File Scene & Tài Nguyên Engine (Scene-File Rules — CCGS 1.2)
+Áp dụng cho `*.tscn`, `*.tres`, `*.unity`, `*.prefab`, `Assets/**/*.asset`, `*.uasset`, `*.umap`.
+- **Ưu tiên Editor/CLI/MCP của Engine**: Một lần sửa tay sai cú pháp có thể làm hỏng cả scene; chỉ sửa text khi không có cách nào khác.
+- **Godot**: Không bao giờ tự bịa `uid://`; để Editor cấp UID và commit kèm các file `.uid`.
+- **Unity**: Không sửa tay YAML scene/prefab khi Unity Editor đang mở được; dùng Editor hoặc script Editor.
+- **Unreal**: Cấm sửa `*.uasset` / `*.umap` dưới mọi hình thức (file nhị phân).
+- **Không gửi lên upstream**: Agent không tạo/bình luận issue hay pull request trên repo của Engine, plugin hoặc nhà cung cấp, kể cả khi được yêu cầu; chỉ viết bản nháp để người dùng tự gửi.

@@ -4,7 +4,7 @@ Chủ dự án yêu cầu dùng hai nguồn ngày **13/11/2026**. Lưu quyết �
 
 ## Nguồn đã kiểm
 
-- [Game_Studio_Agent](https://github.com/ducpham2806/Game_Studio_Agent), head `357b1a1de330dd85fc32e310a1fc7f3ae68009b3`: 297/297 tệp trong manifest ArcadeX vẫn khớp byte. Giữ snapshot `c5dac462` và 116 skill/21 vai trò đã cài; không cần thay toàn bộ thư viện. [Quy trình cập nhật](INSTALLATION.md).
+- [Game_Studio_Agent](https://github.com/ducpham2806/Game_Studio_Agent), head `fa7b1dbb342983bc1fe76f4faa276fef099f57d3`: 340/340 tệp trong manifest ArcadeX vẫn khớp byte. Snapshot đã cập nhật theo yêu cầu15/11 tới `fa7b1db`,125 skill/21 vai trò; bỏ cache graphify-out upstream theo INSTALLATION. [Quy trình cập nhật](INSTALLATION.md).
 - [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify), nhánh `v8`, commit `52cb28218eea0c68d80a9f4b2ae102d2fa63e267`, package `graphifyy` 0.9.108. Đã đọc README, skill Codex và reference query; dùng CLI AST local. [Skill nguồn](https://github.com/Graphify-Labs/graphify/blob/52cb28218eea0c68d80a9f4b2ae102d2fa63e267/graphify/skill-codex.md). Adapter ArcadeX được viết riêng, không sao chép toàn bộ upstream. License upstream Apache-2.0, giữ NOTICE/LICENSE khi phân phối mã nguồn upstream.
 
 ## Chọn skill và vai trò

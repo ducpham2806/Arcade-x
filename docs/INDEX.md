@@ -7,7 +7,7 @@ AGENTS (nếu chưa tự nạp) → [SESSION-HANDOFF](SESSION-HANDOFF.md) → m�
 - Cách đóng/tóm tắt trước đổi task: [WORKFLOW](WORKFLOW.md).
 - Thành quả đã thu gọn: [COMPLETED](COMPLETED.md); nhật ký chính: [WORKLOG](WORKLOG.md).
 - Công nghệ/cấu hình làm việc: [project.md](../project.md).
-- Thư viện 116 skill/21 vai trò: [studio/INDEX](studio/INDEX.md), chỉ nạp phần phù hợp.
+- Thư viện 125 skill/21 vai trò: [studio/INDEX](studio/INDEX.md), chỉ nạp phần phù hợp.
 
 ## Tra sâu khi thẻ việc yêu cầu
 
