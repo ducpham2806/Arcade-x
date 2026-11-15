@@ -1,3 +1,4 @@
+import { readableCanvasText } from '../../accessibility/canvasText';
 import { getSkinById } from '../folk-duel/skins-catalog';
 import type { EquippedFolkSkins, FolkSeat } from '../folk-duel/types';
 import type { NlcState } from './rules';
@@ -107,7 +108,7 @@ export function renderNhayLoCoCourt(
     ctx.font = 'bold 14px ui-monospace, monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(item.box === 10 ? 'CHÙA' : String(item.box), item.x + 6, item.y + 5);
+    readableCanvasText(ctx, item.box === 10 ? 'CHÙA' : String(item.box), item.x + 6, item.y + 5);
 
     // Dấu Nhà (đã chiếm)
     if (houseOwner) {
@@ -117,7 +118,7 @@ export function renderNhayLoCoCourt(
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 11px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🏠', item.x + item.w - 15, item.y + 8);
+      readableCanvasText(ctx, '🏠', item.x + item.w - 15, item.y + 8);
     }
 
     // Mảnh Chàm đang nằm trong ô

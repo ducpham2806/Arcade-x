@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  type OaqState,
+  type OaqMove,
   applyOaqMove,
   createInitialOaqState,
   getValidOaqMoves,
@@ -95,7 +97,8 @@ test('Economy & Tiệm Tạp Hóa: cộng thưởng chống nhận lặp và mua
     score: 42,
   });
   assert.equal(r1.alreadyClaimed, false);
-  assert.equal(r1.coins, 100); // 80 + 2*10
+  assert.equal(r1.coins, 0); // Shared rewards are deferred by owner decision15/11.
+  assert.equal(r1.exp, 0);
   assert.equal(r1.candy, 10);  // 8 + 2
 
   // Gửi lặp cùng matchId -> không cộng trùng
@@ -121,7 +124,7 @@ test('Economy & Tiệm Tạp Hóa: cộng thưởng chống nhận lặp và mua
 });
 
 test('FolkRoomServer: Tạo phòng mã 6 ký tự, Join bằng mã, Matchmaking FIFO và CAS', () => {
-  const server = new FolkRoomServer({
+  const server = new FolkRoomServer<OaqState, OaqMove>({
     createInitialState: () => createInitialOaqState(),
     validateAndApplyMove: (state, seat, move) => {
       const res = applyOaqMove(state, seat, move);
@@ -176,4 +179,37 @@ test('FolkRoomServer: Tạo phòng mã 6 ký tự, Join bằng mã, Matchmaking 
   const q2 = server.matchmake({ userId: 'q_b', name: 'B', gameKind: 'nhay-lo-co', now: t0 + 200 });
   assert.equal(q1.roomId, q2.roomId);
   assert.equal(q2.players.length, 2);
+});
+
+
+function freeze<T>(value:T):T {
+ if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}
+ return value;
+}
+test('OAQ reducer, both previews and AI preserve a deeply frozen input and sibling branches',()=>{
+ const initial=freeze(createInitialOaqState()),before=JSON.stringify(initial);
+ const left=applyOaqMove(initial,'P1',{cellIndex:1,direction:'CW'});
+ const right=applyOaqMove(initial,'P1',{cellIndex:1,direction:'CCW'});
+ assert(left.ok&&right.ok);assert.notStrictEqual(left.nextState,initial);assert.notStrictEqual(left.nextState.cells,right.nextState.cells);
+ assert.equal(previewOaqLandingCell(initial,{cellIndex:1,direction:'CW'}),left.steps.filter(s=>s.type==='drop').at(-1)?.cellIndex);
+ previewOaqLandingCell(initial,{cellIndex:1,direction:'CCW'});
+ for(const level of ['easy','hard'] as const){const move=chooseOaqBotMove(initial,'P1',level,()=>.5);assert(move);assert(applyOaqMove(initial,'P1',move).ok);}
+ assert.equal(JSON.stringify(initial),before);
+ const leftBefore=JSON.stringify(left.nextState);applyOaqMove(right.nextState,'P2',{cellIndex:7,direction:'CW'});assert.equal(JSON.stringify(left.nextState),leftBefore);
+ const invalid=applyOaqMove(initial,'P2',{cellIndex:7,direction:'CW'});assert(!invalid.ok);assert.equal(JSON.stringify(initial),before);
+});
+test('Folk candy policy never calls shared currency, quests or loot APIs',()=>{
+ for(const mode of ['bot_easy','bot_hard','local_2p','friend_room','matchmaking'] as const){
+  const calls:string[]=[],saves:unknown[]=[];
+  const bridge={saveGameState:(value:unknown)=>saves.push(value),grantCoins:()=>calls.push('coins'),grantExp:()=>calls.push('exp'),grantGems:()=>calls.push('gems'),reportQuest:()=>calls.push('quest'),triggerLootRoll:()=>calls.push('loot')} as any;
+  const reward=applyMatchReward(createInitialFolkProfile(),{matchId:'policy-'+mode,game:'o-an-quan',mode,won:true,skillBonuses:2,score:42},bridge);
+  assert.equal(reward.coins,0);assert.equal(reward.exp,0);assert(reward.candy>0);assert.equal(saves.length,1);assert.deepEqual(calls,[]);
+  const repeated=applyMatchReward(reward.profile,{matchId:'policy-'+mode,game:'o-an-quan',mode,won:true,skillBonuses:2,score:42},bridge);assert(repeated.alreadyClaimed);assert.equal(repeated.candy,0);assert.deepEqual(calls,[]);
+ }
+});
+
+test('OAQ resowing an empty side also preserves the frozen source',()=>{
+ const source=createInitialOaqState();for(let cell=1;cell<=5;cell++)source.cells[cell]=0;source.scores.P1=5;
+ const input=freeze(source),before=JSON.stringify(input),result=applyOaqMove(input,'P1',{cellIndex:1,direction:'CW'});
+ assert(result.ok);assert.equal(JSON.stringify(input),before);assert.notStrictEqual(result.nextState.cells,input.cells);
 });

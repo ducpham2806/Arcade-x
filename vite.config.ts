@@ -198,6 +198,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        ...(mode === 'folk-preview' ? {'./folk-duel/catalog-entry':path.resolve(__dirname,'src/games/folk-duel/catalog-entry-enabled.ts')} : {}),
         ...(snakeCatalog ? {'./snake-legend/catalog-entry':path.resolve(__dirname,'src/games/snake-legend/catalog-entry-enabled.ts')} : {}),
       },
     },

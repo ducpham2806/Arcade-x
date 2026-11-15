@@ -1,3 +1,4 @@
+import { FOLK_ONLINE_AVAILABLE } from '../folk-duel/release-policy';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { GameComponentProps } from '../../types';
 import {
@@ -81,7 +82,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
           <div className="fd-hero-card">
             <h2 style={{ margin: '0 0 6px', color: '#fde68a' }}>Sân Gạch Tàu · Rải Sỏi Tính Nước</h2>
             <p style={{ margin: 0, fontSize: 13, color: '#fed7aa' }}>
-              Chạm ô Dân chọn hướng rải sỏi, săn Ăn Kép và hốt trọn Quan. Kiếm Xu &amp; Kẹo Mạch Nha để sưu tập bộ Bi Ve, Xu Cổ, Ngọc Bích Rồng!
+              Chạm ô Dân chọn hướng rải sỏi, săn Ăn Kép và hốt trọn Quan. Kiếm Kẹo Mạch Nha để sưu tập bộ Bi Ve, Xu Cổ, Ngọc Bích Rồng!
             </p>
           </div>
 
@@ -89,26 +90,26 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
             <button
               type="button"
               className="fd-menu-btn is-primary"
-              onClick={() => setScreen({ kind: 'online', entry: 'match' })}
+              disabled={!FOLK_ONLINE_AVAILABLE}
             >
               <strong>⚡ Ghép Trận 1vs1 (Matchmaking)</strong>
-              <span>Tìm đối thủ ngẫu nhiên · 25s/lượt</span>
+              <span>Sắp có</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'online', entry: 'create' })}
+              disabled={!FOLK_ONLINE_AVAILABLE}
             >
               <strong>🏠 Tạo Phòng Riêng</strong>
-              <span>Lấy mã 6 ký tự mời bạn</span>
+              <span>Sắp có</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'online', entry: 'join' })}
+              disabled={!FOLK_ONLINE_AVAILABLE}
             >
               <strong>🔑 Nhập Mã Vào Phòng</strong>
-              <span>Vào bàn của bạn bè</span>
+              <span>Sắp có</span>
             </button>
             <button
               type="button"
@@ -116,7 +117,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
               onClick={() => setScreen({ kind: 'bot', level: 'easy', matchId: `oaq_easy_${Date.now()}` })}
             >
               <strong>🤖 Bot Tí Sún (Dễ)</strong>
-              <span>Làm quen luật · +25 Xu</span>
+              <span>Làm quen luật · Kẹo Mạch Nha</span>
             </button>
             <button
               type="button"
@@ -124,7 +125,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
               onClick={() => setScreen({ kind: 'bot', level: 'hard', matchId: `oaq_hard_${Date.now()}` })}
             >
               <strong>🧠 Bot Bờm (Khó)</strong>
-              <span>Minimax tính nước · +45 Xu</span>
+              <span>Minimax tính nước · Kẹo Mạch Nha</span>
             </button>
             <button
               type="button"
@@ -171,7 +172,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
         />
       )}
 
-      {screen.kind === 'online' && (
+      {FOLK_ONLINE_AVAILABLE && screen.kind === 'online' && (
         <OnlineRoom
           gameKind="o-an-quan"
           gameTitle="Ô Ăn Quan"
@@ -222,7 +223,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
               <li>Đến lượt, chạm 1 ô Dân của mình rồi chọn <b>◀ Rải Trái</b> hoặc <b>Rải Phải ▶</b>.</li>
               <li>Viên cuối rơi trước ô có quân thì bốc rải tiếp; rơi trước 1 ô trống + 1 ô có quân thì được <b>Ăn quân</b> (có thể ăn kép liên hoàn!).</li>
               <li>2 lượt đầu không được ăn Quan khi Quan chưa có sỏi Dân đi kèm.</li>
-              <li>Cả 2 ô Quan hết quân -> Hốt tàn, ai nhiều điểm hơn thắng!</li>
+              <li>Cả 2 ô Quan hết quân → Hốt tàn, ai nhiều điểm hơn thắng!</li>
             </ul>
             <button type="button" className="fd-btn-primary" onClick={() => setShowRules(false)}>
               Đã hiểu!
@@ -456,7 +457,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
             </p>
             {rewardInfo && (
               <p style={{ margin: '4px 0', fontSize: 13, color: '#86efac', fontWeight: 700 }}>
-                Phần thưởng: +{rewardInfo.coins} Xu · +{rewardInfo.exp} XP · +{rewardInfo.candy} 🍬 Kẹo
+                Phần thưởng: +{rewardInfo.candy} 🍬 Kẹo
               </p>
             )}
             <div className="fd-btn-row">

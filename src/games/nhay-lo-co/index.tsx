@@ -1,3 +1,4 @@
+import { FOLK_ONLINE_AVAILABLE } from '../folk-duel/release-policy';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { GameComponentProps } from '../../types';
 import {
@@ -86,26 +87,26 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
             <button
               type="button"
               className="fd-menu-btn is-primary"
-              onClick={() => setScreen({ kind: 'online', entry: 'match' })}
+              disabled={!FOLK_ONLINE_AVAILABLE}
             >
               <strong>⚡ Ghép Trận 1vs1 (Matchmaking)</strong>
-              <span>Đua xây 3 Nhà · Tìm đối thủ nhanh</span>
+              <span>Sắp có</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'online', entry: 'create' })}
+              disabled={!FOLK_ONLINE_AVAILABLE}
             >
               <strong>🏠 Tạo Phòng Riêng</strong>
-              <span>Lấy mã 6 ký tự mời bạn</span>
+              <span>Sắp có</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'online', entry: 'join' })}
+              disabled={!FOLK_ONLINE_AVAILABLE}
             >
               <strong>🔑 Nhập Mã Vào Phòng</strong>
-              <span>Vào sân của bạn bè</span>
+              <span>Sắp có</span>
             </button>
             <button
               type="button"
@@ -113,7 +114,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
               onClick={() => setScreen({ kind: 'bot', level: 'easy', matchId: `nlc_easy_${Date.now()}` })}
             >
               <strong>🤖 Bot Tí Sún (Dễ)</strong>
-              <span>Luyện thảy Chàm · +25 Xu</span>
+              <span>Luyện thảy Chàm · Kẹo Mạch Nha</span>
             </button>
             <button
               type="button"
@@ -121,7 +122,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
               onClick={() => setScreen({ kind: 'bot', level: 'hard', matchId: `nlc_hard_${Date.now()}` })}
             >
               <strong>🧠 Bot Bờm (Khó)</strong>
-              <span>Nhịp nhanh chuẩn xác · +45 Xu</span>
+              <span>Nhịp nhanh chuẩn xác · Kẹo Mạch Nha</span>
             </button>
             <button
               type="button"
@@ -168,7 +169,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
         />
       )}
 
-      {screen.kind === 'online' && (
+      {FOLK_ONLINE_AVAILABLE && screen.kind === 'online' && (
         <OnlineRoom
           gameKind="nhay-lo-co"
           gameTitle="Nhảy Lò Cò"
@@ -513,7 +514,7 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
             <p style={{ margin: '4px 0', fontSize: 13 }}>{statusMsg}</p>
             {rewardInfo && (
               <p style={{ margin: '4px 0', fontSize: 13, color: '#86efac', fontWeight: 700 }}>
-                Phần thưởng: +{rewardInfo.coins} Xu · +{rewardInfo.exp} XP · +{rewardInfo.candy} 🍬 Kẹo
+                Phần thưởng: +{rewardInfo.candy} 🍬 Kẹo
               </p>
             )}
             <div className="fd-btn-row">

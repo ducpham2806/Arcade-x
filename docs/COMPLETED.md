@@ -2,6 +2,14 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## Folk FD-0 · baseline local · 15/11/2026
+
+- Nhánh codex/folk-fd0-baseline-20261115 từ a55af6e: sửa build/runner/docs, OAQ reducer bất biến; hai prototype chỉ ở folk-preview.
+- Online khóa; reward chỉ Kẹo, không gọi Xu/XP/quest/loot; shop và Canvas đọc rõ. Giữ quyết định Ô Ăn Quan trước/Lò Cò sau.
+- 9 unit, 2 browser desktop/mobile, lint/build/budget/package/fast và Dungeon4 ca qua; full-release24 game giữ nguyên. [QA](qa/FOLK-FD0-2026-11-15.md).
+- GDD giữ nguyên văn, QA độc lập và Graphify scoped đã dùng. Local candidate; full CI trên PR còn chờ, chưa merge/deploy. Netlify HOLD/[skip netlify].
+- FD-1/2 hoàn thiện gameplay; FD-3 owner/save/receipt; FD-4 art và online còn riêng. [Bản trước FD-0 nguyên văn](archive/COMPLETED-2026-11-15-before-folk-fd0.md).
+
 ## Snake R01 · kỹ thuật ứng viên · 14/11/2026
 
 - Nhánh codex/snake-r01-finish từ2ca0b3c/PR33: sửa S1accountsave cùng store xuyên Story/Journey/Lab, giữ guest/format và audio prefs. [QA](qa/SNAKE-FINISH-2026-11-14.md).
@@ -24,11 +32,9 @@
 - PR21 full CI36 → main9061bfd, Netlify Published và bundle byte-match. Nối Từ tạo/rời phòng, Tank tự nối lại sau khôi phục. [QA](qa/ONLINE-ERROR-2026-11-08.md).
 - Tank Render Free phục hồi thủ công c705100, chủ dự án chọn giữ Free. 409 cũ thiếu body, ON5/ON6 còn QA. [Tóm tắt nguyên văn trước phát hành Snake](archive/COMPLETED-2026-11-13-before-snake-public.md).
 
-## WC-L0 · DONE bot/offline ra sảnh · 07/11/2026
+## WC-L0 · DONE · 07/11/2026
 
-- PR18/main3f943d9: bundled-free/policy server, icon512/banner1280×640 từ2master ImageGen, hash/offline package. Online=false, không SQL production.
-- Full CI24/head5882adf success,5UI Nối Từ/13Tank/generated clean; CUA PC/phone320–390 qua. Netlify6aeebb61665214227ba314ef Published,4JS+2ảnh byte-match; bot “cấm địa”→“địa giới”, exit qua. [QA](qa/WC-L0-2026-11-07.md).
-- Audit WC-R0 xác nhận source đã ở main, catalog thiếu game; WC-L0 xử lý bằng bundled entry. CI24ảnh bị dọn, đã sửa upload trong PR19/CI26–28. Lịch sử chi tiết giữ [nguyên văn](archive/COMPLETED-2026-11-08-before-word-chain-pilot.md).
+PR18/main3f943d9 đưa bot/offline ra sảnh, CI24 và public byte-match đã qua; online=false. [Chi tiết nguyên văn trước FD-0](archive/COMPLETED-2026-11-15-before-folk-fd0.md).
 
 ## WC-ON1–ON4 / WC-PUBLIC · pilot và phát hành · 08/11/2026
 
@@ -45,18 +51,9 @@
 - Bằng chứng: [TC-R0 report](tank-clash/TC-R0-2026-11-06.md). Cập nhật07/11: Netlify/Auth đã phát hành, logout retest qua; còn ca A/mã B cũ được chủ dự án để sau. TC-R1 chưa làm.
 - Giữ Blueprint cũ paused, không sync ghi đè service main; lần sau tiếp QA còn thiếu, không deploy lại vô cớ.
 
-## DOC-01 · DONE · 06/11/2026
+## Các mốc trước · đã tích hợp
 
-- codex/docs-game-studio-handoff→PR17: thẻ game/project.md/một WORKLOG/bàn giao ngắn, thu gọn trước đổi việc và checker budget.
-- Studio c5dac462:116skill/21role/4rules/297blob; discovery theo task, không nạp cả thư viện. [Chi tiết](archive/WORKLOG-2026-11-06-DOC-01.md). Không đổi runtime/schema.
-
-## MERGE-AUDIT · 06/11/2026
-
-- Mainc705100/PR16 đã tích hợp; audit24nhánh phân biệt nhánh đã có, docs tương đương và P2 cần port theoTC-R2. [Chi tiết nguyên văn](archive/COMPLETED-2026-11-14-before-snake-finish.md).
-
-## Tank Clash / Battleship / Dungeon · các mốc trước
-
-- PR16 gồm P3b/c/d, adapter Tank và motion PC/polish Battleship/Dungeon; chưa kết luận thiết bị/backend/reward. [Chi tiết nguyên văn](archive/COMPLETED-2026-11-14-before-snake-finish.md), [thẻ Tank](plans/TANK-CLASH.md).
+DOC-01/PR17 cài Studio và workflow; audit24 nhánh đã đóng. Tank P3b/c/d, adapter và motion/polish Battleship/Dungeon vào PR16. Không suy ra thiết bị/backend/reward đã nghiệm thu. [Chi tiết nguyên văn](archive/COMPLETED-2026-11-15-before-folk-fd0.md), [thẻ Tank](plans/TANK-CLASH.md).
 
 ## Snake / nền tảng / các game khác
 
