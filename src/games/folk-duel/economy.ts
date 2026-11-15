@@ -113,34 +113,24 @@ export interface MatchRewardOutput {
 
 export function calculateMatchReward(input: MatchRewardInput): { coins: number; exp: number; candy: number } {
   if (input.mode === 'local_2p' || input.forfeitedEarly) {
-    return { coins: 10, exp: 15, candy: 1 };
+    return { coins: 0, exp: 0, candy: 1 };
   }
-  let baseCoins = 20;
-  let baseExp = 35;
   let baseCandy = 1;
 
   if (input.mode === 'bot_easy') {
-    baseCoins = input.won ? 25 : 10;
-    baseExp = input.won ? 40 : 20;
     baseCandy = input.won ? 2 : 1;
   } else if (input.mode === 'bot_hard') {
-    baseCoins = input.won ? 45 : 15;
-    baseExp = input.won ? 65 : 25;
     baseCandy = input.won ? 4 : 1;
   } else if (input.mode === 'friend_room') {
-    baseCoins = input.won ? 50 : 20;
-    baseExp = input.won ? 75 : 35;
     baseCandy = input.won ? 5 : 2;
   } else if (input.mode === 'matchmaking') {
-    baseCoins = input.won ? 80 : input.isDraw ? 45 : 25;
-    baseExp = input.won ? 100 : input.isDraw ? 60 : 45;
     baseCandy = input.won ? 8 : input.isDraw ? 4 : 2;
   }
 
   const cappedBonus = Math.min(3, Math.max(0, Math.floor(input.skillBonuses)));
   return {
-    coins: baseCoins + cappedBonus * 10,
-    exp: baseExp + cappedBonus * 15,
+    coins: 0,
+    exp: 0,
     candy: baseCandy + cappedBonus,
   };
 }
@@ -178,16 +168,8 @@ export function applyMatchReward(
   };
   saveFolkProfile(nextProfile, bridge);
 
-  if (bridge) {
-    // Gọi bridge để cộng Xu, XP & điểm bảng xếp hạng Arcade-X
-    bridge.grantCoins(reward.coins);
-    bridge.grantExp(reward.exp);
-    bridge.reportQuest('play_any', 1);
-    if (input.won) bridge.reportQuest('win_match', 1);
-    if (input.mode === 'matchmaking' || input.mode === 'friend_room') {
-      bridge.triggerLootRoll(input.score);
-    }
-  }
+  // FD-0: only the local candy/profile changes above are available. Shared
+  // currency, quests and loot require the verified ledger in FD-3.
 
   return {
     alreadyClaimed: false,

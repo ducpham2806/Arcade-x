@@ -203,7 +203,7 @@
 }
 
 .fd-overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.72);
   display: flex;
@@ -228,9 +228,14 @@
 
 @media (min-width: 640px) {
   .fd-modal-shell {
-    height: 92vh;
+    height: min(92vh, 100%);
     max-height: 900px;
   }
+}
+
+@media (max-width: 639px) {
+  .fd-overlay { padding: 0; }
+  .fd-modal-shell { border-radius: 0; }
 }
 
 .fd-modal-header {

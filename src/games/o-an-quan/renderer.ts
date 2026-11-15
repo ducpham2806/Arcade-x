@@ -1,3 +1,4 @@
+import { readableCanvasText } from '../../accessibility/canvasText';
 import { getSkinById } from '../folk-duel/skins-catalog';
 import type { EquippedFolkSkins } from '../folk-duel/types';
 import { cellTotalStones, type OaqState } from './rules';
@@ -176,6 +177,6 @@ export function renderOAnQuanBoard(
     ctx.font = 'bold 11px ui-monospace, monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(ptsDisplay, r.x + 6 + (r.isQuan ? 17 : 12), r.y + 15);
+    readableCanvasText(ctx, ptsDisplay, r.x + 6 + (r.isQuan ? 17 : 12), r.y + 15);
   }
 }

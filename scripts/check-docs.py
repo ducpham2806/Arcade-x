@@ -17,8 +17,9 @@ LIMITS = {
 LINK = re.compile(r'\[[^\]]*\]\(([^)]+)\)')
 errors = []
 cards = sorted((ROOT / 'docs/plans').glob('*.md'))
-if len(cards) != 7:
-    errors.append(f'Expected 7 module cards; found {len(cards)}')
+expected_cards = {'WORD-CHAIN.md', 'SNAKE.md', 'TANK-CLASH.md', 'DUEL.md', 'GAME-POLISH.md', 'COMMERCE.md', 'MAINTENANCE.md', 'FOLK-GAMES-PLAN.md'}
+if {card.name for card in cards} != expected_cards:
+    errors.append('Module cards must match the registered modules: ' + ', '.join(sorted(expected_cards)))
 for card in cards:
     LIMITS[card.relative_to(ROOT).as_posix()] = 6500
 

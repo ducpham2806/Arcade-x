@@ -110,7 +110,10 @@
     "test:snake-campaign-browser": "node tests/snake/campaign-browser.mjs",
     "test:snake-ui": "node --test tests/snake/ui-live-guard.mjs && playwright test tests/snake/ui-save.test.ts tests/snake/ui-controls.test.ts --output=test-results/snake-ui",
     "test:snake-ui-live": "node scripts/test-snake-ui-live.mjs",
-    "test:snake-controls": "playwright test tests/snake/ui-controls.test.ts --output=test-results/snake-controls"
+    "test:snake-controls": "playwright test tests/snake/ui-controls.test.ts --output=test-results/snake-controls",
+    "test:folk": "node tests/folk-duel/run.mjs",
+    "test:folk-ui": "playwright test -c playwright.folk.config.ts --output=test-results/folk-ui",
+    "test:folk-package": "node tests/folk-duel/package.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

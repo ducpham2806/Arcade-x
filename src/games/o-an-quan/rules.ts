@@ -151,7 +151,7 @@ export function applyOaqMove(
     return { ok: false, error: 'Chưa đến lượt của bạn.', nextState: rawState, steps: [] };
   }
 
-  const state = ensureSideHasStones(rawState, seat);
+  const state = ensureSideHasStones(cloneOaqState(rawState), seat);
   const validRange = getOwnRange(seat);
   if (!validRange.includes(move.cellIndex) || state.cells[move.cellIndex] <= 0) {
     return { ok: false, error: 'Ô được chọn không hợp lệ hoặc không có quân.', nextState: rawState, steps: [] };

@@ -182,7 +182,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
   };
 
   return (
-    <div className="fd-overlay" role="dialog" aria-modal="true" aria-labelledby="fd-shop-title">
+    <div className="fd-overlay" role="dialog" data-modal-skin="authored" aria-modal="true" aria-labelledby="fd-shop-title">
       <div className="fd-modal-shell">
         <header className="fd-modal-header">
           <div>
