@@ -17,8 +17,13 @@ LIMITS = {
 LINK = re.compile(r'\[[^\]]*\]\(([^)]+)\)')
 errors = []
 cards = sorted((ROOT / 'docs/plans').glob('*.md'))
-if len(cards) != 7:
-    errors.append(f'Expected 7 module cards; found {len(cards)}')
+expected_cards = {'COMMERCE.md', 'DUEL.md', 'FOLK-GAMES-PLAN.md', 'GAME-POLISH.md', 'MAINTENANCE.md', 'SNAKE.md', 'TANK-CLASH.md', 'WORD-CHAIN.md'}
+if {card.name for card in cards} != expected_cards:
+    errors.append('Module card inventory differs from the maintained eight-module plan')
+plan = (ROOT / 'docs/PROJECT-PLAN.md').read_text()
+for card in cards:
+    if f'(plans/{card.name})' not in plan:
+        errors.append(f'Unrouted module card: {card.name}')
 for card in cards:
     LIMITS[card.relative_to(ROOT).as_posix()] = 6500
 
@@ -29,6 +34,7 @@ inputs += [ROOT / name for name in (
     'docs/studio/INSTALLATION.md', 'docs/OWNER-TODO.md',
     'docs/PENDING-DECISIONS.md', 'docs/TESTING.md',
     '.agents/skills/arcadex-studio/SKILL.md',
+    '.agents/skills/arcadex-graphify/SKILL.md', 'docs/studio/GRAPHIFY.md',
 )]
 for file in inputs:
     if not file.is_file() or file.suffix != '.md':

@@ -11,12 +11,13 @@ Mốc nguồn main9061bfd: PR21 đã merge sau fullCI36; Netlify Published đún
 | Ưu tiên | Nhóm | Task tiếp theo / tình trạng | Thẻ đủ để tiếp quản |
 |---|---|---|---|
 | Duy trì | Nối Từ / incident online | Client đã phát hành, Tank giữFree/phục hồi thủ công; ON5/ON6 cònQA | [Nối Từ](plans/WORD-CHAIN.md) |
-| 1 | Snake Legend | SN-R2b đã phát hành R01 offline-first. Còn nghiệm thu thiết bị, người mới chơi và live save | [Snake](plans/SNAKE.md) |
+| 1 | Snake Legend | R01 Published8320385; ứng viên14/11 sửa accountsave/keyboard/boss và gồm badgePR33; UI10màn qua, release/M2/thiết bị/live còn QA | [Snake](plans/SNAKE.md) |
 | Chờ | Tank Clash | TC-R0 ca A do chủ dự án để sau; TC-R1mạng/tải thật; TC-R2port P2→P3, không merge nguyên nhánh | [Tank](plans/TANK-CLASH.md) |
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
 | 5 | Battleship và game đã tích hợp | GP-R0 xác minh lại khoảng trống QA từ báo cáo cũ; GP-R1 polish theo lỗi tái hiện; GP-R2 Rainbow/Chronicles chỉ khi chọn mở phạm vi | [QA và hoàn thiện game](plans/GAME-POLISH.md) |
 | Riêng | Commerce/thuê game | CM1→CM4: staging quyền → DB/admin → payment → restore/pilot. WAITING runtime/provider/admin; giữ checkout tắt | [Commerce](plans/COMMERCE.md) |
-| Hiện tại | Chat bubble / chờ kiểm | Wireframe đã duyệt14/11, CH1–CH4 code/QA local15/11; chờ anh kiểm trước merge, backend native chưa deploy | [Bảo trì · CHAT](plans/MAINTENANCE.md) |
+| Tiếp quản | Ô Ăn Quan / Nhảy Lò Cò | Nguồn mới trong main; cần xác minh QA/CI và milestone trước task mới; GDD giữ nguyên trong archive | [Folk Duel](plans/FOLK-GAMES-PLAN.md) |
+| Hiện tại | Chat bubble / native3game | Tank/Nối Từ/Hải Chiến đã code/QA local và backend staging; còn positive2tester/duyệt/fullCI, PR38draft | [Bảo trì · CHAT](plans/MAINTENANCE.md) |
 | Duy trì | Test/art/docs/nợ kỹ thuật | MT1 test cũ, MT2 banner/art, MT3 phòng dùng chung, MT4 dung lượng Git. Không rewrite/LFS khi chưa duyệt | [Bảo trì](plans/MAINTENANCE.md) |
 
 Làm một task có bằng chứng rồi mới chuyển task khác. Có thể xử lý việc tài liệu/test độc lập khi chờ người chơi hoặc dịch vụ; không tự chuyển ưu tiên gameplay chỉ vì task chờ.

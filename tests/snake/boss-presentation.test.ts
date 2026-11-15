@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {Engine,T} from '../../src/games/snake-legend/src/core';
 import {STORY_LEVELS} from '../../src/games/snake-legend/src/story-data';
 import {B01,type BossState} from '../../src/games/snake-legend/src/encounters';
-import {bossCue,bossPose} from '../../src/games/snake-legend/src/boss-presentation';
+import {bossCue,bossPose,bossObjective} from '../../src/games/snake-legend/src/boss-presentation';
 import {drawBoss,drawBossTargets} from '../../src/games/snake-legend/src/boss-render';
 import {capture} from '../../src/games/snake-legend/src/checkpoint';
 const engine=new Engine(STORY_LEVELS[9]),e=engine.encounters!;
@@ -29,3 +29,27 @@ e.state='idle';assert.deepEqual(bossPose(e,0,true),bossPose(e,999,true));e.state
 e.phase=3;e.state='idle';e.anchorTicks=Math.round(B01.hold*T.hz);assert.equal(bossCue(e,16).hold,1);assert.match(bossCue(e,12).label,/12\/16/);
 e.state='weak';e.timer=-1;assert.equal(bossCue(e,16).fraction,0);e.timer=9999;assert.equal(bossCue(e,16).fraction,1);
 console.log('PASS boss presentation: real tick transitions, locked aim, countdown, all 24 phase/state combinations, checkpoint purity, round shot radius, fallback, reduced motion, bounded meters');
+
+const objectiveEngine=new Engine(STORY_LEVELS[9]),boss=objectiveEngine.encounters!;
+const objective=(label:string,target:{x:number;y:number})=>{
+ const before=capture(objectiveEngine,'objective-purity',[]);
+ assert.deepEqual(bossObjective(objectiveEngine),{label,target});
+ assert.deepEqual(capture(objectiveEngine,'objective-purity',[]),before);
+};
+objective('ĐIỂM YẾU',boss.boss!.weak);
+boss.phase=2;boss.state='idle';objective('TƠ',boss.spec.webs[0]);
+boss.state='weak';objective('ĐIỂM YẾU',boss.boss!.weak);
+boss.phase=3;boss.state='idle';objective('CỘT A',boss.boss!.posts[0]);
+boss.anchors=[true,false];objective('CỘT B',boss.boss!.posts[1]);
+objectiveEngine.length=12;
+const apple=objectiveEngine.arena.story!.foods.filter(f=>f.kind==='apple'||f.kind==='gold')
+ .sort((a,b)=>Math.hypot(a.x-objectiveEngine.pos.x,a.y-objectiveEngine.pos.y)-Math.hypot(b.x-objectiveEngine.pos.x,b.y-objectiveEngine.pos.y))[0];
+objective('ĂN TÁO',apple);
+objectiveEngine.eaten.add(apple.id);
+assert.notDeepEqual(bossObjective(objectiveEngine)?.target,apple,'point to available food before a consumed apple');
+for(const food of objectiveEngine.arena.story!.foods){objectiveEngine.eaten.add(food.id);objectiveEngine.respawns.set(food.id,objectiveEngine.tick+120);}
+objective('ĂN TÁO',apple); // If all apples are regrowing, keep pointing to their next location.
+boss.state='weak';objective('ĐIỂM YẾU',boss.boss!.weak);
+boss.state='defeated';objective('CỔNG',objectiveEngine.arena.story!.exit);
+assert.equal(bossObjective(new Engine(STORY_LEVELS[0])),undefined);
+console.log('PASS boss objective: web, both anchors, available/regrowing apples, open weak point and exit have matching targets and labels without changing simulation');

@@ -201,6 +201,7 @@
 .arcadex-modal-overlay {
   position: fixed;
   inset: 0;
+  bottom: var(--arcadex-host-bottom-inset, 0px);
   z-index: 50;
   display: flex;
   align-items: center;
@@ -232,7 +233,7 @@
   width: 100%;
   max-width: 56rem;
   height: 92vh;
-  max-height: 900px;
+  max-height: min(900px, 100%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -262,7 +263,7 @@
   width: 100%;
   max-width: 52rem;
   height: 90vh;
-  max-height: 800px;
+  max-height: min(800px, 100%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -282,7 +283,7 @@
   width: 100%;
   max-width: 32rem;
   height: 88vh;
-  max-height: 700px;
+  max-height: min(700px, 100%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -303,6 +304,7 @@
 .app-modal-overlay {
   position: fixed;
   inset: 0;
+  bottom: var(--arcadex-host-bottom-inset, 0px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -321,7 +323,7 @@
 }
 @media (min-width: 640px) {
   .app-modal-overlay { padding: 1rem; }
-  .app-modal { height: 92vh; max-height: 900px; max-width: 56rem; border-radius: 1.5rem; }
+  .app-modal { height: 92vh; max-height: min(900px, 100%); max-width: 56rem; border-radius: 1.5rem; }
 }
 @media (min-width: 1024px) {
   .app-modal-overlay { padding: 1.5rem; }
@@ -359,3 +361,12 @@
   animation: hapticMicroPulse 0.12s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* Hosting badges live outside the app. Keep their bottom strip available while
+   each modal/game still fills the remaining host area. No badge means no inset. */
+#game-wrapper-viewport {
+  bottom: var(--arcadex-host-bottom-inset, 0px);
+}
+
+.arcade-launcher {
+  padding-bottom: var(--arcadex-host-bottom-inset, 0px);
+}

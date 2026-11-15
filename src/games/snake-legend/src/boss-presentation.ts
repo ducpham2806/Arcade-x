@@ -1,5 +1,28 @@
-import {clamp,T} from './core';
+import {clamp,distance,T,type Engine,type V} from './core';
 import {B01,type Encounters} from './encounters';
+
+// Keep both map and offscreen arrow on the current task. A web or anchor is
+// useful before the weak point opens, but must not be labelled as the weak point.
+export function bossObjective(engine:Engine):{target:V;label:string}|undefined{
+ const encounter=engine.encounters,boss=encounter?.boss,story=engine.arena.story;
+ if(!encounter||!boss||!story)return undefined;
+ if(engine.goalReady||encounter.state==='defeated')return {target:story.exit,label:'CỔNG'};
+ if(encounter.weakOpen||encounter.phase===1)return {target:boss.weak,label:'ĐIỂM YẾU'};
+ if(encounter.phase===2)return {target:encounter.spec.webs[0],label:'TƠ'};
+ if(engine.length<16){
+  let nearest:V|undefined,available:V|undefined,best=Infinity,availableBest=Infinity;
+  for(const food of story.foods){
+   if(food.kind!=='apple'&&food.kind!=='gold')continue;
+   const d=distance(engine.pos,food);
+   if(d<best){nearest=food;best=d;}
+   if(d<availableBest&&engine.foodAvailable(food.id)){available=food;availableBest=d;}
+  }
+  nearest=available??nearest;
+  if(nearest)return {target:nearest,label:'ĂN TÁO'};
+ }
+ const anchor=encounter.anchors[0]?1:0;
+ return {target:boss.posts[anchor],label:anchor?'CỘT B':'CỘT A'};
+}
 
 // Presentation reads simulation ticks only: pause/checkpoint/replay keep every cue aligned.
 export function bossCue(encounter:Encounters,length:number){

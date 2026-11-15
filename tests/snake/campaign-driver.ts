@@ -2,7 +2,7 @@ import { distance, Engine, T, type Input, type V } from '../../src/games/snake-l
 import { STORY_LEVELS } from '../../src/games/snake-legend/src/story-data';
 
 // Visit the jade before looping through the bonus field as apples become available.
-const bonusRoute: V[] = [
+export const bonusRoute: V[] = [
   { x: 27, y: 22 }, { x: 29, y: 5 }, { x: 18, y: 7 }, { x: 7, y: 8 },
   { x: 11, y: 12 }, { x: 13, y: 17 }, { x: 18, y: 23 }, { x: 27, y: 20 },
   { x: 25, y: 15 }, { x: 20, y: 9 }, { x: 13, y: 8 }, { x: 7, y: 14 }, { x: 10, y: 22 },
@@ -25,7 +25,7 @@ export function steer(engine: Engine, target: V, dash = false): Input {
   return { x: dx / length, y: dy / length, dash };
 }
 
-function bossSteering(engine: Engine) {
+export function bossSteering(engine: Engine) {
   const encounter = engine.encounters!;
   const weak = encounter.boss!.weak;
   const exitRoute = [{ x: 36, y: 35 }, { x: 40, y: 30 }, { x: 39, y: 13 },
@@ -33,6 +33,7 @@ function bossSteering(engine: Engine) {
   let phase = 1;
   let waypoint = 0;
   let exitWaypoint = 0;
+  let priorHits = encounter.totalHits;
 
   return () => {
     if (encounter.state === 'defeated') {
@@ -42,6 +43,13 @@ function bossSteering(engine: Engine) {
     if (phase !== encounter.phase) {
       phase = encounter.phase;
       waypoint = 0;
+    }
+    // A successful Dash interrupts the anchor route. Begin a fresh lap after
+    // each phase-three hit instead of resuming a stale mid-route waypoint;
+    // native browser input is sampled less often than the fixed-step engine.
+    if (encounter.totalHits !== priorHits) {
+      priorHits = encounter.totalHits;
+      if (phase === 3) waypoint = 0;
     }
     const route = bossRoutes[phase - 1];
     if (distance(engine.pos, route[waypoint]) < .65) waypoint = (waypoint + 1) % route.length;

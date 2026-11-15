@@ -33,6 +33,36 @@ jobs:
             test-results/qc-results.json
           if-no-files-found: ignore
           retention-days: 7
+      - name: Public Snake account saves, checkpoint restore and keyboard menus
+        run: npm run test:snake-player
+        env:
+          QC_REPORT_PATH: test-results/snake-player-results.json
+          QC_HTML_PATH: test-results/snake-player-html
+      - name: Preserve public Snake player evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-player-evidence
+          path: |
+            test-results/snake-player/
+            test-results/snake-player-results.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Hosting badge safe area, late insertion, popover and removal
+        run: npm run test:hosting
+        env:
+          QC_REPORT_PATH: test-results/hosting-badge-results.json
+          QC_HTML_PATH: test-results/hosting-badge-html
+      - name: Preserve hosting safe area evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosting-badge-evidence
+          path: |
+            test-results/hosting-badge/
+            test-results/hosting-badge-results.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Snake production catalog, rollback build and offline package
         run: npm run build && npm run build:snake-disabled && npm run test:snake-catalog
       - name: Preserve Snake catalog candidate evidence
@@ -99,6 +129,17 @@ jobs:
         run: npm run test:games
       - name: Desktop animation isolation and Canvas loops (all games, normal and reduced motion)
         run: npm run test:animations
+      - name: Preserve motion and save-failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-regression-evidence
+          path: |
+            test-results/desktop-motion.json
+            test-results/motion-playwright/
+            test-results/qc-results.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Neon Run sound, feel and controls
         run: npm run test:neon-feel
       - name: Offline launcher shell

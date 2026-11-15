@@ -1,3 +1,5 @@
+/** Hosting chrome reserves a bottom strip outside the game/modal viewport. */
+export function chatBottomInset(){const value=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--arcadex-host-bottom-inset'));return Number.isFinite(value)?Math.max(0,Math.min(innerHeight-100,value)):0;}
 export type Point={x:number;y:number};
 export type Box={left:number;top:number;right:number;bottom:number};
 export const clampPoint=(p:Point,w:number,h:number,size=48):Point=>({x:Math.max(6,Math.min(w-size-6,p.x)),y:Math.max(6,Math.min(h-size-6,p.y))});

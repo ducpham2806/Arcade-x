@@ -75,3 +75,20 @@ test.describe('touch viewport',()=>{
   }finally{await session.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]}).catch(()=>{});await session.detach();}
  });
 });
+
+test('training settings preserve the same owner Story audio preferences',async({page,context})=>{
+ const fixture=await snakeUiFixture();await fixture.install(context);await loginSnake(page,fixture.user('lab-settings'));await openFirstLevel(page);
+ await page.locator('.story-app [data-action="settings"]').click();
+ await page.locator('[data-setting="sound"]').check();
+ const volume=page.locator('[data-setting="volume"]');await volume.focus();await page.keyboard.press('Home');
+ for(let i=0;i<27;i++)await page.keyboard.press('ArrowRight');
+ await expect(volume).toHaveValue('27');
+ await page.locator('[data-action="close-settings"]').click();await page.locator('.story-app [data-action="journey"]').click();
+ await page.locator('[data-action="lab"]').click();await page.locator('[data-action="settings"]').click();
+ await page.locator('[data-setting="hand"]').selectOption('right');await page.locator('[data-action="close-settings"]').click();
+ await page.getByRole('button',{name:'Về hành trình',exact:true}).click();
+ await page.locator('.snake-journey [data-level="0"]').click();await page.locator('.journey-play').click();
+ await page.locator('.story-app [data-action="settings"]').click();
+ await expect(page.locator('[data-setting="sound"]')).toBeChecked();await expect(page.locator('[data-setting="volume"]')).toHaveValue('27');
+ await expect(page.locator('[data-setting="hand"]')).toHaveValue('right');
+});

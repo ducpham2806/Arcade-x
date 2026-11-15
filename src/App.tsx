@@ -1,6 +1,7 @@
 import {ChatProvider} from './chat/ChatProvider';
 import { GamePackageGate } from './components/GamePackageGate';
 import { installReadability } from './accessibility/readability.js';
+import { installHostingSafeArea } from './services/hostingSafeArea';
 import './accessibility/readability.css';
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { LauncherProvider, useLauncher } from './launcher/LauncherContext';
@@ -223,6 +224,7 @@ const AppContent: React.FC = () => {
 };
 
 export function App({ reviewControls }: { reviewControls?: React.ReactNode } = {}) {
+  useEffect(() => installHostingSafeArea(), []);
   return (
     <AuthProvider>
       <LauncherProvider>

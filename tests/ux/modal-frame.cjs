@@ -31,8 +31,10 @@ function sourcePolicy() {
 
 const viewports = [
   { name: 'phone', width: 390, height: 844 },
+  { name: 'tall phone', width: 390, height: 1000 },
   { name: 'tablet', width: 820, height: 1100 },
   { name: 'desktop', width: 1440, height: 900 },
+  { name: 'tall desktop', width: 1440, height: 1200 },
 ];
 const panels = [
   { name: 'settings', open: page => page.getByRole('button', { name: 'Cài đặt', exact: true }).click() },

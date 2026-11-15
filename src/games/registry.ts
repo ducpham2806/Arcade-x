@@ -47,9 +47,49 @@ const WordCrossGame = packageLazy('word-cross', () => import('./word-cross').the
 import { WORD_CROSS_ACHIEVEMENTS, WORD_CROSS_DROP_RATES, WORD_CROSS_CONTROLS } from './word-cross/config';
 const WordChainGame = packageLazy('word-chain', () => import('./word-chain').then(async module => { const {loadLexicon} = await import('./word-chain/lexicon'); await loadLexicon(); return { default: module.WordChainGame }; }));
 import { WORD_CHAIN_ACHIEVEMENTS, WORD_CHAIN_DROP_RATES, WORD_CHAIN_CONTROLS } from './word-chain/config';
+const OAnQuanGame = packageLazy('o-an-quan', () => import('./o-an-quan').then(module => ({ default: module.OAnQuanGame })));
+import { O_AN_QUAN_ACHIEVEMENTS, O_AN_QUAN_DROP_RATES, O_AN_QUAN_CONTROLS } from './o-an-quan/config';
+const NhayLoCoGame = packageLazy('nhay-lo-co', () => import('./nhay-lo-co').then(module => ({ default: module.NhayLoCoGame })));
+import { NHAY_LO_CO_ACHIEVEMENTS, NHAY_LO_CO_DROP_RATES, NHAY_LO_CO_CONTROLS } from './nhay-lo-co/config';
 
 export const GAME_REGISTRY: Record<string, GameMetadata> = {
   ...snakeCatalogEntries,
+  'o-an-quan': {
+    id: 'o-an-quan',
+    title: 'Ô Ăn Quan · Sân Đình',
+    shortDesc: 'Đấu trí rải sỏi 1vs1 · Bot AI, Ghép trận, Mã mời & Tiệm Skin',
+    description: 'Trò chơi dân gian Ô Ăn Quan phong cách Pixel Art sân đình Việt Nam. Rải sỏi tính nước ăn kép, bảo vệ Quan đầu ván, rải sinh khi hết quân. Hỗ trợ đấu Bot Tí Sún/Bờm, 2 người chung máy, tạo phòng mã 6 ký tự, ghép trận 1vs1 và đổi Kẹo Mạch Nha lấy bộ Skin Bi Ve, Xu Cổ, Ngọc Bích Rồng.',
+    category: 'Multiplayer',
+    difficulty: 'Trung Bình',
+    icon: '🪨',
+    bannerGradient: 'from-amber-900 via-orange-950 to-stone-950',
+    themeColor: '#f59e0b',
+    tags: ['Game mới', 'Dân Gian', 'Ô Ăn Quan', '1vs1', 'Pixel Art', 'Mã mời'],
+    supportsAI: true,
+    multiplayer: true,
+    controls: O_AN_QUAN_CONTROLS,
+    achievements: O_AN_QUAN_ACHIEVEMENTS,
+    dropRates: O_AN_QUAN_DROP_RATES,
+    component: OAnQuanGame,
+  },
+  'nhay-lo-co': {
+    id: 'nhay-lo-co',
+    title: 'Nhảy Lò Cò · Ngõ Nhỏ',
+    shortDesc: 'Thảy Chàm, nhảy 1-2 chân & Cất Nhà 1vs1 · Đổi Skin Gạch Đôi',
+    description: 'Đua xây 3 Ngôi Nhà trên bàn Lò Cò 10 ô truyền thống! Canh lực thảy Chàm, bấm nhịp 1 chân / 2 chân vượt chướng ngại vật. Tích lũy Xu và Kẹo Mạch Nha tại Tiệm Tạp Hóa Cổng Trường để thay Skin Ô Viên Gạch Đôi (Gạch Bông, Lá Sen, Gốm Bát Tràng), sân chơi Hội An và nhân vật Pixel.',
+    category: 'Multiplayer',
+    difficulty: 'Dễ',
+    icon: '🦘',
+    bannerGradient: 'from-orange-900 via-rose-950 to-stone-950',
+    themeColor: '#fbbf24',
+    tags: ['Game mới', 'Dân Gian', 'Nhảy Lò Cò', '1vs1', 'Pixel Art', 'Skin Gạch Đôi'],
+    supportsAI: true,
+    multiplayer: true,
+    controls: NHAY_LO_CO_CONTROLS,
+    achievements: NHAY_LO_CO_ACHIEVEMENTS,
+    dropRates: NHAY_LO_CO_DROP_RATES,
+    component: NhayLoCoGame,
+  },
   'tank-clash': {
     id:'tank-clash', title:'Tank Clash', shortDesc:'Xe tăng bắn bật tường · Luyện bot và online 1v1, 2v2',
     description:'Đọc góc bắn, dùng tường để đưa đạn tới đối thủ và đỡ đạn bằng khiên. Học qua năm bài ngắn, luyện 1v1 hoặc đồng đội 2v2 với bot, tạo phòng và tìm trận online bằng tài khoản ArcadeX. Miễn phí; chưa có thưởng hoặc bảng xếp hạng.',

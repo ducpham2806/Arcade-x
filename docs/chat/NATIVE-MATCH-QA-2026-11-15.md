@@ -44,3 +44,13 @@ Các lượt đầu sửa bộ dựng test (locator button, Origin header, Deno 
 ## Phần chưa nghiệm thu
 
 Chủ dự án trả lời đã đăng nhập2tab, nhưng hai tab review trong Chrome profile xuan duc vẫn được quan sát ở form login, chưa có nút Đăng xuất. Đang xác định đúng phiên/handoff để kiểm hai account thật trên backend cuối. Không ghi tạo/join/gửi/nhận staging thành PASS khi chưa thấy hành vi đó. Còn thiết bị thật/bàn phím ảo/mạng yếu và full CI remote trước merge; **không merge khi chưa được chủ dự án yêu cầu**. Tank WS ở localhost không phải phép đo Render/hai mạng. Không nâng plan hoặc deploy backend production từ nhiệm vụ này.
+
+## Tích hợp main để CI / PR38
+
+PR38draft source native local64f5d95/remote1da582d cùngtree0505fdd. Maina55af6e đã thêm Snake/Auth/hosting/Folk; xử lý xung đột trên nhánh chat, giữ nguyên ba tài liệu Snake của main và archive bàn giao/log/tóm tắt main nguyên văn. Main không bị merge/push. Có thêm kiểm inset64px cho khung chat mobile, drag và speech dùng cùng vùng chừa hosting, không đổi branding.
+
+CI upstream bị chặn bởi GDD Folk24429ký tự và thẻ thứ8 chưa route: chuyển nguyên văn sang archive, tạo thẻ tiếp quản ngắn, thêm route PROJECT-PLAN và kiểm inventory8tên chính xác + mọi thẻ đều có route; budget6500 giữ nguyên. Sửa2lỗi cúpháp kế thừa: ký tự `>` trong JSX Ô Ăn Quan và non-null assertion TypeScript trong test.mjs; không đổi luật/assertion. Nguồn kết hợp lint/build/commonChat3/nativeChat3 đã qua (native44,1s). DirectNode testFolk không resolve import extensionless; bundle bằng esbuild cho5/6PASS,1FAIL ở nước đi Ô Ăn Quan đầu tiên (`res.ok` false). Đây là ca ngoài scopechat kế thừa main, giữ FAIL, chưa đổi engine/test để xanh. Không gọi tất cả game đã nghiệm thu.
+
+Đã dùng Studio backend-architect/game-qa-playtest và vai tròqa-lead. Graph ASTlocal src/chat15file/124node/270edge bằng CLI0.9.104 có sẵn (khác pin được tài liệu hóa0.9.108), refreshed trên file hiện tại; queryseeduseChatRoom depth1/budget700 cho9node/15edge, đối chiếu3adapter gọi host chung. CSS/ba server core ngoài graph được tra nguồn hẹp và kiểm runtime/test; graph không chứng minh Auth hoặc staging.
+
+Kiểm trên nguồn kết hợp cuối: `test:readability` chặn rawCanvastext tại Nhảy Lò Cò110 (Ô Ăn Quan179 cùng loại), nên fullfast chưa PASS. `test:artwork` chạy riêng báo `Missing metadata: o-an-quan`; cả2ID mới chưa có bộ SVG trong public/game-art. Không loại hai game khỏi vòng kiểm hoặc thêm art/exception giả để xanh; renderer Folk giữ nguyên main. Hai phép kiểm inventory cập nhật24→26 vẫn kiểm mọi entry/asset/geometry và bắt buộc2ID mới. Các lỗi này cần được xử lý ở module Folk trước merge; bản chat/nghiệm thu staging không là nghiệm thu Folk.

@@ -2,6 +2,8 @@
 
 Cài đầy đủ, không nạp tất cả vào ngữ cảnh. [Cách tích hợp](INSTALLATION.md); [manifest nguồn](SOURCE-MANIFEST.md) chỉ khi kiểm nguồn/cập nhật. ArcadeX dùng engine web riêng theo [project.md](../../project.md), không chọn Godot/Unity chỉ vì có skill.
 
+Chủ dự án xác nhận hai nguồn Studio/Graphify ngày13/11; [quy ước và cài Graphify](GRAPHIFY.md) cho tra quan hệ code, dùng cùng skill/vai trò phù hợp.
+
 ## Đường đọc ngắn
 
 | Công việc | Skill nên đọc trước |

@@ -7,7 +7,7 @@ import {usePlayer} from '../context/PlayerContext';
 import {SocialChatThread} from '../components/SocialChatThread';
 import {useChatDrag} from './useChatDrag';
 import {useDialogFocus} from '../launcher/useDialogFocus';
-import {protectedBoxes,overlaps} from './placement';
+import {chatBottomInset,protectedBoxes,overlaps} from './placement';
 import {ChatSpeeches} from './ChatSpeeches';
 import '../components/social.css';
 import './chat.css';
@@ -22,11 +22,11 @@ export function ChatShell(){
  const bubble=useChatDrag(`${profile.id}:lobby`,false),panelDrag=useChatDrag(`${profile.id}:${activeGameId||'lobby'}:panel`,false,Math.min(320,innerWidth-24));
  const section=useDialogFocus(chat.close,isChatOpen&&!chat.expanded&&geometry.full),root=useRef<HTMLDivElement>(null);
  useEffect(()=>{const layout=()=>{
-  const width=window.visualViewport?.width||innerWidth,height=window.visualViewport?.height||innerHeight;
+  const width=window.visualViewport?.width||innerWidth,height=Math.max(100,(window.visualViewport?.height||innerHeight)-chatBottomInset());
   let left=16,full=width<740&&(!!activeGameId||height<innerHeight-100);
   if(activeGameId&&!full){const boxes=protectedBoxes();const choices=[16,width-336];const top=80,h=Math.min(large?440:360,height-104);const safe=choices.find(x=>!boxes.some(b=>overlaps({x,y:top},320,h,b)));if(safe===undefined)full=true;else left=safe;}
   setGeometry({width,height,left,full});
- };layout();const resize=new ResizeObserver(layout);const game=document.getElementById('game-viewport-stage');if(game)resize.observe(game);window.addEventListener('resize',layout);window.visualViewport?.addEventListener('resize',layout);return()=>{resize.disconnect();window.removeEventListener('resize',layout);window.visualViewport?.removeEventListener('resize',layout);};},[activeGameId,isChatOpen,large,chat.expanded]);
+ };layout();const inset=new MutationObserver(layout);inset.observe(document.documentElement,{attributes:true,attributeFilter:['style']});const resize=new ResizeObserver(layout);const game=document.getElementById('game-viewport-stage');if(game)resize.observe(game);window.addEventListener('resize',layout);window.visualViewport?.addEventListener('resize',layout);return()=>{inset.disconnect();resize.disconnect();window.removeEventListener('resize',layout);window.visualViewport?.removeEventListener('resize',layout);};},[activeGameId,isChatOpen,large,chat.expanded]);
  useEffect(()=>{if(!isChatOpen||chat.expanded||geometry.full||!panelDrag.position)return;const r=root.current?.querySelector('section')?.getBoundingClientRect();if(r&&activeGameId&&protectedBoxes().some(b=>overlaps({x:r.left,y:r.top},r.width,r.height,b)))panelDrag.reset();},[panelDrag.position,isChatOpen]);
  const channel=chat.channel;
  const roomChannel=chat.room&&!chat.room.unavailable?{scope:'room' as const,target:chat.room.id,selfId:chat.room.selfId,transport:chat.room.transport,maxLength:chat.room.transport?500:1000}:null;

@@ -26,6 +26,7 @@ test('phone: full chat, input above keyboard viewport, close and bubble remain i
   await page.getByRole('button',{name:'Tank PvP',exact:true}).click();await page.locator('.game-chat-bubble').click();await expect(page.locator('.chat-floating-panel')).toBeVisible();
   await page.screenshot({path:`test-results/chat-review/chat-${viewport.width}.png`});
   const rect=await page.locator('.chat-floating-panel').boundingBox();expect(rect!.x).toBeGreaterThanOrEqual(0);expect(rect!.x+rect!.width).toBeLessThanOrEqual(viewport.width+1);expect(rect!.y+rect!.height).toBeLessThanOrEqual(viewport.height+1);
+  if(viewport.width<740){await page.evaluate(()=>document.documentElement.style.setProperty('--arcadex-host-bottom-inset','64px'));await expect.poll(async()=>{const r=await page.locator('.chat-floating-panel').boundingBox();return r!.y+r!.height;}).toBeLessThanOrEqual(viewport.height-64);await page.evaluate(()=>document.documentElement.style.removeProperty('--arcadex-host-bottom-inset'));}
   await page.getByLabel('Nội dung tin nhắn').fill('Chơi vui nhé');await page.getByRole('button',{name:'Thu chat về bubble'}).click();await expect(page.locator('.game-chat-bubble')).toBeVisible();await page.screenshot({path:`test-results/chat-review/game-${viewport.width}.png`});
  }
 });

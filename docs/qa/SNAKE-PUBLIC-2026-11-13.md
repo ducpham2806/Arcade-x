@@ -13,10 +13,23 @@ Chủ dự án yêu cầu đưa game ra sảnh, merge main và phát hành Netli
 
 Build production và bản rollback qua. Chrome với Auth fixture tải gói 16 JS/CSS + 20 media, retry lỗi 503, tắt mạng và reload sảnh rồi mở game, sprite/âm thanh và thao tác joystick/Dash qua. Hai namespace khách/tài khoản đọc đúng tiến trình. JS game khoảng 131 KB raw, chunk lớn nhất khoảng 468 KB raw, graph JS launcher khoảng 301 KB gzip ước tính. [Bằng chứng ứng viên trước phát hành](SNAKE-CATALOG-2026-11-12.md).
 
-[PR #29](https://github.com/ducpham2806/Arcade-x/pull/29) qua [CI #47](https://github.com/ducpham2806/Arcade-x/actions/runs/43321055153), cả `verify` và `snake_ui` success ở head `a215da6`. Hai lượt trước bắt lỗi đổi tài khoản xuyên tab. Client dùng phiên từ sự kiện SDK để tránh đọc lại phiên cũ, đồng thời hủy restore đã lỗi thời. Sáu ca Auth session và sáu ca Snake UI save local qua. Lượt kiểm bổ sung `tests/auth` có 22 ca không qua. Ca khách mở tab đăng ký tái hiện trên main cũ `9061bfd` với cùng locator, các ca khác chưa đối chiếu hết.
+PR29 đã merge main19af480. Sau sửa cross-tab Auth, PR31 gồm cả cấu hình Studio/Graphify từ PR30 được retargetmain và merge8320385 sau fullCI50 success trên head1909fa6 (verify + snake_ui). Tree merge giống tree đã kiểm; PR30 đã tích hợp/đóng. [QA Auth](SNAKE-AUTH-XTAB-2026-11-13.md).
 
-## Production · 13/11/2026
+## Xác minh public · 13/11/2026
 
-- Merge `19af480ab627c5e31f1e8a5540643c499cee62d2`, cây mã trùng head đã qua CI. [Netlify production](https://app.netlify.com/projects/arcade-x/deploys/6af6c33ffa88465933ad464a) là bản đang Published của main, lúc 14:59:49 GMT+7.
-- Chrome cảm ứng mô phỏng 390×844 trên site công khai. Đã giải mã icon/banner, tải 16 tệp code/CSS và 20 media, ngắt mạng thật trong context rồi reload. Màn 1 chạy, sprite vẽ vào Canvas, joystick/Dash hiện và chạm tới được, phát âm thử, thoát về sảnh và thấy mục chơi gần đây.
-- JS game và cả 20 media công khai khớp SHA-256 với build local. Kiểm trong phiên khách cô lập. Còn Android/iPhone thật, người mới chơi và JWT/save cloud theo [thẻ Snake](../plans/SNAKE.md).
+- Nguồn phát hành: `8320385ce09d873e5c209758b19d3383179990b3`. [Bản public](https://arcade-x.netlify.app/).
+- Netlify API `/api/v1/sites/arcade-x.netlify.app` xác nhận `published_deploy`: id `6af6f590d7b4bd3516a37885`, state `ready`, context `production`, commit_ref đúng8320385, Published **18:34:34 GMT+7**. Không suy deploy từ trạng thái merge.
+- Tải HTML/manifest và36URL code/media qua HTTPS: **3.047.410byte** khớp byte với build đã kiểm của1909fa6; source merge cùng tree. Entry `index-fDtlq_tI.js`,16JS/CSS và20media đúng manifest. SHA-256/size từng file lưu trong artifact local.
+- Chromium156/Playwright1.64, trình duyệt mới, guest thật, không Authfixture: một card Snake, icon/banner decode, favorite; detail390×844 tải đủ36tệp vào cache. Đã xem ảnh desktop/detail/gameplay trước khi kết luận.
+- Tắt mạng Chromium + navigator, reload thật từ service worker; probe URL không cache thất bại. Mở màn1, timer tiến, thao tác joystick/Dash, công cụ QA ẩn; thử âm thanh có thông báo đã phát; thoát về Chơi gần đây. Favorite còn sau reload. Không pageerror và không gọi `snake-complete`.
+- Probe online riêng kiểm CTA detail và tâm joystick/Dash; ảnh online kiểm thêm overlay hosting. Đây là pointer trong viewport mobile Chromium, không phải điện thoại/cảm ứng hay nghe âm thanh bằng tai trên thiết bị thật.
+
+Evidence ngoài git tại `/workspace/tooling/snake-release-live-20261113/`: `report.json` (6nhóm PASS), `asset-proofs.json`, `online-controls.json`, script tái lập và4ảnh. Log `/tmp/snake-public-live.log`, `/tmp/snake-public-online.log`. Browser lượt đầu vướng proxyCA; dùng CA do môi trường cung cấp trong NSS đúng quyền để kiểm lại, giữ xác thực TLS; không bật ignoreHTTPS/certificate-errors. Script/các file output không thay application hoặc backend.
+
+FullCI51 sau merge trên8320385 đã success cả verify/snake_ui; fullCI50 đã xanh trước merge. Docs-only checkpoint ở nhánh `codex/snake-release-verification-20261113`, kiểm docs/structure/diff riêng.
+
+## Còn nghiệm thu
+
+SN-R2b đã phát hành và smoke public; chưa đóng toàn bộ game. Android/iPhone/Safari thật, human playtest10màn, FPS/heap/audio và live DB/JWT/cloud save giữ theo [thẻ Snake](../plans/SNAKE.md). Không tự mở quyền backend/grant/reward từ kết quả client.
+
+Quan sát S3: badge “Powered by Netlify” che phần phải footer detail và phần dưới Dash/chữ hướng dẫn ở390×844online. Tâm CTA/joystick/Dash vẫn thao tác được; offline không thấy badge. [Bug/tái hiện và AC](../../production/qa/bugs/BUG-NETLIFY-BADGE-MOBILE.md) theo dõi riêng; không gọi giao diện mobile đã nghiệm thu hoàn toàn.

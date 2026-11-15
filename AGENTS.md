@@ -6,6 +6,7 @@
 - Dùng duy nhất `docs/WORKLOG.md` làm nhật ký chính. Trước chuyển việc: tóm tắt task xong (kết quả, quyết định, kiểm tra, giới hạn, bước tiếp) vào `docs/COMPLETED.md`; thu gọn log còn tối đa 3 mục; giữ chi tiết nguyên văn trong `docs/archive/`; cập nhật bàn giao rồi mới bắt đầu việc mới. Quy trình/budget: `docs/WORKFLOW.md`.
 - Mọi phần hoàn tất ghi ngày, nhánh, việc/file, kiểm tra thật và phần còn dở; commit cùng thay đổi. Phân biệt đã code/merge/deploy/nghiệm thu; không dùng báo cáo cũ chứng minh production hiện tại. Trả lời tiếng Việt.
 - Game Studio đã cài ở `.agents/game-studio/`; tra `docs/studio/INDEX.md`, chỉ nạp 1–3 skill phù hợp. Dùng `project.md` và bàn giao hiện có thay các template `project.yaml`/active-session của nguồn. Quyết định người dùng và quy tắc ArcadeX ưu tiên; không chạy initializer ghi đè dự án.
+- Chủ dự án xác nhận dùng Game_Studio_Agent và Graphify ngày 13/11/2026. Mỗi task chọn skill/vai trò Studio phù hợp; với câu hỏi quan hệ code, dùng graph đúng module nếu có, kiểm độ mới rồi truy vấn có budget. Thiếu graph thì dựng AST local theo `docs/studio/GRAPHIFY.md`; tra văn bản hẹp cho phần graph chưa phủ. Ghi skill/role, phạm vi graph và kiểm chứng trong bàn giao; không nạp toàn thư viện mỗi phiên.
 - Làm trên nhánh riêng, theo module được chủ dự án duyệt; commit/push nhánh làm việc. Chỉ merge `main` khi chủ dự án yêu cầu (Netlify tự deploy); chạy đủ CI trước merge. Không tắt/nới test để xanh.
 
 ## Giao diện (giữ nguyên quy tắc đã duyệt)
