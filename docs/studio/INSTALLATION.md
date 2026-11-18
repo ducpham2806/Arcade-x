@@ -2,15 +2,15 @@
 
 ## Nguồn và phạm vi
 
-Đã cài toàn bộ repo [Game_Studio_Agent](https://github.com/ducpham2806/Game_Studio_Agent) tại commit `c5dac4629d4f61972cc16033bbc13b4ac8e16aaa`, ngày 06/11/2026: **116 skill, 21 định nghĩa vai trò, 4 rules, 6 template**, scripts/docs và tài nguyên đi kèm. Thư viện nằm `.agents/game-studio/`; [SOURCE-MANIFEST](SOURCE-MANIFEST.md) ghi đường dẫn/blob 297 file để kiểm lại.
+Ngày 18/11/2026 cập nhật theo `main` của [Game_Studio_Agent](https://github.com/ducpham2806/Game_Studio_Agent) tại `fa7b1dbb342983bc1fe76f4faa276fef099f57d3`. Snapshot có **125 skill, 21 vai trò, 4 rules, 7 mẫu Markdown** và tài nguyên nguồn. [Manifest](SOURCE-MANIFEST.md) xác minh 340 blob Git. [Nguồn thành phần và giấy phép](../../.agents/game-studio/docs/UPSTREAM-SYNC.md) ghi AGAS 2.0.0, CCGS 1.3.0, Agency Agents và PixelFX. [Bản giấy phép](UPSTREAM-LICENSES.md).
 
-GitHub connector xác nhận commit; bản repo local cùng commit và sạch được dùng qua `skill-installer --method git` với ánh xạ URL tạm trong tiến trình. Không dùng credential mới hoặc sửa Git config toàn máy. Chủ dự án đã cho phép đưa toàn bộ thư viện từ repo private lên ArcadeX public ngày 06/11/2026. Skill được trải phẳng từ `skills/<nhóm>/<tên>/` thành `skills/<tên>/`; file bên trong giữ nguyên byte. Các thư mục còn lại giữ nguyên. Không chạy initializer upstream lên ArcadeX.
+File lấy từ cây Git đã định danh, giữ byte/mode và cách trải phẳng thư mục skill của ArcadeX. `graphify-out/` của repo nguồn là cache sinh sẵn, dùng [Graphify](GRAPHIFY.md) để dựng graph mới theo module. Giữ adapter và checkpoint ArcadeX. Initializer upstream chỉ được lưu làm tài liệu/tham chiếu.
 
 ## Bộ nhớ giữa các phiên
 
-Đây là **bộ nhớ bằng file trong dự án**, không phải nạp vĩnh viễn 116 skill vào bộ nhớ mô hình hay cài toàn máy. Repo đi theo checkout/nhánh; cần commit/push và checkout nhánh có bộ file này ở máy/session khác.
+Đây là **bộ nhớ bằng file trong dự án**, không phải nạp vĩnh viễn 125 skill vào bộ nhớ mô hình hay cài toàn máy. Repo đi theo checkout/nhánh; cần commit/push và checkout nhánh có bộ file này ở máy/session khác.
 
-Một skill đầu mối tại `.agents/skills/arcadex-studio/SKILL.md` dùng để tìm thư viện. Các skill đầy đủ ở ngoài thư mục tự discovery; agent mở đúng file qua [INDEX](INDEX.md). Cách này giữ đủ nội dung trên đĩa nhưng không tự chèn 116 mô tả vào mỗi phiên. Skill đầu mối sẽ có thể được phát hiện ở lượt tiếp theo; phiên hiện tại đã đọc trực tiếp các workflow cần dùng.
+Một skill đầu mối tại `.agents/skills/arcadex-studio/SKILL.md` dùng để tìm thư viện. Các skill đầy đủ ở ngoài thư mục tự discovery; agent mở đúng file qua [INDEX](INDEX.md). Cách này giữ đủ nội dung trên đĩa nhưng không tự chèn 125 mô tả vào mỗi phiên. Skill đầu mối sẽ có thể được phát hiện ở lượt tiếp theo; phiên hiện tại đã đọc trực tiếp các workflow cần dùng.
 
 21 vai trò được giữ làm playbook trong `agents/`, không tự biến thành subagent executable của Codex. Các adapter `.claude/agents`/`.claude/skills` cũ giữ nguyên; Claude dùng CLAUDE.md trỏ vào cùng thư viện. Không tự chạy 21 agent hoặc tải mọi engine khi bắt đầu việc.
 
@@ -29,8 +29,6 @@ Tất cả đầu vào điều phối đang dùng là `.md`. YAML/JSON/scripts/�
 
 ## Kiểm tra và cập nhật
 
-Ngày07/11/2026, yêu cầu xác nhận lại của chủ dự án: GitHub compare c5dac462→main trả identical/ahead0/behind0; doc checker297blob/116skill/21role/4rules qua. Không có bản nguồn mới cần cài chồng. Toàn bộ định nghĩa agent/subagent và skill đã có trên đĩa; dùng playbook theo task, không khởi chạy21tiến trình hay nạp mọi nội dung vào mỗi phiên.
+`python3 scripts/check-docs.py` kiểm đường dẫn, budget, inventory và hash. `npm run test:claude` kiểm adapter cũ. Lần 18/11 đối chiếu 340 blob từ checkout upstream đã ghim, gồm `router/references/routing-table.md`. Kết quả này xác nhận bộ nguồn được nhập đúng. Các ví dụ engine và script chỉ chạy theo phạm vi task.
 
-`python3 scripts/check-docs.py` kiểm entrypoint/link/budget/nhật ký/số lượng/file nguồn đã cài. `npm run test:claude` kiểm adapter ArcadeX cũ. Validator tổng upstream hiện lỗi thiếu `router/references/routing-table.md` cả tại repo nguồn nguyên gốc và bản cài; đây là lỗi đường dẫn của validator, không phải kiểm chứng đã qua. Validator skill chuẩn đã kiểm 117/117 manifest hợp lệ; không coi đó là kiểm nghiệm tất cả ví dụ/script với ArcadeX. Mọi skill chọn dùng vẫn cần kiểm API/version theo source/lockfile hiện hành.
-
-Khi cập nhật thư viện: lấy commit đích rõ → đọc diff các skill/rules dùng thực tế → chạy installer vào thư mục tạm → so nguồn/collision → thay snapshot và manifest có chủ đích → kiểm docs/skill → ghi WORKLOG/COMPLETED. Không tự pull/cài dependency/chạy script upstream trong mọi phiên. Giữ `.claude/CCGS-NOTICE.md` và các notice/license đi kèm nguồn.
+Khi cập nhật thư viện: lấy commit đích rõ → đọc diff các skill/rules dùng thực tế → lấy snapshot trong thư mục tạm → so nguồn/collision → thay snapshot và manifest có chủ đích → kiểm docs/skill → ghi WORKLOG/COMPLETED. Không tự pull/cài dependency/chạy script upstream trong mọi phiên. Giữ `.claude/CCGS-NOTICE.md` và các notice/license đi kèm nguồn.

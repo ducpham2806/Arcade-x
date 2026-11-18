@@ -18,7 +18,7 @@ the skill's `name`. To install a skill, copy that `<name>/` folder (with its `re
 `scripts/`, `assets/` if present) into the agent's skills directory. Skill names are unique
 across this repository, so installing every skill into one flat directory is safe.
 
-**Install the router too.** The [`router/`](../router) folder is itself a skill (its `SKILL.md`
+**Install the router too.** The [`router/`](../skills/00-orchestration-and-workflows/router) folder is itself a skill (its `SKILL.md`
 is the dispatcher). Copy it in alongside the others so the agent can route requests:
 `cp -R router <agent-skills-dir>/router`. The bulk-install snippets below copy everything under
 `skills/`; add the router with the extra line shown for Claude Code.
@@ -30,7 +30,7 @@ is the dispatcher). Copy it in alongside the others so the agent can route reque
 
 The [`skills` CLI](https://www.npmjs.com/package/skills) is the package manager for the Agent
 Skills ecosystem. It detects the agents installed on your machine and installs the skills (the
-router plus all 77) into each one's skills directory — no clone required. It needs Node.js 22.20
+router plus all 79) into each one's skills directory — no clone required. It needs Node.js 22.20
 or later. Interactive runs ask which skills and agents to use; by default each agent directory is
 a symlink to one shared copy (add `--copy` for independent copies, `-y` to skip the prompts):
 
@@ -56,14 +56,14 @@ The sections below cover each agent's native or manual route if you'd rather not
 
 ## Claude Code (plugin — recommended)
 
-This repo is a Claude Code plugin marketplace (see [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json)),
+This repo is a Claude Code plugin marketplace (see [`.claude-plugin/marketplace.json`](https://github.com/gamedev-skills/awesome-gamedev-agent-skills/blob/c6ca6c4/.claude-plugin/marketplace.json)),
 so you can install it without cloning or copying files. Add the marketplace once:
 
 ```bash
 claude plugin marketplace add gamedev-skills/awesome-gamedev-agent-skills
 ```
 
-Easiest — install the router and all 77 skills in one command:
+Easiest — install the router and all 79 skills in one command:
 
 ```bash
 claude plugin install gamedev@awesome-gamedev-agent-skills
@@ -87,6 +87,13 @@ Add `--scope project` to `claude plugin marketplace add` and `claude plugin inst
 them in the project's settings and share them with your team. To pick up a new release, run
 `claude plugin marketplace update awesome-gamedev-agent-skills`, then
 `claude plugin update gamedev@awesome-gamedev-agent-skills` (or the plugin you installed).
+
+**Many skills installed?** Claude Code lists skill descriptions within a budget of 1% of the
+context window and cuts some descriptions when the list is longer. Install `router` plus your
+engine's bundle instead of `gamedev`, or raise the budget with the `skillListingBudgetFraction`
+setting (for example `0.02`) or the `SLASH_COMMAND_TOOL_CHAR_BUDGET` environment variable (a
+character count). See [Claude Code skills](https://code.claude.com/docs/en/skills). Other agents
+have similar limits, so the smaller install helps there too.
 
 ## Claude Code (manual copy)
 

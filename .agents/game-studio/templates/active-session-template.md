@@ -16,4 +16,5 @@
 
 ## 3. Hạng Mục Đang Chờ Xử Lý Tiếp Theo (Next Actions)
 1. Chạy `/start` hoặc `/project-stage-detect` cùng `game-studio-orchestrator` để rà soát dự án.
-2. Sử dụng `/brainstorm` hoặc `/team-combat`, `/team-ui`, `/team-level` để bắt đầu phát triển tính năng.
+2. Muốn có bản chơi được ngay: nói "make me a game" / chạy `/prototype` (brief một trang → game trình duyệt one-shot → chỉnh sau khi chơi → grow).
+3. Dự án cần Studio Mode: dùng `/brainstorm` hoặc `/team-combat`, `/team-ui`, `/team-level` để phát triển tính năng; bí thì chạy `/next-step`.

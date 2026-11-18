@@ -6,7 +6,7 @@ description: Use the installed Game Studio library for ArcadeX game planning, ga
 
 Locate the repository root from this skill (three parents). Read root `AGENTS.md` if it was not already provided, then `docs/SESSION-HANDOFF.md` and the one active card in `docs/plans/`. Technology and workflow configuration lives in `project.md`.
 
-Select only the 1–3 relevant playbooks through `docs/studio/INDEX.md`. The complete 116-skill library is at `.agents/game-studio/skills/<name>/SKILL.md`; bundled references/scripts are on demand. Do not load every skill or engine. Use `game-production-scrum` for task planning/closure, `game-qa-playtest` for verification, or `router` if the discipline is unclear. Source grouping paths were flattened; resolve names through the local index.
+Select only the 1–3 relevant playbooks through `docs/studio/INDEX.md`. The complete 125-skill library is at `.agents/game-studio/skills/<name>/SKILL.md`; bundled references/scripts are on demand. Do not load every skill or engine. Use `game-production-scrum` for task planning/closure, `game-qa-playtest` for verification, or `router` if the discipline is unclear. Source grouping paths were flattened; resolve names through the local index.
 
 The owner reaffirmed Game_Studio_Agent and Graphify on 2026-11-13. Use the relevant Studio role playbooks as well as skills; these files are not running agents. For structural code questions, use the scoped local graph workflow in `docs/studio/GRAPHIFY.md` and `.agents/skills/arcadex-graphify/SKILL.md`. Record which playbooks and graph scope informed the work.
 
