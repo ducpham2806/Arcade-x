@@ -1,6 +1,6 @@
 # Nhảy Lò Cò và Ô Ăn Quan
 
-Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-2026-11-14-v2.md) lưu luật, art, skin và thiết kế thưởng. FD-ON1 tiếp bản offline trên `codex/folk-duel-foundation` tiếp FD-L0 `20c5a72`, chờ anh chơi thử và duyệt.
+Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-2026-11-14-v2.md) lưu luật, art, skin và thiết kế thưởng. Bản offline và code FD-ON1 đã merge qua PR40 vào main `f154795` ngày 19/11 sau CI71. [Release](../qa/FOLK-CHAT-RELEASE-2026-11-19.md).
 
 ## Phạm vi và quyết định phải giữ
 
@@ -14,7 +14,7 @@ Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 
 - FD-L0 sửa preview/bot Ô Ăn Quan để giữ state đầu vào, kiểm bảo toàn 70 điểm, rải sinh/hốt tàn và chuyền tay. Artwork, chữ Canvas và preview DEV của cả hai game đã kiểm.
 - FD-L1 có bot/hai người chung máy, lưu sau mỗi lượt, mở lại, đấu lại và receipt thưởng cục bộ. Nhảy Lò Cò đủ thảy, một/hai chân, nhặt Chàm và xây Nhà. Ô Ăn Quan có tay bốc/rải từng viên, hiệu ứng ăn về mẹt theo ghế, cam/xanh ngọc và lịch sử sau reload.
-- Chi tiết và bằng chứng offline giữ ở [bản trước FD-ON1](../archive/FOLK-GAMES-PLAN-2026-11-19-before-online.md). CI #69 của bản trình diễn qua. Còn anh duyệt hình và kiểm thiết bị thật.
+- Chi tiết và bằng chứng offline giữ ở [bản trước FD-ON1](../archive/FOLK-GAMES-PLAN-2026-11-19-before-online.md). CI #69 của bản trình diễn qua. Anh duyệt merge ngày 19/11; còn kiểm thiết bị thật.
 
 ## Thứ tự triển khai và điểm duyệt
 
@@ -32,4 +32,4 @@ Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 - Nối adapter bubble vào Trận và lời cạnh HUD, gỡ khi rời/đổi tài khoản. Frontend QA bật bằng `VITE_FOLK_ONLINE=1` với backend staging. Luồng offline vẫn có ở build mặc định.
 - Đã áp schema, Edge và scheduler trên staging `khqipuipeawzlkqmdzdg`. Âm Auth/quyền RPC và scheduler 200 đã kiểm. Ngày 19/11 anh chọn để anh kiểm hai tài khoản sau.
 - [Báo cáo FD-ON1](../qa/FOLK-ONLINE-2026-11-19.md) giữ hợp đồng, test và giới hạn. [Bàn giao](../SESSION-HANDOFF.md) giữ kết quả chạy cuối.
-- Bước tiếp kiểm đủ bộ offline/online trên đúng nguồn, CI và hai tài khoản staging, sau đó anh chơi thử trước merge.
+- PR40 đã merge và Netlify Published. Tiếp theo anh kiểm hai tài khoản staging, thiết bị và latency thật. Folk online ở public tiếp tục theo cấu hình phát hành riêng.

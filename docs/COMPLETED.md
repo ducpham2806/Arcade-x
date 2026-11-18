@@ -2,11 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Folk và chat · bản review 19/11/2026
+## Folk và chat · merge/phát hành 19/11/2026
 
-- FD-L0/L1 có artwork, ván offline lưu/đấu lại và nhặt Chàm. Ô Ăn Quan thêm bốc/rải từng viên, mẹt và lịch sử hai ghế. Folk 12/12, UI 5/5. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), PR 40 nháp.
+- FD-L0/L1 có artwork, ván offline lưu/đấu lại và nhặt Chàm. Ô Ăn Quan thêm bốc/rải từng viên, mẹt và lịch sử hai ghế. Folk 12/12, UI 5/5. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), PR40/main `f154795` đã merge sau CI71, Netlify Published `6afe368bb6e8bc96958e23e5`. [Release](qa/FOLK-CHAT-RELEASE-2026-11-19.md).
 - FD-ON1 trên `codex/folk-duel-foundation` có Edge/Auth, CAS/PostgreSQL, queue, resume, rematch, scheduler và chat riêng. NLC server nhận từng thao tác. 21 ca Node và 7 ca browser cục bộ qua. Staging ref `khqipuipeawzlkqmdzdg` có Edge v2/scheduler 200 và RPC denial. Còn hai tài khoản thật, latency/thiết bị và duyệt, giữ cấp thưởng online tắt. [Báo cáo](qa/FOLK-ONLINE-2026-11-19.md).
-- Studio `fa7b1db`. PR 38 chat 27/27, preview Snake và native 3/3 cục bộ. Staging hai tester còn chờ; chưa merge.
+- Studio `fa7b1db`. PR 38 chat 27/27, preview Snake và native 3/3 cục bộ. PR38 đã vào main qua PR40. Staging hai tester do anh kiểm sau.
 - [Tóm tắt trước animation Ô Ăn Quan](archive/COMPLETED-2026-11-18-before-oaq-turn-art.md).
 
 ## Snake R01 · kỹ thuật ứng viên · 14/11/2026
