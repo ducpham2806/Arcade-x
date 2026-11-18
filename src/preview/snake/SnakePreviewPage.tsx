@@ -4,13 +4,13 @@ import {useAuth} from '../../context/AuthContext';
 import {GamePackageGate} from '../../components/GamePackageGate';
 import {GameErrorBoundary} from '../../components/common/GameErrorBoundary';
 import {snakePreview} from './metadata';import './preview.css';
-const GameWrapper=lazy(()=>import('../../games/GameWrapper').then(m=>({default:m.GameWrapper})));
+const SnakePreviewGame=lazy(()=>import('./SnakePreviewGame'));
 
 export function SnakePreviewPage(){
  const {currentUser,isLoggedIn,isGuest,openEntry,logout}=useAuth();const [playing,setPlaying]=useState(false);
  const owner=isLoggedIn&&!isGuest?currentUser?.id:null;
  useEffect(()=>{const stop=()=>setPlaying(false);window.addEventListener('arcadex:account_switching',stop);window.addEventListener('arcadex:auth_recovery',stop);return()=>{window.removeEventListener('arcadex:account_switching',stop);window.removeEventListener('arcadex:auth_recovery',stop);};},[]);
- if(playing&&owner)return <GameErrorBoundary onExit={()=>setPlaying(false)}><GamePackageGate game={snakePreview} onExit={()=>setPlaying(false)}><Suspense fallback={<p className="snake-preview-loading" role="status">Đang mở Rắn Săn Mồi…</p>}><GameWrapper key={owner} gameMeta={snakePreview} onExit={()=>setPlaying(false)}/></Suspense></GamePackageGate></GameErrorBoundary>;
+ if(playing&&owner)return <GameErrorBoundary onExit={()=>setPlaying(false)}><GamePackageGate game={snakePreview} onExit={()=>setPlaying(false)}><Suspense fallback={<p className="snake-preview-loading" role="status">Đang mở Rắn Săn Mồi…</p>}><SnakePreviewGame key={owner} onExit={()=>setPlaying(false)}/></Suspense></GamePackageGate></GameErrorBoundary>;
  return <main className="snake-preview-page">
   <header className="snake-preview-nav"><a href="/" aria-label="Về ArcadeX">Arcade<span>X</span></a><span>BẢN PHÁT TRIỂN</span><button onClick={()=>owner?void logout():openEntry('login')}>{owner?'Đổi tài khoản':'Đăng nhập'}</button></header>
   <section className="snake-preview-hero" aria-labelledby="snake-preview-title">

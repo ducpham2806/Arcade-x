@@ -2,12 +2,13 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## CH0–CH4 · code/QA local + backend staging, chờ2tester · 15/11/2026
+## Studio và CH0–CH4 · 18/11/2026 · PR 38 nháp
 
-- Nhánh codex/chat-bubble-wireframe; wireframe đã duyệt14/11, user yêu cầu native3game15/11.
-- Sảnh/bubble theo owner, kéo/thu/phóng/unread/nháp/input; chat riêng Tank/Nối Từ/Hải Chiến, ID/receipt/rate, speech tránh vùng chơi.
-- NativeUI3/commonUI3, Tank70/WS18, Word54, Battleship/build/lint/bundle qua. Supabase staging đã có Word4/Battleship2/schema và12probe Auth-negative.
-- Chưa positive2account, thiết bị thật, fullCI/merge/production. [QA hiện tại](chat/NATIVE-MATCH-QA-2026-11-15.md); [tóm tắt trước native](archive/COMPLETED-2026-11-15-before-native-chat-staging.md).
+- Studio nguồn `fa7b1db`, 125 skill/21 vai trò/340 blob kiểm hash. Nhánh `codex/chat-all-games`.
+- Bubble chung ở sảnh, 27/27 launcher, Snake preview; kéo tránh iframe. Chat chung 3/3, chat trận Tank/Nối Từ/Hải Chiến 3/3 cục bộ.
+- Word/Battleship đã có schema và Edge trên staging, 12 probe Auth-negative qua ngày 15/11. [QA](chat/NATIVE-MATCH-QA-2026-11-15.md).
+- Còn hai tài khoản staging, thiết bị thật, CI Folk; chưa merge. [Kế hoạch Folk](plans/FOLK-GAMES-PLAN.md) chờ duyệt.
+- [Tóm tắt trước mở rộng](archive/COMPLETED-2026-11-18-before-all-game-chat.md).
 
 ## Snake R01 · kỹ thuật ứng viên · 14/11/2026
 

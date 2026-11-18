@@ -63,6 +63,7 @@ const evidence='test-results/snake-baseline';
   report.checks.push('root service worker preserves deep preview route without a duplicate registration');
   await context.close();
   report.media=await checkPreviewMedia(browser,origin,evidence);
+  report.checks.push('built registered preview opens and closes the Snake chat channel');
   report.checks.push('built registered preview stages media, renders during delay, retries one WAV and aborts on exit');
   report.status='PASS';console.log(JSON.stringify({status:report.status,checks:report.checks,initialJs:report.views.map(({viewport,scriptRaw,gzipEstimate})=>({viewport,scriptRaw,gzipEstimate}))}));
  }finally{

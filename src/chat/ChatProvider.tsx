@@ -1,14 +1,15 @@
 import React,{useEffect,useMemo,useRef,useState,useSyncExternalStore} from 'react';
 import {usePlayer} from '../context/PlayerContext';
 import {useGameSession,useLauncherUi} from '../context/GameContext';
-import {ChatContext,type ChatContextValue,type ChatRoom} from './ChatContext';
+import {ChatContext,type ChatContextValue,type ChatGame,type ChatRoom} from './ChatContext';
 import {ChatStore,channelKey,type Channel} from './chat-store';
 import {releaseChatInput} from './input';
-export function ChatProvider({children}:{children:React.ReactNode}){
- const {profile}=usePlayer();return <OwnerChatProvider key={profile.id} owner={profile.id}>{children}</OwnerChatProvider>;
+export function ChatProvider({children,previewGame}:{children:React.ReactNode;previewGame?:ChatGame}){
+ const {profile}=usePlayer(),{activeGameId}=useGameSession();
+ return <OwnerChatProvider key={profile.id} owner={profile.id} activeGameId={previewGame?.id??activeGameId} previewGame={previewGame}>{children}</OwnerChatProvider>;
 }
-function OwnerChatProvider({owner,children}:{owner:string;children:React.ReactNode}){
- const {activeGameId}=useGameSession(),{isChatOpen,openChat,toggleChat}=useLauncherUi();
+function OwnerChatProvider({owner,activeGameId,previewGame,children}:{owner:string;activeGameId:string|null;previewGame?:ChatGame;children:React.ReactNode}){
+ const {isChatOpen,openChat,toggleChat}=useLauncherUi();
  const [room,setRoom]=useState<ChatRoom|null>(null),[selected,select]=useState<Channel|null>(null),[expanded,setExpanded]=useState(false),[speechEnabled,setSpeechEnabled]=useState(true);
  const store=useMemo(()=>new ChatStore(owner),[owner]);useSyncExternalStore(store.subscribe,store.snapshot,store.snapshot);
  const previous=useRef<string|null|undefined>(undefined);
@@ -22,6 +23,6 @@ function OwnerChatProvider({owner,children}:{owner:string;children:React.ReactNo
  useEffect(()=>()=>store.dispose(),[store]);
  const close=()=>{if(selected?.scope==='inbox')select(null);setExpanded(false);if(isChatOpen)toggleChat();requestAnimationFrame(()=>document.querySelector<HTMLElement>('.game-chat-bubble,.chat-launcher-bubble')?.focus({preventScroll:true}));};
  const open=(c?:Channel)=>{releaseChatInput();if(c)select(c);if(!isChatOpen)openChat();};
- const value:ChatContextValue={store,room,setRoom,channel,select,expanded,expand:()=>{releaseChatInput();setExpanded(true);if(!isChatOpen)openChat();},compact:()=>{if(selected?.scope==='inbox')select(null);setExpanded(false);},open,close,unread:store.unread(),speechEnabled,setSpeechEnabled};
+ const value:ChatContextValue={activeGameId,previewGame,store,room,setRoom,channel,select,expanded,expand:()=>{releaseChatInput();setExpanded(true);if(!isChatOpen)openChat();},compact:()=>{if(selected?.scope==='inbox')select(null);setExpanded(false);},open,close,unread:store.unread(),speechEnabled,setSpeechEnabled};
  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }

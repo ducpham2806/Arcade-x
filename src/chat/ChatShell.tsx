@@ -2,7 +2,7 @@ import {releaseChatInput} from './input';
 import React,{Suspense,useEffect,useRef,useState} from 'react';
 import {MessageCircle,Minus,Maximize2,Scaling,Pin} from 'lucide-react';
 import {useChat} from './ChatContext';
-import {useGameSession,useLauncherUi} from '../context/GameContext';
+import {useLauncherUi} from '../context/GameContext';
 import {usePlayer} from '../context/PlayerContext';
 import {SocialChatThread} from '../components/SocialChatThread';
 import {useChatDrag} from './useChatDrag';
@@ -17,7 +17,7 @@ export function ChatInputBoundary({children}:{children:React.ReactNode}){
  return <div data-chat-ui="true" className="chat-input-boundary" onFocusCapture={releaseChatInput} onKeyDownCapture={e=>{if(e.key==='Escape'){e.preventDefault();chat?.close();}e.stopPropagation();}} onKeyUpCapture={e=>e.stopPropagation()} onPointerDown={e=>e.stopPropagation()}>{children}</div>;
 }
 export function ChatShell(){
- const chat=useChat()!,{activeGameId}=useGameSession(),{isChatOpen,activeModal}=useLauncherUi(),{profile}=usePlayer();
+ const chat=useChat()!,{activeGameId}=chat,{isChatOpen,activeModal}=useLauncherUi(),{profile}=usePlayer();
  const [geometry,setGeometry]=useState({width:innerWidth,height:innerHeight,left:16,full:!!activeGameId&&innerWidth<740}),[large,setLarge]=useState(false);
  const bubble=useChatDrag(`${profile.id}:lobby`,false),panelDrag=useChatDrag(`${profile.id}:${activeGameId||'lobby'}:panel`,false,Math.min(320,innerWidth-24));
  const section=useDialogFocus(chat.close,isChatOpen&&!chat.expanded&&geometry.full),root=useRef<HTMLDivElement>(null);
