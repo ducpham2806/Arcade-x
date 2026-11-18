@@ -5,8 +5,10 @@ import {
   applyOaqMove,
   cellPointValue,
   createInitialOaqState,
+  getOaqTray,
   getValidOaqMoves,
   previewOaqLandingCell,
+  recordOaqTurn,
 } from '../../src/games/o-an-quan/rules.ts';
 import { chooseOaqBotMove } from '../../src/games/o-an-quan/ai.ts';
 import {
@@ -25,12 +27,46 @@ import {
 } from '../../src/games/folk-duel/economy.ts';
 import { FolkRoomServer, normalizeRoomCode } from '../../src/games/folk-duel/server.ts';
 import { isNlcOfflineState, isOaqOfflineState, loadOfflineMatch, saveOfflineMatch } from '../../src/games/folk-duel/offlineMatch.ts';
+import { buildOaqFrames } from '../../src/games/o-an-quan/turnAnimation.ts';
 
 function totalOaqPoints(state) {
   const board = state.cells.reduce((total, _, index) => total + cellPointValue(state, index), 0);
   const outstandingDebt = state.finished ? 0 : state.debt.P1 + state.debt.P2;
   return board + state.scores.P1 + state.scores.P2 - outstandingDebt;
 }
+
+test('Ô Ăn Quan: từng bước giữ thứ tự, chuyển đúng quân vào mẹt và ghi lịch sử', () => {
+  const before = {
+    ...createInitialOaqState(),
+    cells: [0, 1, 0, 0, 3, 0, 0, 4, 0, 0, 0, 0],
+    scores: { P1: 22, P2: 20 },
+    turnNumber: 3,
+  };
+  const original = structuredClone(before);
+  const move = { cellIndex: 1, direction: 'CW' };
+  const result = applyOaqMove(before, 'P1', move);
+  assert.equal(result.ok, true);
+  const frames = buildOaqFrames(before, result.steps);
+  assert.deepEqual(frames.map(({ step }) => [step.type, step.cellIndex]), [
+    ['pickup', 1], ['drop', 2], ['capture', 4], ['capture', 6],
+  ]);
+  assert.equal(frames[0].before.cells[1], 1);
+  assert.equal(frames[0].after.cells[1], 0);
+  assert.equal(frames[1].after.cells[2], 1);
+  assert.deepEqual(getOaqTray(frames[2].after, 'P1'), { dan: 25, quan: 0 });
+  assert.deepEqual(getOaqTray(frames[3].after, 'P1'), { dan: 25, quan: 1 });
+  assert.deepEqual(getOaqTray(frames[3].after, 'P2'), { dan: 20, quan: 0 });
+  assert.deepEqual(frames.at(-1).after.cells, result.nextState.cells);
+  assert.deepEqual(before, original);
+
+  const next = recordOaqTurn(before, move, result.nextState, result.steps);
+  assert.ok(isOaqOfflineState(JSON.parse(JSON.stringify(next))));
+  assert.deepEqual(next.history, [{
+    turn: 3, seat: 'P1', move, drops: [2],
+    captures: [{ cellIndex: 4, points: 3, quan: false }, { cellIndex: 6, points: 10, quan: true }],
+  }]);
+  assert.deepEqual(getOaqTray(next, 'P1'), { dan: 25, quan: 1 });
+});
 
 test('Ô Ăn Quan: khởi tạo 70 điểm (2 Quan x 10 + 10 Dân x 5) và rải quân hợp lệ', () => {
   const s0 = createInitialOaqState();

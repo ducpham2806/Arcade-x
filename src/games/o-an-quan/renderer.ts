@@ -1,6 +1,7 @@
+import { readableCanvasText } from '../../accessibility/canvasText';
 import { getSkinById } from '../folk-duel/skins-catalog';
-import type { EquippedFolkSkins } from '../folk-duel/types';
-import { cellTotalStones, type OaqState } from './rules';
+import type { EquippedFolkSkins, FolkSeat } from '../folk-duel/types';
+import { cellTotalStones, getOaqTray, type OaqState } from './rules';
 
 export interface OaqCellRect {
   idx: number;
@@ -12,15 +13,23 @@ export interface OaqCellRect {
 }
 
 export const BOARD_W = 640;
-export const BOARD_H = 300;
+export const BOARD_H = 394;
+const TABLE_TOP = 47;
+const TABLE_H = 300;
+
+export const OAQ_SEAT_COLOR = { P1: '#ffbc73', P2: '#79e2cb' };
+
+export function getOaqTrayRect(seat: FolkSeat) {
+  return { x: 110, y: seat === 'P2' ? 5 : TABLE_TOP + TABLE_H + 4, w: 420, h: 38 };
+}
 
 export function getOaqCellRects(): OaqCellRect[] {
   const rects: OaqCellRect[] = [];
   const padX = 24;
-  const padY = 36;
+  const padY = TABLE_TOP + 26;
   const quanW = 86;
-  const cellW = (BOARD_W - padX * 2 - quanW * 2) / 5; // 84px
-  const cellH = (BOARD_H - padY * 2) / 2; // 114px
+  const cellW = (BOARD_W - padX * 2 - quanW * 2) / 5;
+  const cellH = (TABLE_H - 52) / 2;
 
   // 0: Quan Trái
   rects.push({ idx: 0, x: padX, y: padY, w: quanW, h: cellH * 2, isQuan: true });
@@ -62,7 +71,7 @@ export function getOaqCellRects(): OaqCellRect[] {
   return rects.sort((a, b) => a.idx - b.idx);
 }
 
-function drawSingleStone(
+export function drawSingleStone(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -89,25 +98,71 @@ function drawSingleStone(
   ctx.fillRect(Math.round(x - r * 0.45), Math.round(y - r * 0.45), isQuan ? 4 : 2, isQuan ? 4 : 2);
 }
 
+function drawTray(ctx: CanvasRenderingContext2D, state: OaqState, seat: FolkSeat, skins: EquippedFolkSkins) {
+  const { x, y, w, h } = getOaqTrayRect(seat);
+  const stones = getOaqTray(state, seat);
+  const hand = getSkinById(skins.oaq_hand).palette;
+  const stone = getSkinById(skins.oaq_stones).palette;
+  ctx.save();
+  ctx.fillStyle = hand.outline;
+  ctx.strokeStyle = OAQ_SEAT_COLOR[seat];
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 13);
+  ctx.fill();
+  ctx.stroke();
+  ctx.clip();
+  ctx.strokeStyle = hand.secondary;
+  ctx.globalAlpha = .42;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let i = 0; i <= w; i += 12) {
+    ctx.moveTo(x + i, y);
+    ctx.lineTo(x + i + 34, y + h);
+    ctx.moveTo(x + i, y + h);
+    ctx.lineTo(x + i + 34, y);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  for (let i = 0; i < Math.min(16, stones.dan); i++) {
+    drawSingleStone(ctx, x + 101 + (i % 8) * 15 + Math.floor(i / 8) * 5, y + 13 + Math.floor(i / 8) * 12, 5.3, false, stone);
+  }
+  for (let i = 0; i < stones.quan; i++) {
+    drawSingleStone(ctx, x + 235 + i * 22, y + 18, 9, true, stone);
+  }
+  ctx.font = '700 18px system-ui';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = OAQ_SEAT_COLOR[seat];
+  readableCanvasText(ctx, seat === 'P1' ? 'Mẹt 1' : 'Mẹt 2', x + 11, y + h / 2);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#fff5df';
+  readableCanvasText(ctx, stones.quan ? `${stones.dan} sỏi · ${stones.quan} Q` : `${stones.dan} sỏi`, x + w - 10, y + h / 2);
+  ctx.restore();
+}
+
 export function renderOAnQuanBoard(
   ctx: CanvasRenderingContext2D,
   state: OaqState,
   skins: EquippedFolkSkins,
   selectedCell: number | null,
-  previewCells: number[] = []
+  previewCells: number[] = [],
+  trayState = state
 ) {
   ctx.imageSmoothingEnabled = false;
   const boardSkin = getSkinById(skins.oaq_board);
   const stoneSkin = getSkinById(skins.oaq_stones);
 
   // 1. Nền sân đình / bàn gỗ / chiếu cói
-  ctx.fillStyle = boardSkin.palette.secondary;
+  ctx.fillStyle = boardSkin.palette.outline;
   ctx.fillRect(0, 0, BOARD_W, BOARD_H);
+  ctx.fillStyle = boardSkin.palette.secondary;
+  ctx.fillRect(0, TABLE_TOP, BOARD_W, TABLE_H);
 
   // Họa tiết gạch tàu / vân gỗ pixel
   ctx.fillStyle = boardSkin.palette.primary;
   for (let gx = 8; gx < BOARD_W - 8; gx += 40) {
-    for (let gy = 8; gy < BOARD_H - 8; gy += 28) {
+    for (let gy = TABLE_TOP + 8; gy < TABLE_TOP + TABLE_H - 26; gy += 28) {
       ctx.fillRect(gx, gy, 36, 24);
     }
   }
@@ -125,7 +180,7 @@ export function renderOAnQuanBoard(
       : isPreview
       ? 'rgba(56, 189, 248, 0.22)'
       : 'rgba(15, 23, 42, 0.18)';
-    ctx.strokeStyle = isSelected ? '#FDE047' : boardSkin.palette.accent;
+    ctx.strokeStyle = isSelected ? '#ffe6b4' : r.isQuan ? boardSkin.palette.accent : OAQ_SEAT_COLOR[r.idx <= 5 ? 'P1' : 'P2'];
     ctx.lineWidth = isSelected ? 3 : 2;
 
     if (r.isQuan) {
@@ -179,5 +234,6 @@ export function renderOAnQuanBoard(
     ctx.textBaseline = 'middle';
     readableCanvasText(ctx, ptsDisplay, r.x + 6 + badgeWidth / 2, r.y + 19);
   }
+  drawTray(ctx, trayState, 'P2', skins);
+  drawTray(ctx, trayState, 'P1', skins);
 }
-import { readableCanvasText } from '../../accessibility/canvasText';

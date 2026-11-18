@@ -37,3 +37,8 @@ Kế hoạch cập nhật ngày 18/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 - Ván bot và hai người chung máy tự lưu sau lượt, mở lại bằng **Tiếp tục ván đã lưu**. Nhảy dở tiếp tục từ đầu lượt. Ván kết thúc mở lại được và giữ receipt thưởng. Hồ sơ cũ trong save ArcadeX đọc được, skin giữ khi đổi ván.
 - Ô Ăn Quan chọn ô bằng touch hoặc bàn phím. Nhảy Lò Cò bỏ ô Nhà đối thủ và thêm nhặt Chàm có canh lực. Kiểm đủ ván bốn tổ hợp game/chế độ trên Chromium, mở lại, đấu lại, điểm và thưởng. Bằng chứng `test-results/folk-offline/`.
 - Vào thử [Ô Ăn Quan](http://127.0.0.1:4357/?review=o-an-quan) và [Nhảy Lò Cò](http://127.0.0.1:4357/?review=nhay-lo-co) trên máy đang chạy dev. Bước kế FD-ON1 là phòng 1v1 và chat Trận sau khi anh duyệt bản offline.
+
+### Ô Ăn Quan · trình diễn lượt đi
+
+- Bàn tay bốc và rải từng viên. Quân ăn, quân Quan và hốt tàn bay về mẹt theo ghế. Cam cho người 1, xanh ngọc cho người 2. Lưu kết quả lượt được chấp nhận cùng đường rải/ô ăn. Mở lại thấy bàn đã chốt và lịch sử.
+- Chromium đã kiểm đúng thứ tự ô, khóa nhập khi trình diễn, mẹt nhận sỏi, lưu và mở lại. Có bỏ qua hiệu ứng và hỗ trợ giảm chuyển động. [Bàn giao hiện tại](../SESSION-HANDOFF.md).

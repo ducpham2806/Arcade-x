@@ -4,9 +4,9 @@
 
 ## Folk và chat · bản review 18/11/2026
 
-- FD-L0 sửa luật Ô Ăn Quan và hoàn thiện artwork. FD-L1 trên `codex/folk-duel-foundation` có lưu lượt, bàn phím, nhặt Chàm, đấu lại và thưởng. Folk 11/11, browser 4 ván đủ lượt; chờ duyệt PR 40. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md).
+- FD-L0/L1 có artwork, ván offline lưu/đấu lại và nhặt Chàm. Ô Ăn Quan thêm bốc/rải từng viên, mẹt và lịch sử hai ghế. Folk 12/12, UI 5/5. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), PR 40 nháp.
 - Studio `fa7b1db`. PR 38 chat 27/27, preview Snake và native 3/3 cục bộ. Staging hai tester còn chờ; chưa merge.
-- [Tóm tắt trước FD-L1](archive/COMPLETED-2026-11-18-before-folk-offline.md).
+- [Tóm tắt trước animation Ô Ăn Quan](archive/COMPLETED-2026-11-18-before-oaq-turn-art.md).
 
 ## Snake R01 · kỹ thuật ứng viên · 14/11/2026
 

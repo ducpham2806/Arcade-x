@@ -11,6 +11,15 @@ const object = (value: unknown): value is Record<string, unknown> => !!value && 
 const count = (value: unknown): value is number => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 const seatPair = (value: unknown) => object(value) && count(value.P1) && count(value.P2);
 const seat = (value: unknown) => value === 'P1' || value === 'P2';
+const oaqCell = (value: unknown) => count(value) && value < 12;
+
+function oaqTurn(value: unknown): boolean {
+  return object(value) && count(value.turn) && value.turn > 0 && seat(value.seat) && object(value.move) &&
+    oaqCell(value.move.cellIndex) && (value.move.direction === 'CW' || value.move.direction === 'CCW') &&
+    Array.isArray(value.drops) && value.drops.every(oaqCell) &&
+    Array.isArray(value.captures) && value.captures.every(capture =>
+      object(capture) && oaqCell(capture.cellIndex) && count(capture.points) && typeof capture.quan === 'boolean');
+}
 
 function matchState(value: unknown): value is Record<string, unknown> {
   return object(value) && seat(value.turn) && count(value.turnNumber) && value.turnNumber > 0 &&
@@ -21,7 +30,9 @@ function matchState(value: unknown): value is Record<string, unknown> {
 export function isOaqOfflineState(value: unknown): value is OaqState {
   return matchState(value) && Array.isArray(value.cells) && value.cells.length === 12 && value.cells.every(count) &&
     Array.isArray(value.quanAlive) && value.quanAlive.length === 2 && value.quanAlive.every(alive => typeof alive === 'boolean') &&
-    seatPair(value.quanCaptured) && seatPair(value.debt) && count(value.lastCapturedPoints) && count(value.lastComboCount);
+    seatPair(value.quanCaptured) && seatPair(value.debt) && count(value.lastCapturedPoints) && count(value.lastComboCount) &&
+    (value.trayQuan === undefined || seatPair(value.trayQuan)) &&
+    (value.history === undefined || Array.isArray(value.history) && value.history.every(oaqTurn));
 }
 
 export function isNlcOfflineState(value: unknown): value is NlcState {

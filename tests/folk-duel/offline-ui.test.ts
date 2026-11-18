@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { applyOaqMove, getValidOaqMoves, type OaqState } from '../../src/games/o-an-quan/rules';
+import { applyOaqMove, getOaqTray, getValidOaqMoves, recordOaqTurn, type OaqState } from '../../src/games/o-an-quan/rules';
 import type { NlcState } from '../../src/games/nhay-lo-co/rules';
 import type { FolkProfileSave } from '../../src/games/folk-duel/economy';
 import type { OfflineMatch } from '../../src/games/folk-duel/offlineMatch';
@@ -80,6 +80,61 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => { Math.random = () => .4; });
 });
 
+test('Ô Ăn Quan diễn đủ từng ô, khóa nước đi trong lúc rải và giữ lịch sử sau reload', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await open(page, 'o-an-quan');
+  await page.getByRole('button', { name: startMenu.two }).click();
+  const board = page.locator('.oaq-stage');
+  const canvas = board.locator('canvas');
+  await canvas.evaluate(element => {
+    const trace: string[] = [];
+    const seen = new Set<string>();
+    (window as Window & { oaqTrace?: string[] }).oaqTrace = trace;
+    new MutationObserver(() => {
+      const { oaqFrame, oaqStep, oaqCell } = element.dataset;
+      if (oaqFrame === undefined || seen.has(oaqFrame)) return;
+      seen.add(oaqFrame);
+      trace.push(`${oaqStep}:${oaqCell}`);
+    }).observe(element, { attributeFilter: ['data-oaq-frame'] });
+  });
+  const before = (await read(page, 'o-an-quan'))!.offlineMatch.state;
+  const move = { cellIndex: 1, direction: 'CW' } as const;
+  const expected = applyOaqMove(before, 'P1', move);
+  await board.locator('[data-folk-cell="1"]').tap();
+  await board.getByRole('button', { name: /Rải Phải/ }).tap();
+  await expect(board).toHaveAttribute('data-oaq-playing', 'true');
+  await expect(board.locator('.fd-cell-target:enabled')).toHaveCount(0);
+  await expect(board.locator('[data-folk-seat="P1"]')).toHaveClass(/is-active/);
+  await expect(canvas).toHaveAttribute('data-oaq-step', 'drop');
+  await page.screenshot({ path: 'test-results/folk-offline/oaq-rai-soi.png' });
+  await expect(canvas).toHaveAttribute('data-oaq-step', 'capture');
+  await page.screenshot({ path: 'test-results/folk-offline/oaq-an-quan.png' });
+  await expect(board).toHaveAttribute('data-oaq-playing', 'false', { timeout: 10000 });
+  const trace = await page.evaluate(() => (window as Window & { oaqTrace?: string[] }).oaqTrace);
+  expect(trace).toEqual(expected.steps.filter(step => step.type !== 'stop').map(step => `${step.type}:${step.cellIndex}`));
+  expect((await read(page, 'o-an-quan'))!.offlineMatch.state).toEqual(recordOaqTurn(before, move, expected.nextState, expected.steps));
+  const tray = getOaqTray(expected.nextState, 'P1');
+  await expect(board.getByRole('group', { name: `Mẹt 1, ${tray.dan} sỏi, ${tray.quan} Quan, ${expected.nextState.scores.P1} điểm` })).toBeVisible();
+  await expect(board.locator('[data-folk-seat="P2"]')).toHaveClass(/is-active/);
+
+  await reloadMatch(page, 'o-an-quan');
+  await page.getByRole('button', { name: /Lịch sử lượt đi/ }).tap();
+  const dialog = page.getByRole('dialog', { name: 'Lịch sử lượt đi' });
+  await expect(dialog).toBeVisible();
+  await dialog.locator('summary').tap();
+  await expect(dialog).toContainText('Lượt 1 · Người chơi 1');
+  await expect(dialog).toContainText('Đường rải · ô 2 → ô 3');
+  await expect(dialog).toContainText(`Ô ăn được · ô 2 (+${expected.nextState.lastCapturedPoints})`);
+  await page.screenshot({ path: 'test-results/folk-offline/oaq-lich-su.png' });
+  await dialog.getByRole('button', { name: 'Đóng lịch sử' }).tap();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole('button', { name: /Lịch sử lượt đi/ })).toBeFocused();
+  expect(errors).toEqual([]);
+});
+
 for (const mode of ['two', 'bot'] as const) {
   const touch = mode === 'two';
   const width = touch ? 390 : 1280;
@@ -88,6 +143,7 @@ for (const mode of ['two', 'bot'] as const) {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewportSize({ width, height: touch ? 844 : 820 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await open(page, 'o-an-quan');
     await page.getByRole('button', { name: startMenu[mode] }).click();
     for (let step = 0; step < 20; step++) {
@@ -103,8 +159,10 @@ for (const mode of ['two', 'bot'] as const) {
       const cell = page.locator(`[data-folk-cell="${candidate.move.cellIndex}"]`);
       await press(cell, touch);
       await expect(cell).toHaveAttribute('aria-pressed', 'true');
-      await press(page.getByRole('button', { name: candidate.move.direction === 'CW' ? /Rải Phải/ : /Rải Trái/ }), touch);
-      expect((await read(page, 'o-an-quan'))!.offlineMatch.state).toEqual(candidate.result.nextState);
+      const right = state.turn === 'P1' ? 'CW' : 'CCW';
+      await press(page.getByRole('button', { name: candidate.move.direction === right ? /Rải Phải/ : /Rải Trái/ }), touch);
+      const accepted = recordOaqTurn(state, candidate.move, candidate.result.nextState, candidate.result.steps);
+      expect((await read(page, 'o-an-quan'))!.offlineMatch.state).toEqual(accepted);
       if (step === 0 && touch) {
         await reloadMatch(page, 'o-an-quan');
         const shop = page.getByRole('button', { name: /Tiệm Tạp Hóa/ });
@@ -113,7 +171,7 @@ for (const mode of ['two', 'bot'] as const) {
         await page.getByRole('button', { name: /Đổi bằng.*15 Kẹo/ }).click();
         await page.getByRole('button', { name: 'Đóng tiệm' }).click();
         expect((await read(page, 'o-an-quan'))!.equippedSkins.oaq_stones).toBe('stones_tamarind');
-        expect((await read(page, 'o-an-quan'))!.offlineMatch.state).toEqual(candidate.result.nextState);
+        expect((await read(page, 'o-an-quan'))!.offlineMatch.state).toEqual(accepted);
       }
       if (step === 0 && !touch) {
         const bubble = page.locator('.game-chat-bubble');
