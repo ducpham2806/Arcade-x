@@ -25,11 +25,11 @@ Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 | **FD-ON1 · Phòng 1v1 dùng chung** | Dùng Edge Function có Auth, cập nhật phòng bằng một giao dịch có kiểm version. Hỗ trợ mã phòng, ghép theo từng game, kết nối lại, hết lượt/rời phòng, rematch và receipt khi gửi lại. Server kiểm nước Ô Ăn Quan. Với Nhảy Lò Cò, đặc tả cách server xác nhận chuỗi thao tác và cửa sổ thời gian trước khi mở PvP. Điểm và kết quả tính ở server. Bubble tự vào `Trận` khi ghế hợp lệ, chấm xanh và lời cạnh avatar qua adapter chung. | PGlite kiểm ghế, Auth, phiên bản, gửi lặp, sai lượt, lộ dữ liệu và nhận thưởng trùng. Hai tài khoản staging chơi qua hai phiên, nhận chat đúng phòng, rời hoặc chơi lại và vào lại sau mất mạng. |
 | **FD-ON2 · Nghiệm thu** | Chạy CI đúng head, QA qua trình duyệt và thiết bị thật, kiểm mạng chậm và cả offline. Chuẩn bị mở catalog theo từng game, ghi cách thu hồi cấu hình catalog khi có lỗi. | Anh chơi và duyệt từng game trước merge. Migration trong mốc phát triển chỉ chạy ở PGlite hoặc staging. Giữ commerce tắt. |
 
-## FD-ON1 · ACTIVE
+## FD-ON1 · WAITING nghiệm thu
 
 - Đã thay prototype trong bộ nhớ bằng Edge/Auth + PostgreSQL, mã phòng và ghép FIFO theo game. CAS revision và receipt cùng giao dịch. Có rời, resume, timeout và hai phiếu đấu lại. Kết quả/điểm ở server. Giữ cấp thưởng online tắt trong bản QA.
 - Ô Ăn Quan dùng luật và trace chung, lưu lịch sử. Hạn lượt mới bắt đầu sau thời lượng trình diễn. Nhảy Lò Cò gửi từng thao tác và dùng thời điểm server để kiểm pha/nhịp/điểm.
 - Nối adapter bubble vào Trận và lời cạnh HUD, gỡ khi rời/đổi tài khoản. Frontend QA bật bằng `VITE_FOLK_ONLINE=1` với backend staging. Luồng offline vẫn có ở build mặc định.
-- Đã áp schema, Edge và scheduler trên staging `khqipuipeawzlkqmdzdg`. Âm Auth/quyền RPC và scheduler 200 đã kiểm. Chưa nghiệm thu hai tài khoản thật trong phiên mới.
+- Đã áp schema, Edge và scheduler trên staging `khqipuipeawzlkqmdzdg`. Âm Auth/quyền RPC và scheduler 200 đã kiểm. Ngày 19/11 anh chọn để anh kiểm hai tài khoản sau.
 - [Báo cáo FD-ON1](../qa/FOLK-ONLINE-2026-11-19.md) giữ hợp đồng, test và giới hạn. [Bàn giao](../SESSION-HANDOFF.md) giữ kết quả chạy cuối.
 - Bước tiếp kiểm đủ bộ offline/online trên đúng nguồn, CI và hai tài khoản staging, sau đó anh chơi thử trước merge.

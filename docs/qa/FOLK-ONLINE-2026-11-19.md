@@ -17,7 +17,7 @@ Nhánh `codex/folk-duel-foundation`, tiếp head local `92e3dd3` có cùng tree 
 - 11 ca luật/lưu/economy offline và 10 ca Edge/PGlite. Có Auth âm, RPC denial, sai game, thành viên thứ ba, phiên bản, receipt gửi lặp, chat riêng, queue đồng thời, NLC đủ lượt, scheduler, hai phiếu rematch đồng thời, leave retry và rate limit.
 - Bộ trình duyệt offline và online chung 7/7 qua. Bộ online chạy qua App thật trong hai context desktop/mobile giả lập, mock Auth và PostgREST nối PGlite với handler Edge thật. Có đủ lượt NLC, history/resume/retry Ô Ăn Quan và đổi lượt/đấu lại. Ảnh ở `test-results/folk-online/` đã mở kiểm.
 - Staging `khqipuipeawzlkqmdzdg` đã áp schema, Edge và cron riêng. Request thiếu hoặc sai bearer trả 401. HTTP RPC công khai bị chặn 401. Probe RPC xác nhận `anon/authenticated` không có execute trên 5 hàm Folk, service có quyền. Scheduler đã nhận HTTP 200.
-- Chưa kiểm gửi/nhận bằng hai tài khoản thật trong phiên 19/11. Đã nhờ anh đăng nhập tại `http://127.0.0.1:4335`. Đây là Vite chạy backend staging. Cổng 4357 giữ backend tắt cho bản offline.
+- Chưa kiểm gửi/nhận bằng hai tài khoản thật trong phiên 19/11. Ngày 19/11 anh chọn tự kiểm hai tài khoản sau tại `http://127.0.0.1:4335`. Đây là Vite chạy backend staging. Cổng 4357 giữ backend tắt cho bản offline.
 - Không có bằng chứng điện thoại vật lý hoặc liên thiết bị. Chờ kiểm canh lực dưới latency thật và duyệt hình/thao tác trước merge.
 
 ## An ninh và vận hành staging
