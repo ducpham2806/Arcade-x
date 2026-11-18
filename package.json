@@ -42,8 +42,8 @@
     "preview:rainbow": "node scripts/rainbow-preview.mjs",
     "test:rainbow": "playwright test tests/rainbow",
     "test:claude": "node tests/claude/structure.cjs",
-    "test:folk-duel": "node --test tests/folk-duel/folk-games.test.mjs",
-    "test:folk-duel-ui": "playwright test tests/folk-duel/offline-ui.test.ts",
+    "test:folk-duel": "node --test tests/folk-duel/folk-games.test.mjs && node scripts/folk-server-package.mjs --check && node --test tests/folk-duel/online.test.mjs",
+    "test:folk-duel-ui": "playwright test tests/folk-duel/offline-ui.test.ts tests/folk-duel/online-ui.test.ts",
     "test:readability": "node tests/readability/contrast.mjs && node tests/readability/dom-policy.cjs",
     "test:duel": "node tests/duel/engines.mjs && node tests/duel/ui.cjs && node tests/duel/worker.mjs",
     "test:duel-server": "node tests/duel/authoritative.mjs && node tests/duel/schema.mjs && node tests/duel/edge-room.mjs",
@@ -116,7 +116,8 @@
     "test:chat-ui": "playwright test tests/social/bubble-ui.test.ts",
     "preview:chat": "node scripts/chat-preview.mjs",
     "preview:chat-staging": "node scripts/chat-staging-preview.mjs",
-    "test:chat-native-ui": "playwright test --config playwright.native-chat.config.ts"
+    "test:chat-native-ui": "playwright test --config playwright.native-chat.config.ts",
+    "prepare:folk-server": "node scripts/folk-server-package.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

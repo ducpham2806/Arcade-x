@@ -560,3 +560,15 @@
   gap: 10px;
   justify-content: center;
 }
+
+.fd-room-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 12px;
+  color: #fef3c7;
+  font-size: 13px;
+}
+.fd-room-status p { margin: 0; }

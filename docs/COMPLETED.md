@@ -2,9 +2,10 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Folk và chat · bản review 18/11/2026
+## Folk và chat · bản review 19/11/2026
 
 - FD-L0/L1 có artwork, ván offline lưu/đấu lại và nhặt Chàm. Ô Ăn Quan thêm bốc/rải từng viên, mẹt và lịch sử hai ghế. Folk 12/12, UI 5/5. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), PR 40 nháp.
+- FD-ON1 trên `codex/folk-duel-foundation` có Edge/Auth, CAS/PostgreSQL, queue, resume, rematch, scheduler và chat riêng. NLC server nhận từng thao tác. 21 ca Node và 7 ca browser cục bộ qua. Staging ref `khqipuipeawzlkqmdzdg` có Edge v2/scheduler 200 và RPC denial. Còn hai tài khoản thật, latency/thiết bị và duyệt, giữ cấp thưởng online tắt. [Báo cáo](qa/FOLK-ONLINE-2026-11-19.md).
 - Studio `fa7b1db`. PR 38 chat 27/27, preview Snake và native 3/3 cục bộ. Staging hai tester còn chờ; chưa merge.
 - [Tóm tắt trước animation Ô Ăn Quan](archive/COMPLETED-2026-11-18-before-oaq-turn-art.md).
 
@@ -51,15 +52,4 @@
 - Bằng chứng: [TC-R0 report](tank-clash/TC-R0-2026-11-06.md). Cập nhật07/11: Netlify/Auth đã phát hành, logout retest qua; còn ca A/mã B cũ được chủ dự án để sau. TC-R1 chưa làm.
 - Giữ Blueprint cũ paused, không sync ghi đè service main; lần sau tiếp QA còn thiếu, không deploy lại vô cớ.
 
-## DOC-01 · DONE · 06/11/2026
-
-- codex/docs-game-studio-handoff→PR17: thẻ game/project.md/một WORKLOG/bàn giao ngắn, thu gọn trước đổi việc và checker budget.
-- Studio c5dac462:116skill/21role/4rules/297blob; discovery theo task, không nạp cả thư viện. [Chi tiết](archive/WORKLOG-2026-11-06-DOC-01.md). Không đổi runtime/schema.
-
-## MERGE-AUDIT · 06/11/2026
-
-- Mainc705100/PR16 đã tích hợp; audit24nhánh phân biệt nhánh đã có, docs tương đương và P2 cần port theoTC-R2. [Chi tiết nguyên văn](archive/COMPLETED-2026-11-14-before-snake-finish.md).
-
-## Các mốc nền tảng trước
-
-Tank/Battleship/Dungeon và launcher M0–M8/các game khác giữ nguồn, quyết định và giới hạn trong [main trước tích hợp chat](archive/COMPLETED-2026-11-15-main-before-chat-integration.md). Snake còn thiết bị/human/live-save; Duel/commerce chưa hoàn tất, payment tắt. Không dùng báo cáo cũ chứng minh production hiện tại.
+[Các việc cũ đã đóng](archive/COMPLETED-2026-11-19-before-folk-online.md).

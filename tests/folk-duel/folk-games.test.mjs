@@ -25,7 +25,6 @@ import {
   loadFolkProfile,
   purchaseSkinWithCandy,
 } from '../../src/games/folk-duel/economy.ts';
-import { FolkRoomServer, normalizeRoomCode } from '../../src/games/folk-duel/server.ts';
 import { isNlcOfflineState, isOaqOfflineState, loadOfflineMatch, saveOfflineMatch } from '../../src/games/folk-duel/offlineMatch.ts';
 import { buildOaqFrames } from '../../src/games/o-an-quan/turnAnimation.ts';
 
@@ -293,62 +292,4 @@ test('Economy & Tiệm Tạp Hóa: cộng thưởng chống nhận lặp và mua
   const eq = equipFolkSkin(buy.profile, 'stones_pebbles');
   assert.equal(eq.ok, true);
   assert.equal(eq.profile.equippedSkins.oaq_stones, 'stones_pebbles');
-});
-
-test('FolkRoomServer: Tạo phòng mã 6 ký tự, Join bằng mã, Matchmaking FIFO và CAS', () => {
-  const server = new FolkRoomServer({
-    createInitialState: () => createInitialOaqState(),
-    validateAndApplyMove: (state, seat, move) => {
-      const res = applyOaqMove(state, seat, move);
-      return {
-        ok: res.ok,
-        error: res.error,
-        nextState: res.nextState,
-        nextTurn: res.nextState.turn,
-        winner: res.nextState.winner,
-      };
-    },
-  });
-
-  const t0 = 1_700_000_000_000;
-  const hostRoom = server.createRoom({
-    userId: 'u1',
-    name: 'Đức',
-    gameKind: 'o-an-quan',
-    isPublic: false,
-    now: t0,
-  });
-  assert.equal(hostRoom.code.length, 6);
-  assert.equal(normalizeRoomCode(` ${hostRoom.code.toLowerCase()} `), hostRoom.code);
-
-  const joined = server.joinByCode({
-    userId: 'u2',
-    name: 'Bạn B',
-    code: hostRoom.code,
-    now: t0 + 500,
-  });
-  assert.equal(joined.ok, true);
-  assert.equal(joined.room?.phase, 'countdown');
-
-  // Sau 3 giây đếm ngược -> tự chuyển sang playing
-  const playing = server.getRoom(hostRoom.roomId, t0 + 4000);
-  assert.equal(playing?.phase, 'playing');
-
-  // Gửi nước đi hợp lệ của P1
-  const mv = server.submitMove({
-    roomId: hostRoom.roomId,
-    userId: 'u1',
-    expectedVersion: playing.version,
-    requestId: 'req_1',
-    move: { cellIndex: 1, direction: 'CW' },
-    now: t0 + 5000,
-  });
-  assert.equal(mv.ok, true);
-  assert.equal(mv.room?.turn, 'P2');
-
-  // Thử Matchmaking FIFO
-  const q1 = server.matchmake({ userId: 'q_a', name: 'A', gameKind: 'nhay-lo-co', now: t0 });
-  const q2 = server.matchmake({ userId: 'q_b', name: 'B', gameKind: 'nhay-lo-co', now: t0 + 200 });
-  assert.equal(q1.roomId, q2.roomId);
-  assert.equal(q2.players.length, 2);
 });
