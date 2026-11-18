@@ -80,6 +80,7 @@ function validCommand(command:unknown):command is Command {
   if(!command||typeof command!=='object'||Array.isArray(command))return false;
   const c=command as Record<string,unknown>;
   switch(c.type){
+    case 'chat':return typeof c.text==='string'&&c.text.trim().length>0&&c.text.length<=500&&Object.keys(c).every(k=>k==='type'||k==='text');
     case 'ready':return typeof c.ready==='boolean';
     case 'submit':return typeof c.word==='string'&&c.word.length<=80&&Number.isInteger(c.turn)&&Number(c.turn)>0;
     case 'react':return typeof c.emoji==='string'&&c.emoji.length<=16;

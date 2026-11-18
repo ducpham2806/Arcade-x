@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { GameComponentProps } from '../../types';
 import {
-  applyMatchReward,
   loadFolkProfile,
   type FolkProfileSave,
 } from '../folk-duel/economy';
+import { FolkMatchReward, FolkResume, FolkRules, FolkSaveNotice } from '../folk-duel/FolkOfflineUi';
+import { isNlcOfflineState, useOfflineMatch, type OfflineMode } from '../folk-duel/offlineMatch';
 import { FolkShopModal } from '../folk-duel/FolkShopModal';
-import { OnlineRoom, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
-import { FolkRoomServer } from '../folk-duel/server';
+import { OnlineRoom, folkOnlineEnabled, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
+import { folkChatId, folkPowerAt, type FolkCommand, type FolkOnlineRoom } from '../folk-duel/online-protocol';
 import { FolkSoundEngine } from '../folk-duel/sfx';
 import { getSkinById } from '../folk-duel/skins-catalog';
 import type { FolkSeat } from '../folk-duel/types';
@@ -19,37 +20,29 @@ import {
   buildHopSequence,
   countHouses,
   createInitialNlcState,
+  getNlcTargetBox,
   type HopType,
   type NlcMove,
   type NlcState,
+  type NlcTurnPhase,
 } from './rules';
-
-const sharedLocalNlcServer = new FolkRoomServer<NlcState, NlcMove>({
-  createInitialState: () => createInitialNlcState(),
-  validateAndApplyMove: (state, seat, move) => {
-    const res = applyNlcTurnResult(state, seat, move);
-    return {
-      ok: res.ok,
-      error: res.error,
-      nextState: res.nextState,
-      nextTurn: res.nextState.turn,
-      winner: res.nextState.winner,
-    };
-  },
-});
 
 type ScreenMode =
   | { kind: 'home' }
-  | { kind: 'bot'; level: NlcBotLevel; matchId: string }
-  | { kind: 'local_2p'; matchId: string }
+  | { kind: 'offline' }
   | { kind: 'online'; entry: OnlineEntryMode };
 
-export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false }) => {
+export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false, isPaused }) => {
   const [profile, setProfile] = useState<FolkProfileSave>(() => loadFolkProfile(bridge));
   const [screen, setScreen] = useState<ScreenMode>({ kind: 'home' });
+  const offline = useOfflineMatch(bridge, createInitialNlcState, isNlcOfflineState);
+  const mode = offline.match?.mode;
+  const botLevel = mode === 'bot_easy' ? 'easy' : mode === 'bot_hard' ? 'hard' : null;
+  const startOffline = (mode: OfflineMode) => {
+    if (offline.start(mode)) setScreen({ kind: 'offline' });
+  };
   const [showShop, setShowShop] = useState(false);
   const [showRules, setShowRules] = useState(false);
-  const [localUserId] = useState(() => `nlc_${Math.random().toString(36).slice(2, 8)}`);
 
   const mutedRef = useRef(isMuted);
   mutedRef.current = isMuted;
@@ -83,6 +76,11 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
           </div>
 
           <div className="fd-menu-grid">
+            {offline.match && <FolkResume match={offline.match} onResume={() => setScreen({ kind: 'offline' })}/>}
+            {folkOnlineEnabled && <>
+              <button type="button" className="fd-menu-btn" onClick={() => setScreen({ kind: 'online', entry: 'resume' })}>
+                <strong>Tiếp tục phòng online</strong><span>Kết nối lại phòng đang mở</span>
+              </button>
             <button
               type="button"
               className="fd-menu-btn is-primary"
@@ -107,26 +105,27 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
               <strong>🔑 Nhập Mã Vào Phòng</strong>
               <span>Vào sân của bạn bè</span>
             </button>
+            </>}
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'bot', level: 'easy', matchId: `nlc_easy_${Date.now()}` })}
+              onClick={() => startOffline('bot_easy')}
             >
               <strong>🤖 Bot Tí Sún (Dễ)</strong>
-              <span>Luyện thảy Chàm · +25 Xu</span>
+              <span>Luyện thảy Chàm và nhảy</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'bot', level: 'hard', matchId: `nlc_hard_${Date.now()}` })}
+              onClick={() => startOffline('bot_hard')}
             >
               <strong>🧠 Bot Bờm (Khó)</strong>
-              <span>Nhịp nhanh chuẩn xác · +45 Xu</span>
+              <span>Đối thủ xây Nhà chính xác hơn</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'local_2p', matchId: `nlc_2p_${Date.now()}` })}
+              onClick={() => startOffline('local_2p')}
             >
               <strong>👥 2 Người Chung Máy</strong>
               <span>Thay phiên nhau nhảy lò cò</span>
@@ -139,54 +138,46 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
         </main>
       )}
 
-      {(screen.kind === 'bot' || screen.kind === 'local_2p') && (
+      {!offline.saved && <FolkSaveNotice onRetry={offline.retry}/>}
+      {screen.kind === 'offline' && offline.match && (
         <NlcMatchCourt
-          key={screen.matchId}
-          mode={screen.kind === 'bot' ? (screen.level === 'easy' ? 'bot_easy' : 'bot_hard') : 'local_2p'}
-          matchId={screen.matchId}
+          key={offline.match.id}
+          mode={offline.match.mode}
+          matchId={offline.match.id}
           mySeat="P1"
-          opponentName={
-            screen.kind === 'bot'
-              ? screen.level === 'easy'
-                ? 'Bot Tí Sún (Dễ)'
-                : 'Bot Bờm (Khó)'
-              : 'Người chơi 2'
-          }
-          botLevel={screen.kind === 'bot' ? screen.level : null}
+          opponentName={botLevel === 'easy' ? 'Bot Tí Sún' : botLevel === 'hard' ? 'Bot Bờm' : 'Người chơi 2'}
+          botLevel={botLevel}
+          state={offline.match.state}
+          onLocalStateChange={offline.update}
+          paused={isPaused || showShop}
+          rewardReady={offline.saved}
           profile={profile}
           sound={soundRef.current}
           bridge={bridge}
           onProfileChange={setProfile}
           onExit={() => setScreen({ kind: 'home' })}
-          onRematch={() =>
-            setScreen(
-              screen.kind === 'bot'
-                ? { kind: 'bot', level: screen.level, matchId: `nlc_${screen.level}_${Date.now()}` }
-                : { kind: 'local_2p', matchId: `nlc_2p_${Date.now()}` }
-            )
-          }
+          onRematch={() => startOffline(offline.match!.mode)}
         />
       )}
 
       {screen.kind === 'online' && (
         <OnlineRoom
-          gameKind="nhay-lo-co"
+          game="nhay-lo-co"
           gameTitle="Nhảy Lò Cò"
           mode={screen.entry}
-          server={sharedLocalNlcServer}
-          userId={localUserId}
-          playerName="Bé Tí"
-          skins={profile.equippedSkins}
           onExit={() => setScreen({ kind: 'home' })}
-          renderMatch={({ room, mySeat, onMove, onRematch, onLeave }) => (
+          renderMatch={({ room, blocked, arrivalNow, onAction, onRematch, onLeave }) => (
             <NlcMatchCourt
               mode={room.isPublic ? 'matchmaking' : 'friend_room'}
-              matchId={room.roomId}
-              mySeat={mySeat}
-              opponentName={room.players.find((p) => p.seat !== mySeat)?.name ?? 'Đối thủ'}
+              key={room.matchId}
+              matchId={room.matchId}
+              mySeat={room.mySeat}
+              opponentName={room.players.find((p) => p.seat !== room.mySeat)?.name ?? 'Đối thủ'}
               botLevel={null}
-              externalState={room.state}
-              externalMoveHandler={(mv) => onMove(mv)}
+              state={room.state}
+              online={{ room, arrivalNow, onAction }}
+              paused={isPaused || showShop || blocked}
+              rewardReady={false}
               profile={profile}
               sound={soundRef.current}
               bridge={bridge}
@@ -209,20 +200,14 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
       )}
 
       {showRules && (
-        <div className="fd-overlay" role="dialog" aria-modal="true">
-          <div className="fd-room-card" style={{ textAlign: 'left' }}>
-            <h2 style={{ margin: 0, color: '#fde68a' }}>Luật Chơi Nhảy Lò Cò</h2>
-            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.6 }}>
-              <li><b>Bước 1 — Thảy Chàm:</b> Bấm nút dừng thanh lực ở vùng Xanh lá để ném Chàm vào đúng ô mục tiêu.</li>
-              <li><b>Bước 2 — Nhảy 10 Ô:</b> Bấm <b>1 CHÂN</b> cho ô đơn, <b>2 CHÂN</b> cho cặp Ô Gạch Đôi (4-5, 7-8) và Đầu Chùa (10).</li>
-              <li><b>Vượt chướng ngại:</b> Ô đang có Chàm của bạn hoặc ô đã thành Nhà của đối thủ sẽ phải nhảy vọt qua (không dẫm lên).</li>
-              <li><b>Xây Nhà thắng trận:</b> Hoàn thành bàn nào được đóng dấu Xây Nhà ô đó. Ai xây đủ <b>3 Ngôi Nhà</b> trước sẽ thắng!</li>
-            </ul>
-            <button type="button" className="fd-btn-primary" onClick={() => setShowRules(false)}>
-              Đã hiểu!
-            </button>
-          </div>
-        </div>
+        <FolkRules title="Luật chơi Nhảy Lò Cò" onClose={() => setShowRules(false)}>
+          <ol className="list-decimal pl-6">
+            <li>Canh vạch vàng trong vùng xanh rồi thảy Chàm. Trúng vùng giữa được thêm 10 điểm kỹ năng.</li>
+            <li>Ô đơn bấm 1 chân, cặp ô trống và Đầu Chùa bấm 2 chân. Bỏ qua ô có Chàm hoặc Nhà đối thủ.</li>
+            <li>Khi quay về đến gần ô có Chàm, bấm Nhặt Chàm lúc vạch vàng ở vùng xanh. Nhảy về vạch xuất phát.</li>
+            <li>Xong lượt thì xây Nhà ở ô mục tiêu còn trống. Ai xây đủ 3 Nhà trước sẽ thắng. Game lưu sau lượt đã hoàn tất.</li>
+          </ol>
+        </FolkRules>
       )}
     </div>
   );
@@ -234,14 +219,21 @@ interface NlcMatchCourtProps {
   mySeat: FolkSeat;
   opponentName: string;
   botLevel: NlcBotLevel | null;
-  externalState?: NlcState;
-  externalMoveHandler?: (move: NlcMove) => void;
+  state: NlcState;
+  onLocalStateChange?: (state: NlcState) => void;
+  paused?: boolean;
+  rewardReady?: boolean;
+  online?: {
+    room: FolkOnlineRoom<'nhay-lo-co'>;
+    arrivalNow: number;
+    onAction: (action: FolkCommand) => void;
+  };
   profile: FolkProfileSave;
   sound: FolkSoundEngine;
   bridge: GameComponentProps['bridge'];
   onProfileChange: (next: FolkProfileSave) => void;
   onExit: () => void;
-  onRematch: () => void;
+  onRematch?: () => void;
 }
 
 const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
@@ -250,8 +242,11 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
   mySeat,
   opponentName,
   botLevel,
-  externalState,
-  externalMoveHandler,
+  state,
+  onLocalStateChange,
+  paused = false,
+  rewardReady = true,
+  online,
   profile,
   sound,
   bridge,
@@ -259,38 +254,50 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
   onExit,
   onRematch,
 }) => {
-  const [localState, setLocalState] = useState<NlcState>(() => createInitialNlcState());
-  const state = externalState ?? localState;
 
-  const [turnPhase, setTurnPhase] = useState<'THROW' | 'HOP'>('THROW');
-  const [powerPos, setPowerPos] = useState(50);
+  const [localPhase, setTurnPhase] = useState<NlcTurnPhase>('THROW');
+  const [localPower, setPowerPos] = useState(50);
+  const powerAngle = useRef(0);
   const [throwPerfect, setThrowPerfect] = useState(false);
-  const [hopIndex, setHopIndex] = useState(0);
-  const [statusMsg, setStatusMsg] = useState('Canh thanh lực ở vùng Xanh rồi bấm THẢY CHÀM!');
-  const [rewardInfo, setRewardInfo] = useState<{ coins: number; exp: number; candy: number } | null>(null);
-  const rewardedRef = useRef(false);
+  const [localPickedUp, setPickedUp] = useState(false);
+  const [localHopIndex, setHopIndex] = useState(0);
+  const [localStatus, setStatusMsg] = useState(state.lastSummary);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const remoteStep = online?.room.nlc;
+  const turnPhase = remoteStep?.phase ?? localPhase;
+  const powerPos = remoteStep ? folkPowerAt(remoteStep.since, online!.arrivalNow) : localPower;
+  const pickedUp = remoteStep?.pickedUp ?? localPickedUp;
+  const hopIndex = remoteStep?.hopIndex ?? localHopIndex;
+  const statusMsg = remoteStep?.message ?? (online ? state.lastSummary : localStatus);
+  const waitingForLanding = !!remoteStep && remoteStep.phase === 'HOP' && online!.arrivalNow < remoteStep.since + 110;
+  const waitingForMeter = !!remoteStep && online!.arrivalNow < remoteStep.since;
+
 
   const doubleSkin = getSkinById(profile.equippedSkins.nlc_double_tile);
-  const activeSeat = mode === 'local_2p' ? state.turn : mySeat;
+  const localTwo = mode === 'local_2p';
+  const activeSeat = localTwo ? state.turn : mySeat;
   const isMyTurn = !state.finished && state.turn === activeSeat;
-  const targetBox = state.level[state.turn];
+  const targetBox = getNlcTargetBox(state, state.turn);
+  const timing = turnPhase === 'THROW' || turnPhase === 'PICKUP';
 
   const hopSequence = useMemo(
     () => buildHopSequence(targetBox, state.houses, state.turn),
     [targetBox, state.houses, state.turn]
   );
 
-  // Con thoi thanh lực chạy qua lại trong pha THROW
   useEffect(() => {
-    if (!isMyTurn || turnPhase !== 'THROW') return;
-    let t = 0;
+    powerAngle.current = 0;
+    setPowerPos(50);
+  }, [state.turnNumber, turnPhase]);
+
+  useEffect(() => {
+    if (online || paused || !isMyTurn || !timing) return;
     const id = setInterval(() => {
-      t += 0.12;
-      setPowerPos(Math.round(50 + Math.sin(t) * 48));
+      powerAngle.current += 0.12;
+      setPowerPos(Math.round(50 + Math.sin(powerAngle.current) * 48));
     }, 30);
     return () => clearInterval(id);
-  }, [isMyTurn, turnPhase]);
+  }, [!!online, isMyTurn, paused, timing, state.turnNumber, turnPhase]);
 
   // Vẽ bàn lò cò
   useEffect(() => {
@@ -301,75 +308,50 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
       if (canvasRef.current) {
         const ctx = canvasRef.current.getContext('2d');
         if (ctx) {
-          const activeBoxes =
-            turnPhase === 'HOP' && hopSequence[hopIndex] ? hopSequence[hopIndex].boxes : [targetBox];
-          renderNhayLoCoCourt(ctx, state, profile.equippedSkins, activeBoxes, targetBox, mySeat, tick);
+          const step = hopSequence[turnPhase === 'PICKUP' ? hopIndex - 1 : hopIndex];
+          const activeBoxes = state.finished ? [] : turnPhase !== 'THROW' && step ? step.boxes : [targetBox];
+          const chamBox = !state.finished && turnPhase !== 'THROW' && !pickedUp ? targetBox : null;
+          renderNhayLoCoCourt(ctx, state, profile.equippedSkins, activeBoxes, chamBox, mySeat, tick);
         }
       }
-      raf = requestAnimationFrame(draw);
+      if (!paused && !state.finished) raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [state, profile.equippedSkins, turnPhase, hopSequence, hopIndex, targetBox, mySeat]);
+  }, [state, profile.equippedSkins, turnPhase, hopSequence, hopIndex, targetBox, mySeat, paused, pickedUp]);
 
   // Bot tự động chơi lượt P2
   useEffect(() => {
-    if (!botLevel || state.finished || state.turn !== 'P2') return;
+    if (paused || !botLevel || state.finished || state.turn !== 'P2') return;
     const timer = setTimeout(() => {
       const mv = simulateNlcBotTurn(state, 'P2', botLevel);
       const res = applyNlcTurnResult(state, 'P2', mv);
       if (res.ok) {
         if (mv.hopCompleted) sound.playCapture(true);
         else sound.playFoul();
-        setLocalState(res.nextState);
+        onLocalStateChange?.(res.nextState);
         setTurnPhase('THROW');
         setHopIndex(0);
         setStatusMsg(res.nextState.lastSummary);
       }
     }, 1100);
     return () => clearTimeout(timer);
-  }, [botLevel, state, sound]);
-
-  // Trao thưởng khi kết thúc
-  useEffect(() => {
-    if (!state.finished || rewardedRef.current) return;
-    rewardedRef.current = true;
-    sound.playWin();
-    const won = state.winner === mySeat;
-    const out = applyMatchReward(
-      profile,
-      {
-        matchId,
-        game: 'nhay-lo-co',
-        mode,
-        won,
-        skillBonuses: countHouses(state, mySeat),
-        score: state.scores[mySeat],
-      },
-      bridge
-    );
-    onProfileChange(out.profile);
-    if (!out.alreadyClaimed) {
-      setRewardInfo({ coins: out.coins, exp: out.exp, candy: out.candy });
-    }
-  }, [state.finished]);
+  }, [paused, botLevel, state, sound, onLocalStateChange]);
 
   const submitTurnResult = (mv: NlcMove) => {
-    if (externalMoveHandler) {
-      externalMoveHandler(mv);
-    } else {
-      const res = applyNlcTurnResult(state, activeSeat, mv);
-      if (res.ok) {
-        setLocalState(res.nextState);
-        setStatusMsg(res.nextState.lastSummary);
-      }
+    const res = applyNlcTurnResult(state, activeSeat, mv);
+    if (res.ok) {
+      onLocalStateChange?.(res.nextState);
+      setStatusMsg(res.nextState.lastSummary);
     }
     setTurnPhase('THROW');
     setHopIndex(0);
+    setPickedUp(false);
   };
 
   const handleThrowCham = () => {
-    if (!isMyTurn || turnPhase !== 'THROW') return;
+    if (paused || !isMyTurn || turnPhase !== 'THROW') return;
+    if (online) { online.onAction({ type: 'throw' }); return; }
     const inGreen = powerPos >= 25 && powerPos <= 75;
     const inPerfect = powerPos >= 42 && powerPos <= 58;
     if (!inGreen) {
@@ -387,15 +369,30 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
     setThrowPerfect(inPerfect);
     setTurnPhase('HOP');
     setHopIndex(0);
-    setStatusMsg(
-      inPerfect
-        ? `TRÚNG TÂM Ô ${targetBox}! Bấm nhịp 1 Chân / 2 Chân để hoàn thành bàn!`
-        : `Trúng Ô ${targetBox}! Hãy nhảy lần lượt qua các ô.`
-    );
+    setStatusMsg(inPerfect ? `Trúng tâm ô ${targetBox} · +10 điểm kỹ năng khi hết lượt.` : `Chàm đã vào ô ${targetBox}.`);
+  };
+
+  const finishHop = () => {
+    sound.playCapture(true);
+    submitTurnResult({ kind: 'TURN_RESULT', throwSuccess: true, throwPerfect, hopCompleted: true, scoreGained: throwPerfect ? 25 : 15 });
+  };
+
+  const handlePickup = () => {
+    if (paused || !isMyTurn || turnPhase !== 'PICKUP') return;
+    if (online) { online.onAction({ type: 'pickup' }); return; }
+    if (powerPos < 25 || powerPos > 75) {
+      sound.playFoul();
+      submitTurnResult({ kind: 'TURN_RESULT', throwSuccess: true, throwPerfect, hopCompleted: false, scoreGained: 0, missedPickup: true });
+      return;
+    }
+    setPickedUp(true);
+    if (hopIndex === hopSequence.length) finishHop();
+    else { setTurnPhase('HOP'); setStatusMsg('Đã nhặt Chàm. Nhảy về vạch xuất phát.'); }
   };
 
   const handleHop = (hopType: HopType) => {
-    if (!isMyTurn || turnPhase !== 'HOP') return;
+    if (paused || !isMyTurn || turnPhase !== 'HOP') return;
+    if (online) { online.onAction({ type: 'hop', feet: hopType }); return; }
     const step = hopSequence[hopIndex];
     if (!step) return;
 
@@ -412,48 +409,45 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
     }
 
     sound.playHop(hopType === 'DOUBLE', doubleSkin.sfxProfile);
-    const nextIdx = hopIndex + 1;
-    if (nextIdx >= hopSequence.length) {
-      sound.playCapture(true);
-      submitTurnResult({
-        kind: 'TURN_RESULT',
-        throwSuccess: true,
-        throwPerfect,
-        hopCompleted: true,
-        scoreGained: throwPerfect ? 25 : 15,
-      });
-    } else {
-      setHopIndex(nextIdx);
+    setHopIndex(hopIndex + 1);
+    if (step.pickChamHere) {
+      setTurnPhase('PICKUP');
+      setStatusMsg(`Canh vùng xanh để nhặt Chàm ở ô ${targetBox}.`);
+    } else if (hopIndex + 1 === hopSequence.length) {
+      finishHop();
     }
   };
 
   const oppSeat: FolkSeat = mySeat === 'P1' ? 'P2' : 'P1';
   const nextStep = hopSequence[hopIndex];
+  const playerName = localTwo ? 'Người chơi 1' : 'Bạn';
+  const winnerName = state.winner === mySeat ? playerName : opponentName;
 
   return (
-    <main className="fd-board-stage">
-      <div className={`fd-hud-strip ${state.turn === oppSeat && !state.finished ? 'is-active' : ''}`}>
+    <main className="fd-board-stage" data-folk-version={online?.room.version}>
+      <div data-chat-player={online ? folkChatId(online.room.matchId, oppSeat) : undefined} data-folk-seat={oppSeat} className={`fd-hud-strip ${state.turn === oppSeat && !state.finished ? 'is-active' : ''}`}>
         <div>
           <strong>{opponentName}</strong>
           <div style={{ fontSize: 12, color: '#fcd34d' }}>
-            Bàn Ô {state.level[oppSeat]} · 🏠 {countHouses(state, oppSeat)}/{state.maxHousesToWin} Nhà
+            Ô {getNlcTargetBox(state, oppSeat)} · {countHouses(state, oppSeat)}/{state.maxHousesToWin} Nhà
           </div>
         </div>
         <div style={{ fontSize: 16, fontWeight: 900, color: '#fde047' }}>{state.scores[oppSeat]}đ</div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', maxWidth: 420 }}>
+      <div className="fd-court">
         <canvas
           ref={canvasRef}
           width={COURT_W}
           height={COURT_H}
           className="fd-pixel-canvas"
-          style={{ maxHeight: '48vh', width: 'auto', borderRadius: 14, border: '3px solid #78350f' }}
+          aria-label="Sân lò cò 10 ô"
         />
 
-        {!state.finished && isMyTurn && turnPhase === 'THROW' && (
+        {!state.finished && <p className="fd-status" role="status">{statusMsg}</p>}
+        {isMyTurn && timing && (
           <div style={{ width: '100%', background: '#1c0f0a', padding: 10, borderRadius: 12, border: '2px solid #92400e' }}>
-            <div style={{ height: 18, borderRadius: 999, background: '#7f1d1d', position: 'relative', overflow: 'hidden', marginBottom: 8 }}>
+            <div aria-hidden="true" data-folk-power={powerPos} style={{ height: 18, borderRadius: 999, background: '#7f1d1d', position: 'relative', overflow: 'hidden', marginBottom: 8 }}>
               <div style={{ position: 'absolute', left: '25%', width: '50%', top: 0, bottom: 0, background: '#15803d' }} />
               <div style={{ position: 'absolute', left: '42%', width: '16%', top: 0, bottom: 0, background: '#22c55e' }} />
               <div
@@ -468,22 +462,24 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
                 }}
               />
             </div>
-            <button type="button" className="fd-btn-primary" style={{ width: '100%' }} onClick={handleThrowCham}>
-              🎯 THẢY CHÀM VÀO Ô {targetBox}
+            <button type="button" className="fd-btn-primary" style={{ width: '100%' }} disabled={paused || waitingForMeter} onClick={turnPhase === 'PICKUP' ? handlePickup : handleThrowCham}>
+              {turnPhase === 'PICKUP' ? 'NHẶT CHÀM' : `THẢY CHÀM VÀO Ô ${targetBox}`}
             </button>
+            <p className="fd-meter-hint">Bấm khi vạch vàng vào vùng xanh.</p>
           </div>
         )}
 
         {!state.finished && isMyTurn && turnPhase === 'HOP' && (
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div style={{ textAlign: 'center', fontSize: 12, color: '#fde68a' }}>
-              Bước {hopIndex + 1}/{hopSequence.length}: Nhảy vào{' '}
+              Bước {hopIndex + 1}/{hopSequence.length} · Nhảy vào{' '}
               <b>{nextStep?.boxes.join(' & ')}</b> ({nextStep?.expectedHop === 'DOUBLE' ? '2 CHÂN' : '1 CHÂN'})
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <button
                 type="button"
                 className="fd-btn-primary"
+                disabled={paused || waitingForLanding}
                 style={{ minHeight: 56, fontSize: 15 }}
                 onClick={() => handleHop('SINGLE')}
               >
@@ -492,6 +488,7 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
               <button
                 type="button"
                 className="fd-btn-primary"
+                disabled={paused || waitingForLanding}
                 style={{ minHeight: 56, fontSize: 15 }}
                 onClick={() => handleHop('DOUBLE')}
               >
@@ -508,18 +505,18 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
         {state.finished && (
           <div className="fd-room-card" style={{ width: '100%', padding: 14 }}>
             <h3 style={{ margin: 0, color: '#fde047' }}>
-              {state.winner === mySeat ? '🏆 BẠN ĐÃ XÂY ĐỦ NHÀ & CHIẾN THẮNG!' : '😅 ĐỐI THỦ VỀ ĐÍCH TRƯỚC RỒI!'}
+              {state.winner === 'DRAW' ? 'Hòa nhau!' : `${winnerName} thắng!`}
             </h3>
-            <p style={{ margin: '4px 0', fontSize: 13 }}>{statusMsg}</p>
-            {rewardInfo && (
-              <p style={{ margin: '4px 0', fontSize: 13, color: '#86efac', fontWeight: 700 }}>
-                Phần thưởng: +{rewardInfo.coins} Xu · +{rewardInfo.exp} XP · +{rewardInfo.candy} 🍬 Kẹo
-              </p>
-            )}
+            <p style={{ margin: '4px 0', fontSize: 13 }}>{state.lastSummary}</p>
+            <FolkMatchReward
+              input={{ matchId, game: 'nhay-lo-co', mode, won: state.winner === mySeat, isDraw: state.winner === 'DRAW',
+                skillBonuses: countHouses(state, mySeat), score: state.scores[mySeat] }}
+              profile={profile} bridge={bridge} ready={rewardReady} onProfileChange={onProfileChange} onAward={() => sound.playWin()}
+            />
             <div className="fd-btn-row">
-              <button type="button" className="fd-btn-primary" onClick={onRematch}>
+              {onRematch && <button type="button" className="fd-btn-primary" onClick={onRematch}>
                 🔄 Đấu Lại
-              </button>
+              </button>}
               <button type="button" className="fd-btn-secondary" onClick={onExit}>
                 Về Sảnh Game
               </button>
@@ -528,11 +525,11 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
         )}
       </div>
 
-      <div className={`fd-hud-strip ${isMyTurn ? 'is-active' : ''}`}>
+      <div data-chat-player={online ? folkChatId(online.room.matchId, mySeat) : undefined} data-folk-seat={mySeat} className={`fd-hud-strip ${state.turn === mySeat && !state.finished ? 'is-active' : ''}`}>
         <div>
-          <strong>Bạn ({activeSeat})</strong>
+          <strong>{playerName}</strong>
           <div style={{ fontSize: 12, color: '#86efac' }}>
-            Bàn Ô {state.level[mySeat]} · 🏠 {countHouses(state, mySeat)}/{state.maxHousesToWin} Nhà
+            Ô {getNlcTargetBox(state, mySeat)} · {countHouses(state, mySeat)}/{state.maxHousesToWin} Nhà
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

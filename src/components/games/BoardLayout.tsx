@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import { Timer } from 'lucide-react';
 
 export interface PlayerInfo {
+  chatPlayerId?: string;
   name: string;
   avatar: ReactNode;
   elo?: number;
@@ -77,7 +78,7 @@ export const PlayerCard = ({ player, isTop }: PlayerCardProps) => {
       */}
       <div className="grid grid-cols-[auto_1fr_auto] gap-2.5 items-center">
         {/* Avatar */}
-        <div className="relative">
+        <div className="relative" data-chat-player={player.chatPlayerId}>
           {typeof player.avatar === 'string' && player.avatar.startsWith('http') ? (
             <PlayerAvatar src={player.avatar} name={player.name}/>
           ) : (
@@ -117,7 +118,7 @@ export const PlayerCard = ({ player, isTop }: PlayerCardProps) => {
         {/* Right side: Timer & Captured */}
         <div className="flex flex-col items-end justify-center gap-1.5">
           {isActive && player.timeLeft !== undefined && (
-            <div className={`flex items-center gap-1 font-mono font-bold text-sm px-2 py-0.5 rounded-md border ${player.timeLeft <= 10 ? 'bg-rose-950/80 text-rose-400 border-rose-500/50 animate-pulse' : `bg-slate-800 ${theme.textHighlight} ${theme.timerBg}`}`}>
+            <div data-chat-protect="true" className={`flex items-center gap-1 font-mono font-bold text-sm px-2 py-0.5 rounded-md border ${player.timeLeft <= 10 ? 'bg-rose-950/80 text-rose-400 border-rose-500/50 animate-pulse' : `bg-slate-800 ${theme.textHighlight} ${theme.timerBg}`}`}>
               <Timer className="w-3.5 h-3.5" />
               {player.timeLeft}s
             </div>
@@ -161,7 +162,7 @@ export const BoardLayout = ({ header, topPlayer, bottomPlayer, board, controls, 
         
         {topPlayer && <PlayerCard player={topPlayer} isTop={true} />}
         
-        <div className="relative flex flex-col items-center justify-center w-full my-1 sm:my-2">
+        <div data-chat-protect="true" className="relative flex flex-col items-center justify-center w-full my-1 sm:my-2">
           {board}
         </div>
         

@@ -1,211 +1,158 @@
-import React, { useEffect, useState } from 'react';
-import { FOLK_EMOTES, type EquippedFolkSkins, type FolkGameKind, type FolkRoomSnapshot, type FolkSeat } from './types';
-import type { FolkRoomServer } from './server';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { usePlayer } from '../../context/PlayerContext';
+import { platformFolkClient, type FolkOnlineClient } from './online-client';
+import type { FolkCommand, FolkOnlineRoom } from './online-protocol';
+import type { FolkGameKind } from './types';
+import { useFolkChat } from './useFolkChat';
 
-export type OnlineEntryMode = 'match' | 'create' | 'join';
+export const folkOnlineEnabled = import.meta.env.VITE_FOLK_ONLINE === '1';
+export type OnlineEntryMode = 'match' | 'create' | 'join' | 'resume';
 
-interface OnlineRoomProps<TState, TMove> {
-  gameKind: FolkGameKind;
+interface OnlineRoomProps<Game extends FolkGameKind> {
+  game: Game;
   gameTitle: string;
   mode: OnlineEntryMode;
-  server: FolkRoomServer<TState, TMove>;
-  userId: string;
-  playerName: string;
-  skins: EquippedFolkSkins;
   onExit: () => void;
   renderMatch: (ctx: {
-    room: FolkRoomSnapshot<TState>;
-    mySeat: FolkSeat;
-    onMove: (move: TMove) => { ok: boolean; error?: string };
-    onEmote: (emoteId: string) => void;
-    onRematch: () => void;
+    room: FolkOnlineRoom<Game>;
+    blocked: boolean;
+    now: number;
+    arrivalNow: number;
+    onAction: (command: FolkCommand) => void;
+    onRematch?: () => void;
     onLeave: () => void;
-  }) => React.ReactNode;
+  }) => ReactNode;
 }
 
-export function OnlineRoom<TState, TMove>({
-  gameKind,
-  gameTitle,
-  mode,
-  server,
-  userId,
-  playerName,
-  skins,
-  onExit,
-  renderMatch,
-}: OnlineRoomProps<TState, TMove>) {
-  const [room, setRoom] = useState<FolkRoomSnapshot<TState> | null>(null);
+export function OnlineRoom<Game extends FolkGameKind>({ game, gameTitle, mode, onExit, renderMatch }: OnlineRoomProps<Game>) {
+  const { profile } = usePlayer();
+  const name = profile.username;
+  const [client, setClient] = useState<FolkOnlineClient<Game> | null>(null);
   const [joinCode, setJoinCode] = useState('');
-  const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [connectError, setConnectError] = useState('');
+  const [copyStatus, setCopyStatus] = useState('');
+  const [, repaint] = useState(0);
+  const [connectAttempt, retryConnection] = useState(0);
+  const [entered, setEntered] = useState(false);
 
   useEffect(() => {
-    setError('');
-    if (mode === 'create') {
-      setRoom(server.createRoom({ userId, name: playerName, gameKind, isPublic: false, skins }));
-    } else if (mode === 'match') {
-      setRoom(server.matchmake({ userId, name: playerName, gameKind, skins }));
-    } else {
-      setRoom(null);
-    }
-  }, [mode, gameKind, userId, playerName]);
+    let live = true;
+    let connection: FolkOnlineClient<Game> | null = null;
+    let unsubscribe: (() => void) | undefined;
+    setClient(null);
+    setConnectError('');
+    setEntered(false);
+    platformFolkClient(game).then(async next => {
+      if (!live) { next.close(); return; }
+      connection = next;
+      unsubscribe = next.subscribe(() => repaint(value => value + 1));
+      setClient(next);
+      if (mode !== 'join') await next.enter(mode, name);
+      if (live) setEntered(true);
+    }).catch(error => { if (live) setConnectError(error instanceof Error ? error.message : 'Không kết nối được phòng.'); });
+    return () => { live = false; unsubscribe?.(); connection?.close(); };
+  }, [game, mode, name, connectAttempt]);
 
   useEffect(() => {
-    if (!room) return;
-    const interval = setInterval(() => {
-      const updated = server.getRoom(room.roomId, Date.now());
-      if (updated && updated.version !== room.version) {
-        setRoom(updated);
-      }
-    }, 500);
-    return () => clearInterval(interval);
-  }, [room?.roomId, room?.version]);
+    if (!client) return;
+    const poll = setInterval(() => void client.refresh(), 1000);
+    const clock = setInterval(() => repaint(value => value + 1), 160);
+    const onOnline = () => void client.refresh();
+    window.addEventListener('online', onOnline);
+    return () => { clearInterval(poll); clearInterval(clock); window.removeEventListener('online', onOnline); };
+  }, [client]);
 
-  const handleJoin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    const res = server.joinByCode({ userId, name: playerName, code: joinCode, skins });
-    if (!res.ok || !res.room) {
-      setError(res.error || 'Không vào được phòng.');
-      return;
-    }
-    setRoom(res.room);
+  useEffect(() => {
+    if (!client) return;
+    const close = () => {
+      client.close();
+      setClient(null);
+      setConnectError('Tài khoản đã thay đổi. Hãy vào lại phòng.');
+    };
+    window.addEventListener('arcadex_auth_changed', close);
+    return () => window.removeEventListener('arcadex_auth_changed', close);
+  }, [client]);
+
+  useFolkChat(client);
+  const room = client?.room;
+  const now = client?.now ?? Date.now();
+  const blocked = !client?.online || !!(client.busy || client.pending);
+  const handleJoin = (event: FormEvent) => {
+    event.preventDefault();
+    if (joinCode.length === 6) void client?.enter('join', name, joinCode);
   };
-
-  const handleCopyCode = () => {
-    if (!room) return;
-    const text = `Vào đấu ${gameTitle} 1vs1 với mình trên ArcadeX! Mã phòng: ${room.code}`;
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      void navigator.clipboard.writeText(room.code).catch(() => {});
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    void text;
+  const leave = async () => {
+    if (client && (!room || await client.command({ type: 'leave' }))) onExit();
   };
-
-  const handleLeave = () => {
-    if (room) {
-      server.leaveRoom(room.roomId, userId);
-    }
-    onExit();
+  const retryPending = async () => {
+    const leaving = client?.pending?.type === 'command' && client.pending.command.type === 'leave';
+    if (await client?.retry() && leaving) onExit();
   };
+  const notice = client?.notice ?? '';
+  const error = connectError || notice;
+  const retry = client?.pending && !client.busy &&
+    <button type="button" className="fd-btn-secondary" onClick={retryPending}>Gửi lại thao tác</button>;
 
-  if (!room && mode === 'join') {
-    return (
-      <div className="fd-room-card">
-        <h2>Nhập Mã Phòng 1vs1</h2>
-        <p className="fd-subtitle">Nhập mã 6 ký tự từ bạn bè để vào thẳng bàn {gameTitle}.</p>
-        <form onSubmit={handleJoin} className="fd-join-form">
-          <input
-            type="text"
-            maxLength={6}
-            value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-            placeholder="VD: K8M4P2"
-            className="fd-code-input"
-            aria-label="Mã phòng 6 ký tự"
-          />
-          {error && <p className="fd-error-text">{error}</p>}
-          <div className="fd-btn-row">
-            <button type="submit" className="fd-btn-primary" disabled={joinCode.trim().length < 4}>
-              Vào Phòng
-            </button>
-            <button type="button" className="fd-btn-secondary" onClick={onExit}>
-              Quay lại
-            </button>
-          </div>
-        </form>
+  if (!room) return <section className="fd-room-card">
+    <h2>{mode === 'join' ? 'Nhập Mã Phòng 1vs1' : 'Đấu Online 1vs1'}</h2>
+    {error && <p className="fd-error-text" role="alert">{error}</p>}
+    {!entered && !error && <p role="status">Đang kết nối phòng đấu…</p>}
+    {entered && mode === 'resume' && !error && <p role="status">Bạn chưa có phòng đang mở.</p>}
+    {mode === 'join' && client && <form onSubmit={handleJoin} className="fd-join-form">
+      <label htmlFor="fd-room-code">Mã phòng 6 ký tự</label>
+      <input id="fd-room-code" maxLength={6} value={joinCode} autoComplete="off" autoCapitalize="characters"
+        className="fd-code-input" onChange={event => setJoinCode(event.target.value.toUpperCase().replace(/[^A-Z2-9]/g, ''))}/>
+      <button type="submit" className="fd-btn-primary" disabled={joinCode.length !== 6 || client.busy || !!client.pending}>Vào Phòng</button>
+    </form>}
+    {retry}
+    {error && !client?.pending && mode !== 'join' &&
+      <button type="button" className="fd-btn-secondary" onClick={() => retryConnection(value => value + 1)}>Thử kết nối lại</button>}
+    <button type="button" className="fd-btn-secondary" onClick={onExit}>Quay lại</button>
+  </section>;
+
+  if (!client) return null;
+  const seconds = Math.max(0, Math.ceil((room.deadlineAt - now) / 1000));
+  const expiredLobby = room.phase === 'finished' && !room.winner;
+  const lobby = room.phase === 'lobby' || room.phase === 'countdown' || expiredLobby;
+  const canRematch = room.phase === 'finished' && room.rematchUntil > now;
+  const voted = room.rematchVotes.includes(room.mySeat);
+  return <>
+    {(error || retry || !client.online) && <div className="fd-room-status" data-chat-protect="true">
+      <p role="status">{error || 'Đang kết nối lại…'}</p>
+      {retry}
+    </div>}
+    {lobby ? <section className="fd-room-card">
+      <h2>{expiredLobby ? 'Phòng đã hết hạn' : room.phase === 'countdown' ? `Bắt đầu sau ${seconds} giây` : 'Đang chờ đối thủ'}</h2>
+      {!room.isPublic && !expiredLobby && <div className="fd-invite-box">
+        <span className="fd-invite-label">Mã mời · {gameTitle}</span>
+        <strong className="fd-invite-code" data-testid="folk-room-code">{room.code}</strong>
+        <button type="button" className="fd-btn-secondary" onClick={() => {
+          void navigator.clipboard?.writeText(room.code).then(() => setCopyStatus('Đã sao chép mã.'),
+            () => setCopyStatus('Chọn và sao chép mã phía trên.'));
+        }}>Sao chép mã</button>
+        {copyStatus && <span role="status">{copyStatus}</span>}
+      </div>}
+      <div className="fd-seats-row">
+        {room.players.map(player => <div key={player.seat} className="fd-seat-box is-occupied">
+          <span className="fd-seat-tag">{player.seat === room.mySeat ? 'Bạn' : 'Đối thủ'}</span>
+          <strong>{player.name}</strong>
+        </div>)}
       </div>
-    );
-  }
-
-  if (!room) {
-    return (
-      <div className="fd-room-card">
-        <p>Đang kết nối phòng đấu…</p>
+      <button type="button" className="fd-btn-secondary" disabled={client.busy || !!client.pending} onClick={leave}>Rời phòng</button>
+    </section> : <>
+      <div className="fd-room-status" data-chat-protect="true">
+        {room.phase === 'playing' && now < room.readyAt && <span>Đang rải quân · lượt mới sau {Math.ceil((room.readyAt - now) / 1000)}s</span>}
+        {room.phase === 'playing' && now >= room.readyAt && <span>Đến lượt {room.state.turn === room.mySeat ? 'bạn' : 'đối thủ'} · {seconds}s</span>}
+        {room.finishReason === 'timeout' && <span>Kết thúc do hết giờ lượt.</span>}
+        {room.finishReason === 'forfeit' && <span>Đối thủ đã rời trận.</span>}
+        {canRematch && voted && <span>Đã mời đấu lại. Đang chờ đối thủ.</span>}
+        <button type="button" className="fd-btn-secondary" disabled={client.busy || !!client.pending} onClick={leave}>Rời phòng</button>
       </div>
-    );
-  }
-
-  const mySeat: FolkSeat = room.players.find((p) => p.userId === userId)?.seat ?? 'P1';
-
-  if (room.phase === 'lobby' || room.phase === 'countdown') {
-    return (
-      <div className="fd-room-card">
-        <div className="fd-room-badge">{room.isPublic ? '⚡ Ghép Trận 1vs1' : '🏠 Phòng Riêng'}</div>
-        <h2>{room.phase === 'countdown' ? 'Đã đủ 2 người! Chuẩn bị vào trận…' : 'Đang chờ đối thủ'}</h2>
-
-        {!room.isPublic && (
-          <div className="fd-invite-box">
-            <span className="fd-invite-label">Mã Mời Bạn Bè</span>
-            <div className="fd-invite-code">{room.code}</div>
-            <button type="button" className="fd-btn-primary" onClick={handleCopyCode}>
-              {copied ? '✓ Đã sao chép mã!' : '📋 Sao chép mã mời'}
-            </button>
-          </div>
-        )}
-
-        <div className="fd-seats-row">
-          {(['P1', 'P2'] as FolkSeat[]).map((seat) => {
-            const player = room.players.find((p) => p.seat === seat);
-            return (
-              <div key={seat} className={`fd-seat-box ${player ? 'is-occupied' : ''}`}>
-                <span className="fd-seat-tag">{seat === 'P1' ? 'Chủ Sân' : 'Khách Thách Đấu'}</span>
-                <strong>{player ? player.name : 'Đang chờ…'}</strong>
-              </div>
-            );
-          })}
-        </div>
-
-        <button type="button" className="fd-btn-secondary" onClick={handleLeave}>
-          Rời phòng
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {renderMatch({
-        room,
-        mySeat,
-        onMove: (move) => {
-          const res = server.submitMove({
-            roomId: room.roomId,
-            userId,
-            expectedVersion: room.version,
-            requestId: `${userId}_${room.version}_${Date.now()}`,
-            move,
-          });
-          if (res.room) setRoom(res.room);
-          return { ok: res.ok, error: res.error };
-        },
-        onEmote: (emoteId) => {
-          const updated = server.sendEmote(room.roomId, userId, emoteId);
-          if (updated) setRoom(updated);
-        },
-        onRematch: () => {
-          const updated = server.voteRematch(room.roomId, userId);
-          if (updated) setRoom(updated);
-        },
-        onLeave: handleLeave,
+      {renderMatch({ room, blocked: blocked || seconds === 0, now, arrivalNow: client.arrivalNow,
+        onAction: command => { void client.command(command); },
+        onRematch: canRematch && !voted ? () => { void client.command({ type: 'rematch' }); } : undefined,
+        onLeave: () => { void leave(); },
       })}
-      <div className="fd-emote-bar" aria-label="Biểu cảm nhanh">
-        {FOLK_EMOTES.map((em) => (
-          <button
-            key={em.id}
-            type="button"
-            title={em.label}
-            className="fd-emote-btn"
-            onClick={() => {
-              const updated = server.sendEmote(room.roomId, userId, em.id);
-              if (updated) setRoom(updated);
-            }}
-          >
-            {em.emoji}
-          </button>
-        ))}
-      </div>
-    </>
-  );
+    </>}
+  </>;
 }

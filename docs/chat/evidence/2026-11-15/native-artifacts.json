@@ -1,0 +1,48 @@
+{
+  "project": "khqipuipeawzlkqmdzdg",
+  "scope": "Generated sources, no deployment or credentials",
+  "artifacts": [
+    {
+      "file": "word-chain-room-index.ts",
+      "bytes": 488348,
+      "sha256": "7418a563a06d879d1f348538fb82e1fa6b385f36a381a879c8d8ee2a3cfe5913"
+    },
+    {
+      "file": "battleship-room-index.ts",
+      "bytes": 23497,
+      "sha256": "2c61f9eec96a6fd76831026d2c1aa82a14228090fb63d831067c2a1ba0146a81"
+    },
+    {
+      "file": "chat-staging-schema.sql",
+      "bytes": 31411,
+      "sha256": "f49a3c0c80aeaf995004bbf773ac5e0430aaea2fa0f1af852ae06e9b3a20ea3b"
+    }
+  ],
+  "sources": [
+    {
+      "file": "supabase/word-chain/schema.sql",
+      "sha256": "d9f1fa54c04678a2ca43aed93bffbbd99f2b9a2c5b0e4a43dbd52127610dfc31"
+    },
+    {
+      "file": "supabase/battleship/schema.sql",
+      "sha256": "e62a288bb90af58dda1aa5022c4f0a3d3919641b5aecfc0d6aa1eccbee75cc2e"
+    },
+    {
+      "file": "supabase/battleship/presence.sql",
+      "sha256": "36773ce4e16568f44e0d150c826b5f740b8c49e058138a335716300b908bc035"
+    },
+    {
+      "file": "supabase/battleship/matchmaking.sql",
+      "sha256": "389bf59eb699c6bafb3c64028af7366c6da89c4ca4556cae6e61849e6542e5f9"
+    },
+    {
+      "file": "supabase/battleship/rematch.sql",
+      "sha256": "a5eb0c0460564ff4f50e659bdce1546d7d7b633e40b5796b097b7b4eb9a8fd97"
+    }
+  ],
+  "appliedSchema": {
+    "file": "chat-staging-schema.sql",
+    "sha256": "20be1775fcee8f33e6216decd32c58f9a39ddaa3178a8c7abb5338d34c638c59",
+    "note": "Applied earlier with a different header comment; SQL sources identical to manifest."
+  }
+}

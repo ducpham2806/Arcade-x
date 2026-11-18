@@ -240,5 +240,21 @@
     "sourceSHA256": "9ec3539fbd0cff51fdd210272029483c69822b5e6cb63e1b826322ef23d312fc",
     "bannerSHA256": "65ba825ddddabfa8777597f97476ee28af9964e837d56cb050cdf10115f4cdd7",
     "sourceBannerSHA256": "a06c2d636f01f69df494d78c3de47a9826da0c0471e73c7e95889c8348cdff00"
+  },
+  {
+    "id": "o-an-quan",
+    "icon": "/game-art/icons/o-an-quan.webp",
+    "banner": "/game-art/banners/o-an-quan.webp",
+    "iconBytes": 25838,
+    "bannerBytes": 40430,
+    "sha256": "04b390920c9f0a1d20b7b8cf6bf47bddfd97d86f9086b95d49d4032d21747c4a"
+  },
+  {
+    "id": "nhay-lo-co",
+    "icon": "/game-art/icons/nhay-lo-co.webp",
+    "banner": "/game-art/banners/nhay-lo-co.webp",
+    "iconBytes": 19596,
+    "bannerBytes": 33164,
+    "sha256": "853dfb02caa53c133329455fc55607322b26b6253d186f581217de30941eb6c3"
   }
 ]

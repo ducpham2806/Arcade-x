@@ -74,8 +74,8 @@ begin
    end if;
   end if; return '{}'::jsonb;
  elsif p_action='inbox' then
-  select coalesce(jsonb_agg(jsonb_build_object('peer',peer,'profile',arcadex_social.profile(peer),'text',text,'created_at',created_at) order by created_at desc),'[]'::jsonb) into result from (
-   select distinct on (case when sender=p_actor then target else sender end) case when sender=p_actor then target else sender end peer,text,created_at
+  select coalesce(jsonb_agg(jsonb_build_object('sender',sender,'peer',peer,'profile',arcadex_social.profile(peer),'text',text,'created_at',created_at) order by created_at desc),'[]'::jsonb) into result from (
+   select distinct on (case when sender=p_actor then target else sender end) case when sender=p_actor then target else sender end peer,sender,text,created_at
    from arcadex_social.messages where scope='dm' and (sender=p_actor or target=p_actor)
    order by case when sender=p_actor then target else sender end,created_at desc) q;
   return result;

@@ -1,6 +1,6 @@
 ---
 name: game-systems-ai-programmer
-description: Core game architecture, gameplay systems, AI programming, networking, and performance optimization specialist based on Claude-Code-Game-Studios (/create-architecture, /architecture-decision, /architecture-review, /perf-profile, /tech-debt). Enforces path-scoped coding standards across gameplay, core engine, AI behavior trees/pathfinding, networking, and UI decoupling. Use when designing game architecture, writing ADRs, programming core systems or enemy AI, profiling performance, or enforcing clean game code standards.
+description: Core game architecture, gameplay systems, AI programming, networking, and performance optimization specialist based on Claude-Code-Game-Studios 1.3 (/create-architecture, /architecture-decision, /architecture-review, /perf-profile, /tech-debt). Enforces path-scoped coding standards across gameplay, core engine, AI behavior trees/pathfinding, networking, and UI decoupling. Use when designing game architecture, writing ADRs, programming core systems or enemy AI, profiling performance, or enforcing clean game code standards.
 ---
 # Game Systems & AI Programmer
 
@@ -29,7 +29,7 @@ Document foundational technical choices in `docs/architecture/` and `docs/adr/AD
 Apply strict domain rules based on the module being edited (adapting paths to Godot `src/`, Unity `Assets/Scripts/`, or Unreal `Source/<Module>/`):
 
 - **Gameplay (`src/gameplay/**` / `Gameplay/`)**:
-  - **Data-Driven Values**: Never hardcode cooldowns, speeds, or damage numbers in scripts. Load them from custom Resources (`Resource` / `ScriptableObject` / `UDataAsset`) or validated JSON tables under `assets/data/`.
+  - **Data-Driven Values**: Never hardcode cooldowns, speeds, or damage numbers in scripts. Load them from custom Resources (`Resource` / `ScriptableObject` / `UDataAsset`) or validated JSON tables under `<assets_root>/data/`.
   - **Frame-Rate Independence**: Multiply all continuous movement, physics forces, and timers by `delta` (`Time.deltaTime` / `DeltaSeconds`).
   - **Zero Direct UI References**: Never call `get_node("/root/HUD/...")` or mutate UI labels directly from gameplay scripts; emit typed events/signals instead.
 - **Core & Engine (`src/core/**` / `Core/`)**:
@@ -55,5 +55,7 @@ When diagnosing frame drops or auditing code health:
 
 ## Gotchas
 
-- Never hand-edit binary engine assets (`*.uasset`, `*.umap`) as text, and when editing text-based scene files (`*.tscn`, `*.tres`), preserve UID/ext_resource integrity carefully.
+- Engine scene and asset files are corrupted by a bad hand edit (CCGS 1.2 scene-file rule): use the editor or its CLI/MCP where you can; never invent a Godot `uid://` (let the editor assign it and commit the `.uid` files); never hand-edit Unity YAML (`*.unity`, `*.prefab`, `Assets/**/*.asset`) while an Editor is reachable; never edit `*.uasset` / `*.umap` at all.
+- When `engine.code_root` / `engine.test_root` are set in `project.yaml`, they replace the engine's usual folders above; a value that cannot be used makes code checks NOT ASSESSED with the reason, never a silent fallback.
+- An ADR that is only Proposed does not unblock stories: `/create-stories` blocks a story whose governing ADR (or one it depends on) is not Accepted.
 - Combine this skill with the matching engine specialist skill (`godot-gameplay-scripter`, `unity-architect`, or `unreal-systems-engineer`) when writing engine-specific implementation code.

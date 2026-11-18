@@ -117,6 +117,7 @@ begin
   v_doc := r.doc
    || jsonb_build_object('version', r.version + 1)
    || jsonb_build_object('members', (r.doc->'members') || jsonb_build_object(v_seat, p_uid))
+   || jsonb_build_object('chatMembers', coalesce(r.doc->'chatMembers', '{}'::jsonb) || jsonb_build_object(v_seat, (r.doc->>'id') || ':' || v_seat || ':' || ((r.doc->>'version')::int+1)::text))
    || jsonb_build_object('names', coalesce(r.doc->'names', '{}'::jsonb) || jsonb_build_object(v_seat, left(coalesce(p_name, ''), 18)))
    || jsonb_build_object('lastSeen', coalesce(r.doc->'lastSeen', '{}'::jsonb) || jsonb_build_object(v_seat, p_now));
   if v_count + 1 >= 2 and not (r.doc ? 'pairAt') then v_doc := v_doc || jsonb_build_object('pairAt', p_now); end if;

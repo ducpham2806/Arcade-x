@@ -1,3 +1,4 @@
+import {useChat} from '../../chat/ChatContext';
 import {DuelLobby} from '../../components/games/DuelLobby';
 import {IngameChat} from '../../components/SocialChatThread';
 import '../../components/social.css';
@@ -73,6 +74,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   onGameOver,
   onRestart,
 }) => {
+  const chat=useChat();
   const { profile, addExp, addCoins } = usePlayer();
 
   // Navigation mode
@@ -699,7 +701,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   return (
     <div className="arcade-game-surface relative w-full min-h-0 max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
 <ConnectionNotice active={!!activeRoomId}/>
-<IngameChat roomId={activeRoomId}/>
+<IngameChat roomId={activeRoomId} players={opponentInfo ? [{id:opponentInfo.uid,name:opponentInfo.name,avatar:opponentInfo.avatarUrl}] : []}/>
       {activeRoomId&&error&&<p role="alert" className="p-2 text-amber-200">{error} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
       {moveHint&&<p role="status" className="text-sm text-amber-200 p-2">{moveHint}</p>}
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
@@ -810,6 +812,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                         ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=P2_Xiangqi'
                         : 'https://api.dicebear.com/7.x/bottts/svg?seed=XiangqiBot'
                     }
+                    data-chat-player={activeRoomId ? opponentInfo?.uid : undefined}
                     alt="Opponent"
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-800 border-2 border-slate-700 object-cover shadow-sm"
                   />
@@ -1083,7 +1086,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
               {activeRoomId && (
                 <button
                   id="btn-xiangqi-chat"
-                  onClick={() => setShowChatBox(!showChatBox)}
+                  onClick={() => chat ? chat.open() : setShowChatBox(!showChatBox)}
                   className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all cursor-pointer"
                   title="Tin nhắn nhanh"
                 >

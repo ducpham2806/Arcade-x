@@ -15,6 +15,12 @@ module.exports = async function checkPreviewMedia(browser, origin, evidence) {
   const user = fixture.user('AssetQA');
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, serviceWorkers: 'block' });
   await fixture.install(context);
+  const chatReads = new Set();
+  await context.route('**/rest/v1/rpc/arcadex_social_action', async route => {
+    const payload = route.request().postDataJSON();
+    if (payload.p_action === 'read') chatReads.add(`${payload.p_scope}:${payload.p_target}`);
+    await route.fulfill({ json: [] });
+  });
 
   let releaseArt, releaseAudio;
   const art = new Promise(resolve => { releaseArt = resolve; });
@@ -67,6 +73,18 @@ module.exports = async function checkPreviewMedia(browser, origin, evidence) {
     await page.getByRole('button', { name: 'Chơi bản preview' }).click();
     await expect(page.locator('.snake-journey')).toBeVisible();
     assert.deepEqual(requests.filter(file => !file.endsWith('.wav')), [], 'Journey must not request gameplay art');
+    const bubble = page.locator('.game-chat-bubble');
+    await expect(bubble).toHaveAttribute('aria-expanded', 'false');
+    await bubble.click();
+    const panel = page.locator('.chat-floating-panel');
+    await expect(panel.getByRole('button', { name: 'Game', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => chatReads.has('game:snake-legend')).toBe(true);
+    if (!holdAudio) await page.screenshot({ path: evidence + '/preview-game-chat.png' });
+    await panel.getByRole('button', { name: 'Phóng lớn chat và bạn bè' }).click();
+    await expect(page.getByLabel('Chọn kênh để tìm bạn chơi cùng')).toHaveValue('snake-legend');
+    await page.getByRole('button', { name: 'Về khung chat nhỏ' }).click();
+    await page.getByRole('button', { name: 'Thu chat về bubble' }).click();
+    await expect(bubble).toHaveAttribute('aria-expanded', 'false');
     await page.locator('.journey-play').click();
     await expect(page.locator('.story-app canvas')).toBeVisible();
   }
@@ -77,6 +95,7 @@ module.exports = async function checkPreviewMedia(browser, origin, evidence) {
     await page.locator('#btn-game-exit').click();
     await page.locator('#btn-exit-confirm').click();
     await expect(page.getByRole('button', { name: 'Chơi bản preview' })).toBeVisible();
+    await expect(page.locator('.game-chat-bubble,.chat-floating-panel')).toHaveCount(0);
   };
 
   try {

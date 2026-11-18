@@ -8,11 +8,19 @@ export interface OaqMove {
 }
 
 export interface OaqStepEvent {
-  type: 'pickup' | 'drop' | 'capture' | 'resow' | 'stop';
+  type: 'pickup' | 'drop' | 'capture' | 'resow' | 'sweep' | 'stop';
   cellIndex: number;
   count: number;
   seat: FolkSeat;
   isQuan?: boolean;
+}
+
+export interface OaqTurn {
+  turn: number;
+  seat: FolkSeat;
+  move: OaqMove;
+  drops: number[];
+  captures: { cellIndex: number; points: number; quan: boolean }[];
 }
 
 export interface OaqState {
@@ -30,9 +38,12 @@ export interface OaqState {
   lastMove?: OaqMove;
   lastCapturedPoints: number;
   lastComboCount: number;
+  trayQuan?: Record<FolkSeat, number>;
+  history?: OaqTurn[];
 }
 
 export const QUAN_VALUE = 10;
+const MAX_SOWING_PASSES = 24;
 
 export function createInitialOaqState(): OaqState {
   // Ô 0 và 6 chứa 1 viên Quan (đếm 1 viên vật lý nhưng quy đổi 10 điểm khi ăn)
@@ -75,6 +86,23 @@ export function cellPointValue(state: OaqState, idx: number): number {
   return state.cells[idx] + quanPts;
 }
 
+export function getOaqTray(state: OaqState, seat: FolkSeat) {
+  const quan = Math.min(2, state.trayQuan?.[seat] ?? state.quanCaptured[seat], Math.floor(state.scores[seat] / QUAN_VALUE));
+  return { dan: state.scores[seat] - quan * QUAN_VALUE, quan };
+}
+
+export function recordOaqTurn(before: OaqState, move: OaqMove, next: OaqState, steps: readonly OaqStepEvent[]): OaqState {
+  const turn: OaqTurn = {
+    turn: before.turnNumber,
+    seat: before.turn,
+    move: { ...move },
+    drops: steps.filter(step => step.type === 'drop').map(step => step.cellIndex),
+    captures: steps.filter(step => step.type === 'capture')
+      .map(step => ({ cellIndex: step.cellIndex, points: step.count, quan: !!step.isQuan })),
+  };
+  return { ...next, history: [...(before.history ?? []), turn] };
+}
+
 export function getOwnRange(seat: FolkSeat): number[] {
   return seat === 'P1' ? [1, 2, 3, 4, 5] : [7, 8, 9, 10, 11];
 }
@@ -106,16 +134,15 @@ export function ensureSideHasStones(state: OaqState, seat: FolkSeat): OaqState {
   }
 
   const next = cloneOaqState(state);
-  const opponent: FolkSeat = seat === 'P1' ? 'P2' : 'P1';
+  next.trayQuan ??= { P1: getOaqTray(state, 'P1').quan, P2: getOaqTray(state, 'P2').quan };
   if (next.scores[seat] >= 5) {
     next.scores[seat] -= 5;
   } else {
     const needed = 5 - next.scores[seat];
     next.scores[seat] = 0;
     next.debt[seat] += needed;
-    // Ghi nhận nợ với đối phương
-    void opponent;
   }
+  next.trayQuan[seat] = getOaqTray(next, seat).quan;
   for (const idx of range) {
     next.cells[idx] = 1;
   }
@@ -124,18 +151,14 @@ export function ensureSideHasStones(state: OaqState, seat: FolkSeat): OaqState {
 
 export function cloneOaqState(s: OaqState): OaqState {
   return {
+    ...s,
     cells: [...s.cells],
     quanAlive: [s.quanAlive[0], s.quanAlive[1]],
     scores: { ...s.scores },
     debt: { ...s.debt },
     quanCaptured: { ...s.quanCaptured },
-    turn: s.turn,
-    turnNumber: s.turnNumber,
-    finished: s.finished,
-    winner: s.winner,
+    ...(s.trayQuan && { trayQuan: { ...s.trayQuan } }),
     lastMove: s.lastMove ? { ...s.lastMove } : undefined,
-    lastCapturedPoints: s.lastCapturedPoints,
-    lastComboCount: s.lastComboCount,
   };
 }
 
@@ -151,13 +174,15 @@ export function applyOaqMove(
     return { ok: false, error: 'Chưa đến lượt của bạn.', nextState: rawState, steps: [] };
   }
 
-  const state = ensureSideHasStones(rawState, seat);
+  const prepared = ensureSideHasStones(rawState, seat);
   const validRange = getOwnRange(seat);
-  if (!validRange.includes(move.cellIndex) || state.cells[move.cellIndex] <= 0) {
+  if (!validRange.includes(move.cellIndex) || prepared.cells[move.cellIndex] <= 0) {
     return { ok: false, error: 'Ô được chọn không hợp lệ hoặc không có quân.', nextState: rawState, steps: [] };
   }
 
+  const state = prepared === rawState ? cloneOaqState(prepared) : prepared;
   const steps: OaqStepEvent[] = [];
+  if (prepared !== rawState) steps.push({ type: 'resow', cellIndex: validRange[0], count: 5, seat });
   let cursor = move.cellIndex;
   let hand = state.cells[cursor];
   state.cells[cursor] = 0;
@@ -167,7 +192,7 @@ export function applyOaqMove(
   let capturedTotal = 0;
   let comboCount = 0;
 
-  while (loopGuard < 24) {
+  while (loopGuard < MAX_SOWING_PASSES) {
     loopGuard += 1;
     // Rải từng viên trong tay
     while (hand > 0) {
@@ -191,6 +216,10 @@ export function applyOaqMove(
     }
 
     if (!isQuanCell(nextIdx) && state.cells[nextIdx] > 0) {
+      if (loopGuard === MAX_SOWING_PASSES) {
+        steps.push({ type: 'stop', cellIndex: nextIdx, count: 0, seat });
+        break;
+      }
       // Bốc tiếp ô Dân kế tiếp để rải tiếp
       cursor = nextIdx;
       hand = state.cells[cursor];
@@ -223,8 +252,12 @@ export function applyOaqMove(
         state.quanAlive[qSlot] = false;
       }
       state.cells[targetIdx] = 0;
+      if (ateQuan) {
+        state.trayQuan ??= { P1: getOaqTray(state, 'P1').quan, P2: getOaqTray(state, 'P2').quan };
+        state.trayQuan[seat] += 1;
+        state.quanCaptured[seat] += 1;
+      }
       state.scores[seat] += pts;
-      if (ateQuan) state.quanCaptured[seat] += 1;
       capturedTotal += pts;
       comboCount += 1;
       steps.push({ type: 'capture', cellIndex: targetIdx, count: pts, seat, isQuan: ateQuan });
@@ -244,24 +277,31 @@ export function applyOaqMove(
   const quan1Empty = !state.quanAlive[1] && state.cells[6] === 0;
   if (quan0Empty && quan1Empty) {
     // Hốt Tàn: quân Dân còn bên nào thuộc về người đó
-    for (const idx of getOwnRange('P1')) {
-      state.scores.P1 += state.cells[idx];
-      state.cells[idx] = 0;
+    for (const owner of ['P1', 'P2'] as const) {
+      for (const idx of getOwnRange(owner)) {
+        const count = state.cells[idx];
+        if (count > 0) steps.push({ type: 'sweep', cellIndex: idx, count, seat: owner });
+        state.scores[owner] += count;
+        state.cells[idx] = 0;
+      }
     }
-    for (const idx of getOwnRange('P2')) {
-      state.scores.P2 += state.cells[idx];
-      state.cells[idx] = 0;
+    // Quân rải trước theo nợ chỉ trở thành điểm sau khi trừ phần đã ứng.
+    const netP1 = state.scores.P1 - state.debt.P1;
+    const netP2 = state.scores.P2 - state.debt.P2;
+    const totalPoints = netP1 + netP2;
+    // Nếu một bên không đủ điểm trả nợ, bên còn lại giữ phần điểm thật của bàn.
+    state.scores.P1 = Math.min(totalPoints, Math.max(0, netP1));
+    state.scores.P2 = totalPoints - state.scores.P1;
+    if (state.trayQuan) {
+      state.trayQuan.P1 = getOaqTray(state, 'P1').quan;
+      state.trayQuan.P2 = getOaqTray(state, 'P2').quan;
     }
-    // Trừ nợ rải sinh
-    const finalP1 = state.scores.P1 - state.debt.P1 + state.debt.P2;
-    const finalP2 = state.scores.P2 - state.debt.P2 + state.debt.P1;
-    state.scores.P1 = Math.max(0, finalP1);
-    state.scores.P2 = Math.max(0, finalP2);
     state.finished = true;
     state.winner = state.scores.P1 > state.scores.P2 ? 'P1' : state.scores.P2 > state.scores.P1 ? 'P2' : 'DRAW';
   } else {
     const nextSeat: FolkSeat = seat === 'P1' ? 'P2' : 'P1';
     const ensuredNext = ensureSideHasStones(state, nextSeat);
+    if (ensuredNext !== state) steps.push({ type: 'resow', cellIndex: getOwnRange(nextSeat)[0], count: 5, seat: nextSeat });
     ensuredNext.turn = nextSeat;
     ensuredNext.turnNumber = state.turnNumber + 1;
     return { ok: true, nextState: ensuredNext, steps };

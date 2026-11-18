@@ -1,3 +1,5 @@
+import {ChatProvider} from './chat/ChatProvider';
+import {useChat} from './chat/ChatContext';
 import { GamePackageGate } from './components/GamePackageGate';
 import { installReadability } from './accessibility/readability.js';
 import { installHostingSafeArea } from './services/hostingSafeArea';
@@ -29,7 +31,7 @@ const launcherPanels = {
   GameDetailModal: () => import('./components/GameDetailModal').then(m => ({ default: m.GameDetailModal })),
   PvpMatchHistoryModal: () => import('./components/PvpMatchHistoryModal').then(m => ({ default: m.PvpMatchHistoryModal })),
   ShareModal: () => import('./components/ShareModal').then(m => ({ default: m.ShareModal })),
-  GlobalChat: () => import('./components/GlobalChat').then(m => ({ default: m.GlobalChat })),
+  GlobalChat: () => import('./chat/ChatShell').then(m => ({ default: m.ChatShell })),
 };
 const ProfileModal = React.lazy(launcherPanels.ProfileModal);
 const SettingsModal = React.lazy(launcherPanels.SettingsModal);
@@ -47,6 +49,7 @@ import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy, Pause, Sa
 
 const AppContent: React.FC = () => {
   useRippleEffect();
+  const expandChat = useChat()?.expand;
   useEffect(() => installReadability(), []);
   const launcher = useLauncher();
   const { openEntry, authModalMode, notice, dismissNotice } = useAuth();
@@ -66,21 +69,24 @@ const AppContent: React.FC = () => {
     setActiveModal,
     shareData,
     closeShareModal,
-    isChatOpen,
-    toggleChat,
     openChat,
   } = useLauncherUi();
 
-  const inviteOpened = useRef(false);
+  const entryOpened = useRef(false);
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    if (!inviteOpened.current && query.get('game') === 'tank-clash' && /^[A-HJ-KM-NP-Z2-9]{6}$/i.test(query.get('room') || '')) {
-      inviteOpened.current = true; launchGame('tank-clash');
+    if (entryOpened.current) return;
+    const reviewId = query.get('review');
+    if (import.meta.env.DEV && (reviewId === 'o-an-quan' || reviewId === 'nhay-lo-co') && launcher.catalog.games.some(game => game.id === reviewId)) {
+      entryOpened.current = true;
+      launchGame(reviewId);
+    } else if (query.get('game') === 'tank-clash' && /^[A-HJ-KM-NP-Z2-9]{6}$/i.test(query.get('room') || '')) {
+      entryOpened.current = true;
+      launchGame('tank-clash');
     }
-  }, [launchGame]);
+  }, [launchGame, launcher.catalog.games]);
 
-  const [chatMounted, setChatMounted] = useState(false);
-  useEffect(() => { if (isChatOpen) setChatMounted(true); }, [isChatOpen]);
+
 
   // Warm the lazy panels once the launcher is idle so the first open is instant.
   useEffect(() => whenIdle(() => Object.values(launcherPanels).forEach(load => { void load().catch(() => {}); })), []);
@@ -97,14 +103,19 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const handleOpenModalEvent = (e: Event) => {
       const custom = e as CustomEvent<{ modal?: string }>;
-      if (custom.detail?.modal === 'friends') { openChat(); return; }
+      if (custom.detail?.modal === 'friends') {
+        setActiveModal('none');
+        if (expandChat) expandChat();
+        else openChat();
+        return;
+      }
       if (custom.detail?.modal) {
         setActiveModal(custom.detail.modal as any);
       }
     };
     window.addEventListener('arcadex:open_modal', handleOpenModalEvent);
     return () => window.removeEventListener('arcadex:open_modal', handleOpenModalEvent);
-  }, [setActiveModal]);
+  }, [setActiveModal, expandChat, openChat]);
 
   return (
     <div className={`${!activeGameId ? "launcher-light " : ""}arcade-app relative w-full min-h-screen bg-[#050505] text-slate-200 overflow-x-hidden selection:bg-indigo-500 selection:text-white`}>
@@ -219,8 +230,8 @@ const AppContent: React.FC = () => {
 
 
       {/* Real-time Global Chat Floating Window - Rendered last so it sits on top of all views */}
-      {/* Mounted from the first open on, so tabs and drafts survive closing the panel. */}
-      {chatMounted && <div className="platform-ui"><Suspense fallback={null}><GlobalChat isOpen={isChatOpen} onToggle={toggleChat} onOpenShare={() => setActiveModal('share')} /></Suspense></div>}
+      {/* Shared host; its owner-scoped feeds and drafts survive panel close. */}
+      <div className="platform-ui"><Suspense fallback={null}><GlobalChat /></Suspense></div>
     </div>
   );
 };
@@ -233,7 +244,7 @@ export function App({ reviewControls }: { reviewControls?: React.ReactNode } = {
       <PlayerProvider>
         <InventoryProvider>
           <GameProvider>
-            <AppContent />
+            <ChatProvider><AppContent /></ChatProvider>
             {reviewControls}
           </GameProvider>
         </InventoryProvider>

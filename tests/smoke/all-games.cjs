@@ -7,6 +7,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
+const { expect } = require('@playwright/test');
 const bundledGameIds = require('../helpers/bundled-game-ids.cjs');
 
 const PORT = 4324;
@@ -40,6 +41,8 @@ const only = process.argv.find(a => a.startsWith('--only='))?.split('=')[1]?.spl
       errors.length = 0;
       const started = Date.now();
       try {
+        const minimize = page.getByRole('button', { name: 'Thu chat về bubble' });
+        if (await minimize.isVisible()) await minimize.click();
         await page.locator(`#btn-play-${id}`).click();
         await page.locator(`#game-wrapper-viewport[data-game="${id}"]`).waitFor({ timeout: 20000 });
         // Wait until the game (not the loading fallback) has put content into the stage.
@@ -48,6 +51,26 @@ const only = process.argv.find(a => a.startsWith('--only='))?.split('=')[1]?.spl
           if (!stage || stage.querySelector('[role="status"]')?.textContent?.includes('Đang tải')) return false;
           return stage.querySelectorAll('*').length > 10 || !!stage.querySelector('canvas,iframe');
         }, null, { timeout: 30000 });
+        const bubble = page.locator('.game-chat-bubble');
+        await expect(bubble).toHaveAttribute('aria-expanded', 'false');
+        const gameFrame = page.locator('#game-viewport-stage iframe');
+        if (await gameFrame.count()) {
+          const frame = await gameFrame.boundingBox();
+          const dock = await bubble.boundingBox();
+          await page.mouse.move(dock.x + dock.width / 2, dock.y + dock.height / 2);
+          await page.mouse.down();
+          await page.mouse.move(frame.x + frame.width / 2, frame.y + frame.height / 2, { steps: 8 });
+          await page.mouse.up();
+          const settled = await bubble.boundingBox();
+          assert.ok(settled.x + settled.width <= frame.x || frame.x + frame.width <= settled.x ||
+            settled.y + settled.height <= frame.y || frame.y + frame.height <= settled.y,
+          'Dragged chat bubble must stay outside the embedded game');
+        }
+        await bubble.click();
+        const panel = page.locator('.chat-floating-panel');
+        await expect(panel.getByRole('button', { name: 'Game', exact: true })).toHaveAttribute('aria-pressed', 'true');
+        await minimize.click();
+        await expect(bubble).toHaveAttribute('aria-expanded', 'false');
         // Generic play input: taps on the stage and the common keys, so game loops and input
         // handlers actually run before the checks.
         const stage = await page.locator('#game-viewport-stage').boundingBox();
@@ -78,7 +101,7 @@ const only = process.argv.find(a => a.startsWith('--only='))?.split('=')[1]?.spl
         await page.locator('#game-library').waitFor({ timeout: 15000 });
       }
     }
-    console.log(`all games: ${passed}/${ids.length} launched and exited cleanly`);
+    console.log(`all games: ${passed}/${ids.length} launched, opened and closed chat, and exited cleanly`);
     if (!ids.length || failures.length) process.exitCode = 1;
   } finally {
     await browser.close();

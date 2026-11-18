@@ -4,8 +4,8 @@ import {
   type EquippedFolkSkins,
   type FolkGameKind,
   type SkinCategory,
-} from './types';
-import { FOLK_SKINS_CATALOG, getSkinById } from './skins-catalog';
+} from './types.ts';
+import { FOLK_SKINS_CATALOG, getSkinById } from './skins-catalog.ts';
 
 const STORAGE_KEY = 'arcadex:folk-duel:profile:v1';
 
@@ -23,6 +23,26 @@ export interface FolkProfileSave {
     winStreak: number;
     bestStreak: number;
   };
+}
+
+type FolkSaveDocument = Partial<FolkProfileSave> & { offlineMatch?: unknown };
+
+export function readFolkSave(bridge?: GameBridgeAPI): FolkSaveDocument | null {
+  try {
+    const value = bridge?.loadGameState<unknown>();
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+export function writeFolkSave(bridge: GameBridgeAPI, document: FolkSaveDocument): boolean {
+  try {
+    bridge.saveGameState(document);
+    return JSON.stringify(readFolkSave(bridge)) === JSON.stringify(document);
+  } catch {
+    return false;
+  }
 }
 
 export function createInitialFolkProfile(): FolkProfileSave {
@@ -46,15 +66,8 @@ export function createInitialFolkProfile(): FolkProfileSave {
 
 export function loadFolkProfile(bridge?: GameBridgeAPI): FolkProfileSave {
   const base = createInitialFolkProfile();
-  let raw: Partial<FolkProfileSave> | null = null;
-  if (bridge) {
-    try {
-      raw = bridge.loadGameState<FolkProfileSave>();
-    } catch {
-      raw = null;
-    }
-  }
-  if (!raw && typeof localStorage !== 'undefined') {
+  let raw = readFolkSave(bridge);
+  if (!bridge && typeof localStorage !== 'undefined') {
     try {
       const str = localStorage.getItem(STORAGE_KEY);
       if (str) raw = JSON.parse(str) as Partial<FolkProfileSave>;
@@ -74,20 +87,13 @@ export function loadFolkProfile(bridge?: GameBridgeAPI): FolkProfileSave {
   };
 }
 
-export function saveFolkProfile(profile: FolkProfileSave, bridge?: GameBridgeAPI): void {
-  if (bridge) {
-    try {
-      bridge.saveGameState(profile);
-    } catch {
-      // Bỏ qua nếu môi trường test không có storage
-    }
-  }
-  if (typeof localStorage !== 'undefined') {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-    } catch {
-      // Optional
-    }
+export function saveFolkProfile(profile: FolkProfileSave, bridge?: GameBridgeAPI): boolean {
+  if (bridge) return writeFolkSave(bridge, { ...readFolkSave(bridge), ...profile });
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -105,6 +111,7 @@ export interface MatchRewardInput {
 
 export interface MatchRewardOutput {
   alreadyClaimed: boolean;
+  saveFailed?: true;
   coins: number;
   exp: number;
   candy: number;
@@ -150,6 +157,7 @@ export function applyMatchReward(
   input: MatchRewardInput,
   bridge?: GameBridgeAPI
 ): MatchRewardOutput {
+  if (readFolkSave(bridge)) profile = loadFolkProfile(bridge);
   if (profile.claimedMatchIds.includes(input.matchId)) {
     return { alreadyClaimed: true, coins: 0, exp: 0, candy: 0, profile };
   }
@@ -176,7 +184,9 @@ export function applyMatchReward(
     claimedMatchIds: [...profile.claimedMatchIds.slice(-99), input.matchId],
     stats: nextStats,
   };
-  saveFolkProfile(nextProfile, bridge);
+  if (!saveFolkProfile(nextProfile, bridge)) {
+    return { alreadyClaimed: false, saveFailed: true, coins: 0, exp: 0, candy: 0, profile };
+  }
 
   if (bridge) {
     // Gọi bridge để cộng Xu, XP & điểm bảng xếp hạng Arcade-X
@@ -222,7 +232,7 @@ export function purchaseSkinWithCandy(
       [skin.category as SkinCategory]: skinId,
     },
   };
-  saveFolkProfile(next, bridge);
+  if (!saveFolkProfile(next, bridge)) return { ok: false, error: 'Thiết bị chưa lưu được skin. Hãy thử lại.', profile };
   return { ok: true, profile: next };
 }
 
@@ -242,6 +252,6 @@ export function equipFolkSkin(
       [skin.category]: skinId,
     },
   };
-  saveFolkProfile(next, bridge);
+  if (!saveFolkProfile(next, bridge)) return { ok: false, profile };
   return { ok: true, profile: next };
 }

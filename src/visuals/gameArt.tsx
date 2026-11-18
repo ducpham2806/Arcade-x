@@ -7,11 +7,14 @@ import realmsOrb from '../../standalone/chronicles-realms/dist/assets/spriteshee
 import {asset as blossomAsset} from '../games/hex-match/blossom/assets';
 import {BLOSSOM_ICON,BLOSSOM_LOGO} from '../games/hex-match/blossom/branding';
 import {asset as rainbowAsset} from '../games/rainbow-blocks/assets';
+import {NhayLoCoArt,OAnQuanArt} from './folkGameArt';
 
 // Local vector artwork stays sharp on phones, loads offline and needs no image CDN.
 export const GAME_ART: Record<string, { color: string; secondary: string; label: string; world: string }> = {
   'tank-clash': {color:'#8de6c9',secondary:'#ff8b72',label:'GAME MỚI',world:'Đấu trường xe tăng · Bắn bật tường'},
   'snake-legend': {color:'#e8c367',secondary:'#6baa76',label:'BẢN THỬ',world:'Thảo Nguyên Xanh'},
+  'o-an-quan': {color:'#ffd193',secondary:'#bb654d',label:'DÂN GIAN',world:'Sân Đình'},
+  'nhay-lo-co': {color:'#b9e4c5',secondary:'#4fabc9',label:'DÂN GIAN',world:'Ngõ Nhỏ'},
   'battleship': {color:'#dfbb7e',secondary:'#6ca7c2',label:'HẢI CHIẾN',world:'Naval Warfare · Hạm đội vỏ thép'},
   'boom-buddies': {color:'#ffa846',secondary:'#89ce57',label:'GAME MỚI',world:'Khu vườn bom vui nhộn'},
   'brick-breaker': {color:'#67eece',secondary:'#a68dff',label:'GAME MỚI',world:'Chronicles · Sáu miền Aethra'},
@@ -52,6 +55,8 @@ function Tile({ x, y, size = 56, color, text }: { x: number; y: number; size?: n
 }
 function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string }) {
   switch (id) {
+    case 'o-an-quan': return <OAnQuanArt/>;
+    case 'nhay-lo-co': return <NhayLoCoArt/>;
     case 'tank-clash': return <g>
       <path d="M82 204L133 66H305L355 204Z" fill="#162c2c" stroke="#8de6c9" strokeWidth="3"/>
       <path d="M105 167H159V192H105ZM257 80H310V108H257ZM186 107H229V137H186Z" fill="#a67750" stroke="#e8bb81" strokeWidth="3"/>
@@ -246,6 +251,8 @@ function Scene({ id, a, b, uid }: { id: string; a: string; b: string; uid:string
 }
 function Backdrop({id,a,b}:{id:string;a:string;b:string}){
  switch(id){
+ case 'o-an-quan':return <g><path d="M0 0H420V250H0Z" fill="#874431"/><path d="M0 0H420V60L294 43L184 57L0 23Z" fill="#584036"/>{[0,1,2,3,4,5].map(i=><path key={i} d={`M${i*95-70} 250L${i*82+22} 38M0 ${53+i*38}H420`} stroke="#c97b59" strokeWidth="3" opacity=".55"/>)}</g>;
+ case 'nhay-lo-co':return <g><path d="M0 0H420V250H0Z" fill="#24463b"/><path d="M0 211L119 48L163 26L98 250H0ZM420 175L286 28L272 49L350 250H420Z" fill="#39634f"/><path d="M32 163l22-35 34-3 9 19-15 31-30 15ZM347 106l19-27 24 9 10 21-19 18-25-4Z" fill="#83ae76" opacity=".62"/></g>;
  case 'boom-buddies':return <g><path d="M0 0H420V250H0Z" fill="#d6ed9c"/><path d="M0 137Q94 112 182 159T420 126V250H0Z" fill="#84b04e"/>{Array.from({length:18},(_,i)=><circle key={i} cx={18+i*47%390} cy={154+i*29%91} r={i%2?3:5} fill="#619640"/>)}<path d="M0 41Q115 83 207 28T420 49" stroke="#efffcb" strokeWidth="32"/></g>;
  case 'brick-breaker':return <g><path d="M0 0H420V250H0Z" fill="#12233a"/><path d="M0 44L103 7L79 116L0 172M420 12L331 70L401 112L420 216" fill="#284760"/><path d="M0 229L121 187L180 250M420 187L334 212L316 250" fill="#386460"/><path d="M42 0L80 84L28 129M377 0L331 70L374 130" fill="none" stroke="#8562bd" strokeWidth="4"/>{[[47,37],[360,177],[65,212],[353,33]].map(([x,y],i)=><path key={i} d={`M${x} ${y-8}l8 8-8 8-8-8Z`} fill={a} opacity=".5"/>)}</g>;
  case 'rainbow-blocks':return <g>{['#25c6df','#4d6ecb','#ca6aac','#ffd873'].map((c,i)=><path key={c} d={`M${-80+i*125} 0l160 250h95L${15+i*125} 0Z`} fill={c} opacity=".17"/>)}<path d="M0 233Q209 120 420 229" stroke="#69e6dd" strokeWidth="18" opacity=".35"/></g>;

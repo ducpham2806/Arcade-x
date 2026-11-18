@@ -107,17 +107,28 @@ export function renderNhayLoCoCourt(
     ctx.font = 'bold 14px ui-monospace, monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(item.box === 10 ? 'CHÙA' : String(item.box), item.x + 6, item.y + 5);
+    readableCanvasText(ctx, item.box === 10 ? 'CHÙA' : String(item.box), item.x + 6, item.y + 5);
 
     // Dấu Nhà (đã chiếm)
     if (houseOwner) {
       const isMine = houseOwner === mySeat;
       ctx.fillStyle = isMine ? '#22C55E' : '#EF4444';
       ctx.fillRect(item.x + item.w - 24, item.y + 6, 18, 16);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('🏠', item.x + item.w - 15, item.y + 8);
+      const x = item.x + item.w - 15;
+      const y = item.y + 8;
+      ctx.fillStyle = '#172132';
+      ctx.beginPath();
+      ctx.moveTo(x - 6, y + 5);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x + 6, y + 5);
+      ctx.lineTo(x + 4, y + 5);
+      ctx.lineTo(x + 4, y + 12);
+      ctx.lineTo(x - 4, y + 12);
+      ctx.lineTo(x - 4, y + 5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#fff6e3';
+      ctx.fillRect(x - 1, y + 8, 2, 4);
     }
 
     // Mảnh Chàm đang nằm trong ô
@@ -149,3 +160,4 @@ export function renderNhayLoCoCourt(
     }
   }
 }
+import { readableCanvasText } from '../../accessibility/canvasText';

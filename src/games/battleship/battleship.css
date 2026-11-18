@@ -105,3 +105,7 @@
 .bs-radar[data-paused=true] .bs-radar-sweep{animation-play-state:paused}
 .bs-radar[data-reduced=true] .bs-radar-sweep{animation:none;opacity:.3}
 @keyframes bs-radar-turn{to{transform:rotate(360deg)}}
+
+.bs-chat-roster{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.bs-chat-roster span{display:flex;align-items:center;gap:5px;border:1px solid #688594;border-radius:20px;padding:3px 9px;font-size:11px;white-space:nowrap}.bs-chat-roster b{display:grid;place-items:center;width:24px;height:24px;background:#284554;border-radius:50%;font-size:16px}
+
+.bs-chat-hud{justify-content:center;margin:0;padding:5px 8px;background:#172630}

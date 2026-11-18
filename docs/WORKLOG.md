@@ -1,21 +1,31 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa ba mục. [Trước hoàn thiện Snake](archive/WORKLOG-2026-11-14-before-snake-finish.md). Xem WORKFLOW và COMPLETED.
+Một nhật ký chính, tối đa3mục. [Main trước tích hợp chat](archive/WORKLOG-2026-11-15-main-before-chat-integration.md); [chat trước native](archive/WORKLOG-2026-11-15-before-native-chat-staging.md).
 
-## 14/11/2026 · SN-R01-FINISH · codex/snake-r01-finish
+[Nhật ký trước mở rộng chat](archive/WORKLOG-2026-11-18-before-all-game-chat.md).
 
-- User yêu cầu làm tiếp Snake cho xong. Từ2ca0b3c/PR33(CI55xanh), sửa S1 Story ghi guest dù Journey theo owner; truyền store Story/Lab, giữ audio settings. Red/green account win/checkpoint/reload/B/guest và Space/focus/Escape; marker boss đúng nhiệm vụ, physics/digest giữ nguyên.
-- V2 UI10màn/29sao/3tim mỗi màn qua native input/time, boss6hit/tutorial2-3, reload/cleanup0/pageerror0. V1 driver thua boss giữ evidence; sửa cadence/routebot, không hạ độkhó. Lint/build/rollback/preview/budget/6suite/catalog/storage, player3/3 và hosting5/5 qua; CI56 Snake xanh, verify lỗi testDungeon syntheticerror/autosave; sửa quota thật/recovery, giữ timeout và thêm artifactmotion. CI đúnghead trướcmerge. [QA](qa/SNAKE-FINISH-2026-11-14.md).
-- game-qa-playtest/game-feel/game-ui-ux, Technical Director/QA độc lập không còn blocker. Graph46file/424node/1101edge, contextcall700. [Phiếu nghiệmthu](snake/R01-ACCEPTANCE.md); livepreflightWAITING4bindings. Thiết bị/người mới/art/audio thật chưa PASS; bản sửa chưa merge/deploy.
+[Log trước bắt đầu FD-L0](archive/WORKLOG-2026-11-18-before-folk-duel-foundation.md).
 
-## 13/11/2026 · SN-UI-BADGE · codex/fix-hosting-badge-safe-area
+[Log trước FD-L1](archive/WORKLOG-2026-11-18-before-folk-offline.md).
 
-- Từec65ea9/PR32, user cho làm tiếp S3 hosting. Đo HUD thật, chừa64px theo badge/8px đệm; không sửa branding/iframe/gói. Observer không theo subtree gameplay; popup không co game thêm, hide/remove trả vùng.
-- Baseline8320385 đỏ đúng CTA; candidate hosting5/5, modal36checks kể cả tall phone1000px, catalog/offline/audio/isolation, lint/build/rollback/bundle qua. Animation50+25 và SnakeUI11/11+3guard qua, khôngretry/skip/flaky. [QA và evidence](qa/SNAKE-BADGE-2026-11-13.md).
-- game-ui-ux/input-systems/game-qa-playtest + review QA/Technical Director; giữ cap mobile/desktop theo review. Graph components37file230node440edge, services47file485node1289edge; query depth1/budget900. PR33 targetmain gồmPR32; CI theo checks đúng head trướcmerge. Netlifypreview readyef9f636 nhưng edge-access chặn guest; chưa proofHUD thật/merge/deploy, thiết bị/human/liveJWT còn riêng.
+[Log trước trình diễn Ô Ăn Quan](archive/WORKLOG-2026-11-18-before-oaq-turn-art.md).
 
-## 13/11/2026 · SN-RELEASE-VERIFY · codex/snake-release-verification-20261113
 
-- User cho tiếp kế hoạch; fullCI50/head1909fa6 success cảverify/snake_ui. PR31 retargetmain→merge8320385, gồmPR30; tree khớp nguồn đã kiểm. Netlify6af6f590d7b4bd3516a37885 Published18:34:34GMT+7 đúngSHA; đọc API thật.
-- Public36resource/3.047.410byte byte-match build;6nhóm guest/card/art/favorite/mobile detail/download/offline reload/play/input/audio/exit qua, khôngAuthfixture/pageerror/snake-complete. Online probeCTA/joystick/Dash tới được. Đã xem4ảnh; S3badge hosting che một phần nhãn mobile được ghi bug.
-- [QA/giới hạn](qa/SNAKE-PUBLIC-2026-11-13.md): Chromiumviewport không thay điện thoại/human/liveJWT; registered public chưa kiểm. Dùng game-release-liveops/game-qa-playtest và release-lead. CLItrustCA môi trường trongNSS, giữTLS. CI51/main8320385 success cảverify/snake_ui; docs-only checkpoint kiểm docs/structure/diff, không chạy lại gameplay.
+[Log trước FD-ON1](archive/WORKLOG-2026-11-18-before-folk-online.md).
+
+## 19/11/2026 · FD-ON1 · phòng xác thực và chat Trận
+
+- Tiếp plan từ head local `92e3dd3`/remote `791810c`, nhánh `codex/folk-duel-foundation`. Edge kiểm Auth, PostgreSQL CAS + receipt, FIFO theo game, resume, leave, timeout và hai phiếu rematch. NLC server giữ pha/nhịp/tính điểm. Ô Ăn Quan bắt đầu đồng hồ sau timeline rải. Adapter chat dùng chung, unread và lời cạnh HUD, gỡ theo phiên.
+- 21 Node/PGlite, 7 browser offline/online, lint/build/bundle và test:fast qua. Test chứng minh receipt gửi lại sau mất phản hồi và rematch đồng thời. Bản staging ref `khqipuipeawzlkqmdzdg` đã áp schema, Edge v2 và cron 10s trả 200. Ngày 19/11 anh để bước hai tài khoản thật cho anh kiểm sau; thiết bị/độ trễ thật còn QA. Thưởng online giữ tắt, PR nháp chờ duyệt. [QA](qa/FOLK-ONLINE-2026-11-19.md).
+- Studio Backend Architect, QA/Playtest, Technical Director. Graphify cập nhật Folk 126/277 và Edge 115/240, depth 1, đối chiếu source và PGlite.
+
+## 18/11/2026 · Ô Ăn Quan · trình diễn và lịch sử lượt
+
+- User yêu cầu tay bốc, rải từng ô, sỏi rơi, hiệu ứng ăn và mẹt riêng. Dùng trace luật với RAF, tạm dừng khi mở chat, bỏ qua hoặc giảm chuyển động. Lưu bàn đã chốt và lịch sử đường rải/ô ăn từng lượt. Hiện hai hàng theo ghế cam/xanh ngọc, hướng Trái/Phải theo phía hiển thị.
+- Folk 12/12, Playwright 5/5, lint/build/bundle, readability, smoke Ô Ăn Quan và CSS motion 2/2 qua. Xem ảnh/chuyển động ở `test-results/folk-offline/oaq-*`; chưa đi máy thật. Studio Game Feel, UI/UX, QA/Playtest. Graphify Ô Ăn Quan phạm vi bước, renderer và host.
+
+## 18/11/2026 · FD-L1 · codex/folk-duel-foundation
+
+- User cho tiếp theo plan. Thêm ván offline phiên bản 1 trong GameBridge, lưu sau mỗi lượt, giữ profile cũ và báo nếu thiết bị chưa ghi được. Kết quả, skin, receipt giữ qua reload. Ô Ăn Quan dùng nút phủ vùng Canvas để chọn ô bằng touch/phím. Nhảy Lò Cò canh lực thảy/nhặt Chàm, báo lỗi theo pha và bỏ Nhà đối thủ.
+- Node Folk 11/11, lint/build/bundle và test:fast qua. Chromium đủ 4 ván bot/hai người, reload/đấu lại/nhận thưởng một lần ở 390 và 1280. Hai link DEV qua 320 dọc và 844 ngang; ảnh `test-results/folk-offline/`. Sửa mở cộng đồng từ thông báo để giữ hợp đồng modal đã duyệt.
+- Studio Game UI/UX, Save Systems, QA/Playtest và QA Lead. Graphify theo hai engine và module chung. Chờ chủ dự án duyệt offline. Online phòng thật và chat Trận ở FD-ON1.

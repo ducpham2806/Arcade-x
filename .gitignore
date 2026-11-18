@@ -39,3 +39,7 @@ tests/blossom/screenshots/
 
 # Local authenticated Word Chain review; regenerate from source/public staging config.
 /review/word-chain-staging.html
+
+# Native match chat staging review, generated from real clients.
+/deliverables/chat-staging-review.html
+/.env.chat-staging.local

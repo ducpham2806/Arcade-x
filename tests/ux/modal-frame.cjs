@@ -71,8 +71,10 @@ function expectFrame(box, vp, label, inGame = false) {
   try {
     for (const vp of viewports) {
       const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height } });
+      await page.route('**/*', route => new URL(route.request().url()).origin === `http://127.0.0.1:${PORT}` ? route.continue() : route.abort());
       await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'networkidle' });
       await page.locator('#game-library').waitFor({ timeout: 15000 });
+      await page.getByRole('button', { name: 'Thu chat về bubble' }).click();
       for (const panel of panels) {
         await panel.open(page);
         const dialog = page.locator('[role="dialog"][aria-modal="true"]').last();
@@ -112,7 +114,7 @@ function expectFrame(box, vp, label, inGame = false) {
     }
     console.log(`modal frame: ${checks} checks passed`);
   } catch (e) {
-    console.error('FAIL:', e.message.split('\n')[0]);
+    console.error('FAIL:', e.message);
     process.exitCode = 1;
   } finally {
     await browser.close();

@@ -23,6 +23,10 @@ export function createNetSession(options: SessionOptions) {
   const { send, now } = options;
   let code: string | null = null, seat: SeatId | null = null, role: 'player' | 'spectator' | null = null, resumeToken: string | null = null, nextSeq = 0;
   let room: RoomView | null = null, result: MatchResult | null = null, matchId: string | null = null;
+  let chatRetry:{id:string;text:string;code:string}|null=null;
+  const chatListeners=new Set<()=>void>();
+  const chatPending=new Map<string,{resolve:()=>void;reject:(e:Error)=>void;timer:ReturnType<typeof setTimeout>}>();
+  const cancelChat=()=>{chatRetry=null;chatPending.forEach(p=>{clearTimeout(p.timer);p.reject(new Error('Đã rời phòng chat.'));});chatPending.clear();};
   let error: { code: ErrorCode; message: string; fatal: boolean } | null = null;
   // Solo queue status (a party's status is room.queue). `queueAt` = local time the status arrived.
   let soloQueue: QueueView | null = null, queueAt = 0, queueReason: string | null = null, roomAt = 0;
@@ -79,6 +83,9 @@ export function createNetSession(options: SessionOptions) {
 
   const api = {
     stats,
+    subscribeChat(fn:()=>void){chatListeners.add(fn);return()=>{chatListeners.delete(fn);};},
+    cancelChat,
+    chat(text:string){if(!room?.chatVersion||!seat)return Promise.reject(new Error('Chat trận chưa sẵn sàng.'));const id=chatRetry?.code===code&&chatRetry.text===text?chatRetry.id:crypto.randomUUID();chatRetry={id,text,code:code!};if(room.chat?.some(m=>m.requestId===id&&m.sender===room?.seats.find(s=>s.id===seat)?.chatId)){chatRetry=null;return Promise.resolve();}return new Promise<void>((resolve,reject)=>{const timer=setTimeout(()=>{chatPending.delete(id);reject(new Error('Chưa xác nhận gửi tin. Nháp vẫn được giữ.'));},12000);chatPending.set(id,{resolve,reject,timer});send({type:'chat',id,text});});},
     get code() { return code; }, get seat() { return seat; }, get role() { return role; }, get myTeam() { return seat ? teamOf(seat) : null; }, get room() { return room; },
     // Room updates are event-driven. Advance display timers locally without adding snapshots.
     get timedRoom(): RoomView | null {
@@ -117,10 +124,12 @@ export function createNetSession(options: SessionOptions) {
       if ('room' in msg && msg.room) roomAt = now();
       switch (msg.type) {
         case 'joined':
+          if(code!==msg.code)cancelChat();
           soloQueue = null; queueReason = null;
           code = msg.code; seat = msg.seat; role = msg.role; resumeToken = msg.resumeToken; nextSeq = msg.nextSeq; room = msg.room; result = msg.room.result; error = null;
           reset(); if (msg.walls) walls = msg.walls; if (msg.snapshot) { matchId = msg.room.matchId; onSnapshot(msg.snapshot); }
           break;
+        case 'chat': if(room&&room.code===msg.code)room={...room,chat:[...(room.chat||[]).filter(m=>m.id!==msg.message.id),msg.message].slice(-100)};break;
         case 'seat': seat = msg.seat; break;
         case 'queue': // solo queue status: searching solo means not being in a room
           soloQueue = msg.queue; queueAt = now(); queueReason = msg.reason ?? null;
@@ -134,8 +143,10 @@ export function createNetSession(options: SessionOptions) {
         case 'error': error = { code: msg.code, message: msg.message, fatal: msg.fatal };
           if (msg.code === 'RESUME_INVALID' || msg.code === 'ROOM_CLOSED' || msg.code === 'ROOM_NOT_FOUND') { code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); }
           break;
-        case 'left': code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); break;
+        case 'left': cancelChat();code = seat = role = resumeToken = null; room = null; result = null; soloQueue = null; reset(); break;
       }
+      if(msg.type==='error'||msg.type==='queue'||msg.type==='chat'||msg.type==='room'||msg.type==='joined'||msg.type==='seat'||msg.type==='left'){for(const [id,p] of chatPending){if(room?.chat?.some(m=>m.requestId===id&&m.sender===room?.seats.find(s=>s.id===seat)?.chatId)){clearTimeout(p.timer);if(chatRetry?.id===id)chatRetry=null;p.resolve();chatPending.delete(id);}}chatListeners.forEach(fn=>fn());}
+      if(msg.type==='error'&&chatPending.size){chatPending.forEach(p=>{clearTimeout(p.timer);p.reject(new Error(msg.message));});chatPending.clear();}
       options.onChange?.(msg.type);
     },
     /** One fixed 60 Hz client tick. Sends intents in small batches; predicts movement only. */
@@ -208,7 +219,7 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
   let connectTimer: ReturnType<typeof setTimeout> | undefined, opened = false;
   const store = options.storage === undefined ? (() => { try { return sessionStorage; } catch { return null; } })() : options.storage;
   const session = createNetSession({ now: () => performance.now(), name: options.name, token: options.token,
-    send: msg => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg)); else if (msg.type !== 'input' && msg.type !== 'ping') queue.push(msg); },
+    send: msg => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg)); else if (msg.type !== 'input' && msg.type !== 'ping' && msg.type !== 'chat') queue.push(msg); },
     onChange: kind => {
       try { if (session.code && session.resumeToken) store?.setItem('tank-clash.seat', JSON.stringify({ code: session.code, resumeToken: session.resumeToken })); else if (kind === 'left' || kind === 'error' || kind === 'queue') store?.removeItem('tank-clash.seat'); } catch { /* storage optional */ }
       options.onChange?.(kind);
@@ -252,5 +263,5 @@ export function connectTankRoom(url: string, options: { name?: string; token?: (
   }
   open();
   return { session, get status() { return status; },
-    close() { closed = true; status = 'closed'; clearTimeout(retryTimer); clearTimeout(connectTimer); clearInterval(pingTimer); queue = []; const socket = ws; ws = null; try { socket?.close(); } catch { /* ignore */ } } };
+    close() { session.cancelChat();closed = true; status = 'closed'; clearTimeout(retryTimer); clearTimeout(connectTimer); clearInterval(pingTimer); queue = []; const socket = ws; ws = null; try { socket?.close(); } catch { /* ignore */ } } };
 }

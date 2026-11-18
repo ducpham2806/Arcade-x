@@ -33,7 +33,7 @@ export class LocalRoomStore implements RoomStore{
   const open=[...this.rooms.values()].filter(r=>r.status==='waiting'&&r.public&&r.createdAt>now-600000&&Object.keys(r.members).length<r.capacity&&Object.keys(r.members).some(s=>((r.lastSeen as Record<string,number>)[s]??r.createdAt)>now-90000)).sort((a,b)=>a.createdAt-b.createdAt)[0];
   if(!open)return this.create(fresh);
   const seat=SEATS.find(s=>!(open.members as Record<string,string>)[s])!;
-  const next:Room={...open,version:open.version+1,members:{...open.members,[seat]:uid},names:{...open.names,[seat]:name},lastSeen:{...open.lastSeen,[seat]:now}};
+  const next:Room={...open,version:open.version+1,members:{...open.members,[seat]:uid},chatMembers:{...open.chatMembers,[seat]:`${open.id}:${seat}:${open.version+1}`},names:{...open.names,[seat]:name},lastSeen:{...open.lastSeen,[seat]:now}};
   if(Object.keys(next.members).length>=2&&next.pairAt===undefined)next.pairAt=now;
   this.rooms.set(next.id,this.copy(next));return this.copy(next);
  }

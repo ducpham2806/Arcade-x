@@ -1,8 +1,11 @@
 {
-  "checks": 13,
+  "checks": 16,
   "passed": [
     "create and join traverse HTTP handler, verified fixture identity and PostgreSQL",
     "server auto-placement reveals own fleet only for both seats",
+    "private room chat is server-attributed, idempotent after lost ACK and does not alter hidden fleets",
+    "outsiders cannot read or send private chat; spoofed sender and excessive length are rejected",
+    "chat rate limit keeps draft failure explicit; rejoining recovers one copy without changing turn",
     "unrelated identity cannot fetch a known room ID",
     "both players ready into the same authoritative turn and deadline",
     "lost committed shot retains exact request and replay produces one shot only",

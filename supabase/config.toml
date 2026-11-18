@@ -33,3 +33,9 @@ verify_jwt = true
 # Per-project deployment approval and evidence: docs/word-chain/PUBLIC-RELEASE-2026-11-08.md.
 [functions.word-chain-room]
 verify_jwt = false
+
+# Folk Duel verifies registered accounts through Auth.getUser and a Vault-backed tick-only token.
+# Generate this entrypoint with npm run prepare:folk-server before deployment.
+[functions.folk-duel-room]
+verify_jwt = false
+entrypoint = "./functions/folk-duel-room/entrypoint.js"

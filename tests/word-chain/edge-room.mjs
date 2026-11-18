@@ -88,6 +88,17 @@ await test('private room over HTTP: create, join by code, names come from the ac
   assert.equal((await snap('tok-dan', roomId)).status, 403);
 });
 
+await test('chat over HTTP: private membership, length, sender identity and idempotent retry',async()=>{
+ const before=(await snap('tok-ann',roomId)).body;
+ const body={type:'command',roomId,version:before.version,actionId:'chat-http-1',command:{type:'chat',text:'Chơi vui nhé'}};
+ const sent=await call('tok-ann',body);assert.equal(sent.status,200);assert.equal(sent.body.chat.at(-1).text,'Chơi vui nhé');
+ assert.equal(sent.body.chat.at(-1).sender,sent.body.roster.find(p=>p.seat==='P1').chatId);
+ assert.equal((await call('tok-ann',body)).body.chat.length,1);
+ assert.equal((await call('tok-dan',{...body,actionId:'chat-http-2',version:sent.body.version})).status,403);
+ assert.equal((await call('tok-ann',{...body,command:{type:'chat',text:'x'.repeat(501)}})).status,400);
+ assert.equal((await call('tok-ann',{...body,command:{type:'chat',text:'x',sender:'fake'}})).status,400);
+});
+
 await test('ready, 3-2-1, server-checked words, retry after a lost response is a duplicate', async () => {
   for (const t of ['tok-ann', 'tok-bob', 'tok-cat']) {clock += 200; await send(t, roomId, {type: 'ready', ready: true});}
   clock += 3100;

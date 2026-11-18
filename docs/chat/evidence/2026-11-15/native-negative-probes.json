@@ -1,0 +1,127 @@
+{
+  "at": "2026-11-15T08:58:23.001Z",
+  "project": "khqipuipeawzlkqmdzdg",
+  "scope": "No signup/login/data mutation. Invalid Auth and preflight only.",
+  "results": [
+    {
+      "game": "word-chain",
+      "origin": "http://127.0.0.1:4335",
+      "kind": "preflight",
+      "status": 204,
+      "cors": "http://127.0.0.1:4335",
+      "body": null
+    },
+    {
+      "game": "word-chain",
+      "origin": "http://127.0.0.1:4335",
+      "kind": "no-bearer",
+      "status": 401,
+      "cors": "http://127.0.0.1:4335",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733098256
+      }
+    },
+    {
+      "game": "word-chain",
+      "origin": "http://127.0.0.1:4335",
+      "kind": "invalid-bearer",
+      "status": 401,
+      "cors": "http://127.0.0.1:4335",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733099358
+      }
+    },
+    {
+      "game": "word-chain",
+      "origin": "http://localhost:4335",
+      "kind": "preflight",
+      "status": 204,
+      "cors": "http://localhost:4335",
+      "body": null
+    },
+    {
+      "game": "word-chain",
+      "origin": "http://localhost:4335",
+      "kind": "no-bearer",
+      "status": 401,
+      "cors": "http://localhost:4335",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733099634
+      }
+    },
+    {
+      "game": "word-chain",
+      "origin": "http://localhost:4335",
+      "kind": "invalid-bearer",
+      "status": 401,
+      "cors": "http://localhost:4335",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733099835
+      }
+    },
+    {
+      "game": "battleship",
+      "origin": "http://127.0.0.1:4335",
+      "kind": "preflight",
+      "status": 204,
+      "cors": "*",
+      "body": null
+    },
+    {
+      "game": "battleship",
+      "origin": "http://127.0.0.1:4335",
+      "kind": "no-bearer",
+      "status": 401,
+      "cors": "*",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733101902
+      }
+    },
+    {
+      "game": "battleship",
+      "origin": "http://127.0.0.1:4335",
+      "kind": "invalid-bearer",
+      "status": 401,
+      "cors": "*",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733102355
+      }
+    },
+    {
+      "game": "battleship",
+      "origin": "http://localhost:4335",
+      "kind": "preflight",
+      "status": 204,
+      "cors": "*",
+      "body": null
+    },
+    {
+      "game": "battleship",
+      "origin": "http://localhost:4335",
+      "kind": "no-bearer",
+      "status": 401,
+      "cors": "*",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733102601
+      }
+    },
+    {
+      "game": "battleship",
+      "origin": "http://localhost:4335",
+      "kind": "invalid-bearer",
+      "status": 401,
+      "cors": "*",
+      "body": {
+        "error": "UNAUTHORIZED",
+        "serverNow": 1794733102957
+      }
+    }
+  ]
+}

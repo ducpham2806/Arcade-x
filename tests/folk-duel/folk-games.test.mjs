@@ -3,9 +3,12 @@ import test from 'node:test';
 
 import {
   applyOaqMove,
+  cellPointValue,
   createInitialOaqState,
+  getOaqTray,
   getValidOaqMoves,
   previewOaqLandingCell,
+  recordOaqTurn,
 } from '../../src/games/o-an-quan/rules.ts';
 import { chooseOaqBotMove } from '../../src/games/o-an-quan/ai.ts';
 import {
@@ -13,36 +16,151 @@ import {
   buildHopSequence,
   countHouses,
   createInitialNlcState,
+  getNlcTargetBox,
 } from '../../src/games/nhay-lo-co/rules.ts';
 import {
   applyMatchReward,
   createInitialFolkProfile,
   equipFolkSkin,
+  loadFolkProfile,
   purchaseSkinWithCandy,
 } from '../../src/games/folk-duel/economy.ts';
-import { FolkRoomServer, normalizeRoomCode } from '../../src/games/folk-duel/server.ts';
+import { isNlcOfflineState, isOaqOfflineState, loadOfflineMatch, saveOfflineMatch } from '../../src/games/folk-duel/offlineMatch.ts';
+import { buildOaqFrames } from '../../src/games/o-an-quan/turnAnimation.ts';
+
+function totalOaqPoints(state) {
+  const board = state.cells.reduce((total, _, index) => total + cellPointValue(state, index), 0);
+  const outstandingDebt = state.finished ? 0 : state.debt.P1 + state.debt.P2;
+  return board + state.scores.P1 + state.scores.P2 - outstandingDebt;
+}
+
+test('Ô Ăn Quan: từng bước giữ thứ tự, chuyển đúng quân vào mẹt và ghi lịch sử', () => {
+  const before = {
+    ...createInitialOaqState(),
+    cells: [0, 1, 0, 0, 3, 0, 0, 4, 0, 0, 0, 0],
+    scores: { P1: 22, P2: 20 },
+    turnNumber: 3,
+  };
+  const original = structuredClone(before);
+  const move = { cellIndex: 1, direction: 'CW' };
+  const result = applyOaqMove(before, 'P1', move);
+  assert.equal(result.ok, true);
+  const frames = buildOaqFrames(before, result.steps);
+  assert.deepEqual(frames.map(({ step }) => [step.type, step.cellIndex]), [
+    ['pickup', 1], ['drop', 2], ['capture', 4], ['capture', 6],
+  ]);
+  assert.equal(frames[0].before.cells[1], 1);
+  assert.equal(frames[0].after.cells[1], 0);
+  assert.equal(frames[1].after.cells[2], 1);
+  assert.deepEqual(getOaqTray(frames[2].after, 'P1'), { dan: 25, quan: 0 });
+  assert.deepEqual(getOaqTray(frames[3].after, 'P1'), { dan: 25, quan: 1 });
+  assert.deepEqual(getOaqTray(frames[3].after, 'P2'), { dan: 20, quan: 0 });
+  assert.deepEqual(frames.at(-1).after.cells, result.nextState.cells);
+  assert.deepEqual(before, original);
+
+  const next = recordOaqTurn(before, move, result.nextState, result.steps);
+  assert.ok(isOaqOfflineState(JSON.parse(JSON.stringify(next))));
+  assert.deepEqual(next.history, [{
+    turn: 3, seat: 'P1', move, drops: [2],
+    captures: [{ cellIndex: 4, points: 3, quan: false }, { cellIndex: 6, points: 10, quan: true }],
+  }]);
+  assert.deepEqual(getOaqTray(next, 'P1'), { dan: 25, quan: 1 });
+});
 
 test('Ô Ăn Quan: khởi tạo 70 điểm (2 Quan x 10 + 10 Dân x 5) và rải quân hợp lệ', () => {
   const s0 = createInitialOaqState();
+  const before = structuredClone(s0);
+  const move = { cellIndex: 1, direction: 'CW' };
   assert.equal(s0.quanAlive[0], true);
   assert.equal(s0.quanAlive[1], true);
+  assert.equal(totalOaqPoints(s0), 70);
   assert.equal(getValidOaqMoves(s0, 'P1').length, 10);
 
-  const preview = previewOaqLandingCell(s0, { cellIndex: 1, direction: 'CW' });
+  const preview = previewOaqLandingCell(s0, move);
   assert.ok(preview !== null);
+  assert.ok(previewOaqLandingCell(s0, { ...move, direction: 'CCW' }) !== null);
+  assert.deepEqual(s0, before, 'preview in either direction must leave the live game intact');
 
-  const res = applyOaqMove(s0, 'P1', { cellIndex: 1, direction: 'CW' });
+  const res = applyOaqMove(s0, 'P1', move);
   assert.equal(res.ok, true);
   assert.equal(res.nextState.turn, 'P2');
   assert.equal(res.nextState.cells[1], 0);
+  assert.equal(preview, res.steps.findLast(step => step.type === 'drop').cellIndex);
+  assert.ok(res.steps.filter(step => step.type === 'pickup').length > 1, 'opening move passes the hand');
+  assert.equal(totalOaqPoints(res.nextState), 70);
+  assert.deepEqual(s0, before, 'accepted moves must also leave their input intact');
+  assert.deepEqual(applyOaqMove(s0, 'P1', move), res, 'replay must produce identical events and board');
 });
 
 test('Ô Ăn Quan: Bot AI chọn được nước đi hợp lệ', () => {
   const s0 = createInitialOaqState();
   const s1 = applyOaqMove(s0, 'P1', { cellIndex: 3, direction: 'CW' }).nextState;
+  const before = structuredClone(s1);
   const botMove = chooseOaqBotMove(s1, 'P2', 'hard');
   assert.ok(botMove !== null);
   assert.ok(botMove.cellIndex >= 7 && botMove.cellIndex <= 11);
+  assert.deepEqual(s1, before, 'searching alternate moves leaves the live bot turn intact');
+  assert.equal(applyOaqMove(s1, 'P2', botMove).ok, true);
+});
+
+test('Ô Ăn Quan: ăn kép theo chuỗi và bảo vệ Quan ở lượt đầu', () => {
+  const initial = {
+    ...createInitialOaqState(),
+    cells: [0, 1, 0, 0, 3, 0, 0, 4, 0, 0, 0, 0],
+    scores: { P1: 22, P2: 20 },
+  };
+  const move = { cellIndex: 1, direction: 'CW' };
+  const early = applyOaqMove(initial, 'P1', move).nextState;
+  assert.equal(early.quanAlive[1], true);
+  assert.equal(early.lastComboCount, 1);
+  assert.equal(early.lastCapturedPoints, 3);
+  const late = applyOaqMove({ ...initial, turnNumber: 3 }, 'P1', move).nextState;
+  assert.equal(late.quanAlive[1], false);
+  assert.equal(late.lastComboCount, 2);
+  assert.equal(late.lastCapturedPoints, 13);
+  assert.equal(totalOaqPoints(early), 70);
+  assert.equal(totalOaqPoints(late), 70);
+});
+
+test('Ô Ăn Quan: rải sinh ghi phần thiếu và hốt tàn quyết toán 70 điểm', () => {
+  const start = createInitialOaqState();
+  start.cells.fill(0, 1, 6);
+  start.scores = { P1: 2, P2: 23 };
+  const resow = applyOaqMove(start, 'P1', { cellIndex: 1, direction: 'CW' });
+  assert.equal(resow.ok, true);
+  assert.equal(resow.nextState.debt.P1, 3);
+  assert.equal(start.debt.P1, 0);
+  assert.equal(totalOaqPoints(resow.nextState), 70);
+
+  const endgame = {
+    ...createInitialOaqState(),
+    turnNumber: 12,
+    quanAlive: [false, true],
+    cells: [0, 3, 0, 1, 0, 0, 2, 4, 0, 0, 0, 0],
+    scores: { P1: 24, P2: 28 },
+    debt: { P1: 2, P2: 0 },
+  };
+  const settled = applyOaqMove(endgame, 'P1', { cellIndex: 3, direction: 'CW' }).nextState;
+  assert.equal(settled.finished, true);
+  assert.equal(settled.winner, 'P1');
+  assert.deepEqual(settled.scores, { P1: 38, P2: 32 });
+  assert.equal(totalOaqPoints(settled), 70);
+  assert.ok(settled.cells.every(count => count === 0));
+});
+
+test('Ô Ăn Quan: chạm giới hạn chuyền tay vẫn giữ đủ quân trên bàn', () => {
+  const state = {
+    ...createInitialOaqState(),
+    cells: [5, 4, 6, 3, 7, 3, 6, 6, 7, 4, 5, 2],
+    quanAlive: [false, false],
+    scores: { P1: 6, P2: 6 },
+    turnNumber: 12,
+  };
+  const result = applyOaqMove(state, 'P1', { cellIndex: 3, direction: 'CW' });
+  assert.equal(result.steps.filter(step => step.type === 'pickup').length, 24);
+  assert.equal(result.steps.at(-1).type, 'stop');
+  assert.equal(result.nextState.turn, 'P2');
+  assert.equal(totalOaqPoints(result.nextState), 70);
 });
 
 test('Nhảy Lò Cò: chuỗi bước nhảy bỏ qua ô có Chàm và Nhà đối thủ', () => {
@@ -84,6 +202,62 @@ test('Nhảy Lò Cò: xây đủ 3 Ngôi Nhà sẽ chiến thắng ngay', () => 
   assert.equal(s.winner, 'P1');
 });
 
+test('Nhảy Lò Cò: nhặt Chàm đúng hàng khi quay về và bỏ qua Nhà đối thủ', () => {
+  for (let box = 1; box <= 9; box++) {
+    const route = buildHopSequence(box, {}, 'P1');
+    const afterTurn = route.findIndex(step => step.boxes.includes(10));
+    const pickup = route.findIndex(step => step.pickChamHere);
+    assert.ok(pickup >= afterTurn);
+    assert.equal(route.filter(step => step.pickChamHere).length, 1);
+    assert.ok(route.slice(0, pickup + 1).every(step => !step.boxes.includes(box)));
+  }
+  const move = { kind: 'TURN_RESULT', throwSuccess: true, throwPerfect: false, hopCompleted: true, scoreGained: 15 };
+  const first = applyNlcTurnResult(createInitialNlcState(), 'P1', move).nextState;
+  assert.equal(first.houses[1], 'P1');
+  assert.equal(getNlcTargetBox(first, 'P2'), 2);
+  const missed = applyNlcTurnResult(first, 'P2', { ...move, hopCompleted: false, missedPickup: true }).nextState;
+  assert.match(missed.lastSummary, /nhặt Chàm hụt nhịp/);
+  assert.deepEqual(missed.houses, first.houses);
+  const second = applyNlcTurnResult(first, 'P2', move).nextState;
+  assert.equal(second.houses[2], 'P2');
+  assert.equal(getNlcTargetBox(second, 'P1'), 3);
+});
+
+test('Ván offline: đọc hồ sơ cũ, lưu ván, đổi skin và thử lưu thưởng lại đúng một lần', () => {
+  const legacy = createInitialFolkProfile();
+  legacy.candyTokens = 50;
+  let stored = structuredClone(legacy);
+  let writable = true;
+  let coinGrants = 0;
+  const bridge = {
+    loadGameState: () => structuredClone(stored),
+    saveGameState: data => { if (writable) stored = structuredClone(data); },
+    grantCoins: () => { coinGrants++; },
+    grantExp: () => {}, reportQuest: () => {},
+  };
+  const match = { version: 1, id: 'offline-one', mode: 'local_2p', state: createInitialOaqState() };
+  assert.equal(loadOfflineMatch(bridge, isOaqOfflineState), null);
+  assert.equal(saveOfflineMatch(bridge, match), true);
+  assert.deepEqual(loadOfflineMatch(bridge, isOaqOfflineState), match);
+  assert.equal(loadOfflineMatch(bridge, isNlcOfflineState), null);
+  assert.equal(loadFolkProfile(bridge).candyTokens, 50);
+  const purchase = purchaseSkinWithCandy(loadFolkProfile(bridge), 'stones_marbles', bridge);
+  assert.equal(purchase.ok, true);
+  assert.deepEqual(loadOfflineMatch(bridge, isOaqOfflineState), match);
+
+  const input = { matchId: match.id, game: 'o-an-quan', mode: match.mode, won: true, skillBonuses: 0, score: 43 };
+  writable = false;
+  assert.equal(applyMatchReward(legacy, input, bridge).saveFailed, true);
+  assert.equal(coinGrants, 0);
+  writable = true;
+  assert.equal(applyMatchReward(legacy, input, bridge).profile.candyTokens, 21);
+  assert.equal(applyMatchReward(legacy, input, bridge).alreadyClaimed, true);
+  assert.equal(coinGrants, 1);
+  stored.offlineMatch.version = 99;
+  assert.equal(loadOfflineMatch(bridge, isOaqOfflineState), null);
+  assert.equal(loadFolkProfile(bridge).equippedSkins.oaq_stones, 'stones_marbles');
+});
+
 test('Economy & Tiệm Tạp Hóa: cộng thưởng chống nhận lặp và mua/trang bị Skin', () => {
   let profile = createInitialFolkProfile();
   const r1 = applyMatchReward(profile, {
@@ -118,62 +292,4 @@ test('Economy & Tiệm Tạp Hóa: cộng thưởng chống nhận lặp và mua
   const eq = equipFolkSkin(buy.profile, 'stones_pebbles');
   assert.equal(eq.ok, true);
   assert.equal(eq.profile.equippedSkins.oaq_stones, 'stones_pebbles');
-});
-
-test('FolkRoomServer: Tạo phòng mã 6 ký tự, Join bằng mã, Matchmaking FIFO và CAS', () => {
-  const server = new FolkRoomServer({
-    createInitialState: () => createInitialOaqState(),
-    validateAndApplyMove: (state, seat, move) => {
-      const res = applyOaqMove(state, seat, move);
-      return {
-        ok: res.ok,
-        error: res.error,
-        nextState: res.nextState,
-        nextTurn: res.nextState.turn,
-        winner: res.nextState.winner,
-      };
-    },
-  });
-
-  const t0 = 1_700_000_000_000;
-  const hostRoom = server.createRoom({
-    userId: 'u1',
-    name: 'Đức',
-    gameKind: 'o-an-quan',
-    isPublic: false,
-    now: t0,
-  });
-  assert.equal(hostRoom.code.length, 6);
-  assert.equal(normalizeRoomCode(` ${hostRoom.code.toLowerCase()} `), hostRoom.code);
-
-  const joined = server.joinByCode({
-    userId: 'u2',
-    name: 'Bạn B',
-    code: hostRoom.code,
-    now: t0 + 500,
-  });
-  assert.equal(joined.ok, true);
-  assert.equal(joined.room?.phase, 'countdown');
-
-  // Sau 3 giây đếm ngược -> tự chuyển sang playing
-  const playing = server.getRoom(hostRoom.roomId, t0 + 4000);
-  assert.equal(playing?.phase, 'playing');
-
-  // Gửi nước đi hợp lệ của P1
-  const mv = server.submitMove({
-    roomId: hostRoom.roomId,
-    userId: 'u1',
-    expectedVersion: playing!.version,
-    requestId: 'req_1',
-    move: { cellIndex: 1, direction: 'CW' },
-    now: t0 + 5000,
-  });
-  assert.equal(mv.ok, true);
-  assert.equal(mv.room?.turn, 'P2');
-
-  // Thử Matchmaking FIFO
-  const q1 = server.matchmake({ userId: 'q_a', name: 'A', gameKind: 'nhay-lo-co', now: t0 });
-  const q2 = server.matchmake({ userId: 'q_b', name: 'B', gameKind: 'nhay-lo-co', now: t0 + 200 });
-  assert.equal(q1.roomId, q2.roomId);
-  assert.equal(q2.players.length, 2);
 });

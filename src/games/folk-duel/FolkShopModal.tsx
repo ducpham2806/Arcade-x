@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameBridgeAPI } from '../../types';
+import { useDialogFocus } from '../../launcher/useDialogFocus';
 import {
   equipFolkSkin,
   purchaseSkinWithCandy,
@@ -131,6 +132,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
   onProfileChange,
   onClose,
 }) => {
+  const dialog = useDialogFocus(onClose);
   const tabs = CATEGORY_TABS.filter((t) => t.game === game);
   const [activeTab, setActiveTab] = useState<SkinCategory>(tabs[0].id);
   const items = FOLK_SKINS_CATALOG.filter((s) => s.category === activeTab);
@@ -178,12 +180,12 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
     if (res.ok) {
       onProfileChange(res.profile);
       setNotice(`Đã trang bị "${selectedItem.name}".`);
-    }
+    } else setNotice('Thiết bị chưa lưu được skin. Hãy thử lại.');
   };
 
   return (
-    <div className="fd-overlay" role="dialog" aria-modal="true" aria-labelledby="fd-shop-title">
-      <div className="fd-modal-shell">
+    <div className="fd-overlay">
+      <section ref={dialog} role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="fd-shop-title" className="fd-modal-shell">
         <header className="fd-modal-header">
           <div>
             <h2 id="fd-shop-title">Tiệm Tạp Hóa Cổng Trường</h2>
@@ -267,7 +269,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
             })}
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

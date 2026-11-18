@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import {useTankChat} from '../../chat/useTankChat';
+import type {NetSession} from './net-client';
+import React, { useEffect, useRef, useState } from 'react';
 import type { GameComponentProps } from '../../types';
 import { supabase } from '../../services/supabaseClient';
 import { mountTankClash, type TankController } from './runtime';
@@ -7,13 +9,14 @@ import './tank-clash.css';
 // This deployment owns the verifier. Invitations cannot redirect an ArcadeX session elsewhere.
 export const TANK_SERVER = 'wss://arcadex-tank-staging.onrender.com/tank';
 export default function TankClashGame({ isPaused }: GameComponentProps) {
+  const [chatSession,setChatSession]=useState<NetSession|null>(null);useTankChat(chatSession);
   const root = useRef<HTMLDivElement>(null), controller = useRef<TankController | null>(null);
   const paused = useRef(isPaused); paused.current = isPaused;
   useEffect(() => {
     if (!root.current) return;
     let alive = true, initialized = false, token: string | undefined, owner: string | undefined, revision = 0;
     const mount = () => {
-      controller.current = mountTankClash(root.current!, { paused: paused.current, serverUrl: TANK_SERVER, fixedServer: true,
+      controller.current = mountTankClash(root.current!, { onChatSession:setChatSession,paused: paused.current, serverUrl: TANK_SERVER, fixedServer: true,
         trustedServers: [TANK_SERVER], getToken: () => token, requireAuthentication: true, inviteGameId: 'tank-clash',
         onAuthRequired: () => window.dispatchEvent(new CustomEvent('arcadex:open_modal', { detail: { modal: 'auth' } })) });
     };

@@ -1,3 +1,4 @@
+import {useChat} from '../../chat/ChatContext';
 import {DuelLobby} from '../../components/games/DuelLobby';
 import {IngameChat} from '../../components/SocialChatThread';
 import '../../components/social.css';
@@ -76,6 +77,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   onGameOver,
   onRestart,
 }) => {
+  const chat=useChat();
   const { profile, addExp, addCoins } = usePlayer();
 
   // Screen navigation state
@@ -616,6 +618,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   };
 
   const handleSendEmote = async (emote: string) => {
+    if(chat&&activeRoomId){const channel={scope:'room' as const,target:activeRoomId};chat.store.draft(channel,emote);chat.open(channel);await chat.store.send(channel);return;}
     if (screenMode === 'playing' && roomData) {
       await MultiplayerService.sendQuickMessage(
         roomData.roomId,
@@ -937,7 +940,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
   return (
     <div className="arcade-game-surface relative w-full min-h-0 max-w-5xl mx-auto flex flex-col items-center justify-start p-2 sm:p-4 text-white font-sans select-none">
 <ConnectionNotice active={!!activeRoomId}/>
-<IngameChat roomId={activeRoomId}/>
+<IngameChat roomId={activeRoomId} players={(myRole==='host'?roomData?.guestPlayer:roomData?.hostPlayer) ? [{id:(myRole==='host'?roomData?.guestPlayer:roomData?.hostPlayer)!.uid,name:(myRole==='host'?roomData?.guestPlayer:roomData?.hostPlayer)!.displayName}] : []}/>
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
       <LearningHub game="caro-gomoku" lobby={screenMode==='lobby'} roomId={activeRoomId} ended={!!isMatchFinished} result={matchResult} matchKey={activeRoomId ? activeRoomId+JSON.stringify(roomData?.lastMove) : JSON.stringify(screenMode==='local_hotseat'?localBoardState:aiBoardState)} ranked={screenMode==='playing'} board={activeBoard} onResume={id=>{setActiveRoomId(id);setScreenMode('playing');}} onInvite={()=>{void handleCreateRoom();}}/>
       {screenMode==='local_hotseat'&&<p className="rounded-xl bg-slate-800 px-4 py-2 text-white">Chuỗi đấu: P1 {series.p1} – {series.p2} P2 · {series.p1>=2?'P1 thắng chuỗi':series.p2>=2?'P2 thắng chuỗi':'Ai thắng 2 ván trước sẽ thắng chuỗi'}</p>}
@@ -1159,6 +1162,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
             </div>
           }
           topPlayer={{
+            chatPlayerId: activeRoomId ? (myRole==='host'?roomData?.guestPlayer:roomData?.hostPlayer)?.uid : undefined,
             name:
               screenMode === 'ai_practice'
                 ? `ArcadeX Bot (${aiDifficulty === 'easy' ? 'Tập sự' : aiDifficulty === 'medium' ? 'Trung bình' : 'Khó'})`
@@ -1368,7 +1372,7 @@ export const CaroGomokuGame: React.FC<GameComponentProps> = ({
                     ))}
                     <button
                       id="btn-caro-toggle-chat"
-                      onClick={() => setShowChatBox(!showChatBox)}
+                      onClick={() => chat ? chat.open() : setShowChatBox(!showChatBox)}
                       className="p-1.5 rounded-lg hover:bg-indigo-600/40 text-indigo-300 active:scale-95 transition-all cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
                       title="Tin nhắn nhanh"
                     >
