@@ -2,7 +2,7 @@ import type { FolkSeat } from '../folk-duel/types';
 
 export type HopType = 'SINGLE' | 'DOUBLE';
 
-export type NlcTurnPhase = 'THROW' | 'HOP';
+export type NlcTurnPhase = 'THROW' | 'HOP' | 'PICKUP';
 
 export interface NlcHopStep {
   /** Các ô (1..10) cần chạm trong bước nhảy này (1 số nếu nhảy 1 chân, 2 số nếu nhảy 2 chân) */
@@ -17,6 +17,7 @@ export interface NlcMove {
   throwPerfect: boolean;
   hopCompleted: boolean;
   scoreGained: number;
+  missedPickup?: boolean;
 }
 
 export interface NlcState {
@@ -53,6 +54,12 @@ export function countHouses(state: NlcState, seat: FolkSeat): number {
   return Object.values(state.houses).filter((owner) => owner === seat).length;
 }
 
+export function getNlcTargetBox(state: NlcState, seat: FolkSeat): number {
+  const first = state.level[seat];
+  const boxes = [first, ...Array.from({ length: 8 }, (_, index) => (first + index) % 9 + 1)];
+  return boxes.find(box => !state.houses[box] || state.houses[box] === seat) ?? first;
+}
+
 /**
  * Tính chuỗi bước nhảy chuẩn cho một lượt đi-về:
  * - Bỏ qua ô đang đặt Chàm của mình (targetBox)
@@ -87,10 +94,14 @@ export function buildHopSequence(
     }
   }
 
-  // Lượt về từ 9 xuống 1 (bỏ 10 vì vừa đứng ở 10 xoay người)
+  // Đánh dấu chỗ đứng ngay trước khi quay về hàng có Chàm.
   const backwardGroups: number[][] = [[9], [7, 8], [6], [4, 5], [3], [2], [1]];
   const backward: NlcHopStep[] = [];
   for (const g of backwardGroups) {
+    if (g.includes(targetBox)) {
+      const beforeCham = backward.at(-1) ?? forward.at(-1);
+      if (beforeCham) beforeCham.pickChamHere = true;
+    }
     if (g.length === 1) {
       const b = g[0];
       if (!isBlocked(b)) {
@@ -106,7 +117,6 @@ export function buildHopSequence(
     }
   }
 
-  // Đánh dấu bước ngay trước khi về qua targetBox để hiện nút Nhặt Chàm (tự động tích hợp ở lượt về)
   return [...forward, ...backward];
 }
 
@@ -146,12 +156,13 @@ export function applyNlcTurnResult(
   }
 
   if (!move.hopCompleted) {
-    next.lastSummary = `${seat === 'P1' ? 'Người 1' : 'Người 2'} nhảy hụt nhịp / chống chân! Mất lượt.`;
+    const fault = move.missedPickup ? 'nhặt Chàm hụt nhịp' : 'nhảy sai nhịp';
+    next.lastSummary = `${seat === 'P1' ? 'Người 1' : 'Người 2'} ${fault}. Mất lượt!`;
     return { ok: true, nextState: next };
   }
 
   // Hoàn thành bàn hiện tại -> Xây Nhà nếu ô đó chưa có chủ, tăng bàn lên
-  const completedBox = next.level[seat];
+  const completedBox = getNlcTargetBox(next, seat);
   if (!next.houses[completedBox]) {
     next.houses[completedBox] = seat;
     next.scores[seat] += 30;

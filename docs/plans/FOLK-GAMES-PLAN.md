@@ -1,6 +1,6 @@
 # Nhảy Lò Cò và Ô Ăn Quan
 
-Kế hoạch cập nhật ngày 18/11/2026, đối chiếu nguồn Main `a55af6e` và bản chat `dd2e155`. [GDD v2](../archive/FOLK-GAMES-PLAN-2026-11-14-v2.md) lưu luật, art, skin và thiết kế thưởng. Bản FD-L0 trên `codex/folk-duel-foundation` đã code và kiểm cục bộ, chờ anh duyệt.
+Kế hoạch cập nhật ngày 18/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-2026-11-14-v2.md) lưu luật, art, skin và thiết kế thưởng. Bản FD-L1 trên `codex/folk-duel-foundation` tiếp FD-L0 `20c5a72`, chờ anh chơi thử và duyệt.
 
 ## Phạm vi và quyết định phải giữ
 
@@ -32,4 +32,8 @@ Kế hoạch cập nhật ngày 18/11/2026, đối chiếu nguồn Main `a55af6e
 | **FD-ON1 · Phòng 1v1 dùng chung** | Dùng Edge Function có Auth, cập nhật phòng bằng một giao dịch có kiểm version. Hỗ trợ mã phòng, ghép theo từng game, kết nối lại, hết lượt/rời phòng, rematch và receipt khi gửi lại. Server kiểm nước Ô Ăn Quan. Với Nhảy Lò Cò, đặc tả cách server xác nhận chuỗi thao tác và cửa sổ thời gian trước khi mở PvP. Điểm và kết quả tính ở server. Bubble tự vào `Trận` khi ghế hợp lệ, chấm xanh và lời cạnh avatar qua adapter chung. | PGlite kiểm ghế, Auth, phiên bản, gửi lặp, sai lượt, lộ dữ liệu và nhận thưởng trùng. Hai tài khoản staging chơi qua hai phiên, nhận chat đúng phòng, rời hoặc chơi lại và vào lại sau mất mạng. |
 | **FD-ON2 · Nghiệm thu** | Chạy CI đúng head, QA qua trình duyệt và thiết bị thật, kiểm mạng chậm và cả offline. Chuẩn bị mở catalog theo từng game, ghi cách thu hồi cấu hình catalog khi có lỗi. | Anh chơi và duyệt từng game trước merge. Migration trong mốc phát triển chỉ chạy ở PGlite hoặc staging. Giữ commerce tắt. |
 
-FD-L0 dùng Game UI/UX, Game QA/Playtest, Create Game Assets và vai trò QA Lead. Graphify AST Ô Ăn Quan và Nhảy Lò Cò, truy vấn `applyOaqMove` và `renderNhayLoCoCourt` depth 1, đối chiếu nguồn và kiểm trình duyệt. Bước tiếp sau khi anh duyệt là FD-L1, chơi ván offline hoàn chỉnh trước khi làm phòng 1v1.
+## Bản offline FD-L1 · 18/11/2026
+
+- Ván bot và hai người chung máy tự lưu sau lượt, mở lại bằng **Tiếp tục ván đã lưu**. Nhảy dở tiếp tục từ đầu lượt. Ván kết thúc mở lại được và giữ receipt thưởng. Hồ sơ cũ trong save ArcadeX đọc được, skin giữ khi đổi ván.
+- Ô Ăn Quan chọn ô bằng touch hoặc bàn phím. Nhảy Lò Cò bỏ ô Nhà đối thủ và thêm nhặt Chàm có canh lực. Kiểm đủ ván bốn tổ hợp game/chế độ trên Chromium, mở lại, đấu lại, điểm và thưởng. Bằng chứng `test-results/folk-offline/`.
+- Vào thử [Ô Ăn Quan](http://127.0.0.1:4357/?review=o-an-quan) và [Nhảy Lò Cò](http://127.0.0.1:4357/?review=nhay-lo-co) trên máy đang chạy dev. Bước kế FD-ON1 là phòng 1v1 và chat Trận sau khi anh duyệt bản offline.

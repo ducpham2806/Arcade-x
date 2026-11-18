@@ -14,14 +14,17 @@ import {
   buildHopSequence,
   countHouses,
   createInitialNlcState,
+  getNlcTargetBox,
 } from '../../src/games/nhay-lo-co/rules.ts';
 import {
   applyMatchReward,
   createInitialFolkProfile,
   equipFolkSkin,
+  loadFolkProfile,
   purchaseSkinWithCandy,
 } from '../../src/games/folk-duel/economy.ts';
 import { FolkRoomServer, normalizeRoomCode } from '../../src/games/folk-duel/server.ts';
+import { isNlcOfflineState, isOaqOfflineState, loadOfflineMatch, saveOfflineMatch } from '../../src/games/folk-duel/offlineMatch.ts';
 
 function totalOaqPoints(state) {
   const board = state.cells.reduce((total, _, index) => total + cellPointValue(state, index), 0);
@@ -162,6 +165,62 @@ test('Nhảy Lò Cò: xây đủ 3 Ngôi Nhà sẽ chiến thắng ngay', () => 
   assert.equal(countHouses(s, 'P1'), 3);
   assert.equal(s.finished, true);
   assert.equal(s.winner, 'P1');
+});
+
+test('Nhảy Lò Cò: nhặt Chàm đúng hàng khi quay về và bỏ qua Nhà đối thủ', () => {
+  for (let box = 1; box <= 9; box++) {
+    const route = buildHopSequence(box, {}, 'P1');
+    const afterTurn = route.findIndex(step => step.boxes.includes(10));
+    const pickup = route.findIndex(step => step.pickChamHere);
+    assert.ok(pickup >= afterTurn);
+    assert.equal(route.filter(step => step.pickChamHere).length, 1);
+    assert.ok(route.slice(0, pickup + 1).every(step => !step.boxes.includes(box)));
+  }
+  const move = { kind: 'TURN_RESULT', throwSuccess: true, throwPerfect: false, hopCompleted: true, scoreGained: 15 };
+  const first = applyNlcTurnResult(createInitialNlcState(), 'P1', move).nextState;
+  assert.equal(first.houses[1], 'P1');
+  assert.equal(getNlcTargetBox(first, 'P2'), 2);
+  const missed = applyNlcTurnResult(first, 'P2', { ...move, hopCompleted: false, missedPickup: true }).nextState;
+  assert.match(missed.lastSummary, /nhặt Chàm hụt nhịp/);
+  assert.deepEqual(missed.houses, first.houses);
+  const second = applyNlcTurnResult(first, 'P2', move).nextState;
+  assert.equal(second.houses[2], 'P2');
+  assert.equal(getNlcTargetBox(second, 'P1'), 3);
+});
+
+test('Ván offline: đọc hồ sơ cũ, lưu ván, đổi skin và thử lưu thưởng lại đúng một lần', () => {
+  const legacy = createInitialFolkProfile();
+  legacy.candyTokens = 50;
+  let stored = structuredClone(legacy);
+  let writable = true;
+  let coinGrants = 0;
+  const bridge = {
+    loadGameState: () => structuredClone(stored),
+    saveGameState: data => { if (writable) stored = structuredClone(data); },
+    grantCoins: () => { coinGrants++; },
+    grantExp: () => {}, reportQuest: () => {},
+  };
+  const match = { version: 1, id: 'offline-one', mode: 'local_2p', state: createInitialOaqState() };
+  assert.equal(loadOfflineMatch(bridge, isOaqOfflineState), null);
+  assert.equal(saveOfflineMatch(bridge, match), true);
+  assert.deepEqual(loadOfflineMatch(bridge, isOaqOfflineState), match);
+  assert.equal(loadOfflineMatch(bridge, isNlcOfflineState), null);
+  assert.equal(loadFolkProfile(bridge).candyTokens, 50);
+  const purchase = purchaseSkinWithCandy(loadFolkProfile(bridge), 'stones_marbles', bridge);
+  assert.equal(purchase.ok, true);
+  assert.deepEqual(loadOfflineMatch(bridge, isOaqOfflineState), match);
+
+  const input = { matchId: match.id, game: 'o-an-quan', mode: match.mode, won: true, skillBonuses: 0, score: 43 };
+  writable = false;
+  assert.equal(applyMatchReward(legacy, input, bridge).saveFailed, true);
+  assert.equal(coinGrants, 0);
+  writable = true;
+  assert.equal(applyMatchReward(legacy, input, bridge).profile.candyTokens, 21);
+  assert.equal(applyMatchReward(legacy, input, bridge).alreadyClaimed, true);
+  assert.equal(coinGrants, 1);
+  stored.offlineMatch.version = 99;
+  assert.equal(loadOfflineMatch(bridge, isOaqOfflineState), null);
+  assert.equal(loadFolkProfile(bridge).equippedSkins.oaq_stones, 'stones_marbles');
 });
 
 test('Economy & Tiệm Tạp Hóa: cộng thưởng chống nhận lặp và mua/trang bị Skin', () => {

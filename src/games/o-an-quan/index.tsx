@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { GameComponentProps } from '../../types';
 import {
-  applyMatchReward,
   loadFolkProfile,
   type FolkProfileSave,
 } from '../folk-duel/economy';
+import { FolkMatchReward, FolkResume, FolkRules, FolkSaveNotice } from '../folk-duel/FolkOfflineUi';
+import { isOaqOfflineState, useOfflineMatch, type OfflineMode } from '../folk-duel/offlineMatch';
 import { FolkShopModal } from '../folk-duel/FolkShopModal';
 import { OnlineRoom, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
 import { FolkRoomServer } from '../folk-duel/server';
@@ -41,13 +42,18 @@ const sharedLocalOaqServer = new FolkRoomServer<OaqState, OaqMove>({
 
 type ScreenMode =
   | { kind: 'home' }
-  | { kind: 'bot'; level: OaqBotLevel; matchId: string }
-  | { kind: 'local_2p'; matchId: string }
+  | { kind: 'offline' }
   | { kind: 'online'; entry: OnlineEntryMode };
 
-export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false }) => {
+export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false, isPaused }) => {
   const [profile, setProfile] = useState<FolkProfileSave>(() => loadFolkProfile(bridge));
   const [screen, setScreen] = useState<ScreenMode>({ kind: 'home' });
+  const offline = useOfflineMatch(bridge, createInitialOaqState, isOaqOfflineState);
+  const mode = offline.match?.mode;
+  const botLevel = mode === 'bot_easy' ? 'easy' : mode === 'bot_hard' ? 'hard' : null;
+  const startOffline = (mode: OfflineMode) => {
+    if (offline.start(mode)) setScreen({ kind: 'offline' });
+  };
   const [showShop, setShowShop] = useState(false);
   const [showRules, setShowRules] = useState(false);
   const [localUserId] = useState(() => `player_${Math.random().toString(36).slice(2, 8)}`);
@@ -86,6 +92,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
           </div>
 
           <div className="fd-menu-grid">
+            {offline.match && <FolkResume match={offline.match} onResume={() => setScreen({ kind: 'offline' })}/>}
             <button
               type="button"
               className="fd-menu-btn is-primary"
@@ -113,23 +120,23 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'bot', level: 'easy', matchId: `oaq_easy_${Date.now()}` })}
+              onClick={() => startOffline('bot_easy')}
             >
               <strong>🤖 Bot Tí Sún (Dễ)</strong>
-              <span>Làm quen luật · +25 Xu</span>
+              <span>Làm quen cách rải quân</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'bot', level: 'hard', matchId: `oaq_hard_${Date.now()}` })}
+              onClick={() => startOffline('bot_hard')}
             >
               <strong>🧠 Bot Bờm (Khó)</strong>
-              <span>Minimax tính nước · +45 Xu</span>
+              <span>Đối thủ tính trước nhiều nước</span>
             </button>
             <button
               type="button"
               className="fd-menu-btn"
-              onClick={() => setScreen({ kind: 'local_2p', matchId: `oaq_2p_${Date.now()}` })}
+              onClick={() => startOffline('local_2p')}
             >
               <strong>👥 2 Người Chung Máy</strong>
               <span>Đấu trực tiếp cạnh nhau</span>
@@ -142,32 +149,25 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
         </main>
       )}
 
-      {(screen.kind === 'bot' || screen.kind === 'local_2p') && (
+      {!offline.saved && <FolkSaveNotice onRetry={offline.retry}/>}
+      {screen.kind === 'offline' && offline.match && (
         <OaqMatchBoard
-          key={screen.matchId}
-          mode={screen.kind === 'bot' ? (screen.level === 'easy' ? 'bot_easy' : 'bot_hard') : 'local_2p'}
-          matchId={screen.matchId}
+          key={offline.match.id}
+          mode={offline.match.mode}
+          matchId={offline.match.id}
           mySeat="P1"
-          opponentName={
-            screen.kind === 'bot'
-              ? screen.level === 'easy'
-                ? 'Bot Tí Sún (Dễ)'
-                : 'Bot Bờm (Khó)'
-              : 'Người chơi 2'
-          }
-          botLevel={screen.kind === 'bot' ? screen.level : null}
+          opponentName={botLevel === 'easy' ? 'Bot Tí Sún' : botLevel === 'hard' ? 'Bot Bờm' : 'Người chơi 2'}
+          botLevel={botLevel}
+          state={offline.match.state}
+          onLocalStateChange={offline.update}
+          paused={isPaused || showShop}
+          rewardReady={offline.saved}
           profile={profile}
           sound={soundRef.current}
           bridge={bridge}
           onProfileChange={setProfile}
           onExit={() => setScreen({ kind: 'home' })}
-          onRematch={() =>
-            setScreen(
-              screen.kind === 'bot'
-                ? { kind: 'bot', level: screen.level, matchId: `oaq_${screen.level}_${Date.now()}` }
-                : { kind: 'local_2p', matchId: `oaq_2p_${Date.now()}` }
-            )
-          }
+          onRematch={() => startOffline(offline.match!.mode)}
         />
       )}
 
@@ -188,7 +188,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
               mySeat={mySeat}
               opponentName={room.players.find((p) => p.seat !== mySeat)?.name ?? 'Đối thủ'}
               botLevel={null}
-              externalState={room.state}
+              state={room.state}
               externalMoveHandler={(mv) => {
                 onMove(mv);
               }}
@@ -214,21 +214,14 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
       )}
 
       {showRules && (
-        <div className="fd-overlay" role="dialog" aria-modal="true">
-          <div className="fd-room-card" style={{ textAlign: 'left' }}>
-            <h2 style={{ margin: 0, color: '#fde68a' }}>Luật Chơi Ô Ăn Quan</h2>
-            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.6 }}>
-              <li>Mỗi bên có <b>5 ô Dân</b> (5 sỏi/ô) và 2 ô <b>Quan</b> ở hai đầu (10 điểm/Quan).</li>
-              <li>Đến lượt, chạm 1 ô Dân của mình rồi chọn <b>◀ Rải Trái</b> hoặc <b>Rải Phải ▶</b>.</li>
-              <li>Viên cuối rơi trước ô có quân thì bốc rải tiếp; rơi trước 1 ô trống + 1 ô có quân thì được <b>Ăn quân</b> (có thể ăn kép liên hoàn!).</li>
-              <li>2 lượt đầu không được ăn Quan khi Quan chưa có sỏi Dân đi kèm.</li>
-              <li>Cả 2 ô Quan hết quân → Hốt tàn, ai nhiều điểm hơn thắng!</li>
-            </ul>
-            <button type="button" className="fd-btn-primary" onClick={() => setShowRules(false)}>
-              Đã hiểu!
-            </button>
-          </div>
-        </div>
+        <FolkRules title="Luật chơi Ô Ăn Quan" onClose={() => setShowRules(false)}>
+          <ol className="list-decimal pl-6">
+            <li>Mỗi bên có 5 ô Dân. Hai ô Quan ở hai đầu có Quan trị giá 10 điểm.</li>
+            <li>Chạm ô Dân phía mình hoặc dùng Tab và Enter để chọn. Xem ô rải cuối, rồi chọn Rải Trái hoặc Rải Phải.</li>
+            <li>Ô kế bên còn quân thì bốc rải tiếp. Qua một ô trống gặp ô có quân thì ăn quân và có thể ăn kép.</li>
+            <li>Hai lượt đầu chỉ được ăn Quan có sỏi Dân đi kèm. Khi cả hai Quan hết quân, hốt tàn và chốt điểm.</li>
+          </ol>
+        </FolkRules>
       )}
     </div>
   );
@@ -240,7 +233,10 @@ interface OaqMatchBoardProps {
   mySeat: FolkSeat;
   opponentName: string;
   botLevel: OaqBotLevel | null;
-  externalState?: OaqState;
+  state: OaqState;
+  onLocalStateChange?: (state: OaqState) => void;
+  paused?: boolean;
+  rewardReady?: boolean;
   externalMoveHandler?: (move: OaqMove) => void;
   profile: FolkProfileSave;
   sound: FolkSoundEngine;
@@ -256,7 +252,10 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
   mySeat,
   opponentName,
   botLevel,
-  externalState,
+  state,
+  onLocalStateChange,
+  paused = false,
+  rewardReady = true,
   externalMoveHandler,
   profile,
   sound,
@@ -265,15 +264,15 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
   onExit,
   onRematch,
 }) => {
-  const [localState, setLocalState] = useState<OaqState>(() => createInitialOaqState());
-  const state = externalState ?? localState;
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
   const [bannerMsg, setBannerMsg] = useState<string>('Chạm vào một ô Dân của bạn để rải sỏi.');
-  const [rewardInfo, setRewardInfo] = useState<{ coins: number; exp: number; candy: number } | null>(null);
-  const rewardedRef = useRef(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const stoneSkin = getSkinById(profile.equippedSkins.oaq_stones);
+  const localTwo = mode === 'local_2p';
+  const activeSeat = localTwo ? state.turn : mySeat;
+  const canMove = !paused && !state.finished && state.turn === activeSeat;
+  const ownCells = getOwnRange(activeSeat);
 
   const previewCells = useMemo(() => {
     if (selectedCell === null || state.finished) return [];
@@ -292,7 +291,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
 
   // Bot tự động đi khi đến lượt P2
   useEffect(() => {
-    if (!botLevel || state.finished || state.turn !== 'P2') return;
+    if (paused || !botLevel || state.finished || state.turn !== 'P2') return;
     const timer = setTimeout(() => {
       const mv = chooseOaqBotMove(state, 'P2', botLevel);
       if (!mv) return;
@@ -305,65 +304,14 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
         } else {
           setBannerMsg(`Đến lượt của bạn!`);
         }
-        setLocalState(res.nextState);
+        onLocalStateChange?.(res.nextState);
       }
     }, 650);
     return () => clearTimeout(timer);
-  }, [botLevel, state, opponentName, sound, stoneSkin.sfxProfile]);
-
-  // Trao thưởng khi ván đấu kết thúc
-  useEffect(() => {
-    if (!state.finished || rewardedRef.current) return;
-    rewardedRef.current = true;
-    sound.playWin();
-    const won = state.winner === mySeat;
-    const isDraw = state.winner === 'DRAW';
-    const out = applyMatchReward(
-      profile,
-      {
-        matchId,
-        game: 'o-an-quan',
-        mode,
-        won,
-        isDraw,
-        skillBonuses: state.quanCaptured[mySeat],
-        score: state.scores[mySeat],
-      },
-      bridge
-    );
-    onProfileChange(out.profile);
-    if (!out.alreadyClaimed) {
-      setRewardInfo({ coins: out.coins, exp: out.exp, candy: out.candy });
-    }
-  }, [state.finished]);
-
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (state.finished) return;
-    const activeSeat = mode === 'local_2p' ? state.turn : mySeat;
-    if (state.turn !== activeSeat) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = BOARD_W / rect.width;
-    const scaleY = BOARD_H / rect.height;
-    const cx = (e.clientX - rect.left) * scaleX;
-    const cy = (e.clientY - rect.top) * scaleY;
-
-    const cellRects = getOaqCellRects();
-    const hit = cellRects.find((r) => cx >= r.x && cx <= r.x + r.w && cy >= r.y && cy <= r.y + r.h);
-    if (!hit) return;
-
-    const ownRange = getOwnRange(activeSeat);
-    if (ownRange.includes(hit.idx) && state.cells[hit.idx] > 0) {
-      setSelectedCell(hit.idx);
-      setBannerMsg(`Đã chọn ô ${hit.idx}. Hãy chọn hướng Rải Trái hoặc Rải Phải.`);
-    }
-  };
+  }, [paused, botLevel, state, opponentName, sound, stoneSkin.sfxProfile, onLocalStateChange]);
 
   const executeMove = (dir: OaqDirection) => {
-    if (selectedCell === null || state.finished) return;
-    const activeSeat = mode === 'local_2p' ? state.turn : mySeat;
+    if (selectedCell === null || !canMove) return;
     const mv: OaqMove = { cellIndex: selectedCell, direction: dir };
 
     if (externalMoveHandler) {
@@ -388,19 +336,21 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
     } else {
       setBannerMsg(mode === 'local_2p' ? `Đến lượt ${res.nextState.turn === 'P1' ? 'Người 1' : 'Người 2'}` : 'Đang chờ đối thủ…');
     }
-    setLocalState(res.nextState);
+    onLocalStateChange?.(res.nextState);
     setSelectedCell(null);
   };
 
   const oppSeat: FolkSeat = mySeat === 'P1' ? 'P2' : 'P1';
+  const playerName = localTwo ? 'Người chơi 1' : 'Bạn';
+  const winnerName = state.winner === mySeat ? playerName : opponentName;
 
   return (
     <main className="fd-board-stage">
-      <div className={`fd-hud-strip ${state.turn === oppSeat && !state.finished ? 'is-active' : ''}`}>
+      <div data-folk-seat={oppSeat} className={`fd-hud-strip ${state.turn === oppSeat && !state.finished ? 'is-active' : ''}`}>
         <div>
           <strong>{opponentName}</strong>
           <div style={{ fontSize: 12, color: '#fcd34d' }}>
-            {state.turn === oppSeat && !state.finished ? '⏳ Đang suy nghĩ…' : 'Đang chờ'}
+            {state.turn === oppSeat && !state.finished ? localTwo ? 'Đến lượt rải' : 'Đang suy nghĩ…' : 'Đang chờ'}
           </div>
         </div>
         <div style={{ fontSize: 18, fontWeight: 900, color: '#fde047' }}>
@@ -408,35 +358,41 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
         </div>
       </div>
 
-      <div style={{ width: '100%', maxWidth: 680, position: 'relative' }}>
+      <div className="fd-oaq-board" data-chat-protect="true">
         <canvas
           ref={canvasRef}
           width={BOARD_W}
           height={BOARD_H}
-          onClick={handleCanvasClick}
           className="fd-pixel-canvas"
-          style={{ width: '100%', height: 'auto', borderRadius: 14, border: '3px solid #78350f', cursor: 'pointer' }}
+          aria-hidden="true"
         />
+        <div className="fd-oaq-targets" role="group" aria-label="Ô dân trên bàn">
+          {getOaqCellRects().filter(cell => !cell.isQuan).map(({ idx, x, y, w, h }) => (
+            <button key={idx} type="button" className="fd-cell-target" data-folk-cell={idx}
+              style={{ left: `${x / BOARD_W * 100}%`, top: `${y / BOARD_H * 100}%`, width: `${w / BOARD_W * 100}%`, height: `${h / BOARD_H * 100}%` }}
+              disabled={!canMove || !ownCells.includes(idx) || state.cells[idx] === 0}
+              aria-label={`Ô ${idx}, ${state.cells[idx]} sỏi`} aria-pressed={selectedCell === idx}
+              onClick={() => { setSelectedCell(idx); setBannerMsg(`Đã chọn ô ${idx}. Chọn một hướng rải.`); }} />
+          ))}
+        </div>
       </div>
 
       <div className="fd-controls-bar">
         {!state.finished ? (
           <>
+            <p className="fd-status" role="status">{bannerMsg}</p>
             <button
               type="button"
               className="fd-btn-primary"
-              disabled={selectedCell === null}
+              disabled={selectedCell === null || !canMove}
               onClick={() => executeMove('CCW')}
             >
               ◀ Rải Trái
             </button>
-            <span style={{ fontSize: 13, color: '#fde68a', textAlign: 'center', minWidth: 180 }}>
-              {bannerMsg}
-            </span>
             <button
               type="button"
               className="fd-btn-primary"
-              disabled={selectedCell === null}
+              disabled={selectedCell === null || !canMove}
               onClick={() => executeMove('CW')}
             >
               Rải Phải ▶
@@ -445,20 +401,16 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
         ) : (
           <div className="fd-room-card" style={{ width: '100%', maxWidth: 520, padding: 14 }}>
             <h3 style={{ margin: 0, color: '#fde047' }}>
-              {state.winner === 'DRAW'
-                ? '🤝 HÒA NHAU!'
-                : state.winner === mySeat
-                ? '🏆 BẠN ĐÃ CHIẾN THẮNG!'
-                : '😅 ĐỐI THỦ THẮNG RỒI!'}
+              {state.winner === 'DRAW' ? 'Hòa nhau!' : `${winnerName} thắng!`}
             </h3>
             <p style={{ margin: '4px 0', fontSize: 13 }}>
-              Tỉ số chung cuộc: Bạn <b>{state.scores[mySeat]}</b> – <b>{state.scores[oppSeat]}</b> {opponentName}
+              {playerName} <b>{state.scores[mySeat]}</b> – <b>{state.scores[oppSeat]}</b> {opponentName}
             </p>
-            {rewardInfo && (
-              <p style={{ margin: '4px 0', fontSize: 13, color: '#86efac', fontWeight: 700 }}>
-                Phần thưởng: +{rewardInfo.coins} Xu · +{rewardInfo.exp} XP · +{rewardInfo.candy} 🍬 Kẹo
-              </p>
-            )}
+            <FolkMatchReward
+              input={{ matchId, game: 'o-an-quan', mode, won: state.winner === mySeat, isDraw: state.winner === 'DRAW',
+                skillBonuses: state.quanCaptured[mySeat], score: state.scores[mySeat] }}
+              profile={profile} bridge={bridge} ready={rewardReady} onProfileChange={onProfileChange} onAward={() => sound.playWin()}
+            />
             <div className="fd-btn-row">
               <button type="button" className="fd-btn-primary" onClick={onRematch}>
                 🔄 Đấu Lại
@@ -471,11 +423,11 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
         )}
       </div>
 
-      <div className={`fd-hud-strip ${state.turn === mySeat && !state.finished ? 'is-active' : ''}`}>
+      <div data-folk-seat={mySeat} className={`fd-hud-strip ${state.turn === mySeat && !state.finished ? 'is-active' : ''}`}>
         <div>
-          <strong>Bạn ({mode === 'local_2p' ? (state.turn === 'P1' ? 'P1' : 'P2') : 'Sân Dưới'})</strong>
+          <strong>{playerName}</strong>
           <div style={{ fontSize: 12, color: '#86efac' }}>
-            {state.turn === mySeat && !state.finished ? '✨ Đến lượt bạn' : 'Chờ đối thủ'}
+            {state.turn === mySeat && !state.finished ? 'Đến lượt rải' : 'Đang chờ'}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

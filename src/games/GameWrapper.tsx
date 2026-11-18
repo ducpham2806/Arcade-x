@@ -134,6 +134,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
 
   // Active Game Session Stats & Timer Tracking
   const gameId = gameMeta?.id || 'default';
+  const folkOfflineSave = gameId === 'o-an-quan' || gameId === 'nhay-lo-co';
   const highScore = profile?.stats?.highScores?.[gameId] || 0;
 
   const sessionStartTimeRef = useRef<number>(Date.now());
@@ -246,7 +247,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   // Handle Save Game and Exit to Main Hub safely
   const handleSaveAndExit = useCallback(() => {
     if (!gameMeta) return;
-    if (gameMeta.id === 'battleship' || gameMeta.id === 'snake-legend') { onExit(); return; }
+    if (gameMeta.id === 'battleship' || gameMeta.id === 'snake-legend' || folkOfflineSave) { onExit(); return; }
     const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
     const score = currentScoreRef.current;
     saveAndSuspendGame({
@@ -267,11 +268,11 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       },
     }, true);
     setHasAutoSaved(true);
-  }, [gameMeta, isPracticeMode, isDailyChallengeMode, saveAndSuspendGame]);
+  }, [gameMeta, isPracticeMode, isDailyChallengeMode, saveAndSuspendGame, folkOfflineSave, onExit]);
 
   // Periodic background auto-saving to cloud during active gameplay
   useEffect(() => {
-    if (!gameMeta || gameOverData || (gameMeta.id === 'battleship' || gameMeta.id === 'snake-legend')) return;
+    if (!gameMeta || gameOverData || gameMeta.id === 'battleship' || gameMeta.id === 'snake-legend' || folkOfflineSave) return;
     const interval = setInterval(() => {
       if (document.hidden || isPaused) return;
       const timePlayed = initialTimeOffsetRef.current + Math.max(1, Math.floor((Date.now() - sessionStartTimeRef.current) / 1000));
@@ -295,7 +296,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       });
     }, 30000);
     return () => clearInterval(interval);
-  }, [gameMeta, gameOverData, isPaused, isPracticeMode, isDailyChallengeMode, autoSaveGameSession]);
+  }, [gameMeta, gameOverData, isPaused, isPracticeMode, isDailyChallengeMode, autoSaveGameSession, folkOfflineSave]);
 
   const rankInfo = useMemo(() => {
     if (!gameOverData) return null;
@@ -762,7 +763,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                 {/* Auto-save Status Pill */}
                 <div className="flex items-center justify-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 py-1.5 px-3 rounded-xl font-semibold">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{gameId === 'snake-legend' ? 'Game quản lý lưu trên thiết bị · xem thông báo trong game' : gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : 'Tiến trình game được tự động lưu an toàn'}</span>
+                  <span>{folkOfflineSave ? 'Game lưu ván offline sau mỗi lượt' : gameId === 'snake-legend' ? 'Game quản lý lưu trên thiết bị · xem thông báo trong game' : gameId === 'battleship' ? 'Bot không lưu · Online lưu tại phòng' : 'Tiến trình game được tự động lưu an toàn'}</span>
                 </div>
 
                 {/* Dynamic Viewport Resolution Info */}
@@ -885,7 +886,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
               </div>
               <h2 className="text-lg font-bold text-white mb-2 font-display">TẠM DỪNG HOẶC RỜI GAME?</h2>
               <p className="text-xs text-slate-400 mb-5">
-                {gameId === 'snake-legend' ? 'Mốc đang chơi được game quản lý trên trình duyệt này. Chưa đồng bộ tài khoản; xem thông báo trong game nếu có lỗi lưu.' : gameId === 'battleship' ? 'Ván bot sẽ kết thúc. Phòng online vẫn chạy; quay lại trong 90 giây để giữ trận.' : 'Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.'}
+                {folkOfflineSave ? 'Game giữ mốc từ lượt offline gần nhất. Mở lại game rồi chọn Tiếp tục ván đã lưu.' : gameId === 'snake-legend' ? 'Mốc đang chơi được game quản lý trên trình duyệt này. Chưa đồng bộ tài khoản; xem thông báo trong game nếu có lỗi lưu.' : gameId === 'battleship' ? 'Ván bot sẽ kết thúc. Phòng online vẫn chạy; quay lại trong 90 giây để giữ trận.' : 'Bạn có thể lưu tiến trình để trở lại chơi tiếp bất cứ lúc nào từ sảnh chính, hoặc hủy ván chơi này.'}
               </p>
 
               <div className="space-y-2">
@@ -896,7 +897,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                   className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{gameId === 'snake-legend' ? 'Giữ mốc trên thiết bị & về sảnh' : gameId === 'battleship' ? 'Về sảnh' : 'Lưu Tiến Trình & Trở Về Sảnh'}</span>
+                  <span>{gameId === 'snake-legend' ? 'Giữ mốc trên thiết bị & về sảnh' : gameId === 'battleship' || folkOfflineSave ? 'Về sảnh' : 'Lưu Tiến Trình & Trở Về Sảnh'}</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">

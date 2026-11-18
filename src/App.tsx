@@ -1,4 +1,5 @@
 import {ChatProvider} from './chat/ChatProvider';
+import {useChat} from './chat/ChatContext';
 import { GamePackageGate } from './components/GamePackageGate';
 import { installReadability } from './accessibility/readability.js';
 import { installHostingSafeArea } from './services/hostingSafeArea';
@@ -48,6 +49,7 @@ import { Flame, Gift, Play, XCircle, Cloud, Clock, Footprints, Trophy, Pause, Sa
 
 const AppContent: React.FC = () => {
   useRippleEffect();
+  const expandChat = useChat()?.expand;
   useEffect(() => installReadability(), []);
   const launcher = useLauncher();
   const { openEntry, authModalMode, notice, dismissNotice } = useAuth();
@@ -70,13 +72,19 @@ const AppContent: React.FC = () => {
     openChat,
   } = useLauncherUi();
 
-  const inviteOpened = useRef(false);
+  const entryOpened = useRef(false);
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    if (!inviteOpened.current && query.get('game') === 'tank-clash' && /^[A-HJ-KM-NP-Z2-9]{6}$/i.test(query.get('room') || '')) {
-      inviteOpened.current = true; launchGame('tank-clash');
+    if (entryOpened.current) return;
+    const reviewId = query.get('review');
+    if (import.meta.env.DEV && (reviewId === 'o-an-quan' || reviewId === 'nhay-lo-co') && launcher.catalog.games.some(game => game.id === reviewId)) {
+      entryOpened.current = true;
+      launchGame(reviewId);
+    } else if (query.get('game') === 'tank-clash' && /^[A-HJ-KM-NP-Z2-9]{6}$/i.test(query.get('room') || '')) {
+      entryOpened.current = true;
+      launchGame('tank-clash');
     }
-  }, [launchGame]);
+  }, [launchGame, launcher.catalog.games]);
 
 
 
@@ -95,14 +103,19 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const handleOpenModalEvent = (e: Event) => {
       const custom = e as CustomEvent<{ modal?: string }>;
-      if (custom.detail?.modal === 'friends') { openChat(); return; }
+      if (custom.detail?.modal === 'friends') {
+        setActiveModal('none');
+        if (expandChat) expandChat();
+        else openChat();
+        return;
+      }
       if (custom.detail?.modal) {
         setActiveModal(custom.detail.modal as any);
       }
     };
     window.addEventListener('arcadex:open_modal', handleOpenModalEvent);
     return () => window.removeEventListener('arcadex:open_modal', handleOpenModalEvent);
-  }, [setActiveModal]);
+  }, [setActiveModal, expandChat, openChat]);
 
   return (
     <div className={`${!activeGameId ? "launcher-light " : ""}arcade-app relative w-full min-h-screen bg-[#050505] text-slate-200 overflow-x-hidden selection:bg-indigo-500 selection:text-white`}>

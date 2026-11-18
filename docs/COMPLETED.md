@@ -2,11 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## FD-L0 và chat · bản review 18/11/2026
+## Folk và chat · bản review 18/11/2026
 
-- `codex/folk-duel-foundation` sửa preview/bot, giữ 70 điểm Ô Ăn Quan, làm chữ Canvas và artwork hai game. Folk 9/9, artwork/readability và browser 390/1280 qua. [Thẻ FD-L0](plans/FOLK-GAMES-PLAN.md) chờ duyệt.
-- Studio `fa7b1db` 125 skill/21 vai trò/340 blob. PR 38 nháp `dd2e155`, chat 27/27 và preview Snake, native 3/3 cục bộ. Còn staging hai tester; chưa merge.
-- [Tóm tắt chat và Studio nguyên văn](archive/COMPLETED-2026-11-18-before-folk-duel-foundation.md).
+- FD-L0 sửa luật Ô Ăn Quan và hoàn thiện artwork. FD-L1 trên `codex/folk-duel-foundation` có lưu lượt, bàn phím, nhặt Chàm, đấu lại và thưởng. Folk 11/11, browser 4 ván đủ lượt; chờ duyệt PR 40. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md).
+- Studio `fa7b1db`. PR 38 chat 27/27, preview Snake và native 3/3 cục bộ. Staging hai tester còn chờ; chưa merge.
+- [Tóm tắt trước FD-L1](archive/COMPLETED-2026-11-18-before-folk-offline.md).
 
 ## Snake R01 · kỹ thuật ứng viên · 14/11/2026
 
