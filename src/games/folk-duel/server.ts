@@ -4,7 +4,7 @@ import {
   type FolkGameKind,
   type FolkRoomSnapshot,
   type FolkSeat,
-} from './types';
+} from './types.ts';
 
 // Loại bỏ 0/O, 1/I/L để bạn bè đọc mã phòng qua điện thoại hoặc tin nhắn không bị nhầm
 const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';

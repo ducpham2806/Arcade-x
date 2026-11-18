@@ -2,13 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Studio và CH0–CH4 · 18/11/2026 · PR 38 nháp
+## FD-L0 và chat · bản review 18/11/2026
 
-- Studio nguồn `fa7b1db`, 125 skill/21 vai trò/340 blob kiểm hash. Nhánh `codex/chat-all-games`.
-- Bubble chung ở sảnh, 27/27 launcher, Snake preview; kéo tránh iframe. Chat chung 3/3, chat trận Tank/Nối Từ/Hải Chiến 3/3 cục bộ.
-- Word/Battleship đã có schema và Edge trên staging, 12 probe Auth-negative qua ngày 15/11. [QA](chat/NATIVE-MATCH-QA-2026-11-15.md).
-- Còn hai tài khoản staging, thiết bị thật, CI Folk; chưa merge. [Kế hoạch Folk](plans/FOLK-GAMES-PLAN.md) chờ duyệt.
-- [Tóm tắt trước mở rộng](archive/COMPLETED-2026-11-18-before-all-game-chat.md).
+- `codex/folk-duel-foundation` sửa preview/bot, giữ 70 điểm Ô Ăn Quan, làm chữ Canvas và artwork hai game. Folk 9/9, artwork/readability và browser 390/1280 qua. [Thẻ FD-L0](plans/FOLK-GAMES-PLAN.md) chờ duyệt.
+- Studio `fa7b1db` 125 skill/21 vai trò/340 blob. PR 38 nháp `dd2e155`, chat 27/27 và preview Snake, native 3/3 cục bộ. Còn staging hai tester; chưa merge.
+- [Tóm tắt chat và Studio nguyên văn](archive/COMPLETED-2026-11-18-before-folk-duel-foundation.md).
 
 ## Snake R01 · kỹ thuật ứng viên · 14/11/2026
 

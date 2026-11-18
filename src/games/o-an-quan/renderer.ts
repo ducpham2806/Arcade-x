@@ -166,16 +166,18 @@ export function renderOAnQuanBoard(
     // Badge số lượng sỏi rõ nét ở góc ô
     const totalDisplay = cellTotalStones(state, r.idx);
     const ptsDisplay = r.isQuan && qSlot !== null && state.quanAlive[qSlot] ? `${state.cells[r.idx]}+Q` : `${totalDisplay}`;
+    const badgeWidth = r.isQuan ? 58 : 36;
     ctx.fillStyle = totalDisplay > 0 ? '#1C1008' : 'rgba(28, 16, 8, 0.5)';
-    ctx.fillRect(r.x + 6, r.y + 6, r.isQuan ? 34 : 24, 18);
+    ctx.fillRect(r.x + 6, r.y + 6, badgeWidth, 26);
     ctx.strokeStyle = boardSkin.palette.accent;
     ctx.lineWidth = 1;
-    ctx.strokeRect(r.x + 6, r.y + 6, r.isQuan ? 34 : 24, 18);
+    ctx.strokeRect(r.x + 6, r.y + 6, badgeWidth, 26);
 
     ctx.fillStyle = totalDisplay > 0 ? '#FDE047' : '#94A3B8';
-    ctx.font = 'bold 11px ui-monospace, monospace';
+    ctx.font = 'bold 20px ui-monospace, monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(ptsDisplay, r.x + 6 + (r.isQuan ? 17 : 12), r.y + 15);
+    readableCanvasText(ctx, ptsDisplay, r.x + 6 + badgeWidth / 2, r.y + 19);
   }
 }
+import { readableCanvasText } from '../../accessibility/canvasText';

@@ -4,8 +4,8 @@ import {
   type EquippedFolkSkins,
   type FolkGameKind,
   type SkinCategory,
-} from './types';
-import { FOLK_SKINS_CATALOG, getSkinById } from './skins-catalog';
+} from './types.ts';
+import { FOLK_SKINS_CATALOG, getSkinById } from './skins-catalog.ts';
 
 const STORAGE_KEY = 'arcadex:folk-duel:profile:v1';
 

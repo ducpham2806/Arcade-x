@@ -979,5 +979,13 @@
   "tank-clash": [
     "/game-art/icons/tank-clash.webp",
     "/game-art/banners/tank-clash.webp"
+  ],
+  "o-an-quan": [
+    "/game-art/icons/o-an-quan.webp",
+    "/game-art/banners/o-an-quan.webp"
+  ],
+  "nhay-lo-co": [
+    "/game-art/icons/nhay-lo-co.webp",
+    "/game-art/banners/nhay-lo-co.webp"
   ]
 }

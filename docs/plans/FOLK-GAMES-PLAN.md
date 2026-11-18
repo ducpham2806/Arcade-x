@@ -1,6 +1,6 @@
 # Nhảy Lò Cò và Ô Ăn Quan
 
-Kế hoạch triển khai cập nhật ngày 18/11/2026, đối chiếu nguồn Main `a55af6e` và bản chat trên `codex/chat-all-games`. [GDD v2](../archive/FOLK-GAMES-PLAN-2026-11-14-v2.md) lưu luật, art, skin và thiết kế thưởng chi tiết. Phạm vi kỳ này là kiểm nền và bàn giao kế hoạch để chủ dự án duyệt.
+Kế hoạch cập nhật ngày 18/11/2026, đối chiếu nguồn Main `a55af6e` và bản chat `dd2e155`. [GDD v2](../archive/FOLK-GAMES-PLAN-2026-11-14-v2.md) lưu luật, art, skin và thiết kế thưởng. Bản FD-L0 trên `codex/folk-duel-foundation` đã code và kiểm cục bộ, chờ anh duyệt.
 
 ## Phạm vi và quyết định phải giữ
 
@@ -10,12 +10,18 @@ Kế hoạch triển khai cập nhật ngày 18/11/2026, đối chiếu nguồn 
 - Skin chỉ đổi hình/hiệu ứng/âm thanh; zero pay-to-win. GameBridge, thưởng, Xu/XP/Kẹo/Rương và commerce trong GDD là thiết kế, không tự cấp quyền production hoặc bật thanh toán. Áp quy tắc save/Auth/commerce của AGENTS/project hiện tại.
 - Art pixel Việt Nam: icon512/banner1280×640, sprite trong suốt/nearest-neighbor, bảng màu/render đa skin ở GDD §5–§8. Modal và vùng chơi theo quy tắc ArcadeX đã duyệt.
 
-## Hiện trạng đã kiểm
+## Mốc trước FD-L0
 
 - Cả hai game có luật, bot, hai người cùng máy, Canvas, skin, âm thanh và màn phòng thử. Build cục bộ vào được cả hai game, mở kênh `Game` bằng bubble và thoát về sảnh. Kiểm chat trên build cục bộ không xác nhận phát hành catalog production.
 - Bộ luật/economy/phòng Folk sau khi bundle bằng esbuild đạt **5/6**. `previewOaqLandingCell()` gọi `applyOaqMove()` trên chính state đang chơi. Đường `ensureSideHasStones()` trả lại cùng object khi còn quân, phép tính preview đổi lượt và sửa ô trước khi người chơi xác nhận. Ca đỏ là P1 chọn ô 1 theo chiều CW ngay ván đầu.
 - Kiểm chữ Canvas báo lỗi ở `src/games/nhay-lo-co/renderer.ts:110`. Kiểm artwork dừng ở `o-an-quan`; cả hai game cần metadata, icon và banner của launcher.
 - `OnlineRoom.tsx` gọi `FolkRoomServer` trong bộ nhớ trình duyệt. Hai game đã có SQL nháp ở `supabase/folk-duel/schema.sql`; luồng đối đầu cross-device, chat `Trận` và xác nhận thưởng online còn chờ triển khai.
+
+## Bản FD-L0 · 18/11/2026
+
+- Preview hai chiều, bot và nước đi chính dùng cùng bộ luật, kiểm state đầu vào giữ nguyên. Chuyền tay đủ lượt để đưa hết quân xuống bàn. Khi hốt tàn, trừ số điểm rải sinh đã ứng, giữ hai điểm cuối không âm và tổng 70. Node 24 chạy trực tiếp `npm run test:folk-duel`, đạt 9/9 và nằm trong `test:fast`.
+- Chữ Canvas dùng `readableCanvasText`, số sỏi trên Ô Ăn Quan tăng cỡ cho điện thoại. Hai bộ artwork native SVG có bàn hai hàng và hai Quan, sân nhảy ô đơn/đôi và mảnh Chàm. WebP xuất bằng script, icon 512 × 512, banner 1280 × 640, mỗi tệp dưới 41 kB. Đăng ký cache gói và preview DEV của hai game.
+- Chromium 390 × 844 và 1280 × 820 đã tải artwork, mở/thu bubble, chọn ô 1 và rải phải, thảy Chàm và nhảy bước đầu, thoát về sảnh. Ảnh ở `test-results/folk-review/`. Kiểm giả lập trình duyệt, chưa đánh giá ván đủ lượt trên điện thoại thật.
 
 ## Thứ tự triển khai và điểm duyệt
 
@@ -26,4 +32,4 @@ Kế hoạch triển khai cập nhật ngày 18/11/2026, đối chiếu nguồn 
 | **FD-ON1 · Phòng 1v1 dùng chung** | Dùng Edge Function có Auth, cập nhật phòng bằng một giao dịch có kiểm version. Hỗ trợ mã phòng, ghép theo từng game, kết nối lại, hết lượt/rời phòng, rematch và receipt khi gửi lại. Server kiểm nước Ô Ăn Quan. Với Nhảy Lò Cò, đặc tả cách server xác nhận chuỗi thao tác và cửa sổ thời gian trước khi mở PvP. Điểm và kết quả tính ở server. Bubble tự vào `Trận` khi ghế hợp lệ, chấm xanh và lời cạnh avatar qua adapter chung. | PGlite kiểm ghế, Auth, phiên bản, gửi lặp, sai lượt, lộ dữ liệu và nhận thưởng trùng. Hai tài khoản staging chơi qua hai phiên, nhận chat đúng phòng, rời hoặc chơi lại và vào lại sau mất mạng. |
 | **FD-ON2 · Nghiệm thu** | Chạy CI đúng head, QA qua trình duyệt và thiết bị thật, kiểm mạng chậm và cả offline. Chuẩn bị mở catalog theo từng game, ghi cách thu hồi cấu hình catalog khi có lỗi. | Anh chơi và duyệt từng game trước merge. Migration trong mốc phát triển chỉ chạy ở PGlite hoặc staging. Giữ commerce tắt. |
 
-Phạm vi kiểm gồm `src/games/folk-duel/`, hai engine, `tests/folk-duel/folk-games.test.mjs` và SQL nháp. Dùng Game UI/UX, Game QA/Playtest và Game Production/Scrum. Graphify `folk-duel` có 7 tệp, 72 nút; truy vấn `FolkRoomServer` depth 1 rồi xác nhận bằng nguồn. Bước đầu khi được duyệt là tạo nhánh Folk riêng cho FD-L0, xử lý preview Ô Ăn Quan và hai ca CI về chữ Canvas/artwork trước khi làm phòng online.
+FD-L0 dùng Game UI/UX, Game QA/Playtest, Create Game Assets và vai trò QA Lead. Graphify AST Ô Ăn Quan và Nhảy Lò Cò, truy vấn `applyOaqMove` và `renderNhayLoCoCourt` depth 1, đối chiếu nguồn và kiểm trình duyệt. Bước tiếp sau khi anh duyệt là FD-L1, chơi ván offline hoàn chỉnh trước khi làm phòng 1v1.

@@ -33,6 +33,7 @@ export interface OaqState {
 }
 
 export const QUAN_VALUE = 10;
+const MAX_SOWING_PASSES = 24;
 
 export function createInitialOaqState(): OaqState {
   // Ô 0 và 6 chứa 1 viên Quan (đếm 1 viên vật lý nhưng quy đổi 10 điểm khi ăn)
@@ -106,15 +107,12 @@ export function ensureSideHasStones(state: OaqState, seat: FolkSeat): OaqState {
   }
 
   const next = cloneOaqState(state);
-  const opponent: FolkSeat = seat === 'P1' ? 'P2' : 'P1';
   if (next.scores[seat] >= 5) {
     next.scores[seat] -= 5;
   } else {
     const needed = 5 - next.scores[seat];
     next.scores[seat] = 0;
     next.debt[seat] += needed;
-    // Ghi nhận nợ với đối phương
-    void opponent;
   }
   for (const idx of range) {
     next.cells[idx] = 1;
@@ -151,12 +149,13 @@ export function applyOaqMove(
     return { ok: false, error: 'Chưa đến lượt của bạn.', nextState: rawState, steps: [] };
   }
 
-  const state = ensureSideHasStones(rawState, seat);
+  const prepared = ensureSideHasStones(rawState, seat);
   const validRange = getOwnRange(seat);
-  if (!validRange.includes(move.cellIndex) || state.cells[move.cellIndex] <= 0) {
+  if (!validRange.includes(move.cellIndex) || prepared.cells[move.cellIndex] <= 0) {
     return { ok: false, error: 'Ô được chọn không hợp lệ hoặc không có quân.', nextState: rawState, steps: [] };
   }
 
+  const state = prepared === rawState ? cloneOaqState(prepared) : prepared;
   const steps: OaqStepEvent[] = [];
   let cursor = move.cellIndex;
   let hand = state.cells[cursor];
@@ -167,7 +166,7 @@ export function applyOaqMove(
   let capturedTotal = 0;
   let comboCount = 0;
 
-  while (loopGuard < 24) {
+  while (loopGuard < MAX_SOWING_PASSES) {
     loopGuard += 1;
     // Rải từng viên trong tay
     while (hand > 0) {
@@ -191,6 +190,10 @@ export function applyOaqMove(
     }
 
     if (!isQuanCell(nextIdx) && state.cells[nextIdx] > 0) {
+      if (loopGuard === MAX_SOWING_PASSES) {
+        steps.push({ type: 'stop', cellIndex: nextIdx, count: 0, seat });
+        break;
+      }
       // Bốc tiếp ô Dân kế tiếp để rải tiếp
       cursor = nextIdx;
       hand = state.cells[cursor];
@@ -252,11 +255,13 @@ export function applyOaqMove(
       state.scores.P2 += state.cells[idx];
       state.cells[idx] = 0;
     }
-    // Trừ nợ rải sinh
-    const finalP1 = state.scores.P1 - state.debt.P1 + state.debt.P2;
-    const finalP2 = state.scores.P2 - state.debt.P2 + state.debt.P1;
-    state.scores.P1 = Math.max(0, finalP1);
-    state.scores.P2 = Math.max(0, finalP2);
+    // Quân rải trước theo nợ chỉ trở thành điểm sau khi trừ phần đã ứng.
+    const netP1 = state.scores.P1 - state.debt.P1;
+    const netP2 = state.scores.P2 - state.debt.P2;
+    const totalPoints = netP1 + netP2;
+    // Nếu một bên không đủ điểm trả nợ, bên còn lại giữ phần điểm thật của bàn.
+    state.scores.P1 = Math.min(totalPoints, Math.max(0, netP1));
+    state.scores.P2 = totalPoints - state.scores.P1;
     state.finished = true;
     state.winner = state.scores.P1 > state.scores.P2 ? 'P1' : state.scores.P2 > state.scores.P1 ? 'P2' : 'DRAW';
   } else {

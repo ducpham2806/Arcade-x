@@ -4,14 +4,14 @@ import {
   getValidOaqMoves,
   type OaqMove,
   type OaqState,
-} from './rules';
+} from './rules.ts';
 
 export type OaqBotLevel = 'easy' | 'hard';
 
 function evaluateState(state: OaqState, botSeat: FolkSeat): number {
   const oppSeat: FolkSeat = botSeat === 'P1' ? 'P2' : 'P1';
   const scoreDiff = state.scores[botSeat] - state.scores[oppSeat];
-  const debtDiff = state.debt[oppSeat] - state.debt[botSeat];
+  const debtDiff = state.finished ? 0 : state.debt[oppSeat] - state.debt[botSeat];
   return scoreDiff * 3 + debtDiff * 2;
 }
 

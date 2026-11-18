@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   applyOaqMove,
+  cellPointValue,
   createInitialOaqState,
   getValidOaqMoves,
   previewOaqLandingCell,
@@ -22,27 +23,106 @@ import {
 } from '../../src/games/folk-duel/economy.ts';
 import { FolkRoomServer, normalizeRoomCode } from '../../src/games/folk-duel/server.ts';
 
+function totalOaqPoints(state) {
+  const board = state.cells.reduce((total, _, index) => total + cellPointValue(state, index), 0);
+  const outstandingDebt = state.finished ? 0 : state.debt.P1 + state.debt.P2;
+  return board + state.scores.P1 + state.scores.P2 - outstandingDebt;
+}
+
 test('Ô Ăn Quan: khởi tạo 70 điểm (2 Quan x 10 + 10 Dân x 5) và rải quân hợp lệ', () => {
   const s0 = createInitialOaqState();
+  const before = structuredClone(s0);
+  const move = { cellIndex: 1, direction: 'CW' };
   assert.equal(s0.quanAlive[0], true);
   assert.equal(s0.quanAlive[1], true);
+  assert.equal(totalOaqPoints(s0), 70);
   assert.equal(getValidOaqMoves(s0, 'P1').length, 10);
 
-  const preview = previewOaqLandingCell(s0, { cellIndex: 1, direction: 'CW' });
+  const preview = previewOaqLandingCell(s0, move);
   assert.ok(preview !== null);
+  assert.ok(previewOaqLandingCell(s0, { ...move, direction: 'CCW' }) !== null);
+  assert.deepEqual(s0, before, 'preview in either direction must leave the live game intact');
 
-  const res = applyOaqMove(s0, 'P1', { cellIndex: 1, direction: 'CW' });
+  const res = applyOaqMove(s0, 'P1', move);
   assert.equal(res.ok, true);
   assert.equal(res.nextState.turn, 'P2');
   assert.equal(res.nextState.cells[1], 0);
+  assert.equal(preview, res.steps.findLast(step => step.type === 'drop').cellIndex);
+  assert.ok(res.steps.filter(step => step.type === 'pickup').length > 1, 'opening move passes the hand');
+  assert.equal(totalOaqPoints(res.nextState), 70);
+  assert.deepEqual(s0, before, 'accepted moves must also leave their input intact');
+  assert.deepEqual(applyOaqMove(s0, 'P1', move), res, 'replay must produce identical events and board');
 });
 
 test('Ô Ăn Quan: Bot AI chọn được nước đi hợp lệ', () => {
   const s0 = createInitialOaqState();
   const s1 = applyOaqMove(s0, 'P1', { cellIndex: 3, direction: 'CW' }).nextState;
+  const before = structuredClone(s1);
   const botMove = chooseOaqBotMove(s1, 'P2', 'hard');
   assert.ok(botMove !== null);
   assert.ok(botMove.cellIndex >= 7 && botMove.cellIndex <= 11);
+  assert.deepEqual(s1, before, 'searching alternate moves leaves the live bot turn intact');
+  assert.equal(applyOaqMove(s1, 'P2', botMove).ok, true);
+});
+
+test('Ô Ăn Quan: ăn kép theo chuỗi và bảo vệ Quan ở lượt đầu', () => {
+  const initial = {
+    ...createInitialOaqState(),
+    cells: [0, 1, 0, 0, 3, 0, 0, 4, 0, 0, 0, 0],
+    scores: { P1: 22, P2: 20 },
+  };
+  const move = { cellIndex: 1, direction: 'CW' };
+  const early = applyOaqMove(initial, 'P1', move).nextState;
+  assert.equal(early.quanAlive[1], true);
+  assert.equal(early.lastComboCount, 1);
+  assert.equal(early.lastCapturedPoints, 3);
+  const late = applyOaqMove({ ...initial, turnNumber: 3 }, 'P1', move).nextState;
+  assert.equal(late.quanAlive[1], false);
+  assert.equal(late.lastComboCount, 2);
+  assert.equal(late.lastCapturedPoints, 13);
+  assert.equal(totalOaqPoints(early), 70);
+  assert.equal(totalOaqPoints(late), 70);
+});
+
+test('Ô Ăn Quan: rải sinh ghi phần thiếu và hốt tàn quyết toán 70 điểm', () => {
+  const start = createInitialOaqState();
+  start.cells.fill(0, 1, 6);
+  start.scores = { P1: 2, P2: 23 };
+  const resow = applyOaqMove(start, 'P1', { cellIndex: 1, direction: 'CW' });
+  assert.equal(resow.ok, true);
+  assert.equal(resow.nextState.debt.P1, 3);
+  assert.equal(start.debt.P1, 0);
+  assert.equal(totalOaqPoints(resow.nextState), 70);
+
+  const endgame = {
+    ...createInitialOaqState(),
+    turnNumber: 12,
+    quanAlive: [false, true],
+    cells: [0, 3, 0, 1, 0, 0, 2, 4, 0, 0, 0, 0],
+    scores: { P1: 24, P2: 28 },
+    debt: { P1: 2, P2: 0 },
+  };
+  const settled = applyOaqMove(endgame, 'P1', { cellIndex: 3, direction: 'CW' }).nextState;
+  assert.equal(settled.finished, true);
+  assert.equal(settled.winner, 'P1');
+  assert.deepEqual(settled.scores, { P1: 38, P2: 32 });
+  assert.equal(totalOaqPoints(settled), 70);
+  assert.ok(settled.cells.every(count => count === 0));
+});
+
+test('Ô Ăn Quan: chạm giới hạn chuyền tay vẫn giữ đủ quân trên bàn', () => {
+  const state = {
+    ...createInitialOaqState(),
+    cells: [5, 4, 6, 3, 7, 3, 6, 6, 7, 4, 5, 2],
+    quanAlive: [false, false],
+    scores: { P1: 6, P2: 6 },
+    turnNumber: 12,
+  };
+  const result = applyOaqMove(state, 'P1', { cellIndex: 3, direction: 'CW' });
+  assert.equal(result.steps.filter(step => step.type === 'pickup').length, 24);
+  assert.equal(result.steps.at(-1).type, 'stop');
+  assert.equal(result.nextState.turn, 'P2');
+  assert.equal(totalOaqPoints(result.nextState), 70);
 });
 
 test('Nhảy Lò Cò: chuỗi bước nhảy bỏ qua ô có Chàm và Nhà đối thủ', () => {

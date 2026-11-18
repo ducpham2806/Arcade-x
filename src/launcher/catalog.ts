@@ -5,7 +5,7 @@ export type CatalogGame = GameMetadata & { availability: 'published' | 'maintena
 const snakeCatalogBuild=!!GAME_REGISTRY[SNAKE_GAME_ID]?.offlinePackage;
 export const BUNDLED_FREE_GAME_IDS=snakeCatalogBuild?[SNAKE_GAME_ID,'word-chain','tank-clash']:['word-chain','tank-clash'];
 export const isBundledFreeGame=(id:string)=>BUNDLED_FREE_GAME_IDS.includes(id);
-export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker'];
+export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker','o-an-quan','nhay-lo-co'];
 export const isDeviceLibraryGame=(id:string)=>isBundledFreeGame(id)||isLocalReviewGame(id);
 export const isLocalReviewGame=(id:string)=>import.meta.env.DEV&&LOCAL_REVIEW_GAME_IDS.includes(id);
 export type Catalog = { schemaVersion: 1; games: CatalogGame[]; commerceEnabled: boolean; support: { enabled: boolean; bankName?: string; account?: string; beneficiary?: string; message?: string } };
