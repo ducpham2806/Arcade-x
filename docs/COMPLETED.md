@@ -4,8 +4,8 @@
 
 ## Sửa lỗi QA Folk · 19/11/2026
 
-- Sau [lần kiểm lại](qa/FOLK-RECHECK-2026-11-19.md), đã sửa bốn mục trên `codex/folk-qa-20261119`: vạch lực online theo khung hình, khung thấp, focus theo pha và Chơi lại offline.
-- 21 ca Node/PGlite, lint/build/budget và hồi quy trình duyệt. Nghiệm thu staging bằng hai tài khoản, thiết bị và mạng thật vẫn chờ. [Báo cáo](qa/FOLK-POLISH-2026-11-19.md).
+- Nhánh `codex/folk-qa-20261119` sửa vạch lực online, khung thấp, focus và Chơi lại offline. 21 ca Node/PGlite, lint/build/budget và hồi quy trình duyệt qua. [Báo cáo](qa/FOLK-POLISH-2026-11-19.md).
+- PR 42 thêm xác nhận rời trận ở cả hai game, qua 2 ca online. [Kiểm tra](WORKLOG.md). Nghiệm thu staging, thiết bị và mạng thật còn chờ.
 
 ## Folk và chat · merge/phát hành 19/11/2026
 

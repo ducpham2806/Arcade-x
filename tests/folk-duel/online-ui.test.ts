@@ -63,6 +63,9 @@ test.afterEach(async () => {
   expect(errors.splice(0)).toEqual([]);
   advance = 0;
   last = {};
+  dropNext = false;
+  dropped = null;
+  replayed = false;
 });
 
 test.afterAll(async () => {
@@ -191,7 +194,23 @@ test('Ô Ăn Quan online · chat hai chiều, gửi lặp, vào lại, hết gi�
   await expect(b.locator('[data-folk-seat="P2"]')).toContainText('Đến lượt');
   await a.screenshot({ path: 'test-results/folk-online/oaq-online.png' });
   await b.screenshot({ path: 'test-results/folk-online/oaq-phone.png' });
-  await a.getByRole('button', { name: 'Rời phòng', exact: true }).click();
+  const leave = a.getByRole('button', { name: 'Rời phòng', exact: true });
+  await leave.click();
+  const confirmLeave = a.getByRole('alertdialog', { name: 'Rời trận?' });
+  await expect(confirmLeave).toContainText('được tính là bỏ cuộc');
+  await expect(confirmLeave.getByRole('button', { name: 'Ở lại' })).toBeFocused();
+  await a.keyboard.press('Escape');
+  await expect(confirmLeave).toHaveCount(0);
+  await expect(leave).toBeFocused();
+  await expect(b.locator('[data-folk-seat="P2"]')).toContainText('Đến lượt');
+
+  await leave.click();
+  dropNext = true;
+  replayed = false;
+  await confirmLeave.getByRole('button', { name: 'Bỏ cuộc và rời' }).click();
+  await expect(a.getByRole('button', { name: 'Gửi lại thao tác' })).toBeVisible();
+  await a.getByRole('button', { name: 'Gửi lại thao tác' }).click();
+  await expect.poll(() => replayed).toBe(true);
   await expect(a.getByRole('button', { name: /Tạo Phòng Riêng/ })).toBeVisible();
   await expect(b.locator('.fd-room-status')).toContainText('đã rời trận');
   await expect(b.locator('.chat-opponent-speech')).toHaveCount(0);
@@ -250,4 +269,16 @@ test('Nhảy Lò Cò online · thảy, từng bước nhảy, nhặt Chàm, đ�
   await b.reload();
   await b.getByRole('button', { name: 'Tiếp tục phòng online' }).click();
   await expect(b.getByRole('button', { name: /THẢY CHÀM/ })).toBeVisible();
+  const exit = b.locator('.nlc-stage').getByRole('button', { name: 'Thoát', exact: true });
+  await exit.click();
+  const confirmLeave = b.getByRole('alertdialog', { name: 'Rời trận?' });
+  await expect(confirmLeave).toBeVisible();
+  await b.screenshot({ path: 'test-results/folk-online/nlc-leave-phone.png' });
+  await confirmLeave.getByRole('button', { name: 'Ở lại' }).click();
+  await expect(exit).toBeFocused();
+  await expect(b.getByRole('button', { name: /THẢY CHÀM/ })).toBeVisible();
+  await exit.click();
+  await confirmLeave.getByRole('button', { name: 'Bỏ cuộc và rời' }).click();
+  await expect(b.getByRole('button', { name: /Tạo Phòng Riêng/ })).toBeVisible();
+  await expect(a.locator('.fd-room-status')).toContainText('đã rời trận');
 });

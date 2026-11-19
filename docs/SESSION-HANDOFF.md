@@ -1,4 +1,6 @@
-# Bàn giao · 19/11/2026 · sửa lỗi QA Folk
+# Bàn giao · 19/11/2026 · xác nhận rời trận Folk
+
+Tiếp `37605a2` trên `codex/folk-qa-20261119` ([PR 42](https://github.com/ducpham2806/Arcade-x/pull/42)). Hai game xác nhận trước khi bỏ cuộc online. Xem kiểm tra và phạm vi Graphify ở [nhật ký](WORKLOG.md). Bước nghiệm thu còn lại là hai tài khoản staging, thiết bị và mạng thật.
 
 Nhánh `codex/folk-qa-20261119` từ `ea65ede`. Đã sửa nhịp vạch online của Nhảy Lò Cò, bố cục thấp ở hai game, focus theo pha và Chơi lại offline qua xác nhận. 21 Node/PGlite; Playwright, lint/build/bundle/docs theo [báo cáo](qa/FOLK-POLISH-2026-11-19.md). Nghiệm thu hai tài khoản staging, thiết bị và mạng thật còn chờ. Studio Game QA & Playtest, Game UI/UX, QA Lead. Graphify Folk 128/279, Nhảy Lò Cò 73/116, depth 1 theo lưu ván, đăng ký Chơi lại và vạch lực.
 

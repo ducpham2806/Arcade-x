@@ -172,7 +172,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
           gameTitle="Ô Ăn Quan"
           mode={screen.entry}
           onExit={() => setScreen({ kind: 'home' })}
-          renderMatch={({ room, blocked, now, onAction, onRematch, onLeave }) => (
+          renderMatch={({ room, blocked, now, onAction, onRematch, onLeave, leaveDisabled }) => (
             <OaqMatchBoard
               mode={room.isPublic ? 'matchmaking' : 'friend_room'}
               key={room.matchId}
@@ -191,6 +191,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
               bridge={bridge}
               onProfileChange={setProfile}
               onExit={onLeave}
+              exitDisabled={leaveDisabled}
               onRematch={onRematch}
             />
           )}
@@ -239,13 +240,14 @@ interface OaqMatchBoardProps {
   bridge: GameComponentProps['bridge'];
   onProfileChange: (next: FolkProfileSave) => void;
   onExit: () => void;
+  exitDisabled?: boolean;
   onRematch?: () => void;
 }
 
 const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
   mode, matchId, mySeat, opponentName, botLevel, state, onLocalStateChange,
   paused = false, rewardReady = true, inputBlocked = false, externalMoveHandler, profile, sound, bridge,
-  onProfileChange, onExit, onRematch, chatMatchId,
+  onProfileChange, onExit, exitDisabled, onRematch, chatMatchId,
 }) => {
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
   const [bannerMsg, setBannerMsg] = useState('');
@@ -350,7 +352,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
       <div className="oaq-seat-score" role="group" aria-label={`Mẹt ${side}, ${tray.dan} sỏi, ${tray.quan} Quan, ${shown.scores[seat]} điểm`}>
         <b>{shown.scores[seat]}</b> <span>điểm</span>
       </div>
-      {seat === 'P1' && <button type="button" className="fd-btn-secondary oaq-exit" onClick={onExit}>Thoát</button>}
+      {seat === 'P1' && <button type="button" className="fd-btn-secondary oaq-exit" disabled={exitDisabled} onClick={onExit}>Thoát</button>}
     </div>;
   }
 
@@ -398,7 +400,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
             />
             <div className="fd-btn-row">
               {onRematch && <button type="button" className="fd-btn-primary" onClick={onRematch}>Đấu Lại</button>}
-              <button type="button" className="fd-btn-secondary" onClick={onExit}>Về Sảnh Game</button>
+              <button type="button" className="fd-btn-secondary" disabled={exitDisabled} onClick={onExit}>Về Sảnh Game</button>
             </div>
           </div>
         )}

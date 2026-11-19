@@ -1,6 +1,12 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa 3 mục. [Log trước sửa](archive/WORKLOG-2026-11-19-before-folk-polish.md).
+Một nhật ký chính, tối đa 3 mục. [Log trước đợt này](archive/WORKLOG-2026-11-19-before-folk-followup.md).
+
+## 19/11/2026 · xác nhận rời trận Folk
+
+- Tiếp từ `37605a2` trên `codex/folk-qa-20261119` ([PR 42](https://github.com/ducpham2806/Arcade-x/pull/42)). Nút Rời phòng và Thoát trong bàn cùng mở xác nhận nếu ván online đang đếm ngược hoặc đang chơi. Ở lại hoặc Escape trả focus về nút mở. Chỉ xác nhận mới gửi lệnh rời. Luồng thử lại giữ nguyên ID yêu cầu khi mất phản hồi.
+- Qua 14 ca Playwright (12 offline, 2 online) và 21 ca Folk Node/PGlite. Ô Ăn Quan gửi lại cùng ID khi mất phản hồi. Nhảy Lò Cò kiểm hủy và bỏ cuộc ở 390×844 với độ trễ giả lập 250 ms khứ hồi. Đã xem ảnh `test-results/folk-online/nlc-leave-phone.png`. Lint, build production, bundle budget và kiểm Markdown qua.
+- Studio Game QA & Playtest, Game UI/UX, vai trò QA Lead. Graphify 0.9.108 AST `src/games/folk-duel`, 129 nút/281 cạnh, truy vấn `FolkLeaveDialog` depth 1. Hai trình duyệt mô phỏng dùng fixture Auth/Edge/PGlite. Nghiệm thu tài khoản staging, thiết bị và mạng thật vẫn chờ.
 
 ## 19/11/2026 · sửa lỗi QA Folk
 
@@ -13,9 +19,3 @@ Một nhật ký chính, tối đa 3 mục. [Log trước sửa](archive/WORKLOG
 - Nguồn `07bd19f`, nhánh `codex/folk-qa-20261119`. 21 test luật/Edge/PGlite qua. Playwright lượt đầu 6/7, ca Nhảy Lò Cò online hết chờ vùng lực. Chạy lại riêng 3/3 qua. Lint/build/budget/docs qua.
 - Bản production cục bộ: 8 lượt mở/chơi/thoát/mở lại theo kích thước, ghi lỗi vạch lực, bố cục khung thấp, restart thanh game và focus. Proxy chặn URL public, Chrome Cloud lỗi sandbox, chưa QA thiết bị/hai tài khoản staging thật. [Báo cáo kiểm lại](qa/FOLK-RECHECK-2026-11-19.md).
 - Game QA & Playtest, QA Lead, Graphify Folk 126/277, query lưu ván và đồng hồ.
-
-## 19/11/2026 · merge và Published chat/Folk
-
-- Anh yêu cầu merge. PR40 chuyển base từ nhánh chat sang main, merge `f154795`; PR38 tự ghi merged. Main cũ là tổ tiên, tree merge bằng head `4dfd09c` đã qua fullCI71. Giữ phần QA hai tài khoản cho anh như quyết định trước.
-- Netlify dashboard xác nhận Published đúng main/commit, deploy `6afe368bb6e8bc96958e23e5`, 06:36 GMT+7. Connector Primary hết phiên, dùng Chrome đọc trạng thái. Public 16 tệp/1.946.623 byte khớp build, smoke 4/4 desktop/phone, pageerror 0. Xem [release](qa/FOLK-CHAT-RELEASE-2026-11-19.md). Backend Folk mới vẫn staging, thưởng online tắt.
-- Studio Game Release & LiveOps, Release Lead, Netlify Deploy. Git DAG/tree kiểm phạm vi merge, không sửa code. Nhánh bàn giao `codex/folk-chat-release`.

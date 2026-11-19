@@ -169,7 +169,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
           gameTitle="Nhảy Lò Cò"
           mode={screen.entry}
           onExit={() => setScreen({ kind: 'home' })}
-          renderMatch={({ room, blocked, readArrivalTime, onAction, onRematch, onLeave }) => (
+          renderMatch={({ room, blocked, readArrivalTime, onAction, onRematch, onLeave, leaveDisabled }) => (
             <NlcMatchCourt
               mode={room.isPublic ? 'matchmaking' : 'friend_room'}
               key={room.matchId}
@@ -186,6 +186,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
               bridge={bridge}
               onProfileChange={setProfile}
               onExit={onLeave}
+              exitDisabled={leaveDisabled}
               onRematch={onRematch}
             />
           )}
@@ -236,6 +237,7 @@ interface NlcMatchCourtProps {
   bridge: GameComponentProps['bridge'];
   onProfileChange: (next: FolkProfileSave) => void;
   onExit: () => void;
+  exitDisabled?: boolean;
   onRematch?: () => void;
 }
 
@@ -255,6 +257,7 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
   bridge,
   onProfileChange,
   onExit,
+  exitDisabled,
   onRematch,
 }) => {
 
@@ -535,7 +538,7 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
                 {onRematch && <button type="button" className="fd-btn-primary" onClick={onRematch}>
                   🔄 Đấu Lại
                 </button>}
-                <button type="button" className="fd-btn-secondary" onClick={onExit}>
+                <button type="button" className="fd-btn-secondary" disabled={exitDisabled} onClick={onExit}>
                   Về Sảnh Game
                 </button>
               </div>
@@ -553,7 +556,7 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 16, fontWeight: 900, color: '#fde047' }}>{state.scores[mySeat]}đ</span>
-          <button type="button" className="fd-btn-secondary" style={{ padding: '6px 10px' }} onClick={onExit}>
+          <button type="button" className="fd-btn-secondary" style={{ padding: '6px 10px' }} disabled={exitDisabled} onClick={onExit}>
             Thoát
           </button>
         </div>
