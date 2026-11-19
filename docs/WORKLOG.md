@@ -6,6 +6,7 @@ Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLO
 
 - Tiếp `aad7895` trên `codex/folk-qa-20261119`. Migration mặc định tắt online từng game. Menu cập nhật qua catalog, có quy trình thu hồi. Ô Ăn Quan kiểm ngắt và nối lại mạng, Nhảy Lò Cò kiểm lượt ở 250 ms khứ hồi mô phỏng.
 - 15 ca Playwright Folk, PGlite toàn bộ migration, 21 ca luật/lưu/phòng, lint, build, budget và hai smoke catalog trên bản production cục bộ qua. Preview Vite 4335 trỏ staging đã qua smoke khách. Staging Edge v2 `ACTIVE`, cron `succeeded`. [Phiếu nghiệm thu](qa/FOLK-ON2-2026-11-19.md).
+- CI #77 trên `b918742` qua Folk và `snake_ui`. Job `verify` chạm giới hạn 30 phút sau khi bắt đầu bộ Tank Clash ở phút 29. Nâng giới hạn job lên 40 phút. So sánh YAML xác nhận chỉ đổi thời lượng job. Smoke preview khách chạy lại qua 2/2. [CI #77](https://github.com/ducpham2806/Arcade-x/actions/runs/44559811794).
 - Studio Game QA & Playtest, Game Release & LiveOps, vai trò QA Lead. Graphify 0.9.108, Folk 133/286, launcher 81/159, depth 1 theo `useFolkOnlineAvailability` và `fetchCatalog`, đối chiếu nguồn. Còn hai tài khoản staging, thiết bị và mạng thật.
 
 ## 19/11/2026 · xác nhận rời trận Folk
