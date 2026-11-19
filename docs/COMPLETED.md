@@ -2,6 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## Kiểm lại hai game Folk · 19/11/2026
+
+- Kiểm `07bd19f`: 21 Node/PGlite, 5 browser offline, Ô Ăn Quan online giả lập và 8 lượt kiểm bản production local qua. Nhảy Lò Cò online có lần hết chờ vùng lực.
+- Ghi lỗi vạch lực, khung thấp, restart và focus. Tiếp theo còn sửa/kiểm lại và nghiệm thu mạng/thiết bị thật. [Báo cáo](qa/FOLK-RECHECK-2026-11-19.md).
+
 ## Folk và chat · merge/phát hành 19/11/2026
 
 - FD-L0/L1 có artwork, ván offline lưu/đấu lại và nhặt Chàm. Ô Ăn Quan thêm bốc/rải từng viên, mẹt và lịch sử hai ghế. Folk 12/12, UI 5/5. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), PR40/main `f154795` đã merge sau CI71, Netlify Published `6afe368bb6e8bc96958e23e5`. [Release](qa/FOLK-CHAT-RELEASE-2026-11-19.md).

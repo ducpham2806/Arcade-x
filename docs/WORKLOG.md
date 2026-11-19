@@ -1,6 +1,12 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa 3 mục. [Log trước merge](archive/WORKLOG-2026-11-19-before-folk-chat-merge.md).
+Một nhật ký chính, tối đa 3 mục. [Log trước kiểm lại](archive/WORKLOG-2026-11-19-before-folk-recheck.md).
+
+## 19/11/2026 · kiểm lại hai game Folk
+
+- Nguồn `07bd19f`, nhánh `codex/folk-qa-20261119`. 21 test luật/Edge/PGlite qua. Playwright lượt đầu 6/7, ca Nhảy Lò Cò online hết chờ vùng lực. Chạy lại riêng 3/3 qua. Lint/build/budget/docs qua.
+- Bản production cục bộ: 8 lượt mở/chơi/thoát/mở lại theo kích thước, ghi lỗi vạch lực, bố cục khung thấp, restart thanh game và focus. Proxy chặn URL public, Chrome Cloud lỗi sandbox, chưa QA thiết bị/hai tài khoản staging thật. [Báo cáo kiểm lại](qa/FOLK-RECHECK-2026-11-19.md).
+- Game QA & Playtest, QA Lead, Graphify Folk 126/277, query lưu ván và đồng hồ.
 
 ## 19/11/2026 · merge và Published chat/Folk
 
@@ -13,8 +19,3 @@ Một nhật ký chính, tối đa 3 mục. [Log trước merge](archive/WORKLOG
 - Tiếp plan từ head local `92e3dd3`/remote `791810c`, nhánh `codex/folk-duel-foundation`. Edge kiểm Auth, PostgreSQL CAS + receipt, FIFO theo game, resume, leave, timeout và hai phiếu rematch. NLC server giữ pha/nhịp/tính điểm. Ô Ăn Quan bắt đầu đồng hồ sau timeline rải. Adapter chat dùng chung, unread và lời cạnh HUD, gỡ theo phiên.
 - 21 Node/PGlite, 7 browser offline/online, lint/build/bundle và test:fast qua. Test chứng minh receipt gửi lại sau mất phản hồi và rematch đồng thời. Bản staging ref `khqipuipeawzlkqmdzdg` đã áp schema, Edge v2 và cron 10s trả 200. Ngày 19/11 anh để bước hai tài khoản thật cho anh kiểm sau; thiết bị/độ trễ thật còn QA. Thưởng online giữ tắt, PR nháp chờ duyệt. [QA](qa/FOLK-ONLINE-2026-11-19.md).
 - Studio Backend Architect, QA/Playtest, Technical Director. Graphify cập nhật Folk 126/277 và Edge 115/240, depth 1, đối chiếu source và PGlite.
-
-## 18/11/2026 · Ô Ăn Quan · trình diễn và lịch sử lượt
-
-- User yêu cầu tay bốc, rải từng ô, sỏi rơi, hiệu ứng ăn và mẹt riêng. Dùng trace luật với RAF, tạm dừng khi mở chat, bỏ qua hoặc giảm chuyển động. Lưu bàn đã chốt và lịch sử đường rải/ô ăn từng lượt. Hiện hai hàng theo ghế cam/xanh ngọc, hướng Trái/Phải theo phía hiển thị.
-- Folk 12/12, Playwright 5/5, lint/build/bundle, readability, smoke Ô Ăn Quan và CSS motion 2/2 qua. Xem ảnh/chuyển động ở `test-results/folk-offline/oaq-*`; chưa đi máy thật. Studio Game Feel, UI/UX, QA/Playtest. Graphify Ô Ăn Quan phạm vi bước, renderer và host.

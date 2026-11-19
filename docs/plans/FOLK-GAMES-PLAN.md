@@ -33,3 +33,8 @@ Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 - Đã áp schema, Edge và scheduler trên staging `khqipuipeawzlkqmdzdg`. Âm Auth/quyền RPC và scheduler 200 đã kiểm. Ngày 19/11 anh chọn để anh kiểm hai tài khoản sau.
 - [Báo cáo FD-ON1](../qa/FOLK-ONLINE-2026-11-19.md) giữ hợp đồng, test và giới hạn. [Bàn giao](../SESSION-HANDOFF.md) giữ kết quả chạy cuối.
 - PR40 đã merge và Netlify Published. Tiếp theo anh kiểm hai tài khoản staging, thiết bị và latency thật. Folk online ở public tiếp tục theo cấu hình phát hành riêng.
+
+## Kiểm lại sau phát hành · 19/11/2026
+
+- Ghi kết quả chạy lại và bốn phát hiện về vạch lực online, bố cục khung thấp, restart thanh game và focus trong [báo cáo QA](../qa/FOLK-RECHECK-2026-11-19.md).
+- FD-ON2 còn nghiệm thu hai tài khoản staging, thiết bị và latency thật.
