@@ -1,6 +1,12 @@
 # Nhật ký công việc
 
-Một nhật ký chính, tối đa 3 mục. [Log trước kiểm lại](archive/WORKLOG-2026-11-19-before-folk-recheck.md).
+Một nhật ký chính, tối đa 3 mục. [Log trước sửa](archive/WORKLOG-2026-11-19-before-folk-polish.md).
+
+## 19/11/2026 · sửa lỗi QA Folk
+
+- Tiếp từ `ea65ede` trên `codex/folk-qa-20261119`. Vạch lực Nhảy Lò Cò online vẽ theo khung hình từ giờ server ước lượng. Sửa khung thấp hai game, focus theo pha và Chơi lại offline có xác nhận.
+- 21 test luật/Edge/PGlite, lint/build/budget/docs qua. 14 ca Playwright có kết quả qua sau chạy lại, gồm độ trễ 250 ms khứ hồi và khung ngang chừa badge.
+- Game QA & Playtest, Game UI/UX, QA Lead. Graphify Folk 128/279, Nhảy Lò Cò 73/116. [Báo cáo](qa/FOLK-POLISH-2026-11-19.md). Nghiệm thu hai tài khoản staging, mạng và thiết bị thật còn chờ.
 
 ## 19/11/2026 · kiểm lại hai game Folk
 
@@ -13,9 +19,3 @@ Một nhật ký chính, tối đa 3 mục. [Log trước kiểm lại](archive/
 - Anh yêu cầu merge. PR40 chuyển base từ nhánh chat sang main, merge `f154795`; PR38 tự ghi merged. Main cũ là tổ tiên, tree merge bằng head `4dfd09c` đã qua fullCI71. Giữ phần QA hai tài khoản cho anh như quyết định trước.
 - Netlify dashboard xác nhận Published đúng main/commit, deploy `6afe368bb6e8bc96958e23e5`, 06:36 GMT+7. Connector Primary hết phiên, dùng Chrome đọc trạng thái. Public 16 tệp/1.946.623 byte khớp build, smoke 4/4 desktop/phone, pageerror 0. Xem [release](qa/FOLK-CHAT-RELEASE-2026-11-19.md). Backend Folk mới vẫn staging, thưởng online tắt.
 - Studio Game Release & LiveOps, Release Lead, Netlify Deploy. Git DAG/tree kiểm phạm vi merge, không sửa code. Nhánh bàn giao `codex/folk-chat-release`.
-
-## 19/11/2026 · FD-ON1 · phòng xác thực và chat Trận
-
-- Tiếp plan từ head local `92e3dd3`/remote `791810c`, nhánh `codex/folk-duel-foundation`. Edge kiểm Auth, PostgreSQL CAS + receipt, FIFO theo game, resume, leave, timeout và hai phiếu rematch. NLC server giữ pha/nhịp/tính điểm. Ô Ăn Quan bắt đầu đồng hồ sau timeline rải. Adapter chat dùng chung, unread và lời cạnh HUD, gỡ theo phiên.
-- 21 Node/PGlite, 7 browser offline/online, lint/build/bundle và test:fast qua. Test chứng minh receipt gửi lại sau mất phản hồi và rematch đồng thời. Bản staging ref `khqipuipeawzlkqmdzdg` đã áp schema, Edge v2 và cron 10s trả 200. Ngày 19/11 anh để bước hai tài khoản thật cho anh kiểm sau; thiết bị/độ trễ thật còn QA. Thưởng online giữ tắt, PR nháp chờ duyệt. [QA](qa/FOLK-ONLINE-2026-11-19.md).
-- Studio Backend Architect, QA/Playtest, Technical Director. Graphify cập nhật Folk 126/277 và Edge 115/240, depth 1, đối chiếu source và PGlite.

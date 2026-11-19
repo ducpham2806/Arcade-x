@@ -2,10 +2,10 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Kiểm lại hai game Folk · 19/11/2026
+## Sửa lỗi QA Folk · 19/11/2026
 
-- Kiểm `07bd19f`: 21 Node/PGlite, 5 browser offline, Ô Ăn Quan online giả lập và 8 lượt kiểm bản production local qua. Nhảy Lò Cò online có lần hết chờ vùng lực.
-- Ghi lỗi vạch lực, khung thấp, restart và focus. Tiếp theo còn sửa/kiểm lại và nghiệm thu mạng/thiết bị thật. [Báo cáo](qa/FOLK-RECHECK-2026-11-19.md).
+- Sau [lần kiểm lại](qa/FOLK-RECHECK-2026-11-19.md), đã sửa bốn mục trên `codex/folk-qa-20261119`: vạch lực online theo khung hình, khung thấp, focus theo pha và Chơi lại offline.
+- 21 ca Node/PGlite, lint/build/budget và hồi quy trình duyệt. Nghiệm thu staging bằng hai tài khoản, thiết bị và mạng thật vẫn chờ. [Báo cáo](qa/FOLK-POLISH-2026-11-19.md).
 
 ## Folk và chat · merge/phát hành 19/11/2026
 

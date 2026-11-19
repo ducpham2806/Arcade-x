@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { usePlayer } from '../../context/PlayerContext';
 import { platformFolkClient, type FolkOnlineClient } from './online-client';
 import type { FolkCommand, FolkOnlineRoom } from './online-protocol';
@@ -17,7 +17,7 @@ interface OnlineRoomProps<Game extends FolkGameKind> {
     room: FolkOnlineRoom<Game>;
     blocked: boolean;
     now: number;
-    arrivalNow: number;
+    readArrivalTime: () => number;
     onAction: (command: FolkCommand) => void;
     onRematch?: () => void;
     onLeave: () => void;
@@ -28,6 +28,7 @@ export function OnlineRoom<Game extends FolkGameKind>({ game, gameTitle, mode, o
   const { profile } = usePlayer();
   const name = profile.username;
   const [client, setClient] = useState<FolkOnlineClient<Game> | null>(null);
+  const readArrivalTime = useCallback(() => client?.arrivalNow ?? Date.now(), [client]);
   const [joinCode, setJoinCode] = useState('');
   const [connectError, setConnectError] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
@@ -148,7 +149,7 @@ export function OnlineRoom<Game extends FolkGameKind>({ game, gameTitle, mode, o
         {canRematch && voted && <span>Đã mời đấu lại. Đang chờ đối thủ.</span>}
         <button type="button" className="fd-btn-secondary" disabled={client.busy || !!client.pending} onClick={leave}>Rời phòng</button>
       </div>
-      {renderMatch({ room, blocked: blocked || seconds === 0, now, arrivalNow: client.arrivalNow,
+      {renderMatch({ room, blocked: blocked || seconds === 0, now, readArrivalTime,
         onAction: command => { void client.command(command); },
         onRematch: canRematch && !voted ? () => { void client.command({ type: 'rematch' }); } : undefined,
         onLeave: () => { void leave(); },

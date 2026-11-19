@@ -6,6 +6,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { setTimeout as delay } from 'node:timers/promises';
 import type { FolkOnlineRoom, FolkRequest } from '../../src/games/folk-duel/online-protocol';
 
 const port = 4361;
@@ -70,7 +71,7 @@ test.afterAll(async () => {
   await db?.close();
 });
 
-async function player(browser: Browser, n: number, game: string, phone = false) {
+async function player(browser: Browser, n: number, game: string, phone = false, latency = 0) {
   const context = await browser.newContext({ viewport: phone ? { width: 390, height: 844 } : { width: 1280, height: 900 }, serviceWorkers: 'block' });
   contexts.push(context);
   const page = await context.newPage();
@@ -93,9 +94,11 @@ async function player(browser: Browser, n: number, game: string, phone = false) 
     if (url.pathname === '/auth/v1/user') return route.fulfill({ json: user });
     if (url.pathname === '/functions/v1/folk-duel-room') {
       const body = req.postDataJSON() as FolkRequest;
+      if (latency) await delay(latency);
       const response = await handle(new Request(req.url(), { method: req.method(), headers: req.headers(), body: req.postData() }),
         { url: api, key: 'fixture-service' }, Date.now() + advance);
       const reply = await response.json();
+      if (latency) await delay(latency);
       if (reply.room && (!last[user.id] || last[user.id].roomId !== reply.room.roomId || last[user.id].version <= reply.room.version)) last[user.id] = reply.room;
       if (dropNext && body.type === 'command') {
         dropped = body;
@@ -196,10 +199,19 @@ test('Ô Ăn Quan online · chat hai chiều, gửi lặp, vào lại, hết gi�
 
 test('Nhảy Lò Cò online · thảy, từng bước nhảy, nhặt Chàm, đổi lượt và chat', async ({ browser }) => {
   test.setTimeout(90000);
-  const a = await player(browser, 3, 'nhay-lo-co');
-  const b = await player(browser, 4, 'nhay-lo-co', true);
+  const a = await player(browser, 3, 'nhay-lo-co', false, 125);
+  const b = await player(browser, 4, 'nhay-lo-co', true, 125);
   await enter(a, b);
+  await expect(a.getByRole('button', { name: 'Chơi lại ván mới' })).toBeDisabled();
   await chat(a, b, 'Cùng nhảy Ngõ Nhỏ');
+  const meter = a.locator('[data-folk-power]');
+  const samples = await meter.evaluate(element => new Promise<number>(resolve => {
+    let changes = 0;
+    const observer = new MutationObserver(records => { changes += records.length; });
+    observer.observe(element, { attributes: true, attributeFilter: ['data-folk-power'] });
+    setTimeout(() => { observer.disconnect(); resolve(changes); }, 1250);
+  }));
+  expect(samples).toBeGreaterThan(12);
   // Click at the center of the server-aligned timing meter.
   async function center(page: Page, name: RegExp) {
     await page.getByRole('button', { name }).evaluate(button => new Promise<void>((resolve, reject) => {
@@ -213,8 +225,9 @@ test('Nhảy Lò Cò online · thảy, từng bước nhảy, nhặt Chàm, đ�
       check();
     }));
   }
+  await a.getByRole('button', { name: /THẢY CHÀM/ }).focus();
   await center(a, /THẢY CHÀM/);
-  await expect(a.getByRole('button', { name: /1 CHÂN/, exact: false })).toBeVisible();
+  await expect(a.getByRole('button', { name: /1 CHÂN/ })).toBeFocused();
   for (let i = 0; i < 20 && last[uuid(3)].state.turn === 'P1'; i++) {
     const version = last[uuid(3)].version;
     await expect(a.locator('.fd-board-stage')).toHaveAttribute('data-folk-version', String(version));

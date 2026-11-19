@@ -1,20 +1,22 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { GameComponentProps } from '../../types';
 import {
   loadFolkProfile,
   type FolkProfileSave,
 } from '../folk-duel/economy';
 import { FolkMatchReward, FolkResume, FolkRules, FolkSaveNotice } from '../folk-duel/FolkOfflineUi';
-import { isNlcOfflineState, useOfflineMatch, type OfflineMode } from '../folk-duel/offlineMatch';
+import { isNlcOfflineState, useFolkRestart, useOfflineMatch, type OfflineMode } from '../folk-duel/offlineMatch';
 import { FolkShopModal } from '../folk-duel/FolkShopModal';
 import { OnlineRoom, folkOnlineEnabled, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
-import { folkChatId, folkPowerAt, type FolkCommand, type FolkOnlineRoom } from '../folk-duel/online-protocol';
+import { folkChatId, type FolkCommand, type FolkOnlineRoom } from '../folk-duel/online-protocol';
 import { FolkSoundEngine } from '../folk-duel/sfx';
 import { getSkinById } from '../folk-duel/skins-catalog';
 import type { FolkSeat } from '../folk-duel/types';
 import '../folk-duel/folk-duel.css';
 import { simulateNlcBotTurn, type NlcBotLevel } from './ai';
 import { COURT_H, COURT_W, renderNhayLoCoCourt } from './renderer';
+import { NlcPowerMeter } from './NlcPowerMeter';
+import './court.css';
 import {
   applyNlcTurnResult,
   buildHopSequence,
@@ -32,7 +34,7 @@ type ScreenMode =
   | { kind: 'offline' }
   | { kind: 'online'; entry: OnlineEntryMode };
 
-export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false, isPaused }) => {
+export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false, isPaused, registerRestart }) => {
   const [profile, setProfile] = useState<FolkProfileSave>(() => loadFolkProfile(bridge));
   const [screen, setScreen] = useState<ScreenMode>({ kind: 'home' });
   const offline = useOfflineMatch(bridge, createInitialNlcState, isNlcOfflineState);
@@ -43,6 +45,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
   };
   const [showShop, setShowShop] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  useFolkRestart(registerRestart, screen.kind === 'offline' && !showShop ? offline.restart : undefined);
 
   const mutedRef = useRef(isMuted);
   mutedRef.current = isMuted;
@@ -156,7 +159,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
           bridge={bridge}
           onProfileChange={setProfile}
           onExit={() => setScreen({ kind: 'home' })}
-          onRematch={() => startOffline(offline.match!.mode)}
+          onRematch={offline.restart}
         />
       )}
 
@@ -166,7 +169,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
           gameTitle="Nhảy Lò Cò"
           mode={screen.entry}
           onExit={() => setScreen({ kind: 'home' })}
-          renderMatch={({ room, blocked, arrivalNow, onAction, onRematch, onLeave }) => (
+          renderMatch={({ room, blocked, readArrivalTime, onAction, onRematch, onLeave }) => (
             <NlcMatchCourt
               mode={room.isPublic ? 'matchmaking' : 'friend_room'}
               key={room.matchId}
@@ -175,7 +178,7 @@ export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = f
               opponentName={room.players.find((p) => p.seat !== room.mySeat)?.name ?? 'Đối thủ'}
               botLevel={null}
               state={room.state}
-              online={{ room, arrivalNow, onAction }}
+              online={{ room, readArrivalTime, onAction }}
               paused={isPaused || showShop || blocked}
               rewardReady={false}
               profile={profile}
@@ -225,7 +228,7 @@ interface NlcMatchCourtProps {
   rewardReady?: boolean;
   online?: {
     room: FolkOnlineRoom<'nhay-lo-co'>;
-    arrivalNow: number;
+    readArrivalTime: () => number;
     onAction: (action: FolkCommand) => void;
   };
   profile: FolkProfileSave;
@@ -263,15 +266,17 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
   const [localHopIndex, setHopIndex] = useState(0);
   const [localStatus, setStatusMsg] = useState(state.lastSummary);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const keyboardActionRef = useRef<HTMLButtonElement | null>(null);
+  const [, checkReady] = useState(0);
   const remoteStep = online?.room.nlc;
   const turnPhase = remoteStep?.phase ?? localPhase;
-  const powerPos = remoteStep ? folkPowerAt(remoteStep.since, online!.arrivalNow) : localPower;
   const pickedUp = remoteStep?.pickedUp ?? localPickedUp;
   const hopIndex = remoteStep?.hopIndex ?? localHopIndex;
   const statusMsg = remoteStep?.message ?? (online ? state.lastSummary : localStatus);
-  const waitingForLanding = !!remoteStep && remoteStep.phase === 'HOP' && online!.arrivalNow < remoteStep.since + 110;
-  const waitingForMeter = !!remoteStep && online!.arrivalNow < remoteStep.since;
-
+  const readArrivalTime = online?.readArrivalTime;
+  const inputReadyAt = remoteStep ? remoteStep.since + (turnPhase === 'HOP' ? 110 : 0) : 0;
+  const waitingForInput = !!readArrivalTime && readArrivalTime() < inputReadyAt;
 
   const doubleSkin = getSkinById(profile.equippedSkins.nlc_double_tile);
   const localTwo = mode === 'local_2p';
@@ -284,6 +289,27 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
     () => buildHopSequence(targetBox, state.houses, state.turn),
     [targetBox, state.houses, state.turn]
   );
+
+  useEffect(() => {
+    if (!readArrivalTime || !waitingForInput || !isMyTurn || paused) return;
+    const timer = setTimeout(() => checkReady(value => value + 1), Math.max(1, Math.ceil(inputReadyAt - readArrivalTime())));
+    return () => clearTimeout(timer);
+  }, [readArrivalTime, inputReadyAt, waitingForInput, isMyTurn, paused]);
+
+  useLayoutEffect(() => {
+    const source = keyboardActionRef.current;
+    if (!source) return;
+    if (document.activeElement !== document.body && document.activeElement !== source) {
+      keyboardActionRef.current = null;
+      return;
+    }
+    if (!isMyTurn || paused || waitingForInput) return;
+    const target = source.isConnected ? source : actionsRef.current?.querySelector<HTMLButtonElement>('[data-nlc-action]');
+    if (target && !target.disabled) {
+      target.focus({ preventScroll: true });
+      keyboardActionRef.current = null;
+    }
+  }, [isMyTurn, paused, waitingForInput, turnPhase, hopIndex, state.turnNumber]);
 
   useEffect(() => {
     powerAngle.current = 0;
@@ -352,8 +378,8 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
   const handleThrowCham = () => {
     if (paused || !isMyTurn || turnPhase !== 'THROW') return;
     if (online) { online.onAction({ type: 'throw' }); return; }
-    const inGreen = powerPos >= 25 && powerPos <= 75;
-    const inPerfect = powerPos >= 42 && powerPos <= 58;
+    const inGreen = localPower >= 25 && localPower <= 75;
+    const inPerfect = localPower >= 42 && localPower <= 58;
     if (!inGreen) {
       sound.playFoul();
       submitTurnResult({
@@ -380,7 +406,7 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
   const handlePickup = () => {
     if (paused || !isMyTurn || turnPhase !== 'PICKUP') return;
     if (online) { online.onAction({ type: 'pickup' }); return; }
-    if (powerPos < 25 || powerPos > 75) {
+    if (localPower < 25 || localPower > 75) {
       sound.playFoul();
       submitTurnResult({ kind: 'TURN_RESULT', throwSuccess: true, throwPerfect, hopCompleted: false, scoreGained: 0, missedPickup: true });
       return;
@@ -424,7 +450,7 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
   const winnerName = state.winner === mySeat ? playerName : opponentName;
 
   return (
-    <main className="fd-board-stage" data-folk-version={online?.room.version}>
+    <main className="fd-board-stage nlc-stage" data-folk-version={online?.room.version}>
       <div data-chat-player={online ? folkChatId(online.room.matchId, oppSeat) : undefined} data-folk-seat={oppSeat} className={`fd-hud-strip ${state.turn === oppSeat && !state.finished ? 'is-active' : ''}`}>
         <div>
           <strong>{opponentName}</strong>
@@ -442,87 +468,80 @@ const NlcMatchCourt: React.FC<NlcMatchCourtProps> = ({
           height={COURT_H}
           className="fd-pixel-canvas"
           aria-label="Sân lò cò 10 ô"
+          data-chat-protect="true"
         />
 
-        {!state.finished && <p className="fd-status" role="status">{statusMsg}</p>}
-        {isMyTurn && timing && (
-          <div style={{ width: '100%', background: '#1c0f0a', padding: 10, borderRadius: 12, border: '2px solid #92400e' }}>
-            <div aria-hidden="true" data-folk-power={powerPos} style={{ height: 18, borderRadius: 999, background: '#7f1d1d', position: 'relative', overflow: 'hidden', marginBottom: 8 }}>
-              <div style={{ position: 'absolute', left: '25%', width: '50%', top: 0, bottom: 0, background: '#15803d' }} />
-              <div style={{ position: 'absolute', left: '42%', width: '16%', top: 0, bottom: 0, background: '#22c55e' }} />
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `calc(${powerPos}% - 4px)`,
-                  top: 0,
-                  bottom: 0,
-                  width: 8,
-                  background: '#fde047',
-                  border: '1px solid #000',
-                }}
+        <div className="nlc-actions" ref={actionsRef} data-chat-protect="true" onClickCapture={event => {
+          const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-nlc-action]');
+          if (button && event.detail === 0 && document.activeElement === button) keyboardActionRef.current = button;
+        }}>
+          {!state.finished && <p className="fd-status" role="status">{statusMsg}</p>}
+          {isMyTurn && timing && (
+            <div className="nlc-power-panel">
+              <NlcPowerMeter power={remoteStep ? 50 : localPower} since={remoteStep?.since} readArrivalTime={readArrivalTime} paused={paused} />
+              <button type="button" className="fd-btn-primary" data-nlc-action disabled={paused || waitingForInput}
+                onClick={turnPhase === 'PICKUP' ? handlePickup : handleThrowCham}>
+                {turnPhase === 'PICKUP' ? 'NHẶT CHÀM' : `THẢY CHÀM VÀO Ô ${targetBox}`}
+              </button>
+              <p className="fd-meter-hint">Bấm khi vạch vàng vào vùng xanh.</p>
+            </div>
+          )}
+
+          {!state.finished && isMyTurn && turnPhase === 'HOP' && (
+            <div className="nlc-hop-panel">
+              <div className="nlc-hop-hint">
+                Bước {hopIndex + 1}/{hopSequence.length} · Nhảy vào{' '}
+                <b>{nextStep?.boxes.join(' & ')}</b> ({nextStep?.expectedHop === 'DOUBLE' ? '2 CHÂN' : '1 CHÂN'})
+              </div>
+              <div className="nlc-hop-buttons">
+                <button
+                  type="button"
+                  className="fd-btn-primary"
+                  data-nlc-action
+                  disabled={paused || waitingForInput}
+                  onClick={() => handleHop('SINGLE')}
+                >
+                  🦶 1 CHÂN
+                </button>
+                <button
+                  type="button"
+                  className="fd-btn-primary"
+                  data-nlc-action
+                  disabled={paused || waitingForInput}
+                  onClick={() => handleHop('DOUBLE')}
+                >
+                  🦶🦶 2 CHÂN
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!state.finished && !isMyTurn && (
+            <div style={{ fontSize: 13, color: '#fcd34d', padding: 8 }}>⏳ {opponentName} đang nhảy…</div>
+          )}
+
+          {state.finished && (
+            <div className="fd-room-card" style={{ width: '100%', padding: 14 }}>
+              <h3 style={{ margin: 0, color: '#fde047' }}>
+                {state.winner === 'DRAW' ? 'Hòa nhau!' : `${winnerName} thắng!`}
+              </h3>
+              <p style={{ margin: '4px 0', fontSize: 13 }}>{state.lastSummary}</p>
+              <FolkMatchReward
+                input={{ matchId, game: 'nhay-lo-co', mode, won: state.winner === mySeat, isDraw: state.winner === 'DRAW',
+                  skillBonuses: countHouses(state, mySeat), score: state.scores[mySeat] }}
+                profile={profile} bridge={bridge} ready={rewardReady} onProfileChange={onProfileChange} onAward={() => sound.playWin()}
               />
+              <div className="fd-btn-row">
+                {onRematch && <button type="button" className="fd-btn-primary" onClick={onRematch}>
+                  🔄 Đấu Lại
+                </button>}
+                <button type="button" className="fd-btn-secondary" onClick={onExit}>
+                  Về Sảnh Game
+                </button>
+              </div>
             </div>
-            <button type="button" className="fd-btn-primary" style={{ width: '100%' }} disabled={paused || waitingForMeter} onClick={turnPhase === 'PICKUP' ? handlePickup : handleThrowCham}>
-              {turnPhase === 'PICKUP' ? 'NHẶT CHÀM' : `THẢY CHÀM VÀO Ô ${targetBox}`}
-            </button>
-            <p className="fd-meter-hint">Bấm khi vạch vàng vào vùng xanh.</p>
-          </div>
-        )}
-
-        {!state.finished && isMyTurn && turnPhase === 'HOP' && (
-          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ textAlign: 'center', fontSize: 12, color: '#fde68a' }}>
-              Bước {hopIndex + 1}/{hopSequence.length} · Nhảy vào{' '}
-              <b>{nextStep?.boxes.join(' & ')}</b> ({nextStep?.expectedHop === 'DOUBLE' ? '2 CHÂN' : '1 CHÂN'})
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <button
-                type="button"
-                className="fd-btn-primary"
-                disabled={paused || waitingForLanding}
-                style={{ minHeight: 56, fontSize: 15 }}
-                onClick={() => handleHop('SINGLE')}
-              >
-                🦶 1 CHÂN
-              </button>
-              <button
-                type="button"
-                className="fd-btn-primary"
-                disabled={paused || waitingForLanding}
-                style={{ minHeight: 56, fontSize: 15 }}
-                onClick={() => handleHop('DOUBLE')}
-              >
-                🦶🦶 2 CHÂN
-              </button>
-            </div>
-          </div>
-        )}
-
-        {!state.finished && !isMyTurn && (
-          <div style={{ fontSize: 13, color: '#fcd34d', padding: 8 }}>⏳ {opponentName} đang nhảy…</div>
-        )}
-
-        {state.finished && (
-          <div className="fd-room-card" style={{ width: '100%', padding: 14 }}>
-            <h3 style={{ margin: 0, color: '#fde047' }}>
-              {state.winner === 'DRAW' ? 'Hòa nhau!' : `${winnerName} thắng!`}
-            </h3>
-            <p style={{ margin: '4px 0', fontSize: 13 }}>{state.lastSummary}</p>
-            <FolkMatchReward
-              input={{ matchId, game: 'nhay-lo-co', mode, won: state.winner === mySeat, isDraw: state.winner === 'DRAW',
-                skillBonuses: countHouses(state, mySeat), score: state.scores[mySeat] }}
-              profile={profile} bridge={bridge} ready={rewardReady} onProfileChange={onProfileChange} onAward={() => sound.playWin()}
-            />
-            <div className="fd-btn-row">
-              {onRematch && <button type="button" className="fd-btn-primary" onClick={onRematch}>
-                🔄 Đấu Lại
-              </button>}
-              <button type="button" className="fd-btn-secondary" onClick={onExit}>
-                Về Sảnh Game
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div data-chat-player={online ? folkChatId(online.room.matchId, mySeat) : undefined} data-folk-seat={mySeat} className={`fd-hud-strip ${state.turn === mySeat && !state.finished ? 'is-active' : ''}`}>

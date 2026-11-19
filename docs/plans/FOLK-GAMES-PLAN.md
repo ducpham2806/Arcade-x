@@ -37,4 +37,4 @@ Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 ## Kiểm lại sau phát hành · 19/11/2026
 
 - Ghi kết quả chạy lại và bốn phát hiện về vạch lực online, bố cục khung thấp, restart thanh game và focus trong [báo cáo QA](../qa/FOLK-RECHECK-2026-11-19.md).
-- FD-ON2 còn nghiệm thu hai tài khoản staging, thiết bị và latency thật.
+- Bốn mục QA đã sửa trên `codex/folk-qa-20261119`. [Báo cáo sửa và kiểm lại](../qa/FOLK-POLISH-2026-11-19.md). FD-ON2 còn nghiệm thu hai tài khoản staging, thiết bị và latency thật.

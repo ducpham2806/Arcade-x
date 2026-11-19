@@ -85,3 +85,26 @@
   .oaq-stage .fd-controls-bar > button { padding-inline: 10px; }
   .oaq-history-button { flex-shrink: 0; }
 }
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .fd-board-stage.oaq-stage {
+    container-type: size;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(200px, 39%, 340px);
+    grid-template-rows: max-content max-content minmax(min-content, 1fr);
+    grid-template-areas: "board seat-two" "board seat-one" "board controls";
+    place-items: center;
+    gap: 6px 12px;
+  }
+
+  .oaq-stage .fd-oaq-board {
+    grid-area: board;
+    align-self: start;
+    max-width: min(680px, calc((100cqh - 4px) * var(--oaq-board-ratio)));
+  }
+  .oaq-stage .oaq-seat[data-folk-seat="P2"] { grid-area: seat-two; }
+  .oaq-stage .oaq-seat[data-folk-seat="P1"] { grid-area: seat-one; }
+  .oaq-stage .oaq-seat-name strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .oaq-stage .fd-controls-bar { grid-area: controls; align-self: start; gap: 6px; }
+  .oaq-stage .fd-controls-bar > button { padding-inline: 10px; }
+}

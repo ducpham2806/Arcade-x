@@ -166,24 +166,6 @@
 .fd-cell-target:disabled { cursor: default; }
 .fd-cell-target:focus-visible { outline: 3px solid #fff0ad; outline-offset: -4px; }
 
-.fd-court {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-  width: 100%;
-  max-width: 460px;
-}
-
-.fd-court canvas {
-  display: block;
-  max-width: 100%;
-  max-height: min(43vh, 430px);
-  width: auto;
-  height: auto;
-  border: 3px solid #78350f;
-  border-radius: 14px;
-}
-
 .fd-status, .fd-meter-hint, .fd-reward {
   margin: 0;
   font-size: 13px;
@@ -222,6 +204,16 @@
 .fd-hud-strip.is-active {
   border-color: #fbbf24;
   box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.25);
+}
+
+@media (max-height: 680px) {
+  .fd-shell:has(.fd-board-stage) .fd-header { padding: 5px 10px; }
+  .fd-shell:has(.fd-board-stage) .fd-title-group h1 { font-size: 14px; }
+  .fd-shell:has(.fd-board-stage) .fd-title-group p { display: none; }
+  .fd-shell:has(.fd-board-stage) .fd-shop-btn,
+  .fd-shell:has(.fd-board-stage) .fd-candy-badge { white-space: nowrap; padding-inline: 7px; }
+  .fd-board-stage { padding: 6px 10px; gap: 6px; }
+  .fd-board-stage .fd-hud-strip { padding-block: 4px; }
 }
 
 .fd-controls-bar {

@@ -1,6 +1,6 @@
-# Bàn giao · 19/11/2026 · kiểm lại Folk sau phát hành
+# Bàn giao · 19/11/2026 · sửa lỗi QA Folk
 
-Kiểm lại từ `07bd19f` trên `codex/folk-qa-20261119`: 21 Node/PGlite qua, 8 luồng local mở/chơi/thoát/mở lại qua. Playwright lượt đầu 6/7, Nhảy Lò Cò online có lần không tới vùng lực giữa, chạy lại riêng 3/3 qua. Khung thấp cần cuộn, nút chơi lại thanh game về menu, chuyển pha thảy/nhảy rơi focus. [Báo cáo](qa/FOLK-RECHECK-2026-11-19.md). Preview cục bộ xác minh được, URL public bị proxy chặn ở phiên này. Studio Game QA & Playtest, QA Lead. Graphify Folk 126/277 query `useOfflineMatch` và `.arrivalNow`. Bước tiếp theo là xử lý vạch lực/bố cục và kiểm lại, còn nghiệm thu staging hai tài khoản/thiết bị thật.
+Nhánh `codex/folk-qa-20261119` từ `ea65ede`. Đã sửa nhịp vạch online của Nhảy Lò Cò, bố cục thấp ở hai game, focus theo pha và Chơi lại offline qua xác nhận. 21 Node/PGlite; Playwright, lint/build/bundle/docs theo [báo cáo](qa/FOLK-POLISH-2026-11-19.md). Nghiệm thu hai tài khoản staging, thiết bị và mạng thật còn chờ. Studio Game QA & Playtest, Game UI/UX, QA Lead. Graphify Folk 128/279, Nhảy Lò Cò 73/116, depth 1 theo lưu ván, đăng ký Chơi lại và vạch lực.
 
 Anh yêu cầu merge ngày 19/11. [PR 40](https://github.com/ducpham2806/Arcade-x/pull/40) vào main `f154795`, gồm nền chat [PR 38](https://github.com/ducpham2806/Arcade-x/pull/38) tự ghi merged. Head `4dfd09c` và merge cùng tree `f7caf525`, [full CI #71](https://github.com/ducpham2806/Arcade-x/actions/runs/44416723603) xanh trước merge. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), [release](qa/FOLK-CHAT-RELEASE-2026-11-19.md), [bàn giao trước merge](archive/SESSION-HANDOFF-2026-11-19-before-folk-chat-merge.md).
 

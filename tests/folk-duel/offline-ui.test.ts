@@ -80,6 +80,98 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => { Math.random = () => .4; });
 });
 
+for (const viewport of [{ width: 320, height: 568 }, { width: 844, height: 390 }]) {
+  for (const game of ['o-an-quan', 'nhay-lo-co'] as const) {
+    test(`${game} giữ bàn và nút chơi trong khung ${viewport.width}×${viewport.height}`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await open(page, game);
+      await page.getByRole('button', { name: startMenu.two }).tap();
+      const stage = page.locator('.fd-board-stage');
+      await expect(stage.locator('canvas')).toBeInViewport({ ratio: .99 });
+      if (game === 'o-an-quan') {
+        await expect(stage.getByRole('button', { name: /Rải Phải/ })).toBeInViewport({ ratio: .99 });
+        await stage.locator('[data-folk-cell="1"]').tap();
+        await expect(stage.getByRole('button', { name: /Rải Phải/ })).toBeEnabled();
+        const rows = await stage.locator('[data-folk-seat="P1"], .fd-controls-bar').evaluateAll(elements =>
+          elements.map(element => element.getBoundingClientRect().toJSON()));
+        expect(rows[0].bottom).toBeLessThan(rows[1].top);
+      } else {
+        await expect(stage.locator('[data-folk-power]')).toBeInViewport({ ratio: .99 });
+        await expect(stage.getByRole('button', { name: /THẢY CHÀM/ })).toBeInViewport({ ratio: .99 });
+        await expect(stage.locator('[data-folk-seat="P1"]')).toBeInViewport({ ratio: .99 });
+      }
+      await page.screenshot({ path: `test-results/folk-offline/${game}-${viewport.width}x${viewport.height}.png` });
+      if (viewport.width > viewport.height) {
+        await page.evaluate(() => document.documentElement.style.setProperty('--arcadex-host-bottom-inset', '64px'));
+        await expect(stage.locator('canvas')).toBeInViewport({ ratio: .99 });
+        const move = stage.getByRole('button', { name: game === 'o-an-quan' ? /Rải Phải/ : /THẢY CHÀM/ });
+        await expect(move).toBeInViewport({ ratio: .99 });
+      }
+    });
+  }
+}
+
+for (const game of ['o-an-quan', 'nhay-lo-co'] as const) {
+  test(`${game} chơi lại từ thanh game và màn tạm dừng`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page, game);
+    const restart = page.getByRole('button', { name: 'Chơi lại ván mới' });
+    await expect(restart).toBeDisabled();
+    await page.getByRole('button', { name: startMenu.two }).click();
+    const stage = page.locator('.fd-board-stage');
+    if (game === 'o-an-quan') {
+      await stage.locator('[data-folk-cell="1"]').click();
+      await stage.getByRole('button', { name: /Rải Phải/ }).click();
+    } else {
+      await timingButton(stage.getByRole('button', { name: /THẢY CHÀM/ }), false);
+    }
+    const before = (await read(page, game))!.offlineMatch;
+    expect(before.state.turnNumber).toBe(2);
+    page.once('dialog', dialog => dialog.dismiss());
+    await restart.click();
+    await expect(stage).toBeVisible();
+    expect((await read(page, game))!.offlineMatch).toEqual(before);
+
+    await page.getByRole('button', { name: 'Tạm dừng', exact: true }).click();
+    const pauseRestart = page.locator('#btn-pause-restart');
+    page.once('dialog', dialog => dialog.dismiss());
+    await pauseRestart.click();
+    await expect(pauseRestart).toBeVisible();
+    expect((await read(page, game))!.offlineMatch).toEqual(before);
+
+    page.once('dialog', dialog => dialog.accept());
+    await pauseRestart.click();
+    await expect(pauseRestart).toBeHidden();
+    await expect(stage).toBeVisible();
+    const after = (await read(page, game))!.offlineMatch;
+    expect(after.id).not.toBe(before.id);
+    expect(after.mode).toBe(before.mode);
+    expect(after.state.turnNumber).toBe(1);
+    await reloadMatch(page, game);
+  });
+}
+
+test('Nhảy Lò Cò giữ focus khi đổi từ thảy sang nhảy và nhặt Chàm', async ({ page }) => {
+  await open(page, 'nhay-lo-co');
+  await page.getByRole('button', { name: startMenu.two }).click();
+  const court = page.locator('.fd-court');
+  const throwButton = court.getByRole('button', { name: /THẢY CHÀM/ });
+  const oneFoot = court.getByRole('button', { name: /1 CHÂN/ });
+  const pickCham = court.getByRole('button', { name: 'NHẶT CHÀM' });
+  await throwButton.focus();
+  await page.waitForFunction(() => {
+    const power = Number(document.querySelector<HTMLElement>('[data-folk-power]')?.dataset.folkPower);
+    return power >= 42 && power <= 58;
+  });
+  await page.keyboard.press('Enter');
+  await expect(oneFoot).toBeFocused();
+  for (let step = 0; step < 16 && !await pickCham.isVisible(); step++) {
+    const hint = await court.getByText(/^Bước \d+\/\d+/).innerText();
+    await court.getByRole('button', { name: hint.endsWith('(2 CHÂN)') ? /2 CHÂN/ : /1 CHÂN/ }).press('Enter');
+  }
+  await expect(pickCham).toBeFocused();
+});
+
 test('Ô Ăn Quan diễn đủ từng ô, khóa nước đi trong lúc rải và giữ lịch sử sau reload', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'no-preference' });
