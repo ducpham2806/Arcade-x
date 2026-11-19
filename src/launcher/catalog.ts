@@ -1,7 +1,7 @@
 import { ALL_GAMES_LIST, GAME_REGISTRY } from '../games/registry';
 import type { GameMetadata } from '../types';
 import { SNAKE_GAME_ID } from '../games/snake-legend/catalog-mode';
-export type CatalogGame = GameMetadata & { availability: 'published' | 'maintenance'; accessModel: 'free' | 'premium'; supportsOffline: boolean; featured: boolean; sortOrder: number; deviceOnly?: boolean };
+export type CatalogGame = GameMetadata & { availability: 'published' | 'maintenance'; accessModel: 'free' | 'premium'; supportsOffline: boolean; featured: boolean; sortOrder: number; deviceOnly?: boolean; folkOnlineEnabled?: boolean };
 const snakeCatalogBuild=!!GAME_REGISTRY[SNAKE_GAME_ID]?.offlinePackage;
 export const BUNDLED_FREE_GAME_IDS=snakeCatalogBuild?[SNAKE_GAME_ID,'word-chain','tank-clash']:['word-chain','tank-clash'];
 export const isBundledFreeGame=(id:string)=>BUNDLED_FREE_GAME_IDS.includes(id);
@@ -11,7 +11,7 @@ export const isLocalReviewGame=(id:string)=>import.meta.env.DEV&&LOCAL_REVIEW_GA
 export type Catalog = { schemaVersion: 1; games: CatalogGame[]; commerceEnabled: boolean; support: { enabled: boolean; bankName?: string; account?: string; beneficiary?: string; message?: string } };
 export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,...(isBundledFreeGame(game.id)?{deviceOnly:true}:{}),availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:['word-chain','tank-clash','battleship','boom-buddies','brick-breaker','rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };
 // Database metadata can select a bundled engine, never execute remote JavaScript.
-export function parseCatalog(raw: any): Catalog | null {
+export function parseCatalog(raw: any, live = false): Catalog | null {
   if (raw?.schemaVersion !== 1 || !Array.isArray(raw.games)) return null;
   const seen = new Set<string>();
   const games: CatalogGame[] = raw.games.flatMap((row: any) => {
@@ -21,7 +21,8 @@ export function parseCatalog(raw: any): Catalog | null {
     return [{...base,title:['hex-match','neon-runner'].includes(base.id)?base.title:typeof row.title==='string'?row.title.slice(0,100):base.title,
       shortDesc:['hex-match','neon-runner'].includes(base.id)?base.shortDesc:typeof row.short_description==='string'?row.short_description.slice(0,500):base.shortDesc,
       category:['Arcade','Puzzle','Action','Reflex','Multiplayer'].includes(row.category)?row.category:base.category,
-      availability:row.status,accessModel:row.access_model,supportsOffline:row.supports_offline===true,featured:row.featured===true,sortOrder:Number.isFinite(row.sort_order)?row.sort_order:100}];
+      availability:row.status,accessModel:row.access_model,supportsOffline:row.supports_offline===true,featured:row.featured===true,sortOrder:Number.isFinite(row.sort_order)?row.sort_order:100,
+      folkOnlineEnabled:live && row.status==='published' && row.folk_online_enabled===true && (base.id==='o-an-quan' || base.id==='nhay-lo-co')}];
   }).sort((a:CatalogGame,b:CatalogGame)=>a.sortOrder-b.sortOrder || a.id.localeCompare(b.id));
   // Add approved free releases absent from an older cloud catalog. Explicit rows
   // retain their access/maintenance policy and never receive the device bypass.

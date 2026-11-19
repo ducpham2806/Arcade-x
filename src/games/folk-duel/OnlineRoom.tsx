@@ -1,12 +1,49 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { usePlayer } from '../../context/PlayerContext';
+import { fetchCatalog } from '../../launcher/repository';
+import { SYNC } from '../../services/syncPolicy';
 import { platformFolkClient, type FolkOnlineClient } from './online-client';
 import type { FolkCommand, FolkOnlineRoom } from './online-protocol';
 import type { FolkGameKind } from './types';
 import { useFolkChat } from './useFolkChat';
 
-export const folkOnlineEnabled = import.meta.env.VITE_FOLK_ONLINE === '1';
+const localPreview = import.meta.env.DEV && import.meta.env.VITE_FOLK_ONLINE === '1';
 export type OnlineEntryMode = 'match' | 'create' | 'join' | 'resume';
+
+export function useFolkOnlineAvailability(game: FolkGameKind, inMenu: boolean) {
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    if (localPreview) return;
+    setEnabled(false);
+    if (!inMenu) return;
+    let generation = 0;
+    const disable = () => { generation++; setEnabled(false); };
+    const refresh = async () => {
+      const current = ++generation;
+      try {
+        const catalog = await fetchCatalog(true);
+        if (current !== generation) return;
+        setEnabled(catalog.games.some(row => row.id === game && row.folkOnlineEnabled));
+      } catch {
+        if (current === generation) setEnabled(false);
+      }
+    };
+    const onVisible = () => { if (!document.hidden) void refresh(); };
+    void refresh();
+    const timer = setInterval(onVisible, SYNC.library);
+    window.addEventListener('online', refresh);
+    window.addEventListener('offline', disable);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      generation++;
+      clearInterval(timer);
+      window.removeEventListener('online', refresh);
+      window.removeEventListener('offline', disable);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [game, inMenu]);
+  return localPreview || enabled;
+}
 
 interface OnlineRoomProps<Game extends FolkGameKind> {
   game: Game;

@@ -2,10 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Sửa lỗi QA Folk · 19/11/2026
+## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 
-- Nhánh `codex/folk-qa-20261119` sửa vạch lực online, khung thấp, focus và Chơi lại offline. 21 ca Node/PGlite, lint/build/budget và hồi quy trình duyệt qua. [Báo cáo](qa/FOLK-POLISH-2026-11-19.md).
-- PR 42 thêm xác nhận rời trận ở cả hai game, qua 2 ca online. [Kiểm tra](WORKLOG.md). Nghiệm thu staging, thiết bị và mạng thật còn chờ.
+- PR 42 sửa vạch lực online, khung thấp, focus, Chơi lại offline và xác nhận bỏ cuộc. [QA](qa/FOLK-POLISH-2026-11-19.md).
+- FD-ON2 kiểm bật và thu hồi online từng game, mặc định tắt. 21 ca Folk Node/PGlite, SQL và hồi quy trình duyệt. [Kiểm tra](WORKLOG.md).
+- Preview staging cổng 4335. Còn nghiệm thu hai tài khoản, thiết bị và mạng thật. [Phiếu nghiệm thu](qa/FOLK-ON2-2026-11-19.md).
 
 ## Folk và chat · merge/phát hành 19/11/2026
 

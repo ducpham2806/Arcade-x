@@ -7,7 +7,7 @@ import {
 import { FolkMatchReward, FolkResume, FolkRules, FolkSaveNotice } from '../folk-duel/FolkOfflineUi';
 import { isNlcOfflineState, useFolkRestart, useOfflineMatch, type OfflineMode } from '../folk-duel/offlineMatch';
 import { FolkShopModal } from '../folk-duel/FolkShopModal';
-import { OnlineRoom, folkOnlineEnabled, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
+import { OnlineRoom, useFolkOnlineAvailability, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
 import { folkChatId, type FolkCommand, type FolkOnlineRoom } from '../folk-duel/online-protocol';
 import { FolkSoundEngine } from '../folk-duel/sfx';
 import { getSkinById } from '../folk-duel/skins-catalog';
@@ -37,6 +37,7 @@ type ScreenMode =
 export const NhayLoCoGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false, isPaused, registerRestart }) => {
   const [profile, setProfile] = useState<FolkProfileSave>(() => loadFolkProfile(bridge));
   const [screen, setScreen] = useState<ScreenMode>({ kind: 'home' });
+  const folkOnlineEnabled = useFolkOnlineAvailability('nhay-lo-co', screen.kind === 'home');
   const offline = useOfflineMatch(bridge, createInitialNlcState, isNlcOfflineState);
   const mode = offline.match?.mode;
   const botLevel = mode === 'bot_easy' ? 'easy' : mode === 'bot_hard' ? 'hard' : null;

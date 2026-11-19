@@ -1,8 +1,8 @@
-# Bàn giao · 19/11/2026 · xác nhận rời trận Folk
+# Bàn giao · 19/11/2026 · FD-ON2
 
-Tiếp `37605a2` trên `codex/folk-qa-20261119` ([PR 42](https://github.com/ducpham2806/Arcade-x/pull/42)). Hai game xác nhận trước khi bỏ cuộc online. Xem kiểm tra và phạm vi Graphify ở [nhật ký](WORKLOG.md). Bước nghiệm thu còn lại là hai tài khoản staging, thiết bị và mạng thật.
+Tiếp `aad7895` trên `codex/folk-qa-20261119` ([PR 42](https://github.com/ducpham2806/Arcade-x/pull/42)). Có cấu hình catalog riêng cho từng game, mặc định tắt. [Phiếu FD-ON2](qa/FOLK-ON2-2026-11-19.md) ghi cách bật và thu hồi, preview staging và các bước anh nghiệm thu. [Nhật ký](WORKLOG.md) giữ bằng chứng kiểm thử, phạm vi Graphify và tình trạng CI.
 
-Nhánh `codex/folk-qa-20261119` từ `ea65ede`. Đã sửa nhịp vạch online của Nhảy Lò Cò, bố cục thấp ở hai game, focus theo pha và Chơi lại offline qua xác nhận. 21 Node/PGlite; Playwright, lint/build/bundle/docs theo [báo cáo](qa/FOLK-POLISH-2026-11-19.md). Nghiệm thu hai tài khoản staging, thiết bị và mạng thật còn chờ. Studio Game QA & Playtest, Game UI/UX, QA Lead. Graphify Folk 128/279, Nhảy Lò Cò 73/116, depth 1 theo lưu ván, đăng ký Chơi lại và vạch lực.
+Nhánh QA đã sửa vạch lực Nhảy Lò Cò, khung thấp hai game, focus theo pha và Chơi lại offline. `aad7895` thêm xác nhận bỏ cuộc. [Báo cáo đợt trước](qa/FOLK-POLISH-2026-11-19.md).
 
 Anh yêu cầu merge ngày 19/11. [PR 40](https://github.com/ducpham2806/Arcade-x/pull/40) vào main `f154795`, gồm nền chat [PR 38](https://github.com/ducpham2806/Arcade-x/pull/38) tự ghi merged. Head `4dfd09c` và merge cùng tree `f7caf525`, [full CI #71](https://github.com/ducpham2806/Arcade-x/actions/runs/44416723603) xanh trước merge. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), [release](qa/FOLK-CHAT-RELEASE-2026-11-19.md), [bàn giao trước merge](archive/SESSION-HANDOFF-2026-11-19-before-folk-chat-merge.md).
 
@@ -10,6 +10,6 @@ Netlify dashboard xác nhận Published main@f154795, deploy `6afe368bb6e8bc9695
 
 Public có chat bubble, hai game offline/bot/chung máy, lưu/đấu lại. Ô Ăn Quan có tay rải, mẹt theo ghế và history. Code phòng Folk/chat Trận đã merge, backend mới vẫn staging `khqipuipeawzlkqmdzdg`. Folk online mặc định tắt trên public. Cấp thưởng online giữ tắt. Không ghi schema/Edge/cron production trong task merge.
 
-Anh chọn tự kiểm hai tài khoản staging sau, giữ quyết định này. Còn thiết bị vật lý và canh lực NLC với latency thật. Preview 4335 dùng backend staging và bật Folk online, 4357 backend tắt. [QA FD-ON1](qa/FOLK-ONLINE-2026-11-19.md) có 21 Node/PGlite và 7 browser, motion 54+25, lint/build/bundle/fast qua.
+Anh chọn tự kiểm hai tài khoản staging sau. Còn thiết bị vật lý và canh lực NLC với độ trễ thật. Preview Vite 4335 trỏ staging và đã qua smoke khách hai game. [QA FD-ON1](qa/FOLK-ONLINE-2026-11-19.md) giữ hợp đồng và kết quả nền.
 
 Studio `fa7b1db`, Game Release & LiveOps, Release Lead, Netlify Deploy. Graph Folk 126/277 và Edge 115/240 từ FD-ON1, depth 1 đối chiếu nguồn/transaction. Lần release kiểm DAG/tree và CI, không đổi code. Bàn giao phát hành trên nhánh `codex/folk-chat-release`.

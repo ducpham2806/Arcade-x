@@ -14,11 +14,11 @@ async function rpc(name: string, args: Record<string,unknown> = {}) {
 }
 let catalogRequest: Promise<Catalog> | null = null;
 let catalogUntil = 0;
-export async function fetchCatalog(): Promise<Catalog> {
-  if (Date.now() < catalogUntil) return cachedCatalog();
+export async function fetchCatalog(fresh = false): Promise<Catalog> {
+  if (!fresh && Date.now() < catalogUntil) return cachedCatalog();
   if (catalogRequest) return catalogRequest;
   catalogRequest = (async () => {
-    const raw=await rpc('launcher_catalog');const result=parseCatalog(raw);
+    const raw=await rpc('launcher_catalog');const result=parseCatalog(raw,true);
     if(!result)throw new Error('catalog_unavailable');
     try {localStorage.setItem(cacheKey,JSON.stringify(raw));catalogUntil=Date.now()+SYNC.library;}catch {}
     return result;

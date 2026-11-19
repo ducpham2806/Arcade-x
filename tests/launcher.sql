@@ -3,6 +3,15 @@ begin;
 insert into auth.users(id) values ('00000000-0000-4000-8000-000000000001'),('00000000-0000-4000-8000-000000000002');
 create function public.launcher_assert(ok boolean,label text) returns void language plpgsql as $$begin if ok is distinct from true then raise exception 'FAIL: %',label; end if; raise notice 'PASS: %',label;end$$;
 insert into public.launcher_games(id,engine_key,title,status,access_model) values('paid-test','paid-test','Paid','published','premium'),('draft-test','draft-test','Draft','draft','free');
+insert into public.launcher_games(id,engine_key,title,status) values
+ ('o-an-quan','o-an-quan','Ô Ăn Quan','published'),('nhay-lo-co','nhay-lo-co','Nhảy Lò Cò','published');
+select public.launcher_assert((select count(*)=2 and not bool_or(folk_online_enabled) from public.launcher_games where id in ('o-an-quan','nhay-lo-co')),'Folk online defaults off independently');
+do $$begin
+ begin update public.launcher_games set folk_online_enabled=true where id='tile-2048';
+ exception when check_violation then return; end;
+ raise exception 'FAIL: non-Folk catalog row enabled Folk online';
+end$$;
+update public.launcher_games set folk_online_enabled=true where id='o-an-quan';
 insert into public.launcher_products(id,title,kind,amount_minor,active,all_games,duration_days) values('buy-test','Buy','game',99000,true,false,null),('sub-test','Month','subscription',49000,true,true,30),('donate-test','Support','donation',10000,true,false,null);
 insert into public.launcher_product_games values('buy-test','paid-test');
 do $$begin
@@ -15,7 +24,13 @@ select public.launcher_assert((public.launcher_check_access('tile-2048')->>'allo
 select public.launcher_assert(not (public.launcher_check_access('paid-test')->>'allowed')::boolean,'guest cannot access paid game');
 select public.launcher_assert(not exists(select 1 from jsonb_array_elements(public.launcher_catalog()->'games') g where g->>'id'='draft-test'),'draft game hidden from public catalog');
 select public.launcher_assert(not(public.launcher_catalog()->>'commerceEnabled')::boolean,'commerce disabled by default');
+select public.launcher_assert((select array_agg(g->>'id')=array['o-an-quan'] from jsonb_array_elements(public.launcher_catalog()->'games') g where (g->>'folk_online_enabled')::boolean),'catalog exposes only the enabled Folk game');
 do $$begin begin perform public.launcher_record_payment('bank','fake',gen_random_uuid(),1,'VND','paid'); exception when insufficient_privilege then raise notice 'PASS: guest cannot confirm payment';return;end;raise exception 'FAIL: guest payment';end$$;
+reset role;
+update public.launcher_games set folk_online_enabled=false where id='o-an-quan';
+set local role anon;
+select public.launcher_assert(not exists(select 1 from jsonb_array_elements(public.launcher_catalog()->'games') g where (g->>'folk_online_enabled')::boolean),'catalog rollback turns Folk online off');
+select public.launcher_assert((public.launcher_check_access('o-an-quan')->>'allowed')::boolean and (public.launcher_check_access('nhay-lo-co')->>'allowed')::boolean,'Folk games remain accessible after rollback');
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
