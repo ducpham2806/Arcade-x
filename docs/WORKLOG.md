@@ -2,6 +2,12 @@
 
 Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLOG-2026-11-19-before-fd-on2.md).
 
+## 20/11/2026 · backend production Folk
+
+- Theo phạm vi anh duyệt, dùng bản `main@932db80` trên Supabase Arcade-x `whjatkhhupeqfngakmee`. Hai migration production là `20261120023641 folk_duel_room_schema` và `20261120023657 folk_online_catalog`. Migration catalog chạy đúng nội dung file `20261119154045_folk_online_catalog.sql` trong repo.
+- Bốn bảng có RLS. Năm RPC chỉ cấp EXECUTE cho `service_role`. Edge `folk-duel-room` v1 ACTIVE, mã khớp main. Cron job 4 dùng token Vault. Năm lượt cron liên tiếp cách nhau 10 giây, đều trả HTTP 200. Hai ca khách trả 401. 21 ca Folk và SQL PGlite qua.
+- Catalog có 0 hàng Folk bật online. Chưa chạy trận production bằng hai tài khoản. Bàn giao trên `codex/folk-production-backend-20261120` theo Game Release & LiveOps, vai trò Release Lead. [Edge production](https://supabase.com/dashboard/project/whjatkhhupeqfngakmee/functions/folk-duel-room).
+
 ## 19–20/11/2026 · FD-ON2 và phát hành launcher
 
 - Ngày 20/11 anh yêu cầu bỏ test staging, đưa hai game lên launcher và merge main. Catalog đóng gói bảo đảm mở ván offline khi catalog cloud thiếu hàng. Hàng cloud hợp lệ vẫn quyết định quyền và trạng thái. Hai ca trình duyệt trên bản dựng production cục bộ vào bàn offline qua sảnh ở 1280×900 và 390×844. Lint, test catalog/quyền mở game, build và bundle budget qua.
@@ -16,9 +22,3 @@ Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLO
 - Tiếp từ `37605a2` trên `codex/folk-qa-20261119` ([PR 42](https://github.com/ducpham2806/Arcade-x/pull/42)). Nút Rời phòng và Thoát trong bàn cùng mở xác nhận nếu ván online đang đếm ngược hoặc đang chơi. Ở lại hoặc Escape trả focus về nút mở. Chỉ xác nhận mới gửi lệnh rời. Luồng thử lại giữ nguyên ID yêu cầu khi mất phản hồi.
 - Qua 14 ca Playwright (12 offline, 2 online) và 21 ca Folk Node/PGlite. Ô Ăn Quan gửi lại cùng ID khi mất phản hồi. Nhảy Lò Cò kiểm hủy và bỏ cuộc ở 390×844 với độ trễ giả lập 250 ms khứ hồi. Đã xem ảnh `test-results/folk-online/nlc-leave-phone.png`. Lint, build production, bundle budget và kiểm Markdown qua.
 - Studio Game QA & Playtest, Game UI/UX, vai trò QA Lead. Graphify 0.9.108 AST `src/games/folk-duel`, 129 nút/281 cạnh, truy vấn `FolkLeaveDialog` depth 1. Hai trình duyệt mô phỏng dùng fixture Auth/Edge/PGlite. Nghiệm thu tài khoản staging, thiết bị và mạng thật vẫn chờ.
-
-## 19/11/2026 · sửa lỗi QA Folk
-
-- Tiếp từ `ea65ede` trên `codex/folk-qa-20261119`. Vạch lực Nhảy Lò Cò online vẽ theo khung hình từ giờ server ước lượng. Sửa khung thấp hai game, focus theo pha và Chơi lại offline có xác nhận.
-- 21 test luật/Edge/PGlite, lint/build/budget/docs qua. 14 ca Playwright có kết quả qua sau chạy lại, gồm độ trễ 250 ms khứ hồi và khung ngang chừa badge.
-- Game QA & Playtest, Game UI/UX, QA Lead. Graphify Folk 128/279, Nhảy Lò Cò 73/116. [Báo cáo](qa/FOLK-POLISH-2026-11-19.md). Nghiệm thu hai tài khoản staging, mạng và thiết bị thật còn chờ.

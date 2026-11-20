@@ -2,6 +2,12 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## Folk · backend production · 20/11/2026
+
+- Supabase Arcade-x `whjatkhhupeqfngakmee` đã có schema, cột catalog, Edge v1 và cron 10 giây từ `main@932db80`.
+- Đối chiếu mã Edge và quyền năm RPC. Tick thật trả 200, khách của hai game trả 401. 21 ca Folk và SQL PGlite qua.
+- Online vẫn tắt trong catalog. Trận production hai tài khoản chưa thử. [Nhật ký và phiên bản migration](WORKLOG.md).
+
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 
 - PR 42 sửa vạch lực online, khung thấp, focus, Chơi lại offline và xác nhận bỏ cuộc. [QA](qa/FOLK-POLISH-2026-11-19.md).
@@ -49,13 +55,5 @@
 - Staging2account qua phòng/PK/hosttransfer/mãđóng, queue/hủy/reset20s/timeout/2phiếu rematch; cron đóng phòng hết rematch khi đóngtab. [QA](qa/WC-STAGING-2026-11-08.md).
 - User duyệt exception production riêng: schema/Edge/handlerAuth/CORSexact/legacyJWT OFF/cronVault. Đã áp/probeAuth/CORS/tick/RPCdenial; tick200. PublicX9FL8R tạo-rời vàqueue-hủy qua; [release](word-chain/PUBLIC-RELEASE-2026-11-08.md).
 - Không đổi save/Auth/commerce; online chưaXP/xu, cầnreceipt bền vững. User bỏ gate thật3/4; ON5/ON6 cònQA. Chi tiết cũ giữ trong archive trước đóngONLINE-ERROR.
-
-## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
-
-- Đã phát hiện và sửa Render còn staging3950abb; service main/c705100 đã Live14:54, Free/cap16/Node24, registered-free đúng ArcadeX.
-- Health/TLS/origin/token âm qua; review/config/metrics public404. Không đổi SQL/key/chi phí.
-- Account thật tạo/rời1v1, tạo2v2/exit dọn phòng, logout sau exit chặn online lại; không bắt đầu trận nhiều người.
-- Bằng chứng: [TC-R0 report](tank-clash/TC-R0-2026-11-06.md). Cập nhật07/11: Netlify/Auth đã phát hành, logout retest qua; còn ca A/mã B cũ được chủ dự án để sau. TC-R1 chưa làm.
-- Giữ Blueprint cũ paused, không sync ghi đè service main; lần sau tiếp QA còn thiếu, không deploy lại vô cớ.
 
 [Các việc cũ đã đóng](archive/COMPLETED-2026-11-19-before-folk-online.md).
