@@ -6,13 +6,19 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { setTimeout as delay } from 'node:timers/promises';
 import type { FolkOnlineRoom, FolkRequest } from '../../src/games/folk-duel/online-protocol';
+import type { FolkGameKind } from '../../src/games/folk-duel/types';
 
 const port = 4361;
 const base = `http://127.0.0.1:${port}`;
 const api = 'https://folk.example';
+const folkGames = ['o-an-quan', 'nhay-lo-co'] as const;
 const contexts: BrowserContext[] = [];
 const errors: string[] = [];
+const disconnected = new Set<string>();
+let catalogFlags: readonly FolkGameKind[] = folkGames;
+let catalogAvailable = true;
 let vite: ChildProcess;
 let db: PGlite;
 let originalFetch: typeof fetch;
@@ -52,7 +58,7 @@ test.beforeAll(async () => {
   await build({ entryPoints: ['supabase/functions/folk-duel-room/index.ts'], outfile, bundle: true, format: 'cjs', platform: 'node' });
   handle = createRequire(import.meta.url)(outfile).handleFolkRequest;
   vite = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
-    stdio: 'ignore', env: { ...process.env, VITE_SUPABASE_URL: api, VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_fixture', VITE_FOLK_ONLINE: '1' },
+    stdio: 'ignore', env: { ...process.env, VITE_SUPABASE_URL: api, VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_fixture', VITE_FOLK_ONLINE: '0' },
   });
   await expect.poll(async () => { try { return (await originalFetch(base)).ok; } catch { return false; } }).toBe(true);
 });
@@ -62,6 +68,12 @@ test.afterEach(async () => {
   expect(errors.splice(0)).toEqual([]);
   advance = 0;
   last = {};
+  dropNext = false;
+  dropped = null;
+  replayed = false;
+  disconnected.clear();
+  catalogFlags = folkGames;
+  catalogAvailable = true;
 });
 
 test.afterAll(async () => {
@@ -70,8 +82,8 @@ test.afterAll(async () => {
   await db?.close();
 });
 
-async function player(browser: Browser, n: number, game: string, phone = false) {
-  const context = await browser.newContext({ viewport: phone ? { width: 390, height: 844 } : { width: 1280, height: 900 }, serviceWorkers: 'block' });
+async function player(browser: Browser, n: number, game: FolkGameKind, phone = false, latency = 0, fromLauncher = false) {
+  const context = await browser.newContext({ viewport: phone ? { width: 390, height: 844 } : { width: 1280, height: 900 }, hasTouch: phone, serviceWorkers: 'block' });
   contexts.push(context);
   const page = await context.newPage();
   page.on('pageerror', error => errors.push(error.message));
@@ -91,11 +103,20 @@ async function player(browser: Browser, n: number, game: string, phone = false) 
     if (url.origin === base) return route.continue();
     if (url.origin !== api) return route.abort();
     if (url.pathname === '/auth/v1/user') return route.fulfill({ json: user });
+    if (url.pathname === '/rest/v1/rpc/launcher_catalog') {
+      if (!catalogAvailable) return route.abort();
+      return route.fulfill({ json: { schemaVersion: 1, games: folkGames.map(id => ({
+        id, engine_key: id, status: 'published', access_model: 'free', supports_offline: true, folk_online_enabled: catalogFlags.includes(id),
+      })) } });
+    }
     if (url.pathname === '/functions/v1/folk-duel-room') {
+      if (disconnected.has(user.id)) return route.abort('internetdisconnected');
       const body = req.postDataJSON() as FolkRequest;
+      if (latency) await delay(latency);
       const response = await handle(new Request(req.url(), { method: req.method(), headers: req.headers(), body: req.postData() }),
         { url: api, key: 'fixture-service' }, Date.now() + advance);
       const reply = await response.json();
+      if (latency) await delay(latency);
       if (reply.room && (!last[user.id] || last[user.id].roomId !== reply.room.roomId || last[user.id].version <= reply.room.version)) last[user.id] = reply.room;
       if (dropNext && body.type === 'command') {
         dropped = body;
@@ -111,9 +132,13 @@ async function player(browser: Browser, n: number, game: string, phone = false) 
     if (url.pathname.endsWith('/arcadex_get_identity')) return route.fulfill({ json: { display_name: user.user_metadata.username, avatar: '🎮' } });
     return route.fulfill({ json: [] });
   });
-  await page.goto(base + '/?review=' + game);
-  await expect(page.locator('#game-wrapper-viewport')).toBeVisible({ timeout: 20000 });
+  await page.goto(fromLauncher ? `${base}/#game-card-${game}` : `${base}/?review=${game}`);
   const collapse = page.getByRole('button', { name: 'Thu chat về bubble' });
+  if (fromLauncher) {
+    if (await collapse.isVisible()) await collapse.click();
+    await page.locator(`#btn-play-${game}`).click();
+  }
+  await expect(page.locator('#game-wrapper-viewport')).toBeVisible({ timeout: 20000 });
   if (await collapse.isVisible()) await collapse.click();
   return page;
 }
@@ -151,7 +176,7 @@ async function chat(a: Page, b: Page, text: string) {
   await b.getByRole('button', { name: 'Thu chat về bubble' }).click();
 }
 
-test('Ô Ăn Quan online · chat hai chiều, gửi lặp, vào lại, hết giờ và đấu lại', async ({ browser }) => {
+test('Ô Ăn Quan online · chat, mất mạng, gửi lặp, vào lại, hết giờ và đấu lại', async ({ browser }) => {
   test.setTimeout(90000);
   const a = await player(browser, 1, 'o-an-quan');
   const b = await player(browser, 2, 'o-an-quan', true);
@@ -160,8 +185,18 @@ test('Ô Ăn Quan online · chat hai chiều, gửi lặp, vào lại, hết gi�
   await chat(a, b, 'Chào từ Sân Đình A');
   await chat(b, a, 'Chào từ Sân Đình B');
   await a.locator('[data-folk-cell="1"]').click();
+  const sow = a.getByRole('button', { name: /Rải Phải/ });
+  await expect(sow).toBeEnabled();
+  disconnected.add(uuid(1));
+  await a.context().setOffline(true);
+  await expect(a.getByRole('status').filter({ hasText: /Mất kết nối phòng/ })).toBeVisible();
+  await expect(sow).toBeDisabled({ timeout: 8000 });
+  expect(last[uuid(2)].state.turnNumber).toBe(1);
+  disconnected.delete(uuid(1));
+  await a.context().setOffline(false);
+  await expect(sow).toBeEnabled({ timeout: 8000 });
   dropNext = true;
-  await a.getByRole('button', { name: /Rải Phải/ }).click();
+  await sow.click();
   await expect(a.getByRole('button', { name: 'Gửi lại thao tác' })).toBeVisible();
   await a.getByRole('button', { name: 'Gửi lại thao tác' }).click();
   await expect.poll(() => replayed).toBe(true);
@@ -188,18 +223,45 @@ test('Ô Ăn Quan online · chat hai chiều, gửi lặp, vào lại, hết gi�
   await expect(b.locator('[data-folk-seat="P2"]')).toContainText('Đến lượt');
   await a.screenshot({ path: 'test-results/folk-online/oaq-online.png' });
   await b.screenshot({ path: 'test-results/folk-online/oaq-phone.png' });
-  await a.getByRole('button', { name: 'Rời phòng', exact: true }).click();
-  await expect(a.getByRole('button', { name: /Tạo Phòng Riêng/ })).toBeVisible();
+  catalogFlags = ['nhay-lo-co'];
+  const leave = a.getByRole('button', { name: 'Rời phòng', exact: true });
+  await leave.click();
+  const confirmLeave = a.getByRole('alertdialog', { name: 'Rời trận?' });
+  await expect(confirmLeave).toContainText('được tính là bỏ cuộc');
+  await expect(confirmLeave.getByRole('button', { name: 'Ở lại' })).toBeFocused();
+  await a.keyboard.press('Escape');
+  await expect(confirmLeave).toHaveCount(0);
+  await expect(leave).toBeFocused();
+  await expect(b.locator('[data-folk-seat="P2"]')).toContainText('Đến lượt');
+
+  await leave.click();
+  dropNext = true;
+  replayed = false;
+  await confirmLeave.getByRole('button', { name: 'Bỏ cuộc và rời' }).click();
+  await expect(a.getByRole('button', { name: 'Gửi lại thao tác' })).toBeVisible();
+  await a.getByRole('button', { name: 'Gửi lại thao tác' }).click();
+  await expect.poll(() => replayed).toBe(true);
+  await expect(a.getByRole('button', { name: /2 Người Chung Máy/ })).toBeVisible();
+  await expect(a.getByRole('button', { name: /Tạo Phòng Riêng/ })).toHaveCount(0);
   await expect(b.locator('.fd-room-status')).toContainText('đã rời trận');
   await expect(b.locator('.chat-opponent-speech')).toHaveCount(0);
 });
 
-test('Nhảy Lò Cò online · thảy, từng bước nhảy, nhặt Chàm, đổi lượt và chat', async ({ browser }) => {
+test('Nhảy Lò Cò online · thảy, từng bước nhảy, nhặt Chàm, đổi lượt và chat trên mạng chậm', async ({ browser }) => {
   test.setTimeout(90000);
-  const a = await player(browser, 3, 'nhay-lo-co');
-  const b = await player(browser, 4, 'nhay-lo-co', true);
+  const a = await player(browser, 3, 'nhay-lo-co', false, 125);
+  const b = await player(browser, 4, 'nhay-lo-co', true, 125);
   await enter(a, b);
+  await expect(a.getByRole('button', { name: 'Chơi lại ván mới' })).toBeDisabled();
   await chat(a, b, 'Cùng nhảy Ngõ Nhỏ');
+  const meter = a.locator('[data-folk-power]');
+  const samples = await meter.evaluate(element => new Promise<number>(resolve => {
+    let changes = 0;
+    const observer = new MutationObserver(records => { changes += records.length; });
+    observer.observe(element, { attributes: true, attributeFilter: ['data-folk-power'] });
+    setTimeout(() => { observer.disconnect(); resolve(changes); }, 1250);
+  }));
+  expect(samples).toBeGreaterThan(12);
   // Click at the center of the server-aligned timing meter.
   async function center(page: Page, name: RegExp) {
     await page.getByRole('button', { name }).evaluate(button => new Promise<void>((resolve, reject) => {
@@ -213,8 +275,9 @@ test('Nhảy Lò Cò online · thảy, từng bước nhảy, nhặt Chàm, đ�
       check();
     }));
   }
+  await a.getByRole('button', { name: /THẢY CHÀM/ }).focus();
   await center(a, /THẢY CHÀM/);
-  await expect(a.getByRole('button', { name: /1 CHÂN/, exact: false })).toBeVisible();
+  await expect(a.getByRole('button', { name: /1 CHÂN/ })).toBeFocused();
   for (let i = 0; i < 20 && last[uuid(3)].state.turn === 'P1'; i++) {
     const version = last[uuid(3)].version;
     await expect(a.locator('.fd-board-stage')).toHaveAttribute('data-folk-version', String(version));
@@ -237,4 +300,60 @@ test('Nhảy Lò Cò online · thảy, từng bước nhảy, nhặt Chàm, đ�
   await b.reload();
   await b.getByRole('button', { name: 'Tiếp tục phòng online' }).click();
   await expect(b.getByRole('button', { name: /THẢY CHÀM/ })).toBeVisible();
+  const exit = b.locator('.nlc-stage').getByRole('button', { name: 'Thoát', exact: true });
+  await exit.tap();
+  const confirmLeave = b.getByRole('alertdialog', { name: 'Rời trận?' });
+  await expect(confirmLeave).toBeVisible();
+  await b.screenshot({ path: 'test-results/folk-online/nlc-leave-phone.png' });
+  await confirmLeave.getByRole('button', { name: 'Ở lại' }).click();
+  await expect(exit).toBeFocused();
+  await expect(b.getByRole('button', { name: /THẢY CHÀM/ })).toBeVisible();
+  await exit.click();
+  await confirmLeave.getByRole('button', { name: 'Bỏ cuộc và rời' }).click();
+  await expect(b.getByRole('button', { name: /Tạo Phòng Riêng/ })).toBeVisible();
+  await expect(a.locator('.fd-room-status')).toContainText('đã rời trận');
+});
+
+test('Catalog Folk bật riêng từng game, thu hồi trên menu và giữ ván offline khi mất mạng', async ({ browser }) => {
+  test.setTimeout(90000);
+  catalogFlags = ['o-an-quan'];
+  const oaq = await player(browser, 5, 'o-an-quan', false, 0, true);
+  const nlc = await player(browser, 6, 'nhay-lo-co', true, 0, true);
+  const online = (page: Page) => page.getByRole('button', { name: /Tạo Phòng Riêng/ });
+  const offline = (page: Page) => page.getByRole('button', { name: /2 Người Chung Máy/ });
+  const refresh = async (page: Page) => {
+    await Promise.all([
+      page.waitForResponse(response => response.url().endsWith('/rpc/launcher_catalog')),
+      page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))),
+    ]);
+  };
+  await expect(online(oaq)).toBeVisible();
+  await refresh(nlc);
+  await expect(online(nlc)).toHaveCount(0);
+  await expect(offline(nlc)).toBeVisible();
+
+  catalogFlags = ['nhay-lo-co'];
+  await refresh(oaq);
+  await refresh(nlc);
+  await expect(online(oaq)).toHaveCount(0);
+  await expect(online(nlc)).toBeVisible();
+  expect(await nlc.evaluate(() => JSON.parse(localStorage.getItem('launcher_catalog_v1') ?? '{}').games
+    ?.find((row: { id: string }) => row.id === 'nhay-lo-co')?.folk_online_enabled)).toBe(true);
+  await nlc.screenshot({ path: 'test-results/folk-online/catalog-nlc-enabled.png' });
+
+  await nlc.context().setOffline(true);
+  await expect(online(nlc)).toHaveCount(0);
+  await offline(nlc).tap();
+  await expect(nlc.locator('.nlc-stage')).toBeVisible();
+  const offlineMatch = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('arcadex_save_v1_nhay-lo-co') ?? '{}').payload.offlineMatch);
+  const saved = await offlineMatch(nlc);
+  expect(saved.id).toBeTruthy();
+  catalogAvailable = false;
+  await nlc.context().setOffline(false);
+  await nlc.goto(base + '/?review=nhay-lo-co');
+  await expect(nlc.getByRole('button', { name: 'Tiếp tục ván đã lưu' })).toBeVisible();
+  await expect(online(nlc)).toHaveCount(0);
+  await nlc.getByRole('button', { name: 'Tiếp tục ván đã lưu' }).tap();
+  await expect(nlc.locator('.nlc-stage')).toBeVisible();
+  expect(await offlineMatch(nlc)).toEqual(saved);
 });

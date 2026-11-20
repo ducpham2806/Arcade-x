@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
-import type { GameBridgeAPI } from '../../types';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { GameBridgeAPI, GameComponentProps } from '../../types';
 import type { OaqState } from '../o-an-quan/rules.ts';
 import type { NlcState } from '../nhay-lo-co/rules.ts';
 import { loadFolkProfile, readFolkSave, writeFolkSave } from './economy.ts';
@@ -64,10 +64,15 @@ export function useOfflineMatch<T extends { finished: boolean }>(bridge: GameBri
   const update = useCallback((state: T) => {
     if (current.current) store({ ...current.current, state });
   }, [store]);
-  const start = (mode: OfflineMode) => {
+  const start = useCallback((mode: OfflineMode) => {
     if (current.current && !current.current.state.finished && !window.confirm('Bắt đầu ván mới sẽ thay ván đã lưu. Chơi ván mới?')) return false;
     store({ version: 1, id: crypto.randomUUID(), mode, state: initial() });
     return true;
-  };
-  return { match, start, update, saved, retry: () => { if (current.current) store(current.current); } };
+  }, [initial, store]);
+  const restart = useCallback(() => current.current ? start(current.current.mode) : false, [start]);
+  return { match, start, restart, update, saved, retry: () => { if (current.current) store(current.current); } };
+}
+
+export function useFolkRestart(register: GameComponentProps['registerRestart'], restart?: () => boolean) {
+  useEffect(() => restart && register ? register(restart) : undefined, [register, restart]);
 }

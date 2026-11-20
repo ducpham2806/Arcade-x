@@ -6,11 +6,14 @@ await build({stdin:{contents:"export {parseCatalog,bundledCatalog,isDeviceLibrar
 global.window={};Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:true});
 const {parseCatalog,bundledCatalog,isDeviceLibraryGame,checkAccess,enqueueFavorite,flushFavorites,pendingFavorites}=require('../../node_modules/.cache/tank-launcher.cjs');
 const catalog=parseCatalog({schemaVersion:1,games:[]});
-assert.deepEqual(catalog.games.map(g=>g.id),['word-chain','tank-clash']);
-for(const id of ['tank-clash','word-chain']){
+const publicOfflineGameIds=['word-chain','tank-clash','o-an-quan','nhay-lo-co'];
+assert.deepEqual(catalog.games.map(g=>g.id),publicOfflineGameIds);
+for(const id of publicOfflineGameIds){
  const game=catalog.games.find(g=>g.id===id);assert.ok(game?.deviceOnly&&game.supportsOffline&&game.featured);
  assert.deepEqual(await checkAccess(game),{allowed:true,reason:'bundled_free'},'approved release works with older production catalog, without DB writes');
- assert.equal(bundledCatalog.games.filter(g=>g.id===id).length,1);
+ const deviceGames=bundledCatalog.games.filter(g=>g.id===id);
+ assert.equal(deviceGames.length,1);
+ assert.ok(deviceGames[0].deviceOnly&&deviceGames[0].supportsOffline&&deviceGames[0].featured);
  for(const [status,access_model] of [['maintenance','free'],['published','premium']]){
   const result=parseCatalog({schemaVersion:1,games:[{id,engine_key:id,status,access_model}]});
   const row=result.games.find(g=>g.id===id);assert.equal(result.games.filter(g=>g.id===id).length,1);assert.equal(row.availability,status);assert.equal(row.deviceOnly,undefined);
@@ -26,4 +29,4 @@ assert.equal(wordChainOnline.functionName,'word-chain-room');
 const favoriteStorage=new Map();global.localStorage={getItem:k=>favoriteStorage.get(k)??null,setItem:(k,v)=>favoriteStorage.set(k,v)};
 assert.equal(isDeviceLibraryGame('word-chain'),true);assert.equal(isDeviceLibraryGame('chess'),false);
 enqueueFavorite('fixture-owner','word-chain',true);await flushFavorites('fixture-owner');assert.deepEqual(pendingFavorites('fixture-owner'),[],'device favorite never uploads a game missing from the server');
-console.log('PASS production catalog includes Word Chain/Tank Clash once, free offline entry, server policy precedence and approved online entry');
+console.log('PASS production catalog includes Word Chain, Tank Clash and both Folk games once, with free offline entry and server policy precedence');

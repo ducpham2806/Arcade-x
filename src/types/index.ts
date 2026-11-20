@@ -544,6 +544,7 @@ export interface GameComponentProps {
   isDailyChallengeMode?: boolean;
   onGameOver: (finalScore: number, stats?: Record<string, number>) => void;
   onRestart: () => void;
+  registerRestart?: (restart: () => boolean) => () => void;
 }
 
 export interface DailyLoginRewardItem {

@@ -8,7 +8,7 @@ import { GameSaveGate, GameLoadBoundary } from '../components/GameSaveGate';
 import { readGameSave } from '../services/gameSaves';
 import { GameArtwork, GameIcon, GameAtmosphere, artStyle } from '../visuals/gameArt';
 import React, { useState, useMemo, useCallback, useEffect, useRef, Suspense } from 'react';
-import { GameMetadata } from '../types';
+import type { GameComponentProps, GameMetadata } from '../types';
 import { createGameBridge, type CreateBridgeOptions } from './GameBridge';
 import { usePlayer } from '../context/PlayerContext';
 import { useInventory } from '../context/InventoryContext';
@@ -96,6 +96,11 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   const chat = useChat();
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
+  const [folkRestart, setFolkRestart] = useState<(() => boolean) | null>(null);
+  const registerRestart = useCallback<NonNullable<GameComponentProps['registerRestart']>>(restart => {
+    setFolkRestart(() => restart);
+    return () => setFolkRestart(current => current === restart ? null : current);
+  }, []);
   // Help is available on demand; package readiness is the only launch gate.
   const [showPreGameLoading, setShowPreGameLoading] = useState(false);
 
@@ -522,6 +527,14 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
   }, []);
 
   const handleRestart = useCallback(() => {
+    if (folkOfflineSave) {
+      if (folkRestart?.()) {
+        recordPlay(gameId);
+        setIsPaused(false);
+        setResumeCountdown(null);
+      }
+      return;
+    }
     if (gameId === 'snake-legend') { window.dispatchEvent(new Event('snake-legend:restart')); setIsPaused(false); setResumeCountdown(null); return; }
     if (gameId === 'hex-match') { window.dispatchEvent(new Event('blossom:restart')); return; }
     if (gameId === 'boom-buddies') { window.dispatchEvent(new Event('boom:restart')); return; }
@@ -539,7 +552,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
     setIsPaused(false);
     setShowExitConfirm(false);
     setGameSessionKey((k) => k + 1);
-  }, []);
+  }, [folkOfflineSave, folkRestart, gameId, recordPlay]);
 
   const handlePreGameStart = useCallback(() => {
     setShowPreGameLoading(false);
@@ -666,7 +679,9 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
             type="button"
             onClick={handleRestart}
             title="Chơi lại ván mới"
-            className="w-9 h-9 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-90 text-slate-300 hover:text-white flex items-center justify-center border border-white/5 transition-all cursor-pointer"
+            aria-label="Chơi lại ván mới"
+            disabled={folkOfflineSave && !folkRestart}
+            className="w-9 h-9 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-90 text-slate-300 hover:text-white flex items-center justify-center border border-white/5 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-default"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -688,7 +703,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
       <main
         ref={viewportContainerRef}
         id="game-main-viewport"
-        style={{...cssVariables, ...(['battleship','cosmic-defense','blocker','shikaku','hex-match'].includes(gameId)?{touchAction:'pan-y'}:{})} as React.CSSProperties}
+        style={{...cssVariables, ...(folkOfflineSave || ['battleship','cosmic-defense','blocker','shikaku','hex-match'].includes(gameId)?{touchAction:'pan-y'}:{})} as React.CSSProperties}
         onTouchStart={handleStageTouchStart}
         onTouchEnd={handleStageTouchEnd}
         className="relative flex-1 w-full h-full bg-[#050505] flex items-center justify-center overflow-hidden p-0 scrollbar-thin select-none touch-none"
@@ -712,6 +727,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
             isMuted={isSoundMuted}
             onGameOver={handleGameOver}
             onRestart={handleRestart}
+            registerRestart={folkOfflineSave ? registerRestart : undefined}
           />
           </Suspense>
           </GameLoadBoundary>
@@ -865,7 +881,8 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ gameMeta: propMeta, me
                     id="btn-pause-restart"
                     type="button"
                     onClick={handleRestart}
-                    className="w-full py-2.5 px-3 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-95 text-slate-200 font-semibold text-xs border border-white/5 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    disabled={folkOfflineSave && !folkRestart}
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#141414] hover:bg-white/10 active:scale-95 text-slate-200 font-semibold text-xs border border-white/5 transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-default"
                     title="Chơi Lại"
                     aria-label="Chơi Lại"
                   >

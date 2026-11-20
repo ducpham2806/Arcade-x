@@ -5,9 +5,9 @@ import {
   type FolkProfileSave,
 } from '../folk-duel/economy';
 import { FolkMatchReward, FolkResume, FolkRules, FolkSaveNotice } from '../folk-duel/FolkOfflineUi';
-import { isOaqOfflineState, useOfflineMatch, type OfflineMode } from '../folk-duel/offlineMatch';
+import { isOaqOfflineState, useFolkRestart, useOfflineMatch, type OfflineMode } from '../folk-duel/offlineMatch';
 import { FolkShopModal } from '../folk-duel/FolkShopModal';
-import { OnlineRoom, folkOnlineEnabled, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
+import { OnlineRoom, useFolkOnlineAvailability, type OnlineEntryMode } from '../folk-duel/OnlineRoom';
 import { folkChatId } from '../folk-duel/online-protocol';
 import { FolkSoundEngine } from '../folk-duel/sfx';
 import { getSkinById } from '../folk-duel/skins-catalog';
@@ -35,9 +35,10 @@ type ScreenMode =
   | { kind: 'offline' }
   | { kind: 'online'; entry: OnlineEntryMode };
 
-export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false, isPaused }) => {
+export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = false, isPaused, registerRestart }) => {
   const [profile, setProfile] = useState<FolkProfileSave>(() => loadFolkProfile(bridge));
   const [screen, setScreen] = useState<ScreenMode>({ kind: 'home' });
+  const folkOnlineEnabled = useFolkOnlineAvailability('o-an-quan', screen.kind === 'home');
   const offline = useOfflineMatch(bridge, createInitialOaqState, isOaqOfflineState);
   const mode = offline.match?.mode;
   const botLevel = mode === 'bot_easy' ? 'easy' : mode === 'bot_hard' ? 'hard' : null;
@@ -46,6 +47,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
   };
   const [showShop, setShowShop] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  useFolkRestart(registerRestart, screen.kind === 'offline' && !showShop ? offline.restart : undefined);
 
   const mutedRef = useRef(isMuted);
   mutedRef.current = isMuted;
@@ -161,7 +163,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
           bridge={bridge}
           onProfileChange={setProfile}
           onExit={() => setScreen({ kind: 'home' })}
-          onRematch={() => startOffline(offline.match!.mode)}
+          onRematch={offline.restart}
         />
       )}
 
@@ -171,7 +173,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
           gameTitle="Ô Ăn Quan"
           mode={screen.entry}
           onExit={() => setScreen({ kind: 'home' })}
-          renderMatch={({ room, blocked, now, onAction, onRematch, onLeave }) => (
+          renderMatch={({ room, blocked, now, onAction, onRematch, onLeave, leaveDisabled }) => (
             <OaqMatchBoard
               mode={room.isPublic ? 'matchmaking' : 'friend_room'}
               key={room.matchId}
@@ -190,6 +192,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
               bridge={bridge}
               onProfileChange={setProfile}
               onExit={onLeave}
+              exitDisabled={leaveDisabled}
               onRematch={onRematch}
             />
           )}
@@ -238,13 +241,14 @@ interface OaqMatchBoardProps {
   bridge: GameComponentProps['bridge'];
   onProfileChange: (next: FolkProfileSave) => void;
   onExit: () => void;
+  exitDisabled?: boolean;
   onRematch?: () => void;
 }
 
 const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
   mode, matchId, mySeat, opponentName, botLevel, state, onLocalStateChange,
   paused = false, rewardReady = true, inputBlocked = false, externalMoveHandler, profile, sound, bridge,
-  onProfileChange, onExit, onRematch, chatMatchId,
+  onProfileChange, onExit, exitDisabled, onRematch, chatMatchId,
 }) => {
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
   const [bannerMsg, setBannerMsg] = useState('');
@@ -349,13 +353,14 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
       <div className="oaq-seat-score" role="group" aria-label={`Mẹt ${side}, ${tray.dan} sỏi, ${tray.quan} Quan, ${shown.scores[seat]} điểm`}>
         <b>{shown.scores[seat]}</b> <span>điểm</span>
       </div>
-      {seat === 'P1' && <button type="button" className="fd-btn-secondary oaq-exit" onClick={onExit}>Thoát</button>}
+      {seat === 'P1' && <button type="button" className="fd-btn-secondary oaq-exit" disabled={exitDisabled} onClick={onExit}>Thoát</button>}
     </div>;
   }
 
   const right = rightDirection(activeSeat);
   return (
-    <main className="fd-board-stage oaq-stage" data-oaq-playing={!!startingBoard}>
+    <main className="fd-board-stage oaq-stage" data-oaq-playing={!!startingBoard}
+      style={{ '--oaq-board-ratio': BOARD_W / BOARD_H } as React.CSSProperties}>
       {seatHud('P2')}
       <div className="fd-oaq-board" data-chat-protect="true">
         <canvas ref={canvasRef} width={BOARD_W} height={BOARD_H} className="fd-pixel-canvas" aria-hidden="true"/>
@@ -371,7 +376,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
       </div>
       {seatHud('P1')}
 
-      <div className="fd-controls-bar">
+      <div className="fd-controls-bar" data-chat-protect="true">
         {startingBoard ? (
           <>
             <p className="fd-status" role="status">{names[startingBoard.turn]} đang thực hiện lượt đi.</p>
@@ -396,7 +401,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
             />
             <div className="fd-btn-row">
               {onRematch && <button type="button" className="fd-btn-primary" onClick={onRematch}>Đấu Lại</button>}
-              <button type="button" className="fd-btn-secondary" onClick={onExit}>Về Sảnh Game</button>
+              <button type="button" className="fd-btn-secondary" disabled={exitDisabled} onClick={onExit}>Về Sảnh Game</button>
             </div>
           </div>
         )}

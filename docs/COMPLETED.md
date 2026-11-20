@@ -2,6 +2,12 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
+
+- PR 42 sửa vạch lực online, khung thấp, focus, Chơi lại offline và xác nhận bỏ cuộc. [QA](qa/FOLK-POLISH-2026-11-19.md).
+- FD-ON2 kiểm bật và thu hồi online từng game, mặc định tắt. 21 ca Folk Node/PGlite, SQL và hồi quy trình duyệt. [Kiểm tra](WORKLOG.md).
+- Ngày 20/11 anh bỏ test staging và duyệt phát hành launcher offline. [Nhật ký](WORKLOG.md).
+
 ## Folk và chat · merge/phát hành 19/11/2026
 
 - FD-L0/L1 có artwork, ván offline lưu/đấu lại và nhặt Chàm. Ô Ăn Quan thêm bốc/rải từng viên, mẹt và lịch sử hai ghế. Folk 12/12, UI 5/5. [Thẻ Folk](plans/FOLK-GAMES-PLAN.md), PR40/main `f154795` đã merge sau CI71, Netlify Published `6afe368bb6e8bc96958e23e5`. [Release](qa/FOLK-CHAT-RELEASE-2026-11-19.md).

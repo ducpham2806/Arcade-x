@@ -75,9 +75,8 @@ jobs:
           retention-days: 7
   verify:
     runs-on: ubuntu-latest
-    # Includes all-game motion plus per-game browser suites on the hosted Linux runner.
-    # Keep individual test assertions/timeouts unchanged; allow the full sequence to finish.
-    timeout-minutes: 30
+    # The hosted runner started the final Tank Clash browser suite after 29 minutes in CI #77.
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

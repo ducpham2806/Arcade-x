@@ -22,13 +22,16 @@ for(const mobile of [false,true])for(const reduced of [false,true])test(`Dungeon
  // A synthetic error event races with the game's real 5s autosave. Exercise an
  // actual failed envelope write, so every background retry sees the same fault.
  await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('button',{name:'Lưu tiến trình',exact:true}).click();
- const savedBefore=await page.evaluate(()=>localStorage.getItem('arcadex_save_v1_dungeon-tap'));expect(savedBefore).not.toBeNull();
- await page.evaluate(()=>{
+ const savedBefore=await page.evaluate(()=>{
+  // Read the latest successful save in the same task that blocks subsequent writes.
+  const saved=localStorage.getItem('arcadex_save_v1_dungeon-tap');
   const original=Storage.prototype.setItem;(window as any).__dungeonWriteFaults=0;
   Storage.prototype.setItem=function(key,value){if(this===localStorage&&key==='arcadex_save_v1_dungeon-tap'){(window as any).__dungeonWriteFaults++;throw new DOMException('Fixture quota failure','QuotaExceededError');}return original.call(this,key,value);};
   (window as any).__restoreDungeonStorage=()=>{Storage.prototype.setItem=original;};
+  return saved;
  });
  try{
+  expect(savedBefore).not.toBeNull();
   // Change real gameplay first: otherwise save deduplication can skip the write.
   await page.locator('.fx-main-attack').dispatchEvent('pointerdown',{pointerId:1});await page.locator('.fx-main-attack').dispatchEvent('pointerup',{pointerId:1});
   await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('button',{name:'Lưu tiến trình',exact:true}).click();
