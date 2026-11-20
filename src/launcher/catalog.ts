@@ -3,13 +3,14 @@ import type { GameMetadata } from '../types';
 import { SNAKE_GAME_ID } from '../games/snake-legend/catalog-mode';
 export type CatalogGame = GameMetadata & { availability: 'published' | 'maintenance'; accessModel: 'free' | 'premium'; supportsOffline: boolean; featured: boolean; sortOrder: number; deviceOnly?: boolean; folkOnlineEnabled?: boolean };
 const snakeCatalogBuild=!!GAME_REGISTRY[SNAKE_GAME_ID]?.offlinePackage;
-export const BUNDLED_FREE_GAME_IDS=snakeCatalogBuild?[SNAKE_GAME_ID,'word-chain','tank-clash']:['word-chain','tank-clash'];
+const publicOfflineGameIds=['word-chain','tank-clash','o-an-quan','nhay-lo-co'];
+export const BUNDLED_FREE_GAME_IDS=snakeCatalogBuild?[SNAKE_GAME_ID,...publicOfflineGameIds]:publicOfflineGameIds;
 export const isBundledFreeGame=(id:string)=>BUNDLED_FREE_GAME_IDS.includes(id);
-export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker','o-an-quan','nhay-lo-co'];
+export const LOCAL_REVIEW_GAME_IDS=['battleship','boom-buddies','brick-breaker'];
 export const isDeviceLibraryGame=(id:string)=>isBundledFreeGame(id)||isLocalReviewGame(id);
 export const isLocalReviewGame=(id:string)=>import.meta.env.DEV&&LOCAL_REVIEW_GAME_IDS.includes(id);
 export type Catalog = { schemaVersion: 1; games: CatalogGame[]; commerceEnabled: boolean; support: { enabled: boolean; bankName?: string; account?: string; beneficiary?: string; message?: string } };
-export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,...(isBundledFreeGame(game.id)?{deviceOnly:true}:{}),availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:['word-chain','tank-clash','battleship','boom-buddies','brick-breaker','rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };
+export const bundledCatalog: Catalog = { schemaVersion: 1, commerceEnabled: false, support: { enabled: false }, games: ALL_GAMES_LIST.map((game, i) => ({...game,...(isBundledFreeGame(game.id)?{deviceOnly:true}:{}),availability:'published',accessModel:'free',supportsOffline:!['caro-gomoku','chess','xiangqi'].includes(game.id),featured:[...publicOfflineGameIds,'battleship','boom-buddies','brick-breaker','rainbow-blocks','hex-match','tile-2048','blocker','car-escape'].includes(game.id),sortOrder:i})) };
 // Database metadata can select a bundled engine, never execute remote JavaScript.
 export function parseCatalog(raw: any, live = false): Catalog | null {
   if (raw?.schemaVersion !== 1 || !Array.isArray(raw.games)) return null;

@@ -16,7 +16,7 @@ Mốc nguồn main9061bfd: PR21 đã merge sau fullCI36; Netlify Published đún
 | 3 | Chess/Xiangqi/Caro | DU-R0 staging; DU-R1 tích hợp UI từng game; DU-R2 hai tài khoản thật. Có engine server, chưa cutover UI | [Duel](plans/DUEL.md) |
 | 5 | Battleship và game đã tích hợp | GP-R0 xác minh lại khoảng trống QA từ báo cáo cũ; GP-R1 polish theo lỗi tái hiện; GP-R2 Rainbow/Chronicles chỉ khi chọn mở phạm vi | [QA và hoàn thiện game](plans/GAME-POLISH.md) |
 | Riêng | Commerce/thuê game | CM1→CM4: staging quyền → DB/admin → payment → restore/pilot. WAITING runtime/provider/admin; giữ checkout tắt | [Commerce](plans/COMMERCE.md) |
-| Đã merge · QA online | Nhảy Lò Cò / Ô Ăn Quan | PR40/mainf154795 đã Published. Offline public, online staging và hai tài khoản để anh kiểm sau | [Folk Duel](plans/FOLK-GAMES-PLAN.md) |
+| Phát hành launcher | Nhảy Lò Cò / Ô Ăn Quan | PR42 bổ sung catalog offline đóng gói. Anh duyệt merge và bỏ test staging 20/11 | [Folk Duel](plans/FOLK-GAMES-PLAN.md) |
 | Đã merge · QA trận | Bubble toàn sảnh/game và chat trận | PR38 vào main qua PR40/fullCI71. Bubble public; chat Trận còn nghiệm thu hai tài khoản staging | [Bảo trì · CHAT](plans/MAINTENANCE.md) |
 | Duy trì | Test/art/docs/nợ kỹ thuật | MT1 test cũ, MT2 banner/art, MT3 phòng dùng chung, MT4 dung lượng Git. Không rewrite/LFS khi chưa duyệt | [Bảo trì](plans/MAINTENANCE.md) |
 

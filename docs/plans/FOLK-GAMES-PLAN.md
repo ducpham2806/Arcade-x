@@ -40,7 +40,7 @@ Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 - Bốn mục QA đã sửa trên `codex/folk-qa-20261119`. [Báo cáo sửa và kiểm lại](../qa/FOLK-POLISH-2026-11-19.md). FD-ON2 còn nghiệm thu hai tài khoản staging, thiết bị và latency thật.
 - PR 42 thêm hộp xác nhận trước khi rời ván online đang đếm ngược hoặc đang chơi. Hủy xác nhận tiếp tục ván. Gửi lại khi mất phản hồi dùng cùng ID rời trận. [Nhật ký](../WORKLOG.md).
 
-## FD-ON2 · WAITING duyệt hai game
+## FD-ON2 · phát hành hai game offline
 
 - PR 42 có công tắc catalog riêng cho từng game, mặc định tắt. Đã kiểm bật, thu hồi và lưu offline trong môi trường giả lập. Preview Vite cổng 4335 trỏ staging, dành cho lượt chơi bằng hai tài khoản, điện thoại và mạng thật của anh.
-- [Phiếu nghiệm thu và quy trình bật/thu hồi](../qa/FOLK-ON2-2026-11-19.md). Chạy CI đúng commit ứng viên và đợi duyệt từng game trước merge.
+- Ngày 20/11 anh yêu cầu bỏ test staging và merge PR 42 để phát hành hai game trên launcher. Catalog đóng gói cung cấp bản offline cả khi catalog cloud thiếu hàng. Chạy CI trên đúng commit trước merge và kiểm phát hành Netlify. Online công khai theo đợt backend riêng. [Phiếu nghiệm thu và quy trình bật/thu hồi](../qa/FOLK-ON2-2026-11-19.md).
