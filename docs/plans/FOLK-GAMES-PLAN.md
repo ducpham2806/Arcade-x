@@ -44,6 +44,6 @@ Kế hoạch cập nhật ngày 20/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 - PR 42 có công tắc catalog riêng cho từng game, mặc định tắt. Đã kiểm bật, thu hồi và lưu offline trong môi trường giả lập. Preview Vite cổng 4335 trỏ staging, dành cho lượt chơi bằng hai tài khoản, điện thoại và mạng thật của anh.
 - Ngày 20/11 anh yêu cầu bỏ test staging và merge PR 42 để phát hành hai game trên launcher. Catalog đóng gói cung cấp bản offline khi catalog cloud thiếu hàng. CI #80 qua và Netlify đã Published. [Phiếu nghiệm thu và quy trình bật/thu hồi](../qa/FOLK-ON2-2026-11-19.md).
 
-## Backend production · 20/11/2026
+## Backend và online production · 20/11/2026
 
-- Edge v1 từ `main@932db80`, schema riêng, cột catalog và cron 10 giây đã triển khai. Tick trả 200, khách của hai game trả 401. Online công khai vẫn tắt và trận production hai tài khoản chưa thử. [Nhật ký](../WORKLOG.md).
+- Đã mở online công khai cho cả hai game. API catalog và quyền chơi miễn phí, offline đã kiểm. Edge v1 từ `main@932db80`, cron 10 giây trả 200, khách trả 401. Trận production hai tài khoản chưa thử. [Nhật ký](../WORKLOG.md).

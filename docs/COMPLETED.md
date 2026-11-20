@@ -2,11 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Folk · backend production · 20/11/2026
+## Folk · backend và online production · 20/11/2026
 
 - Supabase Arcade-x `whjatkhhupeqfngakmee` đã có schema, cột catalog, Edge v1 và cron 10 giây từ `main@932db80`.
 - Đối chiếu mã Edge và quyền năm RPC. Tick thật trả 200, khách của hai game trả 401. 21 ca Folk và SQL PGlite qua.
-- Online vẫn tắt trong catalog. Trận production hai tài khoản chưa thử. [Nhật ký và phiên bản migration](WORKLOG.md).
+- Đã mở online công khai cho cả hai game. API catalog production xác nhận online bật và offline khả dụng. Trận production hai tài khoản chưa thử. [Nhật ký và phiên bản migration](WORKLOG.md).
 
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 

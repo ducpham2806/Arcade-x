@@ -2,11 +2,12 @@
 
 Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLOG-2026-11-19-before-fd-on2.md).
 
-## 20/11/2026 · backend production Folk
+## 20/11/2026 · backend và online production Folk
 
 - Theo phạm vi anh duyệt, dùng bản `main@932db80` trên Supabase Arcade-x `whjatkhhupeqfngakmee`. Hai migration production là `20261120023641 folk_duel_room_schema` và `20261120023657 folk_online_catalog`. Migration catalog chạy đúng nội dung file `20261119154045_folk_online_catalog.sql` trong repo.
 - Bốn bảng có RLS. Năm RPC chỉ cấp EXECUTE cho `service_role`. Edge `folk-duel-room` v1 ACTIVE, mã khớp main. Cron job 4 dùng token Vault. Năm lượt cron liên tiếp cách nhau 10 giây, đều trả HTTP 200. Hai ca khách trả 401. 21 ca Folk và SQL PGlite qua.
-- Catalog có 0 hàng Folk bật online. Chưa chạy trận production bằng hai tài khoản. Bàn giao trên `codex/folk-production-backend-20261120` theo Game Release & LiveOps, vai trò Release Lead. [Edge production](https://supabase.com/dashboard/project/whjatkhhupeqfngakmee/functions/folk-duel-room).
+- Theo yêu cầu của anh, lúc 09:50 GMT+7 thêm đúng hai hàng `published` với online bật. Dùng metadata từ registry, giữ miễn phí, offline và vị trí đầu cụm catalog cloud. API production trả cờ online và offline đều đúng, quyền chơi miễn phí, khách vào phòng trả 401. Playwright cục bộ qua 3/3 ca phòng và catalog. Trận production hai tài khoản chưa thử.
+- Bàn giao trên `codex/folk-production-backend-20261120` theo Game Release & LiveOps, vai trò Release Lead. [Edge production](https://supabase.com/dashboard/project/whjatkhhupeqfngakmee/functions/folk-duel-room).
 
 ## 19–20/11/2026 · FD-ON2 và phát hành launcher
 
