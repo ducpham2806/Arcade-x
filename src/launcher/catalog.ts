@@ -19,11 +19,20 @@ export function parseCatalog(raw: any, live = false): Catalog | null {
     const base = GAME_REGISTRY[row?.engine_key];
     if (!base || (snakeCatalogBuild && base.id===SNAKE_GAME_ID) || row.id !== base.id || seen.has(row.id) || !['published','maintenance'].includes(row.status) || !['free','premium'].includes(row.access_model)) return [];
     seen.add(row.id);
-    return [{...base,title:['hex-match','neon-runner'].includes(base.id)?base.title:typeof row.title==='string'?row.title.slice(0,100):base.title,
-      shortDesc:['hex-match','neon-runner'].includes(base.id)?base.shortDesc:typeof row.short_description==='string'?row.short_description.slice(0,500):base.shortDesc,
+    const folkOnlineEnabled=live && row.status==='published' && row.folk_online_enabled===true && (base.id==='o-an-quan' || base.id==='nhay-lo-co');
+    const isOaq=base.id==='o-an-quan', onlineOaq=isOaq&&folkOnlineEnabled;
+    const detail=onlineOaq?{
+      description:`${base.description} Có thể ghép trận online 1vs1 hoặc mời bạn bằng mã phòng 6 ký tự.`,
+      tags:[...base.tags,'Online','Mã phòng'],
+    }:{};
+    const fallbackShortDesc=onlineOaq?'Đấu trí rải sỏi · Đấu bot, 2 người chung máy hoặc ghép trận online':base.shortDesc;
+    // Cached and disabled rows can contain outdated Ô Ăn Quan online copy.
+    const bundledShortDesc=['hex-match','neon-runner'].includes(base.id)||(isOaq&&!onlineOaq);
+    return [{...base,...detail,title:['hex-match','neon-runner'].includes(base.id)?base.title:typeof row.title==='string'?row.title.slice(0,100):base.title,
+      shortDesc:!bundledShortDesc&&typeof row.short_description==='string'?row.short_description.slice(0,500):fallbackShortDesc,
       category:['Arcade','Puzzle','Action','Reflex','Multiplayer'].includes(row.category)?row.category:base.category,
       availability:row.status,accessModel:row.access_model,supportsOffline:row.supports_offline===true,featured:row.featured===true,sortOrder:Number.isFinite(row.sort_order)?row.sort_order:100,
-      folkOnlineEnabled:live && row.status==='published' && row.folk_online_enabled===true && (base.id==='o-an-quan' || base.id==='nhay-lo-co')}];
+      folkOnlineEnabled}];
   }).sort((a:CatalogGame,b:CatalogGame)=>a.sortOrder-b.sortOrder || a.id.localeCompare(b.id));
   // Add approved free releases absent from an older cloud catalog. Explicit rows
   // retain their access/maintenance policy and never receive the device bypass.
