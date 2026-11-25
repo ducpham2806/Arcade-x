@@ -1,3 +1,4 @@
+import { BOARD_TERRAIN_NAMES, type TerrainId } from '../duel/BoardTerrain';
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { INITIAL_XIANGQI_BOARD, PIECE_SYMBOLS, isKingInCheck, type BoardMatrix, type PieceColor, type PieceType, type XiangqiPiece } from './rules';
 import { usePieceMotion } from '../duel/usePieceMotion';
@@ -125,10 +126,11 @@ interface Props {
   paused: boolean;
   motionEnabled: boolean;
   classic?: boolean;
+  terrain?: TerrainId<'xiangqi'>;
   onCell: (row: number, column: number) => void;
 }
 
-export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, motionEnabled, classic = false, onCell }: Props) {
+export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, motionEnabled, classic = false, terrain = 'river', onCell }: Props) {
   const previous = useRef(board);
   const { moving, capture, play, stop } = usePieceMotion<Move>();
   const [focusIndex, setFocusIndex] = useState(9 * 9 + 4);
@@ -168,8 +170,8 @@ export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPiece
 
   const captureInFlight = capture?.victim;
   return (
-    <div className={classic ? "xqb xqb-classic" : "xqb"} data-chat-protect="true">
-      <div className="xqb-title">{classic ? "Bàn cổ điển" : "Bến Sông Sở Hán"}</div>
+    <div className={classic ? "xqb xqb-classic" : "xqb"} data-board-terrain={classic ? "classic" : terrain} data-chat-protect="true">
+      <div className="xqb-title">{classic ? "Bàn cổ điển" : BOARD_TERRAIN_NAMES.xiangqi[terrain]}</div>
       <Tray color="b" captured={captured.b.filter(piece => piece.id !== captureInFlight?.id)} classic={classic} vnPieces={vnPieces}/>
       <div className="xqb-board">
         <div className="xqb-lines" aria-hidden="true">

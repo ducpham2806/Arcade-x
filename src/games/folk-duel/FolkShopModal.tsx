@@ -15,12 +15,13 @@ interface FolkShopModalProps {
   bridge?: GameBridgeAPI;
   onProfileChange: (next: FolkProfileSave) => void;
   onClose: () => void;
+  renderPreview?: (item: SkinItemDef) => React.ReactNode;
 }
 
 const CATEGORY_TABS: { id: SkinCategory; label: string; game: FolkGameKind }[] = [
-  { id: 'oaq_stones', label: 'Quân & Quan', game: 'o-an-quan' },
-  { id: 'oaq_board', label: 'Sân & Bàn Cờ', game: 'o-an-quan' },
-  { id: 'oaq_hand', label: 'Tay & Mẹt', game: 'o-an-quan' },
+  { id: 'oaq_stones', label: 'Quân đội', game: 'o-an-quan' },
+  { id: 'oaq_board', label: 'Chiến trường', game: 'o-an-quan' },
+  { id: 'oaq_hand', label: 'Khay & Cờ', game: 'o-an-quan' },
   { id: 'nlc_double_tile', label: 'Ô Gạch Đôi', game: 'nhay-lo-co' },
   { id: 'nlc_court', label: 'Bàn Chơi & Ngõ', game: 'nhay-lo-co' },
   { id: 'nlc_cham', label: 'Chàm & Dấu Nhà', game: 'nhay-lo-co' },
@@ -131,6 +132,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
   bridge,
   onProfileChange,
   onClose,
+  renderPreview,
 }) => {
   const dialog = useDialogFocus(onClose);
   const tabs = CATEGORY_TABS.filter((t) => t.game === game);
@@ -152,6 +154,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
   }, [activeTab]);
 
   useEffect(() => {
+    if (renderPreview) return;
     let raf = 0;
     let tick = 0;
     const loop = () => {
@@ -163,7 +166,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [selectedItem]);
+  }, [selectedItem, renderPreview]);
 
   const handleBuyCandy = () => {
     const res = purchaseSkinWithCandy(profile, selectedItem.id, bridge);
@@ -188,7 +191,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
       <section ref={dialog} role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="fd-shop-title" className="fd-modal-shell">
         <header className="fd-modal-header">
           <div>
-            <h2 id="fd-shop-title">Tiệm Tạp Hóa Cổng Trường</h2>
+            <h2 id="fd-shop-title">{renderPreview ? 'Kho trang phục' : 'Tiệm Tạp Hóa Cổng Trường'}</h2>
             <p className="fd-subtitle">Đổi Kẹo Mạch Nha lấy Skin Pixel cho {game === 'o-an-quan' ? 'Ô Ăn Quan' : 'Nhảy Lò Cò'}</p>
           </div>
           <div className="fd-wallet-pill">
@@ -214,7 +217,7 @@ export const FolkShopModal: React.FC<FolkShopModalProps> = ({
 
         <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar fd-shop-body">
           <div className="fd-shop-preview-card">
-            <canvas ref={canvasRef} width={180} height={108} className="fd-pixel-canvas" />
+            {renderPreview ? renderPreview(selectedItem) : <canvas ref={canvasRef} width={180} height={108} className="fd-pixel-canvas" />}
             <div className="fd-preview-meta">
               <div className="fd-rarity-badge" data-rarity={selectedItem.rarity}>
                 {RARITY_LABELS[selectedItem.rarity]}

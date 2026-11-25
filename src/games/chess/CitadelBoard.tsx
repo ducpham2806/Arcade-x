@@ -1,3 +1,4 @@
+import { BOARD_TERRAIN_NAMES, type TerrainId } from '../duel/BoardTerrain';
 import { Chess, type Color, type Move, type PieceSymbol, type Square } from 'chess.js';
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { acceptedCitadelMove, citadelRookMove, citadelVictimSquare, replayCitadelCaptures } from './citadelMoves';
@@ -112,10 +113,11 @@ interface Props {
   paused?: boolean;
   motionEnabled: boolean;
   classic?: boolean;
+  terrain?: TerrainId<'chess'>;
   onSquare: (square: Square) => void;
 }
 
-export function CitadelBoard({ fen, history, initialFen, orientation, selected, legal, pending, paused, motionEnabled, classic = false, onSquare }: Props) {
+export function CitadelBoard({ fen, history, initialFen, orientation, selected, legal, pending, paused, motionEnabled, classic = false, terrain = 'citadel', onSquare }: Props) {
   const engine = useMemo(() => new Chess(fen), [fen]);
   const captured = useMemo(() => replayCitadelCaptures(history, fen, initialFen), [history, fen, initialFen]);
   const previous = useRef(fen);
@@ -157,9 +159,9 @@ export function CitadelBoard({ fen, history, initialFen, orientation, selected, 
   const rook = move && citadelRookMove(move);
   const upper = opposite(orientation);
   return (
-    <section className={classic ? "citadel citadel-classic" : "citadel"} data-chat-protect="true" aria-label={classic ? "Bàn Cờ vua cổ điển" : "Bàn Thành Trì Huyền Thuật"}>
+    <section className={classic ? "citadel citadel-classic" : "citadel"} data-board-terrain={classic ? "classic" : terrain} data-chat-protect="true" aria-label={classic ? "Bàn Cờ vua cổ điển" : "Bàn Thành Trì Huyền Thuật"}>
       <div className="citadel-heading">
-        <strong>{classic ? "Bàn cổ điển" : "Chính Điện Đá"}</strong>
+        <strong>{classic ? "Bàn cổ điển" : BOARD_TERRAIN_NAMES.chess[terrain]}</strong>
         <span>{engine.isCheckmate() ? 'Chiếu bí' : checked ? 'Đang chiếu' : history.at(-1) || ''}</span>
       </div>
       <Tray owner={upper} pieces={showTray(upper)} classic={classic}/>

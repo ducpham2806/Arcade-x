@@ -56,6 +56,7 @@ import {
 } from './rules';
 import { botMove } from '../duel/aiClient';
 import { BattlefieldBoard } from './BattlefieldBoard';
+import { BoardTerrainPicker, useBoardTerrain } from '../duel/BoardTerrain';
 import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
 
 type XiangqiPlayMode = 'lobby' | 'online' | 'ai' | 'local_hotseat';
@@ -97,6 +98,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     catch { return true; }
   });
   const boardMotion = useBoardMotion('xiangqi');
+  const boardTerrain = useBoardTerrain('xiangqi', 'river');
   const [vnPieces,setVnPieces]=useState(()=>localStorage.getItem('arcadex_xiangqi_vn')==='1');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('hard');
   const [aiBoard, setAiBoard] = useState<BoardMatrix>(INITIAL_XIANGQI_BOARD);
@@ -713,6 +715,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
       <div className="flex flex-wrap items-center justify-center gap-2">
         <BoardMotionToggle {...boardMotion} className="rounded-lg bg-slate-800 p-2 text-sm text-white"/>
+        {battlefield && <BoardTerrainPicker {...boardTerrain} className="min-h-[40px] max-w-full rounded-lg bg-slate-800 p-2 text-sm text-white"/>}
         <button type="button" className="rounded-lg bg-slate-800 p-2 text-sm text-white" aria-pressed={battlefield}
           onClick={() => {
             const next = !battlefield;
@@ -910,7 +913,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
           <BattlefieldBoard key={`${playMode}:${activeRoomId ?? ''}`} board={currentBoard}
             selected={selectedPos} pending={pendingDest} legalMoves={legalMoves}
             vnPieces={vnPieces} paused={Boolean(isPaused || isReviewingBoard)} classic={!battlefield}
-            motionEnabled={boardMotion.enabled} onCell={handleCellClick}/>
+            terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} onCell={handleCellClick}/>
 
             {selectedPos && pendingDest && !isMatchEnded && (
               <div className="w-full max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">

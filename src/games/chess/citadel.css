@@ -259,3 +259,45 @@
 .citadel-classic .citadel-pending { box-shadow: inset 0 0 0 3px #92efff; }
 .citadel-classic .citadel-check { box-shadow: inset 0 0 0 3px #e85461; }
 .citadel-statue { background: none; }
+
+.citadel[data-board-terrain="ice"] {
+  --citadel-ground: url('/games/chess/citadel/ice.webp');
+  --citadel-base: #4c708e;
+  --citadel-light: #b9d7dfd9;
+  --citadel-dark: #446782ba;
+  background: linear-gradient(155deg, #2f495f, #162334);
+  border-color: #87aebf;
+}
+.citadel[data-board-terrain="desert"] {
+  --citadel-ground: url('/games/chess/citadel/desert.webp');
+  --citadel-base: #98683c;
+  --citadel-light: #e9bd7ad6;
+  --citadel-dark: #87623dbb;
+  background: linear-gradient(155deg, #61462a, #242027);
+  border-color: #c39c63;
+}
+.citadel[data-board-terrain="lava"] {
+  --citadel-ground: url('/games/chess/citadel/lava.webp');
+  --citadel-base: #59322e;
+  --citadel-light: #966559d9;
+  --citadel-dark: #422d44c4;
+  background: linear-gradient(155deg, #552b2a, #261e33);
+  border-color: #ba7966;
+}
+.citadel:is([data-board-terrain="ice"], [data-board-terrain="desert"], [data-board-terrain="lava"]) .citadel-stage {
+  background: var(--citadel-base) var(--citadel-ground) center / 100% 100%;
+}
+.citadel-stage:where(.citadel:is([data-board-terrain="ice"], [data-board-terrain="desert"], [data-board-terrain="lava"]) *) .citadel-square {
+  isolation: isolate;
+}
+.citadel-stage:where(.citadel:is([data-board-terrain="ice"], [data-board-terrain="desert"], [data-board-terrain="lava"]) *) .citadel-square::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: var(--citadel-tile);
+}
+.citadel-square[data-tone="light"] { --citadel-tile: var(--citadel-light); }
+.citadel-square[data-tone="dark"] { --citadel-tile: var(--citadel-dark); }
+.citadel-square:is(.citadel-last, .citadel-selected, .citadel-check, .citadel-pending)::before { opacity: .35; }

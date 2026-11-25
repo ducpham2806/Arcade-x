@@ -108,3 +108,28 @@
   .oaq-stage .fd-controls-bar { grid-area: controls; align-self: start; gap: 6px; }
   .oaq-stage .fd-controls-bar > button { padding-inline: 10px; }
 }
+
+.oaq-board-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.oaq-board-options > * { min-height: 40px; max-width: 100%; }
+.oaq-stage:not([data-oaq-terrain="classic"]) .oaq-seat[data-folk-seat="P1"] {
+  --oaq-seat-accent: #ffbd8a;
+  --oaq-seat-surface: #452621;
+}
+.oaq-stage:not([data-oaq-terrain="classic"]) .oaq-seat-mark { border-radius: 6px 6px 10px 10px; }
+.oaq-stage[data-oaq-terrain="desert"] .fd-oaq-board { border-color: #d9a96b; }
+.oaq-stage[data-oaq-terrain="mountain"] .fd-oaq-board { border-color: #95a7a9; }
+.oaq-stage[data-oaq-terrain="fortress"] .fd-oaq-board { border-color: #c58d75; }
+
+.oaq-campaign-intro {
+  border-color: #bb905c;
+  background:
+    linear-gradient(95deg, #261713f5 34%, #261713b9 72%, #26171350),
+    url('/games/o-an-quan/campaign/terrains.webp') left top / 200% 100%;
+}

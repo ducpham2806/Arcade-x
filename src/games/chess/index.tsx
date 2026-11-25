@@ -42,6 +42,7 @@ import { MatchEndModal, MatchEndReviewBar, MatchEndPlayerInfo } from '../../comp
 import { CHESS_ACHIEVEMENTS } from './config';
 import { botMove } from '../duel/aiClient';
 import { CitadelBoard, CitadelPiece, CITADEL_NAMES } from './CitadelBoard';
+import { BoardTerrainPicker, useBoardTerrain } from '../duel/BoardTerrain';
 import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
 
 // Standard Unicode Chess Pieces with Wizard's Chess Lore Names
@@ -374,6 +375,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   });
 
   const boardMotion = useBoardMotion('chess');
+  const boardTerrain = useBoardTerrain('chess', 'citadel');
 
   // Modals for Draw / Surrender / Match End
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
@@ -1136,6 +1138,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
                 <div className="flex flex-wrap items-center justify-end gap-2">
                   <BoardMotionToggle {...boardMotion} className="min-h-[40px] rounded-xl border border-amber-700 bg-slate-800/80 px-2 text-xs text-amber-100"/>
+                  {citadel && <BoardTerrainPicker {...boardTerrain} className="min-h-[40px] max-w-full rounded-xl border border-amber-700 bg-slate-800 px-2 text-xs text-amber-100"/>}
                   <button type="button" aria-pressed={citadel}
                     className="min-h-[40px] rounded-xl border border-amber-700 bg-slate-800/80 px-2 text-xs text-amber-100"
                     onClick={() => {
@@ -1211,7 +1214,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                 <CitadelBoard key={activeRoomId ?? 'practice'} fen={fen} history={moveHistory}
                   orientation={myColor} selected={selectedSquare} legal={legalMovesFromSelected}
                   pending={pendingTargetSquare} paused={Boolean(isPaused || isReviewingBoard)}
-                  motionEnabled={boardMotion.enabled} classic={!citadel} onSquare={handleSquareClick}/>
+                  terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} classic={!citadel} onSquare={handleSquareClick}/>
 
                 <AnimatePresence>
                   {pendingPromotion && (

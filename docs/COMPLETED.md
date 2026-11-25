@@ -2,11 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Bàn thử Cờ vua và Cờ tướng · 25/11/2026
+## Ba bàn cờ chiến trường · 25/11/2026
 
-- Cờ tướng Bến Sông Sở Hán, 14 sprite pixel full-body mới, Pháo qua ngòi và khay quân ăn. [QA](qa/XIANGQI-BATTLEFIELD-2026-11-25.md).
-- Cờ vua Chính Điện Đá, 12 sprite pixel full-body, nhập thành hai quân, bắt qua đường, phong cấp và khay SAN. [QA](qa/CHESS-CITADEL-2026-11-25.md).
-- Hai mẫu có HTML chơi offline, đổi giao diện và công tắc chuyển động riêng từng game. [QA chuyển động](qa/DUEL-PIECE-MOTION-2026-11-25.md). Còn duyệt art, thiết bị thật và hai tài khoản.
+- Ô Ăn Quan có 4 chiến trường, Sân Đình, hai phe lính giáo và Tướng cưỡi ngựa, kho trang phục dùng ví Kẹo cũ. Điểm nhảy theo thời điểm từng quân về khay.
+- Cờ vua có 12 quân pixel, Cờ tướng có 14. Mỗi game có 4 địa hình và bàn cổ điển. Cả ba có công tắc chuyển động độc lập và bản HTML offline.
+- Nhánh `codex/three-board-games-polish`. [QA bản thử](qa/THREE-BOARD-GAMES-2026-11-25.md). Thiết bị thật và PvP hai tài khoản chờ nghiệm thu.
 
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 

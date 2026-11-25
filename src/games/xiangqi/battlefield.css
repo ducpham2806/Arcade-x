@@ -353,3 +353,25 @@
 .xqb-token-r { color: #9f2225; background-image: url('/games/xiangqi/art/token-red.webp'); }
 .xqb-token-b { color: #1a1a1a; background-image: url('/games/xiangqi/art/token-black.webp'); }
 .xqb-prisoner .xqb-token { font-size: .48rem; }
+
+.xqb[data-board-terrain="gate"] {
+  --xqb-ground: url('/games/xiangqi/battlefield/gate.webp');
+  --xqb-base: #976247;
+  background: linear-gradient(155deg, #4d2922, #192020 68%, #452720);
+  border-color: #a8755b;
+}
+.xqb[data-board-terrain="mountain"] {
+  --xqb-ground: url('/games/xiangqi/battlefield/mountain.webp');
+  --xqb-base: #8d9290;
+  background: linear-gradient(155deg, #40505a, #1a2326 68%, #303e40);
+  border-color: #889997;
+}
+.xqb[data-board-terrain="desert"] {
+  --xqb-ground: url('/games/xiangqi/battlefield/desert.webp');
+  --xqb-base: #bd955a;
+  background: linear-gradient(155deg, #53422b, #1f2625 68%, #46352a);
+  border-color: #af8c59;
+}
+.xqb:is([data-board-terrain="gate"], [data-board-terrain="mountain"], [data-board-terrain="desert"]) .xqb-board {
+  background: var(--xqb-base) var(--xqb-ground) center / 100% 100%;
+}

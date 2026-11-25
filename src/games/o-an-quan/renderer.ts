@@ -1,6 +1,7 @@
 import { readableCanvasText } from '../../accessibility/canvasText';
 import { getSkinById } from '../folk-duel/skins-catalog';
 import type { EquippedFolkSkins, FolkSeat } from '../folk-duel/types';
+import { campaignFormation, drawCampaignGround, drawCampaignUnit, oppositeSeat, type OaqBattlefield } from './battlefield';
 import { cellTotalStones, getOaqTray, type OaqState } from './rules';
 
 export interface OaqCellRect {
@@ -98,7 +99,7 @@ export function drawSingleStone(
   ctx.fillRect(Math.round(x - r * 0.45), Math.round(y - r * 0.45), isQuan ? 4 : 2, isQuan ? 4 : 2);
 }
 
-function drawTray(ctx: CanvasRenderingContext2D, state: OaqState, seat: FolkSeat, skins: EquippedFolkSkins) {
+function drawTray(ctx: CanvasRenderingContext2D, state: OaqState, seat: FolkSeat, skins: EquippedFolkSkins, field?: OaqBattlefield) {
   const { x, y, w, h } = getOaqTrayRect(seat);
   const stones = getOaqTray(state, seat);
   const hand = getSkinById(skins.oaq_hand).palette;
@@ -125,19 +126,25 @@ function drawTray(ctx: CanvasRenderingContext2D, state: OaqState, seat: FolkSeat
   ctx.stroke();
   ctx.globalAlpha = 1;
   for (let i = 0; i < Math.min(16, stones.dan); i++) {
-    drawSingleStone(ctx, x + 101 + (i % 8) * 15 + Math.floor(i / 8) * 5, y + 13 + Math.floor(i / 8) * 12, 5.3, false, stone);
+    const sx = x + 101 + (i % 8) * 15 + Math.floor(i / 8) * 5;
+    const sy = y + 13 + Math.floor(i / 8) * 12;
+    if (field?.units) drawCampaignUnit(ctx, field.units, oppositeSeat(seat), sx, sy, 15);
+    else drawSingleStone(ctx, sx, sy, 5.3, false, stone);
   }
   for (let i = 0; i < stones.quan; i++) {
-    drawSingleStone(ctx, x + 235 + i * 22, y + 18, 9, true, stone);
+    const sx = x + 235 + i * 22;
+    if (field?.units) drawCampaignUnit(ctx, field.units, oppositeSeat(seat), sx, y + 18, 24, true);
+    else drawSingleStone(ctx, sx, y + 18, 9, true, stone);
   }
   ctx.font = '700 18px system-ui';
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
   ctx.fillStyle = OAQ_SEAT_COLOR[seat];
-  readableCanvasText(ctx, seat === 'P1' ? 'Mẹt 1' : 'Mẹt 2', x + 11, y + h / 2);
+  readableCanvasText(ctx, field ? (seat === 'P1' ? 'Trại 1' : 'Trại 2') : (seat === 'P1' ? 'Mẹt 1' : 'Mẹt 2'), x + 11, y + h / 2);
   ctx.textAlign = 'right';
   ctx.fillStyle = '#fff5df';
-  readableCanvasText(ctx, stones.quan ? `${stones.dan} sỏi · ${stones.quan} Q` : `${stones.dan} sỏi`, x + w - 10, y + h / 2);
+  const unit = field ? 'lính' : 'sỏi';
+  readableCanvasText(ctx, stones.quan ? `${stones.dan} ${unit} · ${stones.quan} Q` : `${stones.dan} ${unit}`, x + w - 10, y + h / 2);
   ctx.restore();
 }
 
@@ -147,7 +154,8 @@ export function renderOAnQuanBoard(
   skins: EquippedFolkSkins,
   selectedCell: number | null,
   previewCells: number[] = [],
-  trayState = state
+  trayState = state,
+  field?: OaqBattlefield
 ) {
   ctx.imageSmoothingEnabled = false;
   const boardSkin = getSkinById(skins.oaq_board);
@@ -156,14 +164,16 @@ export function renderOAnQuanBoard(
   // 1. Nền sân đình / bàn gỗ / chiếu cói
   ctx.fillStyle = boardSkin.palette.outline;
   ctx.fillRect(0, 0, BOARD_W, BOARD_H);
-  ctx.fillStyle = boardSkin.palette.secondary;
-  ctx.fillRect(0, TABLE_TOP, BOARD_W, TABLE_H);
-
-  // Họa tiết gạch tàu / vân gỗ pixel
-  ctx.fillStyle = boardSkin.palette.primary;
-  for (let gx = 8; gx < BOARD_W - 8; gx += 40) {
-    for (let gy = TABLE_TOP + 8; gy < TABLE_TOP + TABLE_H - 26; gy += 28) {
-      ctx.fillRect(gx, gy, 36, 24);
+  if (field) {
+    drawCampaignGround(ctx, field, 0, TABLE_TOP, BOARD_W, TABLE_H);
+  } else {
+    ctx.fillStyle = boardSkin.palette.secondary;
+    ctx.fillRect(0, TABLE_TOP, BOARD_W, TABLE_H);
+    ctx.fillStyle = boardSkin.palette.primary;
+    for (let gx = 8; gx < BOARD_W - 8; gx += 40) {
+      for (let gy = TABLE_TOP + 8; gy < TABLE_TOP + TABLE_H - 26; gy += 28) {
+        ctx.fillRect(gx, gy, 36, 24);
+      }
     }
   }
 
@@ -179,7 +189,7 @@ export function renderOAnQuanBoard(
       ? 'rgba(251, 191, 36, 0.26)'
       : isPreview
       ? 'rgba(56, 189, 248, 0.22)'
-      : 'rgba(15, 23, 42, 0.18)';
+      : field ? '#15120e7d' : 'rgba(15, 23, 42, 0.18)';
     ctx.strokeStyle = isSelected ? '#ffe6b4' : r.isQuan ? boardSkin.palette.accent : OAQ_SEAT_COLOR[r.idx <= 5 ? 'P1' : 'P2'];
     ctx.lineWidth = isSelected ? 3 : 2;
 
@@ -201,8 +211,11 @@ export function renderOAnQuanBoard(
 
     // Vẽ quân Quan (nếu còn)
     const qSlot = r.idx === 0 ? 0 : r.idx === 6 ? 1 : null;
+    const seat = r.idx <= 5 ? 'P1' : 'P2';
+    const facing = r.idx === 6 || (!r.isQuan && seat === 'P2') ? -1 : 1;
     if (qSlot !== null && state.quanAlive[qSlot]) {
-      drawSingleStone(ctx, r.x + r.w / 2, r.y + r.h / 2 - 14, 15, true, stoneSkin.palette);
+      if (field?.units) drawCampaignUnit(ctx, field.units, seat, r.x + r.w / 2, r.y + r.h / 2 - 18, 72, true, facing);
+      else drawSingleStone(ctx, r.x + r.w / 2, r.y + r.h / 2 - 14, 15, true, stoneSkin.palette);
     }
 
     // Vẽ tối đa 12 viên Dân đại diện trong ô theo lưới xoắn ốc
@@ -211,6 +224,11 @@ export function renderOAnQuanBoard(
     const centerX = r.x + r.w / 2;
     const centerY = r.y + r.h / 2 + (r.isQuan ? 22 : 4);
     for (let i = 0; i < drawCount; i++) {
+      if (field?.units) {
+        const point = campaignFormation(centerX, centerY - 12, i);
+        drawCampaignUnit(ctx, field.units, seat, point.x, point.y, 31, false, facing);
+        continue;
+      }
       const angle = i * 2.39996;
       const dist = Math.min(22, 6 + Math.sqrt(i) * 5.2);
       const sx = Math.round(centerX + Math.cos(angle) * dist);
@@ -234,6 +252,6 @@ export function renderOAnQuanBoard(
     ctx.textBaseline = 'middle';
     readableCanvasText(ctx, ptsDisplay, r.x + 6 + badgeWidth / 2, r.y + 19);
   }
-  drawTray(ctx, trayState, 'P2', skins);
-  drawTray(ctx, trayState, 'P1', skins);
+  drawTray(ctx, trayState, 'P2', skins, field);
+  drawTray(ctx, trayState, 'P1', skins, field);
 }

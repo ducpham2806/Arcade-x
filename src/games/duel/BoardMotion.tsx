@@ -12,7 +12,7 @@ function prefersMotion() {
   return !window.matchMedia(QUERY).matches;
 }
 
-export function useBoardMotion(game: 'chess' | 'xiangqi') {
+export function useBoardMotion(game: 'chess' | 'xiangqi' | 'o-an-quan') {
   const key = `arcadex_${game}_motion`;
   const systemEnabled = useSyncExternalStore(subscribeToMotion, prefersMotion, () => false);
   const [preference, setPreference] = useState<boolean | null>(() => {
