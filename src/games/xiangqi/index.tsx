@@ -131,6 +131,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   const [showSurrenderConfirm, setShowSurrenderConfirm] = useState(false);
   const [showOfferDrawConfirm, setShowOfferDrawConfirm] = useState(false);
   const [showMatchEndModal, setShowMatchEndModal] = useState(false);
+  const [boardMotionActive, setBoardMotionActive] = useState(false);
   const [isReviewingBoard, setIsReviewingBoard] = useState(false);
   const [hasProcessedMatchEnd, setHasProcessedMatchEnd] = useState(false);
   const [aiEndReason, setAiEndReason] = useState<string>('');
@@ -942,7 +943,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
           <BattlefieldBoard key={`${playMode}:${activeRoomId ?? ''}`} board={reviewedBoard ?? currentBoard}
             selected={isReviewingBoard ? null : selectedPos} pending={isReviewingBoard ? null : pendingDest} legalMoves={isReviewingBoard ? [] : legalMoves}
             vnPieces={vnPieces} paused={Boolean(isPaused || isReviewingBoard)} classic={!battlefield}
-            terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} readOnly={isReviewingBoard} onCell={handleCellClick}/>
+            terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} readOnly={isReviewingBoard} onMotionChange={setBoardMotionActive} onCell={handleCellClick}/>
 
             {selectedPos && pendingDest && !isMatchEnded && (
               <div className="w-full max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
@@ -1109,7 +1110,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
 
       {/* Unified Match End Modal */}
       <MatchEndModal
-        isOpen={showMatchEndModal}
+        isOpen={showMatchEndModal && !boardMotionActive}
         gameTitle="Cờ Tướng (Xiangqi)"
         result={matchResult}
         reason={matchEndReasonText}

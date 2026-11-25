@@ -38,7 +38,17 @@ test('Chess steps through the finished game and restores the checkmate', async (
   const square = (name: string) => page.locator(`[data-citadel-square="${name}"]`);
   for (const [from, to, botTo] of [['e2', 'e4', 'f6'], ['d2', 'd4', 'g5'], ['d1', 'h5']]) {
     await square(from).tap();
-    await square(to).tap();
+    if (to === 'h5') {
+      const playedFinisher = page.waitForFunction(() => {
+        if (!document.querySelector('.citadel-mover')) return false;
+        if (document.querySelector('[data-citadel-square="h5"][data-citadel-piece="wq"]') === null) return false;
+        return { resultVisible: document.querySelector('#match-end-overlay') !== null };
+      });
+      await square(to).tap();
+      expect(await (await playedFinisher).jsonValue()).toEqual({ resultVisible: false });
+    } else {
+      await square(to).tap();
+    }
     if (botTo) await expect(square(botTo)).toHaveAttribute('data-citadel-piece', 'bp');
   }
 
@@ -66,7 +76,10 @@ test('Xiangqi review restores the captured Horse and the capture tray', async ({
   const square = (name: string) => page.locator(`[data-xqb-cell="${name}"]`);
   await square('7,1').tap();
   await square('0,1').tap();
-  await page.getByRole('button', { name: /Đi Nước Này/i }).tap();
+  await Promise.all([
+    expect(page.locator('.xqb-cannon .xqb-impact')).toHaveCSS('background-image', /cannon-impact\.webp/),
+    page.getByRole('button', { name: /Đi Nước Này/i }).tap(),
+  ]);
   await expect(square('0,1')).toHaveAttribute('data-xqb-piece', 'r_c1');
   await page.getByRole('button', { name: 'Đầu Hàng', exact: true }).first().tap();
   await page.getByRole('button', { name: 'Nhận Thua', exact: true }).tap();

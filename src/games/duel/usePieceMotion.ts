@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-export function usePieceMotion<Move>() {
+export function usePieceMotion<Move>(onActiveChange?: (active: boolean) => void) {
   const [moving, setMoving] = useState<Move>();
   const [capture, setCapture] = useState<Move>();
   const travelTimer = useRef<number | undefined>(undefined);
@@ -12,6 +12,12 @@ export function usePieceMotion<Move>() {
   }, []);
 
   useEffect(() => clearTimers, [clearTimers]);
+
+  const active = moving !== undefined || capture !== undefined;
+  useLayoutEffect(() => {
+    onActiveChange?.(active);
+  }, [active, onActiveChange]);
+  useLayoutEffect(() => () => onActiveChange?.(false), [onActiveChange]);
 
   const stop = useCallback(() => {
     clearTimers();

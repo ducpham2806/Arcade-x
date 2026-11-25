@@ -383,6 +383,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const [showOfferDrawModal, setShowOfferDrawModal] = useState(false);
   const [showMatchEndModal, setShowMatchEndModal] = useState(false);
+  const [boardMotionActive, setBoardMotionActive] = useState(false);
   const [isReviewingBoard, setIsReviewingBoard] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [hasProcessedMatchEnd, setHasProcessedMatchEnd] = useState(false);
@@ -1233,7 +1234,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                 <CitadelBoard key={activeRoomId ?? 'practice'} fen={reviewedFen ?? fen} history={reviewedFen ? moveHistory.slice(0, review.index) : moveHistory}
                   orientation={myColor} selected={isReviewingBoard ? null : selectedSquare} legal={isReviewingBoard ? [] : legalMovesFromSelected}
                   pending={isReviewingBoard ? null : pendingTargetSquare} paused={Boolean(isPaused || isReviewingBoard)}
-                  terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} classic={!citadel} readOnly={isReviewingBoard} onSquare={handleSquareClick}/>
+                  terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} classic={!citadel} readOnly={isReviewingBoard} onMotionChange={setBoardMotionActive} onSquare={handleSquareClick}/>
 
                 <AnimatePresence>
                   {pendingPromotion && (
@@ -1493,7 +1494,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
       {/* Unified Match End Modal */}
       <MatchEndModal
-        isOpen={showMatchEndModal}
+        isOpen={showMatchEndModal && !boardMotionActive}
         gameTitle="Cờ Vua Phù Thủy (Wizard's Chess)"
         result={matchResult}
         reason={matchEndReasonText}

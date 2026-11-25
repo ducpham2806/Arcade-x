@@ -1,0 +1,19 @@
+.board-arrival {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: var(--tray-y);
+  width: 13%;
+  height: 4%;
+  border: 1px solid var(--arrival-color);
+  border-radius: 50%;
+  box-shadow: inset 0 0 4px var(--arrival-color);
+  pointer-events: none;
+  animation: board-arrive 85ms ease-out var(--arrival-at) both;
+}
+
+@keyframes board-arrive {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.45); }
+  37% { opacity: .85; }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}

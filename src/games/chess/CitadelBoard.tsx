@@ -4,6 +4,7 @@ import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Ke
 import { acceptedCitadelMove, citadelRookMove, citadelVictimSquare, replayCitadelCaptures } from './citadelMoves';
 import { ChessPiece } from '../../visuals/ChessPiece';
 import { usePieceMotion } from '../duel/usePieceMotion';
+import '../duel/board-vfx.css';
 import './citadel.css';
 
 const ORDER: PieceSymbol[] = ['k', 'q', 'r', 'b', 'n', 'p'];
@@ -72,16 +73,20 @@ function Animation({ move, orientation, classic, captureOnly = false }: { move: 
   const rook = citadelRookMove(move);
   const victimSquare = citadelVictimSquare(move);
   const victim = position(victimSquare, orientation);
+  const landing = position(move.to, orientation);
   const trayY = move.color === orientation ? '104%' : '-4%';
   return (
     <div className="citadel-animation" aria-hidden="true" data-citadel-animation={captureOnly ? undefined : rook ? 'castle' : move.san}>
       {!captureOnly && <MotionPiece path={move} orientation={orientation} color={move.color} type={move.piece} promotion={move.promotion} attacking={!!move.captured} classic={classic}/>}
       {!captureOnly && rook && <MotionPiece path={rook} orientation={orientation} color={move.color} type="r" classic={classic}/>}
+      {!captureOnly && move.promotion && <span className="citadel-promotion-fx" data-promotion-side={move.color}
+        style={{ left: landing.x, top: landing.y }}/>}
       {captureOnly && move.captured && (
-        <div className="citadel-capture" data-citadel-victim={victimSquare}
+        <div className="citadel-capture" data-citadel-victim={victimSquare} data-capture-side={move.color}
           style={{ '--victim-x': victim.x, '--victim-y': victim.y, '--tray-y': trayY } as CSSProperties}>
           {!move.isEnPassant() && <span className="citadel-strike"/>}
           <span className="citadel-shatter"/>
+          <span className="board-arrival"/>
           <span className="citadel-victim"><CitadelPiece type={move.captured} color={opposite(move.color)} classic={classic}/></span>
         </div>
       )}
@@ -115,14 +120,15 @@ interface Props {
   classic?: boolean;
   terrain?: TerrainId<'chess'>;
   readOnly?: boolean;
+  onMotionChange?: (active: boolean) => void;
   onSquare: (square: Square) => void;
 }
 
-export function CitadelBoard({ fen, history, initialFen, orientation, selected, legal, pending, paused, motionEnabled, classic = false, terrain = 'citadel', readOnly = false, onSquare }: Props) {
+export function CitadelBoard({ fen, history, initialFen, orientation, selected, legal, pending, paused, motionEnabled, classic = false, terrain = 'citadel', readOnly = false, onMotionChange, onSquare }: Props) {
   const engine = useMemo(() => new Chess(fen), [fen]);
   const captured = useMemo(() => replayCitadelCaptures(history, fen, initialFen), [history, fen, initialFen]);
   const previous = useRef(fen);
-  const { moving: move, capture, play, stop } = usePieceMotion<Move>();
+  const { moving: move, capture, play, stop } = usePieceMotion<Move>(onMotionChange);
   const [last, setLast] = useState<Move>();
   const [focus, setFocus] = useState(60);
   const grid = useRef<HTMLDivElement>(null);
@@ -136,7 +142,7 @@ export function CitadelBoard({ fen, history, initialFen, orientation, selected, 
       stop();
       return;
     }
-    play(transition, transition.promotion ? 378 : transition.captured ? 330 : 285, transition.captured ? 495 : undefined);
+    play(transition, transition.promotion ? 520 : transition.captured ? 330 : 285, transition.captured ? 495 : undefined);
   }, [fen, paused, motionEnabled, orientation, play, stop]);
 
   function keyMove(event: KeyboardEvent<HTMLButtonElement>, index: number) {
