@@ -28,3 +28,5 @@ Làm lần lượt Chess → Xiangqi → Caro; mỗi game là một task nhỏ, 
 
 - Cờ tướng có mẫu Bến Sông Sở Hán trên nhánh `codex/xiangqi-battlefield-preview`. [QA và nguồn dựng](../qa/XIANGQI-BATTLEFIELD-2026-11-25.md). Chờ duyệt art, thiết bị thật và online hai tài khoản.
 - Cờ vua có mẫu Thành Trì Huyền Thuật trên nhánh `codex/chess-citadel-preview`, từ mốc Cờ tướng `b22b6be`. [QA và nguồn dựng](../qa/CHESS-CITADEL-2026-11-25.md). Sau duyệt hai mẫu, tiếp tục UI và skin. Cutover DU-R1 ở trên theo kế hoạch riêng.
+
+- Bản pixel full-body cho cả hai game nằm trên nhánh `codex/chess-pixel-polish`, tiếp từ `codex/xiangqi-pixel-polish`. Dùng bản HTML từng game để duyệt tạo hình.

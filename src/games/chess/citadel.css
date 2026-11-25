@@ -117,7 +117,7 @@
   display: block;
   width: 100%;
   aspect-ratio: 1;
-  background: url('/games/chess/citadel/pieces.webp') no-repeat;
+  background: url('/games/chess/citadel/pieces-v2.webp') no-repeat;
   background-size: 600% 200%;
   filter: drop-shadow(0 1px 0 #f7deaf42);
 }

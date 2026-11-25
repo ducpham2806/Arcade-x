@@ -6,7 +6,7 @@ Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLO
 
 - Từ `b22b6be` trên `codex/chess-citadel-preview`, thêm hai bộ quân Ngà Vàng và Hắc Thạch, bàn 8×8, nhập thành, bắt qua đường, phong cấp và khay theo lịch sử SAN.
 - Game Studio, Graphify, Agent Sprite Forge và PixelFX đã được dùng. Bản HTML có thế thử và đấu hai người cùng máy. [QA](qa/CHESS-CITADEL-2026-11-25.md).
-- Hai bàn mẫu Cờ vua và Cờ tướng chờ duyệt hình ảnh và kiểm máy thật, phòng online hai tài khoản.
+- Nhánh `codex/chess-pixel-polish` thêm bộ quân full-body 12 sprite, căn tỷ lệ bằng Sprite Forge. Hai game còn chờ kiểm máy thật và phòng online hai tài khoản.
 - [Mục xác nhận rời trận Folk ngày 19/11](archive/WORKLOG-2026-11-19-folk-leave.md).
 
 ## 25/11/2026 · bản chơi thử chiến trường Cờ tướng
