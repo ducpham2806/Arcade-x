@@ -23,3 +23,8 @@ Làm lần lượt Chess → Xiangqi → Caro; mỗi game là một task nhỏ, 
 - Kiểm: `test:duel`, `test:duel-server`, `test:sql`, test UI bổ sung đúng luồng; full CI trước merge code.
 - DONE chỉ khi có bằng chứng trên môi trường đích, không chỉ unit test. Queue/rematch/chat/Elo chưa nằm trong phase này; không tự bổ sung.
 - Bước đầu: DU-R0 đọc runbook và đối chiếu import UI thực tế trước sửa adapter.
+
+## Art và UI · 25/11/2026
+
+- Cờ tướng có mẫu Bến Sông Sở Hán trên nhánh `codex/xiangqi-battlefield-preview`. [QA và nguồn dựng](../qa/XIANGQI-BATTLEFIELD-2026-11-25.md). Chờ duyệt art, thiết bị thật và online hai tài khoản.
+- Cờ vua tiếp theo là mẫu Thành Trì Huyền Thuật với Vua, Mã, Xe, nhập thành và quân vỡ vào khay. Tách khỏi kế hoạch cutover DU-R1 ở trên.

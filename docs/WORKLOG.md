@@ -2,6 +2,13 @@
 
 Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLOG-2026-11-19-before-fd-on2.md).
 
+## 25/11/2026 · bản chơi thử chiến trường Cờ tướng
+
+- Từ `3e2f5b9` trên `codex/xiangqi-battlefield-preview`, thêm Bến Sông Sở Hán với quân top-down hai phe, vạch sông và Cửu Cung, điều khiển phím, animation Pháo và khay quân ăn. Bàn cổ điển vẫn chọn được.
+- Dùng Game Studio, Graphify theo module, Agent Sprite Forge 14 sprite qua QA và PixelFX 16 frame. `test:duel`, `test:artwork`, lint và build qua. [QA](qa/XIANGQI-BATTLEFIELD-2026-11-25.md).
+- Còn thiết bị thật và phòng hai tài khoản. Phần Cờ vua tiếp theo dùng Vua, Mã, Xe để chốt hướng tượng đá và thử nhập thành.
+- [Mục sửa lỗi QA Folk ngày 19/11](archive/WORKLOG-2026-11-19-folk-polish.md).
+
 ## 19–20/11/2026 · FD-ON2 và phát hành launcher
 
 - Ngày 20/11 anh yêu cầu bỏ test staging, đưa hai game lên launcher và merge main. Catalog đóng gói bảo đảm mở ván offline khi catalog cloud thiếu hàng. Hàng cloud hợp lệ vẫn quyết định quyền và trạng thái. Hai ca trình duyệt trên bản dựng production cục bộ vào bàn offline qua sảnh ở 1280×900 và 390×844. Lint, test catalog/quyền mở game, build và bundle budget qua.
@@ -16,9 +23,3 @@ Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLO
 - Tiếp từ `37605a2` trên `codex/folk-qa-20261119` ([PR 42](https://github.com/ducpham2806/Arcade-x/pull/42)). Nút Rời phòng và Thoát trong bàn cùng mở xác nhận nếu ván online đang đếm ngược hoặc đang chơi. Ở lại hoặc Escape trả focus về nút mở. Chỉ xác nhận mới gửi lệnh rời. Luồng thử lại giữ nguyên ID yêu cầu khi mất phản hồi.
 - Qua 14 ca Playwright (12 offline, 2 online) và 21 ca Folk Node/PGlite. Ô Ăn Quan gửi lại cùng ID khi mất phản hồi. Nhảy Lò Cò kiểm hủy và bỏ cuộc ở 390×844 với độ trễ giả lập 250 ms khứ hồi. Đã xem ảnh `test-results/folk-online/nlc-leave-phone.png`. Lint, build production, bundle budget và kiểm Markdown qua.
 - Studio Game QA & Playtest, Game UI/UX, vai trò QA Lead. Graphify 0.9.108 AST `src/games/folk-duel`, 129 nút/281 cạnh, truy vấn `FolkLeaveDialog` depth 1. Hai trình duyệt mô phỏng dùng fixture Auth/Edge/PGlite. Nghiệm thu tài khoản staging, thiết bị và mạng thật vẫn chờ.
-
-## 19/11/2026 · sửa lỗi QA Folk
-
-- Tiếp từ `ea65ede` trên `codex/folk-qa-20261119`. Vạch lực Nhảy Lò Cò online vẽ theo khung hình từ giờ server ước lượng. Sửa khung thấp hai game, focus theo pha và Chơi lại offline có xác nhận.
-- 21 test luật/Edge/PGlite, lint/build/budget/docs qua. 14 ca Playwright có kết quả qua sau chạy lại, gồm độ trễ 250 ms khứ hồi và khung ngang chừa badge.
-- Game QA & Playtest, Game UI/UX, QA Lead. Graphify Folk 128/279, Nhảy Lò Cò 73/116. [Báo cáo](qa/FOLK-POLISH-2026-11-19.md). Nghiệm thu hai tài khoản staging, mạng và thiết bị thật còn chờ.
