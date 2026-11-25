@@ -4,6 +4,8 @@ import { LEVELS } from '../../src/games/hex-match/blossom/levels';
 import { defaultSave } from '../../src/games/hex-match/blossom/save';
 import { lessonsFor } from '../../src/games/hex-match/blossom/tutorials';
 import { skipLessons } from './ui-helpers';
+
+test.use({ hasTouch: true });
 async function load(page: any, save = defaultSave()) {
   await page.goto('/blossom-review.html');
   await page.evaluate((s: any) => localStorage.setItem('arcadex_blossom_review_v1', JSON.stringify(s)), save);
@@ -53,7 +55,7 @@ for (const [width,height] of [[320,568],[390,844],[768,1024]]) {
     expect(await page.locator('.bb-cell:enabled').count()).toBe(25);
   });
 }
-test('tutorial tools cannot enter combine mode; reload restores reading; focus stays in card', async ({page}) => {
+test('tutorial tools stay disabled; reload restores reading and focus stays in card', async ({page}) => {
   const save=defaultSave();save.active=createRun(LEVELS[0],3149624575);
   save.tutorials=['tap-4-way','goal-score'];
   await load(page,save);
@@ -66,22 +68,81 @@ test('tutorial tools cannot enter combine mode; reload restores reading; focus s
   await page.reload();
   await expect(coach).toBeVisible();
   await skipLessons(page);
-  await expect(page.locator('.bb-tools button').first()).toBeDisabled();
+  await expect(page.locator('.bb-combine-guide')).toHaveCount(0);
 });
-test('adjacent specials enable combine and cancellation never spends a move', async ({page}) => {
-  const save=defaultSave(),run=createRun(LEVELS[4],9);
-  run.board[0].special='bee_h';run.board[1].special='bloom_bomb';
-  save.active=run;save.tutorials=lessonsFor(run,[]).map(l=>l.id);
-  await load(page,save);
-  const combine=page.locator('.bb-tools button').first();await expect(combine).toBeEnabled();
-  await combine.click();await expect(page.locator('.bb-instruction')).toContainText('special thứ nhất');
-  await page.locator('.bb-cell[data-cell="0"]').click();
-  await expect(page.locator('.bb-instruction')).toContainText('special thứ hai');
-  await page.getByRole('button',{name:'Hủy chọn',exact:true}).click();
-  await expect(page.locator('.bb-instruction')).toHaveCount(0);
+
+function combinationSave() {
+  const save = defaultSave();
+  const run = createRun(LEVELS[4], 9);
+  run.level.goals = [{ kind: 'score', target: 999999 }];
+  run.board[0].special = 'bee_h';
+  run.board[1].special = 'bloom_bomb';
+  run.board[2] = { ...run.board[2], special: 'sun', hazard: 'ice', hp: 1 };
+  save.active = run;
+  save.tutorials = lessonsFor(run, []).map(lesson => lesson.id);
+  return { save, run };
+}
+
+test('tap two neighboring specials directly, with free cancellation and locked specials excluded', async ({ page }) => {
+  const { save, run } = combinationSave();
+  await load(page, save);
+  const cell = (i: number) => page.locator(`.bb-cell[data-cell="${i}"]`);
+  await expect(page.getByRole('button', { name: 'Ghép đôi', exact: true })).toHaveCount(0);
+  await expect(cell(2)).not.toHaveAttribute('data-combinable');
+  await cell(0).tap();
+  await expect(cell(0)).toHaveAttribute('aria-pressed', 'true');
+  await expect(cell(1)).toHaveClass(/bb-combine-target/);
   expect((await active(page)).moves).toBe(run.moves);
-  await combine.click(); await page.locator('.bb-cell[data-cell="0"]').click(); await page.locator('.bb-cell[data-cell="1"]').click();
-  expect((await active(page)).moves).toBe(run.moves-1);
+  await page.getByRole('button', { name: 'Hủy chọn' }).tap();
+  await expect(cell(0)).toHaveAttribute('aria-pressed', 'false');
+  expect((await active(page)).moves).toBe(run.moves);
+  await cell(0).tap();
+  await cell(1).tap();
+  const after = await active(page);
+  expect(after.turns).toBe(run.turns + 1);
+  expect(after.moves).toBe(run.moves - 1);
+  expect(after.log.at(-1)).toMatchObject({ action: { type: 'merge', cell: 0, other: 1 } });
+});
+
+test('keyboard combines between cells, cancels with Escape, and can fire a special on its own', async ({ page }) => {
+  const { save, run } = combinationSave();
+  await load(page, save);
+  const first = page.locator('.bb-cell[data-cell="0"]');
+  const second = page.locator('.bb-cell[data-cell="1"]');
+  await first.press('Enter');
+  await first.press('Escape');
+  await expect(first).toHaveAttribute('aria-pressed', 'false');
+  expect((await active(page)).turns).toBe(run.turns);
+  await first.press('Enter');
+  await first.press('ArrowRight');
+  await expect(second).toBeFocused();
+  await page.keyboard.press('Enter');
+  expect((await active(page)).log.at(-1)).toMatchObject({ action: { type: 'merge' } });
+  await load(page, save);
+  await first.press('Enter');
+  await first.press('Enter');
+  expect((await active(page)).log.at(-1)).toMatchObject({ action: { type: 'tap', cell: 0 } });
+});
+
+test('swipe on the board combines once and an invalid swipe spends no move', async ({ page }) => {
+  const { save, run } = combinationSave();
+  await load(page, save);
+  const touch = await page.context().newCDPSession(page);
+  const point = async (i: number) => {
+    const box = (await page.locator(`.bb-cell[data-cell="${i}"]`).boundingBox())!;
+    return { x: Math.round(box.x + box.width / 2), y: Math.round(box.y + box.height / 2) };
+  };
+  const swipe = async (from: number, to: number) => {
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [await point(from)] });
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [await point(to)] });
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  };
+  await swipe(0, 2);
+  expect((await active(page)).moves).toBe(run.moves);
+  await swipe(0, 1);
+  const after = await active(page);
+  expect(after.moves).toBe(run.moves - 1);
+  expect(after.log.at(-1)).toMatchObject({ action: { type: 'merge', cell: 0, other: 1 } });
 });
 test('hazard practice only enables a legal neighboring flower group', async ({page}) => {
   const save=defaultSave(),run=createRun(LEVELS[0],9);

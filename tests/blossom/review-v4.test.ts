@@ -98,7 +98,7 @@ test("first middle-chapter scene pauses play and is skipped on a retry", async (
   await inject(page, save);
   await page.locator(".bb-node").nth(4).click();
   await page
-    .getByRole("button", { name: "▶ Bắt đầu", exact: true })
+    .getByRole("button", { name: "Bắt đầu", exact: true })
     .last()
     .click();
   await expect(

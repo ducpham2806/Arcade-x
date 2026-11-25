@@ -12,7 +12,7 @@ test("first lesson requires the highlighted group, saves learning and spends onl
   await page.goto(url);
   await page.locator(".bb-node").first().click();
   await page
-    .getByRole("button", { name: "▶ Bắt đầu", exact: true })
+    .getByRole("button", { name: "Bắt đầu", exact: true })
     .last()
     .click();
   await page.getByRole("button", { name: "Bỏ qua", exact: true }).click();

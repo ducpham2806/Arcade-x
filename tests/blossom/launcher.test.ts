@@ -1,6 +1,5 @@
-import { finishTransition, skipLessons } from "./ui-helpers";
+import { finishTransition, openBlossomFromLauncher } from "./ui-helpers";
 import { test, expect } from "@playwright/test";
-import { launch } from "../qc/helpers";
 import { createRun, act, hint } from "../../src/games/hex-match/blossom/engine";
 import { LEVELS } from "../../src/games/hex-match/blossom/levels";
 import { defaultSave } from "../../src/games/hex-match/blossom/save";
@@ -23,7 +22,8 @@ test("Arcade wrapper keeps Blossom mounted on level completion and supports camp
       ? route.continue()
       : route.abort(),
   );
-  await launch(page, "hex-match");
+  await page.goto("/");
+  await openBlossomFromLauncher(page);
   await finishTransition(page);
   await expect(
     page.getByRole("heading", { name: "Đã hoàn thành mục tiêu!" }),
@@ -34,7 +34,7 @@ test("Arcade wrapper keeps Blossom mounted on level completion and supports camp
   await expect(
     page.getByRole("dialog", { name: "Màn 2", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "▶ Bắt đầu", exact: true }).click();
+  await page.getByRole("dialog", { name: "Màn 2", exact: true }).getByRole("button", { name: "Bắt đầu", exact: true }).click();
   await expect(page.locator(".bb-cell")).toHaveCount(25);
   await page.locator("#btn-game-restart").click();
   await expect(

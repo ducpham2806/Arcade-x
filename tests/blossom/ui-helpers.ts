@@ -1,4 +1,17 @@
 import { Page, expect } from "@playwright/test";
+
+export async function openBlossomFromLauncher(page: Page) {
+  const play = page.locator('#btn-play-hex-match');
+  await expect(play).toBeVisible();
+  const collapse = page.getByRole('button', { name: 'Thu chat về bubble' });
+  await expect(collapse.or(page.locator('.chat-launcher-bubble'))).toBeVisible();
+  if (await collapse.isVisible()) await collapse.click();
+  await expect(collapse).toBeHidden();
+  await play.evaluate(button => button.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await play.click();
+  await expect(page.locator('.blossom')).toBeVisible();
+}
+
 export async function skipLessons(page: Page) {
   await expect(page.locator(".bb-animation-status")).toHaveCount(0, {timeout:30000});
   for (let i = 0; i < 24; i++) {

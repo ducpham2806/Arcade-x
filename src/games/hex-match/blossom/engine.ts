@@ -40,6 +40,14 @@ export const tappable = (t: Tile) =>
   !t.seed &&
   !t.boss &&
   !["weed", "rock", "honey", "vine", "cocoon", "ice"].includes(t.hazard || "");
+export function mergePartners(s: Run, cell: number): number[] {
+  const tile = s.board[cell];
+  if (!tile?.special || !tappable(tile)) return [];
+  return neighbors(s, cell).filter((index) => {
+    const neighbor = s.board[index];
+    return neighbor?.special && tappable(neighbor);
+  });
+}
 export function group(s: Run, cell: number): number[] {
   const t = s.board[cell];
   if (!t || !tappable(t) || t.special) return [];
@@ -1032,11 +1040,7 @@ export function act(
   }
   if (
     action.type === "merge" &&
-    (!s.board[action.cell]?.special ||
-      !s.board[action.other]?.special ||
-      !tappable(s.board[action.cell]) ||
-      !tappable(s.board[action.other]) ||
-      !neighbors(s, action.cell).includes(action.other))
+    !mergePartners(s, action.cell).includes(action.other)
   )
     return { run: original, valid: false };
   const costs = action.type === "tap" || action.type === "merge";

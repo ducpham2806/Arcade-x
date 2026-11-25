@@ -57,12 +57,22 @@ for(const width of [320,390])test(`garden fits ${width}px and place/delete survi
  expect(await page.locator('.bb-main').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
  await page.screenshot({path:`tests/blossom/screenshots/v6-garden-${width}.png`});
 });
-test('preparation and unified results are inset popups with visible footer on small mobile',async({page})=>{
+test('preparation and results fill the mobile frame with nine-slice borders and visible actions',async({page})=>{
  await page.setViewportSize({width:320,height:568});await page.goto('/blossom-review.html');await page.locator('.bb-node').first().click();
- const modal=page.locator('.bb-modal');const b=await modal.boundingBox();expect(b!.x).toBeGreaterThan(0);expect(b!.width).toBeLessThan(320);
- await expect(modal.locator('footer')).toBeInViewport();
+ const expectFullFrame = async (selector: string) => {
+  const dialog = page.locator(selector);
+  await expect(dialog).toBeVisible();
+  const frame = (await page.locator('.blossom').boundingBox())!;
+  const box = (await dialog.boundingBox())!;
+  expect(Math.abs(box.x - frame.x) + Math.abs(box.y - frame.y)).toBeLessThan(1);
+  expect(Math.abs(box.width - frame.width) + Math.abs(box.height - frame.height)).toBeLessThan(1);
+  const frameArt = await dialog.evaluate(element => getComputedStyle(element, '::before').borderImageSource);
+  expect(frameArt).toContain('ui-panel.webp');
+  await expect(dialog.locator('footer')).toBeInViewport({ ratio: 1 });
+ };
+ await expectFullFrame('.bb-preparation');
  const save=defaultSave(),r=createRun(LEVELS[0],9);r.status='won';r.score=15000;r.bonusMoves=4;save.active=r;await load(page,save);
- await expect(page.locator('.bb-unified-result')).toBeVisible();await expect(page.locator('.bb-unified-result footer')).toBeInViewport();
+ await expectFullFrame('.bb-unified-result');
  await page.screenshot({path:'tests/blossom/screenshots/v6-result-320.png'});
 });
 

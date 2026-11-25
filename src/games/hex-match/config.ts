@@ -28,8 +28,8 @@ export const HEX_MATCH_CONTROLS: GameControlInfo[] = [
     action: "Tạo Ong / Bom Hoa / Cầu Vồng / Mặt Trời",
   },
   {
-    key: "Ghép đôi",
-    action: "Chọn hai vật phẩm đặc biệt cạnh nhau; dùng 1 lượt",
+    key: "Chạm hoặc vuốt giữa hai vật phẩm",
+    action: "Ghép hai vật phẩm đặc biệt kề nhau ngay trên bàn; dùng 1 lượt",
   },
   {
     key: "Chuẩn bị trước ván",

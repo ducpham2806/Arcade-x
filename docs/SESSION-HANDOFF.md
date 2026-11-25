@@ -1,5 +1,7 @@
-# Bàn giao · 26/11/2026 · hiệu ứng ba bàn cờ
+# Bàn giao · 26/11/2026 · Blossom Blast
 
-PR #44 là bản bàn chơi và xem lại nước đi. Nhánh `codex/three-board-games-vfx` thêm quét giáo và bóng bám mặt bàn khi lính nhảy cho Ô Ăn Quan, vòng ấn phong cấp cho Cờ vua, đầu nòng và bụi khi Pháo qua ngòi ở Cờ tướng. Công tắc chuyển động và các mốc luật/điểm giữ theo luồng đang dùng. [QA và cách dựng VFX](qa/THREE-BOARD-VFX-2026-11-26.md).
+Nhánh `codex/blossom-garden-ui` nâng giao diện Blossom Blast theo chủ đề vườn hoa và dùng 9-slice trên nút, HUD, khung bàn và hộp thoại. Ghép bằng chạm hai ô, vuốt hoặc bàn phím. Mỗi cặp hợp lệ dùng một lượt theo engine hiện có. [Thẻ QA game](plans/GAME-POLISH.md), [báo cáo Blossom](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
 
-Game Studio Game Feel và PixelFX `5294518`. Ba HTML offline có hiệu ứng mới. Còn nghiệm thu thiết bị thật và phòng hai tài khoản trong môi trường đích. [Bàn giao xem lại](qa/THREE-BOARD-REVIEW-2026-11-26.md).
+Studio Game UI/UX, Input Systems và vai trò Art & UI Lead. Graphify AST trong `src/games/hex-match`, 191 nút/518 cạnh. Bước tiếp là duyệt nhánh Blossom và chơi thử trên điện thoại thật.
+
+PR #45 đã merge `main@fc8bb2f` sau CI #86. Nghiệm thu ba bàn cờ trên thiết bị thật và phòng hai tài khoản vẫn chờ. [QA VFX bàn cờ](qa/THREE-BOARD-VFX-2026-11-26.md).

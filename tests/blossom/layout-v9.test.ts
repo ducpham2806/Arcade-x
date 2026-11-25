@@ -3,6 +3,7 @@ import { createRun } from '../../src/games/hex-match/blossom/engine';
 import { LEVELS } from '../../src/games/hex-match/blossom/levels';
 import { defaultSave } from '../../src/games/hex-match/blossom/save';
 import { lessonsFor } from '../../src/games/hex-match/blossom/tutorials';
+import { openBlossomFromLauncher } from './ui-helpers';
 
 // Play layout v9: the HUD, the whole board and the tools fit the frame without scrolling;
 // wide, short frames put the board left of the HUD; no launcher readability surface
@@ -25,7 +26,7 @@ for (const [width, height] of VIEWPORTS) {
     page.on('pageerror', e => errors.push(String(e)));
     await page.setViewportSize({ width, height });
     await page.goto('/');
-    await page.locator('#btn-play-hex-match').click();
+    await openBlossomFromLauncher(page);
     await page.locator('.blossom .bb-hero .bb-primary').click();
     await expect(page.locator('.bb-board')).toBeVisible({ timeout: 30000 });
     const surfaced = () => page.evaluate(() => [...document.querySelectorAll('.blossom [data-ax-readable]')]

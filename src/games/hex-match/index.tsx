@@ -10,6 +10,7 @@ import {
   hasHazard,
   hint,
   key,
+  mergePartners,
   neighbors,
   revealFog,
   tick,
@@ -44,6 +45,7 @@ import {
   boosterAsset,
 } from "./blossom/assets";
 import "./blossom/blossom.css";
+import "./blossom/garden-ui.css";
 import { BLOSSOM_TITLE, BLOSSOM_ICON, BLOSSOM_LOGO } from "./blossom/branding";
 import { BlossomVFX } from "./blossom/VFX";
 import { lessonsFor, Lesson } from "./blossom/tutorials";
@@ -150,9 +152,6 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
   const [practiceLessonId, setPracticeLessonId] = useState<string | null>(null);
   const practicingLesson = !!lesson?.practice && practiceLessonId === lesson.id;
   const readingLesson = !!lesson && !practicingLesson;
-  const hasMergePair = !!run?.board.some((tile, i) =>
-    tile.special && neighbors(run, i).some((n) => run.board[n].special),
-  );
   const [completionData, setCompletionData] = useState<{
     stars: number;
     reward: number;
@@ -182,6 +181,9 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     [shake, setShake] = useState(-1),
     [deco, setDeco] = useState<string | null>("tree"),
     [rankTab, setRankTab] = useState("Bạn bè");
+  const mergeDrag = useRef<{ id: number; cell: number; x: number; y: number } | null>(null);
+  const suppressBoardClick = useRef(false);
+  const gameRoot = useRef<HTMLDivElement>(null);
   const locked = useRef<Map<number, number>>(new Map()),
     lastInput = useRef(Date.now()),
     undo = useRef<Run[]>([]),
@@ -202,6 +204,15 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     hidden;
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
+  const canCombine = !paused && !tool && run?.status === "playing";
+  const combinableCells = canCombine
+    ? run.board.flatMap((_, i) => mergePartners(run, i).length ? [i] : [])
+    : [];
+  const selectedSpecial = mergeCell !== null && combinableCells.includes(mergeCell) ? mergeCell : null;
+  const mergeTargets = canCombine && selectedSpecial !== null ? mergePartners(run, selectedSpecial) : [];
+  useEffect(() => {
+    if (!canCombine) setMergeCell(null);
+  }, [canCombine]);
   const review = typeof window !== "undefined" && !!window.__BLOSSOM_REVIEW__;
   useEffect(() => {
     const music = musicAudio.current;
@@ -345,13 +356,20 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
   }, []);
   useEffect(() => {
     if (!modal && !prep && !result && !completionData && !readingLesson) return;
-    const root = document.querySelector<HTMLElement>(
+    const root = gameRoot.current?.querySelector<HTMLElement>(
       ".bb-modal,.bb-storybook,.bb-completion,.bb-coach",
     );
-    const first = root?.querySelector<HTMLElement>("button,input,select");
-    first?.focus();
+    if (!root) return;
+    const previous = document.activeElement;
+    root.querySelector<HTMLElement>("button:not(:disabled),input,select")?.focus({ preventScroll: true });
     const handle = (e: KeyboardEvent) => {
-      if (e.key === "Tab" && root) {
+      if (e.key === "Escape" && (prep || modal === "pause" || modal === "help")) {
+        e.preventDefault();
+        if (prep) setPrep(null);
+        else setModal(null);
+        return;
+      }
+      if (e.key === "Tab") {
         const items = Array.from(
           root.querySelectorAll<HTMLElement>(
             "button:not(:disabled),input,select",
@@ -373,8 +391,11 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
         }
       }
     };
-    document.addEventListener("keydown", handle);
-    return () => document.removeEventListener("keydown", handle);
+    root.addEventListener("keydown", handle);
+    return () => {
+      root.removeEventListener("keydown", handle);
+      if (previous instanceof HTMLElement && gameRoot.current?.contains(previous)) previous.focus({ preventScroll: true });
+    };
   }, [modal, prep, !!result, !!completionData, readingLesson, lesson?.id]);
   function advanceLesson() {
     if (!lesson) return;
@@ -535,6 +556,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     setModal(null);
     setResult(null);
     setTool("");
+    setMergeCell(null);
   }
   function perform(action: Action) {
     const current = runRef.current;
@@ -676,29 +698,60 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     }
   }
   function tap(i: number) {
-    if (!runRef.current) return;
+    const current = runRef.current;
+    if (!current || current.status !== "playing") return;
     if (lesson && (!practicingLesson || !lesson.cells?.includes(i))) return;
     if (lesson?.practice) {
       perform({ type: "tap", cell: i });
       return;
     }
-    if (tool === "merge") {
-      if (!runRef.current.board[i].special) {
-        say("Chọn hai vật phẩm đặc biệt ở cạnh nhau.");
-        return;
-      }
-      if (mergeCell === null) setMergeCell(i);
-      else if (i === mergeCell) setMergeCell(null);
-      else perform({ type: "merge", cell: mergeCell, other: i });
-      return;
-    }
-    if (["hammer", "vacuum", "broom"].includes(tool))
+    if (pausedRef.current) return;
+    if (tool === "hammer" || tool === "vacuum" || tool === "broom") {
       perform({
-        type: tool as "hammer" | "vacuum" | "broom",
+        type: tool,
         cell: i,
         vertical,
       });
-    else perform({ type: "tap", cell: i });
+      return;
+    }
+    if (selectedSpecial !== null && mergeTargets.includes(i)) {
+      perform({ type: "merge", cell: selectedSpecial, other: i });
+    } else if (selectedSpecial === i) {
+      setMergeCell(null);
+      perform({ type: "tap", cell: i });
+    } else if (mergePartners(current, i).length) {
+      setMergeCell(i);
+    } else if (selectedSpecial !== null) {
+      setMergeCell(null);
+    } else {
+      perform({ type: "tap", cell: i });
+    }
+  }
+  function startMergeDrag(event: React.PointerEvent<HTMLDivElement>) {
+    if (!event.isPrimary || event.button !== 0) return;
+    suppressBoardClick.current = false;
+    mergeDrag.current = null;
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-combinable]");
+    if (!button) return;
+    const cell = Number(button.dataset.cell);
+    mergeDrag.current = { id: event.pointerId, cell, x: event.clientX, y: event.clientY };
+    button.setPointerCapture(event.pointerId);
+  }
+  function finishMergeDrag(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = mergeDrag.current;
+    if (drag?.id !== event.pointerId) return;
+    mergeDrag.current = null;
+    if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 8) return;
+    suppressBoardClick.current = true;
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>("[data-cell]");
+    const current = runRef.current;
+    if (!current || !canCombine || !target || !event.currentTarget.contains(target)) return;
+    const other = Number(target.dataset.cell);
+    if (mergePartners(current, drag.cell).includes(other)) {
+      perform({ type: "merge", cell: drag.cell, other });
+    } else {
+      setMergeCell(null);
+    }
   }
   function useUndo() {
     const current = runRef.current;
@@ -815,27 +868,23 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     </header>
   );
   const nav = (
-    <nav className="bb-nav">
+    <nav className="bb-nav" aria-label="Blossom Blast">
       {(
         [
-          ["map", "🗺", t.map],
-          ["garden", "🌱", t.garden],
-          ["daily", "☀", t.daily],
-          ["rank", "🏆", t.rank],
-          ["settings", "⚙", t.settings],
+          ["map", "quest", t.map],
+          ["garden", "garden", t.garden],
+          ["daily", "gift", t.daily],
+          ["rank", "trophy", t.rank],
+          ["settings", "settings", t.settings],
         ] as const
       ).map(([s, icon, label]) => (
         <button
           key={s}
           className={screen === s ? "active" : ""}
+          aria-current={screen === s ? "page" : undefined}
           onClick={() => setScreen(s)}
         >
-          <img
-            src={asset(
-              `png/ui/icon_${({ map: "quest", garden: "garden", daily: "gift", rank: "trophy", settings: "settings" } as Record<string, string>)[s]}.png`,
-            )}
-            alt=""
-          />
+          <img src={asset(`png/ui/icon_${icon}.png`)} alt="" />
           {label}
         </button>
       ))}
@@ -914,11 +963,14 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
   return (
     <Localized language={save.settings.language}>
       <div
+        ref={gameRoot}
         className={`blossom bb-screen-${screen} ${save.settings.style === "chibi" ? "bb-chibi" : ""} ${save.settings.reduced ? "bb-reduced" : ""}`}
         style={
           {
             "--bb-font": save.settings.font,
-            "--bb-bg": `url("${screen === "garden" ? "/blossom/gemini/world-garden.webp" : screen === "daily" || screen === "side" ? "/blossom/gemini/world-map.webp" : asset(save.settings.season === "none" ? `png/backgrounds/bg_cluster${pad(chapter)}.png` : `png/backgrounds/bg_season_${save.settings.season}.png`)}")`,
+            "--bb-bg": `url("${asset(screen === "garden" ? "gemini/world-garden.webp" : screen === "daily" || screen === "side" ? "gemini/world-map.webp" : save.settings.season === "none" ? `png/backgrounds/bg_cluster${pad(chapter)}.png` : `png/backgrounds/bg_season_${save.settings.season}.png`)}")`,
+            "--bb-journey-scene": `url("${asset(`gemini/world-${pad(chapter)}.webp`)}")`,
+            "--bb-prep-scene": `url("${asset(`gemini/world-${pad(prep?.chapter ?? chapter)}.webp`)}")`,
           } as React.CSSProperties
         }
       >
@@ -943,17 +995,9 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
           <main className="bb-main bb-map">
             <section className="bb-hero">
               <div>
-                <p className="bb-kicker">MIA & BIBI · 10 HẠT GIỐNG SỰ SỐNG</p>
-                <h1>
-                  Mỗi bông hoa,
-                  <br />
-                  một phép màu.
-                </h1>
-                <p>
-                  Chạm để nở hoa. Giải cứu những người bạn.
-                  <br />
-                  Đánh thức Cây Sự Sống qua 100 màn chơi.
-                </p>
+                <p className="bb-kicker">{BLOSSOM_TITLE}</p>
+                <h1>Hành trình<br />của Mia &amp; Bibi</h1>
+                <p>Đánh thức Cây Sự Sống qua 100 màn chơi.</p>
                 <button
                   className="bb-primary"
                   onClick={() => {
@@ -965,7 +1009,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                     );
                   }}
                 >
-                  ▶ {t.play}
+                  <span aria-hidden="true" className="bb-play-arrow" />{t.play}
                 </button>
                 {save.active?.status === "playing" && (
                   <button
@@ -985,61 +1029,66 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                 alt="Mia"
               />
             </section>
-            <section className="bb-chapter-head">
-              <button
-                onClick={() => setChapter(Math.max(1, chapter - 1))}
-                aria-label="Cụm trước"
-              >
-                ‹
-              </button>
-              <div>
-                <p className="bb-kicker">CHƯƠNG {pad(chapter)} / 10</p>
-                <h2>{CHAPTERS[chapter - 1]}</h2>
-                <p>
-                  {Array.from(
-                    { length: 10 },
-                    (_, i) => save.stars[(chapter - 1) * 10 + i + 1] || 0,
-                  ).reduce((a, b) => a + b, 0)}{" "}
-                  / 30 sao ·{" "}
-                  {chapter === 10
-                    ? "Hành trình đến Cây Sự Sống"
-                    : `Mở chương sau: thắng boss & đạt ${14 + chapter} sao`}
-                </p>
-              </div>
-              <button
-                onClick={() => setChapter(Math.min(10, chapter + 1))}
-                aria-label="Cụm sau"
-              >
-                ›
-              </button>
-            </section>
-            <div className="bb-levels">
-              {LEVELS.slice((chapter - 1) * 10, chapter * 10).map((l) => (
+            <section className="bb-chapter-panel" aria-label={CHAPTERS[chapter - 1]}>
+              <div className="bb-chapter-head">
                 <button
-                  key={l.id}
-                  className={`bb-node ${accessible(l.id) ? "" : "locked"} ${l.bossHP ? "boss" : ""}`}
-                  disabled={!accessible(l.id)}
-                  onClick={() => prepare(l)}
+                  onClick={() => setChapter(Math.max(1, chapter - 1))}
+                  disabled={chapter === 1}
+                  aria-label="Cụm trước"
                 >
-                  <img
-                    src={
-                      l.bossHP
-                        ? bossAsset(chapter)
-                        : asset(
-                            `png/ui/node_${save.stars[l.id] ? "done" : accessible(l.id) ? "current" : "locked"}.png`,
-                          )
-                    }
-                    alt=""
-                  />
-                  <strong>{l.id}</strong>
-                  <span>
-                    {"★".repeat(save.stars[l.id] || 0)}
-                    {"☆".repeat(3 - (save.stars[l.id] || 0))}
-                  </span>
-                  {l.bossHP > 0 && <small>BOSS</small>}
+                  ‹
                 </button>
-              ))}
-            </div>
+                <div>
+                  <p className="bb-kicker">CHƯƠNG {pad(chapter)} / 10</p>
+                  <h2>{CHAPTERS[chapter - 1]}</h2>
+                  <p>
+                    {Array.from(
+                      { length: 10 },
+                      (_, i) => save.stars[(chapter - 1) * 10 + i + 1] || 0,
+                    ).reduce((a, b) => a + b, 0)}{" "}
+                    / 30 sao ·{" "}
+                    {chapter === 10
+                      ? "Hành trình đến Cây Sự Sống"
+                      : `Mở chương sau: thắng boss & đạt ${14 + chapter} sao`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setChapter(Math.min(10, chapter + 1))}
+                  disabled={chapter === 10}
+                  aria-label="Cụm sau"
+                >
+                  ›
+                </button>
+              </div>
+              <div className="bb-levels">
+                {LEVELS.slice((chapter - 1) * 10, chapter * 10).map((l) => (
+                  <button
+                    key={l.id}
+                    className={`bb-node ${accessible(l.id) ? "" : "locked"} ${l.bossHP ? "boss" : ""} ${save.stars[l.id] ? "done" : ""}`}
+                    disabled={!accessible(l.id)}
+                    onClick={() => prepare(l)}
+                  >
+                    <img
+                      src={
+                        l.bossHP
+                          ? bossAsset(chapter)
+                          : asset(
+                              `png/ui/node_${save.stars[l.id] ? "done" : accessible(l.id) ? "current" : "locked"}.png`,
+                            )
+                      }
+                      alt=""
+                    />
+                    <strong>{l.id}</strong>
+                    {!accessible(l.id) && <img className="bb-node-lock" src={asset("png/ui/icon_lock.png")} alt="" />}
+                    <span aria-hidden="true">
+                      {"★".repeat(save.stars[l.id] || 0)}
+                      {"☆".repeat(3 - (save.stars[l.id] || 0))}
+                    </span>
+                    {l.bossHP > 0 && <small>BOSS</small>}
+                  </button>
+                ))}
+              </div>
+            </section>
             <div className="bb-map-actions">
               <button
                 onClick={() => {
@@ -1047,14 +1096,14 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                   setModal("story");
                 }}
               >
-                📖 Câu chuyện chương {chapter}
+                <img src={asset("png/ui/icon_quest.png")} alt="" /> Câu chuyện chương {chapter}
               </button>
-              <button onClick={() => setModal("help")}>✿ {t.help}</button>
+              <button onClick={() => setModal("help")}>{t.help}</button>
               <button
                 disabled={!review && highest < 11}
                 onClick={() => setScreen("side")}
               >
-                🎁 Vườn thử thách
+                <img src={asset("png/ui/icon_gift.png")} alt="" /> Vườn thử thách
               </button>
             </div>
             {save.legacy && (
@@ -1067,15 +1116,15 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
         )}
         {screen === "play" && run && (
           <main
-            className={`bb-play ${lesson ? "bb-teaching" : ""} ${practicingLesson ? "bb-practicing" : ""}`}
+            className={`bb-play ${lesson ? "bb-teaching" : ""} ${practicingLesson ? "bb-practicing" : ""} ${combinableCells.length ? "bb-play-with-pair" : ""}`}
             data-lesson-target={lesson?.target}
             style={{ "--bb-cols": run.level.cols, "--bb-rows": run.level.rows } as React.CSSProperties}
           >
             <div className="bb-play-layout">
               <div className="bb-play-info">
                 <div className="bb-play-top">
-                  <button onClick={() => setModal("pause")} aria-label={t.pause}>
-                    Ⅱ
+                  <button className="bb-icon" onClick={() => setModal("pause")} aria-label={t.pause}>
+                    <img src={asset("png/ui/icon_pause.png")} alt="" />
                   </button>
                   <div>
                     <p className="bb-kicker">
@@ -1090,7 +1139,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                       <span>· {CHAPTERS[run.level.chapter - 1]}</span>
                     </h2>
                   </div>
-                  <button onClick={() => setModal("help")}>?</button>
+                  <button className="bb-icon" onClick={() => setModal("help")} aria-label={t.help}>?</button>
                 </div>
                 <div className="bb-hud">
                   <div>
@@ -1155,6 +1204,22 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                   className="bb-board"
                   role="group"
                   aria-label={`Bàn ${BLOSSOM_TITLE}`}
+                  aria-describedby={combinableCells.length ? "bb-combine-guide" : undefined}
+                  onPointerDown={startMergeDrag}
+                  onPointerUp={finishMergeDrag}
+                  onPointerCancel={() => { mergeDrag.current = null; }}
+                  onClickCapture={(event) => {
+                    if (event.detail && suppressBoardClick.current) {
+                      suppressBoardClick.current = false;
+                      event.stopPropagation();
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape" && selectedSpecial !== null) {
+                      event.stopPropagation();
+                      setMergeCell(null);
+                    }
+                  }}
                   style={
                     {
                       gridTemplateColumns: `repeat(${run.level.cols},1fr)`,
@@ -1170,11 +1235,14 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                         save.settings.season,
                       ),
                       hazard = hazardAsset(tile);
+                    const combinable = combinableCells.includes(i);
                     return (
                       <button
                         key={`${i}-${tile.id}`}
                         data-cell={i}
-                        disabled={readingLesson || (!!lesson && !lesson.cells?.includes(i)) || !!modal || !!result || !!completionData || run.status !== "playing"}
+                        data-combinable={combinable || undefined}
+                        aria-pressed={combinable ? selectedSpecial === i : undefined}
+                        disabled={(paused && !practicingLesson) || isPaused || hidden || (!!lesson && !lesson.cells?.includes(i)) || !!modal || !!result || !!completionData || run.status !== "playing"}
                         style={
                           {
                             "--fall-x": `${fallOffsets.current.get(tile.id)?.x || 0}px`,
@@ -1184,7 +1252,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                           } as React.CSSProperties
                         }
                         aria-label={`Hàng ${Math.floor(i / run.level.cols) + 1}, cột ${(i % run.level.cols) + 1}, ${tile.special || tile.hazard || (tile.fog ? "sương mù" : undefined) || (tile.seed ? "hạt giống" : `hoa ${tile.color + 1}`)}`}
-                        className={`bb-cell ${(i + Math.floor(i / run.level.cols)) % 2 ? "alternate" : ""} ${hintCells.includes(i) ? "hint" : ""} ${mergeCell === i ? "selected" : ""} ${shake === i ? "shake" : ""} ${run.changed.includes(i) ? "land" : ""} ${tile.boss ? "boss-cell" : ""} ${tile.special ? `bb-special special-${tile.special}` : ""} ${lesson?.cells?.includes(i) ? "bb-tutorial-cell" : ""}`}
+                        className={`bb-cell ${(i + Math.floor(i / run.level.cols)) % 2 ? "alternate" : ""} ${hintCells.includes(i) ? "hint" : ""} ${selectedSpecial === i ? "selected" : ""} ${mergeTargets.includes(i) ? "bb-combine-target" : ""} ${shake === i ? "shake" : ""} ${run.changed.includes(i) ? "land" : ""} ${tile.boss ? "boss-cell" : ""} ${tile.special ? `bb-special special-${tile.special}` : ""} ${lesson?.cells?.includes(i) ? "bb-tutorial-cell" : ""}`}
                         onKeyDown={(e) => {
                           const delta = (
                             {
@@ -1196,13 +1264,11 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                           )[e.key];
                           if (delta !== undefined) {
                             e.preventDefault();
-                            const next = Math.max(
-                              0,
-                              Math.min(run.board.length - 1, i + delta),
-                            );
-                            document
-                              .querySelector<HTMLButtonElement>(
-                                `.bb-cell[data-cell="${next}"]`,
+                            const next = i + delta;
+                            if (!neighbors(run, i).includes(next)) return;
+                            e.currentTarget.parentElement
+                              ?.querySelector<HTMLButtonElement>(
+                                `.bb-cell[data-cell="${next}"]:not(:disabled)`,
                               )
                               ?.focus();
                           }
@@ -1222,6 +1288,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                           )}
                         {tile.special && (
                           <>
+                            {combinable && <span className="bb-combine-mark" aria-hidden="true" />}
                             <span className="bb-special-mark">
                               {
                                 (
@@ -1337,18 +1404,19 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                 )}
               </div>
               <div className="bb-play-actions">
+                {combinableCells.length > 0 && (
+                  <div className="bb-combine-guide" id="bb-combine-guide">
+                    <span role="status">
+                      {selectedSpecial === null
+                        ? "Chạm hoặc vuốt để ghép hai vật phẩm kề nhau."
+                        : "Ô sáng để ghép · Ô đã chọn để dùng riêng"}
+                    </span>
+                    {selectedSpecial !== null && (
+                      <button onClick={() => setMergeCell(null)}>Hủy chọn</button>
+                    )}
+                  </div>
+                )}
                 <div className="bb-tools" aria-label="Công cụ trong ván">
-                  <button
-                    className={tool === "merge" ? "active" : ""}
-                    disabled={!!lesson || paused || !hasMergePair}
-                    title={hasMergePair ? "Ghép hai special cạnh nhau" : "Cần hai special cạnh nhau"}
-                    onClick={() => {
-                      setTool(tool === "merge" ? "" : "merge");
-                      setMergeCell(null);
-                    }}
-                  >
-                    ✦<small>Ghép đôi</small>
-                  </button>
                   {Object.entries(BOOSTERS)
                     .filter(
                       ([k, b]) => !b.start && (run.used[`reserved:${k}`] || 0) > 0,
@@ -1388,18 +1456,12 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                     </button>
                   )}
                 </div>
-                {tool === "merge" && (
-                  <p className="bb-instruction">
-                    {mergeCell === null ? "Chọn special thứ nhất · ghép đôi dùng 1 lượt." : "Chọn special thứ hai ở cạnh ô đang sáng."}
-                    <button onClick={() => { setTool(""); setMergeCell(null); }}>Hủy chọn</button>
-                  </p>
-                )}
                 {tool === "broom" && (
                   <button onClick={() => setVertical(!vertical)}>
                     Hướng quét: {vertical ? "dọc ↕" : "ngang ↔"}
                   </button>
                 )}
-                {tool && tool !== "merge" && (
+                {tool && (
                   <p className="bb-instruction">
                     Chọn ô trên bàn để dùng {BOOSTERS[tool]?.label}.
                     <button onClick={() => setTool("")}>Hủy chọn</button>
@@ -1962,7 +2024,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
               </div>
             </>,
             <button className="bb-primary" onClick={() => start()}>
-              ▶ {t.play}
+              {t.play}
             </button>,
             () => setPrep(null),
             "bb-preparation",
@@ -1971,26 +2033,26 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
           modalShell(
             t.pause,
             <>
-              <img
-                className="bb-modal-character"
-                src={asset("png/characters/char_bibi_sleepy.png")}
-                alt="Bibi"
-              />
-              <p>Hoa vẫn ở đây, chờ bạn trở lại.</p>
-              <button onClick={exportReplay}>↓ Xuất replay để kiểm tra</button>
-              <button
-                onClick={() => {
-                  const old = runRef.current;
-                  if (!old) return;
-                  write(refund(saveRef.current, old));
-                  prepare(old.level, old.mode);
-                  setModal(null);
-                  runRef.current = undefined;
-                  setRun(undefined);
-                }}
-              >
-                Chơi lại
-              </button>
+              <div className="bb-pause-intro">
+                {run && <h3>Màn {run.level.id} · {CHAPTERS[run.level.chapter - 1]}</h3>}
+                <img src={asset("png/characters/char_bibi_sleepy.png")} alt="Bibi" />
+              </div>
+              <div className="bb-pause-tools">
+                <button onClick={exportReplay}>↓ Tải bản ghi ván</button>
+                <button
+                  onClick={() => {
+                    const old = runRef.current;
+                    if (!old) return;
+                    write(refund(saveRef.current, old));
+                    prepare(old.level, old.mode);
+                    setModal(null);
+                    runRef.current = undefined;
+                    setRun(undefined);
+                  }}
+                >
+                  Chơi lại
+                </button>
+              </div>
               <label className="bb-setting">
                 <span>Âm thanh</span>
                 <input
@@ -2066,8 +2128,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
               </div>
               <h3>Ghép đôi mạnh hơn</h3>
               <p>
-                Bấm “Ghép đôi”, chọn hai vật phẩm cạnh nhau. Tốn một lượt, không
-                tự ghép khi tạo vật phẩm mới.
+                Chạm hai vật phẩm đặc biệt cạnh nhau hoặc vuốt từ vật phẩm này sang vật phẩm kia. Ghép một cặp dùng một lượt.
               </p>
               <h3>Cứu khu vườn</h3>
               <p>

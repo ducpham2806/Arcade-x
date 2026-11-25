@@ -1,14 +1,17 @@
 import {test,expect} from '@playwright/test';
-import {enterLauncher} from '../qc/helpers';
-import {parseCatalog} from '../../src/launcher/catalog';
 import {BLOSSOM_TITLE} from '../../src/games/hex-match/blossom/branding';
+import {openBlossomFromLauncher} from './ui-helpers';
 
-test('old catalog metadata cannot restore Hex branding or change access rules',()=>{
- const catalog=parseCatalog({schemaVersion:1,games:[{id:'hex-match',engine_key:'hex-match',title:'Hex Collapse Puzzle',short_description:'Old timed hex game',status:'maintenance',access_model:'premium'}]})!;
- expect(catalog.games[0].title).toBe(BLOSSOM_TITLE);
- expect(catalog.games[0].shortDesc).not.toContain('Old timed hex');
- expect(catalog.games[0].availability).toBe('maintenance');
- expect(catalog.games[0].accessModel).toBe('premium');
+test('old catalog metadata cannot restore Hex branding or change access rules',async({page})=>{
+ await page.goto('/blossom-review.html');
+ const catalog=await page.evaluate(async()=>{
+  const modulePath='/src/launcher/catalog.ts';
+  const {parseCatalog}=await import(modulePath);
+  const catalog=parseCatalog({schemaVersion:1,games:[{id:'hex-match',engine_key:'hex-match',title:'Hex Collapse Puzzle',short_description:'Old timed hex game',status:'maintenance',access_model:'premium'}]});
+  return catalog?.games.find((game: {id: string}) => game.id === 'hex-match');
+ });
+ expect(catalog).toMatchObject({title:BLOSSOM_TITLE,availability:'maintenance',accessModel:'premium'});
+ expect(catalog.shortDesc).not.toContain('Old timed hex');
 });
 
 for(const [width,height] of [[320,568],[390,844],[768,400],[1280,900]])test(`fresh launcher opens upgraded Blossom with supplied branding ${width}`,async({page})=>{
@@ -19,11 +22,12 @@ for(const [width,height] of [[320,568],[390,844],[768,400],[1280,900]])test(`fre
   localStorage.setItem('arcadex_skip_pregame_loading','true');
  });
  await page.route('**/*',r=>new URL(r.request().url()).hostname==='127.0.0.1'?r.continue():r.abort());
- await page.goto('/');await enterLauncher(page);
+ await page.goto('/');
  const card=page.locator('#game-card-hex-match');await card.scrollIntoViewIfNeeded();
  await expect(card).toContainText(BLOSSOM_TITLE);
- await expect(card.locator('image[href*="logo_blossom_blast.png"]')).toHaveCount(1);
- await page.locator('#btn-play-hex-match').click();
+ const icon=card.locator('img[data-art-game="hex-match"][data-art-variant="icon"]');
+ await expect.poll(()=>icon.evaluate((e:HTMLImageElement)=>e.complete&&e.naturalWidth>0)).toBe(true);
+ await openBlossomFromLauncher(page);
  await expect(page.locator('.blossom')).toBeVisible();
  await expect(page.locator('#btn-pregame-start')).toHaveCount(0);
  await expect(page.locator('.bb-brand')).toHaveAttribute('aria-label',BLOSSOM_TITLE);
