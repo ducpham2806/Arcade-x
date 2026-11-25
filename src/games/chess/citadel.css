@@ -164,6 +164,26 @@
 .citadel-after-promotion { position: absolute; inset: 0; animation: citadel-reveal 110ms ease-out 255ms both; }
 .citadel-before-promotion { display: block; animation: citadel-transform 90ms ease-out 255ms both; }
 
+.citadel-capture {
+  --arrival-at: 409ms;
+  --arrival-color: #ffdf95;
+}
+
+.citadel-capture[data-capture-side="b"] { --arrival-color: #d8b6ff; }
+
+.citadel-promotion-fx {
+  position: absolute;
+  z-index: 3;
+  width: 25%;
+  aspect-ratio: 104 / 75;
+  transform: translate(-50%, -52%);
+  background: url('/games/chess/citadel/promotion.webp') 0 0 / 1600% 100% no-repeat;
+  image-rendering: pixelated;
+  opacity: 0;
+  animation: citadel-impact 285ms steps(15, end) 230ms forwards;
+}
+.citadel-promotion-fx[data-promotion-side="w"] { filter: hue-rotate(126deg); }
+
 .citadel-victim {
   left: var(--victim-x);
   top: var(--victim-y);

@@ -7,12 +7,14 @@ export interface OaqBattlefield {
   units?: CanvasImageSource;
   terrains?: HTMLImageElement;
   impact?: HTMLImageElement;
+  sweep?: HTMLImageElement;
 }
 
 export const OAQ_CAMPAIGN_IMAGES = {
   units: '/games/o-an-quan/campaign/units.webp',
   terrains: '/games/o-an-quan/campaign/terrains.webp',
   impact: '/games/xiangqi/battlefield/capture.webp',
+  sweep: '/games/o-an-quan/campaign/spear-sweep.webp',
 };
 
 const TERRAIN = {
@@ -40,13 +42,14 @@ export function drawCampaignGround(ctx: CanvasRenderingContext2D, field: OaqBatt
 
 export function drawCampaignUnit(
   ctx: CanvasRenderingContext2D, atlas: CanvasImageSource, seat: FolkSeat,
-  x: number, y: number, size: number, commander = false, facing = 1, tilt = 0,
+  x: number, y: number, size: number, commander = false, facing = 1, tilt = 0, lift = 0,
 ) {
   ctx.save();
   ctx.translate(Math.round(x), Math.round(y));
   ctx.fillStyle = '#170b0a69';
   ctx.beginPath();
-  ctx.ellipse(0, size * .2, size * .29, size * .105, 0, 0, 2 * Math.PI);
+  const shadowScale = 1 - Math.min(.33, lift / 135);
+  ctx.ellipse(0, size * .2 + lift, size * .29 * shadowScale, size * .105 * shadowScale, 0, 0, 2 * Math.PI);
   ctx.fill();
   ctx.scale(facing, 1);
   ctx.rotate(tilt);

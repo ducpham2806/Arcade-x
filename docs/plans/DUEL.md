@@ -35,3 +35,5 @@ Làm lần lượt Chess → Xiangqi → Caro; mỗi game là một task nhỏ, 
 - `codex/three-board-games-polish` có bốn địa hình mỗi game và bản HTML offline đã kiểm. [QA](../qa/THREE-BOARD-GAMES-2026-11-25.md). Giữ bàn cổ điển và công tắc riêng. Cutover và thiết bị thật theo các mốc DU-R.
 
 - Ngày 26/11, Cờ vua và Cờ tướng có tua thế cờ sau trận, đối chiếu thế cuối và khay theo từng mốc. [QA](../qa/THREE-BOARD-REVIEW-2026-11-26.md).
+
+- Ngày 26/11, hiệu ứng phong cấp và Pháo có ảnh riêng, cập nhật khay theo chuyến quân về và dừng qua công tắc chuyển động. [QA VFX](../qa/THREE-BOARD-VFX-2026-11-26.md).

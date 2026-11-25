@@ -1,5 +1,5 @@
-# Bàn giao · 26/11/2026 · xem lại ba game bàn cờ
+# Bàn giao · 26/11/2026 · hiệu ứng ba bàn cờ
 
-Nhánh `codex/three-board-games-qa` nối từ `b19ba63`. Cờ vua và Cờ tướng có xem lại từng thế cờ từ bảng kết quả. Thanh kết quả ở trên bàn. Ô Ăn Quan có bàn và điểm từng lượt trong lịch sử. Ba bản HTML offline giữ công tắc chuyển động, địa hình, chế độ cổ điển và có tua nước. [QA xem lại](qa/THREE-BOARD-REVIEW-2026-11-26.md). [QA bàn và animation](qa/THREE-BOARD-GAMES-2026-11-25.md).
+PR #44 là bản bàn chơi và xem lại nước đi. Nhánh `codex/three-board-games-vfx` thêm quét giáo và bóng bám mặt bàn khi lính nhảy cho Ô Ăn Quan, vòng ấn phong cấp cho Cờ vua, đầu nòng và bụi khi Pháo qua ngòi ở Cờ tướng. Công tắc chuyển động và các mốc luật/điểm giữ theo luồng đang dùng. [QA và cách dựng VFX](qa/THREE-BOARD-VFX-2026-11-26.md).
 
-Studio Game QA & Playtest. Graphify AST scope Ô Ăn Quan, 157 nút/457 cạnh. Tiếp theo nghiệm thu trên điện thoại thật và phòng hai tài khoản. Thẻ [Duel](plans/DUEL.md) và [Folk](plans/FOLK-GAMES-PLAN.md) giữ lộ trình phát hành.
+Game Studio Game Feel và PixelFX `5294518`. Ba HTML offline có hiệu ứng mới. Còn nghiệm thu thiết bị thật và phòng hai tài khoản trong môi trường đích. [Bàn giao xem lại](qa/THREE-BOARD-REVIEW-2026-11-26.md).

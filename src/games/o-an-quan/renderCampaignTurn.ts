@@ -1,6 +1,6 @@
 import { readableCanvasText } from '../../accessibility/canvasText';
 import { getSkinById } from '../folk-duel/skins-catalog';
-import type { EquippedFolkSkins } from '../folk-duel/types';
+import type { EquippedFolkSkins, FolkSeat } from '../folk-duel/types';
 import { campaignFormation, drawCampaignUnit, type OaqBattlefield } from './battlefield';
 import { getOaqCellRects, getOaqTrayRect, OAQ_SEAT_COLOR, renderOAnQuanBoard } from './renderer';
 import { getOaqTray, getOwnRange, QUAN_VALUE, type OaqState } from './rules';
@@ -14,11 +14,9 @@ const clamp = (n: number) => Math.max(0, Math.min(n, 1));
 const center = (r: { x: number; y: number; w: number; h: number }) => ({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
 const cellCenter = (index: number) => center(cells[index]);
 
-function arc(from: Point, to: Point, t: number, height: number): Point {
-  return {
-    x: from.x + (to.x - from.x) * t,
-    y: from.y + (to.y - from.y) * t - Math.sin(t * Math.PI) * height,
-  };
+function arc(from: Point, to: Point, t: number, height: number) {
+  const lift = Math.sin(t * Math.PI) * height;
+  return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t - lift, lift };
 }
 
 function unitDeparture(index: number, total: number) {
@@ -54,6 +52,33 @@ function dust(ctx: CanvasRenderingContext2D, x: number, y: number, t: number, si
   ctx.restore();
 }
 
+function groundRing(ctx: CanvasRenderingContext2D, at: Point, t: number, size: number, color: string) {
+  const width = 5 + size * t;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.6;
+  ctx.globalAlpha = .65 * (1 - t);
+  ctx.beginPath();
+  ctx.ellipse(at.x, at.y, width, width * .32, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function spearSweep(ctx: CanvasRenderingContext2D, sheet: HTMLImageElement, t: number, at: Point,
+  seat: FolkSeat, facing: number, large: boolean,
+) {
+  const width = sheet.naturalWidth / 16;
+  const height = sheet.naturalHeight / 2;
+  const scale = large ? 1.42 : 1.17;
+  const frame = Math.min(15, Math.floor(t * 16));
+  ctx.save();
+  ctx.translate(at.x, at.y);
+  ctx.scale(facing * scale, scale);
+  ctx.drawImage(sheet, frame * width, seat === 'P1' ? 0 : height, width, height,
+    -width / 2, -height * .60, width, height);
+  ctx.restore();
+}
+
 function capture(ctx: CanvasRenderingContext2D, frame: OaqFrame, t: number, at: Point, tray: Point,
   field: OaqBattlefield & { units: CanvasImageSource }, from: Point, particle: string,
 ) {
@@ -61,22 +86,30 @@ function capture(ctx: CanvasRenderingContext2D, frame: OaqFrame, t: number, at: 
   const { seat, isQuan } = step;
   const facing = Math.sign(at.x - from.x) || (seat === 'P1' ? 1 : -1);
   if (step.type === 'capture' && t < .72) {
-    const jump = clamp(t / HIT);
-    const attack = arc(from, at, jump, 41);
+    const preparation = clamp(t / .085);
+    const jump = clamp((t - .085) / (HIT - .085));
+    const attack = arc(from, at, jump, isQuan ? 45 : 35);
+    const brace = Math.sin(preparation * Math.PI);
+    attack.x -= facing * brace * 6;
     ctx.save();
     ctx.globalAlpha = 1 - clamp((t - .54) / .18);
-    drawCampaignUnit(ctx, field.units, seat, attack.x, attack.y, 49, false, facing, .2 + .65 * clamp((t - .22) / .17));
+    drawCampaignUnit(ctx, field.units, seat, attack.x, attack.y, 49, false, facing, -.31 * brace + .78 * clamp((t - .205) / .15), attack.lift);
     ctx.restore();
   }
 
   if (step.type === 'capture' && t >= HIT && t < .7) {
     const impact = clamp((t - HIT) / .38);
-    if (field.impact) {
+    if (field.sweep) spearSweep(ctx, field.sweep, impact, at, seat, facing, !!isQuan);
+    if (field.impact && (isQuan || !field.sweep)) {
       const w = field.impact.naturalWidth / 16;
       const h = field.impact.naturalHeight;
+      ctx.save();
+      ctx.globalAlpha = field.sweep ? .55 : 1;
       ctx.drawImage(field.impact, Math.min(15, Math.floor(impact * 16)) * w, 0, w, h, at.x - 61, at.y - 42, 122, 71);
+      ctx.restore();
     }
     dust(ctx, at.x, at.y + 9, impact, 2, particle);
+    groundRing(ctx, { x: at.x, y: at.y + 12 }, impact, isQuan ? 35 : 22, OAQ_SEAT_COLOR[seat]);
   }
   if (t < HIT) return;
 
@@ -94,11 +127,12 @@ function capture(ctx: CanvasRenderingContext2D, frame: OaqFrame, t: number, at: 
         const x = tray.x + (i % 8) * 10 - 30;
         ctx.save();
         ctx.globalAlpha = clamp((1.46 - elapsed) / .3);
-        ctx.font = 'bold 17px system-ui';
+        ctx.font = commander ? 'bold 22px system-ui' : 'bold 17px system-ui';
         ctx.textAlign = 'center';
         ctx.fillStyle = OAQ_SEAT_COLOR[seat];
         readableCanvasText(ctx, commander ? '+10' : '+1', x, tray.y - 6 - (elapsed - 1) * 36);
         ctx.restore();
+        if (commander || i === count - 1) groundRing(ctx, tray, (elapsed - 1) / .46, commander ? 22 : 10, OAQ_SEAT_COLOR[seat]);
       }
       continue;
     }
@@ -110,7 +144,7 @@ function capture(ctx: CanvasRenderingContext2D, frame: OaqFrame, t: number, at: 
     const point = arc(origin, destination, progress, 25 + i % 4 * 4);
     const size = commander ? 68 - 44 * progress : 31 - 16 * progress;
     drawCampaignUnit(ctx, field.units, defeated, point.x, point.y, size, commander, -facing,
-      (1 - progress) * clamp((t - HIT) * 17) * -.9);
+      (1 - progress) * clamp((t - HIT) * 17) * -.9, point.lift);
   }
 }
 
@@ -129,7 +163,10 @@ export function renderCampaignTurn(
   const facing = Math.sign(at.x - from.x) || (step.seat === 'P1' ? 1 : -1);
 
   if (step.type === 'pickup') {
-    if (!settled) return;
+    if (!settled) {
+      groundRing(ctx, at, t / .25, 18, OAQ_SEAT_COLOR[step.seat]);
+      return;
+    }
     const brace = Math.sin(Math.PI * clamp((t - .25) / .75));
     for (let i = 0; i < Math.min(12, step.count); i++) {
       const point = campaignFormation(at.x, at.y - 8, i);
@@ -146,13 +183,15 @@ export function renderCampaignTurn(
       unit.x -= facing * offset;
       unit.y += i * 4;
       const gait = Math.sin(march * 4 * Math.PI - i);
-      drawCampaignUnit(ctx, field.units, step.seat, unit.x, unit.y - Math.abs(gait) * 4, 33, false, facing, gait * .1);
+      drawCampaignUnit(ctx, field.units, step.seat, unit.x, unit.y - Math.abs(gait) * 4, 33, false, facing, gait * .1, unit.lift + Math.abs(gait) * 4);
     }
     if (carried > 0) dust(ctx, from.x, from.y + 5, march, 1, particle);
     return;
   }
   if (step.type === 'drop') {
-    dust(ctx, at.x, at.y + 8, clamp((t - .78) / .22), 1, particle);
+    const landing = clamp((t - .78) / .22);
+    dust(ctx, at.x, at.y + 8, landing, 1, particle);
+    groundRing(ctx, at, landing, 10, OAQ_SEAT_COLOR[step.seat]);
     return;
   }
   if (step.type === 'capture' || step.type === 'sweep') {
@@ -163,7 +202,7 @@ export function renderCampaignTurn(
     const tResow = clamp((t - .09) / .73);
     for (const index of getOwnRange(step.seat)) {
       const point = arc(tray, cellCenter(index), tResow, 24);
-      drawCampaignUnit(ctx, field.units, step.seat, point.x, point.y, 31);
+      drawCampaignUnit(ctx, field.units, step.seat, point.x, point.y, 31, false, 1, 0, point.lift);
     }
   }
 }

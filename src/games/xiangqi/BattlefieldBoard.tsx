@@ -2,6 +2,7 @@ import { BOARD_TERRAIN_NAMES, type TerrainId } from '../duel/BoardTerrain';
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { INITIAL_XIANGQI_BOARD, PIECE_SYMBOLS, isKingInCheck, type BoardMatrix, type PieceColor, type PieceType, type XiangqiPiece } from './rules';
 import { usePieceMotion } from '../duel/usePieceMotion';
+import '../duel/board-vfx.css';
 import './battlefield.css';
 
 type Point = [row: number, column: number];
@@ -86,10 +87,11 @@ function Motion({ move, classic, vnPieces, captureOnly = false }: { move: Move; 
   const gait = piece.type === 'h' || piece.type === 'k' || piece.type === 'e' ? 'mounted' : piece.type === 'r' || piece.type === 'c' ? 'wheeled' : 'foot';
   return (
     <div className={`xqb-motion xqb-${gait}${screen ? ' xqb-cannon' : ''}${piece.type === 'h' ? ' xqb-horse' : ''}${victim ? ' xqb-capture' : ''}`}
-      style={position} data-xqb-move={captureOnly ? undefined : piece.type} data-xqb-screen={captureOnly ? undefined : screen?.join(',')} aria-hidden="true">
+      style={position} data-attack-side={piece.color} data-xqb-move={captureOnly ? undefined : piece.type} data-xqb-screen={captureOnly ? undefined : screen?.join(',')} aria-hidden="true">
       {!captureOnly && screen && <>
         <span className="xqb-screen"/>
         <span className="xqb-shell"/>
+        <span className="xqb-muzzle"/>
       </>}
       {!captureOnly && <span className="xqb-mover">
         <span className="xqb-ground-shadow"/>
@@ -98,6 +100,7 @@ function Motion({ move, classic, vnPieces, captureOnly = false }: { move: Move; 
       {captureOnly && victim && <>
         {!screen && <span className="xqb-strike"/>}
         <span className="xqb-impact"/>
+        <span className="board-arrival"/>
         <span className="xqb-victim"><Sprite piece={victim} classic={classic} vnPieces={vnPieces}/></span>
       </>}
     </div>
@@ -128,12 +131,13 @@ interface Props {
   classic?: boolean;
   terrain?: TerrainId<'xiangqi'>;
   readOnly?: boolean;
+  onMotionChange?: (active: boolean) => void;
   onCell: (row: number, column: number) => void;
 }
 
-export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, motionEnabled, classic = false, terrain = 'river', readOnly = false, onCell }: Props) {
+export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, motionEnabled, classic = false, terrain = 'river', readOnly = false, onMotionChange, onCell }: Props) {
   const previous = useRef(board);
-  const { moving, capture, play, stop } = usePieceMotion<Move>();
+  const { moving, capture, play, stop } = usePieceMotion<Move>(onMotionChange);
   const [focusIndex, setFocusIndex] = useState(9 * 9 + 4);
   const grid = useRef<HTMLDivElement>(null);
   const checked = useMemo(() => ({ r: isKingInCheck(board, 'r'), b: isKingInCheck(board, 'b') }), [board]);

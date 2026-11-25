@@ -172,11 +172,15 @@
 .xqb-tray-count { color: #eee0c4; font-variant-numeric: tabular-nums; }
 
 .xqb-motion {
+  --arrival-at: calc(var(--flight-at) + 134ms);
+  --arrival-color: #ffd39a;
   position: absolute;
   z-index: 2;
   inset: 0;
   pointer-events: none;
 }
+
+.xqb-motion[data-attack-side="b"] { --arrival-color: #9ef3e8; }
 
 .xqb-mover, .xqb-victim, .xqb-screen, .xqb-impact, .xqb-shell {
   position: absolute;
@@ -233,6 +237,17 @@
   animation: xqb-shell 286ms ease-in both;
 }
 
+.xqb-muzzle {
+  position: absolute;
+  z-index: 3;
+  left: var(--from-x);
+  top: var(--from-y);
+  width: 12%;
+  height: 8%;
+  background: radial-gradient(ellipse at 65% 50%, #fff3ce 0 16%, #ffbd6580 33%, transparent 66%);
+  animation: xqb-muzzle 115ms ease-out 85ms both;
+}
+
 .xqb-victim {
   z-index: 1;
   width: calc(100% / 9);
@@ -254,6 +269,14 @@
   background: url('/games/xiangqi/battlefield/capture.webp') 0 0 / 1600% 100% no-repeat;
   animation: xqb-impact 225ms steps(15, end) var(--impact-at) forwards;
 }
+.xqb-cannon .xqb-impact {
+  width: 26%;
+  aspect-ratio: 96 / 66;
+  image-rendering: pixelated;
+  background-image: url('/games/xiangqi/battlefield/cannon-impact.webp');
+  animation-duration: 250ms;
+}
+
 .xqb-strike {
   height: 18%;
   border-bottom: 2px solid #fff0b8;
@@ -309,6 +332,11 @@
 @keyframes xqb-shadow {
   0%, 100% { transform: scale(1); opacity: .75; }
   50% { transform: scale(.84); opacity: .48; }
+}
+@keyframes xqb-muzzle {
+  from { opacity: 0; transform: translate(-50%, -50%) rotate(var(--shot-angle)) scale(.4); }
+  20% { opacity: .85; }
+  to { opacity: 0; transform: translate(-50%, -50%) rotate(var(--shot-angle)) scale(1.22); }
 }
 @keyframes xqb-shell {
   0%, 31% { left: var(--from-x); top: var(--from-y); opacity: 0; transform: translate(-50%, -50%) rotate(var(--shot-angle)); }
