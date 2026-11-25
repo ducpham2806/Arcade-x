@@ -27,4 +27,4 @@ Làm lần lượt Chess → Xiangqi → Caro; mỗi game là một task nhỏ, 
 ## Art và UI · 25/11/2026
 
 - Cờ tướng có mẫu Bến Sông Sở Hán trên nhánh `codex/xiangqi-battlefield-preview`. [QA và nguồn dựng](../qa/XIANGQI-BATTLEFIELD-2026-11-25.md). Chờ duyệt art, thiết bị thật và online hai tài khoản.
-- Cờ vua tiếp theo là mẫu Thành Trì Huyền Thuật với Vua, Mã, Xe, nhập thành và quân vỡ vào khay. Tách khỏi kế hoạch cutover DU-R1 ở trên.
+- Cờ vua có mẫu Thành Trì Huyền Thuật trên nhánh `codex/chess-citadel-preview`, từ mốc Cờ tướng `b22b6be`. [QA và nguồn dựng](../qa/CHESS-CITADEL-2026-11-25.md). Sau duyệt hai mẫu, tiếp tục UI và skin. Cutover DU-R1 ở trên theo kế hoạch riêng.

@@ -1,7 +1,7 @@
-# Bàn giao · 25/11/2026 · Cờ tướng · Bến Sông Sở Hán
+# Bàn giao · 25/11/2026 · art Cờ vua và Cờ tướng
 
-Nhánh `codex/xiangqi-battlefield-preview` từ main `3e2f5b9`. Bàn chiến trận là lựa chọn hiển thị trong Cờ tướng. Có 14 sprite, lưới 9×10, chiếu Tướng, nước Mã, Pháo ăn qua ngòi và khay quân ăn theo bàn. Kế thừa luồng đấu tại chỗ, bot và online. [QA và nguồn art](qa/XIANGQI-BATTLEFIELD-2026-11-25.md).
+Nhánh `codex/chess-citadel-preview` nối từ `b22b6be`. Cờ vua có bàn tùy chọn Chính Điện Đá, 12 sprite, chuyển động nhập thành, bắt qua đường, phong cấp và khay từ nước đã ăn. Đã có bản HTML hai người cùng máy với các thế thử. [QA và art](qa/CHESS-CITADEL-2026-11-25.md).
 
-Chromium qua ba khung màn hình và bản HTML độc lập mở offline. Thiết bị thật, hai tài khoản online và vòng duyệt art còn chờ. Bước kế là kiểm mẫu trên màn hình thật và làm bản thử Cờ vua cho Vua, Mã, Xe, nhập thành và luồng ăn quân. [Thẻ Duel](plans/DUEL.md).
+Cờ tướng có bàn Bến Sông Sở Hán, 14 sprite, Pháo qua ngòi và khay quân ăn. [QA và art](qa/XIANGQI-BATTLEFIELD-2026-11-25.md). Bước kế là duyệt hai bản mẫu, kiểm thiết bị và phòng hai tài khoản, rồi chốt UI và các bộ bàn phụ. [Thẻ Duel](plans/DUEL.md).
 
-[Bàn giao Folk và chat trước đợt này](archive/SESSION-HANDOFF-2026-11-20-before-xiangqi-battlefield.md).
+[Bàn giao Folk và chat trước hai bản mẫu](archive/SESSION-HANDOFF-2026-11-20-before-xiangqi-battlefield.md).

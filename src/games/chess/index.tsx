@@ -41,6 +41,7 @@ import { GameActionConfirmModal } from '../../components/multiplayer/GameActionC
 import { MatchEndModal, MatchEndReviewBar, MatchEndPlayerInfo } from '../../components/multiplayer/MatchEndModal';
 import { CHESS_ACHIEVEMENTS } from './config';
 import { botMove } from '../duel/aiClient';
+import { CitadelBoard, CitadelPiece, CITADEL_NAMES } from './CitadelBoard';
 
 // Standard Unicode Chess Pieces with Wizard's Chess Lore Names
 const CHESS_PIECE_SYMBOLS: Record<string, { symbol: string; name: string }> = {
@@ -380,7 +381,7 @@ const WizardChessSplashModal: React.FC<{ onDismiss: () => void }> = ({ onDismiss
   );
 };
 
-export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode, onGameOver, onRestart }) => {
+export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode, isPaused, onGameOver, onRestart }) => {
   const { submitScore, reportProgress, triggerLootRoll } = bridge;
   const { profile, addExp, addCoins } = usePlayer();
   const playerElo = profile?.stats?.highScores?.['chess-elo'] || 1200;
@@ -404,6 +405,10 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   const [botError, setBotError] = useState('');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [soundMuted, setSoundMuted] = useState(false);
+  const [citadel, setCitadel] = useState(() => {
+    try { return localStorage.getItem('arcadex_chess_board') === 'citadel'; }
+    catch { return false; }
+  });
 
   // Epic Capture VFX & Board Camera Shake State
   const [captureVfx, setCaptureVfx] = useState<CaptureVfxEvent | null>(null);
@@ -528,7 +533,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             const { from, to } = roomState.lastMove;
             const hasSquares = typeof from === 'string' && typeof to === 'string';
             if (hasSquares) setLastMovedSquare({ from: from as Square, to: to as Square });
-            if (hasSquares && roomState.lastMove.captured) {
+            if (!citadel && hasSquares && roomState.lastMove.captured) {
               const oppColor: Color = myColor === 'w' ? 'b' : 'w';
               triggerEpicCaptureEffect(
                 from as Square,
@@ -557,7 +562,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         console.error('Failed to parse remote chess FEN', err);
       }
     }
-  }, [roomState?.boardState, roomState?.moveHistory, roomState?.lastMove, profile.id, myColor, triggerEpicCaptureEffect]);
+  }, [roomState?.boardState, roomState?.moveHistory, roomState?.lastMove, profile.id, myColor, citadel, triggerEpicCaptureEffect]);
 
   const calculateCapturedPieces = (chess: Chess) => {
     const fullSet: Record<Color, Record<PieceSymbol, number>> = {
@@ -907,7 +912,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         if (moveResult.captured || pieceOnTarget) {
           const victimType = (pieceOnTarget?.type || moveResult.captured || 'p') as PieceSymbol;
           const victimColor: Color = moveResult.color === 'w' ? 'b' : 'w';
-          triggerEpicCaptureEffect(
+          if (!citadel) triggerEpicCaptureEffect(
             from,
             to,
             (movingBefore?.type || moveResult.piece) as PieceSymbol,
@@ -985,7 +990,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         setMoveSending(false);
       }
     },
-    [moveHistory, activeRoomId, roomState, mpMakeMove, isAiMode, myColor, handleAiGameEnd, triggerEpicCaptureEffect]
+    [moveHistory, activeRoomId, roomState, mpMakeMove, isAiMode, myColor, citadel, handleAiGameEnd, triggerEpicCaptureEffect]
   );
 
   // Square Click handler
@@ -1450,7 +1455,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                     </div>
                     <div>
                       <h1 className="text-base sm:text-lg font-serif font-bold text-amber-100 flex items-center gap-2">
-                        Cờ Vua Phù Thủy
+                        {citadel ? 'Thành Trì Huyền Thuật' : 'Cờ Vua Phù Thủy'}
                         <span className="text-xs font-sans px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                           {isAiMode ? `Đấu Phù Thủy AI (${aiDifficulty})` : activeRoomId ? 'Xếp Hạng PvP' : 'Offline'}
                         </span>
@@ -1459,7 +1464,16 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <button type="button" aria-pressed={citadel}
+                    className="min-h-[40px] rounded-xl border border-amber-700 bg-slate-800/80 px-2 text-xs text-amber-100"
+                    onClick={() => {
+                      const next = !citadel;
+                      setCitadel(next);
+                      try { localStorage.setItem('arcadex_chess_board', next ? 'citadel' : 'classic'); } catch {}
+                    }}>
+                    {citadel ? 'Bàn Thành Trì' : 'Bàn cổ điển'}
+                  </button>
                   <button
                     onClick={() => {
                       setConfirmMoveMode(!confirmMoveMode);
@@ -1496,7 +1510,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
               isTurn: !isTurn && roomState?.status !== 'ended' && !chessInstanceRef.current.isGameOver(),
               statusText: 'Đang niệm chú nước đi...',
               timeLeft: activeRoomId ? turnTimeLeft : undefined,
-              capturedPieces: (
+              capturedPieces: citadel ? undefined : (
                 <div className="flex items-center -space-x-1.5 py-0.5">
                   {(myColor === 'w' ? capturedWhite : capturedBlack).map((p, i) => (
                     <span key={i} className="w-5 h-5 inline-block drop-shadow">
@@ -1521,7 +1535,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
               isTurn: isTurn && roomState?.status !== 'ended' && !chessInstanceRef.current.isGameOver(),
               statusText: 'Lượt chỉ huy của bạn',
               timeLeft: activeRoomId ? turnTimeLeft : undefined,
-              capturedPieces: (
+              capturedPieces: citadel ? undefined : (
                 <div className="flex items-center -space-x-1.5 py-0.5">
                   {(myColor === 'w' ? capturedBlack : capturedWhite).map((p, i) => (
                     <span key={i} className="w-5 h-5 inline-block drop-shadow">
@@ -1541,7 +1555,13 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             }}
             board={
               <div className="relative flex flex-col items-center w-full">
-                {/* Enchanted Stone Chamber Outer Frame with Torch Glow */}
+                {citadel ? (
+                  <CitadelBoard key={activeRoomId ?? 'practice'} fen={fen} history={moveHistory}
+                    orientation={myColor} selected={selectedSquare} legal={legalMovesFromSelected}
+                    pending={pendingTargetSquare} paused={Boolean(isPaused || isReviewingBoard)}
+                    onSquare={handleSquareClick}/>
+                ) : (
+                /* Enchanted Stone Chamber Outer Frame with Torch Glow */
                 <motion.div
                   animate={
                     boardShake
@@ -1577,6 +1597,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                     )}
                   </div>
                 </motion.div>
+                )}
 
                 <AnimatePresence>
                   {pendingPromotion && (
@@ -1597,9 +1618,10 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                               executeMoveInternal(pendingPromotion.from, pendingPromotion.to, pieceType)
                             }
                             className="w-14 h-14 rounded-xl bg-slate-900 hover:bg-amber-500/25 border border-amber-500/40 flex items-center justify-center p-1.5 transition-all active:scale-95 cursor-pointer"
+                            aria-label={`Phong cấp ${CITADEL_NAMES[pieceType]}`}
                             title={WIZARD_PIECE_LORE[`${myColor}${pieceType}`]?.name}
                           >
-                            <ChessPiece type={pieceType} color={myColor} />
+                            {citadel ? <CitadelPiece type={pieceType} color={myColor}/> : <ChessPiece type={pieceType} color={myColor}/>}
                           </button>
                         ))}
                       </div>

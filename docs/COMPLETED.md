@@ -2,12 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Cờ tướng · mẫu Bến Sông Sở Hán · 25/11/2026
+## Bàn thử Cờ vua và Cờ tướng · 25/11/2026
 
-- Nhánh `codex/xiangqi-battlefield-preview`, mốc gốc `3e2f5b9`. Tạo bàn 9×10, 14 sprite và hai khay quân ăn.
-- Nối nước đi đã cập nhật, Pháo qua ngòi và lựa chọn bàn cổ điển/chiến trận.
-- Kiểm `test:duel`, `test:artwork`, lint và build. [QA và giới hạn](qa/XIANGQI-BATTLEFIELD-2026-11-25.md).
-- Còn nghiệm thu thiết bị thật, hai tài khoản và bản mẫu Cờ vua.
+- Cờ tướng Bến Sông Sở Hán, 14 sprite, Pháo qua ngòi, khay quân ăn. [QA](qa/XIANGQI-BATTLEFIELD-2026-11-25.md).
+- Cờ vua Chính Điện Đá, 12 sprite, nhập thành hai quân, bắt qua đường, phong cấp và khay SAN. [QA](qa/CHESS-CITADEL-2026-11-25.md).
+- Hai mẫu có HTML chơi offline và chọn giao diện trong ArcadeX. Còn duyệt art, thiết bị thật và hai tài khoản.
 
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 
