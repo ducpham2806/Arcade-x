@@ -134,7 +134,7 @@
 }
 
 .xqb-piece { pointer-events: none; }
-.xqb-sprite { background: url('/games/xiangqi/battlefield/units.webp') no-repeat; background-size: 700% 200%; }
+.xqb-sprite { background: url('/games/xiangqi/battlefield/units-v2.webp') no-repeat; background-size: 700% 200%; }
 .xqb-piece-in-motion { visibility: hidden; }
 
 .xqb-glyph {
