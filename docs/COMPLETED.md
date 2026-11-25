@@ -6,7 +6,7 @@
 
 - Cờ tướng Bến Sông Sở Hán, 14 sprite pixel full-body mới, Pháo qua ngòi và khay quân ăn. [QA](qa/XIANGQI-BATTLEFIELD-2026-11-25.md).
 - Cờ vua Chính Điện Đá, 12 sprite pixel full-body, nhập thành hai quân, bắt qua đường, phong cấp và khay SAN. [QA](qa/CHESS-CITADEL-2026-11-25.md).
-- Hai mẫu có HTML chơi offline và chọn giao diện trong ArcadeX. Còn duyệt art, thiết bị thật và hai tài khoản.
+- Hai mẫu có HTML chơi offline, đổi giao diện và công tắc chuyển động riêng từng game. [QA chuyển động](qa/DUEL-PIECE-MOTION-2026-11-25.md). Còn duyệt art, thiết bị thật và hai tài khoản.
 
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 

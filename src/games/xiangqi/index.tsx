@@ -56,6 +56,7 @@ import {
 } from './rules';
 import { botMove } from '../duel/aiClient';
 import { BattlefieldBoard } from './BattlefieldBoard';
+import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
 
 type XiangqiPlayMode = 'lobby' | 'online' | 'ai' | 'local_hotseat';
 
@@ -91,9 +92,12 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   useEffect(()=>{ aiRequest.current?.abort();return ()=>aiRequest.current?.abort(); },[playMode]);
   const [moveHint,setMoveHint]=useState('');
   const [botError,setBotError]=useState('');
-  const [battlefield, setBattlefield] = useState(() => localStorage.getItem('arcadex_xiangqi_board') === 'battlefield');
+  const [battlefield, setBattlefield] = useState(() => {
+    try { return localStorage.getItem('arcadex_xiangqi_board') !== 'classic'; }
+    catch { return true; }
+  });
+  const boardMotion = useBoardMotion('xiangqi');
   const [vnPieces,setVnPieces]=useState(()=>localStorage.getItem('arcadex_xiangqi_vn')==='1');
-  const pieceNames:Record<string,string>={k:'Tướng',a:'Sĩ',e:'Tượng',r:'Xe',c:'Pháo',h:'Mã',p:'Tốt'};
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('hard');
   const [aiBoard, setAiBoard] = useState<BoardMatrix>(INITIAL_XIANGQI_BOARD);
   const [aiTurn, setAiTurn] = useState<PieceColor>('r');
@@ -708,11 +712,12 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       {moveHint&&<p role="status" className="text-sm text-amber-200 p-2">{moveHint}</p>}
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
       <div className="flex flex-wrap items-center justify-center gap-2">
+        <BoardMotionToggle {...boardMotion} className="rounded-lg bg-slate-800 p-2 text-sm text-white"/>
         <button type="button" className="rounded-lg bg-slate-800 p-2 text-sm text-white" aria-pressed={battlefield}
           onClick={() => {
             const next = !battlefield;
             setBattlefield(next);
-            localStorage.setItem('arcadex_xiangqi_board', next ? 'battlefield' : 'classic');
+            try { localStorage.setItem('arcadex_xiangqi_board', next ? 'battlefield' : 'classic'); } catch {}
           }}>
           {battlefield ? 'Bàn chiến trận' : 'Bàn cổ điển'}
         </button>
@@ -902,98 +907,10 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* TRADITIONAL WOODEN XIANGQI BOARD MATRIX (9 x 10)         */}
-          {/* ========================================================= */}
-          {battlefield ? (
-            <BattlefieldBoard key={`${playMode}:${activeRoomId ?? ''}`} board={currentBoard}
-              selected={selectedPos} pending={pendingDest} legalMoves={legalMoves}
-              vnPieces={vnPieces} paused={Boolean(isPaused || isReviewingBoard)} onCell={handleCellClick}/>
-          ) : (
-            <div
-              className="arcade-board relative p-3 sm:p-5 rounded-3xl bg-[#4a1610] bg-cover bg-center border-4 border-[#b8862f] shadow-2xl shadow-black overflow-x-auto max-w-full"
-              style={{ backgroundImage: 'url(/games/xiangqi/art/frame-lacquer.webp)' }}
-            >
-              {/* Wooden Board Surface */}
-              <div
-                className="relative bg-[#d8ab76] bg-cover bg-center border-2 border-[#5c3a1e] rounded-xl p-3 sm:p-4 shadow-inner"
-                // Piece glyphs sit on the cream token centres and the river text on light wood: the
-                // contrast is designed, so the launcher's image-surface fallback must not box them.
-                data-readability="off"
-                style={{
-                  // Painted Gemini wood and lacquer (art/gemini/xiangqi); grid, river and palace are drawn on top.
-                  backgroundImage: 'url(/games/xiangqi/art/board-wood.webp)',
-                  width: 'min(94vw, 500px)',
-                  height: 'min(105vw, 560px)',
-                }}
-              >
-                {/* River Text Banner (Chu Hà - Hán Giới) */}
-                <div className="absolute top-[46.5%] left-4 right-4 flex items-center justify-between px-6 pointer-events-none text-[#5c3a1e]/85 font-black tracking-[0.5em] text-xs sm:text-sm uppercase font-serif">
-                  <span>楚 河</span>
-                  <span>漢 界</span>
-                </div>
-
-                {/* Grid Cells (10 Rows x 9 Cols) */}
-                <div className="w-full h-full grid grid-rows-10 grid-cols-9 gap-0">
-                  {Array.from({ length: 10 }).map((_, r) =>
-                    Array.from({ length: 9 }).map((_, c) => {
-                      const piece = currentBoard[r][c];
-                      const isSelected = selectedPos?.[0] === r && selectedPos?.[1] === c;
-                      const isLegalDest = legalMoves.some(([lr, lc]) => lr === r && lc === c);
-                      const isPendingDest = pendingDest?.[0] === r && pendingDest?.[1] === c;
-
-                      return (
-                        <div
-                          key={`${r}_${c}`}
-                          onClick={() => handleCellClick(r, c)}
-                          className={`relative flex items-center justify-center cursor-pointer border-[0.5px] border-[#8a5d35]/40 ${
-                            isPendingDest ? 'bg-cyan-400/40 ring-4 ring-cyan-400 z-20 rounded-md shadow-lg animate-pulse' : ''
-                          }`}
-                        >
-                          {/* 2-Tap Pending Reticle */}
-                          {isPendingDest && (
-                            <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
-                              <div className="w-5 h-5 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs font-black shadow-lg">
-                                ✓
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Legal Move Glowing Dot */}
-                          {isLegalDest && !isPendingDest && (
-                            <div
-                              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${
-                                piece
-                                  ? 'ring-4 ring-rose-500 bg-rose-500/50 animate-ping'
-                                  : 'bg-emerald-600/80 ring-2 ring-emerald-300 animate-pulse'
-                              }`}
-                            />
-                          )}
-
-                          {/* Piece Disc */}
-                          {piece && (
-                            <div
-                              className={`arcade-piece relative w-[92%] h-[92%] rounded-full flex items-center justify-center bg-cover bg-center shadow-md shadow-black/60 transition-transform ${
-                                piece.color === 'r'
-                                  ? 'bg-[#f5e6cb] text-[#b02a2a]'
-                                  : 'bg-[#e2d5c1] text-[#1a1a1a]'
-                              } ${isSelected ? 'scale-110 ring-4 ring-amber-400 z-10' : 'hover:scale-105'}`}
-                              style={{ backgroundImage: `url(/games/xiangqi/art/token-${piece.color === 'r' ? 'red' : 'black'}.webp)` }}
-                            >
-                              <span className="font-serif font-black text-base sm:text-xl select-none">
-                                {vnPieces?pieceNames[piece.type]:PIECE_SYMBOLS[piece.color][piece.type]}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-
-            </div>
-          )}
+          <BattlefieldBoard key={`${playMode}:${activeRoomId ?? ''}`} board={currentBoard}
+            selected={selectedPos} pending={pendingDest} legalMoves={legalMoves}
+            vnPieces={vnPieces} paused={Boolean(isPaused || isReviewingBoard)} classic={!battlefield}
+            motionEnabled={boardMotion.enabled} onCell={handleCellClick}/>
 
             {selectedPos && pendingDest && !isMatchEnded && (
               <div className="w-full max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">

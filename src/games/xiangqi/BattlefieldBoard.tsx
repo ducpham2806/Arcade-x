@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { INITIAL_XIANGQI_BOARD, PIECE_SYMBOLS, isKingInCheck, type BoardMatrix, type PieceColor, type PieceType, type XiangqiPiece } from './rules';
+import { usePieceMotion } from '../duel/usePieceMotion';
 import './battlefield.css';
 
 type Point = [row: number, column: number];
@@ -37,8 +38,9 @@ function findCannonScreen(previous: BoardMatrix, from: Point, to: Point): Point 
   return screen;
 }
 
-function getMove(before: BoardMatrix, after: BoardMatrix): Move | null {
+function getMove(before: BoardMatrix, after: BoardMatrix): Move | null | undefined {
   const changed = POSITION_LIST.filter(([r, c]) => before[r][c]?.id !== after[r][c]?.id);
+  if (!changed.length) return;
   if (changed.length !== 2) return null;
   const from = changed.find(([r, c]) => before[r][c] && !after[r][c]);
   const to = changed.find(([r, c]) => !!after[r][c]);
@@ -57,13 +59,16 @@ function y(point: Point) {
   return `${(point[0] + .5) / 10 * 100}%`;
 }
 
-function Sprite({ piece }: { piece: XiangqiPiece }) {
+function Sprite({ piece, classic, vnPieces }: { piece: XiangqiPiece; classic: boolean; vnPieces: boolean }) {
+  if (classic) return <span aria-hidden="true" className={`xqb-token xqb-token-${piece.color}`}>
+    {vnPieces ? NAMES[piece.type] : PIECE_SYMBOLS[piece.color][piece.type]}
+  </span>;
   return <span aria-hidden="true" className="xqb-sprite" style={{
     backgroundPosition: `${PIECE_ORDER.indexOf(piece.type) / 6 * 100}% ${piece.color === 'r' ? 0 : 100}%`,
   }}/>;
 }
 
-function Motion({ move }: { move: Move }) {
+function Motion({ move, classic, vnPieces, captureOnly = false }: { move: Move; classic: boolean; vnPieces: boolean; captureOnly?: boolean }) {
   const { from, to, piece, victim, screen } = move;
   const [dr, dc] = [to[0] - from[0], to[1] - from[1]];
   const horseCorner: Point = Math.abs(dr) === 2 ? [to[0], from[1]] : [from[0], to[1]];
@@ -72,31 +77,39 @@ function Motion({ move }: { move: Move }) {
     '--turn-x': x(horseCorner), '--turn-y': y(horseCorner),
     '--vault-x': screen ? x(screen) : x(from), '--vault-y': screen ? y(screen) : y(from),
     '--shot-angle': `${Math.atan2(dr, dc)}rad`,
+    '--facing': dc < 0 ? -1 : 1,
+    '--impact-at': screen ? '286ms' : '255ms',
+    '--flight-at': screen ? '342ms' : '311ms',
     '--tray-y': piece.color === 'r' ? '104%' : '-4%',
   } as CSSProperties;
+  const gait = piece.type === 'h' || piece.type === 'k' || piece.type === 'e' ? 'mounted' : piece.type === 'r' || piece.type === 'c' ? 'wheeled' : 'foot';
   return (
-    <div className={`xqb-motion${screen ? ' xqb-cannon' : ''}${piece.type === 'h' ? ' xqb-horse' : ''}${victim ? ' xqb-capture' : ''}`}
-      style={position} data-xqb-move={piece.type} data-xqb-screen={screen?.join(',')} aria-hidden="true">
-      {screen && <>
+    <div className={`xqb-motion xqb-${gait}${screen ? ' xqb-cannon' : ''}${piece.type === 'h' ? ' xqb-horse' : ''}${victim ? ' xqb-capture' : ''}`}
+      style={position} data-xqb-move={captureOnly ? undefined : piece.type} data-xqb-screen={captureOnly ? undefined : screen?.join(',')} aria-hidden="true">
+      {!captureOnly && screen && <>
         <span className="xqb-screen"/>
         <span className="xqb-shell"/>
       </>}
-      <span className="xqb-mover"><Sprite piece={piece}/></span>
-      {victim && <>
+      {!captureOnly && <span className="xqb-mover">
+        <span className="xqb-ground-shadow"/>
+        <span className="xqb-stance"><Sprite piece={piece} classic={classic} vnPieces={vnPieces}/></span>
+      </span>}
+      {captureOnly && victim && <>
+        {!screen && <span className="xqb-strike"/>}
         <span className="xqb-impact"/>
-        <span className="xqb-victim"><Sprite piece={victim}/></span>
+        <span className="xqb-victim"><Sprite piece={victim} classic={classic} vnPieces={vnPieces}/></span>
       </>}
     </div>
   );
 }
 
-function Tray({ color, captured }: { color: PieceColor; captured: XiangqiPiece[] }) {
+function Tray({ color, captured, classic, vnPieces }: { color: PieceColor; captured: XiangqiPiece[]; classic: boolean; vnPieces: boolean }) {
   const side = color === 'r' ? 'Đỏ' : 'Đen';
   return (
     <div className={`xqb-tray xqb-tray-${color}`} data-xqb-tray={color} aria-label={`Phe ${side} đã ăn ${captured.length} quân`}>
       <strong>{side}</strong>
       <div className="xqb-tray-pieces">
-        {captured.map(piece => <span className="xqb-prisoner" key={piece.id} title={NAMES[piece.type]}><Sprite piece={piece}/></span>)}
+        {captured.map(piece => <span className="xqb-prisoner" key={piece.id} title={NAMES[piece.type]}><Sprite piece={piece} classic={classic} vnPieces={vnPieces}/></span>)}
       </div>
       <span className="xqb-tray-count">{captured.length}</span>
     </div>
@@ -110,14 +123,14 @@ interface Props {
   legalMoves: Point[];
   vnPieces: boolean;
   paused: boolean;
+  motionEnabled: boolean;
+  classic?: boolean;
   onCell: (row: number, column: number) => void;
 }
 
-export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, onCell }: Props) {
+export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, motionEnabled, classic = false, onCell }: Props) {
   const previous = useRef(board);
-  const timer = useRef<number | undefined>(undefined);
-  const serial = useRef(0);
-  const [motion, setMotion] = useState<{ move: Move; serial: number } | null>(null);
+  const { moving, capture, play, stop } = usePieceMotion<Move>();
   const [focusIndex, setFocusIndex] = useState(9 * 9 + 4);
   const grid = useRef<HTMLDivElement>(null);
   const checked = useMemo(() => ({ r: isKingInCheck(board, 'r'), b: isKingInCheck(board, 'b') }), [board]);
@@ -132,19 +145,18 @@ export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPiece
   useLayoutEffect(() => {
     const before = previous.current;
     previous.current = board;
-    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setMotion(null);
+    if (paused || !motionEnabled) {
+      stop();
       return;
     }
     const move = getMove(before, board);
+    if (move === undefined) return;
     if (!move) {
-      setMotion(null);
+      stop();
       return;
     }
-    setMotion({ move, serial: ++serial.current });
-    timer.current = window.setTimeout(() => setMotion(null), move.screen ? 560 : move.victim ? 470 : 210);
-    return () => window.clearTimeout(timer.current);
-  }, [board, paused]);
+    play(move, move.screen ? 595 : move.victim ? 335 : 295, move.victim ? 565 : undefined);
+  }, [board, paused, motionEnabled, play, stop]);
 
   function moveFocus(event: KeyboardEvent<HTMLButtonElement>, row: number, column: number) {
     const delta = DELTAS[event.key];
@@ -154,12 +166,11 @@ export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPiece
     grid.current?.querySelectorAll('button')[index]?.focus();
   }
 
-  const moving = motion?.move;
-  const captureInFlight = moving?.victim;
+  const captureInFlight = capture?.victim;
   return (
-    <div className="xqb" data-chat-protect="true">
-      <div className="xqb-title">Bến Sông Sở Hán</div>
-      <Tray color="b" captured={captured.b.filter(piece => piece.id !== captureInFlight?.id)}/>
+    <div className={classic ? "xqb xqb-classic" : "xqb"} data-chat-protect="true">
+      <div className="xqb-title">{classic ? "Bàn cổ điển" : "Bến Sông Sở Hán"}</div>
+      <Tray color="b" captured={captured.b.filter(piece => piece.id !== captureInFlight?.id)} classic={classic} vnPieces={vnPieces}/>
       <div className="xqb-board">
         <div className="xqb-lines" aria-hidden="true">
           <span className="xqb-palace xqb-palace-north"/>
@@ -181,15 +192,16 @@ export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPiece
                 tabIndex={index === focusIndex ? 0 : -1} onFocus={() => setFocusIndex(index)}
                 onKeyDown={event => moveFocus(event, r, c)} onClick={() => onCell(r, c)}>
                 {piece && <span className={`xqb-piece xqb-piece-${piece.color}${same(moving?.to ?? null, [r,c]) ? ' xqb-piece-in-motion' : ''}`}>
-                  <Sprite piece={piece}/><span className="xqb-glyph" aria-hidden="true">{glyph}</span>
+                  <Sprite piece={piece} classic={classic} vnPieces={vnPieces}/>{!classic && <span className="xqb-glyph" aria-hidden="true">{glyph}</span>}
                 </span>}
               </button>
             );
           })}
         </div>
-        {motion && <Motion key={motion.serial} move={motion.move}/>}
+        {moving && <Motion key={`move:${moving.piece.id}:${moving.to}`} move={moving} classic={classic} vnPieces={vnPieces}/>}
+        {capture && <Motion key={`capture:${capture.victim?.id}`} move={capture} classic={classic} vnPieces={vnPieces} captureOnly/>}
       </div>
-      <Tray color="r" captured={captured.r.filter(piece => piece.id !== captureInFlight?.id)}/>
+      <Tray color="r" captured={captured.r.filter(piece => piece.id !== captureInFlight?.id)} classic={classic} vnPieces={vnPieces}/>
     </div>
   );
 }

@@ -42,23 +42,9 @@ import { MatchEndModal, MatchEndReviewBar, MatchEndPlayerInfo } from '../../comp
 import { CHESS_ACHIEVEMENTS } from './config';
 import { botMove } from '../duel/aiClient';
 import { CitadelBoard, CitadelPiece, CITADEL_NAMES } from './CitadelBoard';
+import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
 
 // Standard Unicode Chess Pieces with Wizard's Chess Lore Names
-const CHESS_PIECE_SYMBOLS: Record<string, { symbol: string; name: string }> = {
-  wp: { symbol: '♙', name: 'Tốt Trắng · Vệ Binh Cẩm Thạch' },
-  wn: { symbol: '♘', name: 'Mã Trắng · Kỵ Sĩ Chiến Mã' },
-  wb: { symbol: '♗', name: 'Tượng Trắng · Đại Pháp Sư' },
-  wr: { symbol: '♖', name: 'Xe Trắng · Tháp Hộ Vệ' },
-  wq: { symbol: '♕', name: 'Hậu Trắng · Nữ Hoàng Thánh Quang' },
-  wk: { symbol: '♔', name: 'Vua Trắng · Đế Vương Cẩm Thạch' },
-  bp: { symbol: '♟', name: 'Tốt Đen · Thiết Giáp Tiên Phong' },
-  bn: { symbol: '♞', name: 'Mã Đen · Kỵ Sĩ Hỏa Ngục' },
-  bb: { symbol: '♝', name: 'Tượng Đen · Pháp Sư Hắc Ám' },
-  br: { symbol: '♜', name: 'Xe Đen · Khổng Lồ Gargoyle' },
-  bq: { symbol: '♛', name: 'Hậu Đen · Nữ Hoàng Hắc Ám' },
-  bk: { symbol: '♚', name: 'Vua Đen · Lãnh Chúa Obsidian' },
-};
-
 const PIECE_SCORES: Record<PieceSymbol, number> = {
   p: 1,
   n: 3,
@@ -67,29 +53,6 @@ const PIECE_SCORES: Record<PieceSymbol, number> = {
   q: 9,
   k: 0,
 };
-
-interface CaptureVfxEvent {
-  id: number;
-  from: Square;
-  to: Square;
-  attackerType: PieceSymbol;
-  attackerColor: Color;
-  victimType: PieceSymbol;
-  victimColor: Color;
-}
-
-const SHARD_VECTORS = [
-  { dx: -44, dy: -48, rot: -140, scale: 1.15, poly: '2,2 14,0 18,12 6,16' },
-  { dx: 48, dy: -42, rot: 155, scale: 1.2, poly: '0,4 16,2 14,16 2,14' },
-  { dx: -54, dy: 8, rot: -95, scale: 0.95, poly: '4,0 16,6 12,18 0,12' },
-  { dx: 56, dy: 14, rot: 110, scale: 1.05, poly: '0,0 15,4 18,15 4,16' },
-  { dx: -36, dy: 48, rot: -165, scale: 1.1, poly: '2,0 16,3 14,15 0,14' },
-  { dx: 40, dy: 50, rot: 140, scale: 1.0, poly: '0,2 14,0 16,14 4,16' },
-  { dx: -14, dy: -58, rot: -75, scale: 0.9, poly: '3,0 15,5 11,16 1,11' },
-  { dx: 18, dy: 56, rot: 85, scale: 0.95, poly: '1,1 15,2 13,15 2,14' },
-  { dx: -26, dy: -24, rot: -120, scale: 0.8, poly: '2,2 12,0 14,12 4,14' },
-  { dx: 28, dy: -22, rot: 130, scale: 0.85, poly: '0,3 12,1 13,13 2,12' },
-];
 
 // Web Audio API Synthesizer with Heavy Stone Slide & Shatter Impact
 class ChessSoundFX {
@@ -406,14 +369,11 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [soundMuted, setSoundMuted] = useState(false);
   const [citadel, setCitadel] = useState(() => {
-    try { return localStorage.getItem('arcadex_chess_board') === 'citadel'; }
-    catch { return false; }
+    try { return localStorage.getItem('arcadex_chess_board') !== 'classic'; }
+    catch { return true; }
   });
 
-  // Epic Capture VFX & Board Camera Shake State
-  const [captureVfx, setCaptureVfx] = useState<CaptureVfxEvent | null>(null);
-  const [boardShake, setBoardShake] = useState(false);
-  const [lastMovedSquare, setLastMovedSquare] = useState<{ from: Square; to: Square } | null>(null);
+  const boardMotion = useBoardMotion('chess');
 
   // Modals for Draw / Surrender / Match End
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
@@ -438,26 +398,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
   // Stats & Captured Pieces
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
-  const [capturedWhite, setCapturedWhite] = useState<PieceSymbol[]>([]);
-  const [capturedBlack, setCapturedBlack] = useState<PieceSymbol[]>([]);
-
-  const triggerEpicCaptureEffect = useCallback(
-    (from: Square, to: Square, attackerType: PieceSymbol, attackerColor: Color, victimType: PieceSymbol, victimColor: Color) => {
-      setCaptureVfx({
-        id: Date.now(),
-        from,
-        to,
-        attackerType,
-        attackerColor,
-        victimType,
-        victimColor,
-      });
-      setBoardShake(true);
-      setTimeout(() => setBoardShake(false), 520);
-      setTimeout(() => setCaptureVfx(null), 820);
-    },
-    []
-  );
 
   // Sound sync
   useEffect(() => {
@@ -526,24 +466,8 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         if (chessInstanceRef.current.fen() !== roomState.boardState) {
           chessInstanceRef.current.load(roomState.boardState);
           setFen(chessInstanceRef.current.fen());
-          calculateCapturedPieces(chessInstanceRef.current);
 
           if (roomState.lastMove && roomState.lastMove.by !== profile.id) {
-            // Chess rooms record moves as algebraic squares; skip highlight/VFX for any other shape.
-            const { from, to } = roomState.lastMove;
-            const hasSquares = typeof from === 'string' && typeof to === 'string';
-            if (hasSquares) setLastMovedSquare({ from: from as Square, to: to as Square });
-            if (!citadel && hasSquares && roomState.lastMove.captured) {
-              const oppColor: Color = myColor === 'w' ? 'b' : 'w';
-              triggerEpicCaptureEffect(
-                from as Square,
-                to as Square,
-                (roomState.lastMove.piece as PieceSymbol) || 'q',
-                oppColor,
-                (roomState.lastMove.captured as PieceSymbol) || 'p',
-                myColor
-              );
-            }
             if (chessInstanceRef.current.inCheck()) {
               sounds.playCheck();
             } else if (roomState.lastMove.captured) {
@@ -562,35 +486,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         console.error('Failed to parse remote chess FEN', err);
       }
     }
-  }, [roomState?.boardState, roomState?.moveHistory, roomState?.lastMove, profile.id, myColor, citadel, triggerEpicCaptureEffect]);
-
-  const calculateCapturedPieces = (chess: Chess) => {
-    const fullSet: Record<Color, Record<PieceSymbol, number>> = {
-      w: { p: 8, n: 2, b: 2, r: 2, q: 1, k: 1 },
-      b: { p: 8, n: 2, b: 2, r: 2, q: 1, k: 1 },
-    };
-
-    chess.board().forEach((row) => {
-      row.forEach((piece) => {
-        if (piece) {
-          fullSet[piece.color][piece.type]--;
-        }
-      });
-    });
-
-    const capW: PieceSymbol[] = [];
-    const capB: PieceSymbol[] = [];
-
-    (Object.keys(fullSet.w) as PieceSymbol[]).forEach((t) => {
-      for (let i = 0; i < fullSet.w[t]; i++) capW.push(t);
-    });
-    (Object.keys(fullSet.b) as PieceSymbol[]).forEach((t) => {
-      for (let i = 0; i < fullSet.b[t]; i++) capB.push(t);
-    });
-
-    setCapturedWhite(capW);
-    setCapturedBlack(capB);
-  };
+  }, [roomState?.boardState, roomState?.moveHistory, roomState?.lastMove, profile.id]);
 
   // Turn check
   const isTurn = useMemo(() => {
@@ -606,11 +502,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
     const moves = chessInstanceRef.current.moves({ square: selectedSquare, verbose: true });
     return moves.map((m) => m.to);
   }, [selectedSquare, fen]);
-
-  // Check state
-  const isKingInCheck = useMemo(() => {
-    return chessInstanceRef.current.inCheck();
-  }, [fen]);
 
   // AI Match End Handler
   const handleAiGameEnd = useCallback(
@@ -811,9 +702,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
           chessInstanceRef.current.reset();
           setFen(freshFen);
           setMoveHistory([]);
-          setCapturedWhite([]);
-          setCapturedBlack([]);
-          setLastMovedSquare(null);
           setShowMatchEndModal(false);
           setIsReviewingBoard(false);
           await mpRematch(freshFen);
@@ -834,9 +722,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
       setFen(chessInstanceRef.current.fen());
       setSelectedSquare(null);
       setMoveHistory([]);
-      setCapturedWhite([]);
-      setCapturedBlack([]);
-      setLastMovedSquare(null);
       setAiMatchResult(null);
       setShowMatchEndModal(false);
       setIsReviewingBoard(false);
@@ -862,9 +747,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
     setFen(chessInstanceRef.current.fen());
     setSelectedSquare(null);
     setMoveHistory([]);
-    setCapturedWhite([]);
-    setCapturedBlack([]);
-    setLastMovedSquare(null);
   };
 
   const handleExitGame = () => {
@@ -878,8 +760,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   const executeMoveInternal = useCallback(
     async (from: Square, to: Square, promotionPiece: string = 'q') => {
       const chess = chessInstanceRef.current;
-      const movingBefore = chess.get(from);
-      const pieceOnTarget = chess.get(to);
 
       if (moveLock.current) return false;
       if (activeRoomId && !navigator.onLine) {
@@ -905,25 +785,9 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         if (!activeRoomId) setFen(newFen);
         setSelectedSquare(null);
         setPendingPromotion(null);
-        setLastMovedSquare({ from, to });
-        calculateCapturedPieces(chess);
 
-        // Epic Capture VFX + Sound effect
-        if (moveResult.captured || pieceOnTarget) {
-          const victimType = (pieceOnTarget?.type || moveResult.captured || 'p') as PieceSymbol;
-          const victimColor: Color = moveResult.color === 'w' ? 'b' : 'w';
-          if (!citadel) triggerEpicCaptureEffect(
-            from,
-            to,
-            (movingBefore?.type || moveResult.piece) as PieceSymbol,
-            moveResult.color,
-            victimType,
-            victimColor
-          );
-          sounds.playCapture();
-        } else {
-          sounds.playMove();
-        }
+        if (moveResult.captured) sounds.playCapture();
+        else sounds.playMove();
 
         if (chess.inCheck()) {
           sounds.playCheck();
@@ -981,7 +845,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         if (activeRoomId && chess.fen() === proposedFen) {
           chess.load(beforeFen);
           setFen(beforeFen);
-          calculateCapturedPieces(chess);
         }
         setMoveError(err instanceof Error ? err.message : 'Không gửi được nước đi.');
         return false;
@@ -990,7 +853,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         setMoveSending(false);
       }
     },
-    [moveHistory, activeRoomId, roomState, mpMakeMove, isAiMode, myColor, citadel, handleAiGameEnd, triggerEpicCaptureEffect]
+    [moveHistory, activeRoomId, roomState, mpMakeMove, isAiMode, myColor, handleAiGameEnd]
   );
 
   // Square Click handler
@@ -1116,9 +979,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
     setFen(chessInstanceRef.current.fen());
     setSelectedSquare(null);
     setMoveHistory([]);
-    setCapturedWhite([]);
-    setCapturedBlack([]);
-    setLastMovedSquare(null);
     setIsMatchmakingOpen(false);
   };
 
@@ -1131,197 +991,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
       setFen(chessInstanceRef.current.fen());
       setSelectedSquare(null);
       setMoveHistory([]);
-      setCapturedWhite([]);
-      setCapturedBlack([]);
-      setLastMovedSquare(null);
     }
-  };
-
-  // Render Square on the 8x8 Hogwarts Stone Grid
-  const renderSquare = (row: number, col: number) => {
-    const file = myColor === 'w' ? String.fromCharCode(97 + col) : String.fromCharCode(104 - col);
-    const rank = myColor === 'w' ? 8 - row : row + 1;
-    const square = `${file}${rank}` as Square;
-
-    const isLight = (row + col) % 2 === 0;
-    const piece = chessInstanceRef.current.get(square);
-    const isSelected = selectedSquare === square;
-    const isLegalTarget = legalMovesFromSelected.includes(square);
-    const isPendingTarget = pendingTargetSquare === square;
-    const isLastMove =
-      (roomState?.lastMove &&
-        (roomState.lastMove.from === square || roomState.lastMove.to === square)) ||
-      (lastMovedSquare && (lastMovedSquare.from === square || lastMovedSquare.to === square));
-    const isKingChecked =
-      isKingInCheck && piece?.type === 'k' && piece.color === chessInstanceRef.current.turn();
-    const isCaptureLocation = captureVfx?.to === square;
-
-    return (
-      <button
-        key={square}
-        id={`chess-sq-${square}`}
-        aria-label={`${square}${piece ? `: ${CHESS_PIECE_SYMBOLS[`${piece.color}${piece.type}`]?.name}` : ''}`}
-        onClick={() => handleSquareClick(square)}
-        className={`relative aspect-square flex items-center justify-center select-none transition-all duration-150 overflow-visible ${
-          isLight
-            ? 'bg-gradient-to-br from-[#e7dac1] via-[#d2be99] to-[#b9a077] text-[#4a371d] hover:brightness-105 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),inset_0_-2px_4px_rgba(68,51,25,0.35)]'
-            : 'bg-gradient-to-br from-[#384459] via-[#232b3b] to-[#151a26] text-[#94a3b8] hover:brightness-110 shadow-[inset_0_1px_1px_rgba(148,163,184,0.18),inset_0_-2px_5px_rgba(0,0,0,0.65)]'
-        } ${
-          isSelected
-            ? '!bg-amber-400/90 ring-3 ring-amber-200 shadow-[inset_0_0_18px_rgba(245,158,11,0.75)] z-20'
-            : ''
-        } ${
-          isPendingTarget
-            ? '!bg-cyan-500/80 ring-3 ring-cyan-200 z-20 shadow-[0_0_18px_rgba(56,189,248,0.65)]'
-            : ''
-        } ${
-          isLastMove && !isPendingTarget && !isSelected
-            ? 'after:content-[""] after:absolute after:inset-0 after:bg-amber-400/20 after:ring-2 after:ring-inset after:ring-amber-400/60 after:pointer-events-none'
-            : ''
-        } ${
-          isKingChecked
-            ? '!bg-rose-700/95 animate-pulse ring-4 ring-rose-300 z-20 shadow-[0_0_25px_rgba(244,63,94,0.85)]'
-            : ''
-        }`}
-      >
-        {/* Subtle Carved Stone Bevel Frame */}
-        <span className="pointer-events-none absolute inset-[2px] border border-white/5 rounded-[2px]" />
-
-        {/* Coordinates labels */}
-        {col === 0 && (
-          <span className="absolute top-0.5 left-1 text-[9px] sm:text-[10px] font-serif font-extrabold opacity-70 pointer-events-none">
-            {rank}
-          </span>
-        )}
-        {row === 7 && (
-          <span className="absolute bottom-0.5 right-1 text-[9px] sm:text-[10px] font-serif font-extrabold opacity-70 pointer-events-none">
-            {file}
-          </span>
-        )}
-
-        {/* 2-Tap Pending Destination Reticle */}
-        {isPendingTarget && (
-          <div className="absolute inset-0 flex items-center justify-center bg-cyan-400/25 z-30 animate-pulse pointer-events-none">
-            <div className="w-5 h-5 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs font-black shadow-lg">
-              ✓
-            </div>
-          </div>
-        )}
-
-        {/* Living Stone Statue Piece */}
-        {piece && (
-          <motion.div
-            layoutId={`piece-${square}`}
-            initial={{ scale: 0.78, opacity: 0 }}
-            animate={
-              isCaptureLocation
-                ? {
-                    scale: [1.32, 0.94, 1.08, 1],
-                    y: [-14, 3, -2, 0],
-                    rotate: [0, -8, 6, 0],
-                    opacity: 1,
-                  }
-                : isSelected
-                ? { scale: 1.12, y: -5, opacity: 1 }
-                : { scale: 1, y: 0, opacity: 1 }
-            }
-            transition={{ duration: isCaptureLocation ? 0.48 : 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className={`chess-piece-holder relative z-10 w-[88%] h-[88%] flex items-center justify-center transition-transform ${
-              isSelected
-                ? 'drop-shadow-[0_10px_10px_rgba(0,0,0,0.75)] drop-shadow-[0_0_12px_rgba(251,191,36,0.75)]'
-                : 'drop-shadow-[0_5px_6px_rgba(0,0,0,0.6)]'
-            }`}
-          >
-            <ChessPiece type={piece.type} color={piece.color} />
-            <span className="sr-only">{CHESS_PIECE_SYMBOLS[`${piece.color}${piece.type}`]?.symbol}</span>
-          </motion.div>
-        )}
-
-        {/* EPIC CAPTURE VFX OVERLAY: Weapon Slash + Shattering Stone Shards + Shockwave Ring */}
-        <AnimatePresence>
-          {isCaptureLocation && captureVfx && (
-            <motion.div
-              key={captureVfx.id}
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.78, ease: 'easeOut' }}
-              className="pointer-events-none absolute inset-[-45%] z-40 flex items-center justify-center"
-            >
-              {/* Expanding Arcane Shockwave Ring */}
-              <motion.div
-                initial={{ scale: 0.25, opacity: 1 }}
-                animate={{ scale: 1.85, opacity: 0 }}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
-                className={`absolute w-14 h-14 rounded-full border-4 ${
-                  captureVfx.attackerColor === 'w'
-                    ? 'border-amber-300 shadow-[0_0_24px_#f59e0b]'
-                    : 'border-purple-400 shadow-[0_0_24px_#c084fc]'
-                }`}
-              />
-
-              {/* Diagonal Weapon Slash Arc */}
-              <motion.svg
-                viewBox="0 0 100 100"
-                initial={{ scale: 0.4, rotate: -25, opacity: 1 }}
-                animate={{ scale: 1.4, rotate: 12, opacity: 0 }}
-                transition={{ duration: 0.42, ease: 'easeOut' }}
-                className="absolute w-full h-full"
-              >
-                <path
-                  d="M12 88 Q48 42 90 10 Q58 54 18 92 Z"
-                  fill={captureVfx.attackerColor === 'w' ? '#fef08a' : '#f472b6'}
-                />
-                <path
-                  d="M18 14 Q52 48 86 86 Q44 54 14 20 Z"
-                  fill={captureVfx.attackerColor === 'w' ? '#f59e0b' : '#c084fc'}
-                  opacity="0.85"
-                />
-              </motion.svg>
-
-              {/* Flying Shattered Stone Shards of Victim Statue */}
-              {SHARD_VECTORS.map((shard, idx) => {
-                const isWhiteVictim = captureVfx.victimColor === 'w';
-                const fill = isWhiteVictim
-                  ? idx % 2 === 0
-                    ? '#e7dac1'
-                    : '#d9a74a'
-                  : idx % 2 === 0
-                  ? '#334155'
-                  : '#fb923c';
-                const stroke = isWhiteVictim ? '#3f2e18' : '#090c12';
-                return (
-                  <motion.svg
-                    key={idx}
-                    viewBox="0 0 20 20"
-                    initial={{ x: 0, y: 0, rotate: 0, scale: shard.scale, opacity: 1 }}
-                    animate={{
-                      x: shard.dx,
-                      y: shard.dy,
-                      rotate: shard.rot,
-                      scale: 0.2,
-                      opacity: 0,
-                    }}
-                    transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute w-4 h-4 sm:w-5 sm:h-5 drop-shadow-[0_3px_4px_rgba(0,0,0,0.75)]"
-                  >
-                    <polygon points={shard.poly} fill={fill} stroke={stroke} strokeWidth="2" />
-                  </motion.svg>
-                );
-              })}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Move Destination Arcane Rune Dot / Capture Target Ring */}
-        {isLegalTarget && !piece && (
-          <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-amber-400/90 ring-4 ring-amber-400/30 shadow-[0_0_12px_#f59e0b] animate-pulse pointer-events-none z-10" />
-        )}
-        {isLegalTarget && piece && (
-          <div className="absolute inset-0.5 rounded-md border-2 sm:border-3 border-dashed border-rose-400 bg-rose-500/25 shadow-[inset_0_0_12px_rgba(244,63,94,0.6)] pointer-events-none animate-pulse z-20" />
-        )}
-      </button>
-    );
   };
 
   // Material evaluation advantage
@@ -1465,6 +1135,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                 </div>
 
                 <div className="flex flex-wrap items-center justify-end gap-2">
+                  <BoardMotionToggle {...boardMotion} className="min-h-[40px] rounded-xl border border-amber-700 bg-slate-800/80 px-2 text-xs text-amber-100"/>
                   <button type="button" aria-pressed={citadel}
                     className="min-h-[40px] rounded-xl border border-amber-700 bg-slate-800/80 px-2 text-xs text-amber-100"
                     onClick={() => {
@@ -1510,15 +1181,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
               isTurn: !isTurn && roomState?.status !== 'ended' && !chessInstanceRef.current.isGameOver(),
               statusText: 'Đang niệm chú nước đi...',
               timeLeft: activeRoomId ? turnTimeLeft : undefined,
-              capturedPieces: citadel ? undefined : (
-                <div className="flex items-center -space-x-1.5 py-0.5">
-                  {(myColor === 'w' ? capturedWhite : capturedBlack).map((p, i) => (
-                    <span key={i} className="w-5 h-5 inline-block drop-shadow">
-                      <ChessPiece type={p} color={myColor === 'w' ? 'w' : 'b'} />
-                    </span>
-                  ))}
-                </div>
-              ),
               materialAdvantage:
                 myColor === 'w' && materialAdvantage < 0
                   ? `+${Math.abs(materialAdvantage)}`
@@ -1535,15 +1197,6 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
               isTurn: isTurn && roomState?.status !== 'ended' && !chessInstanceRef.current.isGameOver(),
               statusText: 'Lượt chỉ huy của bạn',
               timeLeft: activeRoomId ? turnTimeLeft : undefined,
-              capturedPieces: citadel ? undefined : (
-                <div className="flex items-center -space-x-1.5 py-0.5">
-                  {(myColor === 'w' ? capturedBlack : capturedWhite).map((p, i) => (
-                    <span key={i} className="w-5 h-5 inline-block drop-shadow">
-                      <ChessPiece type={p} color={myColor === 'w' ? 'b' : 'w'} />
-                    </span>
-                  ))}
-                </div>
-              ),
               materialAdvantage:
                 myColor === 'w' && materialAdvantage > 0
                   ? `+${materialAdvantage}`
@@ -1555,49 +1208,10 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             }}
             board={
               <div className="relative flex flex-col items-center w-full">
-                {citadel ? (
-                  <CitadelBoard key={activeRoomId ?? 'practice'} fen={fen} history={moveHistory}
-                    orientation={myColor} selected={selectedSquare} legal={legalMovesFromSelected}
-                    pending={pendingTargetSquare} paused={Boolean(isPaused || isReviewingBoard)}
-                    onSquare={handleSquareClick}/>
-                ) : (
-                /* Enchanted Stone Chamber Outer Frame with Torch Glow */
-                <motion.div
-                  animate={
-                    boardShake
-                      ? {
-                          x: [0, -10, 10, -7, 7, -3, 3, 0],
-                          y: [0, 5, -5, 4, -3, 0],
-                        }
-                      : { x: 0, y: 0 }
-                  }
-                  transition={{ duration: 0.45 }}
-                  className="relative p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-[#2d243b] via-[#171321] to-[#231c30] border-2 border-amber-500/50 shadow-[0_20px_55px_rgba(0,0,0,0.85),inset_0_0_20px_rgba(0,0,0,0.85)]"
-                >
-                  {/* Carved Corner Runes */}
-                  <span className="pointer-events-none absolute top-1 left-2 text-[10px] text-amber-400/60 font-serif">
-                    ✦
-                  </span>
-                  <span className="pointer-events-none absolute top-1 right-2 text-[10px] text-amber-400/60 font-serif">
-                    ✦
-                  </span>
-                  <span className="pointer-events-none absolute bottom-1 left-2 text-[10px] text-amber-400/60 font-serif">
-                    ✦
-                  </span>
-                  <span className="pointer-events-none absolute bottom-1 right-2 text-[10px] text-amber-400/60 font-serif">
-                    ✦
-                  </span>
-
-                  <div
-                    id="chess-board"
-                    className="arcade-board w-[92vw] max-w-[390px] sm:max-w-[436px] md:max-w-[468px] aspect-square rounded-lg sm:rounded-xl overflow-hidden shadow-2xl border-2 border-amber-600/60 grid grid-cols-8 grid-rows-8 bg-[#14101d]"
-                  >
-                    {Array.from({ length: 8 }).map((_, row) =>
-                      Array.from({ length: 8 }).map((_, col) => renderSquare(row, col))
-                    )}
-                  </div>
-                </motion.div>
-                )}
+                <CitadelBoard key={activeRoomId ?? 'practice'} fen={fen} history={moveHistory}
+                  orientation={myColor} selected={selectedSquare} legal={legalMovesFromSelected}
+                  pending={pendingTargetSquare} paused={Boolean(isPaused || isReviewingBoard)}
+                  motionEnabled={boardMotion.enabled} classic={!citadel} onSquare={handleSquareClick}/>
 
                 <AnimatePresence>
                   {pendingPromotion && (
