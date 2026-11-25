@@ -42,6 +42,8 @@ import { MatchEndModal, MatchEndReviewBar, MatchEndPlayerInfo } from '../../comp
 import { CHESS_ACHIEVEMENTS } from './config';
 import { botMove } from '../duel/aiClient';
 import { CitadelBoard, CitadelPiece, CITADEL_NAMES } from './CitadelBoard';
+import { BoardReview, useBoardReview } from '../duel/BoardReview';
+import { replayCitadelPositions } from './citadelMoves';
 import { BoardTerrainPicker, useBoardTerrain } from '../duel/BoardTerrain';
 import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
 
@@ -400,6 +402,10 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
   // Stats & Captured Pieces
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  const reviewPositions = useMemo(() => isReviewingBoard ? replayCitadelPositions(moveHistory, fen) : [], [isReviewingBoard, moveHistory, fen]);
+  const review = useBoardReview(isReviewingBoard, Math.max(0, reviewPositions.length - 1));
+  const reviewedFen = reviewPositions[review.index];
+
 
   // Sound sync
   useEffect(() => {
@@ -508,6 +514,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
   // AI Match End Handler
   const handleAiGameEnd = useCallback(
     (result: 'win' | 'loss' | 'draw', reason: string) => {
+      setIsThinkingAi(false);
       setAiMatchResult({ result, reason });
       if (result === 'win') {
         sounds.playVictory();
@@ -939,7 +946,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
 
   // AI Turn Execution
   useEffect(() => {
-    if (!isAiMode || chessInstanceRef.current.isGameOver()) return;
+    if (!isAiMode || aiMatchResult || chessInstanceRef.current.isGameOver()) return;
 
     const currentTurn = chessInstanceRef.current.turn();
     const aiColor = myColor === 'w' ? 'b' : 'w';
@@ -969,7 +976,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         controller.abort();
       };
     }
-  }, [isAiMode, fen, myColor, aiDifficulty, executeMoveInternal]);
+  }, [isAiMode, aiMatchResult, fen, myColor, aiDifficulty, executeMoveInternal]);
 
   // Start AI Practice Game
   const startAiPractice = (diff: 'easy' | 'medium' | 'hard') => {
@@ -1119,7 +1126,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         <>
           <BoardLayout
             header={
-              <header className="launcher-game-toolbar w-full flex items-center justify-between bg-[#171224]/90 backdrop-blur-md border border-amber-500/30 rounded-2xl px-4 py-3 shadow-xl">
+              <header className="launcher-game-toolbar w-full flex flex-col items-stretch gap-2 lg:flex-row lg:items-center lg:justify-between bg-[#171224]/90 backdrop-blur-md border border-amber-500/30 rounded-2xl px-4 py-3 shadow-xl">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-400/40 flex items-center justify-center p-1 shadow-inner">
@@ -1136,7 +1143,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-end gap-2">
+                <div className="flex flex-wrap items-center gap-2 lg:justify-end">
                   <BoardMotionToggle {...boardMotion} className="min-h-[40px] rounded-xl border border-amber-700 bg-slate-800/80 px-2 text-xs text-amber-100"/>
                   {citadel && <BoardTerrainPicker {...boardTerrain} className="min-h-[40px] max-w-full rounded-xl border border-amber-700 bg-slate-800 px-2 text-xs text-amber-100"/>}
                   <button type="button" aria-pressed={citadel}
@@ -1211,10 +1218,22 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
             }}
             board={
               <div className="relative flex flex-col items-center w-full">
-                <CitadelBoard key={activeRoomId ?? 'practice'} fen={fen} history={moveHistory}
-                  orientation={myColor} selected={selectedSquare} legal={legalMovesFromSelected}
-                  pending={pendingTargetSquare} paused={Boolean(isPaused || isReviewingBoard)}
-                  terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} classic={!citadel} onSquare={handleSquareClick}/>
+                <MatchEndReviewBar
+                  inFlow
+                  isVisible={isReviewingBoard}
+                  result={matchResult}
+                  onOpenModal={() => {
+                    setIsReviewingBoard(false);
+                    setShowMatchEndModal(true);
+                  }}
+                  onRematch={handleRematch}
+                  onReturnToLobby={handleReturnToLobby}
+                />
+                {reviewPositions.length > 1 && <BoardReview {...review} count={reviewPositions.length - 1} label={moveHistory[review.index - 1]}/>}
+                <CitadelBoard key={activeRoomId ?? 'practice'} fen={reviewedFen ?? fen} history={reviewedFen ? moveHistory.slice(0, review.index) : moveHistory}
+                  orientation={myColor} selected={isReviewingBoard ? null : selectedSquare} legal={isReviewingBoard ? [] : legalMovesFromSelected}
+                  pending={isReviewingBoard ? null : pendingTargetSquare} paused={Boolean(isPaused || isReviewingBoard)}
+                  terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} classic={!citadel} readOnly={isReviewingBoard} onSquare={handleSquareClick}/>
 
                 <AnimatePresence>
                   {pendingPromotion && (
@@ -1491,21 +1510,7 @@ export const ChessGame: React.FC<GameComponentProps> = ({ bridge, isPracticeMode
         onExitGame={handleExitGame}
       />
 
-      {/* Floating Review Bar when user is reviewing board */}
-      <MatchEndReviewBar
-        isVisible={isReviewingBoard}
-        result={matchResult}
-        onOpenModal={() => {
-          setIsReviewingBoard(false);
-          setShowMatchEndModal(true);
-        }}
-        onRematch={handleRematch}
-        onReturnToLobby={handleReturnToLobby}
-        isRematchOfferedByMe={isRematchOfferedByMe}
-        isRematchOfferedByOpponent={isRematchOfferedByOpponent}
-        isLoading={isActionLoading}
-      />
-    </div>
+   </div>
   );
 };
 

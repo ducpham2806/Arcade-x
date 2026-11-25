@@ -133,3 +133,12 @@
     linear-gradient(95deg, #261713f5 34%, #261713b9 72%, #26171350),
     url('/games/o-an-quan/campaign/terrains.webp') left top / 200% 100%;
 }
+
+.oaq-history-board {
+  display: block;
+  width: min(100%, 29rem);
+  height: auto;
+  margin: .45rem auto .8rem;
+  border: 1px solid #9e784d;
+  border-radius: .5rem;
+}

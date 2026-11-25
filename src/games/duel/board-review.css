@@ -1,0 +1,27 @@
+.board-review {
+  width: min(100%, 29rem);
+  margin: .35rem auto;
+  padding: .45rem;
+  border: 1px solid #806849;
+  border-radius: .625rem;
+  background: #211b20;
+  color: #fff1d6;
+  text-align: center;
+  font: 600 .8rem system-ui;
+}
+.board-review p { margin: 0 0 .3rem; font-variant-numeric: tabular-nums; }
+.board-review-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .25rem;
+}
+.board-review button {
+  border: 1px solid #9e784d;
+  border-radius: .375rem;
+  padding: .15rem .2rem;
+  min-height: 38px;
+  color: inherit;
+  background: #47313a;
+}
+.board-review button:disabled { opacity: .55; }
+.board-review button:focus-visible { outline: 2px solid #ffdf9e; outline-offset: 1px; }

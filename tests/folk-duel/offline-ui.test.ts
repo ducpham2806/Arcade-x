@@ -216,6 +216,13 @@ test('Ô Ăn Quan diễn đủ từng ô, khóa nước đi trong lúc rải và
   await page.getByRole('button', { name: /Lịch sử lượt đi/ }).tap();
   const dialog = page.getByRole('dialog', { name: 'Lịch sử lượt đi' });
   await expect(dialog).toBeVisible();
+  const boardReview = dialog.getByRole('navigation', { name: 'Xem lại nước đi' });
+  await expect(dialog.getByRole('img', { name: /Thế bàn sau lượt 1/ })).toBeVisible();
+  await boardReview.getByRole('button', { name: 'Đầu ván' }).tap();
+  await expect(dialog.getByRole('img', { name: /Thế bàn xuất phát.*Điểm người 1: 0/ })).toBeVisible();
+  await boardReview.getByRole('button', { name: 'Tiến 1' }).tap();
+  await expect(dialog.getByRole('img', { name: /Thế bàn sau lượt 1/ })).toBeVisible();
+  expect((await read(page, 'o-an-quan'))!.offlineMatch.state).toEqual(recordOaqTurn(before, move, expected.nextState, expected.steps));
   await dialog.locator('summary').tap();
   await expect(dialog).toContainText('Lượt 1 · Người chơi 1');
   await expect(dialog).toContainText('Đường rải · ô 2 → ô 3');

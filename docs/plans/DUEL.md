@@ -33,3 +33,5 @@ Làm lần lượt Chess → Xiangqi → Caro; mỗi game là một task nhỏ, 
 - Chuyển động đi/ăn quân và công tắc độc lập cho mỗi game ở nhánh `codex/duel-piece-motion`. [QA](../qa/DUEL-PIECE-MOTION-2026-11-25.md).
 
 - `codex/three-board-games-polish` có bốn địa hình mỗi game và bản HTML offline đã kiểm. [QA](../qa/THREE-BOARD-GAMES-2026-11-25.md). Giữ bàn cổ điển và công tắc riêng. Cutover và thiết bị thật theo các mốc DU-R.
+
+- Ngày 26/11, Cờ vua và Cờ tướng có tua thế cờ sau trận, đối chiếu thế cuối và khay theo từng mốc. [QA](../qa/THREE-BOARD-REVIEW-2026-11-26.md).

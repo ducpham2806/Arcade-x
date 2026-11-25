@@ -127,10 +127,11 @@ interface Props {
   motionEnabled: boolean;
   classic?: boolean;
   terrain?: TerrainId<'xiangqi'>;
+  readOnly?: boolean;
   onCell: (row: number, column: number) => void;
 }
 
-export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, motionEnabled, classic = false, terrain = 'river', onCell }: Props) {
+export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPieces, paused, motionEnabled, classic = false, terrain = 'river', readOnly = false, onCell }: Props) {
   const previous = useRef(board);
   const { moving, capture, play, stop } = usePieceMotion<Move>();
   const [focusIndex, setFocusIndex] = useState(9 * 9 + 4);
@@ -192,7 +193,7 @@ export function BattlefieldBoard({ board, selected, pending, legalMoves, vnPiece
                 aria-label={`Hàng ${r + 1}, cột ${c + 1}${piece ? `, ${name} ${piece.color === 'r' ? 'Đỏ' : 'Đen'}${inCheck ? ', đang bị chiếu' : ''}` : ''}`}
                 aria-pressed={same(selected, [r,c])}
                 tabIndex={index === focusIndex ? 0 : -1} onFocus={() => setFocusIndex(index)}
-                onKeyDown={event => moveFocus(event, r, c)} onClick={() => onCell(r, c)}>
+                onKeyDown={event => moveFocus(event, r, c)} aria-disabled={readOnly || undefined} onClick={() => { if (!readOnly) onCell(r, c); }}>
                 {piece && <span className={`xqb-piece xqb-piece-${piece.color}${same(moving?.to ?? null, [r,c]) ? ' xqb-piece-in-motion' : ''}`}>
                   <Sprite piece={piece} classic={classic} vnPieces={vnPieces}/>{!classic && <span className="xqb-glyph" aria-hidden="true">{glyph}</span>}
                 </span>}

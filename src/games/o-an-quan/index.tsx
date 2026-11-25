@@ -420,7 +420,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
           Lịch sử lượt đi{state.history?.length ? ` · ${state.history.length}` : ''}
         </button>
       </div>
-      {showHistory && <OaqMoveHistory turns={state.history ?? []} names={names} onClose={() => setShowHistory(false)}/>}
+      {showHistory && <OaqMoveHistory turns={state.history ?? []} state={state} skins={profile.equippedSkins} terrain={boardTerrain.terrain} names={names} onClose={() => setShowHistory(false)}/>}
     </main>
   );
 };

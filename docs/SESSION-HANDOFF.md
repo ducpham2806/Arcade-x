@@ -1,5 +1,5 @@
-# Bàn giao · 25/11/2026 · ba game bàn cờ
+# Bàn giao · 26/11/2026 · xem lại ba game bàn cờ
 
-Nhánh `codex/three-board-games-polish` nối từ `1b2183e`. Ô Ăn Quan có 4 bản đồ chiến trường và Sân Đình, lính cầm giáo, Tướng cưỡi ngựa, rải, nhảy qua ô trống, quân về khay và điểm nhảy theo. Kho trang phục giữ ID, ví và quyền sở hữu. Cờ vua và Cờ tướng mỗi game có 4 địa hình và kiểu cổ điển, tiếp tục dùng bộ quân pixel. Công tắc chuyển động và địa hình lưu độc lập từng game. [Ca kiểm và nguồn art](qa/THREE-BOARD-GAMES-2026-11-25.md).
+Nhánh `codex/three-board-games-qa` nối từ `b19ba63`. Cờ vua và Cờ tướng có xem lại từng thế cờ từ bảng kết quả. Thanh kết quả ở trên bàn. Ô Ăn Quan có bàn và điểm từng lượt trong lịch sử. Ba bản HTML offline giữ công tắc chuyển động, địa hình, chế độ cổ điển và có tua nước. [QA xem lại](qa/THREE-BOARD-REVIEW-2026-11-26.md). [QA bàn và animation](qa/THREE-BOARD-GAMES-2026-11-25.md).
 
-Graphify AST scope Ô Ăn Quan, 115 nút/288 cạnh ở mốc đầu. Studio Game Feel, Generate 2D Sprite, PixelFX. Tiếp theo duyệt ba HTML, kiểm thiết bị thật và phòng hai tài khoản. [Folk](plans/FOLK-GAMES-PLAN.md) và [Duel](plans/DUEL.md) giữ lộ trình phát hành. [Bàn giao Folk trước hai bản mẫu](archive/SESSION-HANDOFF-2026-11-20-before-xiangqi-battlefield.md).
+Studio Game QA & Playtest. Graphify AST scope Ô Ăn Quan, 157 nút/457 cạnh. Tiếp theo nghiệm thu trên điện thoại thật và phòng hai tài khoản. Thẻ [Duel](plans/DUEL.md) và [Folk](plans/FOLK-GAMES-PLAN.md) giữ lộ trình phát hành.

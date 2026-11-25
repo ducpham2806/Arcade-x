@@ -19,16 +19,28 @@ export function citadelRookMove(move: Move): { from: Square; to: Square } | unde
     : { from: `a${rank}` as Square, to: `d${rank}` as Square };
 }
 
-export function replayCitadelCaptures(history: readonly string[], fen: string, initialFen?: string): CitadelCaptures | null {
-  const engine = new Chess(initialFen);
-  const captured: CitadelCaptures = { w: [], b: [] };
+function replayCitadelMoves(history: readonly string[], finalFen: string, initialFen?: string) {
   try {
-    for (const san of history) {
-      const move = engine.move(san);
-      if (move.captured) captured[move.color].push(move.captured);
-    }
-    return engine.fen() === fen ? captured : null;
+    const engine = new Chess(initialFen);
+    const initial = engine.fen();
+    const moves = history.map(move => engine.move(move));
+    return engine.fen() === finalFen ? { initial, moves } : null;
   } catch {
     return null;
   }
+}
+
+export function replayCitadelCaptures(history: readonly string[], fen: string, initialFen?: string): CitadelCaptures | null {
+  const replay = replayCitadelMoves(history, fen, initialFen);
+  if (!replay) return null;
+  const captured: CitadelCaptures = { w: [], b: [] };
+  for (const move of replay.moves) {
+    if (move.captured) captured[move.color].push(move.captured);
+  }
+  return captured;
+}
+
+export function replayCitadelPositions(history: readonly string[], finalFen: string, initialFen?: string): string[] {
+  const replay = replayCitadelMoves(history, finalFen, initialFen);
+  return replay ? [replay.initial, ...replay.moves.map(move => move.after)] : [];
 }

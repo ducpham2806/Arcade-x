@@ -2,11 +2,11 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
-## Ba bàn cờ chiến trường · 25/11/2026
+## Ba bàn cờ chiến trường · 25–26/11/2026
 
 - Ô Ăn Quan có 4 chiến trường, Sân Đình, hai phe lính giáo và Tướng cưỡi ngựa, kho trang phục dùng ví Kẹo cũ. Điểm nhảy theo thời điểm từng quân về khay.
 - Cờ vua có 12 quân pixel, Cờ tướng có 14. Mỗi game có 4 địa hình và bàn cổ điển. Cả ba có công tắc chuyển động độc lập và bản HTML offline.
-- Nhánh `codex/three-board-games-polish`. [QA bản thử](qa/THREE-BOARD-GAMES-2026-11-25.md). Thiết bị thật và PvP hai tài khoản chờ nghiệm thu.
+- Nhánh `codex/three-board-games-polish`. [QA bản thử](qa/THREE-BOARD-GAMES-2026-11-25.md). Tiến/lùi thế cờ, khay và điểm có trên `codex/three-board-games-qa`. [QA xem lại](qa/THREE-BOARD-REVIEW-2026-11-26.md). Thiết bị thật và PvP hai tài khoản chờ nghiệm thu.
 
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 

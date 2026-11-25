@@ -56,6 +56,8 @@ import {
 } from './rules';
 import { botMove } from '../duel/aiClient';
 import { BattlefieldBoard } from './BattlefieldBoard';
+import { BoardReview, useBoardReview } from '../duel/BoardReview';
+import { replayXiangqiPositions, type XiangqiReviewMove } from './review';
 import { BoardTerrainPicker, useBoardTerrain } from '../duel/BoardTerrain';
 import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
 
@@ -102,6 +104,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   const [vnPieces,setVnPieces]=useState(()=>localStorage.getItem('arcadex_xiangqi_vn')==='1');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('hard');
   const [aiBoard, setAiBoard] = useState<BoardMatrix>(INITIAL_XIANGQI_BOARD);
+  const [aiMoveHistory, setAiMoveHistory] = useState<XiangqiReviewMove[]>([]);
   const [aiTurn, setAiTurn] = useState<PieceColor>('r');
   const [aiWinner, setAiWinner] = useState<PieceColor | 'draw' | null>(null);
 
@@ -185,6 +188,16 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     }
     return INITIAL_XIANGQI_BOARD;
   }, [activeRoomId, roomState?.boardState, playMode, localBoard, aiBoard]);
+
+  const reviewPositions = useMemo(() => {
+    if (!isReviewingBoard) return [];
+    if (activeRoomId) return replayXiangqiPositions(roomState?.moveHistory ?? [], currentBoard);
+    if (playMode === 'ai') return replayXiangqiPositions(aiMoveHistory, currentBoard);
+    if (playMode === 'local_hotseat') return [...localMoveHistory.map(snapshot => snapshot.board), currentBoard];
+    return [];
+  }, [isReviewingBoard, activeRoomId, roomState?.moveHistory, currentBoard, playMode, aiMoveHistory, localMoveHistory]);
+  const review = useBoardReview(isReviewingBoard, Math.max(0, reviewPositions.length - 1));
+  const reviewedBoard = reviewPositions[review.index];
 
   // Audio cue when opponent makes a move
   useEffect(() => {
@@ -450,6 +463,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     aiRequest.current?.abort();setBotError('');
     setAiDifficulty(diff);
     setAiBoard(INITIAL_XIANGQI_BOARD);
+    setAiMoveHistory([]);
     setAiTurn('r');
     setAiWinner(null);
     setAiEndReason('');
@@ -501,6 +515,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     } else {
       // AI Rematch
       setAiBoard(INITIAL_XIANGQI_BOARD);
+      setAiMoveHistory([]);
       setAiTurn('r');
       setAiWinner(null);
       setAiEndReason('');
@@ -658,6 +673,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       // AI Practice Move
       else if (playMode === 'ai') {
         setAiBoard(nextBoard);
+        setAiMoveHistory(previous => [...previous, { from: [fromR, fromC], to: [r, c] }]);
 
         if (isCheckmate) {
           setAiWinner('r');
@@ -683,6 +699,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
             aiNextBoard[aiMove.from[0]][aiMove.from[1]] = null;
 
             setAiBoard(aiNextBoard);
+            setAiMoveHistory(previous => [...previous, aiMove]);
             bridge.playSound(aiCapturedPiece ? 'slice' : 'click');
 
             // Check if AI captured player's king
@@ -910,10 +927,22 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
             </div>
           )}
 
-          <BattlefieldBoard key={`${playMode}:${activeRoomId ?? ''}`} board={currentBoard}
-            selected={selectedPos} pending={pendingDest} legalMoves={legalMoves}
+          <MatchEndReviewBar
+            inFlow
+            isVisible={isReviewingBoard}
+            result={matchResult}
+            onOpenModal={() => {
+              setIsReviewingBoard(false);
+              setShowMatchEndModal(true);
+            }}
+            onRematch={handleRematch}
+            onReturnToLobby={handleReturnToLobby}
+          />
+          {reviewPositions.length > 1 && <BoardReview {...review} count={reviewPositions.length - 1}/>}
+          <BattlefieldBoard key={`${playMode}:${activeRoomId ?? ''}`} board={reviewedBoard ?? currentBoard}
+            selected={isReviewingBoard ? null : selectedPos} pending={isReviewingBoard ? null : pendingDest} legalMoves={isReviewingBoard ? [] : legalMoves}
             vnPieces={vnPieces} paused={Boolean(isPaused || isReviewingBoard)} classic={!battlefield}
-            terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} onCell={handleCellClick}/>
+            terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} readOnly={isReviewingBoard} onCell={handleCellClick}/>
 
             {selectedPos && pendingDest && !isMatchEnded && (
               <div className="w-full max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
@@ -1097,21 +1126,6 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
         onExitGame={handleExitGame}
       />
 
-      {/* Floating Review Bar when user is reviewing board */}
-      <MatchEndReviewBar
-        isVisible={isReviewingBoard}
-        result={matchResult}
-        onOpenModal={() => {
-          setIsReviewingBoard(false);
-          setShowMatchEndModal(true);
-        }}
-        onRematch={handleRematch}
-        onReturnToLobby={handleReturnToLobby}
-        isRematchOfferedByMe={isRematchOfferedByMe}
-        isRematchOfferedByOpponent={isRematchOfferedByOpponent}
-        isLoading={isActionLoading}
-      />
-
       {/* Surrender Confirmation Modal */}
       <GameActionConfirmModal
         isOpen={showSurrenderConfirm}
@@ -1132,6 +1146,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
               setLocalEndReason(`${surrenderer} đã xin đầu hàng.`);
               bridge.playSound('gameOver');
             } else {
+              aiRequest.current?.abort();
               setAiWinner('b');
               setAiEndReason('Bạn đã xin đầu hàng máy tính AI.');
               bridge.playSound('gameOver');
@@ -1165,6 +1180,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
               setLocalEndReason('Hai bên đã đồng thuận kết thúc trận đấu Hòa!');
               bridge.playSound('coin');
             } else {
+              aiRequest.current?.abort();
               setAiWinner('draw');
               setAiEndReason('Máy tính AI đã chấp nhận lời cầu hòa của bạn!');
               bridge.playSound('coin');

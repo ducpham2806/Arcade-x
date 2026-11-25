@@ -2,6 +2,12 @@
 
 Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLOG-2026-11-19-before-fd-on2.md).
 
+## 26/11/2026 · xem lại nước đi của ba game
+
+- `codex/three-board-games-qa` thêm tiến/lùi từng nước, thế xuất phát và thế cuối. Ô Ăn Quan xem khay và điểm trong Lịch sử lượt đi. Cờ vua và Cờ tướng mở từ bảng kết quả.
+- Thanh kết quả đặt trên bàn, không che quân trên khung điện thoại. Lịch sử thiếu dữ kiện vẫn hiển thị phần khôi phục được. [QA](qa/THREE-BOARD-REVIEW-2026-11-26.md).
+- [Nhật ký bản Cờ tướng đầu tiên](archive/WORKLOG-2026-11-25-xiangqi-battlefield.md).
+
 ## 25/11/2026 · hoàn thiện bản thử ba bàn cờ
 
 - `codex/three-board-games-polish` thêm Ô Ăn Quan Chiến Trường, lính giáo và Tướng cưỡi ngựa, rải và đánh theo trace, quân về khay mới cộng điểm. Kho trang phục giữ danh mục và ví Kẹo.
@@ -16,10 +22,3 @@ Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLO
 - Nhánh `codex/chess-pixel-polish` thêm bộ quân full-body 12 sprite, căn tỷ lệ bằng Sprite Forge. Hai game còn chờ kiểm máy thật và phòng online hai tài khoản.
 - `codex/duel-piece-motion` thêm nhịp đi, ăn quân và công tắc lưu riêng mỗi game. Bốn ca HTML offline và hai ca launcher qua. [QA](qa/DUEL-PIECE-MOTION-2026-11-25.md).
 - [Mục xác nhận rời trận Folk ngày 19/11](archive/WORKLOG-2026-11-19-folk-leave.md).
-
-## 25/11/2026 · bản chơi thử chiến trường Cờ tướng
-
-- Từ `3e2f5b9` trên `codex/xiangqi-battlefield-preview`, thêm Bến Sông Sở Hán với quân top-down hai phe, vạch sông và Cửu Cung, điều khiển phím, animation Pháo và khay quân ăn. Bàn cổ điển vẫn chọn được.
-- Dùng Game Studio, Graphify theo module, Agent Sprite Forge 14 sprite qua QA và PixelFX 16 frame. `test:duel`, `test:artwork`, lint và build qua. [QA](qa/XIANGQI-BATTLEFIELD-2026-11-25.md).
-- Sau bản Cờ vua, nhánh `codex/xiangqi-pixel-polish` thay bộ quân Cờ tướng bằng 14 sprite pixel full-body. QA Chromium ba khung và HTML offline qua. Còn thiết bị thật và phòng hai tài khoản.
-- [Mục sửa lỗi QA Folk ngày 19/11](archive/WORKLOG-2026-11-19-folk-polish.md).

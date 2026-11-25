@@ -114,10 +114,11 @@ interface Props {
   motionEnabled: boolean;
   classic?: boolean;
   terrain?: TerrainId<'chess'>;
+  readOnly?: boolean;
   onSquare: (square: Square) => void;
 }
 
-export function CitadelBoard({ fen, history, initialFen, orientation, selected, legal, pending, paused, motionEnabled, classic = false, terrain = 'citadel', onSquare }: Props) {
+export function CitadelBoard({ fen, history, initialFen, orientation, selected, legal, pending, paused, motionEnabled, classic = false, terrain = 'citadel', readOnly = false, onSquare }: Props) {
   const engine = useMemo(() => new Chess(fen), [fen]);
   const captured = useMemo(() => replayCitadelCaptures(history, fen, initialFen), [history, fen, initialFen]);
   const previous = useRef(fen);
@@ -179,7 +180,7 @@ export function CitadelBoard({ fen, history, initialFen, orientation, selected, 
                 data-tone={(Math.floor(index / 8) + index % 8) % 2 === 0 ? "light" : "dark"} data-citadel-square={square} data-citadel-piece={piece ? `${piece.color}${piece.type}` : undefined}
                 aria-label={`${square}${piece ? `, ${CITADEL_NAMES[piece.type]} ${piece.color === 'w' ? 'Trắng' : 'Đen'}` : ''}${isChecked ? ', bị chiếu' : ''}`}
                 aria-pressed={selected === square} tabIndex={focus === index ? 0 : -1}
-                onFocus={() => setFocus(index)} onKeyDown={event => keyMove(event, index)} onClick={() => onSquare(square)}>
+                onFocus={() => setFocus(index)} onKeyDown={event => keyMove(event, index)} aria-disabled={readOnly || undefined} onClick={() => { if (!readOnly) onSquare(square); }}>
                 {index % 8 === 0 && <span className="citadel-rank" aria-hidden="true">{square[1]}</span>}
                 {index >= 56 && <span className="citadel-file" aria-hidden="true">{square[0]}</span>}
                 {piece && <span className={`citadel-unit${moving ? ' citadel-in-motion' : ''}`}>
