@@ -1,3 +1,5 @@
+import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
+import { BoardTerrainPicker, useBoardTerrain } from '../duel/BoardTerrain';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameComponentProps } from '../../types';
 import {
@@ -15,6 +17,7 @@ import type { FolkSeat } from '../folk-duel/types';
 import '../folk-duel/folk-duel.css';
 import { chooseOaqBotMove, type OaqBotLevel } from './ai';
 import { BOARD_H, BOARD_W, getOaqCellRects } from './renderer';
+import { OaqSkinPreview } from './OaqSkinPreview';
 import { OaqMoveHistory, rightDirection } from './OaqMoveHistory';
 import { useOaqAnimation } from './useOaqAnimation';
 import './board.css';
@@ -60,7 +63,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
     <div className="fd-shell">
       <header className="fd-header">
         <div className="fd-title-group">
-          <h1>Ô ĂN QUAN · SÂN ĐÌNH</h1>
+          <h1>Ô ĂN QUAN</h1>
           <p>Dân gian Việt Nam · 1vs1</p>
         </div>
         <div className="fd-wallet-row">
@@ -68,17 +71,17 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
             🍬 {profile.candyTokens} Kẹo
           </span>
           <button type="button" className="fd-shop-btn" onClick={() => setShowShop(true)}>
-            🏪 Tiệm Tạp Hóa
+            Tiệm Tạp Hóa
           </button>
         </div>
       </header>
 
       {screen.kind === 'home' && (
         <main className="fd-home-body">
-          <div className="fd-hero-card">
-            <h2 style={{ margin: '0 0 6px', color: '#fde68a' }}>Sân Gạch Tàu · Rải Sỏi Tính Nước</h2>
+          <div className="fd-hero-card oaq-campaign-intro">
+            <h2 style={{ margin: '0 0 6px', color: '#fde68a' }}>Ô Ăn Quan · Chiến Trường</h2>
             <p style={{ margin: 0, fontSize: 13, color: '#fed7aa' }}>
-              Chạm ô Dân chọn hướng rải sỏi, săn Ăn Kép và hốt trọn Quan. Kiếm Xu &amp; Kẹo Mạch Nha để sưu tập bộ Bi Ve, Xu Cổ, Ngọc Bích Rồng!
+              Chọn ô Dân và hướng hành quân. Lính tính 1 điểm, Tướng tính 10 điểm. Có thể đổi địa hình hoặc chọn lại bàn Sân Đình trong trận.
             </p>
           </div>
 
@@ -206,6 +209,7 @@ export const OAnQuanGame: React.FC<GameComponentProps> = ({ bridge, isMuted = fa
           bridge={bridge}
           onProfileChange={setProfile}
           onClose={() => setShowShop(false)}
+          renderPreview={item => <OaqSkinPreview item={item} equipped={profile.equippedSkins}/>}
         />
       )}
 
@@ -254,6 +258,8 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
   const [bannerMsg, setBannerMsg] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const boardMotion = useBoardMotion('o-an-quan');
+  const boardTerrain = useBoardTerrain('o-an-quan', 'grass');
   const previousState = useRef(state);
 
   const stoneSkin = getSkinById(profile.equippedSkins.oaq_stones);
@@ -275,10 +281,11 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
 
   const animation = useOaqAnimation({
     canvas: canvasRef, state, skins: profile.equippedSkins, selected: selectedCell, preview,
-    paused: paused || showHistory, sound, stoneSound: stoneSkin.sfxProfile,
+    paused: paused || showHistory, sound, stoneSound: stoneSkin.sfxProfile, motionEnabled: boardMotion.enabled, terrain: boardTerrain.terrain,
   });
   const { startingBoard, start, running } = animation;
   const shown = startingBoard ?? state;
+  const scoreboard = boardTerrain.terrain !== 'classic' ? animation.presentedTray ?? shown : shown;
   const canMove = !inputBlocked && !paused && !showHistory && !startingBoard && !state.finished && state.turn === activeSeat;
 
   const present = useCallback((before: OaqState, result: ReturnType<typeof applyOaqMove>) => {
@@ -342,16 +349,16 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
 
   function seatHud(seat: FolkSeat) {
     const active = !shown.finished && shown.turn === seat;
-    const tray = getOaqTray(shown, seat);
+    const tray = getOaqTray(scoreboard, seat);
     const side = seat === 'P1' ? '1' : '2';
     return <div data-chat-player={chatMatchId ? folkChatId(chatMatchId, seat) : undefined} data-folk-seat={seat} className={`fd-hud-strip oaq-seat${active ? ' is-active' : ''}`}>
       <span className="oaq-seat-mark" aria-label={`Ghế ${side}`}>{side}</span>
       <div className="oaq-seat-name">
         <strong>{names[seat]}</strong>
-        <span>{active ? startingBoard ? 'Đang rải quân' : 'Đến lượt' : shown.finished ? 'Kết thúc' : 'Đang chờ'}</span>
+        <span>{active ? startingBoard ? 'Đang đi quân' : 'Đến lượt' : shown.finished ? 'Kết thúc' : 'Đang chờ'}</span>
       </div>
-      <div className="oaq-seat-score" role="group" aria-label={`Mẹt ${side}, ${tray.dan} sỏi, ${tray.quan} Quan, ${shown.scores[seat]} điểm`}>
-        <b>{shown.scores[seat]}</b> <span>điểm</span>
+      <div className="oaq-seat-score" role="group" aria-label={`Mẹt ${side}, ${tray.dan} sỏi, ${tray.quan} Quan, ${scoreboard.scores[seat]} điểm`}>
+        <b>{scoreboard.scores[seat]}</b> <span>điểm</span>
       </div>
       {seat === 'P1' && <button type="button" className="fd-btn-secondary oaq-exit" disabled={exitDisabled} onClick={onExit}>Thoát</button>}
     </div>;
@@ -359,7 +366,7 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
 
   const right = rightDirection(activeSeat);
   return (
-    <main className="fd-board-stage oaq-stage" data-oaq-playing={!!startingBoard}
+    <main className="fd-board-stage oaq-stage" data-oaq-playing={!!startingBoard} data-oaq-terrain={boardTerrain.terrain}
       style={{ '--oaq-board-ratio': BOARD_W / BOARD_H } as React.CSSProperties}>
       {seatHud('P2')}
       <div className="fd-oaq-board" data-chat-protect="true">
@@ -405,11 +412,15 @@ const OaqMatchBoard: React.FC<OaqMatchBoardProps> = ({
             </div>
           </div>
         )}
+        <div className="oaq-board-options">
+          <BoardMotionToggle {...boardMotion} className="fd-btn-secondary"/>
+          <BoardTerrainPicker {...boardTerrain} className="fd-btn-secondary" disabled={!!startingBoard}/>
+        </div>
         <button type="button" className="fd-btn-secondary oaq-history-button" onClick={() => setShowHistory(true)}>
           Lịch sử lượt đi{state.history?.length ? ` · ${state.history.length}` : ''}
         </button>
       </div>
-      {showHistory && <OaqMoveHistory turns={state.history ?? []} names={names} onClose={() => setShowHistory(false)}/>}
+      {showHistory && <OaqMoveHistory turns={state.history ?? []} state={state} skins={profile.equippedSkins} terrain={boardTerrain.terrain} names={names} onClose={() => setShowHistory(false)}/>}
     </main>
   );
 };

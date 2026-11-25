@@ -1,0 +1,303 @@
+.citadel {
+  width: min(100%, 29rem);
+  padding: .45rem;
+  border: 1px solid #897854;
+  border-radius: .8rem;
+  color: #f4e3c1;
+  background:
+    radial-gradient(ellipse at 0 0, #51442c, transparent 28%),
+    radial-gradient(ellipse at 100% 100%, #393245, transparent 40%),
+    #201d24;
+  box-shadow: 0 10px 28px #0c091080, inset 0 0 0 2px #121016;
+}
+
+.citadel-heading, .citadel-tray {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .35rem;
+  font-size: .72rem;
+}
+
+.citadel-heading { min-height: 1.6rem; padding: 0 .25rem .25rem; }
+.citadel-heading strong { font: 700 1rem Georgia, serif; letter-spacing: .045em; }
+.citadel-heading span { color: #f2bf85; font-variant-numeric: tabular-nums; }
+
+.citadel-tray {
+  position: relative;
+  z-index: 0;
+  min-height: 1.65rem;
+  padding: .1rem .35rem;
+  border: 1px solid #736043;
+  border-radius: .35rem;
+  background: #2f271f;
+}
+
+.citadel-tray-b { color: #e7d8ef; background: #272333; border-color: #615370; }
+.citadel-tray-pieces { flex: 1; display: flex; align-items: center; min-width: 0; }
+.citadel-tray-pieces > span { width: min(6.66%, 1.4rem); }
+.citadel-tray-count { text-align: right; min-width: 1.1rem; font-variant-numeric: tabular-nums; }
+
+.citadel-stage {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  container-type: inline-size;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-block: .3rem;
+  border-radius: .2rem;
+  background: #6d635a url('/games/chess/citadel/floor.webp') center / 100% 100%;
+  box-shadow: 0 0 0 1px #877451;
+}
+
+.citadel-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template: repeat(8, 1fr) / repeat(8, 1fr);
+}
+
+.citadel-square {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  border: 0;
+  border-radius: .2rem;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.citadel-square:focus-visible {
+  z-index: 1;
+  outline: 2px solid #fbf4d6;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 4px #28293b;
+}
+
+.citadel-square:hover { background-color: #fff2bc20; }
+.citadel-last { background: #ddad3646; }
+.citadel-check { background: #64162d9e; box-shadow: inset 0 0 0 2px #ffc0a2; }
+.citadel-selected { background: #b1702977; box-shadow: inset 0 0 0 2px #fff0b0; }
+.citadel-pending { background: #2d526e9e; box-shadow: inset 0 0 0 2px #c4efff; }
+
+.citadel-legal::after {
+  position: absolute;
+  z-index: 1;
+  inset: 37%;
+  border: 1px solid #ffedbf;
+  border-radius: 50%;
+  background: #34534b;
+  content: '';
+  pointer-events: none;
+}
+
+.citadel-target::after { inset: 7%; border: 2px dashed #ffe1ac; background: none; }
+
+.citadel-rank, .citadel-file {
+  position: absolute;
+  z-index: 2;
+  color: #fff3d8;
+  background: #261e24b0;
+  padding: 0 .13rem;
+  border-radius: .15rem;
+  font-size: clamp(.52rem, 2.4cqw, .67rem);
+  line-height: 1.15;
+  pointer-events: none;
+}
+
+.citadel-rank { inset: 1px auto auto 1px; }
+.citadel-file { inset: auto 1px 1px auto; }
+
+.citadel-unit { position: relative; width: 98%; pointer-events: none; }
+.citadel-sprite {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: url('/games/chess/citadel/pieces-v2.webp') no-repeat;
+  background-size: 600% 200%;
+  filter: drop-shadow(0 1px 0 #f7deaf42);
+}
+
+.citadel-in-motion { visibility: hidden; }
+
+.citadel-animation, .citadel-capture {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.citadel-mover, .citadel-victim, .citadel-shatter {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.citadel-mover {
+  z-index: 4;
+  left: var(--x1);
+  top: var(--y1);
+  width: 12.5%;
+  --travel: 270ms;
+  animation: citadel-travel var(--travel) linear both;
+}
+
+.citadel-attacking { --travel: 315ms; animation-name: citadel-charge; }
+.citadel-foot-shadow {
+  position: absolute;
+  inset: auto 16% 8% 16%;
+  height: 15%;
+  border-radius: 50%;
+  background: #120e19a0;
+  filter: blur(2px);
+  animation: citadel-shadow var(--travel) ease both;
+}
+.citadel-stance { position: relative; display: block; transform-origin: 50% 90%; }
+.citadel-stance .citadel-sprite, .citadel-after-promotion .citadel-sprite { scale: var(--facing) 1; }
+.citadel-step .citadel-stance { animation: citadel-step var(--travel) ease both; }
+.citadel-roll .citadel-stance { animation: citadel-roll var(--travel) ease both; }
+.citadel-leap .citadel-stance { animation: citadel-leap var(--travel) ease both; }
+.citadel-attacking:not(.citadel-leap) .citadel-stance { animation-name: citadel-lunge; }
+.citadel-after-promotion { position: absolute; inset: 0; animation: citadel-reveal 110ms ease-out 255ms both; }
+.citadel-before-promotion { display: block; animation: citadel-transform 90ms ease-out 255ms both; }
+
+.citadel-victim {
+  left: var(--victim-x);
+  top: var(--victim-y);
+  width: 12.5%;
+  animation: citadel-fly 230ms ease-in 258ms both;
+}
+
+.citadel-shatter, .citadel-strike {
+  left: var(--victim-x);
+  top: var(--victim-y);
+  width: 23%;
+}
+.citadel-shatter {
+  aspect-ratio: 100/64;
+  opacity: 0;
+  background: url('/games/chess/citadel/shatter.webp') 0 0 / 1600% 100% no-repeat;
+  animation: citadel-impact 215ms steps(15, end) 241ms forwards;
+}
+.citadel-strike {
+  position: absolute;
+  height: 18%;
+  border: solid #ffdf9d;
+  border-width: 0 0 2px 0;
+  border-radius: 0 0 60% 52%;
+  filter: drop-shadow(0 0 4px #ffaf59);
+  animation: citadel-strike 145ms ease-out 220ms both;
+}
+
+@keyframes citadel-travel {
+  0%, 7% { left: var(--x0); top: var(--y0); }
+  86%, 100% { left: var(--x1); top: var(--y1); }
+}
+@keyframes citadel-charge {
+  0%, 17% { left: var(--x0); top: var(--y0); animation-timing-function: cubic-bezier(.6,.04,.24,1); }
+  76%, 100% { left: var(--x1); top: var(--y1); }
+}
+@keyframes citadel-step {
+  0%, 100% { transform: none; }
+  23%, 61% { transform: translateY(-9%) rotate(-5deg); }
+  41%, 78% { transform: translateY(-1%) rotate(5deg); }
+}
+@keyframes citadel-roll {
+  0%, 100% { transform: none; }
+  20% { transform: scale(1.05,.96); }
+  54% { transform: rotate(3deg); }
+  81% { transform: scale(1.04,.97); }
+}
+@keyframes citadel-leap {
+  0%, 100% { transform: none; }
+  16% { transform: scale(1.08,.92); }
+  49% { transform: translateY(-35%) scale(1.09); }
+  78% { transform: translateY(-5%) scale(1.08,.94); }
+}
+@keyframes citadel-lunge {
+  0%, 100% { transform: none; }
+  16% { transform: rotate(calc(var(--facing) * -10deg)) scale(1.05,.94); }
+  76% { transform: translateX(calc(var(--facing) * 9%)) rotate(calc(var(--facing) * 10deg)) scale(1.12); }
+}
+@keyframes citadel-shadow {
+  0%, 100% { transform: scale(1); opacity: .7; }
+  50% { transform: scale(.78); opacity: .42; }
+}
+@keyframes citadel-reveal {
+  from { opacity: 0; transform: scale(.75); filter: brightness(1.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes citadel-transform { to { opacity: 0; } }
+@keyframes citadel-fly {
+  0% { left: var(--victim-x); top: var(--victim-y); opacity: 1; }
+  21% { transform: translate(-65%, -61%) rotate(-16deg) scale(.92); }
+  100% { left: 50%; top: var(--tray-y); opacity: .2; transform: translate(-50%, -50%) scale(.28) rotate(23deg); }
+}
+@keyframes citadel-impact {
+  0% { opacity: .9; background-position: 0 0; }
+  80% { opacity: .75; }
+  100% { opacity: 0; background-position: 100% 0; }
+}
+@keyframes citadel-strike {
+  0% { transform: translate(-50%, -63%) rotate(-46deg) scale(.4); opacity: 0; }
+  42% { opacity: .85; }
+  100% { transform: translate(-50%, -48%) rotate(24deg) scale(1.02); opacity: 0; }
+}
+
+.citadel-classic {
+  border-color: #987453;
+  background: linear-gradient(140deg,#32263e,#181321 68%,#332538);
+}
+.citadel-classic .citadel-stage { background: #b8a683; }
+.citadel-classic .citadel-square[data-tone="dark"] { background-color: #293342; }
+.citadel-classic .citadel-square[data-tone="light"] { background-color: #c3ad87; }
+.citadel-classic .citadel-last { box-shadow: inset 0 0 0 2px #ffbc52bd; }
+.citadel-classic .citadel-selected { box-shadow: inset 0 0 0 3px #ffdf80; }
+.citadel-classic .citadel-pending { box-shadow: inset 0 0 0 3px #92efff; }
+.citadel-classic .citadel-check { box-shadow: inset 0 0 0 3px #e85461; }
+.citadel-statue { background: none; }
+
+.citadel[data-board-terrain="ice"] {
+  --citadel-ground: url('/games/chess/citadel/ice.webp');
+  --citadel-base: #4c708e;
+  --citadel-light: #b9d7dfd9;
+  --citadel-dark: #446782ba;
+  background: linear-gradient(155deg, #2f495f, #162334);
+  border-color: #87aebf;
+}
+.citadel[data-board-terrain="desert"] {
+  --citadel-ground: url('/games/chess/citadel/desert.webp');
+  --citadel-base: #98683c;
+  --citadel-light: #e9bd7ad6;
+  --citadel-dark: #87623dbb;
+  background: linear-gradient(155deg, #61462a, #242027);
+  border-color: #c39c63;
+}
+.citadel[data-board-terrain="lava"] {
+  --citadel-ground: url('/games/chess/citadel/lava.webp');
+  --citadel-base: #59322e;
+  --citadel-light: #966559d9;
+  --citadel-dark: #422d44c4;
+  background: linear-gradient(155deg, #552b2a, #261e33);
+  border-color: #ba7966;
+}
+.citadel:is([data-board-terrain="ice"], [data-board-terrain="desert"], [data-board-terrain="lava"]) .citadel-stage {
+  background: var(--citadel-base) var(--citadel-ground) center / 100% 100%;
+}
+.citadel-stage:where(.citadel:is([data-board-terrain="ice"], [data-board-terrain="desert"], [data-board-terrain="lava"]) *) .citadel-square {
+  isolation: isolate;
+}
+.citadel-stage:where(.citadel:is([data-board-terrain="ice"], [data-board-terrain="desert"], [data-board-terrain="lava"]) *) .citadel-square::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: var(--citadel-tile);
+}
+.citadel-square[data-tone="light"] { --citadel-tile: var(--citadel-light); }
+.citadel-square[data-tone="dark"] { --citadel-tile: var(--citadel-dark); }
+.citadel-square:is(.citadel-last, .citadel-selected, .citadel-check, .citadel-pending)::before { opacity: .35; }

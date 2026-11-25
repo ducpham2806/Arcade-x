@@ -1,0 +1,377 @@
+.xqb {
+  --xqb-gold: #f2d49b;
+  width: min(100%, 29rem);
+  padding: 0.375rem;
+  margin-inline: auto;
+  color: #f8eddb;
+  background: linear-gradient(155deg, #30241b, #1c2322 62%, #2e201c);
+  border: 1px solid #806849;
+  border-radius: 0.875rem;
+  box-shadow: 0 12px 36px #05080770;
+}
+
+.xqb-title {
+  padding: 0.18rem 0 0.3rem;
+  color: var(--xqb-gold);
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.06em;
+}
+
+.xqb-board {
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+  aspect-ratio: 9 / 10;
+  width: 100%;
+  margin-block: 0.25rem;
+  background: #9e8256 url('/games/xiangqi/battlefield/river.webp') center / 100% 100%;
+  border-radius: 0.4rem;
+}
+
+.xqb-lines {
+  position: absolute;
+  z-index: 0;
+  inset: 5% calc(100% / 18);
+  border: 1px solid #31281e;
+  background: repeating-linear-gradient(to bottom, #30291ee6 0 1px, transparent 1px calc(100% / 9));
+  pointer-events: none;
+}
+
+.xqb-lines::before,
+.xqb-lines::after {
+  position: absolute;
+  inset-inline: 0;
+  height: calc(400% / 9);
+  content: '';
+  background: repeating-linear-gradient(to right, #30291ee6 0 1px, transparent 1px 12.5%);
+}
+
+.xqb-lines::before { top: 0; }
+.xqb-lines::after { bottom: 0; }
+
+.xqb-palace {
+  position: absolute;
+  left: 37.5%;
+  width: 25%;
+  height: calc(200% / 9);
+  background:
+    linear-gradient(45deg, transparent calc(50% - 0.6px), #38281c 50%, transparent calc(50% + 0.8px)),
+    linear-gradient(-45deg, transparent calc(50% - 0.6px), #38281c 50%, transparent calc(50% + 0.8px));
+}
+
+.xqb-palace-north { top: 0; }
+.xqb-palace-south { bottom: 0; }
+
+.xqb-river {
+  position: absolute;
+  inset: 45% 22% auto;
+  height: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff1c8;
+  font: 700 clamp(0.65rem, 3.4cqw, 1rem) Georgia, serif;
+  text-shadow: 0 1px 3px #192723;
+  pointer-events: none;
+}
+
+.xqb-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template: repeat(10, 1fr) / repeat(9, 1fr);
+  z-index: 1;
+}
+
+.xqb-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 0.25rem;
+  color: #fff7e4;
+  touch-action: manipulation;
+}
+
+.xqb-cell:focus-visible {
+  outline: 2px solid #fcfaec;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 4px #244649;
+}
+
+.xqb-selected { background: #5926116b; box-shadow: inset 0 0 0 2px #fff0ab; }
+.xqb-checked { box-shadow: inset 0 0 0 2px #ffcf92, inset 0 0 12px #710b18; background: #92142790; }
+.xqb-pending { background: #083e53a0; box-shadow: inset 0 0 0 2px #b1f7ff; }
+
+.xqb-legal::after {
+  position: absolute;
+  z-index: 1;
+  inset: 36%;
+  content: '';
+  border: 1px solid #e4f5d9;
+  background: #305a34;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.xqb-target::after {
+  inset: 3%;
+  border: 2px dashed #ffe0a4;
+  background: none;
+}
+
+.xqb-piece, .xqb-sprite {
+  display: block;
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+}
+
+.xqb-piece { pointer-events: none; }
+.xqb-sprite { background: url('/games/xiangqi/battlefield/units-v2.webp') no-repeat; background-size: 700% 200%; }
+.xqb-piece-in-motion { visibility: hidden; }
+
+.xqb-glyph {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 0 0.16rem;
+  border: 1px solid #5d392d;
+  border-radius: 0.2rem;
+  background: #582816;
+  color: #ffefd1;
+  font: 700 clamp(0.47rem, 2.45cqw, 0.72rem)/1.25 system-ui, sans-serif;
+  white-space: nowrap;
+}
+
+.xqb-piece-b .xqb-glyph { background: #203943; border-color: #5e7578; }
+
+.xqb-tray {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 1.7rem;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid #725a43;
+  border-radius: 0.32rem;
+  background: #221c18;
+  font-size: 0.72rem;
+}
+
+.xqb-tray-b { background: #172121; border-color: #455b59; }
+.xqb-tray strong { color: var(--xqb-gold); }
+.xqb-tray-b strong { color: #d3e4d9; }
+.xqb-tray-pieces { display: flex; align-items: center; flex: 1; min-width: 0; }
+.xqb-prisoner { width: min(6.45%, 1.3rem); }
+.xqb-tray-count { color: #eee0c4; font-variant-numeric: tabular-nums; }
+
+.xqb-motion {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+
+.xqb-mover, .xqb-victim, .xqb-screen, .xqb-impact, .xqb-shell {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.xqb-mover {
+  z-index: 2;
+  width: calc(100% / 9);
+  left: var(--to-x);
+  top: var(--to-y);
+  --travel: 275ms;
+  animation: xqb-travel var(--travel) linear both;
+}
+.xqb-capture .xqb-mover { --travel: 315ms; animation-name: xqb-charge; }
+.xqb-horse .xqb-mover { animation-name: xqb-horse; }
+.xqb-cannon .xqb-mover { --travel: 575ms; animation-name: xqb-cannon; }
+
+.xqb-ground-shadow {
+  position: absolute;
+  inset: auto 16% 7% 16%;
+  height: 14%;
+  border-radius: 50%;
+  background: #211819aa;
+  filter: blur(2px);
+  animation: xqb-shadow var(--travel) ease both;
+}
+.xqb-stance { position: relative; display: block; transform-origin: 50% 90%; }
+.xqb-stance .xqb-sprite { scale: var(--facing) 1; }
+.xqb-foot .xqb-stance { animation: xqb-step var(--travel) ease both; }
+.xqb-mounted .xqb-stance { animation: xqb-gallop var(--travel) ease both; }
+.xqb-wheeled .xqb-stance { animation: xqb-roll var(--travel) ease both; }
+.xqb-capture:not(.xqb-horse, .xqb-cannon) .xqb-stance { animation: xqb-lunge var(--travel) ease both; }
+.xqb-cannon .xqb-stance { animation: xqb-recoil var(--travel) ease both; }
+
+.xqb-screen {
+  width: 9%;
+  aspect-ratio: 1;
+  left: var(--vault-x);
+  top: var(--vault-y);
+  border: 2px dashed #ffe0ab;
+  border-radius: 50%;
+  box-shadow: 0 0 7px #58381c, inset 0 0 6px #eab66b;
+  animation: xqb-screen 340ms both;
+}
+
+.xqb-shell {
+  z-index: 3;
+  width: 6%;
+  height: 1%;
+  background: linear-gradient(90deg, #c87c44aa, #fff4c4);
+  box-shadow: 0 0 8px #eec17a;
+  border-radius: 50%;
+  animation: xqb-shell 286ms ease-in both;
+}
+
+.xqb-victim {
+  z-index: 1;
+  width: calc(100% / 9);
+  left: var(--to-x);
+  top: var(--to-y);
+  animation: xqb-victim 215ms ease-in var(--flight-at) both;
+}
+
+.xqb-impact, .xqb-strike {
+  position: absolute;
+  z-index: 4;
+  width: 20%;
+  left: var(--to-x);
+  top: var(--to-y);
+}
+.xqb-impact {
+  aspect-ratio: 96 / 56;
+  opacity: 0;
+  background: url('/games/xiangqi/battlefield/capture.webp') 0 0 / 1600% 100% no-repeat;
+  animation: xqb-impact 225ms steps(15, end) var(--impact-at) forwards;
+}
+.xqb-strike {
+  height: 18%;
+  border-bottom: 2px solid #fff0b8;
+  border-radius: 0 0 64% 42%;
+  filter: drop-shadow(0 0 3px #e5a658);
+  animation: xqb-strike 140ms ease-out 218ms both;
+}
+
+@keyframes xqb-travel {
+  0%, 9% { left: var(--from-x); top: var(--from-y); }
+  87%, 100% { left: var(--to-x); top: var(--to-y); }
+}
+@keyframes xqb-charge {
+  0%, 17% { left: var(--from-x); top: var(--from-y); animation-timing-function: cubic-bezier(.6,.04,.24,1); }
+  81%, 100% { left: var(--to-x); top: var(--to-y); }
+}
+@keyframes xqb-horse {
+  0%, 8% { left: var(--from-x); top: var(--from-y); }
+  49% { left: var(--turn-x); top: var(--turn-y); }
+  82%, 100% { left: var(--to-x); top: var(--to-y); }
+}
+@keyframes xqb-cannon {
+  0%, 52% { left: var(--from-x); top: var(--from-y); }
+  95%, 100% { left: var(--to-x); top: var(--to-y); }
+}
+@keyframes xqb-step {
+  0%, 100% { transform: none; }
+  23%, 63% { transform: translateY(-9%) rotate(-5deg); }
+  41%, 82% { transform: translateY(-1%) rotate(5deg); }
+}
+@keyframes xqb-gallop {
+  0%, 100% { transform: none; }
+  16% { transform: scale(1.1,.92) rotate(-4deg); }
+  43% { transform: translateY(-23%) rotate(-6deg); }
+  63% { transform: translateY(-12%) rotate(5deg); }
+  84% { transform: scale(1.07,.94); }
+}
+@keyframes xqb-roll {
+  0%, 100% { transform: none; }
+  36% { transform: rotate(3deg); }
+  74% { transform: translateY(-4%) rotate(-3deg); }
+}
+@keyframes xqb-lunge {
+  0%, 100% { transform: none; }
+  17% { transform: rotate(calc(var(--facing) * -9deg)) scale(1.05,.94); }
+  81% { transform: translateX(calc(var(--facing) * 8%)) rotate(calc(var(--facing) * 9deg)) scale(1.12); }
+}
+@keyframes xqb-recoil {
+  0%, 12%, 100% { transform: none; }
+  21% { transform: translateX(calc(var(--facing) * -17%)) rotate(calc(var(--facing) * -7deg)); }
+  38% { transform: none; }
+}
+@keyframes xqb-shadow {
+  0%, 100% { transform: scale(1); opacity: .75; }
+  50% { transform: scale(.84); opacity: .48; }
+}
+@keyframes xqb-shell {
+  0%, 31% { left: var(--from-x); top: var(--from-y); opacity: 0; transform: translate(-50%, -50%) rotate(var(--shot-angle)); }
+  34%, 90% { opacity: 1; }
+  100% { left: var(--to-x); top: var(--to-y); opacity: 0; transform: translate(-50%, -50%) rotate(var(--shot-angle)); }
+}
+@keyframes xqb-screen {
+  0%, 20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes xqb-victim {
+  0% { opacity: 1; left: var(--to-x); top: var(--to-y); }
+  23% { transform: translate(-62%, -66%) rotate(14deg) scale(.9); }
+  100% { opacity: .22; left: 50%; top: var(--tray-y); transform: translate(-50%, -50%) scale(.28); }
+}
+@keyframes xqb-impact {
+  0% { opacity: .9; background-position: 0 0; }
+  84% { opacity: .8; }
+  100% { opacity: 0; background-position: 100% 0; }
+}
+@keyframes xqb-strike {
+  0% { transform: translate(-50%,-62%) rotate(-48deg) scale(.45); opacity: 0; }
+  43% { opacity: .85; }
+  100% { transform: translate(-50%,-48%) rotate(20deg); opacity: 0; }
+}
+
+.xqb-classic { background: #4a1610 url('/games/xiangqi/art/frame-lacquer.webp') center / cover; }
+.xqb-classic .xqb-board { background: #d8ab76 url('/games/xiangqi/art/board-wood.webp') center / cover; }
+.xqb-classic .xqb-river { color: #422b20; text-shadow: none; }
+.xqb-token {
+  display: grid;
+  width: 90%;
+  margin: 5%;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: #f5e6cb center / cover;
+  box-shadow: 0 2px 4px #2c1c1a80;
+  font: 700 clamp(.48rem, 4cqw, 1.1rem) Georgia, serif;
+  text-align: center;
+}
+.xqb-token-r { color: #9f2225; background-image: url('/games/xiangqi/art/token-red.webp'); }
+.xqb-token-b { color: #1a1a1a; background-image: url('/games/xiangqi/art/token-black.webp'); }
+.xqb-prisoner .xqb-token { font-size: .48rem; }
+
+.xqb[data-board-terrain="gate"] {
+  --xqb-ground: url('/games/xiangqi/battlefield/gate.webp');
+  --xqb-base: #976247;
+  background: linear-gradient(155deg, #4d2922, #192020 68%, #452720);
+  border-color: #a8755b;
+}
+.xqb[data-board-terrain="mountain"] {
+  --xqb-ground: url('/games/xiangqi/battlefield/mountain.webp');
+  --xqb-base: #8d9290;
+  background: linear-gradient(155deg, #40505a, #1a2326 68%, #303e40);
+  border-color: #889997;
+}
+.xqb[data-board-terrain="desert"] {
+  --xqb-ground: url('/games/xiangqi/battlefield/desert.webp');
+  --xqb-base: #bd955a;
+  background: linear-gradient(155deg, #53422b, #1f2625 68%, #46352a);
+  border-color: #af8c59;
+}
+.xqb:is([data-board-terrain="gate"], [data-board-terrain="mountain"], [data-board-terrain="desert"]) .xqb-board {
+  background: var(--xqb-base) var(--xqb-ground) center / 100% 100%;
+}

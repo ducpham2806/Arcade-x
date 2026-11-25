@@ -2,6 +2,12 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## Ba bàn cờ chiến trường · 25–26/11/2026
+
+- Ô Ăn Quan có 4 chiến trường, Sân Đình, hai phe lính giáo và Tướng cưỡi ngựa, kho trang phục dùng ví Kẹo cũ. Điểm nhảy theo thời điểm từng quân về khay.
+- Cờ vua có 12 quân pixel, Cờ tướng có 14. Mỗi game có 4 địa hình và bàn cổ điển. Cả ba có công tắc chuyển động độc lập và bản HTML offline.
+- Nhánh `codex/three-board-games-polish`. [QA bản thử](qa/THREE-BOARD-GAMES-2026-11-25.md). Tiến/lùi thế cờ, khay và điểm có trên `codex/three-board-games-qa`. [QA xem lại](qa/THREE-BOARD-REVIEW-2026-11-26.md). Thiết bị thật và PvP hai tài khoản chờ nghiệm thu.
+
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 
 - PR 42 sửa vạch lực online, khung thấp, focus, Chơi lại offline và xác nhận bỏ cuộc. [QA](qa/FOLK-POLISH-2026-11-19.md).
@@ -50,12 +56,4 @@
 - User duyệt exception production riêng: schema/Edge/handlerAuth/CORSexact/legacyJWT OFF/cronVault. Đã áp/probeAuth/CORS/tick/RPCdenial; tick200. PublicX9FL8R tạo-rời vàqueue-hủy qua; [release](word-chain/PUBLIC-RELEASE-2026-11-08.md).
 - Không đổi save/Auth/commerce; online chưaXP/xu, cầnreceipt bền vững. User bỏ gate thật3/4; ON5/ON6 cònQA. Chi tiết cũ giữ trong archive trước đóngONLINE-ERROR.
 
-## TC-R0 phần deploy/Auth cơ bản · 06/11/2026
-
-- Đã phát hiện và sửa Render còn staging3950abb; service main/c705100 đã Live14:54, Free/cap16/Node24, registered-free đúng ArcadeX.
-- Health/TLS/origin/token âm qua; review/config/metrics public404. Không đổi SQL/key/chi phí.
-- Account thật tạo/rời1v1, tạo2v2/exit dọn phòng, logout sau exit chặn online lại; không bắt đầu trận nhiều người.
-- Bằng chứng: [TC-R0 report](tank-clash/TC-R0-2026-11-06.md). Cập nhật07/11: Netlify/Auth đã phát hành, logout retest qua; còn ca A/mã B cũ được chủ dự án để sau. TC-R1 chưa làm.
-- Giữ Blueprint cũ paused, không sync ghi đè service main; lần sau tiếp QA còn thiếu, không deploy lại vô cớ.
-
-[Các việc cũ đã đóng](archive/COMPLETED-2026-11-19-before-folk-online.md).
+[Kết quả TC-R0 và danh mục cũ](archive/COMPLETED-2026-11-25-before-xiangqi-battlefield.md).

@@ -466,6 +466,7 @@ export interface MatchEndReviewBarProps {
   isRematchOfferedByMe?: boolean;
   isRematchOfferedByOpponent?: boolean;
   isLoading?: boolean;
+  inFlow?: boolean;
   result: 'win' | 'loss' | 'draw';
 }
 
@@ -476,13 +477,16 @@ export const MatchEndReviewBar: React.FC<MatchEndReviewBarProps> = ({
   onExitGame,
   onRematch,
   result,
+  inFlow,
 }) => {
   if (!isVisible) return null;
 
   return (
     <div
       id="match-end-review-bar"
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 p-2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl shadow-2xl shadow-black/80 animate-in fade-in slide-in-from-bottom-3 duration-300"
+      className={`flex items-center gap-2 p-2 bg-slate-900/90 border border-slate-700/80 rounded-2xl ${inFlow
+        ? 'mx-auto w-fit max-w-full flex-wrap justify-center'
+        : 'fixed bottom-4 left-1/2 -translate-x-1/2 z-40 backdrop-blur-md shadow-2xl shadow-black/80 animate-in fade-in slide-in-from-bottom-3 duration-300'}`}
     >
       <button
         type="button"
@@ -496,7 +500,7 @@ export const MatchEndReviewBar: React.FC<MatchEndReviewBarProps> = ({
         }`}
       >
         <Trophy className="w-4 h-4" />
-        <span>Xem Bảng Kết Quả</span>
+        <span>{inFlow ? 'Xem kết quả' : 'Xem Bảng Kết Quả'}</span>
       </button>
 
       {onRematch && (
@@ -505,6 +509,7 @@ export const MatchEndReviewBar: React.FC<MatchEndReviewBarProps> = ({
           onClick={onRematch}
           className="py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold text-xs sm:text-sm border border-amber-500/40 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
           title="Đấu lại ván mới"
+          aria-label="Đấu lại ván mới"
         >
           <RotateCcw className="w-4 h-4 text-amber-400" />
           <span className="hidden sm:inline">Đấu Lại</span>
@@ -516,6 +521,7 @@ export const MatchEndReviewBar: React.FC<MatchEndReviewBarProps> = ({
         onClick={onReturnToLobby}
         className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs sm:text-sm border border-slate-700 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
         title="Về sảnh game"
+        aria-label="Về sảnh game"
       >
         <Home className="w-4 h-4 text-amber-400" />
         <span className="hidden sm:inline">Về Sảnh</span>

@@ -1,3 +1,4 @@
+import type { OaqBattlefield } from './battlefield';
 import { readableCanvasText } from '../../accessibility/canvasText';
 import { getSkinById } from '../folk-duel/skins-catalog';
 import type { EquippedFolkSkins, FolkSeat } from '../folk-duel/types';
@@ -159,12 +160,12 @@ function capture(ctx: CanvasRenderingContext2D, frame: OaqFrame, t: number, at: 
   }
 }
 
-export function renderOaqTurnFrame(ctx: CanvasRenderingContext2D, frame: OaqFrame, progress: number, skins: EquippedFolkSkins) {
+export function renderOaqTurnFrame(ctx: CanvasRenderingContext2D, frame: OaqFrame, progress: number, skins: EquippedFolkSkins, field?: OaqBattlefield) {
   const { step, before, after } = frame;
   const at = cellCenter(step.cellIndex);
   const showingAfter = progress >= { pickup: .57, drop: .78, capture: .22, sweep: .22, resow: .82 }[step.type];
   const countTray = step.type === 'capture' || step.type === 'sweep' ? progress >= .84 : showingAfter;
-  renderOAnQuanBoard(ctx, showingAfter ? after : before, skins, step.type === 'pickup' || step.type === 'drop' ? step.cellIndex : null, [], countTray ? after : before);
+  renderOAnQuanBoard(ctx, showingAfter ? after : before, skins, step.type === 'pickup' || step.type === 'drop' ? step.cellIndex : null, [], countTray ? after : before, field);
 
   switch (step.type) {
     case 'pickup': pickup(ctx, frame, progress, at, skins); break;

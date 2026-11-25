@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { applyOaqMove, getOaqTray, getValidOaqMoves, recordOaqTurn, type OaqState } from '../../src/games/o-an-quan/rules';
+import { applyOaqMove, createInitialOaqState, getOaqTray, getValidOaqMoves, recordOaqTurn, type OaqState } from '../../src/games/o-an-quan/rules';
 import type { NlcState } from '../../src/games/nhay-lo-co/rules';
 import type { FolkProfileSave } from '../../src/games/folk-duel/economy';
 import type { OfflineMatch } from '../../src/games/folk-duel/offlineMatch';
@@ -216,6 +216,13 @@ test('Ô Ăn Quan diễn đủ từng ô, khóa nước đi trong lúc rải và
   await page.getByRole('button', { name: /Lịch sử lượt đi/ }).tap();
   const dialog = page.getByRole('dialog', { name: 'Lịch sử lượt đi' });
   await expect(dialog).toBeVisible();
+  const boardReview = dialog.getByRole('navigation', { name: 'Xem lại nước đi' });
+  await expect(dialog.getByRole('img', { name: /Thế bàn sau lượt 1/ })).toBeVisible();
+  await boardReview.getByRole('button', { name: 'Đầu ván' }).tap();
+  await expect(dialog.getByRole('img', { name: /Thế bàn xuất phát.*Điểm người 1: 0/ })).toBeVisible();
+  await boardReview.getByRole('button', { name: 'Tiến 1' }).tap();
+  await expect(dialog.getByRole('img', { name: /Thế bàn sau lượt 1/ })).toBeVisible();
+  expect((await read(page, 'o-an-quan'))!.offlineMatch.state).toEqual(recordOaqTurn(before, move, expected.nextState, expected.steps));
   await dialog.locator('summary').tap();
   await expect(dialog).toContainText('Lượt 1 · Người chơi 1');
   await expect(dialog).toContainText('Đường rải · ô 2 → ô 3');
@@ -225,6 +232,61 @@ test('Ô Ăn Quan diễn đủ từng ô, khóa nước đi trong lúc rải và
   await expect(dialog).toBeHidden();
   await expect(page.getByRole('button', { name: /Lịch sử lượt đi/ })).toBeFocused();
   expect(errors).toEqual([]);
+});
+
+test('Ô Ăn Quan Chiến Trường chấm từng Dân và Tướng theo lúc về khay', async ({ page }) => {
+  const state: OaqState = {
+    ...createInitialOaqState(),
+    cells: [0, 1, 0, 0, 3, 0, 0, 4, 0, 0, 0, 0],
+    scores: { P1: 22, P2: 20 },
+    turnNumber: 3,
+  };
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await open(page, 'o-an-quan');
+  await page.getByRole('button', { name: startMenu.two }).click();
+  await page.evaluate(fixture => {
+    const key = 'arcadex_save_v1_o-an-quan';
+    const saved = JSON.parse(localStorage.getItem(key)!);
+    saved.payload.offlineMatch.state = fixture;
+    localStorage.setItem(key, JSON.stringify(saved));
+  }, state);
+  await reloadMatch(page, 'o-an-quan');
+
+  const stage = page.locator('.oaq-stage');
+  const motion = stage.getByRole('button', { name: 'Chuyển động quân cờ' });
+  await expect(motion).toHaveAttribute('aria-pressed', 'false');
+  await motion.click();
+  await stage.getByRole('combobox', { name: 'Địa hình bàn cờ' }).selectOption('desert');
+  await expect(stage).toHaveAttribute('data-oaq-terrain', 'desert');
+
+  const score = stage.locator('[data-folk-seat="P1"] .oaq-seat-score b');
+  await score.evaluate(node => {
+    const events = [Number(node.textContent)];
+    (window as Window & { scoreEvents?: number[] }).scoreEvents = events;
+    new MutationObserver(() => events.push(Number(node.textContent))).observe(node, {
+      childList: true, characterData: true, subtree: true,
+    });
+  });
+
+  await stage.locator('[data-folk-cell="1"]').click();
+  await stage.getByRole('button', { name: /Rải Phải/ }).click();
+  await expect(stage).toHaveAttribute('data-oaq-playing', 'true');
+  await expect(stage).toHaveAttribute('data-oaq-playing', 'false', { timeout: 10000 });
+  const events = await page.evaluate(() => (window as Window & { scoreEvents?: number[] }).scoreEvents);
+  expect(events).toEqual([22, 23, 24, 25, 35]);
+  await expect(score).toHaveText('35');
+
+  const nextState = (await read(page, 'o-an-quan'))!.offlineMatch.state;
+  await stage.locator('[data-folk-cell]:enabled').first().click();
+  await stage.getByRole('button', { name: /Rải Trái/ }).click();
+  await expect(stage).toHaveAttribute('data-oaq-playing', 'true');
+  await motion.click();
+  await expect(stage).toHaveAttribute('data-oaq-playing', 'false');
+  expect((await read(page, 'o-an-quan'))!.offlineMatch.state.turnNumber).toBe(nextState.turnNumber + 1);
+
+  await reloadMatch(page, 'o-an-quan');
+  await expect(motion).toHaveAttribute('aria-pressed', 'false');
+  await expect(stage).toHaveAttribute('data-oaq-terrain', 'desert');
 });
 
 for (const mode of ['two', 'bot'] as const) {

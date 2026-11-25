@@ -44,3 +44,7 @@ Kế hoạch cập nhật ngày 19/11/2026. [GDD v2](../archive/FOLK-GAMES-PLAN-
 
 - PR 42 có công tắc catalog riêng cho từng game, mặc định tắt. Đã kiểm bật, thu hồi và lưu offline trong môi trường giả lập. Preview Vite cổng 4335 trỏ staging, dành cho lượt chơi bằng hai tài khoản, điện thoại và mạng thật của anh.
 - Ngày 20/11 anh yêu cầu bỏ test staging và merge PR 42 để phát hành hai game trên launcher. Catalog đóng gói cung cấp bản offline cả khi catalog cloud thiếu hàng. Chạy CI trên đúng commit trước merge và kiểm phát hành Netlify. Online công khai theo đợt backend riêng. [Phiếu nghiệm thu và quy trình bật/thu hồi](../qa/FOLK-ON2-2026-11-19.md).
+
+## Ô Ăn Quan Chiến Trường · 25/11/2026
+
+- Bốn bản đồ, Sân Đình, hai phe lính/Tướng, khay cộng từng quân, kho trang phục và công tắc chuyển động. Nhánh `codex/three-board-games-polish`. [QA](../qa/THREE-BOARD-GAMES-2026-11-25.md).

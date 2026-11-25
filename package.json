@@ -45,7 +45,7 @@
     "test:folk-duel": "node --test tests/folk-duel/folk-games.test.mjs && node scripts/folk-server-package.mjs --check && node --test tests/folk-duel/online.test.mjs",
     "test:folk-duel-ui": "playwright test tests/folk-duel/offline-ui.test.ts tests/folk-duel/online-ui.test.ts",
     "test:readability": "node tests/readability/contrast.mjs && node tests/readability/dom-policy.cjs",
-    "test:duel": "node tests/duel/engines.mjs && node tests/duel/ui.cjs && node tests/duel/worker.mjs",
+    "test:duel": "node tests/duel/engines.mjs && node tests/duel/ui.cjs && node tests/duel/worker.mjs && node --test tests/duel/citadel.mjs",
     "test:duel-server": "node tests/duel/authoritative.mjs && node tests/duel/schema.mjs && node tests/duel/edge-room.mjs",
     "test:social": "node tests/social/audio.mjs && node tests/social/ui.cjs && node tests/social/chat-store.mjs",
     "export:artwork": "node scripts/export-game-art.mjs",

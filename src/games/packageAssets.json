@@ -924,6 +924,12 @@
     "/games/chess/art/bq.webp",
     "/games/chess/art/br.webp",
     "/games/chess/art/splash.webp",
+    "/games/chess/citadel/floor.webp",
+    "/games/chess/citadel/ice.webp",
+    "/games/chess/citadel/desert.webp",
+    "/games/chess/citadel/lava.webp",
+    "/games/chess/citadel/pieces-v2.webp",
+    "/games/chess/citadel/shatter.webp",
     "/games/chess/art/wb.webp",
     "/games/chess/art/wk.webp",
     "/games/chess/art/wn.webp",
@@ -937,7 +943,13 @@
     "/games/xiangqi/art/board-wood.webp",
     "/games/xiangqi/art/frame-lacquer.webp",
     "/games/xiangqi/art/token-black.webp",
-    "/games/xiangqi/art/token-red.webp"
+    "/games/xiangqi/art/token-red.webp",
+    "/games/xiangqi/battlefield/units-v2.webp",
+    "/games/xiangqi/battlefield/river.webp",
+    "/games/xiangqi/battlefield/gate.webp",
+    "/games/xiangqi/battlefield/mountain.webp",
+    "/games/xiangqi/battlefield/desert.webp",
+    "/games/xiangqi/battlefield/capture.webp"
   ],
   "caro-gomoku": [
     "/game-art/icons/caro-gomoku.webp",
@@ -982,7 +994,10 @@
   ],
   "o-an-quan": [
     "/game-art/icons/o-an-quan.webp",
-    "/game-art/banners/o-an-quan.webp"
+    "/game-art/banners/o-an-quan.webp",
+    "/games/xiangqi/battlefield/capture.webp",
+    "/games/o-an-quan/campaign/terrains.webp",
+    "/games/o-an-quan/campaign/units.webp"
   ],
   "nhay-lo-co": [
     "/game-art/icons/nhay-lo-co.webp",

@@ -55,6 +55,11 @@ import {
   deserializeXiangqiBoard,
 } from './rules';
 import { botMove } from '../duel/aiClient';
+import { BattlefieldBoard } from './BattlefieldBoard';
+import { BoardReview, useBoardReview } from '../duel/BoardReview';
+import { replayXiangqiPositions, type XiangqiReviewMove } from './review';
+import { BoardTerrainPicker, useBoardTerrain } from '../duel/BoardTerrain';
+import { BoardMotionToggle, useBoardMotion } from '../duel/BoardMotion';
 
 type XiangqiPlayMode = 'lobby' | 'online' | 'ai' | 'local_hotseat';
 
@@ -90,10 +95,16 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
   useEffect(()=>{ aiRequest.current?.abort();return ()=>aiRequest.current?.abort(); },[playMode]);
   const [moveHint,setMoveHint]=useState('');
   const [botError,setBotError]=useState('');
+  const [battlefield, setBattlefield] = useState(() => {
+    try { return localStorage.getItem('arcadex_xiangqi_board') !== 'classic'; }
+    catch { return true; }
+  });
+  const boardMotion = useBoardMotion('xiangqi');
+  const boardTerrain = useBoardTerrain('xiangqi', 'river');
   const [vnPieces,setVnPieces]=useState(()=>localStorage.getItem('arcadex_xiangqi_vn')==='1');
-  const pieceNames:Record<string,string>={k:'Tướng',a:'Sĩ',e:'Tượng',r:'Xe',c:'Pháo',h:'Mã',p:'Tốt'};
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('hard');
   const [aiBoard, setAiBoard] = useState<BoardMatrix>(INITIAL_XIANGQI_BOARD);
+  const [aiMoveHistory, setAiMoveHistory] = useState<XiangqiReviewMove[]>([]);
   const [aiTurn, setAiTurn] = useState<PieceColor>('r');
   const [aiWinner, setAiWinner] = useState<PieceColor | 'draw' | null>(null);
 
@@ -177,6 +188,16 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     }
     return INITIAL_XIANGQI_BOARD;
   }, [activeRoomId, roomState?.boardState, playMode, localBoard, aiBoard]);
+
+  const reviewPositions = useMemo(() => {
+    if (!isReviewingBoard) return [];
+    if (activeRoomId) return replayXiangqiPositions(roomState?.moveHistory ?? [], currentBoard);
+    if (playMode === 'ai') return replayXiangqiPositions(aiMoveHistory, currentBoard);
+    if (playMode === 'local_hotseat') return [...localMoveHistory.map(snapshot => snapshot.board), currentBoard];
+    return [];
+  }, [isReviewingBoard, activeRoomId, roomState?.moveHistory, currentBoard, playMode, aiMoveHistory, localMoveHistory]);
+  const review = useBoardReview(isReviewingBoard, Math.max(0, reviewPositions.length - 1));
+  const reviewedBoard = reviewPositions[review.index];
 
   // Audio cue when opponent makes a move
   useEffect(() => {
@@ -442,6 +463,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     aiRequest.current?.abort();setBotError('');
     setAiDifficulty(diff);
     setAiBoard(INITIAL_XIANGQI_BOARD);
+    setAiMoveHistory([]);
     setAiTurn('r');
     setAiWinner(null);
     setAiEndReason('');
@@ -493,6 +515,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
     } else {
       // AI Rematch
       setAiBoard(INITIAL_XIANGQI_BOARD);
+      setAiMoveHistory([]);
       setAiTurn('r');
       setAiWinner(null);
       setAiEndReason('');
@@ -650,6 +673,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       // AI Practice Move
       else if (playMode === 'ai') {
         setAiBoard(nextBoard);
+        setAiMoveHistory(previous => [...previous, { from: [fromR, fromC], to: [r, c] }]);
 
         if (isCheckmate) {
           setAiWinner('r');
@@ -675,6 +699,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
             aiNextBoard[aiMove.from[0]][aiMove.from[1]] = null;
 
             setAiBoard(aiNextBoard);
+            setAiMoveHistory(previous => [...previous, aiMove]);
             bridge.playSound(aiCapturedPiece ? 'slice' : 'click');
 
             // Check if AI captured player's king
@@ -705,7 +730,19 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
       {activeRoomId&&error&&<p role="alert" className="p-2 text-amber-200">{error} · Đang giữ lại thế cờ, chờ đồng bộ.</p>}
       {moveHint&&<p role="status" className="text-sm text-amber-200 p-2">{moveHint}</p>}
       {botError&&<p role="alert">{botError}<button type="button" className="underline ml-2" onClick={()=>handleStartAiPractice(aiDifficulty)}>Ván luyện mới</button></p>}
-      <button type="button" className="text-sm rounded-lg p-2 bg-slate-800 text-white" onClick={()=>{setVnPieces(!vnPieces);localStorage.setItem('arcadex_xiangqi_vn',vnPieces?'0':'1');}}>{vnPieces?'Quân: Tiếng Việt':'Quân: Chữ Hán'}</button>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <BoardMotionToggle {...boardMotion} className="rounded-lg bg-slate-800 p-2 text-sm text-white"/>
+        {battlefield && <BoardTerrainPicker {...boardTerrain} className="min-h-[40px] max-w-full rounded-lg bg-slate-800 p-2 text-sm text-white"/>}
+        <button type="button" className="rounded-lg bg-slate-800 p-2 text-sm text-white" aria-pressed={battlefield}
+          onClick={() => {
+            const next = !battlefield;
+            setBattlefield(next);
+            try { localStorage.setItem('arcadex_xiangqi_board', next ? 'battlefield' : 'classic'); } catch {}
+          }}>
+          {battlefield ? 'Bàn chiến trận' : 'Bàn cổ điển'}
+        </button>
+        <button type="button" className="text-sm rounded-lg p-2 bg-slate-800 text-white" onClick={()=>{setVnPieces(!vnPieces);localStorage.setItem('arcadex_xiangqi_vn',vnPieces?'0':'1');}}>{vnPieces?'Quân: Tiếng Việt':'Quân: Chữ Hán'}</button>
+      </div>
       <LearningHub game="xiangqi" lobby={playMode==='lobby'} roomId={activeRoomId} ended={!!isMatchEnded} result={matchResult} matchKey={activeRoomId ? activeRoomId+JSON.stringify(roomState?.lastMove) : JSON.stringify(playMode==='local_hotseat'?localBoard:aiBoard)} ranked={!!activeRoomId} board={playMode==='ai'?aiBoard:playMode==='local_hotseat'?localBoard:roomState?.boardState} onResume={id=>{setActiveRoomId(id);setPlayMode('online');}} onInvite={()=>setIsModalOpen(true)}/>
       {/* VS Screen Pop when online opponent connects */}
       {showVersusScreen && roomState?.players.host && roomState.players.guest && (
@@ -890,94 +927,25 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* TRADITIONAL WOODEN XIANGQI BOARD MATRIX (9 x 10)         */}
-          {/* ========================================================= */}
-          <div
-            className="arcade-board relative p-3 sm:p-5 rounded-3xl bg-[#4a1610] bg-cover bg-center border-4 border-[#b8862f] shadow-2xl shadow-black overflow-x-auto max-w-full"
-            style={{ backgroundImage: 'url(/games/xiangqi/art/frame-lacquer.webp)' }}
-          >
-            {/* Wooden Board Surface */}
-            <div
-              className="relative bg-[#d8ab76] bg-cover bg-center border-2 border-[#5c3a1e] rounded-xl p-3 sm:p-4 shadow-inner"
-              // Piece glyphs sit on the cream token centres and the river text on light wood: the
-              // contrast is designed, so the launcher's image-surface fallback must not box them.
-              data-readability="off"
-              style={{
-                // Painted Gemini wood and lacquer (art/gemini/xiangqi); grid, river and palace are drawn on top.
-                backgroundImage: 'url(/games/xiangqi/art/board-wood.webp)',
-                width: 'min(94vw, 500px)',
-                height: 'min(105vw, 560px)',
-              }}
-            >
-              {/* River Text Banner (Chu Hà - Hán Giới) */}
-              <div className="absolute top-[46.5%] left-4 right-4 flex items-center justify-between px-6 pointer-events-none text-[#5c3a1e]/85 font-black tracking-[0.5em] text-xs sm:text-sm uppercase font-serif">
-                <span>楚 河</span>
-                <span>漢 界</span>
-              </div>
+          <MatchEndReviewBar
+            inFlow
+            isVisible={isReviewingBoard}
+            result={matchResult}
+            onOpenModal={() => {
+              setIsReviewingBoard(false);
+              setShowMatchEndModal(true);
+            }}
+            onRematch={handleRematch}
+            onReturnToLobby={handleReturnToLobby}
+          />
+          {reviewPositions.length > 1 && <BoardReview {...review} count={reviewPositions.length - 1}/>}
+          <BattlefieldBoard key={`${playMode}:${activeRoomId ?? ''}`} board={reviewedBoard ?? currentBoard}
+            selected={isReviewingBoard ? null : selectedPos} pending={isReviewingBoard ? null : pendingDest} legalMoves={isReviewingBoard ? [] : legalMoves}
+            vnPieces={vnPieces} paused={Boolean(isPaused || isReviewingBoard)} classic={!battlefield}
+            terrain={boardTerrain.terrain} motionEnabled={boardMotion.enabled} readOnly={isReviewingBoard} onCell={handleCellClick}/>
 
-              {/* Grid Cells (10 Rows x 9 Cols) */}
-              <div className="w-full h-full grid grid-rows-10 grid-cols-9 gap-0">
-                {Array.from({ length: 10 }).map((_, r) =>
-                  Array.from({ length: 9 }).map((_, c) => {
-                    const piece = currentBoard[r][c];
-                    const isSelected = selectedPos?.[0] === r && selectedPos?.[1] === c;
-                    const isLegalDest = legalMoves.some(([lr, lc]) => lr === r && lc === c);
-                    const isPendingDest = pendingDest?.[0] === r && pendingDest?.[1] === c;
-
-                    return (
-                      <div
-                        key={`${r}_${c}`}
-                        onClick={() => handleCellClick(r, c)}
-                        className={`relative flex items-center justify-center cursor-pointer border-[0.5px] border-[#8a5d35]/40 ${
-                          isPendingDest ? 'bg-cyan-400/40 ring-4 ring-cyan-400 z-20 rounded-md shadow-lg animate-pulse' : ''
-                        }`}
-                      >
-                        {/* 2-Tap Pending Reticle */}
-                        {isPendingDest && (
-                          <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
-                            <div className="w-5 h-5 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs font-black shadow-lg">
-                              ✓
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Legal Move Glowing Dot */}
-                        {isLegalDest && !isPendingDest && (
-                          <div
-                            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${
-                              piece
-                                ? 'ring-4 ring-rose-500 bg-rose-500/50 animate-ping'
-                                : 'bg-emerald-600/80 ring-2 ring-emerald-300 animate-pulse'
-                            }`}
-                          />
-                        )}
-
-                        {/* Piece Disc */}
-                        {piece && (
-                          <div
-                            className={`arcade-piece relative w-[92%] h-[92%] rounded-full flex items-center justify-center bg-cover bg-center shadow-md shadow-black/60 transition-transform ${
-                              piece.color === 'r'
-                                ? 'bg-[#f5e6cb] text-[#b02a2a]'
-                                : 'bg-[#e2d5c1] text-[#1a1a1a]'
-                            } ${isSelected ? 'scale-110 ring-4 ring-amber-400 z-10' : 'hover:scale-105'}`}
-                            style={{ backgroundImage: `url(/games/xiangqi/art/token-${piece.color === 'r' ? 'red' : 'black'}.webp)` }}
-                          >
-                            <span className="font-serif font-black text-base sm:text-xl select-none">
-                              {vnPieces?pieceNames[piece.type]:PIECE_SYMBOLS[piece.color][piece.type]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-
-            {/* Magnifier / 2-Tap Move Confirmation Floating HUD */}
             {selectedPos && pendingDest && !isMatchEnded && (
-              <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 w-[94%] max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
+              <div className="w-full max-w-sm bg-slate-950/95 border border-cyan-400/80 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 font-bold text-xs">
                     <ZoomIn className="w-4 h-4 text-cyan-400 animate-pulse" />
@@ -1013,7 +981,6 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
                 </div>
               </div>
             )}
-          </div>
 
           {/* Bottom / Own Player Card */}
           <div
@@ -1159,21 +1126,6 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
         onExitGame={handleExitGame}
       />
 
-      {/* Floating Review Bar when user is reviewing board */}
-      <MatchEndReviewBar
-        isVisible={isReviewingBoard}
-        result={matchResult}
-        onOpenModal={() => {
-          setIsReviewingBoard(false);
-          setShowMatchEndModal(true);
-        }}
-        onRematch={handleRematch}
-        onReturnToLobby={handleReturnToLobby}
-        isRematchOfferedByMe={isRematchOfferedByMe}
-        isRematchOfferedByOpponent={isRematchOfferedByOpponent}
-        isLoading={isActionLoading}
-      />
-
       {/* Surrender Confirmation Modal */}
       <GameActionConfirmModal
         isOpen={showSurrenderConfirm}
@@ -1194,6 +1146,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
               setLocalEndReason(`${surrenderer} đã xin đầu hàng.`);
               bridge.playSound('gameOver');
             } else {
+              aiRequest.current?.abort();
               setAiWinner('b');
               setAiEndReason('Bạn đã xin đầu hàng máy tính AI.');
               bridge.playSound('gameOver');
@@ -1227,6 +1180,7 @@ export const XiangqiGame: React.FC<GameComponentProps> = ({
               setLocalEndReason('Hai bên đã đồng thuận kết thúc trận đấu Hòa!');
               bridge.playSound('coin');
             } else {
+              aiRequest.current?.abort();
               setAiWinner('draw');
               setAiEndReason('Máy tính AI đã chấp nhận lời cầu hòa của bạn!');
               bridge.playSound('coin');
