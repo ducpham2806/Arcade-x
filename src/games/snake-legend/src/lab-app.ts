@@ -3,7 +3,7 @@ import { DASH_ICON } from './dash-icon';
 import { Engine, FixedClock, ARENAS } from './core';
 import { Controls } from './input';
 import { Renderer } from './render';
-import { TRIALS, loadTrialProgress, saveTrialProgress } from './trials';
+import { TRIALS, TRIAL_STAGE_COUNT, TRIAL_STAGE_SIZE, loadTrialProgress, saveTrialProgress } from './trials';
 import { modalFocus } from './ui-focus';
 
 const KEY = 'snake-legend:prototype-m1:v1';
@@ -62,7 +62,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
 
   root.innerHTML = `<div class="snake-app${trials ? ' snake-trials' : ''}">
     <header class="topbar"><div class="brand"><span class="brand-mark">S</span><div><strong>RẮN SĂN MỒI</strong><span>${trials ? 'Đường thử · Thảo Nguyên Xanh' : 'Arcade-x / Sân thử điều khiển'}</span></div></div><div class="top-actions"><span class="build-tag">${trials ? 'ĐƯỜNG THỬ' : 'CORE M1'}</span><button data-action="settings" aria-label="Cài đặt">Tùy chỉnh</button><button data-action="pause">Tạm dừng</button></div></header>
-    <nav class="arenas" aria-label="${trials ? 'Chọn đường thử' : 'Chọn sân thử'}">${arenas.map((_, i) => `<button data-arena="${i}"><span>0${i+1}</span>${trials ? TRIALS[i].label : LAB_LABELS[i]}</button>`).join('')}</nav>
+    <nav class="arenas" aria-label="${trials ? 'Chọn đường thử' : 'Chọn sân thử'}">${trials ? '<button class="trial-stage-switch" data-action="trial-stage"></button>' : ''}${arenas.map((_, i) => `<button data-arena="${i}"><span>${String(i+1).padStart(2,'0')}</span>${trials ? TRIALS[i].label : LAB_LABELS[i]}</button>`).join('')}</nav>
     <section class="workspace"><div class="play-column">
       <div class="hud"><span class="hearts" aria-label="Số tim"></span><span class="objective"></span><span class="timer"></span></div>
       <div class="field">${trials ? '<div class="trial-map-notes" hidden><strong></strong><p></p></div>' : ''}
@@ -148,8 +148,11 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     $('.overlay-card .eyebrow').textContent = `${trials ? 'ĐƯỜNG THỬ' : 'SÂN THỬ'} 0${save.arena+1}`;
     $('h1').textContent = won ? 'Hoàn thành!' : terminal ? 'Thử lại nhé' : started ? 'Đang tạm dừng' : engine.arena.name;
     const time = engine.time.toFixed(1);
+    let outcome = engine.lastEvent;
+    if (course && won) outcome = 'Đã thu đủ quả';
+    if (course && !course.bridges.length && outcome.startsWith('Rơi khỏi cầu')) outcome = 'Đã rơi xuống hồ · hãy giữ khoảng cách với bờ';
     $('.overlay-description').textContent = terminal
-      ? `${course && won ? 'Đã thu đủ quả' : engine.lastEvent}. ${time} giây · ${engine.length} đốt · ${engine.hits} lần mất tim.`
+      ? `${outcome}. ${time} giây · ${engine.length} đốt · ${engine.hits} lần mất tim.`
       : hostPaused ? 'Launcher đang tạm dừng trò chơi.'
       : started ? 'Bấm Tiếp tục khi sẵn sàng.' : course?.lesson ?? engine.arena.subtitle;
     const resumeButton = $<HTMLButtonElement>('[data-action="resume"]');
@@ -181,6 +184,8 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
       const next = $<HTMLButtonElement>('[data-action="next-trial"]');
       next.hidden = !won || save.arena >= TRIALS.length - 1;
       next.disabled = hostPaused;
+      const nextIndex = save.arena + 1;
+      next.textContent = nextIndex % TRIAL_STAGE_SIZE === 0 ? `Sang chặng ${nextIndex / TRIAL_STAGE_SIZE + 1}` : 'Đường thử tiếp theo';
       game.classList.toggle('is-scouting', scouting);
       $('.trial-map-bar').hidden = !scouting;
       $('.trial-map-notes').hidden = !scouting;
@@ -246,18 +251,28 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     clock.reset();
     $('.toast').textContent = '';
     settings.classList.add('hidden');
+    const stage = Math.floor(index / TRIAL_STAGE_SIZE);
     root.querySelectorAll<HTMLElement>('[data-arena]').forEach(el => {
       const i = Number(el.dataset.arena);
       const selected = i === index;
       el.classList.toggle('selected', selected);
       el.setAttribute('aria-current', String(selected));
-      if (trials) el.setAttribute('aria-label', arenas[i].name);
+      if (trials) {
+        el.hidden = Math.floor(i / TRIAL_STAGE_SIZE) !== stage;
+        el.setAttribute('aria-label', arenas[i].name);
+      }
     });
     $('.arena-name').textContent = arena.name;
     $('.arena-desc').textContent = arena.subtitle;
     $('.test-intent').textContent = trials ? TRIALS[index].lesson : LAB_LESSONS[index];
     if (trials) {
       $('.snake-trials').dataset.trial = String(index);
+      const nextStage = (stage + 1) % TRIAL_STAGE_COUNT;
+      $('.build-tag').textContent = `CHẶNG ${stage + 1} / ${TRIAL_STAGE_COUNT}`;
+      $('.arenas').setAttribute('aria-label', `Đường thử · Chặng ${stage + 1} trên ${TRIAL_STAGE_COUNT}`);
+      const switchStage = $('[data-action="trial-stage"]');
+      switchStage.textContent = `Chặng ${nextStage + 1}`;
+      switchStage.setAttribute('aria-label', `Sang chặng ${nextStage + 1}`);
       $('.trial-par').textContent = `${TRIALS[index].parSeconds.toLocaleString('vi-VN')} giây`;
       if (selectionChanged) persistTrial();
     } else persistSettings();
@@ -320,6 +335,9 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
       case 'close-scout': setScouting(false); break;
       case 'pause': paused ? resume() : pause(); break;
       case 'restart': reset(save.arena); break;
+      case 'trial-stage':
+        if (trials) reset(((Math.floor(save.arena / TRIAL_STAGE_SIZE) + 1) % TRIAL_STAGE_COUNT) * TRIAL_STAGE_SIZE);
+        break;
       case 'next-trial':
         if (trials && engine.status === 'won' && save.arena < TRIALS.length - 1) {
           reset(save.arena + 1);

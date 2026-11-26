@@ -29,9 +29,10 @@
 
 ## Snake Legend · 26/11/2026
 
-- PR #48 R01 + sửa cảm ứng, CI #94 qua. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
-- PR #49 Đồng Cỏ qua CI #96. Chờ duyệt/thiết bị. [QA](qa/SNAKE-MEADOW-2026-11-26.md).
-- Xem đường, kỷ lục, mốc Dash. Chromium 15/15. [QA](qa/SNAKE-SCOUTING-2026-11-26.md).
+- PR #48 R01/cảm ứng qua CI #94. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
+- PR #49 Đồng Cỏ qua CI #96. [QA](qa/SNAKE-MEADOW-2026-11-26.md).
+- PR #50 Xem đường. Chromium 15/15. [QA](qa/SNAKE-SCOUTING-2026-11-26.md).
+- Chặng 2 thêm ba màn. Qua sáu đường. [QA](qa/SNAKE-STAGE-TWO-2026-11-26.md).
 
 ## Snake R01 · kỹ thuật · 14/11/2026
 

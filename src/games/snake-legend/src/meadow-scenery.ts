@@ -9,7 +9,7 @@ const THEMES = {
 
 export function meadowTheme(a: Arena) {
   if (a.story?.encounter) return THEMES.hollow;
-  if (a.id === 15 || a.story?.foods.some(food => food.kind === 'poison')) return THEMES.bramble;
+  if (a.id === 15 || a.id === 18 || a.story?.foods.some(food => food.kind === 'poison')) return THEMES.bramble;
   if (a.water.length) return THEMES.brook;
   return THEMES.orchard;
 }
