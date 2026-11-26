@@ -5,5 +5,5 @@ aefff12224c9c9bb4a140ac5945df39413fcfa27579bc75810ebf420aed82264  src/games/snak
 db97b5be3f5ce827ba03d0abbf40cf63e9ac809892f868ed64c7fa8d97473283  src/games/snake-legend/src/story-app.ts
 c92e2abf8bb28cacf5a9ab94daa3e21acb9ff8103f37f05e01638987050289c9  src/games/snake-legend/src/render.ts
 552d94813d3852cf19572b95e11880603ea3b28752411bb4cd9d6177b485182f  src/games/snake-legend/src/meadow-scenery.ts
-aede0417f35ca5f80dfed10e7dd0b860732d0676d6e390f87beeb9627c948524  src/games/snake-legend/src/styles.css
+e3f8033bc3d5c90127ef75014e0f8811cbdf69c209864db39d393a7ef916acaa  src/games/snake-legend/src/styles.css
 b29e11f65032618c7b2f32e5337a46e0b1bd0098dc54fef988535388ceecfa6b  tests/snake/campaign-chapters.browser.ts

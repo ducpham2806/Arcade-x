@@ -15,3 +15,9 @@ Nhánh `codex/snake-full-campaign` tiếp trên PR #51 tại `9d9ead0`. Hành tr
 Studio Level Design, GDD Architect và QA & Playtest, vai trò Team Level, Level Designer và QA Lead. Graphify AST `src/games/snake-legend` 523 nút và 1.342 cạnh. Seed `campaignMap`, depth 1, budget 1.000 nối tính tiến độ với app, Hành trình và cửa vào màn. CSS và các đường đi được kiểm bằng nguồn hẹp và lượt Engine.
 
 Hai chương mới lưu trên thiết bị và theo hồ sơ. Hai vùng có bảng màu riêng, dùng lại bộ nhân vật và nhịp Nhện Mẹ sáu đòn ở sân mới. Lượt cân bằng với người chơi mới và thiết bị thật còn chờ. Chưa merge hoặc phát hành.
+
+## Kiểm trước merge · 27/11/2026
+
+[PR #52](https://github.com/ducpham2806/Arcade-x/pull/52) chuyển đích `main` theo yêu cầu chủ dự án và chứa đủ mã #48–#51. CI #94, #96, #97 và #98 đã qua ở các nhánh phụ thuộc. CI #99 qua `verify`, còn `snake_ui` phát hiện nút Bắt đầu màn 2-1 chỉ hiện 32% trên khung 320×568. Thu gọn tiêu đề và khoảng cách trong Hành trình ở màn thấp, giữ nguyên yêu cầu hiện toàn bộ nút. Chạy lại 5/5 ca Chromium trong `campaign-chapters.browser.ts` và `content.browser.ts`. Kiểm đủ hai công việc CI ở SHA mới trước khi merge.
+
+Game Release & LiveOps, vai trò Release Lead. Graphify AST Snake 523 nút/1.342 cạnh, seed `mountJourney`, depth 1/budget 900. CSS kiểm tại `src/games/snake-legend/src/styles.css` và bằng giao diện đang chạy.
