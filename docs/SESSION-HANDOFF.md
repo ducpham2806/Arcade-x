@@ -1,7 +1,5 @@
-# Bàn giao · 26/11/2026 · Snake Legend Đồng Cỏ
+# Bàn giao · 26/11/2026 · Snake Legend Xem đường
 
-PR #49, nhánh `codex/snake-meadow-expansion`, tiếp trên PR #48 (`95c8fda`, CI #94 qua). Ba đường thử tùy chọn, kỷ lục theo hồ sơ, chỉ dấu quả và cảnh theo địa hình. PixelFX tạo bốn hiệu ứng, Agent Sprite Forge kiểm và ráp 32 khung. [Thẻ Snake](plans/SNAKE.md).
+`codex/snake-trial-scouting` tiếp trên PR #49 tại `6d9a729`, CI #96 đã qua. PR #48 tại `95c8fda` cũng qua CI #94. Hai PR chưa merge. [QA Đồng Cỏ](qa/SNAKE-MEADOW-2026-11-26.md), [thẻ Snake](plans/SNAKE.md).
 
-CI #95 qua Snake UI, vấp fixture preview còn đòi bốn atlas. Đã kiểm đúng năm atlas và Dash vẽ atlas mới trên Canvas. `lab-app.ts` đồng bộ nhãn nút trên thanh và trong bảng. Chromium chơi thắng cả ba đường bằng joystick, tải lại đúng cả ba kỷ lục. Lint, build, gói/runtime preview và xuất HTML qua. Mô phỏng, sao và checkpoint R01 giữ nguyên. [QA Đồng Cỏ](qa/SNAKE-MEADOW-2026-11-26.md).
-
-Studio QA & Playtest, vai trò QA Lead. Graphify AST Snake 482 nút/1.263 cạnh, truy vấn `meadowFxAssets` và `finish`. Chờ CI mới và nghiệm thu thiết bị thật. Hai PR chưa merge/phát hành.
+Bổ sung bản đồ xem trước khi chuẩn bị hoặc tạm dừng, đưa mốc Dash và kỷ lục vào bảng chuẩn bị. Studio Game UI/UX và QA & Playtest. Kiểm desktop, khổ điện thoại và màn ngang, bàn phím, cảm ứng, giữ ván dừng khi xem đường.

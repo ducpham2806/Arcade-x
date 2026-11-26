@@ -30,7 +30,7 @@
 ## Snake Legend · 26/11/2026
 
 - PR #48 R01 + sửa cảm ứng, CI #94 qua. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
-- `codex/snake-meadow-expansion` thêm ba đường thử, atlas VFX và cảnh Canvas. Engine và Chromium qua ba đường, preview runtime đã sửa. Chờ duyệt/thiết bị. [QA](qa/SNAKE-MEADOW-2026-11-26.md).
+- PR #49 thêm ba đường thử và atlas VFX. Engine và Chromium qua ba đường, CI #96 qua trên `6d9a729`. Chờ duyệt/thiết bị. [QA](qa/SNAKE-MEADOW-2026-11-26.md).
 
 ## Snake R01 · kỹ thuật · 14/11/2026
 
