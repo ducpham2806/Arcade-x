@@ -141,8 +141,51 @@
   box-shadow: inset 0 0 0 4px #f4e9c7, 0 12px 38px #0f281f73;
 }
 .snake-trials .primary { background: var(--trial-leaf); border-color: var(--trial-deep); color: #fff9e6; }
-.snake-trials .secondary[hidden] { display: none; }
 .snake-trials .trial-result { font-size: 12px; font-weight: 750; }
+.snake-trials .trial-result.met-par { color: #23563b; }
+.snake-trials .trial-panel-actions,
+.snake-trials .trial-map-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.snake-trials .trial-panel-actions > button { flex: 1 1 auto; width: auto; }
+.snake-trials .trial-panel-actions > [hidden],
+.snake-trials .trial-map-bar[hidden] { display: none; }
+.snake-trials .trial-secondary { background: #f6edd1; border-color: #ae9862; color: var(--trial-deep); }
+.snake-trials.is-scouting { grid-template-rows: minmax(0, 1fr); }
+.snake-trials.is-scouting :is(.topbar, .arenas, .hud, .dock, .inspector, .field-toolbar, .toast) { display: none; }
+.snake-trials.is-scouting .workspace,
+.snake-trials.is-scouting .play-column { display: block; height: 100%; }
+.snake-trials.is-scouting .field { display: grid; height: 100%; grid-template-rows: minmax(0, 1fr) auto; }
+.snake-trials.is-scouting canvas { min-height: 0; }
+.snake-trials .trial-map-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 8px 16px max(8px,var(--snake-safe-bottom,env(safe-area-inset-bottom,0px)));
+  background: #fcf6e2;
+  border-top: 1px solid #bda46d;
+  color: var(--trial-deep);
+}
+.snake-trials .trial-map-legend strong { display: block; font-size: 15px; }
+.snake-trials .trial-map-legend span { font-size: 12px; }
+.snake-trials .trial-map-actions > button { width: auto; min-height: 44px; }
+.snake-trials .trial-map-notes {
+  display: none;
+  padding: 12px 16px;
+  background: var(--trial-deep);
+  color: #fff5d8;
+  border-bottom: 1px solid #ffffff30;
+}
+@media(max-width: 760px) and (orientation: portrait) {
+  .snake-trials.is-scouting .field { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .snake-trials .trial-map-notes:not([hidden]) { display: block; }
+  .snake-trials .trial-map-notes p { font-size: 12px; line-height: 1.4; margin: 4px 0 0; }
+  .snake-trials .trial-map-legend strong { display: none; }
+}
+@media(max-width: 480px) {
+  .snake-trials .trial-map-actions { width: 100%; }
+  .snake-trials .trial-map-actions > button { flex: 1; }
+}
 .snake-trials > .settings .settings-card {
   width: min(100%, 896px);
   height: min(92vh, 100%);

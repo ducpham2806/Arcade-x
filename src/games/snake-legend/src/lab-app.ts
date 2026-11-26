@@ -8,6 +8,10 @@ import { modalFocus } from './ui-focus';
 
 const KEY = 'snake-legend:prototype-m1:v1';
 const LAB_LABELS = ['Đường cong', 'Cầu & Dash', '150 đốt'];
+const CANVAS_LABEL = 'Sân chơi. Dùng WASD hoặc phím mũi tên để lái, Space để Dash, Escape để tạm dừng.';
+const trialSeconds = (seconds: number) => seconds.toLocaleString('vi-VN', {
+  minimumFractionDigits: 1, maximumFractionDigits: 1,
+});
 const LAB_LESSONS = [
   'Lượn qua hai rào. Thu quả đúng thứ tự. Quan sát bán kính quay khi rắn dài thêm.',
   'Căn hướng trên bờ, đi thẳng qua cầu, quay đầu ở sân rộng. Mép nước gây thua; tường xanh trượt dọc.',
@@ -51,7 +55,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
   const save = readSave(store);
   if (trials) Object.assign(save, loadTrialProgress(store));
   let engine = new Engine(arenas[save.arena]);
-  let paused = true, hostPaused = false, destroyed = false, started = false;
+  let paused = true, hostPaused = false, destroyed = false, started = false, scouting = false;
   let raf = 0, last = 0, lastHud = 0, resultAge = 0, newRecord = false, saveError = false;
   const frames: number[] = [], simTimes: number[] = [];
   const clock = new FixedClock(), abort = new AbortController();
@@ -61,16 +65,24 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     <nav class="arenas" aria-label="${trials ? 'Chọn đường thử' : 'Chọn sân thử'}">${arenas.map((_, i) => `<button data-arena="${i}"><span>0${i+1}</span>${trials ? TRIALS[i].label : LAB_LABELS[i]}</button>`).join('')}</nav>
     <section class="workspace"><div class="play-column">
       <div class="hud"><span class="hearts" aria-label="Số tim"></span><span class="objective"></span><span class="timer"></span></div>
-      <div class="field"><canvas tabindex="0" aria-label="Sân chơi. Dùng WASD hoặc phím mũi tên để lái, Space để Dash, Escape để tạm dừng."></canvas>
+      <div class="field">${trials ? '<div class="trial-map-notes" hidden><strong></strong><p></p></div>' : ''}
+        <canvas tabindex="0" aria-label="${CANVAS_LABEL}"></canvas>
         <div class="field-toolbar"><button data-action="overview" title="Đổi góc nhìn">Toàn cảnh</button>${trials ? '' : '<button data-action="debug" title="Hiện đường đi và vòng va chạm">Va chạm</button>'}</div>
         <div class="toast" role="status"></div>
         <div class="overlay"><div class="overlay-card">
           <span class="eyebrow"></span><h1></h1><p class="overlay-description"></p>
           <div class="instructions"><span><b>WASD / ↑↓←→ / joystick</b> Lái</span><span><b>Space / giữ Dash</b> Tăng tốc</span><span><b>Thả tay</b> Giữ hướng đi</span></div>
-          ${trials ? '<p class="trial-result" role="status" hidden></p>' : ''}
-          <button class="primary" data-action="resume">Bắt đầu</button>
-          ${trials ? '<button class="secondary" data-action="next-trial" hidden>Đường thử tiếp theo</button>' : '<button class="secondary" data-action="restart">Chơi lại sân</button>'}
+          ${trials ? `<p class="trial-result" role="status"></p>
+            <div class="trial-panel-actions">
+              <button class="primary" data-action="resume">Bắt đầu</button>
+              <button class="trial-secondary" data-action="scout">Xem đường</button>
+              <button class="trial-secondary" data-action="next-trial" hidden>Đường thử tiếp theo</button>
+            </div>` : '<button class="primary" data-action="resume">Bắt đầu</button><button class="secondary" data-action="restart">Chơi lại sân</button>'}
         </div></div>
+        ${trials ? `<section class="trial-map-bar" aria-label="Xem trước đường thử" hidden>
+          <div class="trial-map-legend"><strong></strong><span>Nhặt quả theo số trên bản đồ.</span></div>
+          <div class="trial-map-actions"><button data-action="close-scout">Quay lại</button><button class="primary" data-action="start-scout">Bắt đầu</button></div>
+        </section>` : ''}
         <div class="settings hidden"><div class="settings-card"><h2>Tùy chỉnh điều khiển</h2><label>Tay điều khiển<select data-setting="hand"><option value="left">Tay trái</option><option value="right">Tay phải</option></select></label><label>Độ nhạy joystick<select data-setting="sensitivity"><option value="0.7">Nhẹ</option><option value="1">Tiêu chuẩn</option><option value="1.4">Nhanh</option></select></label><p>Joystick giữ-kéo. Khi thả, rắn tiếp tục đi thẳng. Mất focus sẽ tạm dừng.</p><button class="primary" data-action="close-settings">Xong</button></div></div>
       </div>
       <div class="dock"><div class="stick-zone"><div class="joystick" role="group" aria-label="Joystick điều khiển"><div class="cross-h"></div><div class="cross-v"></div><div class="knob"></div></div><span>LÁI</span></div><div class="energy-zone"><div class="energy-label"><span>NĂNG LƯỢNG</span><b class="energy-number">100%</b></div><div class="energy-track"><div class="energy-fill"></div></div><p class="control-tip">Giữ hướng · thả Dash để hồi lực</p></div><div class="dash-zone"><button class="dash" aria-label="Giữ để Dash"><span aria-hidden="true">${DASH_ICON}</span>DASH</button><span>GIỮ NÚT</span></div></div>
@@ -84,17 +96,23 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
   </div>`;
 
   const $ = <E extends HTMLElement = HTMLElement>(selector: string) => root.querySelector<E>(selector)!;
+  const game = $('.snake-app');
+  const canvas = $<HTMLCanvasElement>('canvas');
   const settings = $('.settings');
   const focusDialog = trials ? modalFocus(root, abort.signal) : undefined;
   if (trials) {
-    $('.snake-trials').append(settings);
+    game.append(settings);
     settings.setAttribute('role', 'dialog');
     settings.setAttribute('aria-modal', 'true');
     settings.setAttribute('aria-label', 'Tùy chỉnh điều khiển');
   }
-  const renderer = new Renderer($('canvas'));
+  const renderer = new Renderer(canvas);
   renderer.masterArt = trials;
-  const controls = new Controls($('.joystick'), $('.dash'), $('.knob'), pause, () => paused ? resume() : pause(), () => !paused && engine.status === 'running');
+  const controls = new Controls($('.joystick'), $('.dash'), $('.knob'), pause, () => {
+    if (scouting) setScouting(false);
+    else if (paused) resume();
+    else pause();
+  }, () => !paused && engine.status === 'running');
   controls.sensitivity = save.sensitivity;
   $('.snake-app').classList.toggle('right-hand', save.hand === 'right');
   $<HTMLSelectElement>('[data-setting="hand"]').value = save.hand;
@@ -126,7 +144,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     const terminal = engine.status !== 'running';
     const course = trials ? TRIALS[save.arena] : undefined;
     $('.dock').inert = paused || terminal;
-    $('.overlay').classList.toggle('hidden', !paused && !terminal);
+    $('.overlay').classList.toggle('hidden', scouting || (!paused && !terminal));
     $('.overlay-card .eyebrow').textContent = `${trials ? 'ĐƯỜNG THỬ' : 'SÂN THỬ'} 0${save.arena+1}`;
     $('h1').textContent = won ? 'Hoàn thành!' : terminal ? 'Thử lại nhé' : started ? 'Đang tạm dừng' : engine.arena.name;
     const time = engine.time.toFixed(1);
@@ -142,21 +160,52 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     quickAction.disabled = trials && hostPaused;
     if (course) {
       $('.instructions').hidden = terminal || started;
-      $('.trial-result').hidden = terminal && !won;
+      const result = $('.trial-result');
+      result.hidden = terminal && !won;
       const record = save.best[save.arena];
-      const par = `${engine.time <= course.parSeconds ? 'Đạt mốc' : 'Mốc tốc độ'} ${course.parSeconds.toLocaleString('vi-VN')} giây`;
-      $('.trial-result').textContent = won
-        ? `${saveError ? 'Chưa lưu được kỷ lục' : newRecord ? 'Kỷ lục mới' : `Kỷ lục: ${record?.toFixed(1)} giây`} · ${par}`
-        : `Thu đủ ${engine.arena.route.length} quả · Thử mốc ${course.parSeconds.toLocaleString('vi-VN')} giây`;
+      const par = `Mốc Dash ${trialSeconds(course.parSeconds)} giây`;
+      const best = record === null ? 'Chưa có kỷ lục' : `Kỷ lục ${trialSeconds(record)} giây`;
+      const delta = engine.time - course.parSeconds;
+      const metPar = won && delta <= 0;
+      result.classList.toggle('met-par', metPar);
+      if (won) {
+        const recordStatus = saveError ? 'Chưa lưu được kỷ lục' : newRecord ? `Kỷ lục mới ${trialSeconds(engine.time)} giây` : best;
+        const pace = metPar ? 'Đạt mốc Dash' : delta < .1 ? 'Còn dưới 0,1 giây để đạt mốc Dash' : `Cần nhanh hơn ${trialSeconds(delta)} giây để đạt mốc Dash`;
+        result.textContent = `${recordStatus} · ${pace}`;
+      } else {
+        result.textContent = `Thu ${engine.arena.route.length} quả · ${par} · ${best}${record !== null && record <= course.parSeconds ? ' · Đã đạt mốc' : ''}`;
+      }
+      const scout = $<HTMLButtonElement>('[data-action="scout"]');
+      scout.hidden = terminal;
+      scout.disabled = hostPaused;
       const next = $<HTMLButtonElement>('[data-action="next-trial"]');
       next.hidden = !won || save.arena >= TRIALS.length - 1;
       next.disabled = hostPaused;
+      game.classList.toggle('is-scouting', scouting);
+      $('.trial-map-bar').hidden = !scouting;
+      $('.trial-map-notes').hidden = !scouting;
+      $('.trial-map-notes strong').textContent = engine.arena.name;
+      $('.trial-map-notes p').textContent = course.lesson;
+      $('.trial-map-legend strong').textContent = engine.arena.name;
+      $('.trial-map-legend span').textContent = engine.collected > 0 ? `Nhặt từ quả số ${engine.collected + 1}.` : 'Nhặt quả theo số trên bản đồ.';
+      const mapStart = $<HTMLButtonElement>('[data-action="start-scout"]');
+      mapStart.textContent = resumeButton.textContent;
+      mapStart.disabled = hostPaused;
+      canvas.tabIndex = scouting ? -1 : 0;
+      canvas.setAttribute('aria-label', scouting ? `Bản đồ ${engine.arena.name}, ${engine.arena.route.length} quả theo thứ tự.` : CANVAS_LABEL);
     }
     if (focusDialog) {
       const settingsOpen = !settings.classList.contains('hidden');
       root.querySelectorAll<HTMLElement>('.snake-trials > :not(.settings)').forEach(section => { section.inert = settingsOpen; });
       focusDialog(settingsOpen ? settings : null);
     }
+  }
+
+  function setScouting(value: boolean) {
+    if (value && (!trials || !paused || engine.status !== 'running' || hostPaused)) return;
+    scouting = value;
+    overlay();
+    if (!hostPaused) $(`[data-action="${value ? 'close-scout' : 'scout'}"]`).focus({preventScroll: true});
   }
 
   function pause() {
@@ -172,11 +221,12 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     if (engine.status !== 'running') reset(save.arena);
     paused = false;
     started = true;
+    scouting = false;
     controls.clear();
     last = performance.now();
     clock.reset();
     overlay();
-    $('canvas').focus({preventScroll: true});
+    canvas.focus({preventScroll: true});
   }
 
   function reset(index: number) {
@@ -188,6 +238,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     save.arena = index;
     started = false;
     paused = true;
+    scouting = false;
     newRecord = false;
     resultAge = 0;
     frames.length = 0;
@@ -263,7 +314,10 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     const id = button.dataset.arena;
     if (id !== undefined) { reset(Number(id)); return; }
     switch (button.dataset.action) {
-      case 'resume': resume(); break;
+      case 'resume':
+      case 'start-scout': resume(); break;
+      case 'scout': setScouting(true); break;
+      case 'close-scout': setScouting(false); break;
       case 'pause': paused ? resume() : pause(); break;
       case 'restart': reset(save.arena); break;
       case 'next-trial':
@@ -335,7 +389,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
       if (engine.status !== 'running') finish();
     }
     if (trials && !hostPaused && engine.status === 'won') resultAge += elapsed;
-    renderer.draw(engine, alpha, resultAge);
+    renderer.draw(engine, alpha, resultAge, scouting);
     if (now - lastHud > 100) { hud(); lastHud = now; }
     raf = requestAnimationFrame(frame);
   }
@@ -344,7 +398,13 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
   raf = requestAnimationFrame(frame);
   return {
     ...(trials ? {restart: () => reset(save.arena)} : {}),
-    setHostPaused(value: boolean) { hostPaused = value; if (value) pause(); else overlay(); },
+    setHostPaused(value: boolean) {
+      hostPaused = value;
+      if (value) {
+        scouting = false;
+        pause();
+      } else overlay();
+    },
     destroy() {
       if (destroyed) return;
       destroyed = true;

@@ -42,11 +42,12 @@ export class Renderer {
 
  prop(id:string,x:number,y:number,w:number,h:number){const a=assetData.a1_master.atlas,f=a.frames[id as keyof typeof a.frames],im=this.image('a1_master');if(!f||!im?.complete||!im.naturalWidth)return;const r=f.frame,b=f.visibleRect;this.ctx.drawImage(im,r.x+b[0],r.y+b[1],b[2]-b[0],b[3]-b[1],x,y,w,h);}
  storyProp(id:StoryPropId,p:V,size:number){const im=this.image('r01_props');if(!im?.complete||!im.naturalWidth)return false;const f=storyPropAssets.atlas.frames[id].frame;this.ctx.drawImage(im,f.x,f.y,f.w,f.h,p.x-size/2,p.y-size/2,size,size);return true;}
- draw(e:Engine,alpha:number,celebrateSeconds=0){const c=this.ctx,w=this.width,h=this.height,a=e.arena;
+ draw(e:Engine,alpha:number,celebrateSeconds=0,scouting=false){const c=this.ctx,w=this.width,h=this.height,a=e.arena;
   const trial=trialForArena(a.id), scenic=Boolean(a.story||trial), reduced=this.motion.matches;
   const painted=this.masterArt||Boolean(trial);
+  const overview=this.overview||scouting;
   c.setTransform(this.dpr,0,0,this.dpr,0,0);c.fillStyle='#122c2b';c.fillRect(0,0,w,h);
-  this.scale=this.overview?Math.min((w-24)/a.w,(h-24)/a.h):Math.max(w/24,h/25);this.scale*=this.zoom;
+  this.scale=overview?Math.min(Math.max(1,w-24)/a.w,Math.max(1,h-24)/a.h):Math.max(w/24,h/25);this.scale*=this.zoom;
   const vw=w/this.scale,vh=h/this.scale;const head={x:(e.previous[0]?.x??e.pos.x)+(e.pos.x-(e.previous[0]?.x??e.pos.x))*alpha,y:(e.previous[0]?.y??e.pos.y)+(e.pos.y-(e.previous[0]?.y??e.pos.y))*alpha};
   this.camera={x:a.w<vw?(a.w-vw)/2:clamp(head.x-vw/2,0,a.w-vw),y:a.h<vh?(a.h-vh)/2:clamp(head.y-vh/2,0,a.h-vh)};
   c.scale(this.scale,this.scale);c.translate(-this.camera.x,-this.camera.y);
@@ -93,6 +94,14 @@ export class Renderer {
 
   }
   a.route.forEach((p,i)=>{
+   if(scouting){
+    const active=i===e.collected, visited=i<e.collected, radius=Math.max(.56,7/this.scale);
+    c.fillStyle=active?'#e3aa4a':visited?'#d4e0c5':'#fff3bf';
+    c.strokeStyle='#583d28';c.lineWidth=1.25/this.scale;
+    c.beginPath();c.arc(p.x,p.y,radius,0,Math.PI*2);c.fill();c.stroke();
+    this.label(String(i+1),p.x,p.y+radius*.37,'#392b1c',radius*1.33);
+    return;
+   }
    if(i<e.collected)return;
    const active=i===e.collected;
    if(trial&&active){
@@ -140,7 +149,7 @@ export class Renderer {
   if(encounter?.boss)drawBossTargets(c,encounter,e.length,bossArt,(id,p,size)=>this.sprite('a1_master',id,p,size));
   if(this.debug){c.strokeStyle='#b73e53';c.lineWidth=.035;for(const b of [...a.walls,...(encounter?.posts??[])])c.strokeRect(b.x,b.y,b.w,b.h);if(encounter?.boss){c.beginPath();c.arc(encounter.boss.center.x,encounter.boss.center.y,1.8,0,Math.PI*2);c.stroke();}c.lineWidth=.035;c.strokeStyle='#cd354f';for(let i=0;i<e.body.length;i++){const p=e.body[i];c.beginPath();c.arc(p.x,p.y,i?T.bodyRadius:T.headRadius,0,Math.PI*2);c.stroke();}c.strokeStyle='#234bed';c.beginPath();e.path.points.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.stroke();}
   c.setTransform(this.dpr,0,0,this.dpr,0,0);
-  if(!this.overview){const objective=bossObjective(e);this.minimap(e,objective?.target);if(a.story||trial)this.objectiveMarker(e,objective);}
+  if(!overview){const objective=bossObjective(e);this.minimap(e,objective?.target);if(a.story||trial)this.objectiveMarker(e,objective);}
  }
  label(s:string,x:number,y:number,color:string,size:number){const c=this.ctx;c.fillStyle=color;c.font=`600 ${size}px system-ui`;c.textAlign='center';c.fillText(s,x,y);} // readable-canvas: world labels sit on author-painted tiles chosen per call
  minimap(e:Engine,bossTarget?:V){const c=this.ctx,a=e.arena,compact=!!e.encounters?.boss&&this.width<=480,m=compact?56:86,scale=m/Math.max(a.w,a.h),x=this.width-m-12,y=compact?this.height-a.h*scale-12:12;c.fillStyle='#183e37dc';c.beginPath();c.roundRect(x-5,y-5,m+10,a.h*scale+10,7);c.fill();c.save();c.translate(x,y);c.scale(scale,scale);c.fillStyle=meadowTheme(a).ground;c.fillRect(0,0,a.w,a.h);c.fillStyle='#4b8d98';for(const b of a.water)c.fillRect(b.x,b.y,b.w,b.h);c.fillStyle='#b7834d';for(const b of a.story?.bridges??trialForArena(a.id)?.bridges??[])c.fillRect(b.x,b.y,b.w,b.h);c.fillStyle='#48664d';for(const b of a.walls)c.fillRect(b.x,b.y,b.w,b.h);c.strokeStyle='#386c46';c.lineWidth=.6;c.beginPath();e.body.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.stroke();c.fillStyle='#fff0c5';c.beginPath();c.arc(e.pos.x,e.pos.y,.9,0,Math.PI*2);c.fill();const target=a.story?(bossTarget??e.objectiveTarget):a.route[e.collected];if(target){c.fillStyle='#d17c32';c.beginPath();c.arc(target.x,target.y,.9,0,Math.PI*2);c.fill();}c.strokeStyle='#ffffff99';c.lineWidth=.25;c.strokeRect(this.camera.x,this.camera.y,this.width/this.scale,this.height/this.scale);c.restore();}
