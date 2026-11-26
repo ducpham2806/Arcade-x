@@ -141,7 +141,8 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     "map" | "play" | "garden" | "daily" | "rank" | "settings" | "side"
   >(run ? "play" : "map");
   const [prepTab, setPrepTab] = useState<"start" | "support">("start");
-  const reducedMotion = useReducedMotion() || save.settings.reduced;
+  const systemReducedMotion = useReducedMotion();
+  const reducedMotion = systemReducedMotion || save.settings.reduced;
   const [turnFeedback, setTurnFeedback] = useState<TurnFeedback | null>(null);
   const activeFeedback = turnFeedback?.runId === run?.id && turnFeedback?.move === run?.log.length
     ? turnFeedback : null;
@@ -1403,7 +1404,8 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                       </strong>
                     </div>
                   )}
-                  <BlossomVFX key={run.id} run={run} feedback={activeFeedback} reduced={reducedMotion}
+                  <BlossomVFX key={run.id} run={run} feedback={activeFeedback}
+                    motion={save.settings.reduced ? 'still' : systemReducedMotion ? 'brief' : 'full'}
                     onComplete={() => setAnimating(false)} />
                 </div>
                 {readingLesson && !modal && !result && !completionData && (

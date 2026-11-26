@@ -4,6 +4,7 @@ import { asset, pieceAsset } from "./assets";
 import type { TurnFeedback } from "./turnFeedback";
 
 export const FX_COLORS = ["#ff6487", "#ffdc4b", "#c080ff", "#69bdff", "#8de46d", "#ffa457"];
+type EffectMotion = 'full' | 'brief' | 'still';
 const IMPACT_COLORS: Record<Effect["type"], string> = {
   pop: "#fff0af", bee_h: "#ffe878", bee_v: "#ffe878",
   bloom_bomb: "#ff95ad", sun: "#fff59c", rainbow_orb: "#f3d6ff",
@@ -55,7 +56,8 @@ export function effectTimeline(effects: Effect[], reduced = false) {
 export function effectDuration(run: Run, reduced = false) {
   return Math.max(reduced ? 650 : 750, ...effectTimeline(run.effects, reduced).map(x=>x.delay+x.duration));
 }
-function EffectBatch({ run, feedback, reduced, onComplete }: { run: Run; feedback?: TurnFeedback | null; reduced: boolean; onComplete?: () => void }) {
+function EffectBatch({ run, feedback, motion, onComplete }: { run: Run; feedback?: TurnFeedback | null; motion: EffectMotion; onComplete?: () => void }) {
+  const reduced = motion !== 'full';
   const root = useRef<HTMLDivElement>(null), done = useRef(onComplete);
   done.current = onComplete;
   const stamp = `${run.id}:${run.log.length}`;
@@ -72,7 +74,7 @@ function EffectBatch({ run, feedback, reduced, onComplete }: { run: Run; feedbac
       ]).then(()=>{ if(live) done.current?.(); });
     });
     return ()=>{live=false;cancelAnimationFrame(frame);window.clearTimeout(timer);};
-  },[stamp,reduced]);
+  },[stamp,motion]);
   const w=run.level.cols, h=run.level.rows;
   const action = run.log.at(-1)?.action;
   const portal = run.portalMoves?.[0];
@@ -87,7 +89,7 @@ function EffectBatch({ run, feedback, reduced, onComplete }: { run: Run; feedbac
         const stride = Math.ceil(targets.length / 16) || 1;
         const style={'--fx-delay':`${delay}ms`,'--fx-duration':`${duration}ms`} as React.CSSProperties;
         const sprite=(name:string,cx:number,cy:number,size:number,start=0,frames=10,cell=256)=>
-          <Sheet key={`${name}:${cx}:${cy}:${start}`} name={name} x={cx} y={cy} size={size} delay={delay+local(start)} frames={frames} cell={cell} reduced={reduced}/>;
+          <Sheet key={`${name}:${cx}:${cy}:${start}`} name={name} x={cx} y={cy} size={size} delay={delay+local(start)} frames={frames} cell={cell} motion={motion}/>;
         const burst=(i:number,c:number,start:number,size=115)=>sprite(`blast_${COLOR_NAMES[c]||'yellow'}`,(i%w)*100+50,Math.floor(i/w)*100+50,size,start,7,192);
         const beam=(axis:'h'|'v',line:number,start=80)=> {
           const horizontal=axis==='h',length=(horizontal?w:h)*100;
@@ -149,9 +151,18 @@ function EffectBatch({ run, feedback, reduced, onComplete }: { run: Run; feedbac
   </div>;
 }
 const COLOR_NAMES=['red','yellow','purple','blue','green','orange'];
-function Sheet({name,x,y,size,delay,frames,cell,reduced,path,duration=frames/30*1000,still=Math.floor((frames-1)/2)}:{name:string;x:number;y:number;size:number;delay:number;frames:number;cell:number;reduced:boolean;path?:string;duration?:number;still?:number}) {
- return <svg data-sprite={name} x={x-size/2} y={y-size/2} width={size} height={size} viewBox={`0 0 ${cell} ${cell}`} overflow="hidden" className="bb-fx-sheet" style={{'--sheet-delay':`${delay}ms`,'--sheet-duration':`${duration}ms`,'--sheet-steps':frames,'--sheet-end':`${-frames*cell}px`} as React.CSSProperties}>
-   <image href={asset(path ?? `png/anim/anim_fx_${name}.png`)} width={frames*cell} height={cell} className="bb-fx-strip" style={reduced?{transform:`translateX(${-still*cell}px)`}:undefined}/>
+function Sheet({name,x,y,size,delay,frames,cell,motion,path,duration=frames/30*1000,still=Math.floor((frames-1)/2)}:{name:string;x:number;y:number;size:number;delay:number;frames:number;cell:number;motion:EffectMotion;path?:string;duration?:number;still?:number}) {
+ const brief = motion === 'brief';
+ const impactFrame = `${-still*cell}px`;
+ const style = {
+   '--sheet-delay': `${delay}ms`,
+   '--sheet-duration': `${brief ? 280 : duration}ms`,
+   '--sheet-steps': frames,
+   '--sheet-start': brief ? impactFrame : '0px',
+   '--sheet-end': `${-(brief ? still+1 : frames)*cell}px`,
+ } as React.CSSProperties;
+ return <svg data-sprite={name} data-motion={motion} x={x-size/2} y={y-size/2} width={size} height={size} viewBox={`0 0 ${cell} ${cell}`} overflow="hidden" className="bb-fx-sheet" style={style}>
+   <image href={asset(path ?? `png/anim/anim_fx_${name}.png`)} width={frames*cell} height={cell} className="bb-fx-strip" style={motion==='still'?{transform:`translateX(${impactFrame})`}:undefined}/>
  </svg>;
 }
 const GARDEN_SHEETS = {
@@ -159,8 +170,8 @@ const GARDEN_SHEETS = {
   'merge-ring': { path: 'vfx/merge-ring.webp', duration: 490, still: 4 },
   portal: { path: 'vfx/portal.webp', duration: 550, still: 6 },
 };
-function GardenSheet({name,...position}: {name:keyof typeof GARDEN_SHEETS;x:number;y:number;size:number;delay:number;reduced:boolean}) {
- return <Sheet {...position} name={name} frames={16} cell={128} {...GARDEN_SHEETS[name]} />;
+function GardenSheet({name,reduced,...position}: {name:keyof typeof GARDEN_SHEETS;x:number;y:number;size:number;delay:number;reduced:boolean}) {
+ return <Sheet {...position} name={name} frames={16} cell={128} motion={reduced ? 'still' : 'full'} {...GARDEN_SHEETS[name]} />;
 }
 function Petals({x,y,color,delay,reduced,large=false}:{x:number;y:number;color:number;delay:number;reduced:boolean;large?:boolean}) {
  const shapes=['heart','star','flower','drop','leaf','orange'];
@@ -171,7 +182,7 @@ function Petals({x,y,color,delay,reduced,large=false}:{x:number;y:number;color:n
 }
 
 // Preserve overlapping moves so the final result waits for every outstanding batch.
-export function BlossomVFX({ run, feedback, reduced, onComplete }: { run: Run; feedback?: TurnFeedback | null; reduced: boolean; onComplete?: () => void }) {
+export function BlossomVFX({ run, feedback, motion, onComplete }: { run: Run; feedback?: TurnFeedback | null; motion: EffectMotion; onComplete?: () => void }) {
   const stamp = `${run.id}:${run.log.length}`;
   const [batches, setBatches] = useState([{ stamp, run, feedback }]);
   const latest = useRef(stamp), done = useRef(onComplete);
@@ -187,5 +198,5 @@ export function BlossomVFX({ run, feedback, reduced, onComplete }: { run: Run; f
     setBatches(old => old.filter(batch => batch.stamp !== id));
     if (!pending.current.has(latest.current) && pending.current.size === 0) done.current?.();
   }
-  return <>{batches.map(batch => <EffectBatch key={batch.stamp} run={batch.run} feedback={batch.feedback} reduced={reduced} onComplete={() => complete(batch.stamp)} />)}</>;
+  return <>{batches.map(batch => <EffectBatch key={batch.stamp} run={batch.run} feedback={batch.feedback} motion={motion} onComplete={() => complete(batch.stamp)} />)}</>;
 }

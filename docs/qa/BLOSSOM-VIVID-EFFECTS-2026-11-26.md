@@ -4,7 +4,7 @@ Nhánh `codex/blossom-vivid-effects`, nối từ `codex/blossom-garden-ui@b916d3
 
 - Nhóm hoa có nhịp tô viền từ ô chạm. Ong theo hàng hoặc cột, Mặt Trời theo giao tuyến và Bom Hoa/Cầu Vồng hiện đúng ô tác động. Cầu Vồng giữ đủ dấu ô kể cả khi chỉ chọn một số ô để vẽ tia và hạt phụ.
 - Hai vật phẩm vừa ghép có vòng và dây vàng rồi mới tới lớp nổ riêng. Vật phẩm đặc biệt mới nở tại ô đã rơi tới. Cổng A và B có nhịp tím và đường nối theo điểm đi/đến của engine.
-- HUD báo số điểm tăng, tiến độ và lần đầu hoàn thành mục tiêu. Chế độ giảm chuyển động của game hoặc hệ thống dùng dấu tĩnh. Người chơi vẫn có thể thực hiện lượt kế tiếp khi các lớp VFX đang chạy.
+- HUD báo số điểm tăng, tiến độ và lần đầu hoàn thành mục tiêu. Giảm chuyển động trong game giữ dấu tĩnh. Giảm chuyển động của hệ điều hành giữ hai khung ngắn tại ô nổ, cùng vùng tác động, đường ghép và vệt cổng tĩnh. Người chơi vẫn có thể thực hiện lượt kế tiếp khi các lớp VFX đang chạy.
 
 ## Nguồn và dựng lại
 
@@ -20,3 +20,4 @@ node scripts/blossom-preview.mjs /tmp/blossom-vivid.html
 - Graphify AST `src/games/hex-match`, 203 nút/551 cạnh. Truy vấn `describeTurn` xác nhận HUD đọc chênh lệch sau `act`; kiểm vùng tác động bằng `Effect.cells` và vệt cổng bằng `portalMoves`.
 - Playwright kiểm đúng ô cho sáu loại nổ, hai đầu ghép, hình tĩnh khi giảm chuyển động, vị trí vật phẩm mới, dấu hoàn thành mục tiêu và cổng. Playwright 66/66, engine 21/21, bộ `test:fast`, lint, build và ngân sách bundle đều qua.
 - Dựng lại ba strip có byte trùng. Kiểm ba cảnh VFX trong HTML 18,8 MB sau khi tắt mạng ở Chromium, với art vẽ và VFX nhúng. Thiết bị thật và cảm giác chơi người thật còn chờ.
+- Sau lỗi ở CI #90, kiểm lại 6/6 hiệu ứng trong launcher với `prefers-reduced-motion: reduce`. Đã xem ảnh Mặt Trời trên bàn 1440×900 và chạy lint, build. CI đầy đủ chạy lại trên PR #47.

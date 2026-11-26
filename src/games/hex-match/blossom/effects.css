@@ -87,3 +87,6 @@
 .bb-reduced .bb-impact-cell, .bb-reduced .bb-special-crown { opacity: .75; }
 .bb-reduced .bb-board-link { opacity: .85; }
 .bb-reduced .bb-sprite-beam { opacity: .35; }
+.bb-reduced .bb-fx-sheet[data-motion='brief'] .bb-fx-strip {
+  animation: bb-sheet-frames var(--sheet-duration) var(--sheet-delay) steps(2, jump-none) both !important;
+}

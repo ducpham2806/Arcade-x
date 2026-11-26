@@ -2453,7 +2453,7 @@
 .bb-sprite-fx {mix-blend-mode:screen;pointer-events:none;overflow:hidden;}
 .bb-fx-sheet {opacity:0;animation:bb-sheet-visible var(--sheet-duration) var(--sheet-delay) linear both;}
 .bb-fx-strip {animation:bb-sheet-frames var(--sheet-duration) var(--sheet-delay) steps(var(--sheet-steps),end) both;}
-@keyframes bb-sheet-frames {from{transform:translateX(0)}to{transform:translateX(var(--sheet-end))}}
+@keyframes bb-sheet-frames {from{transform:translateX(var(--sheet-start, 0px))}to{transform:translateX(var(--sheet-end))}}
 @keyframes bb-sheet-visible {0%{opacity:0}1%,85%{opacity:1}100%{opacity:0}}
 .bb-sprite-beam {transform-origin:var(--beam-origin);animation:bb-floral-beam var(--beam-duration) var(--beam-delay) cubic-bezier(.16,.8,.3,1) both;}
 @keyframes bb-floral-beam {0%{transform:scaleX(.01) scaleY(.3);opacity:0}20%{opacity:.9}45%{transform:scaleX(1) scaleY(1);opacity:.85}100%{transform:scaleX(1.04) scaleY(.6);opacity:0}}
@@ -2504,7 +2504,7 @@
  .blossom .bb-preparation > header {padding:4px 14px;}
 }
 
-/* Reduced motion retains a static, legible impact frame on every viewport. */
+/* Keep impact art visible when reduced motion disables the opacity animation. */
 .blossom.bb-reduced .bb-fx-sheet{opacity:1}
 
 /* Play layout: the board is sized from the real play area (container units) so the HUD,
