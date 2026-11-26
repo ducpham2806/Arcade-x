@@ -1,6 +1,6 @@
 import {assertSchema} from './schema';
 import {checkpointSchema} from './contracts';
-import {Engine,T,type V} from './core';
+import {Engine,T,type Arena,type V} from './core';
 import {STORY_LEVELS} from './story-data';
 import type {StorageLike} from './story-save';
 export const CHECKPOINT_KEY='snake-legend:r01-checkpoint:v1';
@@ -9,11 +9,17 @@ const encounterScalars=['spawnSerial','phase','hits','totalHits','state','timer'
 const xy=(p:V)=>({x:p.x,y:p.y});
 function hash(s:string){let h=2166136261;for(let i=0;i<s.length;i++)h=Math.imul(h^s.charCodeAt(i),16777619);return (h>>>0).toString(16);}
 // Bump mechanics revision when simulation rules change. Layout/tuning changes invalidate automatically.
-export const CONTENT_SIGNATURE=hash(JSON.stringify({mechanics:1,levels:STORY_LEVELS,tuning:T}));
-export function capture(e:Engine,runId:string,seen:number[]=[]){
+const contentSignature=(levels:readonly Arena[])=>hash(JSON.stringify({mechanics:1,levels,tuning:T}));
+export const CONTENT_SIGNATURE=contentSignature(STORY_LEVELS);
+const r01={key:CHECKPOINT_KEY,levels:STORY_LEVELS,signature:CONTENT_SIGNATURE,schema:checkpointSchema};
+export function chapterCheckpoint(contentVersion:string,levels:Arena[]){
+ return {key:`snake-legend:${contentVersion}:checkpoint:v1`,levels,signature:contentSignature(levels),
+  schema:{...checkpointSchema,properties:{...checkpointSchema.properties,level:{enum:levels.map(a=>a.story!.id)}}}};
+}
+export function capture(e:Engine,runId:string,seen:number[]=[],signature=CONTENT_SIGNATURE){
  if(!e.arena.story||e.status!=='running')throw Error('Only active Story runs can resume');
  const a=e.encounters;
- return {version:1 as const,content:CONTENT_SIGNATURE,level:e.arena.story.id,runId,seen:[...seen],state:Object.fromEntries(scalars.map(k=>[k,e[k]])),pos:xy(e.pos),path:e.path.snapshot(),previous:e.previous.map(xy),eaten:[...e.eaten],respawns:[...e.respawns],passed:[...e.passed],bridgeEntry:[...e.bridgeEntry],lastEvent:e.lastEvent,encounter:a?{state:Object.fromEntries(encounterScalars.map(k=>[k,a[k]])),spiders:a.spiders.map(s=>({...s,previous:xy(s.previous)})),trapped:[...a.trapped],anchors:[...a.anchors],shot:{from:xy(a.shot.from),to:xy(a.shot.to)}}:null};
+ return {version:1 as const,content:signature,level:e.arena.story.id,runId,seen:[...seen],state:Object.fromEntries(scalars.map(k=>[k,e[k]])),pos:xy(e.pos),path:e.path.snapshot(),previous:e.previous.map(xy),eaten:[...e.eaten],respawns:[...e.respawns],passed:[...e.passed],bridgeEntry:[...e.bridgeEntry],lastEvent:e.lastEvent,encounter:a?{state:Object.fromEntries(encounterScalars.map(k=>[k,a[k]])),spiders:a.spiders.map(s=>({...s,previous:xy(s.previous)})),trapped:[...a.trapped],anchors:[...a.anchors],shot:{from:xy(a.shot.from),to:xy(a.shot.to)}}:null};
 }
 export type Snapshot=ReturnType<typeof capture>;
 function need(ok:unknown):asserts ok{if(!ok)throw Error('Bản lưu giữa màn không hợp lệ.');}
@@ -23,9 +29,9 @@ function num(x:unknown,min=-1e9,max=1e9,int=false):asserts x is number{need(type
 function vector(p:unknown){exact(p,['x','y']);const v=p as V;num(v.x,-1000,1000);num(v.y,-1000,1000);}
 function strings(a:unknown,allowed:(s:string)=>boolean,max:number):asserts a is string[]{need(Array.isArray(a)&&a.length<=max&&new Set(a).size===a.length&&a.every(s=>typeof s==='string'&&allowed(s)));}
 function scalarShape(d:Record<string,any>,base:Record<string,any>){exact(d,Object.keys(base));for(const k of Object.keys(base)){if(typeof base[k]==='number')num(d[k]);else need(typeof d[k]===typeof base[k]);}}
-export function decode(raw:string):{engine:Engine;snapshot:Snapshot}{
- need(raw.length<=262144);const d=JSON.parse(raw);assertSchema(checkpointSchema,d);object(d);need(d.version===1);if(d.content!==CONTENT_SIGNATURE)throw Error('Bản lưu thuộc phiên bản màn khác. Anh có thể chơi lại màn.');
- const index=STORY_LEVELS.findIndex(a=>a.story!.id===d.level);need(index>=0);const e=new Engine(STORY_LEVELS[index]),base=capture(e,'validation');exact(d,Object.keys(base));
+export function decode(raw:string,content=r01):{engine:Engine;snapshot:Snapshot}{
+ need(raw.length<=262144);const d=JSON.parse(raw);assertSchema(content.schema,d);object(d);need(d.version===1);if(d.content!==content.signature)throw Error('Bản lưu thuộc phiên bản màn khác. Anh có thể chơi lại màn.');
+ const index=content.levels.findIndex(a=>a.story!.id===d.level);need(index>=0);const e=new Engine(content.levels[index]),base=capture(e,'validation',[],content.signature);exact(d,Object.keys(base));
  need(typeof d.runId==='string'&&d.runId.length>0&&d.runId.length<100);need(typeof d.lastEvent==='string'&&d.lastEvent.length<=300);
  need(Array.isArray(d.seen)&&d.seen.length<=e.arena.story!.beats.length&&new Set(d.seen).size===d.seen.length);for(const n of d.seen)num(n,0,e.arena.story!.beats.length-1,true);
  scalarShape(d.state,base.state);const s=d.state;
@@ -56,10 +62,10 @@ export function decode(raw:string):{engine:Engine;snapshot:Snapshot}{
 }
 export class Checkpoints{
  error='';private lastRaw:string|null=null;private stamp='';private blocked=false;
- constructor(private store:StorageLike){}
- load(){try{this.lastRaw=this.store.getItem(CHECKPOINT_KEY);if(!this.lastRaw)return null;const d=JSON.parse(this.lastRaw);if(d?.version===1&&d.empty===true&&Object.keys(d).length===2)return null;return decode(this.lastRaw);}catch(e){this.blocked=true;this.error=(e instanceof Error&&e.message.startsWith('Bản lưu')?e.message:'Không đọc được bản lưu giữa màn.')+' Bản cũ được giữ nguyên; có thể bắt đầu lượt mới.';return null;}}
+ constructor(private store:StorageLike,private content=r01){}
+ load(){try{this.lastRaw=this.store.getItem(this.content.key);if(!this.lastRaw)return null;const d=JSON.parse(this.lastRaw);if(d?.version===1&&d.empty===true&&Object.keys(d).length===2)return null;return decode(this.lastRaw,this.content);}catch(e){this.blocked=true;this.error=(e instanceof Error&&e.message.startsWith('Bản lưu')?e.message:'Không đọc được bản lưu giữa màn.')+' Bản cũ được giữ nguyên; có thể bắt đầu lượt mới.';return null;}}
  // Explicit new run may replace an incompatible checkpoint; passive mount never does.
- start(){this.blocked=false;this.stamp='';try{this.lastRaw=this.store.getItem(CHECKPOINT_KEY);}catch{this.error='Chưa đọc được bộ nhớ thiết bị.';return;}this.clear();}
- save(e:Engine,runId:string,seen:number[]){if(this.blocked||e.status!=='running')return false;const stamp=runId+':'+e.tick+':'+seen.join(',')+':'+e.encounters?.tutorialPending;if(stamp===this.stamp)return true;try{if(this.store.getItem(CHECKPOINT_KEY)!==this.lastRaw){this.blocked=true;this.error='Màn đang chơi đã được lưu ở cửa sổ khác. Bản đó được giữ nguyên; hãy tải lại để tiếp tục.';return false;}const raw=JSON.stringify(capture(e,runId,seen));need(raw.length<=262144);this.store.setItem(CHECKPOINT_KEY,raw);this.lastRaw=raw;this.stamp=stamp;this.error='';return true;}catch{this.error='Chưa lưu được màn đang chơi. Anh vẫn chơi được; hãy thử lưu lại khi tạm dừng.';return false;}}
- clear(){if(this.blocked)return;const raw='{"version":1,"empty":true}';if(this.lastRaw===raw)return;try{if(this.store.getItem(CHECKPOINT_KEY)!==this.lastRaw){this.blocked=true;this.error='Màn đang chơi đã đổi ở cửa sổ khác. Bản đó được giữ nguyên.';return;}this.store.setItem(CHECKPOINT_KEY,raw);this.lastRaw=raw;this.stamp='';this.error='';}catch{this.error='Chưa xóa được mốc chơi cũ trên thiết bị.';}}
+ start(){this.blocked=false;this.stamp='';try{this.lastRaw=this.store.getItem(this.content.key);}catch{this.error='Chưa đọc được bộ nhớ thiết bị.';return;}this.clear();}
+ save(e:Engine,runId:string,seen:number[]){if(this.blocked||e.status!=='running')return false;const stamp=runId+':'+e.tick+':'+seen.join(',')+':'+e.encounters?.tutorialPending;if(stamp===this.stamp)return true;try{if(this.store.getItem(this.content.key)!==this.lastRaw){this.blocked=true;this.error='Màn đang chơi đã được lưu ở cửa sổ khác. Bản đó được giữ nguyên; hãy tải lại để tiếp tục.';return false;}const raw=JSON.stringify(capture(e,runId,seen,this.content.signature));need(raw.length<=262144);this.store.setItem(this.content.key,raw);this.lastRaw=raw;this.stamp=stamp;this.error='';return true;}catch{this.error='Chưa lưu được màn đang chơi. Anh vẫn chơi được; hãy thử lưu lại khi tạm dừng.';return false;}}
+ clear(){if(this.blocked)return;const raw='{"version":1,"empty":true}';if(this.lastRaw===raw)return;try{if(this.store.getItem(this.content.key)!==this.lastRaw){this.blocked=true;this.error='Màn đang chơi đã đổi ở cửa sổ khác. Bản đó được giữ nguyên.';return;}this.store.setItem(this.content.key,raw);this.lastRaw=raw;this.stamp='';this.error='';}catch{this.error='Chưa xóa được mốc chơi cũ trên thiết bị.';}}
 }

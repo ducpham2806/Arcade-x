@@ -32,6 +32,10 @@ Bản tiếp theo thêm chế độ Xem đường khi chuẩn bị/tạm dừng 
 
 Bờ Hồ Cong, Vườn Tuần Tra và Hẻm Đá Ba Cầu mở ngay trong Đường thử. Thêm hình học, nhịp chơi và mốc Dash dựa trên Engine. Kỷ lục ba đường đầu giữ nguyên. [Thiết kế và QA](../qa/SNAKE-STAGE-TWO-2026-11-26.md).
 
+## SN-FULL-CAMPAIGN · Toàn bộ hành trình
+
+`codex/snake-full-campaign` tiếp trên PR #51. Chương 02 Suối Hổ Phách và Chương 03 Đền Bình Minh có 10 màn mới, đưa tổng số lên 20 màn chính và sáu Đường thử. Chốt cửa, cầu lệch cao độ, bẫy nhện, ngọc và trận kết chương có đường thắng đã kiểm bằng Engine. Tiến trình và mốc hai chương mới lưu theo hồ sơ trên thiết bị. [Thiết kế toàn game](../snake/CAMPAIGN-LEVEL-DESIGN.md), [QA](../qa/SNAKE-FULL-CAMPAIGN-2026-11-26.md).
+
 ## Bằng chứng đã có và giới hạn
 
 [Live-save QA](../SNAKE_LIVE_SAVE_QA.md) đã kiểm Auth/engine/replay/service thật: thắng/lưu, retry sau lost-ack không nhận lặp, restore mới, đọc offline/retry, refresh và signout. Wrapper React đã nối Auth owner/save session; timeout30giây có hủy. Gold/Gem riêng, adapter chưa phát thưởng launcher. Có sẵn icon/banner/master/manifest, chưa cần vẽ lại.

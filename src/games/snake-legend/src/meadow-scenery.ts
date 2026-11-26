@@ -5,9 +5,13 @@ const THEMES = {
   brook: {ground: '#c7e3bd', tint: '#99cfc590', leaf: '#537f75', bud: '#e7dfae', stone: '#72978e', edge: '#335b53'},
   bramble: {ground: '#e2d1a8', tint: '#d8ad776f', leaf: '#8d7d47', bud: '#d19a70', stone: '#a18e69', edge: '#69543b'},
   hollow: {ground: '#c8d7ad', tint: '#9bb68f8c', leaf: '#5c8169', bud: '#b3c5bf', stone: '#73877e', edge: '#405b50'},
+  amber: {ground: '#dfd0a1', tint: '#d2a8684d', leaf: '#7b7547', bud: '#f6d895', stone: '#8c795d', edge: '#6f583f'},
+  dawn: {ground: '#d7cbb6', tint: '#eadcbc36', leaf: '#817386', bud: '#f9e1a0', stone: '#8d7e8d', edge: '#5f5269'},
 };
 
 export function meadowTheme(a: Arena) {
+  if (a.story?.id.startsWith('2-')) return THEMES.amber;
+  if (a.story?.id.startsWith('3-')) return THEMES.dawn;
   if (a.story?.encounter) return THEMES.hollow;
   if (a.id === 15 || a.id === 18 || a.story?.foods.some(food => food.kind === 'poison')) return THEMES.bramble;
   if (a.water.length) return THEMES.brook;
@@ -51,6 +55,21 @@ export function drawMeadowMotifs(c: CanvasRenderingContext2D, a: Arena, view: Re
   c.strokeStyle = theme.edge;
   c.globalAlpha = .28;
   c.strokeRect(.22, .22, a.w - .44, a.h - .44);
+  if (theme === THEMES.dawn) {
+    c.globalAlpha = .32;
+    c.lineWidth = .05;
+    c.beginPath();
+    const step = 2.4;
+    const left = Math.max(0, Math.floor(view.x / step) * step);
+    const right = Math.min(a.w, view.x + view.w + step);
+    for (let y = Math.max(0, Math.floor(view.y / step) * step); y < Math.min(a.h, view.y + view.h + step); y += step) {
+      c.moveTo(left, y); c.lineTo(right, y);
+      for (let x = left + ((Math.round(y / step) % 2) * step / 2); x < right; x += step) {
+        c.moveTo(x, y); c.lineTo(x, Math.min(a.h, y + step));
+      }
+    }
+    c.stroke();
+  }
   for (const {x, y, size, kind} of scatter(a)) {
     if (x < view.x - 1 || x > view.x + view.w + 1 || y < view.y - 1 || y > view.y + view.h + 1) continue;
     // Tiny silhouettes read as ground cover at play scale. Props and fruit have their own ink.

@@ -54,7 +54,7 @@ for (let stage = 0; stage < TRIAL_STAGE_COUNT; stage++) {
   test(`public guest completes stage ${stage + 1} and reloads its records without changing R01`, async ({ page, context }, info) => {
     test.setTimeout(120_000);
     const errors: string[] = [];
-    const legacyBest = [17, 20, 24];
+    const legacyBest = [17, 18.95, 24];
     page.on('pageerror', error => errors.push(error.message));
     if (stage === 1) {
       await page.addInitScript(({ key, best }) => {
@@ -67,7 +67,8 @@ for (let stage = 0; stage < TRIAL_STAGE_COUNT; stage++) {
     const course = page.locator('.snake-trials');
     const stageSwitch = course.locator('[data-action="trial-stage"]');
     if (stage > 0) {
-      await expect(course.locator('.best')).toHaveText('20.0s');
+      await expect(course.locator('.best')).toHaveText('19,0s');
+      await expect(course.locator('.trial-result')).toContainText('Kỷ lục 19,0 giây');
       await stageSwitch.click();
     }
     const start = stage * TRIAL_STAGE_SIZE;
@@ -100,8 +101,9 @@ for (let stage = 0; stage < TRIAL_STAGE_COUNT; stage++) {
     if (stage === 0) await stageSwitch.click();
     for (const [index, seconds] of stageBest.entries()) {
       await course.locator(`[data-arena="${start + index}"]`).click();
-      await expect(course.locator('.best')).toHaveText(`${seconds!.toFixed(1)}s`);
-      await expect(course.locator('.trial-result')).toContainText(`Kỷ lục ${seconds!.toFixed(1).replace('.', ',')} giây`);
+      const rounded = seconds!.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      await expect(course.locator('.best')).toHaveText(`${rounded}s`);
+      await expect(course.locator('.trial-result')).toContainText(`Kỷ lục ${rounded} giây`);
     }
     expect(errors).toEqual([]);
   });

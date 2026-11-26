@@ -89,6 +89,55 @@
   font-size: 12px;
 }
 .journey-footer .journey-trials:hover { background: #fff0b3; }
+
+.journey-chapters {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 10px 26px;
+  border-bottom: 1px solid #d9ddca;
+}
+.journey-chapters button {
+  min-height: 44px;
+  padding: 7px 9px;
+  text-align: left;
+  border: 1px solid #bac4a8;
+  border-radius: 9px;
+  background: #fffdf3;
+  color: #315740;
+}
+.journey-chapters button[aria-current="true"] {
+  border-color: #365c3b;
+  background: #365c3b;
+  color: #fff5dc;
+}
+.journey-chapters button:disabled { color: #505847; background: #edeedf; opacity: 1; }
+.journey-chapters b, .journey-chapters small { display: block; line-height: 1.25; }
+.journey-chapters b { font-size: 13px; }
+.journey-chapters small { margin-top: 3px; font-size: 10px; }
+.journey-actions { margin: 0 0 16px; }
+.snake-app.story-app .arenas button.selected { color: #fff7db; }
+.snake-app.story-app .arenas button.selected span { opacity: 1; }
+.chapter-ending-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.chapter-ending button[data-action="next-chapter"] { background: #e8bb62; border-color: #a4772e; color: #2c392a; }
+.snake-journey[data-journey-chapter="02"] .journey-hero-shade {
+  background: linear-gradient(90deg, #39251aee, #544028ad 60%, #5a3b2360), linear-gradient(0deg, #322b1eda, transparent);
+}
+.snake-journey[data-journey-chapter="03"] .journey-hero-shade {
+  background: linear-gradient(90deg, #231f3cf2, #453453b3 60%, #53406160), linear-gradient(0deg, #31253fdf, transparent);
+}
+.snake-journey[data-journey-chapter="02"] .journey-totals { background: #39291bde; }
+.snake-journey[data-journey-chapter="03"] .journey-totals { background: #2c253fdf; }
+@media(max-width:760px) {
+  .journey-chapters { gap: 5px; padding: 6px 12px; }
+  .journey-chapters button { padding: 5px; }
+  .journey-chapters b { font-size: 11px; }
+  .journey-chapters small { font-size: 9px; }
+}
 .snake-app.snake-trials {
   --trial-deep: #183b31;
   --trial-leaf: #365b43;

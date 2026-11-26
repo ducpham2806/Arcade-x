@@ -9,9 +9,9 @@ import { modalFocus } from './ui-focus';
 const KEY = 'snake-legend:prototype-m1:v1';
 const LAB_LABELS = ['Đường cong', 'Cầu & Dash', '150 đốt'];
 const CANVAS_LABEL = 'Sân chơi. Dùng WASD hoặc phím mũi tên để lái, Space để Dash, Escape để tạm dừng.';
-const trialSeconds = (seconds: number) => seconds.toLocaleString('vi-VN', {
+const trialSeconds = new Intl.NumberFormat('vi-VN', {
   minimumFractionDigits: 1, maximumFractionDigits: 1,
-});
+}).format;
 const LAB_LESSONS = [
   'Lượn qua hai rào. Thu quả đúng thứ tự. Quan sát bán kính quay khi rắn dài thêm.',
   'Căn hướng trên bờ, đi thẳng qua cầu, quay đầu ở sân rộng. Mép nước gây thua; tường xanh trượt dọc.',
@@ -147,7 +147,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     $('.overlay').classList.toggle('hidden', scouting || (!paused && !terminal));
     $('.overlay-card .eyebrow').textContent = `${trials ? 'ĐƯỜNG THỬ' : 'SÂN THỬ'} 0${save.arena+1}`;
     $('h1').textContent = won ? 'Hoàn thành!' : terminal ? 'Thử lại nhé' : started ? 'Đang tạm dừng' : engine.arena.name;
-    const time = engine.time.toFixed(1);
+    const time = course ? trialSeconds(engine.time) : engine.time.toFixed(1);
     let outcome = engine.lastEvent;
     if (course && won) outcome = 'Đã thu đủ quả';
     if (course && !course.bridges.length && outcome.startsWith('Rơi khỏi cầu')) outcome = 'Đã rơi xuống hồ · hãy giữ khoảng cách với bờ';
@@ -285,7 +285,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     const e = engine;
     $('.hearts').textContent = '♥'.repeat(e.hearts) + '♡'.repeat(3 - e.hearts);
     $('.objective').textContent = e.arena.duration ? `${e.length} đốt · trụ 60s` : `Quả ${e.collected}/${e.arena.route.length} · ${e.length} đốt`;
-    $('.timer').textContent = e.time.toFixed(1) + 's';
+    $('.timer').textContent = (trials ? trialSeconds(e.time) : e.time.toFixed(1)) + 's';
     $('.length').textContent = String(e.length);
     $('.hits').textContent = String(e.hits);
     $('.travel').textContent = e.distanceTravelled.toFixed(1) + ' u';
@@ -295,7 +295,7 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     $('.control-tip').textContent = e.exhausted ? 'Cạn lực · nhả nút rồi giữ lại' : e.stun > 0 ? 'Chạm thân · đang choáng' : 'Giữ hướng · thả Dash để hồi lực';
     $('.self-hits').textContent = String(e.selfHits);
     const best = save.best[save.arena];
-    $('.best').textContent = best === null ? '—' : best.toFixed(1) + 's';
+    $('.best').textContent = best === null ? '—' : (trials ? trialSeconds(best) : best.toFixed(1)) + 's';
     if (!trials && frames.length) {
       const sorted = [...frames].sort((a,b) => a-b);
       $('.fps').textContent = Math.round(1000 / sorted[Math.floor(sorted.length/2)]) + ' fps';

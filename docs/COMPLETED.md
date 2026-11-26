@@ -1,6 +1,6 @@
 # Tóm tắt công việc đã hoàn tất
 
-[Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
+[Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Merge, production và thiết bị có nghiệm thu riêng.
 
 ## Blossom Blast · 26/11/2026
 
@@ -18,7 +18,7 @@
 
 - PR 42 sửa vạch lực online, khung thấp, focus, Chơi lại offline và xác nhận bỏ cuộc. [QA](qa/FOLK-POLISH-2026-11-19.md).
 - FD-ON2 kiểm bật và thu hồi online từng game, mặc định tắt. 21 ca Folk Node/PGlite, SQL và hồi quy trình duyệt. [Kiểm tra](WORKLOG.md).
-- Ngày 20/11 anh bỏ test staging và duyệt phát hành launcher offline. [Nhật ký](WORKLOG.md).
+- 20/11 anh bỏ test staging và duyệt launcher offline. [Nhật ký](WORKLOG.md).
 
 ## Folk và chat · merge/phát hành 19/11/2026
 
@@ -32,7 +32,8 @@
 - PR #48 R01/cảm ứng qua CI #94. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
 - PR #49 Đồng Cỏ qua CI #96. [QA](qa/SNAKE-MEADOW-2026-11-26.md).
 - PR #50 Xem đường. Chromium 15/15. [QA](qa/SNAKE-SCOUTING-2026-11-26.md).
-- Chặng 2 thêm ba màn. Qua sáu đường. [QA](qa/SNAKE-STAGE-TWO-2026-11-26.md).
+- PR #51 Chặng 2 qua 6 đường bằng engine và joystick. [QA](qa/SNAKE-STAGE-TWO-2026-11-26.md).
+- Toàn hành trình có 20 màn chính, 6 Đường thử. [QA](qa/SNAKE-FULL-CAMPAIGN-2026-11-26.md).
 
 ## Snake R01 · kỹ thuật · 14/11/2026
 

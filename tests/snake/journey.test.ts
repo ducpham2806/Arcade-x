@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';import {parseHTML} from 'linkedom';
 import {blankCampaign,CAMPAIGN_KEY,mergeClear,isUnlocked,parseCampaign,saveClear} from '../../src/games/snake-legend/src/story-save';
-import {CHECKPOINT_KEY,capture} from '../../src/games/snake-legend/src/checkpoint';
+import {CHECKPOINT_KEY,Checkpoints,capture,decode} from '../../src/games/snake-legend/src/checkpoint';
 import {Engine,T} from '../../src/games/snake-legend/src/core';import {STORY_LEVELS} from '../../src/games/snake-legend/src/story-data';
 import {mountJourney} from '../../src/games/snake-legend/src/journey';import {journeyProgress} from '../../src/games/snake-legend/src/journey-model';
 import {runCampaignLevel,steer} from './campaign-driver';
+import {CAMPAIGN_CHAPTERS,CAMPAIGN_LENGTH,campaignMap} from '../../src/games/snake-legend/src/campaign';
+import {snakeAccountStorage} from '../../src/games/snake-legend/integration/storage-scope';
 import './trials.test';
+import './campaign-level-routes.test';
 const {window}=parseHTML('<html><body><main id="root"></main></body></html>');Object.assign(globalThis,{window,document:window.document});
 const root=window.document.getElementById('root')! as unknown as HTMLElement;
 const data=new Map<string,string>();const store={getItem:(k:string)=>data.get(k)??null,setItem:(k:string,v:string)=>{data.set(k,v);}};
@@ -26,6 +29,41 @@ click('[data-action="fresh"]');assert.deepEqual(choices.pop(),{level:1,resume:fa
 store.setItem(CHECKPOINT_KEY,'corrupt');hub=mountJourney(root,store,()=>{},()=>{});assert(root.querySelector('.journey-storage-note')!.textContent!.includes('Không đọc được'));assert.equal(store.getItem(CHECKPOINT_KEY),'corrupt');hub.destroy();
 const full=blankCampaign();for(let i=1;i<=10;i++)full.levels['1-'+i]={stars:[true,true,true],bestScore:100,bestTime:20};assert.deepEqual(journeyProgress(full),{completed:10,stars:30,recommended:9});
 console.log('PASS journey: locked levels, next-level recommendation, live progress refresh, preserved selection, pause, checkpoint resume/restart, corrupt save retention, all-clear summary, subscription cleanup');
+
+const [,amber,dawn]=CAMPAIGN_CHAPTERS;
+const chapterStore=snakeAccountStorage(store,'campaign-a');
+const otherOwner=snakeAccountStorage(store,'campaign-b');
+const cleared=(levelId:string,runId=levelId)=>({levelId,runId,time:30,score:100,stars:[true,true,false] as [boolean,boolean,boolean]});
+assert.equal(CAMPAIGN_LENGTH,20);
+assert.deepEqual(campaignMap(chapterStore).map(entry=>entry.unlocked),[true,false,false]);
+const oldR01=JSON.stringify({...full,contentVersion:'r01-6-v1'});
+chapterStore.setItem(CAMPAIGN_KEY,oldR01);
+chapterStore.setItem(CHECKPOINT_KEY,checkpoint);
+assert.deepEqual(campaignMap(chapterStore).map(entry=>entry.unlocked),[true,true,false]);
+assert.deepEqual(campaignMap(otherOwner).map(entry=>entry.unlocked),[true,false,false]);
+const amberRun=new Engine(amber.levels[1]);
+for(let i=0;i<90;i++)amberRun.step({x:1,y:0,dash:false});
+const amberCp=new Checkpoints(chapterStore,amber.checkpoint);
+amberCp.start();
+assert.equal(amberCp.save(amberRun,'amber-resume',[]),true);
+const restoredAmber=new Checkpoints(chapterStore,amber.checkpoint).load()!;
+assert.equal(restoredAmber.engine.tick,90);
+assert.equal(restoredAmber.snapshot.level,'2-2');
+assert.throws(()=>decode(JSON.stringify(restoredAmber.snapshot)));
+assert.equal(new Checkpoints(chapterStore,dawn.checkpoint).load(),null);
+assert.equal(new Checkpoints(otherOwner,amber.checkpoint).load(),null);
+assert.throws(()=>amber.save(chapterStore,[cleared('2-1'),cleared('3-1')]));
+assert.equal(amber.load(chapterStore).data.levels['2-1'],undefined);
+amber.save(chapterStore,amber.levels.map(arena=>cleared(arena.story!.id)));
+amber.save(chapterStore,[{...cleared('2-1','new-best'),time:20,score:80,stars:[true,false,true]}]);
+assert.deepEqual(amber.load(chapterStore).data.levels['2-1'],{stars:[true,true,true],bestTime:20,bestScore:100});
+assert.deepEqual(campaignMap(chapterStore).map(entry=>entry.unlocked),[true,true,true]);
+assert.throws(()=>dawn.save(chapterStore,[{...cleared('3-2'),secret:true}]));
+dawn.save(chapterStore,[{...cleared('3-3'),secret:true}]);
+assert.match(dawn.ending(dawn.load(chapterStore).data).collection,/Đã tìm thấy/);
+assert.equal(chapterStore.getItem(CAMPAIGN_KEY),oldR01);
+assert.equal(chapterStore.getItem(CHECKPOINT_KEY),checkpoint);
+console.log('PASS full campaign: 20 levels, chapter gates, owner-scoped progress/checkpoint, receipt validation, legacy R01 bytes');
 
 const playedStorage = new Map<string, string>();
 const playedStore = {
