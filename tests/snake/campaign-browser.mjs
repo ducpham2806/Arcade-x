@@ -41,7 +41,7 @@ try {
       if (window.__campaignProbe?.engine !== this) {
         const index = Number(this.arena.story.id.split('-')[1]) - 1;
         const route = index === 7 ? bonusRoute : this.arena.story.guide.slice(1);
-        const boss = index === 9 ? bossSteering(this) : null;
+        const boss = index === 9 ? bossSteering(this, 3) : null;
         let waypoint = 0;
         window.__campaignProbe = { engine: this, input: () => {
           if (boss) return boss();
@@ -86,7 +86,7 @@ try {
     } finally { if (holding) await release(); }
     if (last?.status !== 'won') { report.currentFailure = { level: expected, ...last, hits, tutorials }; throw Error(`${expected} did not clear through controls: ${JSON.stringify(last)}`); }
     await expect(page.locator('.story-app .overlay')).toBeVisible();
-    await expect(page.locator('.story-app [data-action="primary"]')).toHaveText(index === 9 ? 'Chơi lại chương' : 'Màn tiếp theo');
+    await expect(page.locator('.story-app [data-action="primary"]')).toHaveText(index === 9 ? 'Xem kết chương' : 'Màn tiếp theo');
     const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('snake-legend:r01-blockout:v1')));
     if (!stored.levels[expected]?.stars[0] || stored.receipts.length !== index + 1) throw Error('Clear was not saved exactly once: ' + expected);
     const resources = await snakeResources(page);
@@ -96,8 +96,9 @@ try {
     writeFileSync(`${evidence}/report.json`, JSON.stringify(report, null, 2));
     if (index < count - 1) await page.locator('.story-app .overlay [data-action="primary"]').click();
   }
-  await page.locator('.story-app [data-action="journey"]').click();
+  await page.locator(count===10?'.story-app [data-action="primary"]':'.story-app [data-action="journey"]').click();
   await expect(page.locator('.journey-clears')).toHaveText(`${count}/10 màn`);
+  if(count===10){await expect(page.locator('.chapter-ending')).toBeVisible();await expect(page.locator('.chapter-story')).toContainText('10 thử thách');}
   await page.screenshot({ path: `${evidence}/journey-complete.png` });
   await page.reload(); await page.locator('#btn-play-snake-legend').click();
   await expect(page.locator('.journey-clears')).toHaveText(`${count}/10 màn`);

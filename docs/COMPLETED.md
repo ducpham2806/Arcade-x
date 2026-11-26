@@ -1,12 +1,12 @@
 # Tóm tắt công việc đã hoàn tất
 
-[Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
+[Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Merge, production và thiết bị có nghiệm thu riêng.
 
 ## Blossom Blast · 26/11/2026
 
-- #46 có 9-slice, ghép tại bàn, UI 64/64 và engine 21/21. [QA](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
+- PR #46 có 9-slice, ghép tại bàn, UI 64/64 và engine 21/21. Merge `657ec42` sau CI #89. [QA](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
 
-- Nhánh VFX có dấu vùng nổ, ghép, cổng và HUD. Chờ duyệt thiết bị. [QA](qa/BLOSSOM-VIVID-EFFECTS-2026-11-26.md).
+- PR #47 có vùng nổ, ghép, cổng và HUD. Sửa giảm chuyển động; 25 ca Playwright chuyển động, 60 ca UI Blossom và CI #92 qua. Merge `5cd1539`. Production và thiết bị thật còn chờ xác nhận. [QA](qa/BLOSSOM-VIVID-EFFECTS-2026-11-26.md).
 
 ## Ba bàn cờ chiến trường · 25–26/11/2026
 
@@ -18,7 +18,7 @@
 
 - PR 42 sửa vạch lực online, khung thấp, focus, Chơi lại offline và xác nhận bỏ cuộc. [QA](qa/FOLK-POLISH-2026-11-19.md).
 - FD-ON2 kiểm bật và thu hồi online từng game, mặc định tắt. 21 ca Folk Node/PGlite, SQL và hồi quy trình duyệt. [Kiểm tra](WORKLOG.md).
-- Ngày 20/11 anh bỏ test staging và duyệt phát hành launcher offline. [Nhật ký](WORKLOG.md).
+- 20/11 anh bỏ test staging và duyệt launcher offline. [Nhật ký](WORKLOG.md).
 
 ## Folk và chat · merge/phát hành 19/11/2026
 
@@ -27,13 +27,18 @@
 - Studio `fa7b1db`. PR 38 chat 27/27, preview Snake và native 3/3 cục bộ. PR38 đã vào main qua PR40. Staging hai tester do anh kiểm sau.
 - [Tóm tắt trước animation Ô Ăn Quan](archive/COMPLETED-2026-11-18-before-oaq-turn-art.md).
 
-## Snake R01 · kỹ thuật ứng viên · 14/11/2026
+## Snake Legend · 26/11/2026
 
-- Nhánh codex/snake-r01-finish từ2ca0b3c/PR33: sửa S1accountsave cùng store xuyên Story/Journey/Lab, giữ guest/format và audio prefs. [QA](qa/SNAKE-FINISH-2026-11-14.md).
-- Sửa nativekeyboard/focus/Escape và boss marker đúng tơ/táo/cột/điểm yếu/cổng; không đổi physics/replay/rewards.
-- UI10/10thắng/29sao qua pointer/time thật, boss6hit/3pha, reload/cleanup0/pageerror0. Giữ V1driverFAIL, V2PASS, không gọi humanplaytest.
-- Player3ca và Labprefs red→green; unit6suite/lint/build/rollback/preview/bundle/catalog/storage qua; CI đúnghead và merge/deploy còn riêng.
-- [Phiếu nghiệm thu](snake/R01-ACCEPTANCE.md) sẵn sàng; Android/iPhone/người mới/art/audio thật cònWAITING. Livepreflight thiếu4binding, không login/ghiDB. [Trước task](archive/COMPLETED-2026-11-14-before-snake-finish.md).
+- PR #48 R01/cảm ứng qua CI #94. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
+- PR #49 Đồng Cỏ qua CI #96. [QA](qa/SNAKE-MEADOW-2026-11-26.md).
+- PR #50 Xem đường. Chromium 15/15. [QA](qa/SNAKE-SCOUTING-2026-11-26.md).
+- PR #51 Chặng 2 qua 6 đường bằng engine và joystick. [QA](qa/SNAKE-STAGE-TWO-2026-11-26.md).
+- Toàn hành trình có 20 màn chính, 6 Đường thử. [QA](qa/SNAKE-FULL-CAMPAIGN-2026-11-26.md).
+
+## Snake R01 · kỹ thuật · 14/11/2026
+
+- PR #34 merge `533c0e7`. Lưu theo owner xuyên Story/Journey/Lab, bàn phím/focus và chỉ dấu boss. UI thắng 10/10 màn, 29 sao, boss 6 hit/3 pha, reload và cleanup qua. [QA kỹ thuật](qa/SNAKE-FINISH-2026-11-14.md).
+- Điện thoại, người mới, art/audio và backend thật còn chờ. [Nghiệm thu](snake/R01-ACCEPTANCE.md).
 
 ## Snake R01 / Auth / Studio · phát hành · 13/11/2026
 

@@ -2,20 +2,16 @@
 
 Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLOG-2026-11-19-before-fd-on2.md).
 
-## 26/11/2026 · Blossom Blast · hiệu ứng lượt đi
+## 26/11/2026 · Snake Legend · Toàn hành trình
 
-- `codex/blossom-vivid-effects` bổ sung liên kết ghép, mầm nở, vệt cổng, dấu vùng tác động theo engine và số tăng trên HUD. PixelFX dựng ảnh, Agent Sprite Forge kiểm và đóng gói khung hình. Playwright 66/66, engine 21/21, HTML chạy cả ba cảnh khi tắt mạng. [QA](qa/BLOSSOM-VIVID-EFFECTS-2026-11-26.md).
-- Chuyển báo cáo cũ sang [archive xem lại nước đi](archive/WORKLOG-2026-11-26-board-review.md). Sửa kiểm art của #46 tại `b916d33` để dò đúng stylesheet 9-slice và đường dẫn ảnh offline.
-- PR #47 chuyển đích sang `main`. CI #90 phát hiện sáu hiệu ứng mất nhịp đổi khung hình khi hệ điều hành bật giảm chuyển động. `VFX.tsx` và CSS giữ hai khung tại chỗ cho hiệu ứng chính. Tùy chọn trong game giữ ảnh tĩnh.
+- Nhánh `codex/snake-full-campaign` tiếp trên PR #51 tại `9d9ead0`. Có 20 màn qua Thảo Nguyên Xanh, Suối Hổ Phách và Đền Bình Minh. Sáu Đường thử là nhánh tùy chọn. Tiến trình và mốc giữa màn hai vùng mới lưu theo hồ sơ trên thiết bị. [Thiết kế](snake/CAMPAIGN-LEVEL-DESIGN.md). [Log Đồng Cỏ](archive/WORKLOG-2026-11-26-before-snake-full-campaign.md).
+- Engine thắng 20 màn chính và 6 Đường thử. Cả 10 màn mới đủ 3 sao. [QA](qa/SNAKE-FULL-CAMPAIGN-2026-11-26.md).
+- 27/11 anh yêu cầu merge #52 vào `main`. CI #99 bắt lỗi nút Bắt đầu bị cắt ở 320×568. Thu gọn tiêu đề và khoảng cách trong Hành trình ở màn thấp, giữ yêu cầu nút hiện đủ. Chromium kiểm lại 5/5. [Chi tiết](qa/SNAKE-FULL-CAMPAIGN-2026-11-26.md).
 
-## 26/11/2026 · Blossom Blast · giao diện và ghép tại bàn
+## 26/11/2026 · Snake Legend · Chặng 2
 
-- `codex/blossom-garden-ui` thay giao diện Hành trình, HUD, bàn, chuẩn bị và các hộp thoại bằng khung 9-slice từ bộ art Blossom. Ghép được bằng chạm, vuốt hoặc bàn phím; đánh dấu các ô đủ điều kiện và hủy chọn miễn phí. Playwright 64/64, engine 21/21, HTML chạy khi tắt mạng sau tải. [QA](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
-- PR #45 đã vào `main` tại `fc8bb2f` sau CI #86. Ghi chú gốc bản thử bàn cờ giữ trong [archive](archive/WORKLOG-2026-11-25-three-board-polish.md).
-- PR #46 đã merge vào `main@657ec42` sau CI #89. Đã đối chiếu cây Git của commit merge với bản chạy CI.
+- Nhánh `codex/snake-trial-second-stage` tiếp trên PR #50 tại `09c94e7`. Bờ Hồ Cong, Vườn Tuần Tra, Hẻm Đá Ba Cầu. Engine và joystick Chromium qua cả sáu đường, kỷ lục cũ đọc được. Build/bundle và HTML Chặng 2 offline qua. [QA](qa/SNAKE-STAGE-TWO-2026-11-26.md). [Log điều khiển R01](archive/WORKLOG-2026-11-26-before-snake-stage-two.md).
 
-## 26/11/2026 · VFX ba bàn cờ
+## 26/11/2026 · Snake Legend · Xem đường
 
-- Ô Ăn Quan có quét giáo hai phe, bóng dưới đất và nhịp vào khay. Cờ vua có vòng ấn phong cấp. Cờ tướng có ánh đầu nòng và bụi riêng cho Pháo.
-- Kiểm frame trong bản HTML dưới hai kích thước, tắt chuyển động giữa chừng, Pháo ăn Mã và chuỗi điểm ăn kép. [QA](qa/THREE-BOARD-VFX-2026-11-26.md).
-- [Nhật ký bản Chính Điện Đá và chuyển động](archive/WORKLOG-2026-11-25-chess-motion.md).
+- Nhánh `codex/snake-trial-scouting` dựa trên PR #49 tại `6d9a729`. Xem đường đánh số quả trên Canvas lúc chuẩn bị/tạm dừng. Bảng chơi có kỷ lục, mốc Dash và khoảng thời gian cần cải thiện. Chromium 15/15, kiểm lại tương phản, build và preview qua. [QA](qa/SNAKE-SCOUTING-2026-11-26.md). [Log Blossom](./archive/WORKLOG-2026-11-26-before-snake-scouting.md).

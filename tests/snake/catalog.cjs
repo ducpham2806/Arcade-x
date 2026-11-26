@@ -47,7 +47,7 @@ async function run() {
   assert(Math.max(...chunkSizes) <= 500 * 1024, 'Catalog 500 KiB JS chunk budget');
   assert(assets.code.includes('/' + game.file));
   assert(game.css.every(file => assets.code.includes('/' + file)));
-  assert.equal(assets.media.length, 20);
+  assert.equal(assets.media.length, 21);
   for (const file of [...assets.code, ...assets.media]) assert(fs.statSync(dir + file).isFile(), file);
   for (const source of ['icon', 'banner']) {
     const art = manifest['src/preview/snake/art/' + source + '.webp'];

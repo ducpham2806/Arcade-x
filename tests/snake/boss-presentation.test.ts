@@ -1,3 +1,4 @@
+import "./meadow-fx.test";
 import assert from 'node:assert/strict';
 import {Engine,T} from '../../src/games/snake-legend/src/core';
 import {STORY_LEVELS} from '../../src/games/snake-legend/src/story-data';
@@ -53,3 +54,6 @@ boss.state='weak';objective('ĐIỂM YẾU',boss.boss!.weak);
 boss.state='defeated';objective('CỔNG',objectiveEngine.arena.story!.exit);
 assert.equal(bossObjective(new Engine(STORY_LEVELS[0])),undefined);
 console.log('PASS boss objective: web, both anchors, available/regrowing apples, open weak point and exit have matching targets and labels without changing simulation');
+
+// Character rig and chapter presentation use the same no-simulation-write contract.
+await import('./character-motion.test');

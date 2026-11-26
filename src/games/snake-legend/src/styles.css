@@ -59,3 +59,237 @@
  .snake-app .energy-label{display:none}
  .snake-app .energy-track{margin-top:0;height:7px}
 }
+
+/* Chapter content remains in the existing scroll body, never over the playfield. */
+.snake-journey .chapter-ending{background:#e6edda;border:1px solid #a8ba89;border-radius:14px;padding:18px;margin-bottom:20px;color:#36573d}
+.snake-journey .chapter-ending[hidden]{display:none}
+.chapter-ending>span{font-size:10px;letter-spacing:.12em;font-weight:750;color:#596b32}
+.snake-journey .chapter-ending h2{font-size:22px;margin:8px 0 12px}
+.chapter-ending p,.journey-field-notes p{font-size:12px;line-height:1.7}
+.chapter-ending button{min-height:44px;padding:10px 16px;border:1px solid #789453;border-radius:9px;background:#365c3b;color:#fff5d8;font-weight:700}
+.journey-field-notes{margin:14px 0;color:#405e45}
+.journey-field-notes summary{cursor:pointer;min-height:28px;font-size:12px;font-weight:750}
+@media(max-width:760px){.snake-journey .chapter-ending{padding:16px}.snake-journey .chapter-ending h2{font-size:20px}}
+
+@media(max-width:760px){.snake-journey.chapter-complete .journey-route{order:-2}}
+@media(max-width:760px) and (max-height:450px){.snake-journey{min-height:0}.journey-hero{min-height:88px;padding:12px 16px}.journey-title h1{font-size:20px;margin:6px 0}.journey-title>p{display:none}.journey-footer{padding-top:0;padding-bottom:0}}
+
+.journey-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.journey-footer .journey-trials {
+  padding: 0 16px;
+  border: 1px solid #937033;
+  border-radius: 9px;
+  background: linear-gradient(#fff0b3, #e7c878);
+  box-shadow: inset 0 1px #fff8d7, 0 2px 0 #b69453;
+  color: #493617;
+  font-size: 12px;
+}
+.journey-footer .journey-trials:hover { background: #fff0b3; }
+
+.journey-chapters {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 10px 26px;
+  border-bottom: 1px solid #d9ddca;
+}
+.journey-chapters button {
+  min-height: 44px;
+  padding: 7px 9px;
+  text-align: left;
+  border: 1px solid #bac4a8;
+  border-radius: 9px;
+  background: #fffdf3;
+  color: #315740;
+}
+.journey-chapters button[aria-current="true"] {
+  border-color: #365c3b;
+  background: #365c3b;
+  color: #fff5dc;
+}
+.journey-chapters button:disabled { color: #505847; background: #edeedf; opacity: 1; }
+.journey-chapters b, .journey-chapters small { display: block; line-height: 1.25; }
+.journey-chapters b { font-size: 13px; }
+.journey-chapters small { margin-top: 3px; font-size: 10px; }
+.journey-actions { margin: 0 0 16px; }
+.snake-app.story-app .arenas button.selected { color: #fff7db; }
+.snake-app.story-app .arenas button.selected span { opacity: 1; }
+.chapter-ending-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.chapter-ending button[data-action="next-chapter"] { background: #e8bb62; border-color: #a4772e; color: #2c392a; }
+.snake-journey[data-journey-chapter="02"] .journey-hero-shade {
+  background: linear-gradient(90deg, #39251aee, #544028ad 60%, #5a3b2360), linear-gradient(0deg, #322b1eda, transparent);
+}
+.snake-journey[data-journey-chapter="03"] .journey-hero-shade {
+  background: linear-gradient(90deg, #231f3cf2, #453453b3 60%, #53406160), linear-gradient(0deg, #31253fdf, transparent);
+}
+.snake-journey[data-journey-chapter="02"] .journey-totals { background: #39291bde; }
+.snake-journey[data-journey-chapter="03"] .journey-totals { background: #2c253fdf; }
+@media(max-width:760px) {
+  .journey-chapters { gap: 5px; padding: 6px 12px; }
+  .journey-chapters button { padding: 5px; }
+  .journey-chapters b { font-size: 11px; }
+  .journey-chapters small { font-size: 9px; }
+}
+@media(max-width:480px) and (max-height:640px) {
+  .journey-hero {
+    min-height: clamp(88px, 20vh, 116px);
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .journey-title h1 { font-size: 22px; margin: 5px 0 0; }
+  .journey-title > p { display: none; }
+  .journey-detail { padding: 14px 16px; }
+  .journey-eyebrow, .journey-level-name { margin-bottom: 6px; }
+  .journey-level-name { font-size: 22px; }
+  .journey-goal { font-size: 14px; margin-bottom: 8px; }
+  .journey-actions { padding-top: 0; }
+}
+.snake-app.snake-trials {
+  --trial-deep: #183b31;
+  --trial-leaf: #365b43;
+  --trial-light: #d9e6c5;
+  --trial-gold: #eed18a;
+  position: relative;
+  background: #f4f0db;
+}
+.snake-trials:is([data-trial='1'],[data-trial='3']) { --trial-deep: #143e43; --trial-leaf: #275e63; --trial-light: #d9ece7; }
+.snake-trials:is([data-trial='2'],[data-trial='5']) { --trial-deep: #342942; --trial-leaf: #594365; --trial-light: #e9dff1; }
+.snake-trials[data-trial='4'] { --trial-deep: #403829; --trial-leaf: #665233; --trial-light: #f1e5c7; }
+.snake-trials .topbar {
+  background: linear-gradient(var(--trial-leaf), var(--trial-deep));
+  color: #fff6d5;
+  border-bottom: 1px solid #141d16;
+}
+.snake-trials .brand-mark { background: #fff1bb; color: var(--trial-deep); }
+.snake-trials .brand div > span, .snake-trials .build-tag { color: #fff2c5; }
+.snake-trials .build-tag { background: #ffffff18; }
+.snake-trials .arenas {
+  display: grid;
+  grid-template-columns: auto repeat(3, minmax(0, 1fr));
+  background: #efeada;
+}
+.snake-trials .arenas button {
+  max-width: none;
+  min-width: 0;
+  border-color: #d1c9a9;
+  background: #fcf7e5;
+  color: var(--trial-deep);
+  line-height: 1.2;
+}
+.snake-trials .arenas button.selected {
+  border-color: var(--trial-deep);
+  background: var(--trial-leaf);
+  color: #fff8db;
+  box-shadow: inset 0 1px #ffffff26;
+}
+.snake-trials .arenas button.selected span { color: var(--trial-gold); opacity: 1; }
+.snake-trials .arenas > [hidden] { display: none; }
+.snake-trials .arenas .trial-stage-switch {
+  justify-content: center;
+  white-space: nowrap;
+  background: var(--trial-light);
+  border-color: var(--trial-leaf);
+}
+.snake-trials .hud { background: var(--trial-light); color: var(--trial-deep); gap: 8px; }
+.snake-trials .hud .objective { font-weight: 750; }
+.snake-trials .timer { white-space: nowrap; }
+.snake-trials .dock { background: linear-gradient(#f8f1d9, #e7e6cb); }
+.snake-trials .inspector { background: #f9f4e1; }
+.snake-trials .overlay-card {
+  max-height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-color: #c3a75f;
+  color: var(--trial-deep);
+  box-shadow: inset 0 0 0 4px #f4e9c7, 0 12px 38px #0f281f73;
+}
+.snake-trials .primary { background: var(--trial-leaf); border-color: var(--trial-deep); color: #fff9e6; }
+.snake-trials .trial-result { font-size: 12px; font-weight: 750; }
+.snake-trials .trial-result.met-par { color: #23563b; }
+.snake-trials .trial-panel-actions,
+.snake-trials .trial-map-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.snake-trials .trial-panel-actions > button { flex: 1 1 auto; width: auto; }
+.snake-trials .trial-panel-actions > [hidden],
+.snake-trials .trial-map-bar[hidden] { display: none; }
+.snake-trials .trial-secondary { background: #f6edd1; border-color: #ae9862; color: var(--trial-deep); }
+.snake-trials.is-scouting { grid-template-rows: minmax(0, 1fr); }
+.snake-trials.is-scouting :is(.topbar, .arenas, .hud, .dock, .inspector, .field-toolbar, .toast) { display: none; }
+.snake-trials.is-scouting .workspace,
+.snake-trials.is-scouting .play-column { display: block; height: 100%; }
+.snake-trials.is-scouting .field { display: grid; height: 100%; grid-template-rows: minmax(0, 1fr) auto; }
+.snake-trials.is-scouting canvas { min-height: 0; }
+.snake-trials .trial-map-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 8px 16px max(8px,var(--snake-safe-bottom,env(safe-area-inset-bottom,0px)));
+  background: #fcf6e2;
+  border-top: 1px solid #bda46d;
+  color: var(--trial-deep);
+}
+.snake-trials .trial-map-legend strong { display: block; font-size: 15px; }
+.snake-trials .trial-map-legend span { font-size: 12px; }
+.snake-trials .trial-map-actions > button { width: auto; min-height: 44px; }
+.snake-trials .trial-map-notes {
+  display: none;
+  padding: 12px 16px;
+  background: var(--trial-deep);
+  color: #fff5d8;
+  border-bottom: 1px solid #ffffff30;
+}
+@media(max-width: 760px) and (orientation: portrait) {
+  .snake-trials.is-scouting .field { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .snake-trials .trial-map-notes:not([hidden]) { display: block; }
+  .snake-trials .trial-map-notes p { font-size: 12px; line-height: 1.4; margin: 4px 0 0; }
+  .snake-trials .trial-map-legend strong { display: none; }
+}
+@media(max-width: 480px) {
+  .snake-trials .trial-map-actions { width: 100%; }
+  .snake-trials .trial-map-actions > button { flex: 1; }
+}
+.snake-trials > .settings .settings-card {
+  width: min(100%, 896px);
+  height: min(92vh, 100%);
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  background: #faf6e6;
+}
+.snake-trials > .settings [data-action='close-settings'] { margin-top: auto; flex-shrink: 0; }
+@media(min-width: 1024px) {
+  .snake-trials > .settings .settings-card { width: min(100%, 1024px); }
+}
+@media(max-width: 760px) {
+  .journey-footer-actions { gap: 8px; }
+  .journey-footer .journey-trials { padding-inline: 10px; }
+  .snake-trials .arenas { gap: 4px; }
+  .snake-trials .arenas button { gap: 5px; }
+  .snake-trials .hud { padding-inline: 10px; }
+  .snake-trials .brand div > span { display: none; }
+}
+@media(max-width: 639px) {
+  .snake-trials > .settings { padding: 0; }
+  .snake-trials > .settings .settings-card { height: 100%; border-radius: 0; padding: 20px; }
+}
+@media(max-width: 360px) {
+  .snake-trials .topbar { padding-inline: 8px; }
+  .snake-trials .brand-mark { display: none; }
+}
+@media(max-height: 580px) and (min-aspect-ratio: 6/5) {
+  .snake-trials .overlay { padding: 5px; }
+  .snake-trials .overlay-card { padding: 8px 12px; }
+  .snake-trials .overlay-card h1 { font-size: 18px; }
+  .snake-trials .overlay-description { font-size: 11px; margin-block: 5px; }
+  .snake-trials .instructions { display: none; }
+}

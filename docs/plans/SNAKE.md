@@ -1,6 +1,6 @@
 # Snake Legend — hoàn thiện R01 và nghiệm thu
 
-Mốc14/11/2026 · R01 offline-first đã phát hành; PR31/main8320385 chứa sửa Auth và cấu hình Studio/Graphify từPR30. FullCI50success, NetlifyPublished đúngSHA và smoke guest/offline public qua. [Phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](../qa/SNAKE-AUTH-XTAB-2026-11-13.md). FullCI51 sau merge cũng success. R0a/R0b local12/11 là bằng chứng trước đó; không làm lại journey/cloud/session đã có.
+Mốc 26/11/2026 · Bản sửa kỹ thuật R01 đã merge qua PR #34 tại `533c0e7`. R01 offline-first phát hành ngày 13/11; PR31/main8320385 chứa sửa Auth và cấu hình Studio/Graphify từPR30. FullCI50success, NetlifyPublished đúngSHA và smoke guest/offline public qua. [Phát hành](../qa/SNAKE-PUBLIC-2026-11-13.md), [Auth](../qa/SNAKE-AUTH-XTAB-2026-11-13.md). FullCI51 sau merge cũng success. R0a/R0b local12/11 là bằng chứng trước đó; không làm lại journey/cloud/session đã có.
 
 ## SN-PLAN · DONE tài liệu · 07/11/2026
 
@@ -10,13 +10,31 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 |---|---|---|
 | SN-R0a | DONE baseline local12/11 | 7suite +5nhóm browser guest/route/SW, profile và art master; backend flags/live chưa kiểm lại, để R0b |
 | SN-R0b | LOCAL UI đã kiểm; LIVE WAITING fixture/grant | 6ca UI gồm win/save/new-device/offline/lost-ack/isolation/concurrency/fixture expiry; còn backend thật và JWT issuer expiry |
-| SN-R1a | LOCAL fixes12–14/11; WAITING thiết bị thật | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
+| SN-R1a | 26/11 kiểm cảm ứng trên nhánh tiếp tục; WAITING thiết bị thật | Android/iOS/Safari, input/safe area/background, FPS/memory/audio cleanup |
 | SN-R1b | UI10/10/29sao14/11; M2/art/audio thật WAITING | Duyệt art, animation, audio và lượt người mới trên thiết bị thật |
 | SN-R2a | LOCAL ứng viên catalog và gói offline đã kiểm | Nghiệm thu thật và quyết định đưa lên sảnh public |
 | SN-R2b | PUBLISHED client13/11; nghiệm thu thật WAITING | CI50→merge/Netlify Published đúngSHA,36resource byte-match và guest/offline smoke public |
 | SN-AUTH-XTAB | MERGED/PUBLISHED13/11 sau CI50 | 6RPC đúng token/owner, unit7/7/UI11/11; registered public/live JWT còn QA riêng |
 | SN-UI-BADGE | PR33/CI55 qua; WAITING merge/deploy | [QA ứng viên](../qa/SNAKE-BADGE-2026-11-13.md): chừa vùng badge, hosting5/5/modal36/catalog qua; production chưa đổi |
-| SN-R01-FINISH | LOCAL sửa14/11; CI/review/merge còn riêng | [QA](../qa/SNAKE-FINISH-2026-11-14.md): accountsave xuyên Story/Journey/Lab, keyboard/focus, markerboss; UI10màn/restore/cleanup qua |
+| SN-R01-FINISH | MERGED PR #34 ngày 14/11 | [QA](../qa/SNAKE-FINISH-2026-11-14.md): accountsave xuyên Story/Journey/Lab, keyboard/focus, markerboss; UI10màn/restore/cleanup qua |
+
+## SN-R01-CONTENT · Ứng viên 26/11
+
+`codex/snake-touch-resume` đưa phần trình diễn R01 từ `b9f7134` lên nền `main@5cd1539`: sổ tay và lời kết từng màn, kết chương và chơi lại để đủ sao, chuyển động Tiểu Xà và Nhện Mẹ. Điều khiển cảm ứng chỉ giữ ngón đã nhận, bỏ qua chạm khi dừng và giới hạn núm joystick trong vòng. [Nội dung](../snake/R01-CONTENT.md), [QA trước tích hợp](../qa/SNAKE-R01-CONTENT-2026-11-14.md).
+
+## SN-MEADOW · Đồng Cỏ
+
+Nhánh `codex/snake-meadow-expansion` tiếp trên PR #48. Ba đường thử có mặt bằng và mục tiêu riêng, vào từ Hành trình ở bản sảnh/offline. Học cua qua hàng rào, căn hai cầu rồi phối hợp cầu và bụi gai. Thêm hiệu ứng Canvas theo trạng thái và sắc độ địa hình riêng để nhận ra từng đường. Dùng chung điều khiển, kỷ lục lưu tách theo thiết bị/tài khoản. Bản đồ ký, checkpoint và sao R01 giữ định dạng hiện tại.
+
+Bản tiếp theo thêm chế độ Xem đường khi chuẩn bị/tạm dừng và hiển thị kỷ lục, mốc Dash ở bảng chơi. [QA Xem đường](../qa/SNAKE-SCOUTING-2026-11-26.md).
+
+## SN-TRIAL-STAGE-2 · Ba đường tiếp theo
+
+Bờ Hồ Cong, Vườn Tuần Tra và Hẻm Đá Ba Cầu mở ngay trong Đường thử. Thêm hình học, nhịp chơi và mốc Dash dựa trên Engine. Kỷ lục ba đường đầu giữ nguyên. [Thiết kế và QA](../qa/SNAKE-STAGE-TWO-2026-11-26.md).
+
+## SN-FULL-CAMPAIGN · Toàn bộ hành trình
+
+`codex/snake-full-campaign` tiếp trên PR #51. Chương 02 Suối Hổ Phách và Chương 03 Đền Bình Minh có 10 màn mới, đưa tổng số lên 20 màn chính và sáu Đường thử. Chốt cửa, cầu lệch cao độ, bẫy nhện, ngọc và trận kết chương có đường thắng đã kiểm bằng Engine. Tiến trình và mốc hai chương mới lưu theo hồ sơ trên thiết bị. [Thiết kế toàn game](../snake/CAMPAIGN-LEVEL-DESIGN.md), [QA](../qa/SNAKE-FULL-CAMPAIGN-2026-11-26.md).
 
 ## Bằng chứng đã có và giới hạn
 
@@ -30,4 +48,4 @@ Kiểm local07/11: build preview +7suite Snake local qua, chunk game1,92MB raw/~
 
 **Kiểm:** `test:snake-cloud`, `test:snake-session`, `test:snake-journey`, `test:snake-boss`, `test:snake-props`, `test:snake-audio`, `test:snake-preview`, `build:snake-preview`; lint/build/bundle theo phần thay đổi, full CI trước merge. `test:snake-live -- --live` tương tác đúng runbook, fixture được cấp và dọn, không bật shared rewards để qua test.
 
-**Tiếp theo:** fullCI/review nhánh codex/snake-r01-finish (gồm PR33) trước quyết định merge; preview bị edge-access chặn guest, không tự đổi bảo vệ; nghiệm thu [R01/M2/thiết bị](../snake/R01-ACCEPTANCE.md) và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Public R01 vẫn lưu theo thiết bị/owner, không tự bật cloud/rewards từ quyết định phát hành client.
+**Tiếp theo:** duyệt bản R01 cập nhật sau CI. Nghiệm thu [R01/M2/thiết bị](../snake/R01-ACCEPTANCE.md) và SN-R0b live theo [runbook](../snake/UI-SAVE-RUNBOOK.md). Việc phát hành client giữ theo quyết định chủ dự án; chưa có nghiệm thu production cho thay đổi ngày 26/11.

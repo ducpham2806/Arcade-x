@@ -25,17 +25,19 @@ export function steer(engine: Engine, target: V, dash = false): Input {
   return { x: dx / length, y: dy / length, dash };
 }
 
-export function bossSteering(engine: Engine) {
+export function bossSteering(engine: Engine, minimumInputTicks = 1, offset: V = { x: 0, y: 0 }) {
   const encounter = engine.encounters!;
   const weak = encounter.boss!.weak;
-  const exitRoute = [{ x: 36, y: 35 }, { x: 40, y: 30 }, { x: 39, y: 13 },
-    { x: 29, y: 9 }, engine.arena.story!.exit];
+  const translate = (point: V) => ({x: point.x + offset.x, y: point.y + offset.y});
+  const routes = bossRoutes.map(route => route.map(translate));
+  const exitRoute = [{ x: 36, y: 35 }, { x: 40, y: 30 }, { x: 39, y: 13 }, { x: 29, y: 9 }].map(translate);
+  exitRoute.push(engine.arena.story!.exit);
   let phase = 1;
   let waypoint = 0;
   let exitWaypoint = 0;
   let priorHits = encounter.totalHits;
 
-  return () => {
+  const next = () => {
     if (encounter.state === 'defeated') {
       if (distance(engine.pos, exitRoute[exitWaypoint]) < .75 && exitWaypoint < exitRoute.length - 1) exitWaypoint++;
       return steer(engine, exitRoute[exitWaypoint]);
@@ -45,18 +47,24 @@ export function bossSteering(engine: Engine) {
       waypoint = 0;
     }
     // A successful Dash interrupts the anchor route. Begin a fresh lap after
-    // each phase-three hit instead of resuming a stale mid-route waypoint;
+    // phase-three hits instead of resuming a stale mid-route waypoint;
     // native browser input is sampled less often than the fixed-step engine.
     if (encounter.totalHits !== priorHits) {
       priorHits = encounter.totalHits;
       if (phase === 3) waypoint = 0;
+      if (phase === 2) waypoint = 6; // Retreat to the south clearing before baiting the next spiders.
     }
-    const route = bossRoutes[phase - 1];
+    const route = routes[phase - 1];
     if (distance(engine.pos, route[waypoint]) < .65) waypoint = (waypoint + 1) % route.length;
-    if (encounter.weakOpen && engine.pos.y >= 31 && distance(engine.pos, weak) < 10 && engine.energy > 22) {
+    if (encounter.weakOpen && engine.pos.y >= 31 + offset.y && distance(engine.pos, weak) < 10 && engine.energy > 22) {
       return steer(engine, weak, true);
     }
     return steer(engine, route[waypoint]);
+  };
+  let lastTick = -Infinity, lastInput: Input = { x: 1, y: 0, dash: false };
+  return () => {
+    if (engine.tick - lastTick >= minimumInputTicks) { lastTick = engine.tick; lastInput = next(); }
+    return lastInput;
   };
 }
 

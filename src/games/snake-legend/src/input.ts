@@ -1,24 +1,117 @@
 import type {Input} from './core';
-/** Independent pointers: joystick never captures Dash's pointer. */
+
+const PLAY_KEYS = new Set(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD','Space']);
+
+/** Independent pointers keep steering and Dash usable at the same time. */
 export class Controls {
- keys=new Set<string>();stick={x:0,y:0};dashPointer:number|null=null;stickPointer:number|null=null;sensitivity=1;
- private abort=new AbortController();private stickEl:HTMLElement;private dashEl:HTMLElement;private knob:HTMLElement;
- constructor(stick:HTMLElement,dash:HTMLElement,knob:HTMLElement,onPause:()=>void,onToggle:()=>void,active:()=>boolean=()=>true){this.stickEl=stick;this.dashEl=dash;this.knob=knob;const signal=this.abort.signal;
-  const update=(e:PointerEvent)=>{const r=stick.getBoundingClientRect(),x=(e.clientX-r.left-r.width/2)/(r.width*.38),y=(e.clientY-r.top-r.height/2)/(r.height*.38),m=Math.hypot(x,y),f=Math.min(m,1)/(m||1);this.stick={x:x*f*this.sensitivity,y:y*f*this.sensitivity};knob.style.transform=`translate(${x*f*30}px,${y*f*30}px)`;};
-  stick.addEventListener('pointerdown',e=>{if(this.stickPointer!==null)return;e.preventDefault();this.stickPointer=e.pointerId;stick.setPointerCapture(e.pointerId);update(e);},{signal});
-  stick.addEventListener('pointermove',e=>{if(e.pointerId===this.stickPointer)update(e);},{signal});
-  stick.addEventListener('pointerup',e=>{if(e.pointerId===this.stickPointer){this.stickPointer=null;this.stick={x:0,y:0};knob.style.transform='';}},{signal});
-  dash.addEventListener('pointerdown',e=>{if(this.dashPointer!==null)return;e.preventDefault();this.dashPointer=e.pointerId;dash.setPointerCapture(e.pointerId);dash.classList.add('held');},{signal});
-  dash.addEventListener('pointerup',e=>{if(e.pointerId===this.dashPointer){this.dashPointer=null;dash.classList.remove('held');}},{signal});
-  for(const el of [stick,dash]){el.addEventListener('pointercancel',()=>{this.clear();onPause();},{signal});el.addEventListener('lostpointercapture',e=>{if(e.pointerId===this.stickPointer||e.pointerId===this.dashPointer){this.clear();onPause();}},{signal});}
-  window.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||e.target instanceof HTMLSelectElement||e.target instanceof HTMLTextAreaElement)return;if(e.code!=='Escape'&&(!active()||e.target instanceof Element&&e.target.closest('button,a,[role="dialog"]')))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD','Space','Escape'].includes(e.code)){e.preventDefault();if(e.code==='Escape'){if(!e.repeat)onToggle();return;}this.keys.add(e.code);}},{signal});
+ sensitivity=1;
+ private keys=new Set<string>();
+ private stick={x:0,y:0};
+ private stickPointer:number|null=null;
+ private dashPointer:number|null=null;
+ private abort=new AbortController();
+
+ constructor(
+  private stickEl:HTMLElement,
+  private dashEl:HTMLElement,
+  private knob:HTMLElement,
+  onPause:()=>void,
+  onToggle:()=>void,
+  active:()=>boolean,
+ ){
+  const {signal}=this.abort;
+  const pause=()=>{this.clear();onPause();};
+
+  stickEl.addEventListener('pointerdown',e=>{
+   if(!active()||e.button!==0||this.stickPointer!==null)return;
+   e.preventDefault();
+   stickEl.setPointerCapture(e.pointerId);
+   this.stickPointer=e.pointerId;
+   this.updateStick(e);
+  },{signal});
+  stickEl.addEventListener('pointermove',e=>{
+   if(e.pointerId===this.stickPointer)this.updateStick(e);
+  },{signal});
+  stickEl.addEventListener('pointerup',e=>{
+   if(e.pointerId===this.stickPointer)this.resetStick();
+  },{signal});
+
+  dashEl.addEventListener('pointerdown',e=>{
+   if(!active()||e.button!==0||this.dashPointer!==null)return;
+   e.preventDefault();
+   dashEl.setPointerCapture(e.pointerId);
+   this.dashPointer=e.pointerId;
+   dashEl.classList.add('held');
+  },{signal});
+  dashEl.addEventListener('pointerup',e=>{
+   if(e.pointerId===this.dashPointer)this.resetDash();
+  },{signal});
+
+  const pauseOnLostStick=(e:PointerEvent)=>{if(e.pointerId===this.stickPointer)pause();};
+  const pauseOnLostDash=(e:PointerEvent)=>{if(e.pointerId===this.dashPointer)pause();};
+  for(const type of ['pointercancel','lostpointercapture'] as const){
+   stickEl.addEventListener(type,pauseOnLostStick,{signal});
+   dashEl.addEventListener(type,pauseOnLostDash,{signal});
+  }
+
+  window.addEventListener('keydown',e=>{
+   if(e.target instanceof HTMLInputElement||e.target instanceof HTMLSelectElement||e.target instanceof HTMLTextAreaElement)return;
+   if(e.code==='Escape'){
+    e.preventDefault();
+    if(!e.repeat)onToggle();
+    return;
+   }
+   if(!PLAY_KEYS.has(e.code)||!active()||e.target instanceof Element&&e.target.closest('button,a,[role="dialog"]'))return;
+   e.preventDefault();
+   this.keys.add(e.code);
+  },{signal});
   window.addEventListener('keyup',e=>this.keys.delete(e.code),{signal});
-  window.addEventListener('blur',()=>{this.clear();onPause();},{signal});
-  window.addEventListener('pagehide',()=>{this.clear();onPause();},{signal});
-  window.addEventListener('orientationchange',()=>{this.clear();onPause();},{signal});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){this.clear();onPause();}},{signal});
+  window.addEventListener('blur',pause,{signal});
+  window.addEventListener('pagehide',pause,{signal});
+  window.addEventListener('orientationchange',pause,{signal});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();},{signal});
  }
- read():Input{const k=this.keys,x=Number(k.has('KeyD')||k.has('ArrowRight'))-Number(k.has('KeyA')||k.has('ArrowLeft')),y=Number(k.has('KeyS')||k.has('ArrowDown'))-Number(k.has('KeyW')||k.has('ArrowUp'));return {x:x||y?x:this.stick.x,y:x||y?y:this.stick.y,steering:x||y?1:this.sensitivity,dash:k.has('Space')||this.dashPointer!==null};}
- clear(){const s=this.stickPointer,d=this.dashPointer;this.stickPointer=this.dashPointer=null;this.keys.clear();this.stick={x:0,y:0};this.knob.style.transform='';this.dashEl.classList.remove('held');for(const [el,id] of [[this.stickEl,s],[this.dashEl,d]] as const)if(id!==null&&el.hasPointerCapture(id))el.releasePointerCapture(id);}
+
+ private updateStick(e:PointerEvent){
+  const {stickEl,knob}=this;
+  const rect=stickEl.getBoundingClientRect();
+  const x=(e.clientX-rect.left-rect.width/2)/(rect.width*.38);
+  const y=(e.clientY-rect.top-rect.height/2)/(rect.height*.38);
+  const scale=1/Math.max(1,Math.hypot(x,y));
+  this.stick={x:x*scale*this.sensitivity,y:y*scale*this.sensitivity};
+  const travelX=(stickEl.clientWidth-knob.offsetWidth)/2;
+  const travelY=(stickEl.clientHeight-knob.offsetHeight)/2;
+  knob.style.transform=`translate(${x*scale*travelX}px,${y*scale*travelY}px)`;
+ }
+
+ private resetStick(){
+  this.stickPointer=null;
+  this.stick={x:0,y:0};
+  this.knob.style.transform='';
+ }
+
+ private resetDash(){
+  this.dashPointer=null;
+  this.dashEl.classList.remove('held');
+ }
+
+ read():Input{
+  const k=this.keys;
+  const x=Number(k.has('KeyD')||k.has('ArrowRight'))-Number(k.has('KeyA')||k.has('ArrowLeft'));
+  const y=Number(k.has('KeyS')||k.has('ArrowDown'))-Number(k.has('KeyW')||k.has('ArrowUp'));
+  const keyboard=x!==0||y!==0;
+  return {x:keyboard?x:this.stick.x,y:keyboard?y:this.stick.y,steering:keyboard?1:this.sensitivity,dash:k.has('Space')||this.dashPointer!==null};
+ }
+
+ clear(){
+  const stickPointer=this.stickPointer,dashPointer=this.dashPointer;
+  this.keys.clear();
+  this.resetStick();
+  this.resetDash();
+  for(const [el,id] of [[this.stickEl,stickPointer],[this.dashEl,dashPointer]] as const){
+   if(id!==null&&el.hasPointerCapture(id))el.releasePointerCapture(id);
+  }
+ }
+
  destroy(){this.clear();this.abort.abort();}
 }

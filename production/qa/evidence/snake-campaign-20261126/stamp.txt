@@ -1,0 +1,9 @@
+d58a3479e9618fabb52edcc7230ae4135ca4a2e680481bb5afbc8c31ff637919  src/games/snake-legend/src/campaign.ts
+747630be96752e99803ca1f7153382fbd4197c1fcb9bfc7a8d43f886ffc52950  src/games/snake-legend/src/campaign-levels.ts
+2c315349633961522510c2e5d6eed6cf202c616e86b2678ccb81e94655c9c6a7  src/games/snake-legend/src/app.ts
+aefff12224c9c9bb4a140ac5945df39413fcfa27579bc75810ebf420aed82264  src/games/snake-legend/src/journey.ts
+db97b5be3f5ce827ba03d0abbf40cf63e9ac809892f868ed64c7fa8d97473283  src/games/snake-legend/src/story-app.ts
+c92e2abf8bb28cacf5a9ab94daa3e21acb9ff8103f37f05e01638987050289c9  src/games/snake-legend/src/render.ts
+552d94813d3852cf19572b95e11880603ea3b28752411bb4cd9d6177b485182f  src/games/snake-legend/src/meadow-scenery.ts
+e3f8033bc3d5c90127ef75014e0f8811cbdf69c209864db39d393a7ef916acaa  src/games/snake-legend/src/styles.css
+b29e11f65032618c7b2f32e5337a46e0b1bd0098dc54fef988535388ceecfa6b  tests/snake/campaign-chapters.browser.ts

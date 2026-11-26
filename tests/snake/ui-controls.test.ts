@@ -33,6 +33,35 @@ test('repeated play/settings/exit releases Snake listeners, render loops, observ
 
 test.describe('touch viewport',()=>{
  test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+ for(const mode of ['story','lab'] as const)test(`${mode} dock ignores pointer input before starting and while paused`,async({page,context})=>{
+  const fixture=await snakeUiFixture();await fixture.install(context);await loginSnake(page,fixture.user(`idle-${mode}`));await observeEngine(page);
+  if(mode==='story')await openFirstLevel(page);
+  else{await page.getByRole('button',{name:'Chơi bản preview'}).click();await page.locator('[data-action="lab"]').click();}
+  const stick=page.locator('.joystick'),knob=stick.locator('.knob'),dash=page.locator('.dash');
+  const startButton=page.locator(mode==='story'?'.story-app [data-action="primary"]':'[data-action="resume"]');
+  const a=(await stick.boundingBox())!,b=(await dash.boundingBox())!;
+  const touches=[{id:1,x:a.x+a.width*.85,y:a.y+a.height/2},{id:2,x:b.x+b.width/2,y:b.y+b.height/2}];
+  const session=await context.newCDPSession(page);
+  async function ignoredTouches(){
+   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:touches});
+   await expect(dash).not.toHaveClass(/held/);
+   await expect(knob).toHaveCSS('transform','none');
+   await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  }
+  try{
+   await ignoredTouches();
+   await startButton.click();
+   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:touches});
+   await expect.poll(async()=>(await probe(page))?.input.dash).toBe(true);
+   await page.keyboard.press('Escape');
+   await expect(startButton).toBeVisible();
+   await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+   await ignoredTouches();
+   await startButton.click();
+   await expect.poll(async()=>(await probe(page))?.input).toMatchObject({x:0,y:0,dash:false});
+  }finally{await session.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]}).catch(()=>{});await session.detach();}
+ });
+
  test('portrait and landscape retain reachable controls and no horizontal overflow',async({page,context},info)=>{
   const fixture=await snakeUiFixture();await fixture.install(context);await loginSnake(page,fixture.user('layout'));await openFirstLevel(page);
   for(const size of [{width:390,height:844},{width:844,height:390},{width:320,height:568},{width:667,height:375},{width:568,height:320}]){
@@ -65,6 +94,16 @@ test.describe('touch viewport',()=>{
    await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[b]});await expect.poll(async()=>(await probe(page)).input.dash).toBe(false);expect((await probe(page)).input.x).toBeGreaterThan(.5);
    await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await expect.poll(async()=>(await probe(page)).input).toMatchObject({x:0,y:0,dash:false});await expect(page.locator('.story-app .overlay')).toBeHidden();
    await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[a,b]});await expect(page.locator('.dash')).toHaveClass(/held/);
+   const stickTarget=page.locator('.joystick');
+   // An ignored extra contact can still dispatch pointercancel on the surface.
+   await stickTarget.dispatchEvent('pointercancel',{pointerId:9999,pointerType:'touch',bubbles:true});
+   await expect(page.locator('.story-app .overlay')).toBeHidden();
+   await expect(page.locator('.dash')).toHaveClass(/held/);
+   await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{...a,x:stick.x+stick.width+12},b]});
+   const knob=(await stickTarget.locator('.knob').boundingBox())!;
+   expect(knob.x+knob.width).toBeLessThanOrEqual(stick.x+stick.width);
+   await expect.poll(async()=>(await probe(page)).input.x).toBeCloseTo(1);
+   await page.screenshot({path:info.outputPath('touch-full-travel.png')});
    await session.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});await expect(page.locator('.story-app .overlay')).toBeVisible();await expect(page.locator('.dash')).not.toHaveClass(/held/);
    const tick=(await probe(page)).tick;await page.waitForTimeout(250);expect((await probe(page)).tick).toBe(tick);await page.screenshot({path:info.outputPath('touch-cancel-paused.png')});
    await start(page);await expect.poll(async()=>(await probe(page)).input).toMatchObject({x:0,y:0,dash:false});
