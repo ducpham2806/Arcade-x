@@ -1,9 +1,8 @@
-import { expect, test, type BrowserContext, type Page } from '@playwright/test';
-import { TRIALS } from '../../src/games/snake-legend/src/trials';
+import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
+import { TRIALS, TRIAL_SAVE_KEY, type TrialCourse } from '../../src/games/snake-legend/src/trials';
 import { mockSupabase } from '../auth/backend';
 import { observeEngine } from './ui-driver';
 
-const trialKey = 'snake-legend:meadow-trials:v1';
 const campaignKey = 'snake-legend:r01-blockout:v1';
 const checkpointKey = 'snake-legend:r01-checkpoint:v1';
 const readSave = (page: Page, key: string) => page.evaluate(key => localStorage.getItem(key), key);
@@ -17,29 +16,22 @@ async function openTrials(page: Page, context: BrowserContext) {
   await expect(page.locator('.snake-trials')).toBeVisible();
 }
 
-test('public guest completes a real course, saves the time and returns to the same R01 journey', async ({ page, context }, info) => {
-  test.setTimeout(120_000);
-  const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
-  await openTrials(page, context);
-  await observeEngine(page);
-  const before = await Promise.all([campaignKey, checkpointKey].map(key => readSave(page, key)));
-  const course = page.locator('.snake-trials');
-  await expect(course.locator('.arenas button')).toHaveCount(3);
-  await expect(course.locator('h1')).toHaveText(TRIALS[0].arena.name);
-  await page.screenshot({ path: info.outputPath('trial-select-desktop.png') });
+async function finishTrial(page: Page, course: Locator, trial: TrialCourse) {
+  const probe = () => page.evaluate(() => (window as typeof window & {
+    __snakeUiProbe?: { engineId: number; status: string; pos: { x: number; y: number } };
+  }).__snakeUiProbe);
+  const previousEngine = (await probe())?.engineId ?? 0;
+  await expect(course.locator('h1')).toHaveText(trial.arena.name);
+  await expect(course.locator('[data-action="pause"]')).toHaveText('Bắt đầu');
   await course.locator('[data-action="resume"]').click();
   const stick = (await course.locator('.joystick').boundingBox())!;
   const center = { x: stick.x + stick.width / 2, y: stick.y + stick.height / 2 };
   await page.mouse.move(center.x, center.y);
   await page.mouse.down();
-  const probe = () => page.evaluate(() => (window as typeof window & {
-    __snakeUiProbe?: { status: string; pos: { x: number; y: number }; tick: number };
-  }).__snakeUiProbe);
   let waypoint = 0;
-  const guide = TRIALS[0].guide;
+  const { guide } = trial;
   try {
-    await expect.poll(async () => (await probe())?.tick ?? 0).toBeGreaterThan(0);
+    await expect.poll(async () => (await probe())?.engineId ?? 0).toBeGreaterThan(previousEngine);
     const deadline = Date.now() + 65_000;
     while (Date.now() < deadline) {
       const state = (await probe())!;
@@ -52,14 +44,32 @@ test('public guest completes a real course, saves the time and returns to the sa
       await page.waitForTimeout(30);
     }
   } finally { await page.mouse.up(); }
-  expect((await probe())?.status).toBe('won');
+  expect((await probe())?.status, trial.arena.name).toBe('won');
   await expect(course.locator('h1')).toHaveText('Hoàn thành!');
+  await expect(course.locator('[data-action="pause"]')).toHaveText('Chơi lại');
   await expect(course.locator('.trial-result')).toContainText('Kỷ lục');
-  const record = await readSave(page, trialKey);
-  expect(record).not.toBeNull();
-  await page.screenshot({ path: info.outputPath('trial-finish-desktop.png') });
-  await course.locator('[data-action="next-trial"]').click();
-  await expect(course.locator('h1')).toHaveText(TRIALS[1].arena.name);
+}
+
+test('public guest completes all three courses and reloads their records without changing R01', async ({ page, context }, info) => {
+  test.setTimeout(120_000);
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await openTrials(page, context);
+  await observeEngine(page);
+  const before = await Promise.all([campaignKey, checkpointKey].map(key => readSave(page, key)));
+  const course = page.locator('.snake-trials');
+  await expect(course.locator('.arenas button')).toHaveCount(TRIALS.length);
+  await page.screenshot({ path: info.outputPath('trial-select-desktop.png') });
+  const next = course.locator('[data-action="next-trial"]');
+  for (const [index, trial] of TRIALS.entries()) {
+    await finishTrial(page, course, trial);
+    await page.screenshot({ path: info.outputPath(`trial-finish-${index + 1}-desktop.png`) });
+    if (index < TRIALS.length - 1) await next.click();
+  }
+  await expect(next).toBeHidden();
+  const best: number[] = JSON.parse((await readSave(page, TRIAL_SAVE_KEY)) ?? '{}').best;
+  expect(best).toHaveLength(TRIALS.length);
+  for (const seconds of best) expect(seconds).toBeGreaterThan(0);
   await course.locator('[data-action="trial-return"]').click();
   await expect(page.locator('.journey-clears')).toHaveText('0/10 màn');
   expect(await Promise.all([campaignKey, checkpointKey].map(key => readSave(page, key)))).toEqual(before);
@@ -67,8 +77,10 @@ test('public guest completes a real course, saves the time and returns to the sa
   await page.locator('#btn-play-snake-legend').click();
   await page.locator('[data-action="trials"]').click();
   await expect(course).toBeVisible();
-  await course.locator('[data-arena="0"]').click();
-  await expect(course.locator('.best')).not.toHaveText('—');
+  for (const [index, seconds] of best.entries()) {
+    await course.locator(`[data-arena="${index}"]`).click();
+    await expect(course.locator('.best')).toHaveText(`${seconds.toFixed(1)}s`);
+  }
   expect(errors).toEqual([]);
 });
 
@@ -94,6 +106,14 @@ test.describe('touch courses', () => {
       await page.screenshot({ path: info.outputPath(`trial-${viewport.width}x${viewport.height}.png`) });
       await course.locator('[data-action="pause"]').tap();
       await expect(course.locator('.overlay')).toBeVisible();
+      await expect(course.locator('[data-action="pause"]')).toHaveText('Tiếp tục');
+      if (index === 0) {
+        const hostPause = page.locator('#btn-game-pause');
+        await hostPause.tap();
+        await expect(course.locator('[data-action="pause"]')).toBeDisabled();
+        await hostPause.tap();
+        await expect(course.locator('[data-action="pause"]')).toBeEnabled();
+      }
       await course.locator('[data-action="settings"]').tap();
       const settings = course.locator('.settings-card');
       await expect(settings).toBeVisible();

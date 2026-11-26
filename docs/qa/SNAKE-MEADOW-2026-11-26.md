@@ -27,6 +27,16 @@ Graphify AST `src/games/snake-legend` có 482 nút, 1.263 cạnh. Dùng `mountJo
 - Build production, bundle, rollback, catalog và preview đều qua. Catalog có 21 tệp media, JS tải đầu 307.802 byte gzip, chunk lớn nhất 484.949 byte. WebP mới khớp byte giữa đầu ra preview và nguồn nhúng.
 - `export:snake-journey` sinh HTML 2.292.623 byte. Chromium tải đúng HTML qua loopback rồi ngắt mạng trong lúc mở Suối Hai Nhịp, chơi, dừng và về R01. Không có yêu cầu bên ngoài hoặc lỗi trang.
 
+## Hồi quy preview · CI #95
+
+`verify` dừng ở `test:snake-preview-runtime` tại `772f7b4`, sau khi `snake_ui` đã qua. Tái hiện tại máy làm việc với đúng bundle đã build. Ca preview vẫn đòi bốn atlas ở Story trong khi bản Đồng Cỏ có thêm WebP `meadow_fx`. `tests/snake/preview-media.cjs` kiểm đúng năm atlas đã đóng gói và đợi thao tác Dash vẽ atlas mới trên Canvas. Giữ nguyên kiểm không tải gameplay art ở trang khách, Auth và Hành trình. Runtime chạy lại đã qua bốn khổ màn, service worker, chat, fallback ảnh, một lần tải lại WAV và hủy 14 WAV khi thoát. [CI #95](https://github.com/ducpham2806/Arcade-x/actions/runs/45741948096).
+
+`src/games/snake-legend/src/lab-app.ts` đồng bộ nhãn Bắt đầu, Tiếp tục, Chơi lại hoặc Thử lại của nút trên thanh với nút trong bảng. Khi sảnh tạm dừng, cả hai nút đều phản ánh trạng thái khóa.
+
+Studio QA & Playtest, vai trò QA Lead. Graphify AST Snake vẫn 482 nút/1.263 cạnh sau khi cập nhật. Truy vấn `meadowFxAssets` xác nhận nguồn atlas đi vào renderer và lớp hiệu ứng. Truy vấn `finish` xác nhận luồng kết thúc ván gọi lại bảng trạng thái. Đường phân phối và bài kiểm thử build được xác minh ngoài graph.
+
+Lượt Chromium trên bản sảnh chạy cả Vườn Quanh Co, Suối Hai Nhịp và Vòng Gai Cổ Thụ liên tiếp bằng thao tác joystick. Tải lại xác nhận đúng cả ba kỷ lục và không đổi byte của save hay checkpoint R01. Ca cảm ứng kiểm cả ba khổ màn cùng trạng thái tạm dừng từ sảnh. Hai ca `trials.browser.ts` qua. Lint, build chính, build/gói preview, runtime preview và xuất HTML mới đều qua. Bằng chứng ở `test-results/snake-player/` và `test-results/snake-baseline/`.
+
 ## Giới hạn nghiệm thu
 
 Kiểm Chromium desktop, khổ điện thoại và màn ngang. Điện thoại thật, lượt chơi người mới và production còn chờ.

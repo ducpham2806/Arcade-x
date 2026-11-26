@@ -137,7 +137,9 @@ export function mountGame(root: HTMLElement, storage?: StorageLike, mode: 'lab' 
     const resumeButton = $<HTMLButtonElement>('[data-action="resume"]');
     resumeButton.textContent = terminal ? won && trials ? 'Chơi lại' : 'Thử lại' : started ? 'Tiếp tục' : 'Bắt đầu';
     resumeButton.disabled = hostPaused;
-    $('[data-action="pause"]').textContent = paused ? 'Tiếp tục' : 'Tạm dừng';
+    const quickAction = $<HTMLButtonElement>('[data-action="pause"]');
+    quickAction.textContent = !paused ? 'Tạm dừng' : trials ? resumeButton.textContent : 'Tiếp tục';
+    quickAction.disabled = trials && hostPaused;
     if (course) {
       $('.instructions').hidden = terminal || started;
       $('.trial-result').hidden = terminal && !won;
