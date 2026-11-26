@@ -4,7 +4,7 @@ Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLO
 
 ## 26/11/2026 · Snake Legend · Xem đường
 
-- Nhánh `codex/snake-trial-scouting` dựa trên PR #49 tại `6d9a729`. Thêm bản đồ xem trước và kỷ lục vào luồng chuẩn bị Đường thử. [Log Blossom](./archive/WORKLOG-2026-11-26-before-snake-scouting.md).
+- Nhánh `codex/snake-trial-scouting` dựa trên PR #49 tại `6d9a729`. Xem đường đánh số quả trên Canvas lúc chuẩn bị/tạm dừng. Bảng chơi có kỷ lục, mốc Dash và khoảng thời gian cần cải thiện. Chromium 15/15, kiểm lại tương phản, build và preview qua. [QA](qa/SNAKE-SCOUTING-2026-11-26.md). [Log Blossom](./archive/WORKLOG-2026-11-26-before-snake-scouting.md).
 
 ## 26/11/2026 · Snake Legend · Đồng Cỏ
 

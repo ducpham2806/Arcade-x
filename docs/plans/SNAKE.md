@@ -26,6 +26,8 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 
 Nhánh `codex/snake-meadow-expansion` tiếp trên PR #48. Ba đường thử có mặt bằng và mục tiêu riêng, vào từ Hành trình ở bản sảnh/offline. Học cua qua hàng rào, căn hai cầu rồi phối hợp cầu và bụi gai. Thêm hiệu ứng Canvas theo trạng thái và sắc độ địa hình riêng để nhận ra từng đường. Dùng chung điều khiển, kỷ lục lưu tách theo thiết bị/tài khoản. Bản đồ ký, checkpoint và sao R01 giữ định dạng hiện tại.
 
+Bản tiếp theo thêm chế độ Xem đường khi chuẩn bị/tạm dừng và hiển thị kỷ lục, mốc Dash ở bảng chơi. [QA Xem đường](../qa/SNAKE-SCOUTING-2026-11-26.md).
+
 ## Bằng chứng đã có và giới hạn
 
 [Live-save QA](../SNAKE_LIVE_SAVE_QA.md) đã kiểm Auth/engine/replay/service thật: thắng/lưu, retry sau lost-ack không nhận lặp, restore mới, đọc offline/retry, refresh và signout. Wrapper React đã nối Auth owner/save session; timeout30giây có hủy. Gold/Gem riêng, adapter chưa phát thưởng launcher. Có sẵn icon/banner/master/manifest, chưa cần vẽ lại.

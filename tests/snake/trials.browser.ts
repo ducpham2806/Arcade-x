@@ -80,6 +80,7 @@ test('public guest completes all three courses and reloads their records without
   for (const [index, seconds] of best.entries()) {
     await course.locator(`[data-arena="${index}"]`).click();
     await expect(course.locator('.best')).toHaveText(`${seconds.toFixed(1)}s`);
+    await expect(course.locator('.trial-result')).toContainText(`Kỷ lục ${seconds.toFixed(1).replace('.', ',')} giây`);
   }
   expect(errors).toEqual([]);
 });
@@ -87,9 +88,14 @@ test('public guest completes all three courses and reloads their records without
 test.describe('touch courses', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
 
-  test('three courses and both controls fit in portrait and short landscape', async ({ page, context }, info) => {
+  test('map, touch controls and settings fit in portrait and short landscape', async ({ page, context }, info) => {
     await openTrials(page, context);
+    await observeEngine(page);
     const course = page.locator('.snake-trials');
+    const scout = course.locator('[data-action="scout"]');
+    const closeScout = course.locator('[data-action="close-scout"]');
+    const startScout = course.locator('[data-action="start-scout"]');
+    const tick = () => page.evaluate(() => (window as unknown as {__snakeUiProbe?: {tick: number}}).__snakeUiProbe?.tick ?? 0);
     const viewports = [
       { width: 320, height: 568 }, { width: 390, height: 844 }, { width: 568, height: 320 },
     ];
@@ -97,8 +103,29 @@ test.describe('touch courses', () => {
       await page.setViewportSize(viewport);
       await course.locator(`[data-arena="${index}"]`).tap();
       await expect(course.locator('h1')).toHaveText(TRIALS[index].arena.name);
-      await course.locator('[data-action="resume"]').tap();
+      await expect(course.locator('.trial-result')).toContainText('Chưa có kỷ lục');
+      await scout.tap();
+      const canvas = course.locator('canvas');
+      await expect(course.locator('.trial-map-bar')).toBeVisible();
+      await expect(canvas).toHaveAttribute('aria-label', new RegExp(`Bản đồ ${TRIALS[index].arena.name}`));
+      await expect(canvas).toBeInViewport({ ratio: 1 });
+      await expect(closeScout).toBeFocused();
+      await expect(course.locator('.dock')).toBeHidden();
+      if (viewport.width < viewport.height) {
+        await expect(course.locator('.trial-map-notes strong')).toHaveCSS('color', 'rgb(255, 245, 216)');
+      }
+      await page.screenshot({ path: info.outputPath(`trial-map-${viewport.width}x${viewport.height}.png`) });
+      if (index === 0) {
+        await page.keyboard.press('Escape');
+        await expect(scout).toBeFocused();
+        expect(await tick()).toBe(0);
+        await scout.tap();
+      }
+      await expect(startScout).toHaveText('Bắt đầu');
+      await startScout.tap();
       await expect(course.locator('.overlay')).toBeHidden();
+      await expect(course.locator('.trial-map-bar')).toBeHidden();
+      await expect(canvas).toBeFocused();
       for (const selector of ['canvas', '.joystick', '.dash']) {
         await expect(course.locator(selector)).toBeInViewport({ ratio: 1 });
       }
@@ -108,8 +135,19 @@ test.describe('touch courses', () => {
       await expect(course.locator('.overlay')).toBeVisible();
       await expect(course.locator('[data-action="pause"]')).toHaveText('Tiếp tục');
       if (index === 0) {
+        await expect.poll(tick).toBeGreaterThan(0);
+        const pausedTick = await tick();
+        await scout.tap();
+        await expect(startScout).toHaveText('Tiếp tục');
+        await page.waitForTimeout(160);
+        expect(await tick()).toBe(pausedTick);
+        await closeScout.tap();
+        await expect(scout).toBeFocused();
+        await scout.tap();
         const hostPause = page.locator('#btn-game-pause');
         await hostPause.tap();
+        await expect(course.locator('.trial-map-bar')).toBeHidden();
+        expect(await tick()).toBe(pausedTick);
         await expect(course.locator('[data-action="pause"]')).toBeDisabled();
         await hostPause.tap();
         await expect(course.locator('[data-action="pause"]')).toBeEnabled();
