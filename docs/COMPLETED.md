@@ -27,6 +27,11 @@
 - Studio `fa7b1db`. PR 38 chat 27/27, preview Snake và native 3/3 cục bộ. PR38 đã vào main qua PR40. Staging hai tester do anh kiểm sau.
 - [Tóm tắt trước animation Ô Ăn Quan](archive/COMPLETED-2026-11-18-before-oaq-turn-art.md).
 
+## Snake R01 · 26/11/2026
+
+- `codex/snake-touch-resume` tích hợp nội dung và chuyển động R01, sửa giữ ngón cảm ứng và joystick. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
+- 14 ca UI, 6 ca bản sảnh và build cục bộ qua. Chờ CI, duyệt trên điện thoại và lượt người chơi mới.
+
 ## Snake R01 · kỹ thuật · 14/11/2026
 
 - PR #34 merge `533c0e7`. Lưu theo owner xuyên Story/Journey/Lab, bàn phím/focus và chỉ dấu boss. UI thắng 10/10 màn, 29 sao, boss 6 hit/3 pha, reload và cleanup qua. [QA kỹ thuật](qa/SNAKE-FINISH-2026-11-14.md).

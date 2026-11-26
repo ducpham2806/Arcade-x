@@ -1,7 +1,7 @@
-# Bàn giao · 26/11/2026 · Điều khiển cảm ứng Snake Legend
+# Bàn giao · 26/11/2026 · Snake Legend R01
 
-SN-R1a trên `codex/snake-touch-resume`, dựa trên `main@5cd1539`. Bản sửa kỹ thuật Snake R01 đã merge ở PR #34 (`533c0e7`). Rà sở hữu điểm chạm, trạng thái tạm dừng và khả năng thao tác trên khổ nhỏ trong Hành trình và Sân thử. [Thẻ Snake](plans/SNAKE.md).
+`codex/snake-touch-resume` từ `main@5cd1539`. Bản kỹ thuật PR #34 đã có trên main. Đưa nội dung R01 từ `b9f7134` lên nền mới: sổ tay 10 màn, đoạn kết, chơi lại để đủ sao, chuyển động Tiểu Xà và Nhện Mẹ. Sửa điều khiển cảm ứng lúc dừng và khi ngón phụ bị hủy. [Thẻ Snake](plans/SNAKE.md).
 
-Studio Input Systems và QA & Playtest, vai trò QA Lead. Bước đầu là tái hiện với Chromium loopback, Graphify AST scope `src/games/snake-legend`. Nghiệm thu thiết bị, lượt người mới và backend thật còn riêng.
+Chromium UI 14/14, bản sảnh 6/6, sáu nhóm Snake local, lint, storage, build/bundle/catalog/preview qua. HTML độc lập chạy và lưu checkpoint ở loopback khi ngắt mạng trong lúc chơi. Studio Input Systems và QA & Playtest, QA Lead. Graphify AST Snake 442 nút/1160 cạnh, truy vấn `Controls` và `chapterEnding`. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
 
-Blossom #46 và #47 đã merge qua CI #89 và #92. [Tóm tắt](COMPLETED.md#blossom-blast--26112026).
+Bước tiếp là duyệt PR sau CI. Chưa merge/phát hành ứng viên, chưa nghiệm thu điện thoại thật, người chơi mới hay backend thật.
