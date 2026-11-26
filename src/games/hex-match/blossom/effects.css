@@ -1,0 +1,92 @@
+/* Keep a readable outline on light and dark gardens. The highlights leave the new pieces visible. */
+.bb-sprite-fx { mix-blend-mode: normal; }
+.bb-impact-cell {
+  fill: currentColor;
+  fill-opacity: .24;
+  stroke: currentColor;
+  stroke-width: 4;
+  opacity: 0;
+  animation: bb-impact-reveal 450ms ease-out both;
+}
+.bb-impact-petal .bb-impact-cell { fill-opacity: .14; stroke-width: 3; animation-duration: 340ms; }
+@keyframes bb-impact-reveal {
+  0% { opacity: 0; }
+  16%, 49% { opacity: .88; }
+  100% { opacity: 0; }
+}
+
+.bb-board-link {
+  --bb-link-ink: #653c1f;
+  --bb-link-light: #ffe87e;
+  fill: none;
+  opacity: 0;
+  animation: bb-link-fade 320ms ease-out both;
+}
+.bb-board-link-portal {
+  --bb-link-ink: #483870;
+  --bb-link-light: #ead9ff;
+  animation-duration: 530ms;
+}
+.bb-link-shadow, .bb-link-line { stroke-linecap: round; }
+.bb-link-shadow { stroke: var(--bb-link-ink); stroke-width: 13; opacity: .72; }
+.bb-link-line {
+  stroke: var(--bb-link-light);
+  stroke-width: 6;
+  stroke-dasharray: 1;
+  animation: bb-link-sweep 240ms cubic-bezier(.15,.7,.26,1) both;
+}
+.bb-link-source, .bb-link-destination { stroke: var(--bb-link-light); stroke-width: 6; }
+.bb-link-source { stroke-dasharray: 7 10; }
+.bb-link-destination { fill: var(--bb-link-ink); fill-opacity: .18; }
+@keyframes bb-link-fade {
+  0% { opacity: 0; }
+  20%, 62% { opacity: .95; }
+  100% { opacity: 0; }
+}
+@keyframes bb-link-sweep { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+.bb-beam-guide { fill: none; stroke: #fff0a9; stroke-width: 7; stroke-linecap: round; opacity: .86; }
+.bb-special-crown {
+  fill: none;
+  stroke: #f7eb8e;
+  stroke-width: 5;
+  stroke-dasharray: 12 9;
+  opacity: 0;
+  animation: bb-impact-reveal 640ms 140ms ease-out both;
+}
+
+.blossom .bb-goal-feedback, .blossom .bb-score-feedback {
+  position: absolute;
+  z-index: 2;
+  top: -7px;
+  right: -3px;
+  min-width: 23px;
+  padding: 2px 6px;
+  border: 1px solid #856224;
+  border-radius: 20px;
+  background: #fff2bf;
+  box-shadow: 0 2px 3px #332a2c38;
+  color: #513710;
+  font: 850 12px/1.2 Nunito, sans-serif;
+  text-align: center;
+  pointer-events: none;
+  animation: bb-hud-tally 1000ms ease-out both;
+}
+.blossom .bb-goal-feedback[data-goal-feedback='completed'] {
+  background: #eaf5ca;
+  color: #355423;
+  border-color: #718d47;
+}
+@keyframes bb-hud-tally {
+  0% { opacity: 0; transform: translateY(4px) scale(.85); }
+  18% { opacity: 1; transform: translateY(-4px) scale(1.10); }
+  42%, 73% { opacity: 1; transform: translateY(-6px); }
+  100% { opacity: 0; transform: translateY(-9px); }
+}
+
+.bb-reduced .bb-impact-cell, .bb-reduced .bb-special-crown { opacity: .75; }
+.bb-reduced .bb-board-link { opacity: .85; }
+.bb-reduced .bb-sprite-beam { opacity: .35; }
+.bb-reduced .bb-fx-sheet[data-motion='brief'] .bb-fx-strip {
+  animation: bb-sheet-frames var(--sheet-duration) var(--sheet-delay) steps(2, jump-none) both !important;
+}

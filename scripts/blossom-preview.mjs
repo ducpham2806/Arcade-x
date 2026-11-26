@@ -1,6 +1,7 @@
 import { build } from "esbuild";
 import fs from "node:fs";
 import path from "node:path";
+import painted from "../src/games/hex-match/blossom/painted.json" with { type: "json" };
 const root = process.cwd(),
   out = process.argv[2] || path.resolve(root, "../blossom-blast-review.html");
 const built = await build({
@@ -17,6 +18,12 @@ const built = await build({
 const scripts = built.outputFiles.find((f) => f.path.endsWith(".js")).text,
   css = built.outputFiles.find((f) => f.path.endsWith(".css")).text;
 const assets = {};
+const relativeArt = url => url.slice("/blossom/".length);
+const includeLegacy = rel => !rel.startsWith("png/anim/") || /anim_fx_(blast_|bloom_bomb|rainbow_burst|sun_burst|special_merge|chain_spark)/.test(rel);
+const paintedWebP = new Set(Object.entries(painted)
+  .filter(([legacy]) => includeLegacy(legacy))
+  .map(([, url]) => relativeArt(url)));
+const directWebP = /^(?:gemini\/(?:world-(?:\d\d|garden|map)|ui-(?:panel|pill-(?:cream|green|gold)|leaf-ring))|vfx\/(?:bloom|merge-ring|portal))\.webp$/;
 const walk = (dir) => {
   for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, f.name);
@@ -26,8 +33,8 @@ const walk = (dir) => {
         .relative(path.join(root, "public/blossom"), p)
         .split(path.sep)
         .join("/");
-      if (rel.endsWith(".webp") && !/^gemini\/(?:world-(?:\d\d|garden|map)|ui-(?:panel|pill-(?:cream|green|gold)|leaf-ring))\.webp$/.test(rel)) continue;
-      if (rel.startsWith("png/anim/") && !/anim_fx_(blast_|bloom_bomb|rainbow_burst|sun_burst|special_merge|chain_spark)/.test(rel)) continue;
+      if (!includeLegacy(rel) || painted[rel]) continue;
+      if (rel.endsWith(".webp") && !paintedWebP.has(rel) && !directWebP.test(rel)) continue;
       const mime = { ".png": "image/png", ".webp": "image/webp", ".wav": "audio/wav", ".ogg": "audio/ogg", ".woff2": "font/woff2" }[path.extname(p)];
       assets[rel] = `data:${mime};base64,${fs.readFileSync(p).toString("base64")}`;
     }
@@ -44,8 +51,9 @@ const shell = fs
     '<script type="module" src="/src/games/hex-match/blossom/preview.tsx"></script>',
     "",
   );
+const pixelFxLicense = fs.readFileSync("public/blossom/vfx/PIXELFX-LICENSE.txt", "utf8");
 const html = shell
-  .replace("</head>", `<style>${inlineCSS}</style></head>`)
+  .replace("</head>", `<style>${inlineCSS}</style>\n<!-- PixelFX\n${pixelFxLicense}-->\n</head>`)
   .replace(
     "</body>",
     () =>

@@ -4,11 +4,13 @@
 
 ## Blossom Blast · 26/11/2026
 
-- `codex/blossom-garden-ui`: 9-slice và ghép tại bàn. UI 64/64, engine 21/21. Chờ duyệt thiết bị. [QA](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
+- #46 có 9-slice, ghép tại bàn, UI 64/64 và engine 21/21. [QA](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
+
+- Nhánh VFX có dấu vùng nổ, ghép, cổng và HUD. Chờ duyệt thiết bị. [QA](qa/BLOSSOM-VIVID-EFFECTS-2026-11-26.md).
 
 ## Ba bàn cờ chiến trường · 25–26/11/2026
 
-- Ô Ăn Quan, Cờ vua và Cờ tướng có bốn địa hình mỗi game, quân pixel, bàn cổ điển, nút chuyển động riêng và HTML offline. [QA](qa/THREE-BOARD-GAMES-2026-11-25.md).
+- Bốn địa hình, quân pixel, bàn cổ điển và HTML offline. [QA](qa/THREE-BOARD-GAMES-2026-11-25.md).
 - Xem lại thế bàn, khay và điểm theo nước đã vào `main` qua #44, CI #84. [QA](qa/THREE-BOARD-REVIEW-2026-11-26.md).
 - Quét giáo, vòng phong cấp, hiệu ứng Pháo và khay vào `main@fc8bb2f` qua #45, CI #86. Lượt kiểm thêm 18/18 Chromium và `test:duel`/`test:folk-duel` qua. Thiết bị thật, hai tài khoản và trạng thái production còn chờ xác minh. [QA](qa/THREE-BOARD-VFX-2026-11-26.md).
 

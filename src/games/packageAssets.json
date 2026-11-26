@@ -164,6 +164,9 @@
     "/game-art/banners/rainbow-blocks.webp"
   ],
   "hex-match": [
+    "/blossom/vfx/bloom.webp",
+    "/blossom/vfx/merge-ring.webp",
+    "/blossom/vfx/portal.webp",
     "/blossom/gemini/world-01.webp",
     "/blossom/png/backgrounds/board_frame_cluster01.png",
     "/blossom/gemini/hazard-bomb-timer.webp",
