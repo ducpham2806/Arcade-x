@@ -6,6 +6,8 @@
 ## Tài sản trong gói này
 SVG, PNG, atlas và âm thanh (WAV) trong gói được **tạo mới bằng script** (thư mục `tools/`) cho dự án Blossom Blast. Không sao chép tài sản của game thương mại nào (Candy Crush, Toon Blast, v.v.); chỉ tham khảo cơ chế chung của thể loại. Đây là **bản placeholder/concept chất lượng cao để lập trình ngay**, họa sĩ và sound designer có thể thay thế sau mà không đổi tên file hay kích thước.
 
+Ba strip hiệu ứng trong `vfx/` kết xuất bằng PixelFX của Patch và Hugo Duprez. Giấy phép MIT đi cùng tài sản và được nhúng vào bản HTML chơi thử. [Giấy phép PixelFX](vfx/PIXELFX-LICENSE.txt)
+
 ## Nguồn miễn phí đã kiểm tra, dùng để bổ sung hoặc thay thế (không có trong gói)
 | Nguồn | Nội dung | Giấy phép | Ghi chú |
 |---|---|---|---|

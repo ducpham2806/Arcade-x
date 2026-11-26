@@ -1,7 +1,7 @@
-# Bàn giao · 26/11/2026 · Blossom Blast
+# Bàn giao · 26/11/2026 · Hiệu ứng lượt đi Blossom Blast
 
-Nhánh `codex/blossom-garden-ui` nâng giao diện Blossom Blast theo chủ đề vườn hoa và dùng 9-slice trên nút, HUD, khung bàn và hộp thoại. Ghép bằng chạm hai ô, vuốt hoặc bàn phím. Mỗi cặp hợp lệ dùng một lượt theo engine hiện có. [Thẻ QA game](plans/GAME-POLISH.md), [báo cáo Blossom](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
+Nhánh `codex/blossom-vivid-effects` tiếp từ `codex/blossom-garden-ui@b916d33`. Bàn có dấu vùng tác động, dây sáng nối cặp ghép, mầm khi sinh vật phẩm đặc biệt, vệt cổng và báo điểm/mục tiêu. Giữ lượt đi và save theo engine. Bản HTML dùng art vẽ và ba strip WebP nhúng. [QA VFX](qa/BLOSSOM-VIVID-EFFECTS-2026-11-26.md), [QA giao diện](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
 
-Studio Game UI/UX, Input Systems và vai trò Art & UI Lead. Graphify AST trong `src/games/hex-match`, 191 nút/518 cạnh. Bước tiếp là duyệt nhánh Blossom và chơi thử trên điện thoại thật.
+Studio Game Feel, PixelFX và vai trò Art & UI Lead. Forge `25203d0`, PixelFX `5294518`, Graphify AST `src/games/hex-match` 203 nút/551 cạnh. Đã sửa kiểm art ở nhánh #46. Tiếp theo duyệt hai PR và chơi thử trên điện thoại thật.
 
-PR #45 đã merge `main@fc8bb2f` sau CI #86. Nghiệm thu ba bàn cờ trên thiết bị thật và phòng hai tài khoản vẫn chờ. [QA VFX bàn cờ](qa/THREE-BOARD-VFX-2026-11-26.md).
+PR #45 đã vào `main@fc8bb2f`. Thiết bị thật và hai tài khoản của ba bàn cờ còn chờ. [QA bàn cờ](qa/THREE-BOARD-VFX-2026-11-26.md).

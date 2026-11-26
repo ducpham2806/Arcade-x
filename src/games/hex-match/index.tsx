@@ -1,5 +1,6 @@
 import { readableCanvasText } from '../../accessibility/canvasText';
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "motion/react";
 import { GameComponentProps } from "../../types";
 import { Action, Level, Run, Save } from "./blossom/types";
 import {
@@ -9,7 +10,6 @@ import {
   hashSeed,
   hasHazard,
   hint,
-  key,
   mergePartners,
   neighbors,
   revealFog,
@@ -46,8 +46,10 @@ import {
 } from "./blossom/assets";
 import "./blossom/blossom.css";
 import "./blossom/garden-ui.css";
+import "./blossom/effects.css";
 import { BLOSSOM_TITLE, BLOSSOM_ICON, BLOSSOM_LOGO } from "./blossom/branding";
 import { BlossomVFX } from "./blossom/VFX";
+import { describeTurn, goalProgress, type TurnFeedback } from "./blossom/turnFeedback";
 import { lessonsFor, Lesson } from "./blossom/tutorials";
 import { englishLesson } from "./blossom/tutorials-en";
 import { Localized } from "./blossom/i18n";
@@ -139,6 +141,15 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     "map" | "play" | "garden" | "daily" | "rank" | "settings" | "side"
   >(run ? "play" : "map");
   const [prepTab, setPrepTab] = useState<"start" | "support">("start");
+  const reducedMotion = useReducedMotion() || save.settings.reduced;
+  const [turnFeedback, setTurnFeedback] = useState<TurnFeedback | null>(null);
+  const activeFeedback = turnFeedback?.runId === run?.id && turnFeedback?.move === run?.log.length
+    ? turnFeedback : null;
+  useEffect(() => {
+    if (!turnFeedback) return;
+    const timer = window.setTimeout(() => setTurnFeedback(null), 1040);
+    return () => window.clearTimeout(timer);
+  }, [turnFeedback]);
   const [animating, setAnimating] = useState(() => !!run && run.status !== "playing" && (run.effects.length > 0 || run.changed.length > 0));
   const storyNext = useRef<null | (() => void)>(null);
   const [lessonQueue, setLessonQueue] = useState<Lesson[]>(() =>
@@ -605,6 +616,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
       undo.current = undo.current.slice(-12);
     }
     const next = out.run;
+    setTurnFeedback(describeTurn(current, next));
     const box = document.querySelector(".bb-board")?.getBoundingClientRect();
     const oldCells = new Map(current.board.map((tile, i) => [tile.id, i]));
     fallOffsets.current = new Map(
@@ -765,6 +777,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     previous.log = [...current.log];
     previous.effects = [];
     previous.changed = [];
+    setTurnFeedback(null);
     commit(previous);
     setTool("");
     locked.current.clear();
@@ -918,14 +931,8 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
   const goals = (l: Level, r?: Run) => (
     <div className="bb-goals">
       {l.goals.map((g, i) => {
-        const progress =
-          g.kind === "score"
-            ? r?.score || 0
-            : g.kind === "combo"
-              ? r?.maxCombo || 0
-              : g.kind === "boss"
-                ? l.bossHP - (r?.bossHP ?? l.bossHP)
-                : r?.progress[key(g)] || 0;
+        const progress = goalProgress(g, l, r);
+        const feedback = r ? activeFeedback?.goals[i] : undefined;
         return (
           <div key={i} className={progress >= g.target ? "done" : ""}>
             {g.kind === "collect" ? (
@@ -955,6 +962,12 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
               </strong>
             </div>
             {progress >= g.target && <b>✓</b>}
+            {!!feedback?.gain && (
+              <span key={activeFeedback!.move} className="bb-goal-feedback"
+                data-goal-feedback={feedback.completed ? "completed" : "progress"} aria-hidden="true">
+                {feedback.completed ? "✓" : g.kind === "score" ? "✦" : `+${feedback.gain}`}
+              </span>
+            )}
           </div>
         );
       })}
@@ -964,7 +977,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
     <Localized language={save.settings.language}>
       <div
         ref={gameRoot}
-        className={`blossom bb-screen-${screen} ${save.settings.style === "chibi" ? "bb-chibi" : ""} ${save.settings.reduced ? "bb-reduced" : ""}`}
+        className={`blossom bb-screen-${screen} ${save.settings.style === "chibi" ? "bb-chibi" : ""} ${reducedMotion ? "bb-reduced" : ""}`}
         style={
           {
             "--bb-font": save.settings.font,
@@ -1157,6 +1170,11 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                   <div>
                     <small>{t.score}</small>
                     <b>{run.score.toLocaleString()}</b>
+                    {!!activeFeedback && activeFeedback.scoreGain > 0 && (
+                      <span key={activeFeedback.move} className="bb-score-feedback" aria-hidden="true">
+                        +{activeFeedback.scoreGain.toLocaleString()}
+                      </span>
+                    )}
                     <div className="bb-star-track">
                       <i
                         style={{
@@ -1385,7 +1403,8 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
                       </strong>
                     </div>
                   )}
-                  <BlossomVFX run={run} reduced={save.settings.reduced} onComplete={() => setAnimating(false)} />
+                  <BlossomVFX key={run.id} run={run} feedback={activeFeedback} reduced={reducedMotion}
+                    onComplete={() => setAnimating(false)} />
                 </div>
                 {readingLesson && !modal && !result && !completionData && (
                   <div className="bb-tutorial-shade">
@@ -2178,7 +2197,7 @@ export const HexMatchGame: React.FC<GameComponentProps> = ({
           />
         )}
         {completionData && run && (
-          <Completion run={run} reduced={save.settings.reduced} language={save.settings.language}
+          <Completion run={run} reduced={reducedMotion} language={save.settings.language}
             stars={completionData.stars} reward={completionData.reward}
             nextLabel={run.status === "won" && run.mode === "campaign" && run.level.id < 100 && accessible(run.level.id + 1) ? "Màn tiếp theo" : t.retry}
             onMap={() => finishResult("map")}
