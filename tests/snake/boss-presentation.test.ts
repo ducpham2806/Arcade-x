@@ -1,3 +1,4 @@
+import "./meadow-fx.test";
 import assert from 'node:assert/strict';
 import {Engine,T} from '../../src/games/snake-legend/src/core';
 import {STORY_LEVELS} from '../../src/games/snake-legend/src/story-data';

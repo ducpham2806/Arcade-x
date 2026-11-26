@@ -73,3 +73,108 @@
 
 @media(max-width:760px){.snake-journey.chapter-complete .journey-route{order:-2}}
 @media(max-width:760px) and (max-height:450px){.snake-journey{min-height:0}.journey-hero{min-height:88px;padding:12px 16px}.journey-title h1{font-size:20px;margin:6px 0}.journey-title>p{display:none}.journey-footer{padding-top:0;padding-bottom:0}}
+
+.journey-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.journey-footer .journey-trials {
+  padding: 0 16px;
+  border: 1px solid #937033;
+  border-radius: 9px;
+  background: linear-gradient(#fff0b3, #e7c878);
+  box-shadow: inset 0 1px #fff8d7, 0 2px 0 #b69453;
+  color: #493617;
+  font-size: 12px;
+}
+.journey-footer .journey-trials:hover { background: #fff0b3; }
+.snake-app.snake-trials {
+  --trial-deep: #183b31;
+  --trial-leaf: #365b43;
+  --trial-light: #d9e6c5;
+  --trial-gold: #eed18a;
+  position: relative;
+  background: #f4f0db;
+}
+.snake-trials[data-trial='1'] { --trial-deep: #143e43; --trial-leaf: #275e63; --trial-light: #d9ece7; }
+.snake-trials[data-trial='2'] { --trial-deep: #342942; --trial-leaf: #594365; --trial-light: #e9dff1; }
+.snake-trials .topbar {
+  background: linear-gradient(var(--trial-leaf), var(--trial-deep));
+  color: #fff6d5;
+  border-bottom: 1px solid #141d16;
+}
+.snake-trials .brand-mark { background: #fff1bb; color: var(--trial-deep); }
+.snake-trials .brand div > span, .snake-trials .build-tag { color: #fff2c5; }
+.snake-trials .build-tag { background: #ffffff18; }
+.snake-trials .arenas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: #efeada;
+}
+.snake-trials .arenas button {
+  max-width: none;
+  min-width: 0;
+  border-color: #d1c9a9;
+  background: #fcf7e5;
+  color: var(--trial-deep);
+  line-height: 1.2;
+}
+.snake-trials .arenas button.selected {
+  border-color: var(--trial-deep);
+  background: var(--trial-leaf);
+  color: #fff8db;
+  box-shadow: inset 0 1px #ffffff26;
+}
+.snake-trials .arenas button.selected span { color: var(--trial-gold); opacity: 1; }
+.snake-trials .hud { background: var(--trial-light); color: var(--trial-deep); gap: 8px; }
+.snake-trials .hud .objective { font-weight: 750; }
+.snake-trials .timer { white-space: nowrap; }
+.snake-trials .dock { background: linear-gradient(#f8f1d9, #e7e6cb); }
+.snake-trials .inspector { background: #f9f4e1; }
+.snake-trials .overlay-card {
+  max-height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-color: #c3a75f;
+  color: var(--trial-deep);
+  box-shadow: inset 0 0 0 4px #f4e9c7, 0 12px 38px #0f281f73;
+}
+.snake-trials .primary { background: var(--trial-leaf); border-color: var(--trial-deep); color: #fff9e6; }
+.snake-trials .secondary[hidden] { display: none; }
+.snake-trials .trial-result { font-size: 12px; font-weight: 750; }
+.snake-trials > .settings .settings-card {
+  width: min(100%, 896px);
+  height: min(92vh, 100%);
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  background: #faf6e6;
+}
+.snake-trials > .settings [data-action='close-settings'] { margin-top: auto; flex-shrink: 0; }
+@media(min-width: 1024px) {
+  .snake-trials > .settings .settings-card { width: min(100%, 1024px); }
+}
+@media(max-width: 760px) {
+  .journey-footer-actions { gap: 8px; }
+  .journey-footer .journey-trials { padding-inline: 10px; }
+  .snake-trials .arenas { gap: 4px; }
+  .snake-trials .arenas button { gap: 5px; }
+  .snake-trials .hud { padding-inline: 10px; }
+  .snake-trials .brand div > span { display: none; }
+}
+@media(max-width: 639px) {
+  .snake-trials > .settings { padding: 0; }
+  .snake-trials > .settings .settings-card { height: 100%; border-radius: 0; padding: 20px; }
+}
+@media(max-width: 360px) {
+  .snake-trials .topbar { padding-inline: 8px; }
+  .snake-trials .brand-mark { display: none; }
+}
+@media(max-height: 580px) and (min-aspect-ratio: 6/5) {
+  .snake-trials .overlay { padding: 5px; }
+  .snake-trials .overlay-card { padding: 8px 12px; }
+  .snake-trials .overlay-card h1 { font-size: 18px; }
+  .snake-trials .overlay-description { font-size: 11px; margin-block: 5px; }
+  .snake-trials .instructions { display: none; }
+}

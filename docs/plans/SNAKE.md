@@ -22,6 +22,10 @@ Theo yêu cầu chủ dự án: [plan tiếp tục Rắn Săn Mồi](../snake/CO
 
 `codex/snake-touch-resume` đưa phần trình diễn R01 từ `b9f7134` lên nền `main@5cd1539`: sổ tay và lời kết từng màn, kết chương và chơi lại để đủ sao, chuyển động Tiểu Xà và Nhện Mẹ. Điều khiển cảm ứng chỉ giữ ngón đã nhận, bỏ qua chạm khi dừng và giới hạn núm joystick trong vòng. [Nội dung](../snake/R01-CONTENT.md), [QA trước tích hợp](../qa/SNAKE-R01-CONTENT-2026-11-14.md).
 
+## SN-MEADOW · Đồng Cỏ
+
+Nhánh `codex/snake-meadow-expansion` tiếp trên PR #48. Ba đường thử có mặt bằng và mục tiêu riêng, vào từ Hành trình ở bản sảnh/offline. Học cua qua hàng rào, căn hai cầu rồi phối hợp cầu và bụi gai. Thêm hiệu ứng Canvas theo trạng thái và sắc độ địa hình riêng để nhận ra từng đường. Dùng chung điều khiển, kỷ lục lưu tách theo thiết bị/tài khoản. Bản đồ ký, checkpoint và sao R01 giữ định dạng hiện tại.
+
 ## Bằng chứng đã có và giới hạn
 
 [Live-save QA](../SNAKE_LIVE_SAVE_QA.md) đã kiểm Auth/engine/replay/service thật: thắng/lưu, retry sau lost-ack không nhận lặp, restore mới, đọc offline/retry, refresh và signout. Wrapper React đã nối Auth owner/save session; timeout30giây có hủy. Gold/Gem riêng, adapter chưa phát thưởng launcher. Có sẵn icon/banner/master/manifest, chưa cần vẽ lại.

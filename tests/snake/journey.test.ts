@@ -4,6 +4,7 @@ import {CHECKPOINT_KEY,capture} from '../../src/games/snake-legend/src/checkpoin
 import {Engine,T} from '../../src/games/snake-legend/src/core';import {STORY_LEVELS} from '../../src/games/snake-legend/src/story-data';
 import {mountJourney} from '../../src/games/snake-legend/src/journey';import {journeyProgress} from '../../src/games/snake-legend/src/journey-model';
 import {runCampaignLevel,steer} from './campaign-driver';
+import './trials.test';
 const {window}=parseHTML('<html><body><main id="root"></main></body></html>');Object.assign(globalThis,{window,document:window.document});
 const root=window.document.getElementById('root')! as unknown as HTMLElement;
 const data=new Map<string,string>();const store={getItem:(k:string)=>data.get(k)??null,setItem:(k:string,v:string)=>{data.set(k,v);}};

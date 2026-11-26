@@ -115,10 +115,20 @@ module.exports = async function checkPreviewMedia(browser, origin, evidence) {
     releaseArt();
     await page.waitForFunction(() => ['a1_master', 'food'].every(name =>
       window.snakeMediaProbe.drawn.some(url => url.includes('snake-' + name + '-'))));
-    await page.screenshot({ path: evidence + '/media-art-loaded.png' });
     const storyArt = [...new Set(requests)];
-    assert.equal(storyArt.length, 4);
-    assert(storyArt.every(file => /^snake-(a1_master|food|r01_props|r01_terrain)-/.test(file)));
+    const expectedSheets = ['a1_master', 'food', 'meadow_fx', 'r01_props', 'r01_terrain'];
+    assert.equal(storyArt.length, expectedSheets.length, 'Story must request only its five art sheets');
+    for (const sheet of expectedSheets) {
+      const hits = storyArt.filter(file => file.startsWith(`snake-${sheet}-`) && /\.(png|webp)$/.test(file));
+      assert.equal(hits.length, 1, `Story must request the packaged ${sheet} sheet`);
+    }
+    await page.keyboard.down('Space');
+    try {
+      await page.waitForFunction(() => window.snakeMediaProbe.drawn.some(url => url.includes('snake-meadow_fx-')));
+    } finally {
+      await page.keyboard.up('Space');
+    }
+    await page.screenshot({ path: evidence + '/media-art-loaded.png' });
     assert.deepEqual(wavRequests(), [], 'A new game keeps sound off until opt-in');
 
     await page.locator('.story-app [data-action="settings"]').click();
@@ -144,7 +154,7 @@ module.exports = async function checkPreviewMedia(browser, origin, evidence) {
     await exit();
     await page.waitForFunction(before => window.snakeMediaProbe.aborted >= before + 14, abortedBefore);
     assert.deepEqual(errors, []);
-    return { storyArt, audioFiles: 14, retriedWavs: 1, abortedWavsOnExit: 14 };
+    return { storyArt, meadowFxRendered: true, audioFiles: 14, retriedWavs: 1, abortedWavsOnExit: 14 };
   } finally {
     releaseArt();
     releaseAudio();
