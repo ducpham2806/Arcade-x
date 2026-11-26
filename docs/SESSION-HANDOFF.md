@@ -1,5 +1,7 @@
 # Bàn giao · 26/11/2026 · Snake Legend Đồng Cỏ
 
-`codex/snake-meadow-expansion` dựa trên `95c8fda` của PR #48. Nâng cảnh Canvas và hiệu ứng, thêm đường thử tùy chọn với mặt bằng và nhịp khó riêng. Giữ định danh, bản đồ đã ký, thành tích và mốc đang chơi của 10 màn R01. [Thẻ Snake](plans/SNAKE.md).
+`codex/snake-meadow-expansion` tiếp trên PR #48 (`95c8fda`, CI #94 qua). Hành trình có ba đường thử tùy chọn, kỷ lục riêng theo hồ sơ, chỉ dấu quả kế tiếp và cảnh Canvas theo địa hình. PixelFX tạo bốn hiệu ứng, Agent Sprite Forge kiểm và ráp 32 khung. Mô phỏng, bản đồ ký, sao và checkpoint R01 giữ nguyên. [Thẻ Snake](plans/SNAKE.md).
 
-Studio Level Design, Create Game Assets, PixelFX. Vai trò Team Level và Art & UI Lead. Bước đầu đo bán kính cua, kiểm đường đi, làm atlas hiệu ứng và thử trên desktop/khổ điện thoại. Agent Sprite Forge kiểm và ráp khung. PR #48 vẫn là nhánh cơ sở để duyệt độc lập.
+Studio Level Design, Create Game Assets, PixelFX. Vai trò Team Level và Art & UI Lead. Graphify AST Snake 482 nút/1.263 cạnh, truy vấn `mountJourney` và `trialForArena`. Ba đường qua ở lượt thường và đạt mốc Dash. Browser bản sảnh 8/8, điều khiển 7/7, Snake local, build/bundle/catalog/preview và HTML offline qua. [QA Đồng Cỏ](qa/SNAKE-MEADOW-2026-11-26.md).
+
+Duyệt PR #48 và PR Đồng Cỏ theo thứ tự. Bản Đồng Cỏ chưa merge/phát hành, còn CI và nghiệm thu thiết bị thật.

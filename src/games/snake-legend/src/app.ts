@@ -10,8 +10,19 @@ export function mountGame(root:HTMLElement,options:{createSaveSession?:SaveSessi
  const completion=options.createSaveSession?.(rawStore),store=completion?.storage??rawStore;
  function applyHost(){active.setHostPaused(hostPaused);if('setMuted'in active)active.setMuted(hostMuted);if(hostVolume!==undefined&&'setHostVolume'in active)active.setHostVolume(hostVolume);}
  function showStory(choice:JourneyChoice={level:0,resume:true}){if(destroyed)return;active?.destroy();active=mountStory(root,showLab,completion,{levelIndex:choice.level,resumeCheckpoint:choice.resume,onJourney:showJourney,storage:store,reviewTools:options.reviewTools});applyHost();}
- function showJourney(){if(destroyed)return;active?.destroy();active=mountJourney(root,store,showStory,showLab,completion,options.artwork,options.reviewTools);applyHost();}
- function showLab(){if(destroyed)return;active?.destroy();active=mountLab(root,store);const btn=document.createElement('button');btn.textContent='Về hành trình';btn.addEventListener('click',showJourney);root.querySelector('.top-actions')?.prepend(btn);applyHost();}
+ function showJourney(){if(destroyed)return;active?.destroy();active=mountJourney(root,store,showStory,showLab,completion,options.artwork,options.reviewTools,()=>showPractice('trials'));applyHost();}
+ function showLab(){showPractice('lab');}
+ function showPractice(mode:'lab'|'trials'){
+  if(destroyed)return;
+  active?.destroy();active=mountLab(root,store,mode);
+  const btn=document.createElement('button');btn.textContent='Về hành trình';
+  if(mode==='trials'){btn.className='trial-return';btn.dataset.action='trial-return';}
+  btn.addEventListener('click',()=>{
+   showJourney();
+   if(mode==='trials')root.querySelector<HTMLButtonElement>('[data-action="trials"]')?.focus({preventScroll:true});
+  });
+  root.querySelector('.top-actions')?.prepend(btn);applyHost();
+ }
  showJourney();
- return {restart(){if(destroyed)return;if('restart'in active)active.restart();else if(!('selectedLevel'in active.getState())){showStory();(active as ReturnType<typeof mountStory>).restart();}},setMuted(v:boolean){hostMuted=v;if('setMuted'in active)active.setMuted(v);},setHostVolume(v:number){hostVolume=v;if('setHostVolume'in active)active.setHostVolume(v);},setHostPaused(v:boolean){hostPaused=v;active.setHostPaused(v);},pause(){active.pause();},getState(){return active.getState();},destroy(){if(destroyed)return;destroyed=true;active.destroy();completion?.destroy();}};
+ return {restart(){if(destroyed)return;if('restart'in active&&active.restart)active.restart();else if(!('selectedLevel'in active.getState())){showStory();(active as ReturnType<typeof mountStory>).restart();}},setMuted(v:boolean){hostMuted=v;if('setMuted'in active)active.setMuted(v);},setHostVolume(v:number){hostVolume=v;if('setHostVolume'in active)active.setHostVolume(v);},setHostPaused(v:boolean){hostPaused=v;active.setHostPaused(v);},pause(){active.pause();},getState(){return active.getState();},destroy(){if(destroyed)return;destroyed=true;active.destroy();completion?.destroy();}};
 }

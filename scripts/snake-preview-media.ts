@@ -8,7 +8,7 @@ export function snakePreviewMedia(): Plugin {
     apply: 'build',
     enforce: 'pre',
     transform(source, id) {
-      const file = id.match(/\/src\/games\/snake-legend\/src\/(assets|story-prop-assets|audio-assets|audio-feedback-assets)\.ts$/)?.[1];
+      const file = id.match(/\/src\/games\/snake-legend\/src\/(assets|story-prop-assets|meadow-fx-assets|audio-assets|audio-feedback-assets)\.ts$/)?.[1];
       if (!file) return;
 
       const assetUrl = (name: string, extension: string, encoded: string) => {
@@ -24,9 +24,10 @@ export function snakePreviewMedia(): Plugin {
       if (file === 'assets') {
         code = source.replace(/"([a-z0-9_]+)":\{"image":"data:image\/(png|webp);base64,([A-Za-z0-9+/=]+)"/g,
           (_literal, name, extension, encoded) => `"${name}":{"image":${assetUrl(name, extension, encoded)}`);
-      } else if (file === 'story-prop-assets') {
+      } else if (file === 'story-prop-assets' || file === 'meadow-fx-assets') {
+        const name = file === 'story-prop-assets' ? 'r01_props' : 'meadow_fx';
         code = source.replace(/"data:image\/webp;base64,([A-Za-z0-9+/=]+)"/,
-          (_literal, encoded) => assetUrl('r01_props', 'webp', encoded));
+          (_literal, encoded) => assetUrl(name, 'webp', encoded));
       } else {
         code = source.replace(/"(sfx_[a-z0-9_]+)":\s*"(UklGR[A-Za-z0-9+/=]+)"/g,
           (_literal, name, encoded) => `"${name}":${assetUrl(name, 'wav', encoded)}`);
