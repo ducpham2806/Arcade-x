@@ -36,7 +36,12 @@ const PAINTED_ICONS=['blocker','chess','mummy-escape'];
    assert.ok(packages['hex-match'].includes(it.out.replace(/^public/,'')),`hex-match: ${it.name} not in packageAssets (offline)`);
   }
   // A sprite either substitutes original PNGs or is referenced directly by the named file.
-  if(it.usedBy)assert.ok(fs.readFileSync(it.usedBy,'utf8').includes(it.out.replace(/^public/,'')),`hex-match: ${it.name} not used in ${it.usedBy}`);
+  if (it.usedBy) {
+   const source = fs.readFileSync(it.usedBy, 'utf8');
+   const url = it.out.replace(/^public/, '');
+   const relative = url.replace(/^\/blossom\//, '');
+   assert.ok(source.includes(url) || source.includes(`"${relative}"`), `hex-match: ${it.name} not used in ${it.usedBy}`);
+  }
   else assert.ok(it.replaces?.length,`hex-match: ${it.name} replaces nothing`);
   // Composed scenes may only layer sprites produced earlier in crops.json.
   for(const layer of it.layers||[])assert.ok(spec.items.indexOf(spec.items.find(o=>o.out===layer.sprite))>-1&&spec.items.findIndex(o=>o.out===layer.sprite)<spec.items.indexOf(it),`hex-match: ${it.name} layers an unknown or later sprite`);
