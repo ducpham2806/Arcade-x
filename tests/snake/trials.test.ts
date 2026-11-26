@@ -53,7 +53,7 @@ const results = TRIALS.map((course, index) => {
   assert.equal(arena.story, undefined);
   assert.equal(arena.duration, undefined);
   assert.equal(guide.length, arena.route.length);
-  assert.equal(arena.route.length, [10,12,15][index]);
+  assert.equal(arena.route.length, [10,12,15,12,15,18][index]);
   const obstacles = [...arena.walls, ...arena.water, ...arena.spikes];
   for (const point of [arena.start, ...arena.route]) {
     assert(point.x >= T.headRadius && point.x <= arena.w - T.headRadius
@@ -66,12 +66,21 @@ const results = TRIALS.map((course, index) => {
       Math.min(deck.x + deck.w, water.x + water.w) - Math.max(deck.x, water.x) <= 1e-9
         || Math.min(deck.y + deck.h, water.y + water.h) - Math.max(deck.y, water.y) <= 1e-9));
   }
-  if (bridges.length) {
-    const engine = new Engine(arena), first = bridges[0];
-    const offDeck = {x: first.x + first.w / 2, y: first.y - 3.5};
+  if (arena.water.length) {
+    const engine = new Engine(arena), first = bridges[0], water = arena.water[0];
+    const offDeck = first ? {x: first.x + first.w / 2, y: first.y - 3.5}
+      : {x: water.x + water.w / 2, y: water.y + water.h / 2};
     while (engine.status === 'running' && engine.tick < 20 * T.hz) engine.step(steer(engine, offDeck));
     assert.equal(engine.status, 'lost');
     assert.match(engine.lastEvent, /Rơi khỏi cầu/);
+  }
+  if (arena.patrols) {
+    const engine = new Engine(arena);
+    while (engine.hearts === 3 && engine.tick < 10 * T.hz) {
+      const nearest = engine.patrols().sort((a, b) => distance(engine.pos, a) - distance(engine.pos, b))[0];
+      engine.step(steer(engine, nearest));
+    }
+    assert.equal(engine.hearts, 2, 'aiming at a moving hazard must cost a heart');
   }
   return {
     course: arena.name,
@@ -85,16 +94,20 @@ const files = new Map<string,string>([[CAMPAIGN_KEY,'campaign'], [CHECKPOINT_KEY
 const store = {getItem: (key: string) => files.get(key) ?? null, setItem: (key: string, value: string) => { files.set(key,value); }};
 const ownerA = snakeAccountStorage(store, 'A'), ownerB = snakeAccountStorage(store, 'B');
 store.setItem(TRIAL_SAVE_KEY, '{"version":1,"arena":99,"best":[-1,"12",0]}');
-assert.deepEqual(loadTrialProgress(store), {arena:0,best:[null,null,null]});
+assert.deepEqual(loadTrialProgress(store), {arena:0,best:[null,null,null,null,null,null]});
+store.setItem(TRIAL_SAVE_KEY, '{"version":1,"arena":1,"best":[15,21,null]}');
+assert.deepEqual(loadTrialProgress(store), {arena:1,best:[15,21,null,null,null,null]});
 saveTrialProgress(store, {arena:0,best:[15,null,null]});
 saveTrialProgress(store, {arena:1,best:[18,20,null]});
 saveTrialProgress(store, {arena:1,best:[null,17,null]});
-assert.deepEqual(loadTrialProgress(store), {arena:1,best:[15,17,null]});
-saveTrialProgress(ownerA, {arena:2,best:[9,10,11]});
-assert.deepEqual(loadTrialProgress(ownerA), {arena:2,best:[9,10,11]});
-assert.deepEqual(loadTrialProgress(ownerB), {arena:0,best:[null,null,null]});
-assert.deepEqual(loadTrialProgress(store), {arena:1,best:[15,17,null]});
+assert.deepEqual(loadTrialProgress(store), {arena:1,best:[15,17,null,null,null,null]});
+saveTrialProgress(ownerA, {arena:5,best:[9,10,11,19,18,25]});
+assert.deepEqual(loadTrialProgress(ownerA), {arena:5,best:[9,10,11,19,18,25]});
+saveTrialProgress(ownerA, {arena:2,best:[8,12,null]});
+assert.deepEqual(loadTrialProgress(ownerA), {arena:2,best:[8,10,11,19,18,25]});
+assert.deepEqual(loadTrialProgress(ownerB), {arena:0,best:[null,null,null,null,null,null]});
+assert.deepEqual(loadTrialProgress(store), {arena:1,best:[15,17,null,null,null,null]});
 assert.equal(store.getItem(CAMPAIGN_KEY),'campaign');
 assert.equal(store.getItem(CHECKPOINT_KEY),'checkpoint');
-console.log('PASS meadow trials: three collision-free routes, all bridge crossings, off-deck loss, optional Dash times, isolated records and minimum time on stale writes');
+console.log('PASS six trials: clean routes, all bridge crossings, lake and off-deck loss, patrol damage, optional Dash times and compatible isolated records');
 console.table(results);

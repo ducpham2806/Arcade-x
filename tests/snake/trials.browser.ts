@@ -1,5 +1,5 @@
 import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
-import { TRIALS, TRIAL_SAVE_KEY, type TrialCourse } from '../../src/games/snake-legend/src/trials';
+import { TRIALS, TRIAL_STAGE_COUNT, TRIAL_STAGE_SIZE, TRIAL_SAVE_KEY, type TrialCourse } from '../../src/games/snake-legend/src/trials';
 import { mockSupabase } from '../auth/backend';
 import { observeEngine } from './ui-driver';
 
@@ -50,40 +50,62 @@ async function finishTrial(page: Page, course: Locator, trial: TrialCourse) {
   await expect(course.locator('.trial-result')).toContainText('Kỷ lục');
 }
 
-test('public guest completes all three courses and reloads their records without changing R01', async ({ page, context }, info) => {
-  test.setTimeout(120_000);
-  const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
-  await openTrials(page, context);
-  await observeEngine(page);
-  const before = await Promise.all([campaignKey, checkpointKey].map(key => readSave(page, key)));
-  const course = page.locator('.snake-trials');
-  await expect(course.locator('.arenas button')).toHaveCount(TRIALS.length);
-  await page.screenshot({ path: info.outputPath('trial-select-desktop.png') });
-  const next = course.locator('[data-action="next-trial"]');
-  for (const [index, trial] of TRIALS.entries()) {
-    await finishTrial(page, course, trial);
-    await page.screenshot({ path: info.outputPath(`trial-finish-${index + 1}-desktop.png`) });
-    if (index < TRIALS.length - 1) await next.click();
-  }
-  await expect(next).toBeHidden();
-  const best: number[] = JSON.parse((await readSave(page, TRIAL_SAVE_KEY)) ?? '{}').best;
-  expect(best).toHaveLength(TRIALS.length);
-  for (const seconds of best) expect(seconds).toBeGreaterThan(0);
-  await course.locator('[data-action="trial-return"]').click();
-  await expect(page.locator('.journey-clears')).toHaveText('0/10 màn');
-  expect(await Promise.all([campaignKey, checkpointKey].map(key => readSave(page, key)))).toEqual(before);
-  await page.reload();
-  await page.locator('#btn-play-snake-legend').click();
-  await page.locator('[data-action="trials"]').click();
-  await expect(course).toBeVisible();
-  for (const [index, seconds] of best.entries()) {
-    await course.locator(`[data-arena="${index}"]`).click();
-    await expect(course.locator('.best')).toHaveText(`${seconds.toFixed(1)}s`);
-    await expect(course.locator('.trial-result')).toContainText(`Kỷ lục ${seconds.toFixed(1).replace('.', ',')} giây`);
-  }
-  expect(errors).toEqual([]);
-});
+for (let stage = 0; stage < TRIAL_STAGE_COUNT; stage++) {
+  test(`public guest completes stage ${stage + 1} and reloads its records without changing R01`, async ({ page, context }, info) => {
+    test.setTimeout(120_000);
+    const errors: string[] = [];
+    const legacyBest = [17, 20, 24];
+    page.on('pageerror', error => errors.push(error.message));
+    if (stage === 1) {
+      await page.addInitScript(({ key, best }) => {
+        if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify({ version: 1, arena: 1, best }));
+      }, { key: TRIAL_SAVE_KEY, best: legacyBest });
+    }
+    await openTrials(page, context);
+    await observeEngine(page);
+    const before = await Promise.all([campaignKey, checkpointKey].map(key => readSave(page, key)));
+    const course = page.locator('.snake-trials');
+    const stageSwitch = course.locator('[data-action="trial-stage"]');
+    if (stage > 0) {
+      await expect(course.locator('.best')).toHaveText('20.0s');
+      await stageSwitch.click();
+    }
+    const start = stage * TRIAL_STAGE_SIZE;
+    const group = TRIALS.slice(start, start + TRIAL_STAGE_SIZE);
+    await expect(course.locator('.arenas [data-arena]:visible')).toHaveCount(group.length);
+    await page.screenshot({ path: info.outputPath('trial-select-desktop.png') });
+    const next = course.locator('[data-action="next-trial"]');
+    for (const [index, trial] of group.entries()) {
+      await finishTrial(page, course, trial);
+      await page.screenshot({ path: info.outputPath(`trial-finish-${start + index + 1}-desktop.png`) });
+      if (index < group.length - 1) await next.click();
+    }
+    const best: (number | null)[] = JSON.parse((await readSave(page, TRIAL_SAVE_KEY)) ?? '{}').best;
+    expect(best).toHaveLength(TRIALS.length);
+    if (stage === 1) expect(best.slice(0, TRIAL_STAGE_SIZE)).toEqual(legacyBest);
+    const stageBest = best.slice(start, start + group.length);
+    for (const seconds of stageBest) expect(seconds).toBeGreaterThan(0);
+    if (stage === 0) {
+      await expect(next).toHaveText('Sang chặng 2');
+      await next.click();
+      await expect(course.locator('h1')).toHaveText(TRIALS[TRIAL_STAGE_SIZE].arena.name);
+    } else await expect(next).toBeHidden();
+    await course.locator('[data-action="trial-return"]').click();
+    await expect(page.locator('.journey-clears')).toHaveText('0/10 màn');
+    expect(await Promise.all([campaignKey, checkpointKey].map(key => readSave(page, key)))).toEqual(before);
+    await page.reload();
+    await page.locator('#btn-play-snake-legend').click();
+    await page.locator('[data-action="trials"]').click();
+    await expect(course.locator('.arenas')).toHaveAttribute('aria-label', 'Đường thử · Chặng 2 trên 2');
+    if (stage === 0) await stageSwitch.click();
+    for (const [index, seconds] of stageBest.entries()) {
+      await course.locator(`[data-arena="${start + index}"]`).click();
+      await expect(course.locator('.best')).toHaveText(`${seconds!.toFixed(1)}s`);
+      await expect(course.locator('.trial-result')).toContainText(`Kỷ lục ${seconds!.toFixed(1).replace('.', ',')} giây`);
+    }
+    expect(errors).toEqual([]);
+  });
+}
 
 test.describe('touch courses', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
@@ -161,5 +183,18 @@ test.describe('touch courses', () => {
       await course.locator('[data-action="close-settings"]').tap();
       await expect(settings).toBeHidden();
     }
+    await page.setViewportSize({ width: 320, height: 568 });
+    const stageSwitch = course.getByRole('button', {name: 'Sang chặng 2'});
+    await expect(stageSwitch).toBeInViewport({ratio:1});
+    await stageSwitch.tap();
+    for (const trial of TRIALS.slice(TRIAL_STAGE_SIZE)) {
+      await expect(course.getByRole('button', {name:trial.arena.name})).toBeInViewport({ratio:1});
+    }
+    const lastCourse = TRIALS.at(-1)!;
+    await course.getByRole('button', {name:lastCourse.arena.name}).tap();
+    await scout.tap();
+    await expect(course.locator('canvas')).toHaveAttribute('aria-label', new RegExp(lastCourse.arena.name));
+    await expect(startScout).toBeInViewport({ratio:1});
+    await page.screenshot({path:info.outputPath('stage-two-map-320x568.png')});
   });
 });

@@ -2,6 +2,7 @@ import type { Arena, Rect, V } from './core';
 import type { StorageLike } from './story-save';
 
 export const TRIAL_SAVE_KEY = 'snake-legend:meadow-trials:v1';
+export const TRIAL_STAGE_SIZE = 3;
 type TrialProgress = { arena: number; best: (number | null)[] };
 
 export type TrialCourse = {
@@ -20,6 +21,15 @@ function points(pairs: [number, number][]): V[] {
 const gardenRoute = points([[9,20],[15,20],[18,17],[19,12],[19,7],[22,4],[28,4],[31,9],[30,15],[27,21]]);
 const streamRoute = points([[10,8.5],[14,8.5],[20,8.5],[28,8.5],[34,8.5],[37,13],[36,17],[32,20],[28,20],[21,20],[14,20],[9,20]]);
 const brambleRoute = points([[11,24],[16,24],[21,24],[26,24],[29,20],[29,12],[28,8],[31,8],[36,8],[40,8],[45,8],[48,11],[48,18],[46,23],[40,25]]);
+const lakesideRoute = points([[11,26],[17,26],[23,26],[29,26],[33,24],[35,20],[35,14],[35,8],[32,4],[27,4],[20,4],[13,5]]);
+const patrolRoute = points([[10,25],[13,23],[15,20],[20,20],[25,20],[30,20],[34,20],[38,18],[39,14],[36,12],[31,12],[26,12],[21,12],[16,12],[10,12]]);
+const gorgeRoute = points([[12,25],[17,25],[22,25],[25,22],[26,17],[26,12],[26,8],[31,8],[35,8],[40,8],[44,9],[45,13],[45,17.5],[48,19],[52,19],[57,19],[61,23],[59,28]]);
+const gorgeHeight = 34;
+const gorgeBridges = [{x:14,y:23.1,w:6,h:3.8},{x:31,y:6.4,w:7,h:3.2},{x:49,y:17.3,w:6,h:3.4}];
+const gorgeWater = gorgeBridges.flatMap(deck => {
+  const bottom = deck.y + deck.h;
+  return [{x:deck.x,y:0,w:deck.w,h:deck.y},{x:deck.x,y:bottom,w:deck.w,h:gorgeHeight-bottom}];
+});
 
 export const TRIALS: readonly TrialCourse[] = [
   {
@@ -70,7 +80,51 @@ export const TRIALS: readonly TrialCourse[] = [
       route: brambleRoute,
     },
   },
+  {
+    label: 'Ven hồ',
+    lesson: 'Giữ cách mép nước một thân rắn. Đi dọc bờ nam rồi nhả Dash trước vòng cua ở góc đông.',
+    parSeconds: 17.5,
+    bridges: [],
+    guide: lakesideRoute,
+    arena: {
+      id: 16, name: 'Bờ Hồ Cong', subtitle: '12 quả · ôm bờ hồ qua hai góc cua',
+      w: 42, h: 32, start: {x:7,y:26}, heading: 0, length: 8,
+      walls: [{x:11,y:12,w:2,h:8},{x:36.8,y:11,w:1.8,h:7}],
+      water: [{x:16,y:8,w:14,h:15},{x:30,y:11,w:2,h:9}],
+      spikes: [], route: lakesideRoute,
+    },
+  },
+  {
+    label: 'Tuần tra',
+    lesson: 'Vật cản đỏ di chuyển. Đi giữa hai hàng, vòng ở bãi rộng phía đông rồi quay lại.',
+    parSeconds: 18,
+    bridges: [],
+    guide: patrolRoute,
+    arena: {
+      id: 17, name: 'Vườn Tuần Tra', subtitle: '15 quả · men theo hai hàng vật cản di động',
+      w: 45, h: 31, start: {x:6,y:25}, heading: 0, length: 9,
+      walls: [{x:18,y:24,w:4,h:3},{x:5,y:7,w:1.8,h:6},{x:41,y:9,w:1.6,h:7}],
+      water: [], spikes: [], patrols: 10, route: patrolRoute,
+    },
+  },
+  {
+    label: 'Ba cầu',
+    lesson: 'Ba cầu lệch độ cao. Chỉnh hướng trên hai cồn, qua hẳn cầu cuối rồi mới rẽ về phía quả cuối.',
+    parSeconds: 21.5,
+    bridges: gorgeBridges,
+    guide: gorgeRoute,
+    arena: {
+      id: 18, name: 'Hẻm Đá Ba Cầu', subtitle: '18 quả · qua ba cầu và hai cồn hẹp',
+      w: 66, h: gorgeHeight, start: {x:8,y:25}, heading: 0, length: 10,
+      walls: [{x:21.5,y:9,w:2.2,h:11},{x:39.5,y:12,w:2.4,h:6},{x:58,y:6,w:2.6,h:8}],
+      water: gorgeWater,
+      spikes: [{x:29,y:12,w:.62,h:6},{x:46.8,y:10.5,w:.6,h:4.8},{x:63,y:20,w:.6,h:6}],
+      route: gorgeRoute,
+    },
+  },
 ];
+
+export const TRIAL_STAGE_COUNT = Math.ceil(TRIALS.length / TRIAL_STAGE_SIZE);
 
 export function trialForArena(id: number): TrialCourse | undefined {
   return TRIALS.find(trial => trial.arena.id === id);
@@ -92,7 +146,8 @@ export function loadTrialProgress(store: StorageLike): TrialProgress {
 
 export function saveTrialProgress(store: StorageLike, progress: TrialProgress): TrialProgress {
   const previous = loadTrialProgress(store);
-  const best = progress.best.map((time, i) => {
+  const best = TRIALS.map((_, i) => {
+    const time = progress.best[i] ?? null;
     const old = previous.best[i];
     if (old === null) return time;
     return time === null ? old : Math.min(old, time);

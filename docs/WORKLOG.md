@@ -4,7 +4,7 @@ Một nhật ký chính, tối đa 3 mục. [Log trước FD-ON2](archive/WORKLO
 
 ## 26/11/2026 · Snake Legend · Chặng 2
 
-- Nhánh `codex/snake-trial-second-stage` tiếp trên PR #50 tại `09c94e7`. Thiết kế ba đường mới và kiểm đường đi trước khi đổi trình bày. [Log điều khiển R01](archive/WORKLOG-2026-11-26-before-snake-stage-two.md).
+- Nhánh `codex/snake-trial-second-stage` tiếp trên PR #50 tại `09c94e7`. Bờ Hồ Cong, Vườn Tuần Tra, Hẻm Đá Ba Cầu. Engine và joystick Chromium qua cả sáu đường, kỷ lục cũ đọc được. Build/bundle và HTML Chặng 2 offline qua. [QA](qa/SNAKE-STAGE-TWO-2026-11-26.md). [Log điều khiển R01](archive/WORKLOG-2026-11-26-before-snake-stage-two.md).
 
 ## 26/11/2026 · Snake Legend · Xem đường
 

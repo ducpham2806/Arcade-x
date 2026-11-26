@@ -28,6 +28,10 @@ Nhánh `codex/snake-meadow-expansion` tiếp trên PR #48. Ba đường thử c�
 
 Bản tiếp theo thêm chế độ Xem đường khi chuẩn bị/tạm dừng và hiển thị kỷ lục, mốc Dash ở bảng chơi. [QA Xem đường](../qa/SNAKE-SCOUTING-2026-11-26.md).
 
+## SN-TRIAL-STAGE-2 · Ba đường tiếp theo
+
+Bờ Hồ Cong, Vườn Tuần Tra và Hẻm Đá Ba Cầu mở ngay trong Đường thử. Thêm hình học, nhịp chơi và mốc Dash dựa trên Engine. Kỷ lục ba đường đầu giữ nguyên. [Thiết kế và QA](../qa/SNAKE-STAGE-TWO-2026-11-26.md).
+
 ## Bằng chứng đã có và giới hạn
 
 [Live-save QA](../SNAKE_LIVE_SAVE_QA.md) đã kiểm Auth/engine/replay/service thật: thắng/lưu, retry sau lost-ack không nhận lặp, restore mới, đọc offline/retry, refresh và signout. Wrapper React đã nối Auth owner/save session; timeout30giây có hủy. Gold/Gem riêng, adapter chưa phát thưởng launcher. Có sẵn icon/banner/master/manifest, chưa cần vẽ lại.
