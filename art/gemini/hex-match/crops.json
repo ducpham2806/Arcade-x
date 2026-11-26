@@ -1936,7 +1936,7 @@
    "size": 300,
    "quality": 88,
    "out": "public/blossom/gemini/ui-pill-green.webp",
-   "usedBy": "src/games/hex-match/blossom/blossom.css"
+   "usedBy": "src/games/hex-match/blossom/garden-ui.css"
   },
   {
    "name": "ui-pill-cream",
@@ -1955,7 +1955,7 @@
    "size": 300,
    "quality": 88,
    "out": "public/blossom/gemini/ui-pill-cream.webp",
-   "usedBy": "src/games/hex-match/blossom/blossom.css"
+   "usedBy": "src/games/hex-match/blossom/garden-ui.css"
   },
   {
    "name": "ui-pill-gold",
@@ -1974,7 +1974,7 @@
    "size": 300,
    "quality": 88,
    "out": "public/blossom/gemini/ui-pill-gold.webp",
-   "usedBy": "src/games/hex-match/blossom/blossom.css"
+   "usedBy": "src/games/hex-match/blossom/garden-ui.css"
   },
   {
    "name": "ui-panel",
@@ -1993,7 +1993,7 @@
    "size": 300,
    "quality": 88,
    "out": "public/blossom/gemini/ui-panel.webp",
-   "usedBy": "src/games/hex-match/blossom/blossom.css"
+   "usedBy": "src/games/hex-match/blossom/garden-ui.css"
   },
   {
    "name": "world-garden",

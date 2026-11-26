@@ -21,26 +21,22 @@ const walk = (dir) => {
   for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, f.name);
     if (f.isDirectory()) walk(p);
-    else if (/\.(png|wav|ogg|woff2)$/.test(p)) {
+    else if (/\.(png|webp|wav|ogg|woff2)$/.test(p)) {
       const rel = path
         .relative(path.join(root, "public/blossom"), p)
         .split(path.sep)
         .join("/");
-      if (
-        !rel.startsWith("png/anim/") ||
-        /anim_fx_(blast_|bloom_bomb|rainbow_burst|sun_burst|special_merge|chain_spark)/.test(
-          rel,
-        )
-      )
-        assets[rel] =
-          `data:${p.endsWith(".png") ? "image/png" : p.endsWith(".wav") ? "audio/wav" : p.endsWith(".ogg") ? "audio/ogg" : "font/woff2"};base64,${fs.readFileSync(p).toString("base64")}`;
+      if (rel.endsWith(".webp") && !/^gemini\/(?:world-(?:\d\d|garden|map)|ui-(?:panel|pill-(?:cream|green|gold)|leaf-ring))\.webp$/.test(rel)) continue;
+      if (rel.startsWith("png/anim/") && !/anim_fx_(blast_|bloom_bomb|rainbow_burst|sun_burst|special_merge|chain_spark)/.test(rel)) continue;
+      const mime = { ".png": "image/png", ".webp": "image/webp", ".wav": "audio/wav", ".ogg": "audio/ogg", ".woff2": "font/woff2" }[path.extname(p)];
+      assets[rel] = `data:${mime};base64,${fs.readFileSync(p).toString("base64")}`;
     }
   }
 };
 walk(path.join(root, "public/blossom"));
 const inlineCSS = css.replace(
   /url\(["']?\/blossom\/([^"')]+)["']?\)/g,
-  (_, p) => `url("${assets[p]}")`,
+  (url, p) => assets[p] ? `url("${assets[p]}")` : url,
 );
 const shell = fs
   .readFileSync("blossom-review.html", "utf8")

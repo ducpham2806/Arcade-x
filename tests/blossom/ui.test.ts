@@ -16,13 +16,13 @@ test("desktop journey, preparation and play use supplied assets without overflow
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(url);
   await expect(
-    page.getByRole("heading", { name: /Mỗi bông hoa/ }),
+    page.getByRole("heading", { name: /Hành trình.*Mia/ }),
   ).toBeVisible();
   await page.screenshot({ path: "tests/blossom/screenshots/desktop-map.png" });
   await page.locator(".bb-node").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.screenshot({ path: "tests/blossom/screenshots/desktop-prep.png" });
-  await page.getByRole("button", { name: "▶ Bắt đầu" }).last().click();
+  await page.getByRole("dialog").getByRole("button", { name: "Bắt đầu", exact: true }).click();
   if (await page.getByRole("dialog", { name: /Chương/ }).count())
     await page.getByRole("button", { name: "Bỏ qua", exact: true }).click();
   await expect(page.locator(".bb-cell")).toHaveCount(25);
@@ -34,18 +34,17 @@ test("desktop journey, preparation and play use supplied assets without overflow
   ).toBe(true);
   expect(failures).toEqual([]);
 });
-test("mobile 390x844: board, inset popups, garden and settings", async ({
+test("mobile 390x844: board, full-frame dialogs, garden and settings", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(url);
   await page.locator(".bb-node").first().click();
-  const frame = await page.getByRole("dialog").boundingBox();
-  expect(frame!.x).toBeGreaterThan(0);
-  expect(frame!.width).toBeLessThan(390);
-  expect(frame!.height).toBeLessThan(810);
-  await expect(page.locator(".bb-modal footer")).toBeInViewport();
-  await page.getByRole("button", { name: "▶ Bắt đầu" }).last().click();
+  const dialog = page.getByRole("dialog");
+  const frame = await page.locator(".blossom").boundingBox();
+  expect(await dialog.boundingBox()).toEqual(frame);
+  await expect(dialog.locator("footer")).toBeInViewport({ ratio: 1 });
+  await dialog.getByRole("button", { name: "Bắt đầu", exact: true }).click();
   if (await page.getByRole("dialog", { name: /Chương/ }).count())
     await page.getByRole("button", { name: "Bỏ qua", exact: true }).click();
   await expect(page.locator(".bb-board")).toBeVisible();
@@ -168,7 +167,7 @@ test("test profile buys and reserves tools; exit returns unused support only", a
     .locator(".bb-booster-store")
     .getByRole("button", { name: "🐝 Ong Mật 5/5" })
     .click();
-  await page.getByRole("button", { name: "▶ Bắt đầu" }).last().click();
+  await page.getByRole("dialog").getByRole("button", { name: "Bắt đầu", exact: true }).click();
   if (await page.getByRole("dialog", { name: /Chương/ }).count())
     await page.getByRole("button", { name: "Bỏ qua", exact: true }).click();
   let s = await page.evaluate(() =>

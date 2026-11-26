@@ -22,7 +22,7 @@ const TIPS: Record<string, [string, string]> = {
   ],
   "merge-pair": [
     "Combine adjacent specials",
-    "Press Combine, then select two neighboring specials. Combining costs one move and does not happen automatically.",
+    "Tap two neighboring specials or swipe from one to the other. Combining costs one move. Tap the selected special again to use it by itself.",
   ],
   "goal-score": [
     "Score goal",

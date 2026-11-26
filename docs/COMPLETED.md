@@ -2,11 +2,15 @@
 
 [Bản trước sửa badge](archive/COMPLETED-2026-11-13-before-hosting-badge.md). Đây là bộ nhớ kết quả theo module, không phải nhật ký thứ hai. Chỉ đọc mục liên quan; nguồn đang làm ở SESSION-HANDOFF. “Đã merge” là trạng thái mã nguồn, không đảm bảo production/thiết bị.
 
+## Blossom Blast · 26/11/2026
+
+- `codex/blossom-garden-ui`: 9-slice và ghép tại bàn. UI 64/64, engine 21/21. Chờ duyệt thiết bị. [QA](qa/BLOSSOM-GARDEN-UI-2026-11-26.md).
+
 ## Ba bàn cờ chiến trường · 25–26/11/2026
 
-- Ô Ăn Quan có 4 chiến trường, Sân Đình, hai phe lính giáo và Tướng cưỡi ngựa, kho trang phục dùng ví Kẹo cũ. Điểm nhảy theo thời điểm từng quân về khay.
-- Cờ vua có 12 quân pixel, Cờ tướng có 14. Mỗi game có 4 địa hình và bàn cổ điển. Cả ba có công tắc chuyển động độc lập và bản HTML offline.
-- Nhánh `codex/three-board-games-polish`. [QA bản thử](qa/THREE-BOARD-GAMES-2026-11-25.md). Tiến/lùi thế cờ, khay và điểm có trên `codex/three-board-games-qa`. [QA xem lại](qa/THREE-BOARD-REVIEW-2026-11-26.md). Quét giáo, vòng phong cấp, hiệu ứng Pháo và vòng sáng khay có trên nhánh VFX. [QA VFX](qa/THREE-BOARD-VFX-2026-11-26.md). Thiết bị thật và PvP hai tài khoản chờ nghiệm thu.
+- Ô Ăn Quan, Cờ vua và Cờ tướng có bốn địa hình mỗi game, quân pixel, bàn cổ điển, nút chuyển động riêng và HTML offline. [QA](qa/THREE-BOARD-GAMES-2026-11-25.md).
+- Xem lại thế bàn, khay và điểm theo nước đã vào `main` qua #44, CI #84. [QA](qa/THREE-BOARD-REVIEW-2026-11-26.md).
+- Quét giáo, vòng phong cấp, hiệu ứng Pháo và khay vào `main@fc8bb2f` qua #45, CI #86. Lượt kiểm thêm 18/18 Chromium và `test:duel`/`test:folk-duel` qua. Thiết bị thật, hai tài khoản và trạng thái production còn chờ xác minh. [QA](qa/THREE-BOARD-VFX-2026-11-26.md).
 
 ## FD-ON2 và sửa lỗi QA Folk · 19/11/2026
 

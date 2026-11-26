@@ -1,12 +1,12 @@
 import { Run } from "./types";
-import { groups, neighbors, hasHazard } from "./engine";
+import { groups, neighbors, hasHazard, mergePartners } from "./engine";
 export interface Lesson {
   id: string;
   title: string;
   body: string;
   cue: string;
   cells?: number[];
-  target?: "board" | "goals" | "moves" | "merge" | "tools";
+  target?: "board" | "goals" | "moves" | "tools";
   practice?: boolean;
 }
 const hazards: Record<string, [string, string]> = {
@@ -280,17 +280,13 @@ export function lessonsFor(s: Run, seen: string[], basic = true): Lesson[] {
         practice: true,
       });
   });
-  if (
-    s.board.some(
-      (t, i) => t.special && neighbors(s, i).some((n) => s.board[n].special),
-    )
-  )
+  if (s.board.some((_, i) => mergePartners(s, i).length))
     add({
       id: "merge-pair",
-      title: "Hai special cạnh nhau",
-      body: "Bấm Ghép đôi rồi chọn hai special cạnh nhau để kết hợp sức mạnh. Ghép đôi dùng một lượt.",
-      cue: "Bấm Ghép đôi khi bạn sẵn sàng kết hợp.",
-      target: "merge",
+      title: "Ghép vật phẩm trên bàn",
+      body: "Chạm hai vật phẩm đặc biệt cạnh nhau hoặc vuốt từ vật phẩm này sang vật phẩm kia. Ghép một cặp dùng một lượt. Chạm lại ô đã chọn để dùng riêng.",
+      cue: "Các vật phẩm ghép được có dấu hai chấm sáng.",
+      target: "board",
     });
   if (s.level.colors > 4)
     add({
