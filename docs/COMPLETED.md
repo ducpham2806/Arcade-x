@@ -30,7 +30,7 @@
 ## Snake R01 · 26/11/2026
 
 - `codex/snake-touch-resume` tích hợp nội dung và chuyển động R01, sửa giữ ngón cảm ứng và joystick. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
-- 14 ca UI, 6 ca bản sảnh và build cục bộ qua. Chờ CI, duyệt trên điện thoại và lượt người chơi mới.
+- PR #48 mở ở `95c8fda`. UI 14/14, bản sảnh 6/6, build cục bộ qua. Chờ CI và nghiệm thu thiết bị.
 
 ## Snake R01 · kỹ thuật · 14/11/2026
 

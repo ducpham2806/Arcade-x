@@ -1,7 +1,5 @@
-# Bàn giao · 26/11/2026 · Snake Legend R01
+# Bàn giao · 26/11/2026 · Snake Legend Đồng Cỏ
 
-`codex/snake-touch-resume` từ `main@5cd1539`. Bản kỹ thuật PR #34 đã có trên main. Đưa nội dung R01 từ `b9f7134` lên nền mới: sổ tay 10 màn, đoạn kết, chơi lại để đủ sao, chuyển động Tiểu Xà và Nhện Mẹ. Sửa điều khiển cảm ứng lúc dừng và khi ngón phụ bị hủy. [Thẻ Snake](plans/SNAKE.md).
+`codex/snake-meadow-expansion` dựa trên `95c8fda` của PR #48. Nâng cảnh Canvas và hiệu ứng, thêm đường thử tùy chọn với mặt bằng và nhịp khó riêng. Giữ định danh, bản đồ đã ký, thành tích và mốc đang chơi của 10 màn R01. [Thẻ Snake](plans/SNAKE.md).
 
-Chromium UI 14/14, bản sảnh 6/6, sáu nhóm Snake local, lint, storage, build/bundle/catalog/preview qua. HTML độc lập chạy và lưu checkpoint ở loopback khi ngắt mạng trong lúc chơi. Studio Input Systems và QA & Playtest, QA Lead. Graphify AST Snake 442 nút/1160 cạnh, truy vấn `Controls` và `chapterEnding`. [QA](qa/SNAKE-R01-RESUME-2026-11-26.md).
-
-Bước tiếp là duyệt PR sau CI. Chưa merge/phát hành ứng viên, chưa nghiệm thu điện thoại thật, người chơi mới hay backend thật.
+Studio Level Design, Create Game Assets, PixelFX. Vai trò Team Level và Art & UI Lead. Bước đầu đo bán kính cua, kiểm đường đi, làm atlas hiệu ứng và thử trên desktop/khổ điện thoại. Agent Sprite Forge kiểm và ráp khung. PR #48 vẫn là nhánh cơ sở để duyệt độc lập.
